@@ -271,9 +271,6 @@ ADD_LIBRARY( wwiilib STATIC
     weap/weapList.cpp weap/weapList.h weap/weapSerial.h
     weap/weapLoadIndexes.cpp weap/weapLoadIndexes.h weap/weapParser.cpp weap/weapParser.h
     weap/weapSpec.cpp weap/weapSpec.h
-    ${LIBRARIES_DIR}/tinyxml/tinystr.cpp ${LIBRARIES_DIR}/tinyxml/tinystr.h
-	${LIBRARIES_DIR}/tinyxml/tinyxml.cpp ${LIBRARIES_DIR}/tinyxml/tinyxml.h
-    ${LIBRARIES_DIR}/tinyxml/tinyxmlerror.cpp ${LIBRARIES_DIR}/tinyxml/tinyxmlparser.cpp
 	libircclient/src/libircclient.cpp
     tut/tutGroupProgress.cpp tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h

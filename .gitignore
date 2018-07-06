@@ -1595,8 +1595,6 @@ WW2/src/tests/testPackers
 WW2/src/tests/testTeul
 WW2/src/teul/.deps
 WW2/src/teul/.dirstamp
-WW2/src/tinyxml/.deps
-WW2/src/tinyxml/.dirstamp
 WW2/src/tolua++
 WW2/src/tools/.deps
 WW2/src/tools/.dirstamp
