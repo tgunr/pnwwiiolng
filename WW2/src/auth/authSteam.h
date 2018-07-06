@@ -13,7 +13,7 @@
 #include <numeric>
 #include <limits>
 
-// IMPORTANT: Keep these in sync with authRelay.php
+// IMPORTANT: Keep these in sync with the auth relay
 // IMPORTANT: DO NOT REORDER OR RENUMBER THESE - only add new ones
 enum class SteamLoginResponse : uint32_t {
     LoginSuccess = 0,
@@ -28,20 +28,32 @@ enum class SteamLoginResponse : uint32_t {
     LoginEmailInUse = 9, // Email is already in use by someone else
     LoginEmailNotValidated = 10, // Email is not yet validated
     LoginExistingUser = 11, // Signup and email change not allowed on existing accounts
-    
+    LoginArenaDown = 12, // Login succeeded, but the requested arena is offline
+    LoginVersionMismatch = 13, // Login succeeded, but the client is not a version supported by the requested arena
+    LoginArenaDenied = 14, // Login succeeded, but the user does not have access to the requested arena
+
     INVALID_RESPONSE_CODE = std::numeric_limits<uint32_t>::max(), // Do not use this. Never returned from any API
 };
 
-// Some of these fields loosely correspond to those of auth's APP_LAUNCH packet
+// Some of these fields loosely correspond to those of auth's APP_LAUNCH packet.
+// N.B.: Having a structure that effectively has three different layouts all squished
+// together like this without even being a union is bad form, but the redesign necessary
+// to improve on it is not presently worth the trouble.
 struct SteamLoginResult {
+    // The response code from the relay API. See functions below for expected results of various calls.
     SteamLoginResponse status;
+    
+    // The code to display to the user for support's reference in case of unrecognized error. More or less always valid.
+    std::string supportCode;
+    
+    // The authHost's APP_LAUNCH response (effectively). Valid ONLY when returned from authRequestSteamLogin() AND status == LoginSuccess
     int32_t arenaID;
     uint32_t otp;
     uint32_t serverIP;
     uint32_t serverPort;
     
-    SteamLoginResult(SteamLoginResponse error) : status(error), arenaID(0), otp(0), serverIP(0), serverPort(0) {}
-    SteamLoginResult(int32_t arenaID, uint32_t otp, uint32_t serverIP, uint32_t serverPort) : status(SteamLoginResponse::LoginSuccess), arenaID(arenaID), otp(otp), serverIP(serverIP), serverPort(serverPort) {}
+    SteamLoginResult(SteamLoginResponse error, const std::string &code) : status(error), supportCode(code), arenaID(0), otp(0), serverIP(0), serverPort(0) {}
+    SteamLoginResult(int32_t arenaID, uint32_t otp, uint32_t serverIP, uint32_t serverPort) : status(SteamLoginResponse::LoginSuccess), arenaID(arenaID), supportCode(), otp(otp), serverIP(serverIP), serverPort(serverPort) {}
 };
 
 // All below APIs operate synchronously (your thread will block until the request completes, and this may take awhile)
@@ -56,6 +68,11 @@ struct SteamLoginResult {
 //  - LoginEmailRequired: This user is an existing Steam user with no email address. Present UI and call `authRequestSteamEmailChange()` next.
 //  - LoginEmailNotValidated: The user needs to verify their email address. Call `authRequestSteamLogin()` to poll verification status or
 //      `authRequestSteamEmailChange()` to request new email send or address change
+//  - LoginArenaDown: The cluster is offline or full. Once arena listing is implemented, this will mean the state changed since the last
+//      time the list was pulled, but for now it's impossible to know whether the arena's up until you've logged in successfully.
+//  - LoginVersionMismatch: This client is too old or too new, did Steam not get a new version yet?
+//  - LoginArenaDenied: This user doesn't have access to the cluster, probably means access was revoked since the arena list was retrieved
+//      (once that's implemented) or they're trying to hack their way into a cluster they shouldn't be accessing.
 //  - LoginSuccess: Login SUCCEEDED. Result object contains server address, OTP, etc.
 SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicketLen, uint32_t arenaID);
 
@@ -71,7 +88,7 @@ SteamLoginResult authRequestSteamLogin(const void *authTicket, size_t authTicket
 //  - LoginExistingUser: This user is already fully signed up and verified. Call `authRequestSteamLogin()` next.
 //  - LoginSuccess: Signup SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
 //      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
-SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &callsign, const std::string &email);
+SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicketLen, const std::string &callsign, const std::string &email);
 
 // Request new user email change.
 // This API will error if called for a user who has no callsign or has already verified their email.
@@ -84,4 +101,4 @@ SteamLoginResult authRequestSteamSignup(const void *authTicket, size_t authTicke
 //  - LoginExistingUser: This user is already fully signed up and verified; email can not be changed through this interface. Call `authRequestSteamLogin()` next.
 //  - LoginSuccess: Email send/update SUCCEEDED. Call `authRequestSteamLogin()` after user verifies their email (or `authRequestSteamEmailChange()` if user requests it).
 //      THE RESULT OBJECT DOES NOT CONTAIN ARENA OR OTP INFORMATION!!!! The user MUST verify their email BEFORE logging in.
-SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, uint32_t arenaID, const std::string &email);
+SteamLoginResult authRequestSteamEmailChange(const void *authTicket, size_t authTicketLen, const std::string &email);

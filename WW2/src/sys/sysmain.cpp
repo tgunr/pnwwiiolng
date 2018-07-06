@@ -453,77 +453,6 @@ struct LANGANDCODEPAGE
 
 #endif	//	EVENT_LOG
 
-//////////////////////////////////////////////////////////////////////
-//	void SetupFPU(bool enableExceptions)
-//
-//	Defines the behaviour of the CPUs floating point unit, including exception.
-//	It can be extended for setting the SSE2 unit as well (use __control87_2).
-//  This should be condidered a global definition, so make sure these states are not overwritten elsewhere!
-//////////////////////////////////////////////////////////////////////
-void SetupFPU(bool enableExceptions)
-{
-	static bool		configHasBeenPrinted	= false;
-
-
-//#ifdef BETA_RELEASE
-#if(DEBUG_FPU)
-	unsigned int	FPUexceptionMask	= _MCW_EM;
-	// Usually we don't need to detect an underflow
-//	unsigned int	FPUexceptionMask = _MCW_EM - (_EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW);
-	if(enableExceptions)	FPUexceptionMask -= (_EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW);
-
-	_clearfp();
-	_control87(FPUexceptionMask, _MCW_EM);
-#endif
-
-	//float test = 0.0f;
-	//float tester = 0.1f / test;
-	//float tester2 = sqrt(-1.23f);
-
-	if(configHasBeenPrinted) return;
-
-#if defined(EVENT_LOG)
-	char*			status[2]	= { "disabled", "enabled" };
-	unsigned int	fp_cw		= 0;
-    unsigned int	fp_mask		= 0;
-    unsigned int	bits;
-
-    fp_cw = _control87( fp_cw,
-                        fp_mask );
-
-    Write_Debug("\n===========================");
-    Write_Debug("          FPU-SETUP        ");
-    Write_Debug("===========================");
-    Write_Debug("Interrupt Exception Masks");
-    bits = fp_cw & MCW_EM;
-	Write_Debug("  Invalid Operation exception	: %s", status[(bits & EM_INVALID) == 0]);
-	Write_Debug("  Denormalized exception		: %s", status[(bits & EM_DENORMAL) == 0]);
-	Write_Debug("  Divide-By-Zero exception		: %s", status[(bits & EM_ZERODIVIDE) == 0]);
-	Write_Debug("  Overflow exception			: %s", status[(bits & EM_OVERFLOW) == 0]);
-	Write_Debug("  Underflow exception			: %s", status[(bits & EM_UNDERFLOW) == 0]);
-	Write_Debug("  Precision exception			: %s", status[(bits & EM_INEXACT) == 0]);
-    Write_Debug("");
-
-    bits = fp_cw & MCW_IC;
-    if(bits == IC_AFFINE)		Write_Debug("Infinity Control = affine");
-    if(bits == IC_PROJECTIVE )	Write_Debug("Infinity Control = projective");
-
-    bits = fp_cw & MCW_RC;
-    if(bits == RC_NEAR)       Write_Debug("Rounding Control = near");
-    if(bits == RC_DOWN)       Write_Debug("Rounding Control = down");
-    if(bits == RC_UP)         Write_Debug("Rounding Control = up");
-    if(bits == RC_CHOP)       Write_Debug("Rounding Control = chop");
-
-    bits = fp_cw & MCW_PC;
-    if(bits == PC_24)         Write_Debug("Precision Control = 24 bits");
-    if(bits == PC_53)         Write_Debug("Precision Control = 53 bits");
-	if(bits == PC_64)         Write_Debug("Precision Control = 64 bits");
-    Write_Debug("===========================\n");
-#endif
-
-	configHasBeenPrinted	= true;
-}
-
 //#ifndef BETA_RELEASE
 #ifdef ANTIHACK
 static const unsigned char FIRST_CHAR = '0';
@@ -767,7 +696,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Write_Debug("CoInitializeEx FAILED with error: %x", hr);
     }
 
-	SetupFPU(true);
 	memInit();
 
 #ifdef DIRECT3D
