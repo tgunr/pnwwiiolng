@@ -350,121 +350,121 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 		if (varName == nullptr || varData == nullptr) continue;
 
-		if (stricmp(buf, "weaponType") == 0)
+		if (strcasecmp(buf, "weaponType") == 0)
 			_fpFPSDataHandleWeaponTypeString (weapon, varData);
-		else if (stricmp(buf, "muzzleRise") == 0)
+		else if (strcasecmp(buf, "muzzleRise") == 0)
 			fpsWeapons[weapon].muzzleRise = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "muzzleReturn") == 0)
+		else if (strcasecmp(buf, "muzzleReturn") == 0)
 			fpsWeapons[weapon].muzzleReturn = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "muzzleClimbRate") == 0)
+		else if (strcasecmp(buf, "muzzleClimbRate") == 0)
 			fpsWeapons[weapon].muzzleClimbRate = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "fireDelay") == 0)
+		else if (strcasecmp(buf, "fireDelay") == 0)
 			fpsWeapons[weapon].fireDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "minimumDispersion") == 0)
+		else if (strcasecmp(buf, "minimumDispersion") == 0)
 			fpsWeapons[weapon].minimumDispersion = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "unaimedDispersionMod") == 0)
+		else if (strcasecmp(buf, "unaimedDispersionMod") == 0)
 			fpsWeapons[weapon].unaimedDispersionMod = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "controlability") == 0)
+		else if (strcasecmp(buf, "controlability") == 0)
 			fpsWeapons[weapon].controlability = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimFOV") == 0)
+		else if (strcasecmp(buf, "aimFOV") == 0)
 			fpsWeapons[weapon].aimFOV = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "bulletJitter") == 0)
+		else if (strcasecmp(buf, "bulletJitter") == 0)
 			fpsWeapons[weapon].bulletJitter = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "horizJitterMult") == 0)
+		else if (strcasecmp(buf, "horizJitterMult") == 0)
 			fpsWeapons[weapon].horizJitterMult = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "speedMultiplier") == 0)
+		else if (strcasecmp(buf, "speedMultiplier") == 0)
 			fpsWeapons[weapon].speedMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimVerticalCorrection") == 0)
+		else if (strcasecmp(buf, "aimVerticalCorrection") == 0)
 			fpsWeapons[weapon].aimVerticalCorrection = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimHorizontalCorrection") == 0)
+		else if (strcasecmp(buf, "aimHorizontalCorrection") == 0)
 			fpsWeapons[weapon].aimHorizontalCorrection = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convergenceDistance") == 0)
+		else if (strcasecmp(buf, "convergenceDistance") == 0)
 			fpsWeapons[weapon].convergenceDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "ejectDelay") == 0)
+		else if (strcasecmp(buf, "ejectDelay") == 0)
 			fpsWeapons[weapon].ejectDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "shellScale") == 0)
+		else if (strcasecmp(buf, "shellScale") == 0)
 			fpsWeapons[weapon].shellScale = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointDisplacement") == 0)
+		else if (strcasecmp(buf, "firepointDisplacement") == 0)
 			fpsWeapons[weapon].firepointDisplacement = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "firepointZDistance") == 0 || stricmp(buf, "fpYOffset") == 0)
+		else if (strcasecmp(buf, "firepointZDistance") == 0 || strcasecmp(buf, "fpYOffset") == 0)
 			fpsWeapons[weapon].firepointZDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointHorizOffset") == 0 || stricmp(buf, "fpxOffset") == 0)
+		else if (strcasecmp(buf, "firepointHorizOffset") == 0 || strcasecmp(buf, "fpxOffset") == 0)
 			fpsWeapons[weapon].firepointHorizOffset = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointVertOffset") == 0 || stricmp(buf, "fpZOffset") == 0)
+		else if (strcasecmp(buf, "firepointVertOffset") == 0 || strcasecmp(buf, "fpZOffset") == 0)
 			fpsWeapons[weapon].firepointVertOffset = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "grenadeVisDelay") == 0)
+		else if (strcasecmp(buf, "grenadeVisDelay") == 0)
 			fpsWeapons[weapon].grenadeVisDelay= (FLOAT32)atof(varData);
 
-		else if (stricmp(buf, "weaponBreathMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponBreathMultiplier") == 0)
 			fpsWeapons[weapon].weaponBreathMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponHeartMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponHeartMultiplier") == 0)
 			fpsWeapons[weapon].weaponHeartMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponMoveMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponMoveMultiplier") == 0)
 			fpsWeapons[weapon].weaponMoveMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponPoseMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponPoseMultiplier") == 0)
 			fpsWeapons[weapon].weaponPoseMultiplier = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "auxAltRGCupConnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGCupConnectTime") == 0)
 			fpsWeapons[weapon].auxAltConnectTime[FPS_AUX_RGCUP] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "auxAltRGCupDisconnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGCupDisconnectTime") == 0)
 			fpsWeapons[weapon].auxAltDisconnectTime[FPS_AUX_RGCUP] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "auxAltRGGrenadeConnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGGrenadeConnectTime") == 0)
 			fpsWeapons[weapon].auxAltConnectTime[FPS_AUX_RGGRENADE] = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "weapDeployUpAngleStand") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleStand") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleStand") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleStand") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployUpAngleCrouch") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleCrouch") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleCrouch") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleCrouch") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployUpAngleProne") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleProne") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleProne") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleProne") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployKneelDeployUpAngle") == 0)
+		else if (strcasecmp(buf, "weapDeployKneelDeployUpAngle") == 0)
 			fpsWeapons[weapon].weapDeployKneelDeployUpAngle = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployKneelDeployDownAngle") == 0)
+		else if (strcasecmp(buf, "weapDeployKneelDeployDownAngle") == 0)
 			fpsWeapons[weapon].weapDeployKneelDeployDownAngle = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "staticDeploy") == 0)
+		else if (strcasecmp(buf, "staticDeploy") == 0)
 			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "grenadeDelayTime") == 0)
+		else if (strcasecmp(buf, "grenadeDelayTime") == 0)
 			fpsWeapons[weapon].grenadeDelayTime = (SINT32)atol(varData);
-		else if (stricmp(buf, "holdfire") == 0)
+		else if (strcasecmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
-		else if (stricmp(buf, "sniperGunSight") == 0)
+		else if (strcasecmp(buf, "sniperGunSight") == 0)
 			fpsWeapons[weapon].sniperGunSight = (SCHAR*) strpool (varData);
-        else if (stricmp(buf, "sniperScopeDelay") == 0)
+        else if (strcasecmp(buf, "sniperScopeDelay") == 0)
 			fpsWeapons[weapon].sniperScopeDelay = atof (varData);
-		else if (stricmp(buf, "sniperScopeEndDelay") == 0)
+		else if (strcasecmp(buf, "sniperScopeEndDelay") == 0)
 			fpsWeapons[weapon].sniperScopeEndDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "hudIconType") == 0)
+		else if (strcasecmp(buf, "hudIconType") == 0)
 			fpsWeapons[weapon].hudIconType = (fpFPSIconType) atol (varData);
-		else if (stricmp(buf, "ejectImmediate") == 0)
+		else if (strcasecmp(buf, "ejectImmediate") == 0)
 			fpsWeapons[weapon].ejectImmediate = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "clipBullets") == 0)
+		else if (strcasecmp(buf, "clipBullets") == 0)
 			fpsWeapons[weapon].clipBullets = atol(varData);
-		else if (stricmp(buf, "reloadSound") == 0)
+		else if (strcasecmp(buf, "reloadSound") == 0)
 			fpsWeapons[weapon].reloadSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "reload2Sound") == 0)
+		else if (strcasecmp(buf, "reload2Sound") == 0)
 			fpsWeapons[weapon].reload2Sound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "reload3Sound") == 0)
+		else if (strcasecmp(buf, "reload3Sound") == 0)
 			fpsWeapons[weapon].reload3Sound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "recycleSound") == 0)
+		else if (strcasecmp(buf, "recycleSound") == 0)
 			fpsWeapons[weapon].recycleSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "rgReloadSound") == 0)
+		else if (strcasecmp(buf, "rgReloadSound") == 0)
 			fpsWeapons[weapon].rgReloadSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "deploySound") == 0)
+		else if (strcasecmp(buf, "deploySound") == 0)
 			fpsWeapons[weapon].deploySound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "undeploySound") == 0)
+		else if (strcasecmp(buf, "undeploySound") == 0)
 			fpsWeapons[weapon].undeploySound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "hiddenMeshes") == 0)
+		else if (strcasecmp(buf, "hiddenMeshes") == 0)
 			fpsWeapons[weapon].hiddenMeshes = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "weaponModel") == 0)
+		else if (strcasecmp(buf, "weaponModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -472,11 +472,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].weaponModel = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "weaponConnectTo") == 0)
+		else if (strcasecmp(buf, "weaponConnectTo") == 0)
 			fpsWeapons[weapon].weaponConnectTo = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "weaponConnect") == 0)
+		else if (strcasecmp(buf, "weaponConnect") == 0)
 			fpsWeapons[weapon].weaponConnect = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "clipModel") == 0)
+		else if (strcasecmp(buf, "clipModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -484,11 +484,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].clipModel = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "clipConnectTo") == 0)
+		else if (strcasecmp(buf, "clipConnectTo") == 0)
 			fpsWeapons[weapon].clipConnectTo = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "clipConnect") == 0)
+		else if (strcasecmp(buf, "clipConnect") == 0)
 			fpsWeapons[weapon].clipConnect = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupModel") == 0)
+		else if (strcasecmp(buf, "auxRGCupModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -496,13 +496,13 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].auxModel[FPS_AUX_RGCUP] = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "auxRGCupConnect") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnect") == 0)
 			fpsWeapons[weapon].auxConnect[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupConnectTo") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnectTo") == 0)
 			fpsWeapons[weapon].auxConnectTo[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupConnectToAlt") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnectToAlt") == 0)
 			fpsWeapons[weapon].auxConnectToAlt[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		/*else if (stricmp(buf, "auxRGGrenadeModel") == 0)
+		/*else if (strcasecmp(buf, "auxRGGrenadeModel") == 0)
 		{
 			char tString[255];
 			memset (tString, 0, sizeof (tString));
@@ -511,62 +511,62 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].auxModel[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (tString);
 		}*/ //DEG
-		else if (stricmp(buf, "auxRGGrenadeConnect") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnect") == 0)
 			fpsWeapons[weapon].auxConnect[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGGrenadeConnectTo") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnectTo") == 0)
 			fpsWeapons[weapon].auxConnectTo[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGGrenadeConnectToAlt") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnectToAlt") == 0)
 			fpsWeapons[weapon].auxConnectToAlt[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
 
-		else if (stricmp(buf, "rgFiringRules") == 0)
+		else if (strcasecmp(buf, "rgFiringRules") == 0)
 			fpsWeapons[weapon].rgFiringRules = (SINT32) atol (varData);
-		else if (stricmp(buf, "rgFiringAngle") == 0)
+		else if (strcasecmp(buf, "rgFiringAngle") == 0)
 			fpsWeapons[weapon].rgFiringAngle = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "leanFireOK") == 0)
+		else if (strcasecmp(buf, "leanFireOK") == 0)
 			fpsWeapons[weapon].leanFireOK = strtoul(varData, nullptr, 10);
 
-		else if (stricmp(buf, "onlyFireDeployed") == 0)
+		else if (strcasecmp(buf, "onlyFireDeployed") == 0)
 			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "suppressAim") == 0)
+		else if (strcasecmp(buf, "suppressAim") == 0)
 			fpsWeapons[weapon].suppressAim = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "deployPivotBone") == 0)
+		else if (strcasecmp(buf, "deployPivotBone") == 0)
 			fpsWeapons[weapon].deployPivotBone = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "perBulletATP") == 0)
+		else if (strcasecmp(buf, "perBulletATP") == 0)
 			fpsWeapons[weapon].perBulletATP = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "riseStopsReload") == 0)
+		else if (strcasecmp(buf, "riseStopsReload") == 0)
 			fpsWeapons[weapon].riseStopsReload = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "delayAfterFire") == 0)
+		else if (strcasecmp(buf, "delayAfterFire") == 0)
 			fpsWeapons[weapon].delayAfterFire = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "sightAdjustSound") == 0)
+		else if (strcasecmp(buf, "sightAdjustSound") == 0)
 			fpsWeapons[weapon].sightAdjustSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "sightAdjustTime") == 0)
+		else if (strcasecmp(buf, "sightAdjustTime") == 0)
 			fpsWeapons[weapon].sightAdjustTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "numConvDists") == 0)
+		else if (strcasecmp(buf, "numConvDists") == 0)
 			fpsWeapons[weapon].numSightDists = (SINT32) atol (varData);
-		else if (stricmp(buf, "startConvDists") == 0)
+		else if (strcasecmp(buf, "startConvDists") == 0)
 			fpsWeapons[weapon].startSightDists = (SINT32) atol (varData);
-		else if (stricmp(buf, "incConvDists") == 0)
+		else if (strcasecmp(buf, "incConvDists") == 0)
 			fpsWeapons[weapon].incSightDists = (SINT32) atol (varData);
 
-		else if (stricmp(buf, "convDist1") == 0 || stricmp(buf, "convDist2") == 0 ||
-                 stricmp(buf, "convDist3") == 0 || stricmp(buf, "convDist4") == 0 ||
-                 stricmp(buf, "convDist5") == 0 || stricmp(buf, "convDist6") == 0 ||
-                 stricmp(buf, "convDist7") == 0 || stricmp(buf, "convDist8") == 0 ||
-                 stricmp(buf, "convDist9") == 0 || stricmp(buf, "convDist10") == 0) {
+		else if (strcasecmp(buf, "convDist1") == 0 || strcasecmp(buf, "convDist2") == 0 ||
+                 strcasecmp(buf, "convDist3") == 0 || strcasecmp(buf, "convDist4") == 0 ||
+                 strcasecmp(buf, "convDist5") == 0 || strcasecmp(buf, "convDist6") == 0 ||
+                 strcasecmp(buf, "convDist7") == 0 || strcasecmp(buf, "convDist8") == 0 ||
+                 strcasecmp(buf, "convDist9") == 0 || strcasecmp(buf, "convDist10") == 0) {
             if (!hasWarned) {
                 Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
                 hasWarned = true;
             }
         }
 
-		else if (stricmp(buf, "dryFireSound") == 0)
+		else if (strcasecmp(buf, "dryFireSound") == 0)
 			fpsWeapons[weapon].dryFireSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "dryFireSoundLength") == 0)
+		else if (strcasecmp(buf, "dryFireSoundLength") == 0)
 			fpsWeapons[weapon].dryFireSoundLength = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "placedObject") == 0)
+		else if (strcasecmp(buf, "placedObject") == 0)
 			fpsWeapons[weapon].placedObject = (LOGICAL) atoi (varData);
 
 		else
@@ -585,7 +585,7 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	for (type=FPS_WEAPONTYPE_SMG; type < FPS_WEAPONTYPE_NUM_TYPES; type++)
 	{
-		if (stricmp (typestring, fpFPSWeaponTypeStrings[type]) == 0)
+		if (strcasecmp (typestring, fpFPSWeaponTypeStrings[type]) == 0)
 			break;
 	}
 
@@ -647,7 +647,7 @@ void fpFPSDataReadFPSFile()
 			continue;
 
 		// for easy lookup of new variable hashes
-		//if(stricmp(varName, "concussionMod") == 0)
+		//if(strcasecmp(varName, "concussionMod") == 0)
 		//	int i = 0;
 
 		UINT64 hash = fpStringHash(buf);
@@ -2756,7 +2756,7 @@ int fpFPSVisLoadoutsLoader::_getArmsID(const char* name)
 {
 	for(int i = 0; i < NUM_INFANTRY_TYPES; i++)
 	{
-		if(!stricmp(name, armTypeStrings[i]))
+		if(!strcasecmp(name, armTypeStrings[i]))
 			return i;
 	}
 
@@ -2767,7 +2767,7 @@ int fpFPSVisLoadoutsLoader::_getWeaponID(const char* name)
 {
 	for(int i = 0; i < NUM_WEAPONS; i++)
 	{
-		if(!stricmp(name, weapNameStrings[i]))
+		if(!strcasecmp(name, weapNameStrings[i]))
 			return i;
 	}
 

@@ -1819,7 +1819,7 @@ JS_FUNCTION_DEF(jsGame, setplayerdata)
 
 	if(me)
 	{
-		if(stricmp(name.c_str(), "weapon") == 0)
+		if(strcasecmp(name.c_str(), "weapon") == 0)
 		{
 			WEAPON_SPEC spec;
 			spec.fromShort((UINT16)atoi(value.c_str()));
@@ -2678,7 +2678,7 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 			if(le)
 			{
-				if(!lastentered.valid() || stricmp(le->Name(), lastentered.ptr()->stratobj->Name()))
+				if(!lastentered.valid() || strcasecmp(le->Name(), lastentered.ptr()->stratobj->Name()))
 					lastentered = new jsStratObject(le->FullObjID());
 
 				*val = lastentered->jsVal();
@@ -3734,7 +3734,7 @@ JSBool jsBlendEditor::GetProperty(JSContext* ctx, int propid, jsval* val)
 					const char* s = fileList[f];
 					const char* ptr = strstr(s, ".");
 
-					if(!stricmp(ptr, ".gr2"))
+					if(!strcasecmp(ptr, ".gr2"))
 						_animations->SetElement(phui::js::NewString(s), i++);
 				}
 			}

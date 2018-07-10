@@ -306,7 +306,6 @@
 		08104F42103DFE120065E0E2 /* wwiiOpinionPoll.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104F08103DFE120065E0E2 /* wwiiOpinionPoll.cpp */; };
 		08104F46103DFE120065E0E2 /* wwiiServerTrackedObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104F1B103DFE120065E0E2 /* wwiiServerTrackedObject.cpp */; };
 		08104F48103DFE120065E0E2 /* wwiiSquads.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104F22103DFE120065E0E2 /* wwiiSquads.cpp */; };
-		08104F49103DFE120065E0E2 /* wwiiString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104F28103DFE120065E0E2 /* wwiiString.cpp */; };
 		08104F4C103DFE120065E0E2 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104F31103DFE120065E0E2 /* wwiiUTF.cpp */; };
 		081418EB12DF707B00C2F0F4 /* BuildTerrain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 081418E912DF707B00C2F0F4 /* BuildTerrain.cpp */; };
 		0818A91312E745AB0035C3B4 /* gr2layerTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0818A91112E745AB0035C3B4 /* gr2layerTypes.cpp */; };
@@ -1335,8 +1334,6 @@
 		08104F22103DFE120065E0E2 /* wwiiSquads.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiSquads.cpp; sourceTree = "<group>"; };
 		08104F23103DFE120065E0E2 /* wwiiSquads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiSquads.h; sourceTree = "<group>"; };
 		08104F24103DFE120065E0E2 /* wwiiSTOTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiSTOTypes.h; sourceTree = "<group>"; };
-		08104F28103DFE120065E0E2 /* wwiiString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiString.cpp; sourceTree = "<group>"; };
-		08104F29103DFE120065E0E2 /* wwiiString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiString.h; sourceTree = "<group>"; };
 		08104F30103DFE120065E0E2 /* wwiiTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiTypes.h; sourceTree = "<group>"; };
 		08104F31103DFE120065E0E2 /* wwiiUTF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiUTF.cpp; sourceTree = "<group>"; };
 		08104F32103DFE120065E0E2 /* wwiiUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiUTF.h; sourceTree = "<group>"; };
@@ -2937,8 +2934,6 @@
 				08104F22103DFE120065E0E2 /* wwiiSquads.cpp */,
 				08104F23103DFE120065E0E2 /* wwiiSquads.h */,
 				08104F24103DFE120065E0E2 /* wwiiSTOTypes.h */,
-				08104F28103DFE120065E0E2 /* wwiiString.cpp */,
-				08104F29103DFE120065E0E2 /* wwiiString.h */,
 				08104F30103DFE120065E0E2 /* wwiiTypes.h */,
 				08104F31103DFE120065E0E2 /* wwiiUTF.cpp */,
 				08104F32103DFE120065E0E2 /* wwiiUTF.h */,
@@ -4042,7 +4037,6 @@
 				08104F42103DFE120065E0E2 /* wwiiOpinionPoll.cpp in Sources */,
 				08104F46103DFE120065E0E2 /* wwiiServerTrackedObject.cpp in Sources */,
 				08104F48103DFE120065E0E2 /* wwiiSquads.cpp in Sources */,
-				08104F49103DFE120065E0E2 /* wwiiString.cpp in Sources */,
 				08104F4C103DFE120065E0E2 /* wwiiUTF.cpp in Sources */,
 				0834F1CC104585DA00E75B52 /* loclAppx.cpp in Sources */,
 				0834F1CD104585DA00E75B52 /* loclLang.cpp in Sources */,

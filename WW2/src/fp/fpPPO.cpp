@@ -340,7 +340,7 @@ static bool _foundMaterial(std::vector<std::string>& texnames, const char* texna
 
 	for(unsigned int i = 0; i < texnames.size(); i++)
 	{
-		if(!stricmp(texnames[i].c_str(), texname))
+		if(!strcasecmp(texnames[i].c_str(), texname))
 			return true;
 	}
 

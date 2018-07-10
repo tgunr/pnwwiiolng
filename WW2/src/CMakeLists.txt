@@ -224,7 +224,7 @@ ADD_LIBRARY(teulserver STATIC
     auth/authGameMessages.cpp auth/authGameMessages.h auth/authTypes.h auth/authServerTypes.h
     teul/teulAuth.cpp teul/teulAuth.h updt/loginTypes.h
     wwii/wwiiConfig.cpp wwii/wwiiConfig.h wwii/wwiiConfigMap.h
-    dbug/dbugInternal.h mem/memPool.h
+    mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
 TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
@@ -263,7 +263,6 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
     wwii/wwiiIRC.cpp wwii/wwiiIRC.h host/hostCommand.h
     wwii/wwiiRank.cpp wwii/wwiiRank.h
-    wwii/wwiiString.cpp wwii/wwiiString.h
     wwii/wwiiThreads.cpp wwii/wwiiThreads.h wwii/wwiiThreadTypes.h
     wwii/wwiiThreadText.cpp wwii/wwiiThreadText.h wwii/wwiiThreadTextQuery.h
     wwii/wwiiUTF.cpp wwii/wwiiUTF.h

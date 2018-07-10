@@ -766,7 +766,7 @@ bool StratObject::IsDeepWaterPort() const
 					StratDB::StratObject* building = *bit;
 
 					// look for the ship spawner
-					if(stricmp(building->Filename(), "svz34_spawn1c") == 0)
+					if(strcasecmp(building->Filename(), "svz34_spawn1c") == 0)
 						return true;
 				}
 			}
@@ -947,7 +947,7 @@ StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
 	StratObjList::iterator cit = list.begin();
 	for(; cit != list.end(); cit++)
 	{
-		if(!stricmp((*cit)->Name(), cp))
+		if(!strcasecmp((*cit)->Name(), cp))
 		{
 			if(fac && *fac)
 			{
@@ -955,7 +955,7 @@ StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
 				StratObject::ChildList::iterator fit = children.begin();
 				for(; fit != children.end(); fit++)
 				{
-					if(!stricmp((*fit)->Name(), fac))
+					if(!strcasecmp((*fit)->Name(), fac))
 					{
 						found = *fit;
 						break;

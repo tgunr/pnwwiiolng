@@ -173,17 +173,12 @@
 #include <Ws2tcpip.h>
 #include <iphlpapi.h>
 
-#ifndef stricmp
-# define stricmp(x,y) _stricmp(x,y)
-#endif
 #ifndef strlwr
 # define strlwr(x) _strlwr(x)
 #endif
 #ifndef strupr
 # define strupr(x) _strupr(x)
 #endif
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
 #define swprintf swprintf_s
 #define	vswprintf vswprintf_s
 

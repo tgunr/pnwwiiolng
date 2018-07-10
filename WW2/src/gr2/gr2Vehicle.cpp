@@ -1490,7 +1490,7 @@ bool gr2VehicleStateLookup(GR2_FLAG_TYPE type, const char* name, unsigned int* v
 		{
 			for(int i = 0; i < sizeof(controlStates); i++)
 			{
-				if(!stricmp(name, controlStates[i]))
+				if(!strcasecmp(name, controlStates[i]))
 				{
 					*value = 1<<i;
 					return true;
@@ -1502,7 +1502,7 @@ bool gr2VehicleStateLookup(GR2_FLAG_TYPE type, const char* name, unsigned int* v
 		{
 			for(int i = 0; i < sizeof(controlStates); i++)
 			{
-				if(!stricmp(name, controlStates[i]))
+				if(!strcasecmp(name, controlStates[i]))
 				{
 					*value = 1<<i;
 					return true;
@@ -1514,7 +1514,7 @@ bool gr2VehicleStateLookup(GR2_FLAG_TYPE type, const char* name, unsigned int* v
 		{
 			for(int i = 0; i < sizeof(controlStates); i++)
 			{
-				if(!stricmp(name, controlStates[i]))
+				if(!strcasecmp(name, controlStates[i]))
 				{
 					*value = 1<<i;
 					return true;
@@ -1526,7 +1526,7 @@ bool gr2VehicleStateLookup(GR2_FLAG_TYPE type, const char* name, unsigned int* v
 		{
 			for(int i = 0; i < sizeof(controlStates); i++)
 			{
-				if(!stricmp(name, controlStates[i]))
+				if(!strcasecmp(name, controlStates[i]))
 				{
 					*value = 1<<i;
 					return true;

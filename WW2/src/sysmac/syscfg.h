@@ -48,9 +48,8 @@
 # include "pi/pi.h"
 # include "include/vars.h"
 # include "ddmac/ddp.h"
-
+# include "str/stringLib.h"
 # include "wwii/wwiiCovert.h"
-# include "wwii/wwiiString.h"
 # include "weap/weapDefs.h"
 # include "weap/weapSpec.h"
 

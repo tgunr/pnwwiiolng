@@ -1383,7 +1383,6 @@
     <ClInclude Include="..\..\src\wwii\wwiiServerTypeEnums.h" />
     <ClInclude Include="..\..\src\wwii\wwiiSquadMsg.h" />
     <ClInclude Include="..\..\src\wwii\wwiiSquads.h" />
-    <ClInclude Include="..\..\src\wwii\wwiiString.h" />
     <ClInclude Include="..\..\src\wwii\wwiiThemes.h" />
     <ClInclude Include="..\..\src\wwii\wwiiTraits.h" />
     <ClInclude Include="..\..\src\wwii\wwiiTypes.h" />
@@ -1942,7 +1941,6 @@
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObject.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp" />
-    <ClCompile Include="..\..\src\wwii\wwiiString.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiSyncVar.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiUTF.cpp" />
     <ClCompile Include="..\..\src\physics\colliderMain.cpp" />

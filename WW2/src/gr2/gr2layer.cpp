@@ -3791,7 +3791,7 @@ void gr2SetMeshActiveByName(gr2Model* model, const char* mesh, bool active)
 		if(!model->meshes[i]->data)
 			continue;
 
-		if(!stricmp(model->meshes[i]->data->GrannyMesh->Name, mesh))
+		if(!strcasecmp(model->meshes[i]->data->GrannyMesh->Name, mesh))
 		{
 #ifdef BETA_RELEASE
 			bool current = gr2IsMeshActive(model, i);
@@ -3815,7 +3815,7 @@ LOGICAL gr2IsMeshActiveByName(gr2Model* model, const char* mesh)
 {
 	for(unsigned int i = 0; i < model->meshes.size(); i++)
 	{
-		if(!stricmp(model->meshes[i]->data->GrannyMesh->Name, mesh))
+		if(!strcasecmp(model->meshes[i]->data->GrannyMesh->Name, mesh))
 			return gr2IsMeshActive(model, i);
 	}
 
@@ -3985,7 +3985,7 @@ LOGICAL gr2ModelHasMesh(gr2Model* model, const char* mesh, int* meshIndex, int* 
 	{
 		currentMesh = model->meshes[m];
 
-		if(!stricmp(currentMesh->data->GrannyMesh->Name, mesh))
+		if(!strcasecmp(currentMesh->data->GrannyMesh->Name, mesh))
 		{
 			if(meshIndex)
 				*meshIndex = m;
@@ -4038,7 +4038,7 @@ int gr2ModelFindBone (gr2Model* model, const SCHAR* boneName, LOGICAL exact)
 				strncpy(buffer, skeleton->Bones[i].Name, nameSize);
 				buffer[nameSize] = 0;
 
-				if(!stricmp(buffer, (const char*)boneName))
+				if(!strcasecmp(buffer, (const char*)boneName))
 				{
 					boneIndex = i;
 					break;
@@ -4066,7 +4066,7 @@ int gr2ModelFindBones (std::vector<int>& found, gr2Model* model, SCHAR* boneName
 
 		for(int i = 0; i < skeleton->BoneCount; i++)
 		{
-			if(!stricmp(skeleton->Bones[i].Name, boneName))
+			if(!strcasecmp(skeleton->Bones[i].Name, boneName))
 				found.push_back(i);
 		}
 	}
@@ -4090,7 +4090,7 @@ int gr2ModelFindBones (std::vector<int>& found, gr2Model* model, SCHAR* boneName
 				strncpy(buffer, skeleton->Bones[i].Name, nameSize);
 				buffer[nameSize] = 0;
 
-				if(!stricmp(buffer, (const char*)boneName))
+				if(!strcasecmp(buffer, (const char*)boneName))
 					found.push_back(i);
 			}
 		}
@@ -4615,17 +4615,17 @@ static const char* _translateAnimation(const char* animFile)
 	static char path[254+1];;
 	const char* ptr = path;
 
-	if(!stricmp(animFile, "TPS\\animations\\trot"))
+	if(!strcasecmp(animFile, "TPS\\animations\\trot"))
 		strncpy(path, "TPS\\animations\\Anim_Stand_Run01", MAX_GR2_PATH_SIZE);
-	else if(!stricmp(animFile, "TPS\\animations\\walk"))
+	else if(!strcasecmp(animFile, "TPS\\animations\\walk"))
 		strncpy(path, "TPS\\animations\\anim_stand_walk01", MAX_GR2_PATH_SIZE);
-	else if(!stricmp(animFile, "TPS\\animations\\sprint"))
+	else if(!strcasecmp(animFile, "TPS\\animations\\sprint"))
 		strncpy(path, "TPS\\animations\\Anim_Stand_Sprint01", MAX_GR2_PATH_SIZE);
-	else if(!stricmp(animFile, "TPS\\animations\\crawl") || !stricmp(animFile, "TPS\\animations\\crawlrifle"))
+	else if(!strcasecmp(animFile, "TPS\\animations\\crawl") || !strcasecmp(animFile, "TPS\\animations\\crawlrifle"))
 		strncpy(path, "TPS\\animations\\anim_prone_rifle_crawl", MAX_GR2_PATH_SIZE);
-	else if(!stricmp(animFile, "TPS\\animations\\kneel"))
+	else if(!strcasecmp(animFile, "TPS\\animations\\kneel"))
 		strncpy(path, "TPS\\animations\\Anim_Kneel_Base", MAX_GR2_PATH_SIZE);
-	else if(!stricmp(animFile, "TPS\\animations\\rifleprone"))
+	else if(!strcasecmp(animFile, "TPS\\animations\\rifleprone"))
 		strncpy(path, "TPS\\animations\\anim_prone_rifle_base", MAX_GR2_PATH_SIZE);
 	else
 		strncpy(path, animFile, MAX_GR2_PATH_SIZE);
@@ -4686,7 +4686,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 
 			// hack for now - ramp
-			if(!stricmp(tString, "standaimwalk"))
+			if(!strcasecmp(tString, "standaimwalk"))
 				strcpy(tString, "walk");
 
 			snprintf (loadedMasks[numAnimFiles].animationFile, 255, "%s%s%s", TPS_MAIN_DIRECTORY, TPS_ANIMATIONS_DIRECTORY, tString);
@@ -4850,7 +4850,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 
 
 			// hack for now - ramp
-			if(!stricmp(tString, "standaimwalk"))
+			if(!strcasecmp(tString, "standaimwalk"))
 				strcpy(tString, "walk");
 
 			snprintf (loadedMasks[numAnimFiles].animationFile, 255, "%s%s%s", TPS_MAIN_DIRECTORY, TPS_ANIMATIONS_DIRECTORY, tString);
@@ -6111,7 +6111,7 @@ XML_TAG_HANDLER(xmlBlendAnimTagHandler)
 
 		animation->mask = GrannyNewTrackMask((granny_real32)weight, *bones);
 
-		if(baseLoop && !stricmp((const char*)baseLoop,"true"))
+		if(baseLoop && !strcasecmp((const char*)baseLoop,"true"))
 			animation->animType = GR2_ANIMATION_BASELOOP;
 
 		XML_PROCESS_CHILDREN(animation);

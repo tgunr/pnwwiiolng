@@ -1417,9 +1417,6 @@
     <ClInclude Include="..\..\src\wwii\wwiiSquads.h">
       <Filter>wwii</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wwii\wwiiString.h">
-      <Filter>wwii</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\wwii\wwiiTypes.h">
       <Filter>wwii</Filter>
     </ClInclude>
@@ -2535,9 +2532,6 @@
       <Filter>wwii</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp">
-      <Filter>wwii</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\wwii\wwiiString.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiSyncVar.cpp">
