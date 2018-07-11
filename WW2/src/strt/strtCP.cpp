@@ -2136,6 +2136,9 @@ CPStruct::numBrigades(BRANCH_ENUM forBranch) const
 	return units;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Return the factories and their current status'
+
 std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 {
     std::string result = "";
