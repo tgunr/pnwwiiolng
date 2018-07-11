@@ -2138,22 +2138,24 @@ CPStruct::numBrigades(BRANCH_ENUM forBranch) const
 
 std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 {
-	char buffer[512];
-	std::string result = "";
-	for ( UINT32 i = 0; i < _factories.size(); ++i )
-	{
-		const ObjectStruct* obj = _factories[forCountry];
-		if ( obj->facility->originalCountry != forCountry )
-			continue;
-		if ( obj->m_country == forCountry )
-			strprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
-		else
-			strprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
-		result += buffer;
-	}
+    std::string result = "";
 
-	if ( result.empty() )
-	{
+    for (const ObjectStruct *obj : _factories) {
+        if (obj->facility->originalCountry != forCountry) {
+            continue;
+        }
+
+        char buffer[512];
+
+        if (obj->m_country == forCountry) {
+            strprintf(buffer, "%s Damage: %u%%\n", obj->name, obj->percentDamage);
+        } else {
+            strprintf(buffer, "%s OWNER:%s Damage: %u%%\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+        }
+        result += buffer;
+    }
+
+	if ( result.empty() ) {
 		return "No factories";
 	}
 
