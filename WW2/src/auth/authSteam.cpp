@@ -16,23 +16,26 @@ static const std::string authSteamRESTPrefix = "/v2/";
 
 static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCode)
 {
-    switch (resultCode) {
-        case static_cast<uint32_t>(SteamLoginResponse::LoginSuccess):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginNotValidUser):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginNewUser):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInvalid):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignDisallowed):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginCallsignInUse):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginUnknownError):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailRequired):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailInvalid):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailInUse):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginEmailNotValidated):
-        case static_cast<uint32_t>(SteamLoginResponse::LoginExistingUser):
+    switch (static_cast<SteamLoginResponse>(resultCode)) {
+        case SteamLoginResponse::LoginSuccess:
+        case SteamLoginResponse::LoginNotValidUser:
+        case SteamLoginResponse::LoginNewUser:
+        case SteamLoginResponse::LoginCallsignInvalid:
+        case SteamLoginResponse::LoginCallsignDisallowed:
+        case SteamLoginResponse::LoginCallsignInUse:
+        case SteamLoginResponse::LoginUnknownError:
+        case SteamLoginResponse::LoginEmailRequired:
+        case SteamLoginResponse::LoginEmailInvalid:
+        case SteamLoginResponse::LoginEmailInUse:
+        case SteamLoginResponse::LoginEmailNotValidated:
+        case SteamLoginResponse::LoginExistingUser:
+        case SteamLoginResponse::LoginArenaDown:
+        case SteamLoginResponse::LoginVersionMismatch:
+        case SteamLoginResponse::LoginArenaDenied:
+        case SteamLoginResponse::INVALID_RESPONSE_CODE:
             return static_cast<SteamLoginResponse>(resultCode);
-        default:
-            return SteamLoginResponse::INVALID_RESPONSE_CODE;
     }
+    return SteamLoginResponse::INVALID_RESPONSE_CODE;
 }
 
 static inline std::string _getAuthRelayURL(const std::string &endpoint)
