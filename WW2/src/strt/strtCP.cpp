@@ -2153,9 +2153,15 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
         if (obj->m_country == forCountry) {
             strprintf(buffer, "%s Damage: %u%%\n", obj->name, obj->percentDamage);
         } else {
-            strprintf(buffer, "%s OWNER:%s Damage: %u%%\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+            strprintf(buffer, "%s (OWNER: %s) Damage: %u%%\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
         }
-        result += buffer;
+
+		// Clean up the UK/FR/DE_PF#_FACTORY names
+		std::string tempString = buffer;
+		tempString.replace(0, 5, "#");
+		tempString.replace(2, 8, "");
+	
+        result += tempString;
     }
 
 	if ( result.empty() ) {
