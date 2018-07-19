@@ -207,5 +207,6 @@ static const UINT64 mp34File_hash = 797680ULL ;
 static const UINT64 fg42gFile_hash = 195568ULL;
 static const UINT64 carcanoFile_hash = 3261424ULL;
 static const UINT64 beretta38File_hash = 53928176ULL;
+static const UINT64 m1a1carbineFile_hash = 18446744073511500272ULL;
 
 static const UINT64 eyeHeights_hash = 2722382ULL;
