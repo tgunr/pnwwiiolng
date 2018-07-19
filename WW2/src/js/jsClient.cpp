@@ -84,7 +84,9 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
 	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
 	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+    JS_FUNCTION_SPEC(jsClient, getLastUnknownErrorCode,0),
 	JS_FUNCTION_SPEC(jsClient, emailReset,0),
+    JS_FUNCTION_SPEC(jsClient, releasesteamticket,0),
 	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
@@ -127,61 +129,61 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, joininstance,4),
 	JS_FUNCTION_SPEC(jsClient, isavailable, 0),
 	JS_FUNCTION_SPEC(jsClient, ismissionleader, 0),
-	{0}
+	{0, NULL, 0, 0, 0}
 };
 
 JSPropertySpec jsClient::jsproperties[] =
 {
-	{"country",				jsClient::COUNTRY_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"branch",				jsClient::BRANCH_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"handle",				jsClient::HANDLE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missions",			jsClient::MISSIONS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"personas",			jsClient::PERSONAS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionroomlist",		jsClient::MISSIONROOMLIST_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"personalisttime",		jsClient::PERSONALISTTIME_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidelocked",			jsClient::SIDELOCKED_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"currentmission",		jsClient::CURRENTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionresults",		jsClient::MISSIONRESULTS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"despawntimer",		jsClient::DESPAWNTIMER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"canpostmission",		jsClient::CANPOSTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"persona",				jsClient::PERSONA_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionlistupdate",	jsClient::MISSIONLISTUPDATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnliststatus",	jsClient::LASTSPAWNLISTSTATUS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnlistsource",	jsClient::LASTSPAWNLISTSOURCE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"activemission",		jsClient::ACTIVEMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnliststate",	jsClient::LASTSPAWNLISTSTATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"squad",				jsClient::SQUAD_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"squadinvite",			jsClient::SQUADINVITE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"currentorders",		jsClient::CURRENTORDERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"isplaynet",			jsClient::ISPLAYNET_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidebalance",			jsClient::SIDEBALANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidedelay",			jsClient::SIDEDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"poll",				jsClient::POLL_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"spawndelay",			jsClient::SPAWNDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"ismobilespawn",		jsClient::ISMOBILESPAWN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"cansto",				jsClient::CANSTO_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigadenotices",		jsClient::BRIGADENOTICES_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"ishc",				jsClient::ISHC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"isoic",				jsClient::ISOIC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"oicof",				jsClient::OICOF_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"havenotices",			jsClient::HAVEBRIGADENOTICES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"recruiter",			jsClient::RECRUITER_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"recruiters",			jsClient::RECRUITERS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"haverecruiters",		jsClient::HAVERECRUITERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missioninvite",		jsClient::MISSIONINVITE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"nextsupply",			jsClient::NEXTSUPPLY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"instance",			jsClient::INSTANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"state",				jsClient::STATE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"capturestate",		jsClient::CAPTURESTATE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"instances",			jsClient::INSTANCES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{0}
+	{"country",				jsClient::COUNTRY_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"branch",				jsClient::BRANCH_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"handle",				jsClient::HANDLE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missions",			jsClient::MISSIONS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"personas",			jsClient::PERSONAS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionroomlist",		jsClient::MISSIONROOMLIST_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"personalisttime",		jsClient::PERSONALISTTIME_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidelocked",			jsClient::SIDELOCKED_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"currentmission",		jsClient::CURRENTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionresults",		jsClient::MISSIONRESULTS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"despawntimer",		jsClient::DESPAWNTIMER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"canpostmission",		jsClient::CANPOSTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"persona",				jsClient::PERSONA_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionlistupdate",	jsClient::MISSIONLISTUPDATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnliststatus",	jsClient::LASTSPAWNLISTSTATUS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnlistsource",	jsClient::LASTSPAWNLISTSOURCE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"activemission",		jsClient::ACTIVEMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnliststate",	jsClient::LASTSPAWNLISTSTATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"squad",				jsClient::SQUAD_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"squadinvite",			jsClient::SQUADINVITE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"currentorders",		jsClient::CURRENTORDERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"isplaynet",			jsClient::ISPLAYNET_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidebalance",			jsClient::SIDEBALANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidedelay",			jsClient::SIDEDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"poll",				jsClient::POLL_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"spawndelay",			jsClient::SPAWNDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"ismobilespawn",		jsClient::ISMOBILESPAWN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"cansto",				jsClient::CANSTO_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigadenotices",		jsClient::BRIGADENOTICES_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"ishc",				jsClient::ISHC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"isoic",				jsClient::ISOIC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"oicof",				jsClient::OICOF_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"havenotices",			jsClient::HAVEBRIGADENOTICES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"recruiter",			jsClient::RECRUITER_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"recruiters",			jsClient::RECRUITERS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"haverecruiters",		jsClient::HAVERECRUITERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missioninvite",		jsClient::MISSIONINVITE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"nextsupply",			jsClient::NEXTSUPPLY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"instance",			jsClient::INSTANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"state",				jsClient::STATE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"capturestate",		jsClient::CAPTURESTATE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"instances",			jsClient::INSTANCES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{0, 0, 0, nullptr, nullptr}
 };
 
 /************************************************************************************************
@@ -282,46 +284,36 @@ JS_FUNCTION_DEF(jsClient, issteamcopy) {
 	steam connection
 *************************************************************************************************/
 
-// TODO: Move this out of the GUI code
-namespace {
-	bool IsValidEmail(const char* email) {
-		// TEMP: Validating emails meaningfully is arbitrarily difficult.
-        // Note that even billing only does this:
-        // email+          = ^[^\s]+\@[^\s]+$
-        bool hasAt = false;
-        bool hasDot = false;
-        
-		for ( const char* c = email ; *c != '\0' ; ++c ) {
-			if ( !std::isprint(*c, std::locale::classic()) ) {
-				return false;
-			}
-            if (*c == '@') { hasAt = true; }
-            if (*c == '.') { hasDot = true; }
-		}
-
-		return hasAt && hasDot;
-	}
-
-	bool IsValidCallsign(const char* callsign) {
-		if ( strlen(callsign) < 2 || strlen(callsign) > 10)
-			return false;
-
-		for ( const char* c = callsign ; *c != '\0' ; ++c ) {
-			if ( !std::isalnum(*c, std::locale::classic()) ) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-}
-
 namespace {
 	// The point in the login process we're at.
 	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
+    
+    // Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
+    struct SteamAuthSessionTicket {
+        SteamAuthSessionTicket() {}
+        ~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
+  
+        const char *getData() { LoadIfNeeded(); return data; }
+        uint32_t getLength() { LoadIfNeeded(); return length; }
+        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
 
-	void UpdateLoginState(SteamLoginResponse res) {
-		switch ( res ) {
+        private:
+        HAuthTicket handle = k_HAuthTicketInvalid;
+        char data[512] = {0};
+        uint32_t length = 0;
+        
+        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
+    };
+    SteamAuthSessionTicket steamAuthTicket;
+    
+    // The most recent response's support code
+    std::string lastSupportCode;
+
+    // Update our global (eww) state to reflect the most recent API result
+	void UpdateLoginState(const SteamLoginResult &res) {
+        lastSupportCode = res.supportCode;
+        
+		switch ( res.status ) {
         // Login succeeded - go to initial state
 		case SteamLoginResponse::LoginSuccess:
 			steam_login_state = LoginReady;
@@ -347,7 +339,7 @@ namespace {
 		case SteamLoginResponse::LoginCallsignInUse:
 		case SteamLoginResponse::LoginEmailInvalid:
             break;
-
+            
         // Email in use during Signup flow requires transitioning to Email flow
         // because EmailInUse during Signup means the callsign is already
         // immutable in the backend. This is a hacky solution to what is
@@ -359,48 +351,33 @@ namespace {
                 assert( steam_login_state == LoginNeedEmail ); // must be in Email flow if not in Signup flow
             }
 			break;
-
+   
+        // State problems on the server side; we need to stick to the Login state.
+        case SteamLoginResponse::LoginArenaDown:
+        case SteamLoginResponse::LoginArenaDenied:
+        case SteamLoginResponse::LoginVersionMismatch:
+            assert( steam_login_state == LoginReady );
+            break;
+        
 		// Something went wrong, reset things on our end.
 		case SteamLoginResponse::LoginNotValidUser:
 		case SteamLoginResponse::LoginUnknownError:
 		case SteamLoginResponse::LoginExistingUser:
 			steam_login_state = LoginReady;
 			break;
+            
 		default:
-			dbugLog(_FLW, "Unknown login response %u", res);
+			dbugLog(_FLW, "Unknown login response %u", res.status);
 			steam_login_state = LoginReady;
 		}
 	}
 
-	//--------------
-
-	// Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
-	struct SteamAuthSessionTicket {
-        SteamAuthSessionTicket() {}
-		~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
-  
-        const char *getData() { LoadIfNeeded(); return data; }
-        uint32_t getLength() { LoadIfNeeded(); return length; }
-        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
-
-        private:
-		HAuthTicket handle = k_HAuthTicketInvalid;
-		char data[512] = {0};
-		uint32_t length = 0;
-        
-        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
-	};
-    SteamAuthSessionTicket steamAuthTicket;
-
+	// Call the appropriate Steam auth API based on our current state
 	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
-		// Some quick pre-validation to avoid unnecessarily pestering auth.
-		if ( (steam_login_state == LoginNewUser || steam_login_state == LoginNeedEmail) &&
-		     ! IsValidEmail(email) ) {
-			return {SteamLoginResponse::LoginEmailInvalid};
-		}
-		if ( steam_login_state == LoginNewUser && ! IsValidCallsign(callsign) ) {
-			return {SteamLoginResponse::LoginCallsignInvalid};
-		}
+        // For now, don't try to pre-validate the user's inputs; this pesters the relay more than is
+        // strictly necessary, but allows the rules to be purely under the relay's control in realtime,
+        // rather than requiring a new client build. It also significantly simplifies the already weird
+        // and messy JavaScript driving this UI.
 
 		//------
 
@@ -408,28 +385,29 @@ namespace {
 		case LoginReady:
 			return authRequestSteamLogin(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena);
 		case LoginNewUser: {
-            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, callsign, email);
+            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), callsign, email);
             
             if (result.status == SteamLoginResponse::LoginSuccess) {
-                return {SteamLoginResponse::LoginEmailNotValidated};
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
             }
             return result;
         }
 		case LoginNeedEmail: {
-			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena, email);
+			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), email);
 
             if (result.status == SteamLoginResponse::LoginSuccess) {
-                return {SteamLoginResponse::LoginEmailNotValidated};
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
             }
             return result;
         }
 		default:
 			assert ( false );
-			return {SteamLoginResponse::LoginUnknownError};
+			return { SteamLoginResponse::LoginUnknownError, "01000000-0000-0000-0000-000000000000" };
 		}
 	}
 }
 
+// Perform a login (or signup or email as appropriate) attempt.
 JS_FUNCTION_DEF(jsClient, steamconnect) {
 	assert ( IsSteamCopy() );
 
@@ -457,7 +435,7 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	//--------------
 
 	SteamLoginResult result = AttemptSteamLogin(arena, callsign, email);
-	UpdateLoginState(result.status);
+	UpdateLoginState(result);
 
 	if ( result.status == SteamLoginResponse::LoginSuccess )
 		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
@@ -466,14 +444,46 @@ JS_FUNCTION_DEF(jsClient, steamconnect) {
 	return JS_TRUE;
 }
 
+// Return the most recent support code.
+JS_FUNCTION_DEF(jsClient, getLastUnknownErrorCode) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+    
+    *rval = phui::js::NewString(lastSupportCode.c_str());
+    return JS_TRUE;
+}
+
+// Go to the "reset your email" state. We only need this to keep the jsClient side in sync with the JS.
 JS_FUNCTION_DEF(jsClient, emailReset) {
+    assert ( IsSteamCopy() );
+
 	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
 	if ( ! jsclient ) return JS_FALSE;
+    if ( argc < 1 ) return JS_FALSE;
 
-	//UpdateLoginState(SteamLoginResponse::LoginEmailRequired);
-	assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
-	steam_login_state = LoginNeedEmail;
+    assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
+    
+    bool forward = JSVAL_TO_BOOLEAN(argv[0]);
+    
+    if (forward) {
+	    steam_login_state = LoginNeedEmail;
+    } else {
+        steam_login_state = LoginReady;
+    }
 	return JS_TRUE;
+}
+
+// Attempt not to hold onto Steam tickets longer than strictly necessary
+JS_FUNCTION_DEF(jsClient, releasesteamticket) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+
+    steamAuthTicket.release();
+    return JS_TRUE;
 }
 
 /************************************************************************************************

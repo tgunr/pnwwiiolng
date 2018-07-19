@@ -437,13 +437,6 @@ LOGICAL rnmainInit()
 	uiInit();
 	dimainInit();
 
-#if platOS == OS_WIN32
-	// We have to do this here again because a dll loaded with dimainInit() resets the FPU exception mask
-	// and we do want to get FPU exceptions for all the other things done here
-	// OGS: Not on the Mac, you don't :)
-	SetupFPU(true);
-#endif
-
 	// Setup variables
 	if (!SetupVariables())
 	{
@@ -502,15 +495,6 @@ LOGICAL rnmainInit()
 
 		rnmainResetPlayer();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-	rnlogoUpdateStatus("loading.extresource");
-	if(!adInit())
-    {
-        // Not an error
-        Write_Log(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
-    }
-#endif
 
 	rnlogoUpdateStatus("loading.sounds.init");
 	if (!sndsInit())
@@ -745,10 +729,6 @@ void rnmainKill()
 		Online = 0;
 		ww2::Client::Kill();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-    adKill();
-#endif
 
 	sptExitApp();
 
