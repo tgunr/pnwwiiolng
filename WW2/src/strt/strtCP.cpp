@@ -2141,9 +2141,15 @@ CPStruct::numBrigades(BRANCH_ENUM forBranch) const
 
 std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 {
+	// Re-order the _factories vector so that the factories are put into the proper order when displayed
+	std::sort(_factories.begin(), _factories.end(), [](const ObjectStruct *obj1, const ObjectStruct *obj2) {
+		return strcmp(obj1->name, obj2->name) < 0;
+	});
+	
     std::string result = "";
 
     for (const ObjectStruct *obj : _factories) {
+		// If the factory isn't part of the specified country, skip this loop
         if (obj->facility->originalCountry != forCountry) {
             continue;
         }
@@ -2151,9 +2157,10 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
         char buffer[512];
 
         if (obj->m_country == forCountry) {
-            strprintf(buffer, "%s Damage: %u%%\n", obj->name, obj->percentDamage);
+            strprintf(buffer, "%s: %u%%\n", obj->name, obj->percentDamage);
         } else {
-            strprintf(buffer, "%s (OWNER: %s) Damage: %u%%\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+			// If someone else besides the orginal owner owns this factory, make a note of it
+            strprintf(buffer, "%s: %u%% (OWNER: %s)\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
         }
 
 		// Clean up the UK/FR/DE_PF#_FACTORY names
