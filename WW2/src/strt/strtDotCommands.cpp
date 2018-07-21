@@ -2378,7 +2378,7 @@ static const char*
 _describeSHCU(StratHCUnit* unit)
 {
 	static std::string text;
-	text = (unit->isBrigade()) ? "Brig" : "Div";
+	text = (unit->isBrigade()) ? "Brig" : (unit->isGarrison()) ? "Gar" : "Div";
 	text += "#";
 	char buf[16];
 	snprintf(buf, 15, "%u", unit->unitID());

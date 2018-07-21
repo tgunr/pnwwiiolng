@@ -1205,7 +1205,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 							tip += L"*";
 						}
 
-						if(unit->isBrigade())
+						if(unit->isBrigade() || unit->isGarrison())
 						{
 							tip += L"     ";
 							tip += uiUTF8toUTF16(unit->m_name);

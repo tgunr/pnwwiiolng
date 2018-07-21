@@ -1435,7 +1435,7 @@ _updateFirebases(const HCUnit& unit, CPStruct* cp)
 {
 	if ( cp == nullptr )
 		return false;
-	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && unit.isBrigade() == true )
+	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && (unit.isBrigade() == true || unit.isGarrison() == true) )
 		return true;
 	if ( cp->isEnemyLinked() && cp->m_units.empty() == true )
 		return true;

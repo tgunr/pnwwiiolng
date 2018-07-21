@@ -122,7 +122,7 @@ static void _initializeBrigadeLocations()
 	HCUNIT_INDEX::iterator it;
 	for (it = hcUnits.begin(); it != hcUnits.end(); ++it) {
 		HCUnit* unit = it->second;
-		if (!unit->isBrigade() && !unit->isDivision())
+		if (!unit->isBrigade() && !unit->isDivision() && !unit->isGarrison())
 			continue;
 		if (unit->homeCPID().id == 0)
 			continue;
@@ -815,7 +815,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 		for ( auto it = hcUnits.begin(); it != hcUnits.end(); ++it )
 		{
 			HCUnit& unit = *(it->second);
-			if ( unit.isBrigade() == false || unit.isTrainingUnit() == true )
+			if ( (unit.isBrigade() == false && unit.isGarrison() == false) || unit.isTrainingUnit() == true )
 				continue;
 			if ( unit.homeCPID().Key() == host_config.routDestination[unit.country()] )
 				continue;

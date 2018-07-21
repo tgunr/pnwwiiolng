@@ -2484,6 +2484,7 @@ JSPropertySpec jsBrigade::jsproperties[] =
 	{"objective",		jsBrigade::OBJECTIVE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"mobilespawns",	jsBrigade::MOBILESPAWNS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isbrigade",		jsBrigade::ISBRIGADE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isgarrison",		jsBrigade::ISGARRISON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"issquadbrigade",	jsBrigade::ISSQUADBRIGADE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"callsign",		jsBrigade::CALLSIGN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"oic",				jsBrigade::OIC_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
@@ -2866,6 +2867,9 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case ISBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(detail.isBrigade());
 		break;
+		case ISGARRISON_PROP:
+			*val = BOOLEAN_TO_JSVAL(detail.isGarrison());
+			break;
 		case ISSQUADBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadBrigade(detail.brigadeID()));
 		break;

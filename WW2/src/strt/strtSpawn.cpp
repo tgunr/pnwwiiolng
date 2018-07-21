@@ -347,7 +347,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 
 		// Make sure it contains our brigade
 		StratHCUnit* unit = StratHCUnit::Lookup(supplyUnitID);
-		if ( unit == nullptr || (!unit->isBrigade() && !unit->isDivision()) )
+		if ( unit == nullptr || (!unit->isBrigade() && !unit->isDivision() && !unit->isGarrison()) )
 			throw PostRequestFail("not a recognized brigade/division", SPAWN_NO_BRIGADE_SUPPLY);
 
 		FacilityStruct* supplyFacility = facility->supplyingFacility(*unit, false);
@@ -1397,7 +1397,7 @@ _diagnoseSupply(const StratHCUnit& unit, const FacilityStruct& facility, const F
 					if ( supplyFacility->cp == unit.homeCP() )
 						return FacilityWeaponList::_NORMAL;
 					// Are we allowed to link back to our brigade?
-					if ( unit.isBrigade() == false || facility.canFollowSupplyLink() == false )
+					if ( (unit.isBrigade() == false && unit.isGarrison() == false) || facility.canFollowSupplyLink() == false )
 						return FacilityWeaponList::_NOT_LINKED;
 				}
 			}

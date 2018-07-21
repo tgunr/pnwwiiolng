@@ -218,6 +218,9 @@ BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* con
 	for ( it = brigades.begin(); it != brigades.end(); ++it )
 	{
 		Brigade& brigade = *(*it);
+		/*if (brigade.isGarrison())
+			continue;*/
+
 		BrigadeSummary& summary = m_summaries[m_count];
 
 		summary = brigade;
