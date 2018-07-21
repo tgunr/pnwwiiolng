@@ -22,7 +22,7 @@ extern UINT64 lastBrigadeMovement;				// How many times brigades have been moved
 class Brigade : public BrigadeDetail
 {
 public:
-	Brigade(UINT32 brigadeID, UINT32 parentID
+	Brigade(UINT32 brigadeID, HCUNIT_TYPE typeID, UINT32 parentID
 			, WWII_COUNTRY countryID, BRANCH_ENUM branchID, BRANCH_ENUM movementType, UCHAR withUnitClass
 			, const ChatHandle handle, const char* name, const char* nick, UINT8 rank
 			, const FULL_OBJ_ID homeCP, const ChatHandle owner, RANK_NO ownerRank);

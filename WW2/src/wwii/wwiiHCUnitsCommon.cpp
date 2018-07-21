@@ -297,7 +297,7 @@ HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 			continue;
 		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
 			continue;
-		if ( it->second->isBrigade() || it->second->isDivision() )
+		if ( it->second->isBrigade() || it->second->isDivision() || it->second->isGarrison() )
 			continue;
 		return it->second;
 	}

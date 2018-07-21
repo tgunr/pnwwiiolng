@@ -24,6 +24,7 @@ enum HCUNIT_TYPE
 	HCU_GENERIC = 0				// Just part o'the structure
 ,	HCU_BRIGADE = 1				// A brigade
 ,	HCU_DIVISION = 2			// A division
+,	HCU_GARRISON = 3
 ,	MAX_HCUNIT_TYPES
 };
 
@@ -119,6 +120,7 @@ public:
 
 	bool isBrigade() const { return m_type == HCU_BRIGADE; }
 	bool isDivision() const { return m_type == HCU_DIVISION; }
+	bool isGarrison() const { return m_type == HCU_GARRISON;  }
 
 	bool isMarineUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_SEA; }
 

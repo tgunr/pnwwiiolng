@@ -51,7 +51,7 @@ static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
 static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
 // Take approx 1078 / sizeof a packed brigade summaries
-static const UINT32 MAX_LISTED_BRIGADES = 88;
+static const UINT32 MAX_LISTED_BRIGADES = 300;
 
 // The highest population rank a brigade can have - semi arbitrary number,
 // but be mindful the number fits inside the number of bits we pack
@@ -63,11 +63,11 @@ class BrigadeSummary : public HCUnit
 public:
 	//// ---- Class Operators ---- ////
 	// Create from scratch
-	BrigadeSummary(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeSummary(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, FULL_OBJ_ID withHome=nullObjID, const ChatHandle withOwner=0LL, RANK_NO withOwnerRank=0)
-		: HCUnit(withBrigadeID, HCU_BRIGADE, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
+		: HCUnit(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 				, withHandle, withName, withNick, withRank, withHome, withOwner, withOwnerRank)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
@@ -148,11 +148,11 @@ public:
 class BrigadeDetail : public BrigadeSummary
 {
 public:
-	BrigadeDetail(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeDetail(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, const FULL_OBJ_ID withHomeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
-		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
+		: BrigadeSummary(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 	virtual ~BrigadeDetail() {}

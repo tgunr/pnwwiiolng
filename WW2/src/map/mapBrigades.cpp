@@ -33,11 +33,11 @@ UINT64 lastBrigadeMovement = 0LL;			// How many times brigades have been moved
 //////////////////////////////////////////////////////////////////////
 // Constructor for a BrigadeDetail object
 
-Brigade::Brigade(UINT32 withBrigadeID, UINT32 withParentID
+Brigade::Brigade(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 				, const ChatHandle withHandle, const char* withName, const char* nick, UINT8 withRank
 				, const FULL_OBJ_ID homeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
-		: BrigadeDetail(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
+		: BrigadeDetail(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 						, withHandle, withName, nick, withRank, homeCP, withOwner, withOwnerRank)
 		, m_missionPartitionIt(m_missionList.end())
 		, m_ownerID(0)
@@ -398,7 +398,7 @@ Brigade*
 mapFindBrigade(UINT32 brigadeID)
 {
 	HCUnit* unit = HCUnit::Lookup(brigadeID);
-	return ( unit != nullptr && unit->type() == HCU_BRIGADE ) ? (Brigade*)unit : nullptr;
+	return ( unit != nullptr && (unit->type() == HCU_BRIGADE) ) ? (Brigade*)unit : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -166,7 +166,7 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 		m_toeTemplateHeader->subscribe(this, m_toe);
 	}
 
-	if (isDivision() || isBrigade())
+	if (isDivision() || isBrigade() || isGarrison())
 		s_units.push_back(this);
 }
 
@@ -345,7 +345,7 @@ strtInitializeHCUnits()
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
 		HCUnit* hcUnit = it->second;
-		if ( !hcUnit->isDivision() && !hcUnit->isBrigade() )
+		if ( !hcUnit->isDivision() && !hcUnit->isBrigade() && !hcUnit->isGarrison() )
 			continue;
 		static_cast<StratHCUnit*>(hcUnit)->initialize();
 	}
@@ -356,7 +356,7 @@ strtInitializeHCUnits()
 	StratHCUnit* unit;
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
-		if ( it->second->isDivision() == false && it->second->isBrigade() == false )
+		if ( it->second->isDivision() == false && it->second->isBrigade() == false && it->second->isGarrison() == false )
 			continue;
 		unit = (StratHCUnit*)it->second;
 		if ( unit->homeCP() && unit->homeCP()->isSupplied() == false )
@@ -374,7 +374,7 @@ StratHCUnit::Lookup(UINT32 unitID)
 	HCUnit* unit = HCUnit::Lookup(unitID);
 	if ( unit == nullptr )
 		return nullptr;
-	if ( unit->isBrigade() || unit->isDivision() )
+	if ( unit->isBrigade() || unit->isDivision() || unit->isGarrison() )
 		return (StratHCUnit*) unit;
 	return nullptr;
 }
@@ -385,7 +385,7 @@ StratHCUnit::Lookup(const char* name)
 	HCUnit* unit = HCUnit::Lookup(name);
 	if ( unit == nullptr )
 		return nullptr;
-	if ( unit->isBrigade() || unit->isDivision() )
+	if ( unit->isBrigade() || unit->isDivision() || unit->isGarrison() )
 		return (StratHCUnit*) unit;
 	return nullptr;
 }
