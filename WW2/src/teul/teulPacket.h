@@ -74,7 +74,7 @@ public:
 	~Packet();
 
 public:
-	enum { DefaultLocalDataSize = 256 };
+	enum { DefaultLocalDataSize = 4096 };
 	enum { GrowthRate = 256 };
 	enum { UnencryptedBytes = 3 };	// Start token and packet size unencrypted.
 

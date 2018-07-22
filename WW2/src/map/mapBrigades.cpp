@@ -398,7 +398,7 @@ Brigade*
 mapFindBrigade(UINT32 brigadeID)
 {
 	HCUnit* unit = HCUnit::Lookup(brigadeID);
-	return ( unit != nullptr && (unit->type() == HCU_BRIGADE) ) ? (Brigade*)unit : nullptr;
+	return ( unit != nullptr && (unit->type() == HCU_BRIGADE || unit->type() == HCU_GARRISON) ) ? (Brigade*)unit : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
