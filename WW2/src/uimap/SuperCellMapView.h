@@ -41,6 +41,12 @@ public:
 	void SetAlpha(float a);
 	void SetNavScale(float ns);
 
+	// Set how far the map can pan
+	void SetMaxPanX(float x) { _maxPanX = x; };
+	void SetMaxPanY(float y) { _maxPanY = y; };
+	void SetMinPanX(float x) { _minPanX = x; };
+	void SetMinPanY(float y) { _minPanY = y; };
+
 	float MapScale(bool force = false);
 	float NavScale() const { return _navscale; }
 	float Scale() const { return _scacross; }
@@ -93,6 +99,7 @@ protected:
 	float _minscale, _maxscale, _mapscale, _navscale;
 	float _mx, _my;
 	float _panx, _pany, _pandirx, _pandiry;
+	float _maxPanX, _maxPanY, _minPanX, _minPanY;// Limit how far the map can pan
 	float _panscale, _startpanscale, _stoppanscale;
 	float _panlength;
 	float _alpha;

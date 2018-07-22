@@ -249,6 +249,34 @@ phui::View* uiMapCreate(_xmlNode* xmlnode, phui::View* parent)
 			xmlFree(val);
 		}
 
+		val = xmlGetProp(xmlnode, (xmlChar*)"maxpanx");
+		if (val)
+		{
+			mapview->SetMaxPanX((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"maxpany");
+		if (val)
+		{
+			mapview->SetMaxPanY((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"minpanx");
+		if (val)
+		{
+			mapview->SetMinPanX((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"minpany");
+		if (val)
+		{
+			mapview->SetMinPanY((float)atof((char*)val));
+			xmlFree(val);
+		}
+
 		for(xmlNodePtr node = xmlnode->children; node; node = node->next)
 		{
 			uiMapAddLayer(mapview, node);
