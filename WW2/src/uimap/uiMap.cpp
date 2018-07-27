@@ -492,7 +492,14 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 
          */
 
-        width = height = 2000.0f/SDM_SUPERCELL_SIZE/mv->MapScale();
+		if (mv->MapScale() < 0.01)
+		{
+			width = height = 1000.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
+		}
+		else 
+		{
+			width = height = 2000.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
+		}
 
 		x = -width/2; y = -height/2;
 
