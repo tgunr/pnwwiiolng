@@ -591,7 +591,12 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	float scx, scy;
 	mv->PositionSuperCell(&scx, &scy);
 
-	width = 1000.0f/SDM_SUPERCELL_SIZE/mapscale; height = 16 / iconscale;
+	width = 1000.0f/SDM_SUPERCELL_SIZE/mapscale;
+	if (mapscale < 0.01)
+	{
+		width = width / 2.0;
+	}
+	height = 16 / iconscale;
 	x = 0; //-120/iconscale;
 	y = -(mv->Height()/2 - (mv->Height() - 40))/iconscale;
 	glTranslatef(scx+x, scy+y, 0);
@@ -604,10 +609,18 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	phui::draw_gl_quad(box.verts, uv);
 
 	char scalestr[32];
-	if(mapscale <= 1)
-		snprintf(scalestr, 31, "%.0f km", 1/mapscale);
+	if (mapscale < 0.01)
+	{
+		snprintf(scalestr, 31, "%.0f km", (1.0 / mapscale) / 2.0);
+	}
+	else if (mapscale <= 1)
+	{
+		snprintf(scalestr, 31, "%.0f km", 1.0 / mapscale);
+	}
 	else
-		snprintf(scalestr, 31, "%.0f m", 1000.0/mapscale);
+	{
+		snprintf(scalestr, 31, "%.0f m", 1000.0 / mapscale);
+	}
 
 	//glTranslatef(width-ctx->FontAdvance(0,scalestr)/iconscale/2, 0, 0);
 	glTranslatef(((ctx->FontAdvance(0, scalestr) + 2) * -1) / iconscale, 0, 0);
