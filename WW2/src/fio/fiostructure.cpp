@@ -21,28 +21,31 @@
 
 #include <string>
 #include "fiostructure.h"
+#include <direct.h>  //  for _getcwd.
 
 #if platOS == OS_WIN32
+#include <shellapi.h>
 #include <shlobj.h>
 #define errno (*_errno())
 #endif
 
-wwiiolpath_string WantedDataPath = L"";					//  SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
-wwiiolpath_string WWIIOnlineDirName = L"WWIIOnLine";	//  The ROOT folder for the game install - .\WWIIOnLine
+LOGICAL				WantedCopyOldSetup = TRUE;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnLine folder.
+wwiiolpath_string	WantedDataPath = L"";				//  DEF = L"" -- SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
+wwiiolpath_string	WWIIOnlineDirName = L"WWIIOnLine";	//  DEF = L"WWIIOnLine" -- The ROOT folder for the game install - .\WWIIOnLine
 
-wwiiolpath_string WW2_exePath;			//	??_exePath - Windows - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-										//	??_exePath - macOS - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
-wwiiolpath_string WW2_exeDataPath;		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
-wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - Windows - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
-                                        //	??_exeDocsPath - macOS - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
-wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - Windoes - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
-                                        //	??_exePlayarcPath - macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
-wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-										//	??_exeWorkingPath - macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
-										//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
-wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
-                                        //	??_userWorkingPath - macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
+wwiiolpath_string	WW2_exePath;			//	Windows - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+											//	macOS - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
+wwiiolpath_string	WW2_exeDataPath;		//	EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
+wwiiolpath_string	WW2_exeDocsPath;		//	Windows - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
+											//	macOS - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
+wwiiolpath_string	WW2_exePlayarcPath;		//	Windoes - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
+											//	macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
+wwiiolpath_string	WW2_exeWorkingPath;		//	Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+											//	macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+wwiiolpath_string	WW2_userDocumentsPath;	//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
+											//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+wwiiolpath_string	WW2_userWorkingPath;	//	Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
+											//	macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
 
 
 /************************************************************************************************
@@ -59,7 +62,7 @@ LOGICAL fioStructureInit()
     LOGICAL exeDocsPathSet = FALSE;
     LOGICAL exePlayarcPathSet = FALSE;
     LOGICAL exeWorkingPathSet = FALSE;
-    LOGICAL userConfigPathSet = FALSE;
+    LOGICAL userDocumentsPathSet = FALSE;
     LOGICAL userWorkingPathSet = FALSE;
     
     const wwiiolpath_string WW2filename = L"\\WW2.exe";		// \\WW2.exe
@@ -79,14 +82,13 @@ LOGICAL fioStructureInit()
 	struct _stat buf;
 	std::wstring filename = L"";
 
-	wwiiolpath_string exePath = L"";			//	??_exePath - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-//	wwiiolpath_string exeBinPath = L"";			//	??_exeBinPath - EXE DLL folder:  \Program * Files -> WWIIOnLine -> bin == *.lib, steam_appid.txt.
-	wwiiolpath_string exeDataPath = L"";		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir).
-	wwiiolpath_string exeDocsPath = L"";		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
-	wwiiolpath_string exePlayarcPath = L"";		//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
-	wwiiolpath_string exeWorkingPath = L"";		//	??_exeWorkingPath - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-	wwiiolpath_string userConfigPath = L"";		//	??_userConfigPath - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
-	wwiiolpath_string userWorkingPath = L"";	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
+	wwiiolpath_string exePath = L"";
+	wwiiolpath_string exeDataPath = L"";
+	wwiiolpath_string exeDocsPath = L"";
+	wwiiolpath_string exePlayarcPath = L"";
+	wwiiolpath_string exeWorkingPath = L"";
+	wwiiolpath_string userDocumentsPath = L"";
+	wwiiolpath_string userWorkingPath = L"";
 	
 
 	//  exePath: Setup - START.
@@ -153,8 +155,8 @@ LOGICAL fioStructureInit()
 
 
 
-	//  userConfigPath - START.
-	//  WW2_userConfigPath - \User -> My Documents -> WWIIOnLine == wwiiol.xml, lg.dat, cfml(dir).
+	//  userDocumentsPath - START.
+	//  WW2_userDocumentsPath - \User -> My Documents -> WWIIOnLine == wwiiol.xml, lg.dat, cfml(dir).
 	//  This folder should be setup by the installer.
 	//  No Fallback.
 
@@ -163,8 +165,8 @@ LOGICAL fioStructureInit()
 	wBuffer[0] = 0;
 	if (SHGetFolderPath(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, wBuffer) == S_OK)
 	{
-		userConfigPath = wBuffer;
-		userConfigPath += L"\\" + WWIIOnlineDirName;
+		userDocumentsPath = wBuffer;
+		userDocumentsPath += L"\\" + WWIIOnlineDirName;
 
 		//  make sure it exists
 		//  Returns:
@@ -172,20 +174,20 @@ LOGICAL fioStructureInit()
 		//  -1 = Directory not created error state. [errno] set to the error code.
 		returnResult = -10;
 		_set_errno(0);
-		returnResult = _wmkdir(userConfigPath.c_str());
+		returnResult = _wmkdir(userDocumentsPath.c_str());
 
 		if (returnResult == -1)
 		{
 			if (errno == EEXIST)
 			{
 				//  File/Directory Already Exists.
-				userConfigPathSet = TRUE;
+				userDocumentsPathSet = TRUE;
 			}
 			else
 			{
 				//  errno = ENOENT - Path was not found.
-				userConfigPath = L"";
-				userConfigPathSet = FALSE;
+				userDocumentsPath = L"";
+				userDocumentsPathSet = FALSE;
 
 #if EXE_BUILD != BUILD_EXE_SETTINGS
 				dbugLog(_FLW, "SHGetFolderPath(CSIDL_PERSONAL) failed.  This folder should be setup by the installer.");
@@ -195,13 +197,13 @@ LOGICAL fioStructureInit()
 		}
 		else
 		{
-			userConfigPathSet= TRUE;
+			userDocumentsPathSet= TRUE;
 		}
 	}
 	else
 	{
-		userConfigPath = L"";
-		userConfigPathSet = FALSE;
+		userDocumentsPath = L"";
+		userDocumentsPathSet = FALSE;
 
 #if EXE_BUILD != BUILD_EXE_SETTINGS
 		dbugLog(_FLA, "SHGetFolderPath(CSIDL_PERSONAL) failed: &HFFFE.  This should NOT happen.");
@@ -210,7 +212,7 @@ LOGICAL fioStructureInit()
 
 		goto ERR_EXIT_POINT;
 	}
-	//  userConfigPath - END.
+	//  userDocumentsPath - END.
 
 
 
@@ -248,11 +250,11 @@ LOGICAL fioStructureInit()
 				//  Unable to create ProgramData directory. If the Installer (or someone else) has already created, all is ok.
 				exeWorkingPathSet = FALSE;
 
-				//  Attempting to use: WW2_userConfigPath - \User -> My Documents -> WWIIOnLine -> bin.
+				//  Attempting to use: WW2_userDocumentsPath - \User -> My Documents -> WWIIOnLine -> bin.
 				//  Fallback to: EXE ROOT folder.
-				if (userConfigPathSet == TRUE)
+				if (userDocumentsPathSet == TRUE)
 				{
-					exeWorkingPath = userConfigPath + DirNameBIN;
+					exeWorkingPath = userDocumentsPath + DirNameBIN;
 
 					//  make sure it exists
 					returnResult = -10;
@@ -498,7 +500,7 @@ LOGICAL fioStructureInit()
 	//  This folder should be setup by the installer.
 
 	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
-	userWorkingPath = userConfigPath + DirNameBIN;
+	userWorkingPath = userDocumentsPath + DirNameBIN;
 
 	//  make sure it exists
 	//  Returns:
@@ -553,7 +555,7 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
 		WW2_exeDocsPath = exeDocsPath;
 		WW2_exePlayarcPath = exePlayarcPath;
 		WW2_exeWorkingPath = exeWorkingPath;
-		WW2_userConfigPath = userConfigPath;
+		WW2_userDocumentsPath = userDocumentsPath;
 		WW2_userWorkingPath = userWorkingPath;
 	}
 
@@ -562,13 +564,13 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     const char *returnValue;
     fioStructureInit_Value = TRUE;
     
-    wwiiolpath_string exePath = L"";			//	??_exePath - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
-    wwiiolpath_string exeDataPath = L"";		//	??_exeDataPath - EXE Support Data folder:  /Applications -> World War II Online.app -> Contents -> Resources == placeholder images (x2), playarc.ww2, steam_apid.txt, WWIIOnLine.ico, readme.*.
-    wwiiolpath_string exeDocsPath = L"";        //	??_exeDocsPath - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
-    wwiiolpath_string exePlayarcPath = L"";		//	??_exePlayarcPath - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2  --OR--  == "-data" command line switch.
-    wwiiolpath_string exeWorkingPath = L"";		//	??_exeWorkingPath - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-    wwiiolpath_string userConfigPath = L"";		//	??_userConfigPath - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
-    wwiiolpath_string userWorkingPath = L"";	//	??_userWorkingPath - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
+    wwiiolpath_string exePath = L"";
+    wwiiolpath_string exeDataPath = L"";
+    wwiiolpath_string exeDocsPath = L"";
+    wwiiolpath_string exePlayarcPath = L"";
+    wwiiolpath_string exeWorkingPath = L"";
+    wwiiolpath_string userDocumentsPath = L"";
+    wwiiolpath_string userWorkingPath = L"";
     
     returnValue = macAppPath();
     if (returnValue != NULL)
@@ -653,8 +655,8 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     {
         //  /Users -> "currentuser" -> Documents -> WWIIOnline
         wwiiolpath_string userDocumentsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
-        userConfigPath = userDocumentsPath;
-        userConfigPathSet = TRUE;
+        userDocumentsPath = userDocumentsPath;
+        userDocumentsPathSet = TRUE;
     }
     else
     {
@@ -680,7 +682,7 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     WW2_exeDocsPath = exeDocsPath;
     WW2_exePlayarcPath = exePlayarcPath;
     WW2_exeWorkingPath = exeWorkingPath;
-    WW2_userConfigPath = userConfigPath;
+    WW2_userDocumentsPath = userDocumentsPath;
     WW2_userWorkingPath = userWorkingPath;
 #endif
 
@@ -721,6 +723,23 @@ unsigned long Wstring2Char(wwiiolpath_string sourceString, char *destinationStri
         //  wcstombs return does not include the terminating NULL ( L"\0" ).
         retValue = retValue + 1;
 	}
+
+	return retValue;
+}
+
+
+unsigned long Wstring2Char(wwiiolpath_string sourceString, wchar_t *destinationString, const size_t sizeLimit)
+{
+	unsigned long retValue = 0;
+
+	if (sizeLimit < 1)
+		return 0;
+
+	if (sourceString.length() == 0)
+		return 0;
+
+	wcscpy(destinationString, sourceString.c_str());
+	retValue = sourceString.length();
 
 	return retValue;
 }
@@ -804,7 +823,8 @@ bool GetExePath(wwiiolpath_string &outFullPath, wwiiolpath_string &outExeName)
 wwiiolpath_string fioGetCurrentWorkingPath()
 {
     char buffer[MAX_PATH];
-    char *answer = getcwd(buffer, sizeof(buffer));
+    //  char *answer = getcwd(buffer, sizeof(buffer));
+	char *answer = _getcwd(buffer, sizeof(buffer));
     wwiiolpath_string retVal;
     Char2Wstring(answer, retVal, strlen(answer));
     
@@ -821,7 +841,8 @@ LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath)
         return FALSE;
     
     Wstring2Char(targetPath, buffer, MAX_PATH);
-    int result = chdir(buffer);
+    //  int result = chdir(buffer);
+	int result = _chdir(buffer);
     
     if (result == 0)
         retVal = TRUE;
@@ -847,8 +868,8 @@ extern wwiiolpath_string WW2_exeDocsPath;		//	??_exeDocsPath - EXE Docs Folder: 
 extern wwiiolpath_string WW2_exePlayarcPath;	//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
 extern wwiiolpath_string WW2_exeWorkingPath;	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 												//	??_exeWorkingPath - macOS - EXE Working folder:  /Library/Application Support//WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-extern wwiiolpath_string WW2_userConfigPath;	//	??_userConfigPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
-												//	??_userConfigPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
+extern wwiiolpath_string WW2_userDocumentsPath;	//	??_userDocumentsPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
+												//	??_userDocumentsPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
 extern wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
 
 extern LOGICAL WW2_exePathSet;
@@ -857,7 +878,244 @@ extern LOGICAL WW2_exeDataPathSet;
 extern LOGICAL WW2_exeDocsPathSet;
 extern LOGICAL WW2_exePlayarcPathSet;
 extern LOGICAL WW2_exeWorkingPathSet;
-extern LOGICAL WW2_userConfigPathSet;
+extern LOGICAL WW2_userDocumentsPathSet;
 extern LOGICAL WW2_userWorkingPathSet;
 */
+}
+
+
+bool CopyOldSetupFiles_WIN()
+{	
+	bool copyFiles = false;
+
+	if (WantedCopyOldSetup == FALSE) { return false; }
+
+#if platOS == OS_WIN32
+	int charCount = 0;
+	int YN = 0;
+
+	wchar_t wBuffer[MAX_PATH + 1];
+	wwiiolpath_string userDocumentsPath = L""; //  \User -> My Documents
+	wwiiolpath_string BGEFolder = L"Battleground Europe";  //  L"Battleground Europe"
+	wwiiolpath_string bgePath = L"";
+	wwiiolpath_string ww2Path = WW2_userDocumentsPath;  //  \User -> My Documents -> WWIIOnLine
+	wwiiolpath_string folderRename = L"";
+	wwiiolpath_string reNamePath = L"";
+	wwiiolpath_string title1 = L"World War II Online - Old Game settings Located.";
+	wwiiolpath_string title2 = L"World War II Online - Old Game settings Saved.";
+	wwiiolpath_string message1 = L"An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
+	wwiiolpath_string message2 = L"";  //  To be set later.
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+	dbugLog(_FLI, "Old Settings - Checking for the presence of Old Game Settings.");
+#endif
+
+
+	//  Create a folder copy date/time stamp.  =================================================
+	if (1 == 1)
+	{
+		int n = 0;
+		time_t rawtime;
+		struct tm * timeinfo;
+		wchar_t timeStamp[256] = L"";
+
+		time(&rawtime);
+		timeinfo = localtime(&rawtime);
+		n = swprintf(timeStamp, 256, L"_Copied_%.4d%.2d%.2d-%.2d%.2d%.2d", timeinfo->tm_year + 1900, timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_hour , timeinfo->tm_min, timeinfo->tm_sec);
+
+		folderRename = timeStamp;
+		timeStamp[0] = 0;
+	}
+
+
+	//  Ask Windows where the users documents folder is?  ======================================
+	wBuffer[0] = 0;
+	if (SHGetFolderPath(nullptr, CSIDL_PERSONAL | CSIDL_FLAG_CREATE, nullptr, SHGFP_TYPE_CURRENT, wBuffer) == S_OK)
+	{
+		userDocumentsPath = wBuffer;  //  \User -> My Documents
+		bgePath = userDocumentsPath + L"\\" + BGEFolder;  //  \User -> My Documents -> Battleground Europe
+		wBuffer[0] = 0;
+	}
+	else
+	{
+		wwiiolpath_string tmp = WWIIOnlineDirName + L" - File System.";
+		MessageBox(nullptr, L"Unable to locate the My Documents directory.\n - This should not happen.", tmp.c_str(), MB_ICONSTOP | MB_OK);
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLI, "Old Settings - Unable to locate the My Documents directory. This should not happen.");
+#endif
+
+		return false;
+	}
+
+
+	//  Locate: \User -> My Documents -> Battleground Europe.  =================================
+	if ((GetFileAttributes(bgePath.c_str())) == INVALID_FILE_ATTRIBUTES)
+	{
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLI, "Old Settings - Old Game Settings NOT found.");
+#endif
+		return false;
+	}
+
+	//  Located: \User -> My Documents -> Battleground Europe.  ================================
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+	dbugLog(_FLI, "Old Settings - Old Game Settings found.");
+#endif
+
+
+	//  Verify the User wants to copy the old Setup Files.  ====================================
+	YN  = MessageBox(nullptr, message1.c_str(), title1.c_str(), MB_ICONASTERISK | MB_YESNO);
+	
+	if (YN == IDNO)
+	{
+		// the User clicked: No.
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLW, "Old Settings - Old Game Settings found -> the user declined the copy option.");
+#endif
+		copyFiles = false;
+	
+	}
+	else
+	{
+		//  Copy the ENTIRE Contents of:  ======================================================
+		//   \User -> My Documents -> Battleground Europe
+		//   TO
+		//   \User -> My Documents -> WWIIOnline.
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying files.");
+#endif
+
+		wwiiolpath_string tmpSource = bgePath + L"\\*.*";
+		wwiiolpath_string tmpdestination = WW2_userDocumentsPath + L"\\";
+		if (SHFileFunctions_WC(tmpSource, tmpdestination, FO_COPY))
+		{
+			//  Copy Completed.
+
+
+			//  Re-Name:  ======================================================================
+			//   \User -> My Documents -> "Battleground Europe"
+			//   TO
+			//   \User -> My Documents -> "Battleground Europe_CopiedXXXXXXXXXX-XXXXXX".
+
+			reNamePath = bgePath + folderRename;
+			message2 = L"The Directory : \n" + bgePath + L"\n\nhas been re-named to : \n" + reNamePath;
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+			dbugLog(_FLI, "Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+#endif
+
+			if (SHFileFunctions_WC(bgePath, reNamePath, FO_RENAME))
+			{
+				//  Rename Succeeded.
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+				dbugLog(_FLI, "Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+#endif
+				YN = MessageBox(nullptr, message2.c_str(), title2.c_str(), MB_ICONASTERISK | MB_OK);
+				copyFiles = true;
+			}
+			else
+			{
+				//  Rename Failed.
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+				char source[MAX_PATH] = "";
+				char destination[MAX_PATH] = "";
+				Wstring2Char(bgePath, source, MAX_PATH);
+				Wstring2Char(reNamePath, destination, MAX_PATH);
+
+				dbugLog(_FLW, "Old Settings - Could not rename:-\n\nfrom path : \n%s,\n\nto path : \n%s.", &source, &destination);
+#endif
+				copyFiles = false;
+			}
+		}
+		else
+		{
+			//  Copy Failed.
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+			char source[MAX_PATH] = "";
+			char destination[MAX_PATH] = "";
+			Wstring2Char(bgePath, source, MAX_PATH);
+			Wstring2Char(WW2_userDocumentsPath, destination, MAX_PATH);
+
+			dbugLog(_FLW, "Old Settings - Could not copy:-\n\nfrom path : \n%s,\n\nto path : \n%s.", &source, &destination);
+#endif
+			copyFiles = false;
+		}
+	}
+
+#else
+	copyFiles = false;
+
+#endif
+
+	return copyFiles;
+}
+
+
+bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function = 2U)
+{
+	bool retValue = false;
+
+#if platOS == OS_WIN32
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+	char source[MAX_PATH] = "";
+	char destination[MAX_PATH] = "";
+	Wstring2Char(sourcePath, source, MAX_PATH);
+	Wstring2Char(destinationPath, destination, MAX_PATH);
+
+	dbugLog(_FLI, "Old Settings - File operations: %d from %s to %s", FO_Function, &source, &destination);
+#endif
+
+	//  FO_Function defines.
+	//  FO_MOVE		0x0001 - Move files from sourcePath, to destinationPath.
+	//  FO_COPY		0x0002 - Copy files from sourcePath, to destinationPath.
+	//  FO_DELETE	0x0003 - Delete files from sourcePath.
+	//  FO_RENAME	0x0004 - ReName a file from sourcePath. Single file ONLY.
+
+	//  ALL Paths are Fully Qualified Paths.
+
+	if (FO_Function == FO_DELETE) { return false; }  //  Disable Deletion.
+	if ( FO_Function < 1 || FO_Function > 4 ) { return false; }
+
+	if (sourcePath == L"" && destinationPath == L"" ) { return false; }
+	if (sourcePath == L"" && ( FO_Function == FO_DELETE || FO_Function == FO_RENAME )) { return false; }
+
+	int result = -1;
+	SHFILEOPSTRUCT fileOp = { 0 };
+	fileOp.wFunc = FO_Function;
+
+	TCHAR newSourcePath[MAX_PATH];
+	wcscpy_s(newSourcePath, sourcePath.c_str());
+	newSourcePath[wcslen(sourcePath.c_str()) + 1] = NULL;
+	fileOp.pFrom = newSourcePath;
+
+	TCHAR newDestinationPath[MAX_PATH];
+	wcscpy_s(newDestinationPath, destinationPath.c_str());
+	newDestinationPath[wcslen(destinationPath.c_str()) + 1] = NULL;
+	fileOp.pTo = newDestinationPath;
+
+	fileOp.fFlags = FOF_SILENT | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_NOCONFIRMMKDIR;
+
+	result = SHFileOperationW(&fileOp);
+
+	if (result == 0 && fileOp.fAnyOperationsAborted == false)
+	{
+		retValue = true;
+	}
+	else
+	{
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLI, "Old Settings - SHFileOperation return code: 0x%x", result);
+#endif
+		retValue = false;
+	}
+
+#else
+	retValue = false;
+
+#endif
+
+	return retValue;
 }

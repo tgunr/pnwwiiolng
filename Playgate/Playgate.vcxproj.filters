@@ -263,14 +263,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\ww2assets\WWIIOnLine.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\ww2assets\DATA\playgate\bg.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
     </Image>
     <Image Include="..\ww2assets\DATA\playgate\bg-tos.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
+    </Image>
+    <Image Include="..\ww2assets\oswin\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
 </Project>

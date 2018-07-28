@@ -62,7 +62,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WWII_ICON           ICON                    "..\\..\\ww2assets\\WWIIOnLine.ico"
+IDI_WWII_ICON           ICON                    "..\\..\\ww2assets\\oswin\\WWIIOnLine.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

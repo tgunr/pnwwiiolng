@@ -1143,7 +1143,7 @@ static void PrintDateTime()
 
     localtime_r(&p, &t);
     strftime(buf, 255, "Date and time: %F %T %z", &t);
-    Write_Debug("%s", buf);
+    Write_Debug("%s\n", buf);
 }
 
 

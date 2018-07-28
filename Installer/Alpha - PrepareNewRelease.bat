@@ -1,6 +1,6 @@
 @echo off
 @echo.
-@echo ====  Launching:  Release - PrepareNewRelease.bat  (release-alpha).
+@echo ====  Launching:  PrepareNewRelease.bat  (release-alpha).
 @echo.
 @echo.
 
@@ -9,15 +9,15 @@ SET LaunchingDir=%~dp0
 IF NOT DEFINED LaunchingDir (
 	@echo.
 	@echo.
-	@echo Release - PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
+	@echo PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
 	EXIT 1
 )
 
 CD /D "%LaunchingDir%"
 
-@echo ====  Current Working Directory: "%CD%"
+@echo ====  Current Working Directory: %CD%
 
-rem If Release - PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
+rem If PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
 IF /I NOT EXIST "PrepareNewRelease.bat" (
 	@echo.
 	@echo PrepareNewRelease.bat: file NOT found - ABORTING.

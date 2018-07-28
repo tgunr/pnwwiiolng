@@ -66,7 +66,7 @@ void fileInit()
 	wchar_t wBuffer[MAX_PATH + 1];
 
 	wwiiolpath_string regBasePath = L"";
-	wwiiolpath_string userConfigPath = L"";
+	wwiiolpath_string userDocumentsPath = L"";
 
 	LOGICAL retValue = FALSE;
 	
@@ -78,21 +78,21 @@ void fileInit()
 		regBasePath = WWIIOnlineDirName;
 
 	//  Registry Path.
-	userConfigPath += wBuffer;
-	userConfigPath += L"\\" + regBasePath;
+	userDocumentsPath += wBuffer;
+	userDocumentsPath += L"\\" + regBasePath;
 
 	//  Initialise Standard Paths.
 	retValue = fioStructureInit();
 
-	if (userConfigPath != L"")
+	if (userDocumentsPath != L"")
 	{
 		//  Use the Registry Path FIRST.
-		WW2_userConfigPath = userConfigPath;
+		WW2_userDocumentsPath = userDocumentsPath;
 	}
-	else if (WW2_userConfigPath != L"")
+	else if (WW2_userDocumentsPath != L"")
 	{
 		//  Use the Initialised Path SECOND.  All is Good.
-		//  ST_userConfigPath = ST_userConfigPath;
+		//  ST_userDocumentsPath = ST_userDocumentsPath;
 	}
 	else
 	{

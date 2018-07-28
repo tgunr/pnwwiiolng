@@ -114,7 +114,6 @@
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
@@ -417,7 +416,7 @@
   <ItemGroup>
     <Image Include="..\ww2assets\DATA\playgate\bg-tos.bmp" />
     <Image Include="..\ww2assets\DATA\playgate\bg.bmp" />
-    <Image Include="..\ww2assets\WWIIOnLine.ico" />
+    <Image Include="..\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

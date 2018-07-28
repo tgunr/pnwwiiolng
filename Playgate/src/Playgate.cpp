@@ -354,7 +354,7 @@ BOOL CPlaygateApp::InitInstance()
 	teulGetHost(PLAY_GATE_VERSION, &g_playgateVersion);
 
 	// Move ourselves to the playgate home
-	if ( registryGetPaths(WW2_exePath, WW2_exeDataPath, WW2_userConfigPath) == false )
+	if ( registryGetPaths(WW2_exePath, WW2_exeDataPath, WW2_userDocumentsPath) == false )
 	{
 		dbugLog(_FLA, "Unable to retrieve paths from registry.");
 		MessageBox(nullptr, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);

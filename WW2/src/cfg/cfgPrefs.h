@@ -30,10 +30,10 @@
 
 #define PREF_FILE_NAME "wwiiol.xml"
 
-#ifdef BETA_RELEASE
-#undef PREF_FILE_NAME
-#define PREF_FILE_NAME "wwiiol_beta.xml"
-#endif
+//  #ifdef BETA_RELEASE
+//  #undef PREF_FILE_NAME
+//  #define PREF_FILE_NAME "wwiiol_beta.xml"
+//  #endif
 
 bool cfgPrefsLoad(); // loads prefs from disk
 void cfgPrefsSave(); // tolua_export // saves all prefs to disk

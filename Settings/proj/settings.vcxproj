@@ -253,10 +253,10 @@
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\ww2assets\WWIIOnLine.ico" />
+    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

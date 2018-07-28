@@ -70,12 +70,16 @@ const TCHAR* registryInstallValue(const TCHAR *Key)
 	// create the path based on the appid
 	wsprintf(path, _T("SOFTWARE\\Playnet\\apps\\appid%d\\instance1"), appid);
 	
-	// try to get the value
-	if(registryGetVal(path, Key, (LPBYTE)value))
+	// try to get the value and return it.
+	if (registryGetVal(path, Key, (LPBYTE)value))
+	{
 		return value;
-	
-	// return it
-	return NULL;
+	}
+	else
+	{
+		//  return NULL;  MJH
+		return L"";
+	}
 }
 
 bool

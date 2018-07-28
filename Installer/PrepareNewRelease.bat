@@ -109,7 +109,7 @@ CD /D "%ww2ExePath%"
 @echo.
 
 CD /D "%LaunchingDir%"
-@echo ====  Current Working Directory: "%CD%"
+@echo ====  Current Working Directory: %CD%
 
 rem If PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
 IF /I NOT EXIST "PrepareNewRelease.bat" (
@@ -123,7 +123,7 @@ IF /I NOT EXIST "PrepareNewRelease.bat" (
 @echo.
 @echo.
 CD /D "%TargetRootPath%\previous"
-@echo ====  Deleting the contents of: "%CD%"
+@echo ====  Deleting the contents of: %CD%
 @echo.
 
 IF /I NOT EXIST "WW2.exe" (
@@ -142,14 +142,14 @@ DEL *.* /S /Q
 RMDIR /S /Q "%CD%"
 
 @echo.
-@echo "%CD%" should now be Empty.
+@echo %CD% should now be Empty.
 @echo.
 @echo.
 
 CD /D "%LaunchingDir%"
 
 CD /D "%TargetRootPath%\diff"
-@echo ====  Deleting the contents of: "%CD%"
+@echo ====  Deleting the contents of: %CD%
 @echo.
 
 IF /I NOT EXIST "WW2.exe.patch" (
@@ -168,7 +168,7 @@ DEL *.* /S /Q
 RMDIR /S /Q "%CD%"
 
 @echo.
-@echo "%CD%" should now be Empty.
+@echo %CD% should now be Empty.
 @echo.
 @echo.
 
@@ -202,18 +202,23 @@ DEL *.* /S /Q
 RMDIR /S /Q "%CD%"
 
 @echo.
-@echo "%CD%" should now be Empty.
+@echo %CD% should now be Empty.
 @echo.
 @echo.
 
 rem CD /D "%TargetRootPath%\current"
-@echo ====  Creating and populating the DATA directory under "%CD%".
+@echo ====  Creating and populating the DATA directory under %CD%.
 MD DATA
+MD DATA\screens
 
 CD /D "%LaunchingDir%"
 
 @echo Copying files to the DATA directory.
-XCOPY "%ww2assetspath%\dependencies\*.*" "%TargetRootPath%\current\DATA\" /S /E /V
+XCOPY "%ww2assetspath%\oswin\dependencies\*.*" "%TargetRootPath%\current\DATA\" /S /E /V
+
+@echo.
+@echo Copying splash screen files to the DATA directory.
+XCOPY "%ww2assetspath%\screens\*.*" "%TargetRootPath%\current\DATA\screens\" /S /E /V
 
 @echo.
 @echo.
@@ -254,22 +259,26 @@ XCOPY "%ww2ExePath%\WW2.exe" "%TargetRootPath%\current\" /V
 
 @echo.
 @echo.
-@echo ====  Unable to locate the files readme.rtf and readme.txt to copy.
+@echo ====  Copying the files readme.rtf and readme.txt to %TargetRootPath%\current\.
+rem XCOPY "%ww2assetspath%\readme.rtf" "%TargetRootPath%\current\" /V 
+rem XCOPY "%ww2assetspath%\readme.txt" "%TargetRootPath%\current\" /V
+XCOPY "%ww2assetspath%\readme.*" "%TargetRootPath%\current\" /V 
 
 @echo.
 @echo.
-@echo ====  Copying the the files in the assets-libs directory to %CD%.
-XCOPY "%ww2assetspath%\libs\*.*" "%TargetRootPath%\current\" /V
+@echo ====  Copying the the files in the assets-libs directory to %TargetRootPath%\current\.
+XCOPY "%ww2assetspath%\oswin\libs\*.*" "%TargetRootPath%\current\" /V
 
 @echo.
 @echo.
-@echo ====  Copying the the files in the assets-steam directory to %CD%.
-XCOPY "%ww2assetspath%\steam\*.*" "%TargetRootPath%\current\" /V
+@echo ====  Copying Steam Files to %TargetRootPath%\current\.
+XCOPY "%ww2assetspath%\steam_appid.txt" "%TargetRootPath%\current\" /V
+XCOPY "%ww2assetspath%\oswin\steam_api.dll" "%TargetRootPath%\current\" /V
 
 @echo.
 @echo.
-@echo ====  Copying the the file WWIIOnLine.ico to %CD%.
-XCOPY "%ww2assetspath%\WWIIOnLine.ico" "%TargetRootPath%\current\" /V
+@echo ====  Copying the the file WWIIOnLine.ico to %TargetRootPath%\current\.
+XCOPY "%ww2assetspath%\oswin\WWIIOnLine.ico" "%TargetRootPath%\current\" /V
 
 @echo off
 

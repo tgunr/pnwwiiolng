@@ -1671,7 +1671,7 @@ static void glScreenCapture(void) {
 	#define topathstr std::to_wstring
 	#define checkfile _waccess
 
-	std::basic_string<fullpath_t> base_filename(WW2_userConfigPath);
+	std::basic_string<fullpath_t> base_filename(WW2_userDocumentsPath);
 #else
 	#define topathstr std::to_string
 	#define checkfile _access

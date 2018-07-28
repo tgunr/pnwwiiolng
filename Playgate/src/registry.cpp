@@ -75,7 +75,7 @@ static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t
 }
 
 bool
-registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring& userConfigPath)
+registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring& userDocumentsPath)
 {
 	wchar_t wBuffer[MAX_PATH+1];
 	wBuffer[0] = 0;
@@ -84,7 +84,7 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 	int returnResult = -10;
 	bool exePathSet = false;
 	bool exeDataPathSet = false;
-	bool userConfigPathSet = false;
+	bool userDocumentsPathSet = false;
 
 #ifdef IGNORE_REGISTRY
 
@@ -92,7 +92,7 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 
 	exePath = WW2_exePath;
 	exeDataPath = WW2_exeDataPath;
-	userConfigPath = WW2_userConfigPath;
+	userDocumentsPath = WW2_userDocumentsPath;
 
 	return true;
 
@@ -181,7 +181,7 @@ registryGetPaths(std::wstring& exePath, std::wstring& exeDataPath, std::wstring&
 		//  Unable to create ProgramData directory. If the Installer (or someone else) has already created, all is ok.
 		WW2_exeDataPathSet = FALSE;
 
-		if (WW2_userConfigPathSet = TRUE)
+		if (WW2_userDocumentsPathSet = TRUE)
 		{
 			dataPath = configPath;
 			_copyPathToString("DataPath", dataPath, L"Bin");

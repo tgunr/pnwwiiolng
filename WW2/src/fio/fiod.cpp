@@ -96,6 +96,7 @@ namespace {
 
 //==============================================================================
 
+/*
 namespace {
 	inline UINT32 pathprintf(char* buf, size_t bufsize, const char* lhs, const char* rhs)
 	{ return snprintf(buf, bufsize, "%s" OS_PATHSEP "%s", lhs, rhs); }
@@ -109,7 +110,9 @@ namespace {
 	UINT32 pathprintf(wchar_t(&buf)[bufSize], const wchar_t* lhs, const wchar_t* rhs)
 	{ return wstrprintf<bufSize>(buf, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
 }
+*/
 
+/*
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 	fullpath_t name[PN_MAX_PATH];
 #if platOS == OS_WIN32
@@ -128,6 +131,32 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
     fiodGetPrepath(returnValue);
     retValue = pathprintf(path, PN_MAX_PATH, returnBuffer, os_file_path(name));
     return retValue;
+}
+*/
+
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname)
+{
+	fullpath_t name[PN_MAX_PATH];
+	UINT32 retValue = 0;
+
+#if platOS == OS_WIN32
+	WWII::ConvertChars(rawname, name, array_size(name));
+	name[array_size(name) - 1] = L'\0';
+#else
+	strsafecpy(name, rawname);
+#endif
+
+	wwiiolpath_string returnBuffer = L"";
+	wwiiolpath_string returnPath = L"";
+
+	fiodGetPrepath_WC(returnBuffer);
+	returnPath = returnBuffer += OS_PATHSEP_W;
+	returnPath = returnPath += os_file_path(name);
+	retValue = returnPath.length();
+
+	wcscpy(path, returnPath.c_str());
+	
+	return retValue;
 }
 
 //==============================================================================
@@ -514,7 +543,7 @@ void fiodSetUserpath(bool userpath) {
 	}
 	else
 	{
-		wwiiolpath_string tepmString =  use_userpath ? WW2_userConfigPath : WW2_exeDataPath;
+		wwiiolpath_string tepmString =  use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
         Wstring2Char(tepmString, returnBuffer, sizeof(returnBuffer));
     }
     
@@ -522,19 +551,34 @@ void fiodSetUserpath(bool userpath) {
 }
 */
 
-bool fiodGetPrepath(char returnBuffer[MAX_PATH + 1])
+bool fiodGetPrepath(char returnPrePath[MAX_PATH + 1])
 {
     if (WantDataDir == TRUE && WantedDataPath != L"")
     {
-        Wstring2Char(WantedDataPath, returnBuffer, MAX_PATH + 1);
+        Wstring2Char(WantedDataPath, returnPrePath, MAX_PATH + 1);
     }
     else
     {
-        wwiiolpath_string tepmString =  use_userpath ? WW2_userConfigPath : WW2_exeDataPath;
-        Wstring2Char(tepmString, returnBuffer, MAX_PATH + 1);
+        wwiiolpath_string tepmString =  use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
+        Wstring2Char(tepmString, returnPrePath, MAX_PATH + 1);
     }
     
     return true;
+}
+
+bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
+{
+	if (WantDataDir == TRUE && WantedDataPath != L"")
+	{
+		returnPrePath = WantedDataPath;
+	}
+	else
+	{
+		wwiiolpath_string tepmString = use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
+		returnPrePath = tepmString;
+	}
+
+	return true;
 }
 
 #else
@@ -562,7 +606,7 @@ void fiodmkdir(const char* path)
 	char fullPath[PN_MAX_PATH];
     char prePath[PN_MAX_PATH];
     
-    Wstring2Char(WW2_userConfigPath, prePath, PN_MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, PN_MAX_PATH);
 
     strprintf(fullPath, "%s/%s", prePath, path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
@@ -923,7 +967,7 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 	char	fullpath[_MAX_PATH];
     char    prePath[_MAX_PATH];
     
-    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
    
 	strprintf(fullpath,"%s/%s", prePath, filename);
     int fd = -1;
@@ -939,7 +983,7 @@ LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 	char	fullpath[_MAX_PATH];
     char    prePath[_MAX_PATH];
     
-    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
     
 	strprintf(fullpath,"%s/%s", prePath, filename);
 
@@ -958,7 +1002,7 @@ size_t fiocfgOpen(const char* filename, bool)
 	int		hfile = -1;
 	struct stat st;
     
-    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
     
 	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
@@ -976,7 +1020,7 @@ size_t fiocfgOpenWrite(const char* filename, bool)
     char    prePath[_MAX_PATH];
 	int     hfile = -1;
     
-    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
 
 	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
@@ -993,7 +1037,7 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 	struct	stat	buffer;
 	SINT32  retval;
     
-    Wstring2Char(WW2_userConfigPath, prePath, _MAX_PATH);
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
 
 	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);

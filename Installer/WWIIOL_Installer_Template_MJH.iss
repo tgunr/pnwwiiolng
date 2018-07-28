@@ -345,8 +345,8 @@ MinVersion=6.0
 SetupIconFile={#CurrentFilesRoot}\{#InstallerIconFileName}
 LicenseFile={#CurrentFilesRoot}\docs\{#WWIIOnlineLicenseFile}
 InfoBeforeFile={#CurrentFilesRoot}\{#WWIIOnlineReadMeFile}
-WizardImageFile={#WWIIOnlineAssetsDir}\{#InstallerImageFile}
-WizardSmallImageFile={#WWIIOnlineAssetsDir}\{#InstallerImageFileSmall}
+WizardImageFile={#WWIIOnlineAssetsDir}\oswin\{#InstallerImageFile}
+WizardSmallImageFile={#WWIIOnlineAssetsDir}\oswin\{#InstallerImageFileSmall}
 
 
 ; Installer - Variables

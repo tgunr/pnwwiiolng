@@ -493,17 +493,17 @@ void SetupFPU(bool enableExceptions)
     fp_cw = _control87( fp_cw,
                         fp_mask );
 
-    Write_Debug("\n===========================");
+    Write_Debug("===========================");
     Write_Debug("          FPU-SETUP        ");
     Write_Debug("===========================");
     Write_Debug("Interrupt Exception Masks");
     bits = fp_cw & MCW_EM;
-	Write_Debug("  Invalid Operation exception	: %s", status[(bits & EM_INVALID) == 0]);
-	Write_Debug("  Denormalized exception		: %s", status[(bits & EM_DENORMAL) == 0]);
-	Write_Debug("  Divide-By-Zero exception		: %s", status[(bits & EM_ZERODIVIDE) == 0]);
-	Write_Debug("  Overflow exception			: %s", status[(bits & EM_OVERFLOW) == 0]);
-	Write_Debug("  Underflow exception			: %s", status[(bits & EM_UNDERFLOW) == 0]);
-	Write_Debug("  Precision exception			: %s", status[(bits & EM_INEXACT) == 0]);
+	Write_Debug("  Invalid Operation exception  : %s", status[(bits & EM_INVALID) == 0]);
+	Write_Debug("  Denormalized exception       : %s", status[(bits & EM_DENORMAL) == 0]);
+	Write_Debug("  Divide-By-Zero exception     : %s", status[(bits & EM_ZERODIVIDE) == 0]);
+	Write_Debug("  Overflow exception           : %s", status[(bits & EM_OVERFLOW) == 0]);
+	Write_Debug("  Underflow exception          : %s", status[(bits & EM_UNDERFLOW) == 0]);
+	Write_Debug("  Precision exception          : %s", status[(bits & EM_INEXACT) == 0]);
     Write_Debug("");
 
     bits = fp_cw & MCW_IC;
@@ -680,6 +680,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 {
 	// setup the data paths
 	fioInit();
+
+	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+	//  Default override. DEF = TRUE.
+	WantedCopyOldSetup = TRUE;
 
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
@@ -913,6 +917,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 #endif	//	EVENT_LOG
+
+	if (WantedCopyOldSetup == TRUE)
+	{
+		CopyOldSetupFiles_WIN();
+	}
 
 	if (!sndsDriverConfig(hInstance))
 	{

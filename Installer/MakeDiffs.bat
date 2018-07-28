@@ -9,7 +9,7 @@
 :: The order of appearence on the Command Line <<< IS CRITICAL >>>
 
 :: Defaults = release candidate:
-:: Launching Directory = The directory where the BAT file is located when it was Launched.
+:: Launching Directory = The directory where this BAT file is located when it was Launched.
 :: NOTE: ALL of the other default paths are relative to this directory.
 
 :: PreviousFilesDirectory = .\release-candidate\previous
@@ -37,7 +37,7 @@ IF NOT DEFINED previouspath (SET previouspath=.\release-candidate\previous)
 IF NOT DEFINED currentpath (SET currentpath=.\release-candidate\current)
 IF NOT DEFINED outputpath (SET outputpath=.\release-candidate\diff)
 
-SET ww2assetspath=..\.\ww2assets
+SET ww2assetspath=..\.\ww2assets\oswin
 
 @echo.
 @echo==========================================================================================================

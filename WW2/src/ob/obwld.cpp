@@ -854,7 +854,7 @@ logTimerEndExtMacro(parseWor);
 	}
 #endif
 	T2 = timeGetTime();
-	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
+	Write_Debug ("\n\n*****************  Total time loading blitzwor.csv file: %u milliseconds\n\n", T2-T1);
 
 	// Granny2 system (needs materials loaded)
 #if defined(BETA_RELEASE)

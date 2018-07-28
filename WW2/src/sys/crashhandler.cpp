@@ -693,7 +693,7 @@ static void ProcessExistingReports(const std::wstring &dataPath)
 	// Any items left in rawDumpPaths or metadataPaths are orphans (not matching any container)
 	dbugLog(_FLI, "Removing %u leftover metadata files", metadataPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : metadataPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
-	dbugLog(_FLI, "Removing %u leftover container files", containerPaths.size());
+	dbugLog(_FLI, "Removing %u leftover container files\n", containerPaths.size());
 	for (const std::pair<std::wstring, std::wstring> &kv : containerPaths) { _wunlink((dataPath + L"\\" + kv.second).c_str()); }
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)

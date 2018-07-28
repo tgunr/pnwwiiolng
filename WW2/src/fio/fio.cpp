@@ -31,13 +31,13 @@ void fioInit()
     
     //  \User -> My Documents -> WWIIOnLine
     resultValue = fioStructureInit();
-    resultValue = SetCurrentDirectoryW(WW2_userConfigPath.c_str());
+    resultValue = SetCurrentDirectoryW(WW2_userDocumentsPath.c_str());
 
 #elif platOS == OS_MACOS
     
     //  /Users -> "currentuser" -> Documents -> WWIIOnline
     resultValue = fioStructureInit();
-    //  resultValue = fioSetCurrentWorkingPath(WW2_userConfigPath);
+    //  resultValue = fioSetCurrentWorkingPath(WW2_userDocumentsPath);
 
 #endif
 }
@@ -123,23 +123,23 @@ int fioOpen(const char* const filename)
 
 	switch(fio_switch)
     {
-        //  local "user" directory.
-		case ISUSERDIRECTORY:
-            WITH ( UsingUserdir() )
-				fd = fiodOpen(fn);
-		break;
-            
-        //  local directory.
-        case ISDIRECTORY:
-       	default:
-            fd = fiodOpen(fn);
-       	break;
-            
-        //  playarc virtual directory (playarc).
+        //  ISARCHIVE = 1: virtual directory (playarc = WW2_exePlayarcPath).
         case ISARCHIVE:
             fd = fioaOpen(fn);
-       	break;
-    }
+       		break;
+
+		//  ISUSERDIRECTORY = 2: local "user" directory (WW2_userDocumentsPath = My Documents -> WWIIOnline).
+		case ISUSERDIRECTORY:
+			WITH(UsingUserdir())
+				fd = fiodOpen(fn);
+			break;
+
+		//  ISDIRECTORY = 0: local directory (WantDataDir - Want to run out od a Data directory. Set by commandline).
+		case ISDIRECTORY:
+		default:
+			fd = fiodOpen(fn);
+			break;
+	}
 
     return fd;
 }
@@ -156,8 +156,6 @@ FILE* fioUserFile(const char* filename, const char* mode)
 	wwiiolpath_string tmpPath = WW2_exeWorkingPath;
 
 	mbstowcs(tmpFilename, filename, PN_MAX_PATH);
-//	tmpPath += L"\\";
-//	tmpPath += tmpFilename;
 	
 #if platOS == OS_WIN32 && defined(_UNICODE)
     tmpPath += L"\\";
@@ -687,7 +685,7 @@ namespace Fio
 
 	//////////////////////////////////////////////////////////////////////
 	// Return the name of the standard log file.
-   const char* LogFileName() { return "WW2_Log.txt"; }
+	const char* LogFileName() { return "WW2_Log.txt"; }
 
 	//////////////////////////////////////////////////////////////////////
 	// Return a FILE* to the unified log file
@@ -696,16 +694,41 @@ namespace Fio
 		return fioUserFile(Fio::LogFileName(), "a");
 	}
 
+	/*
+	void DeleteLogFile()
+	{
+			fullpath_t path[PN_MAX_PATH];
+			WITH ( UsingUserdir() )
+				GetFullPath(path, Fio::LogFileName());
+	#if platOS == OS_WIN32
+			_wunlink(path);
+	#else
+			unlink(path);
+	#endif
+	}
+	*/
+
 	void DeleteLogFile()
 	{
 		fullpath_t path[PN_MAX_PATH];
-		WITH ( UsingUserdir() )
-			GetFullPath(path, Fio::LogFileName());
-#if platOS == OS_WIN32
-		_wunlink(path);
+
+		wchar_t tmpFilename[PN_MAX_PATH];
+		wwiiolpath_string tmpPath = WW2_exeWorkingPath;
+
+		mbstowcs(tmpFilename, Fio::LogFileName(), PN_MAX_PATH);
+
+#if platOS == OS_WIN32 && defined(_UNICODE)
+		tmpPath += L"\\";
+		tmpPath += tmpFilename;
+
+		_wunlink(tmpPath.c_str());
 #else
-		unlink(path);
+		tmpPath += L"/";
+		tmpPath += tmpFilename;
+
+		unlink(tmpPath.c_str());
 #endif
 	}
+
 
 };	// end namespace Fio

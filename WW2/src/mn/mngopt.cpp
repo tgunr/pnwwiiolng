@@ -138,7 +138,8 @@ LOGICAL mngoptParse()
         Wstring2Char(WW2_exeDataPath, DataPath, sizeof(DataPath));
 	
 	if (WantedDataPath == L"" && WantDataDir == TRUE)
-        Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
+        //  Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
+		WantedDataPath = DataPath;
 
 	char*	ptr;
 

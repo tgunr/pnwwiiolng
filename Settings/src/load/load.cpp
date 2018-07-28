@@ -49,7 +49,7 @@ bool loadPreferences()
                              (xmlInputReadCallback)fileRead,
                              (xmlInputCloseCallback)fileClose);
 
-	wwiiolpath_string homePath = WW2_userConfigPath + L"\\" + GameSettingsFilename;
+	wwiiolpath_string homePath = WW2_userDocumentsPath + L"\\" + GameSettingsFilename;
 
 	_loadDefault();
 
@@ -57,7 +57,7 @@ bool loadPreferences()
 	
 	if(!xmlloaded)
 	{
-		wwiiolpath_string workingPath = WW2_userConfigPath + L"\\DATA\\" + GameSettingsFilename;
+		wwiiolpath_string workingPath = WW2_userDocumentsPath + L"\\DATA\\" + GameSettingsFilename;
 
 		xmlloaded = _loadXML(workingPath.c_str());
 	}
@@ -503,7 +503,7 @@ void _saveAsXML()
 	if ( buf == nullptr )
 		return; // ???
 
-	wwiiolpath_string homepath = WW2_userConfigPath + L"\\" + GameSettingsFilename;
+	wwiiolpath_string homepath = WW2_userDocumentsPath + L"\\" + GameSettingsFilename;
 	
 	buf->context = reinterpret_cast<void*>(fileOpenWrite(homepath.c_str()));
 	buf->writecallback = (xmlOutputWriteCallback)fileWrite;
