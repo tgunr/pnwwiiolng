@@ -2136,24 +2136,42 @@ CPStruct::numBrigades(BRANCH_ENUM forBranch) const
 	return units;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Return the factories and their current status'
+
 std::string strtGetFactoryList(WWII_COUNTRY forCountry)
 {
-	char buffer[512];
-	std::string result = "";
-	for ( UINT32 i = 0; i < _factories.size(); ++i )
-	{
-		const ObjectStruct* obj = _factories[forCountry];
-		if ( obj->facility->originalCountry != forCountry )
-			continue;
-		if ( obj->m_country == forCountry )
-			strprintf(buffer, "%s dmg:%u%%. ", obj->name, obj->percentDamage);
-		else
-			strprintf(buffer, "%s OWNER:%s dmg:%u%%. ", obj->name, _countryCode[obj->m_country], obj->percentDamage);
-		result += buffer;
-	}
+	// Re-order the _factories vector so that the factories are put into the proper order when displayed
+	std::sort(_factories.begin(), _factories.end(), [](const ObjectStruct *obj1, const ObjectStruct *obj2) {
+		return strcmp(obj1->name, obj2->name) < 0;
+	});
+	
+    std::string result = "";
 
-	if ( result.empty() )
-	{
+    for (const ObjectStruct *obj : _factories) {
+		// If the factory isn't part of the specified country, skip this loop
+        if (obj->facility->originalCountry != forCountry) {
+            continue;
+        }
+
+        char buffer[512];
+
+        if (obj->m_country == forCountry) {
+            strprintf(buffer, "%s: %u%%\n", obj->name, obj->percentDamage);
+        } else {
+			// If someone else besides the orginal owner owns this factory, make a note of it
+            strprintf(buffer, "%s: %u%% (OWNER: %s)\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+        }
+
+		// Clean up the UK/FR/DE_PF#_FACTORY names
+		std::string tempString = buffer;
+		tempString.replace(0, 5, "#");
+		tempString.replace(2, 8, "");
+	
+        result += tempString;
+    }
+
+	if ( result.empty() ) {
 		return "No factories";
 	}
 
