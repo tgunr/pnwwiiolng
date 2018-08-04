@@ -2160,7 +2160,7 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
             strprintf(buffer, "%s: %u%%\n", obj->name, obj->percentDamage);
         } else {
 			// If someone else besides the orginal owner owns this factory, make a note of it
-            strprintf(buffer, "%s: %u%% (OWNER: %s)\n", obj->name, _countryCode[obj->m_country], obj->percentDamage);
+            strprintf(buffer, "%s: %u%% (OWNER: %s)\n", obj->name, obj->percentDamage, _countryCode[obj->m_country]);
         }
 
 		// Clean up the UK/FR/DE_PF#_FACTORY names
