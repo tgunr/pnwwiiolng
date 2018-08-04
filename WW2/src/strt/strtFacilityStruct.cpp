@@ -68,7 +68,7 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 		return 0;
 
 	// You can only use firebases when spawning your brigade or divisional equipment.
-	if ( type == FACILITY_FIREBASE && (brigade->isBrigade() == false || brigade->isGarrison() == false || brigade->movementType() != BRANCH_LAND) )
+	if ( type == FACILITY_FIREBASE && ((brigade->isBrigade() == false && brigade->isGarrison() == false) || brigade->movementType() != BRANCH_LAND) )
 		return 0;
 
 	// If the CP is here, then its definitely the supplying unit.
