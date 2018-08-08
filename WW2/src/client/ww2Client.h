@@ -64,6 +64,7 @@ class CaptureState;
 struct ClientData;
 struct ClientClassData;
 struct ChatServerInfo;
+class HCUnitCountryChange;
 
 namespace Chat
 {
@@ -273,6 +274,7 @@ public:
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice);
 	virtual void ProcessMissionInvite(const MissionInvite& invite);
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc){}
+	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc){}
 	virtual void ProcessInstanceResult(const Instance::Result& result);
 	virtual void ProcessInstanceList(const Instance::ClientListing* list);
 	virtual void ProcessTutorialFlags(ChatHandle group, UINT64 flags);

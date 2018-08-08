@@ -278,6 +278,12 @@ public:
 
 	void setRouteing(bool isConnected);
 
+	// Purges the supply and unsubscribes the Toe Template header of all Garrisons in this cp.
+	void removeAllGarrisonsSupply();
+
+	// Changes the country and the toe Template header for all Garrisons in this cp.
+	void changeAllGarrisonCountries(WWII_COUNTRY countryID);
+
 	void setTableStates(bool isNewObjective = false);
 
 	// Is a particular side allowed to spawn here?

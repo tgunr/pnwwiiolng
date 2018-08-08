@@ -269,6 +269,13 @@ CaptureAction::ChangeOwner()
 	//Set the side correctly for the facility and all its objects
 	m_facility.setCountry(m_newCountry);
 
+	// Remove all Garrison supply and unsubscribe from the toe template.
+	//m_cp.removeAllGarrisonsSupply();
+
+	// Change the country of all Garrisons in this cp
+	// Sends it to chat and map hosts, map sends it to all clients.
+	m_cp.changeAllGarrisonCountries(m_newCountry);
+
 	// Set the owner of all objects of this facility to this country
 	_setObjectsOwner(m_facility.objectList, m_newSide, m_newCountry);
 
@@ -545,6 +552,21 @@ CaptureAction::LeaveContention() const
 	strtSaveCP(&m_cp);
 }
 
+void HCUnit::GetGarrisonUnits(std::list<HCUnit>& unitsList, UINT16 cpID)
+{
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID().id == cpID)
+			{
+				unitsList.push_back(*it->second);
+			}
+		}
+	}
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // Finish the capture event.
 
@@ -589,6 +611,7 @@ CaptureAction::ApplyEffects() const
 				strtCloseFirebase(*(link->firebase));
 			}
 		}
+
 	}
 
 	// Now that we are clear of brigades, we need to process the

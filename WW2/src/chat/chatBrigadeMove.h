@@ -36,3 +36,20 @@ public:
 using BRIGADE_MOVE_MSG = teul_network_msg<BrigadeMove>;
 
 void chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing);
+
+
+class GarrisonCountryChange
+{
+public:
+	GarrisonCountryChange() : m_brigadeID(0), m_newCountryId(WWII_NO_COUNTRY) {}
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
+	void process(const UINT32 unitID, const WWII_COUNTRY country = WWII_NO_COUNTRY);
+
+public:
+	UINT32		  m_brigadeID;
+	WWII_COUNTRY  m_newCountryId;
+};
+
+using GARRISON_COUNTRY_CHANGE_MSG = teul_network_msg<GarrisonCountryChange>;
+
+void stratSendGarrisonCountryChange(GARRISON_COUNTRY_CHANGE_MSG& outgoing);

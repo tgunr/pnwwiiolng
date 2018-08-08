@@ -40,3 +40,28 @@ public:
 
 using HC_UNIT_LOCATIONS = teul_network_array<HCUnitLocation>;
 
+
+class HCUnitCountryChange
+{
+public:
+	// Constructors
+	HCUnitCountryChange(UINT32 unitID, const FULL_OBJ_ID fid)
+		: m_unitID(unitID), m_country(WWII_NO_COUNTRY)
+	{}
+	HCUnitCountryChange(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
+	HCUnitCountryChange() : m_unitID(0), m_country(WWII_NO_COUNTRY) {}
+
+	// Destructors
+	~HCUnitCountryChange() {}
+
+	// Shared member functions
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
+
+public:
+	// Members
+	UINT32		m_unitID;
+	WWII_COUNTRY m_country;
+
+};
+
+using HC_UNIT_COUNTRY_CHANGES = teul_network_array<HCUnitCountryChange>;

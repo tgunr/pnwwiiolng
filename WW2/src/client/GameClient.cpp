@@ -1844,3 +1844,22 @@ void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 	}
 }
 
+void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
+{
+	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
+
+	if (unit != nullptr)
+	{
+		if (unit->isGarrison())
+		{
+			if (unitloc.m_country != WWII_NO_COUNTRY)
+			{
+				unit->setCountry(unitloc.m_country);
+			}
+		}
+	}
+	else
+	{
+		clientErrorLog("Unit Invalid in country change.");
+	}
+}

@@ -586,6 +586,12 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
 	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	
+	// Garrisons don't change deployment so we don't need to check them.
+	if (unit->isGarrison()) {
+		return;
+	}
+	
 	if ( unit->canDeployTo(cp) )
 		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
@@ -1525,4 +1531,82 @@ CPStruct::setRouteing(bool isConnected)
 #ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this);
 #endif
+}
+
+
+void CPStruct::removeAllGarrisonsSupply()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit->isGarrison())
+		{
+			unit->purgeResupply(true);
+			unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
+		}
+	}
+}
+
+
+void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
+{
+
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				std::string toeTemplateHeaderName = unit->getToeTemplateHeaderName();
+				unit->m_countryID = countryID;
+
+				std::string countryPrefix;
+
+				if (countryID == WWII_ENGLAND)
+				{
+					countryPrefix = "uk";
+				}
+				else if (countryID == WWII_USA)
+				{
+					countryPrefix = "us";
+				}
+				else if (countryID == WWII_FRANCE)
+				{
+					countryPrefix = "fr";
+				}
+				else if (countryID == WWII_GERMANY)
+				{
+					countryPrefix = "de";
+				}
+
+				// Replace the first 2 letters in order to change the country.
+				toeTemplateHeaderName.replace(0, 2, countryPrefix);
+
+				// Get the new toeTemplate for the unit and assign it.
+				TOE_::TemplateHeader* toeTemplate(TOE_::TemplateHeader::Lookup(toeTemplateHeaderName.c_str()));
+
+				if (toeTemplate)
+				{
+					unit->purgeResupply(true);
+					unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
+
+					unit->setToeTemplateHeader(toeTemplate);
+
+					// Subscribe to the template and have it populate our vehicle list
+					// Note: This gives us "default" equipment levels (i.e. full)
+					// we will need to read in any stored levels from the database later.
+					toeTemplate->subscribe(unit, unit->toe());
+
+					// Reset supply and announce the country change to map, chat and clients.
+					unit->resetGarrison();
+				}
+			}
+		}
+	}
+
 }

@@ -130,6 +130,8 @@ public:
 
 	bool isTrainingUnit() const { return m_training; }
 
+	void setCountry(WWII_COUNTRY newCountry) { m_countryID = newCountry;};
+
 	////
 	// Static functions
 
@@ -143,6 +145,9 @@ public:
 
 	// Get the command unit for a particular country/branch
 	static HCUnit* GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch);
+
+	// Get a list of all the Garrisons for a particular Country/CP
+	static void GetGarrisonUnits(std::list<HCUnit> &unitsList, UINT16 cpID);
 
 
 	//// ---- Member Functions ---- ////

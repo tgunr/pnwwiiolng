@@ -66,6 +66,22 @@ StratHCUnit::announceHome() const
 }
 
 void
+StratHCUnit::announceGarrisonCountryChange() const
+{
+	if (isTrainingUnit())
+		return;
+	ChatHandle movedBy = lastMovedBy();
+	if (movedBy == 0LL)
+		movedBy = chatGetHandle("SYSTEM");
+	GARRISON_COUNTRY_CHANGE_MSG outgoing(movedBy, 0, GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE);
+	GarrisonCountryChange& message = outgoing.data();
+	message.m_brigadeID = unitID();
+	message.m_newCountryId = country();
+
+	stratSendGarrisonCountryChange(outgoing);
+}
+
+void
 StratHCUnit::addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate)
 {
 	if ( !isTrainingUnit() )
@@ -131,6 +147,7 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 	, m_nextEvent(nullptr)
 	, m_postedWeaponList()
 	, m_toeTemplateHeader(TOE_::TemplateHeader::Lookup(withToeTemplate))
+	, m_toeTemplateHeaderName(withToeTemplate)
 	, m_toe()
 	, m_impl(*(new StratHCUnitImpl(*this)))
 {
@@ -1287,6 +1304,20 @@ StratHCUnit::reset()
 		m_fallbackCP = division()->startCP();
 	else
 		m_fallbackCP = nullptr;
+}
+
+void
+StratHCUnit::resetGarrison()
+{
+	// Purge all resupply
+	purgeResupply(true);
+
+	// Tell the map host and chat host that the garrison has changed country
+	// map host forwards it on to all clients.
+	announceGarrisonCountryChange();
+
+	// Reset the supply queue
+	restartSupply(0, 0, false);
 }
 
 //////////////////////////////////////////////////////////////////////
