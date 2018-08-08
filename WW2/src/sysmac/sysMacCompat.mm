@@ -72,51 +72,76 @@ char GetOSBuild()
     return 0;
 }
 
-bool CopyOldSetupFiles()
+bool CopyOldSetupFiles_MAC()
 {
     bool copyFiles = false;
-    char buffer [2048];
+    char buffer [2048] = "";
+    char timeStamp [256] = "";
     int charCount = 0;
+    
+    if (WantedCopyOldSetup == FALSE) {
+        return FALSE;
+    }
 
-    //  const char *folderRename = "_Copied";
-    NSString *folderRename = @"_CopiedWWII";
     const char *title1 = "Old Game settings Located.";
     const char *title2 = "Old Game settings Saved.";
     const char *message1 = "An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
-    //  Set Later == const char *message2 = "The Directory:\n%s\n\nhas been re-named to:\n%s_Copied.";
+    //  Set Later: const char *message2
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
     NSString *bgePath = [documentsDirectory stringByAppendingPathComponent:BGEFolder];
     NSString *ww2Path = [documentsDirectory stringByAppendingPathComponent:WWIIOnlineFolder];
+    
+    NSLog(@"Old Settings\n - Checking for the presence of Old Game Settings.");
+    //  dbugLog(_FLI, "Old Settings - Checking for the presence of Old Game Settings.");
+    //  Write_Debug("Old Settings - Checking for the presence of Old Game Settings.");
 
+    //  Create a folder copy date/time stamp.  =================================================
+    time_t rawtime;
+    struct tm * timeinfo;
+    
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    timeStamp[0] = 0;
+    charCount= sprintf(timeStamp, "_Copied_%04d%02d%02d-%02d%02d%02d", (int)timeinfo->tm_year + 1900, (int)timeinfo->tm_mon + 1, (int)timeinfo->tm_mday, (int)timeinfo->tm_hour , (int)timeinfo->tm_min, (int)timeinfo->tm_sec);
+    NSString *folderRename = [NSString stringWithUTF8String:timeStamp];
+    
     const char *c_filepath = [bgePath UTF8String];
     buffer[0] = 0;
-    //  charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s_Copied.", c_filepath, c_filepath);
-    //  charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s%s.", c_filepath, c_filepath, folderRename);
     charCount = sprintf (buffer, "The Directory:\n%s\n\nhas been re-named to:\n%s%s.", c_filepath, c_filepath, [folderRename UTF8String]);
     const char *message2 = &buffer[0];  //  <<=== Set.
 
     
     //  Locate: /Users -> "currentuser" -> Documents -> Battleground Europe
-    if (![fileManager fileExistsAtPath:bgePath])
+    if (![fileManager fileExistsAtPath:bgePath]) {
+        NSLog(@"Old Settings\n - Old Game Settings NOT found.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings NOT found.");
+        //  Write_Debug("(Old Settings - Old Game Settings NOT found.");
         return false;
+    }
     
     //  Located: /Users -> "currentuser" -> Documents -> Battleground Europe
+    NSLog(@"Old Settings\n - Old Game Settings found.");
+    //  dbugLog(_FLI, "Old Settings - Old Game Settings found.");
+    //  Write_Debug("Old Settings - Old Game Settings found.");
 
     
     //  Verify the User wants to copy the old Setup Files.
-    NSAlert *alert = [[NSAlert alloc] init];
+    NSAlert *alert1 = [[NSAlert alloc] init];
 
-    alert.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title1] ?: @""); // Force-unwrap those optionals!
-    alert.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message1] ?: @"");
-    alert.alertStyle = NSAlertStyleInformational;
+    alert1.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title1] ?: @""); // Force-unwrap those optionals!
+    alert1.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message1] ?: @"");
+    alert1.alertStyle = NSAlertStyleInformational;
 
-    [alert addButtonWithTitle:(@"Yes")];
-    [alert addButtonWithTitle:(@"No")];
+    [alert1 addButtonWithTitle:(@"Yes")];
+    [alert1 addButtonWithTitle:(@"No")];
     
-    if ([alert runModal] == NSAlertSecondButtonReturn) {
-        // the User clicked: No, Return.
+    if ([alert1 runModal] == NSAlertSecondButtonReturn) {
+        // the User clicked: No.
+        NSLog(@"Old Settings\n - Old Game Settings found -> the user declined the copy option.");
+        //  dbugLog(_FLW, "Old Settings - Old Game Settings found -> the user declined the copy option.");
+        //  Write_Debug("Old Settings - Old Game Settings found -> the user declined the copy option.");
         copyFiles = false;
 
     } else {
@@ -124,6 +149,10 @@ bool CopyOldSetupFiles()
         //   /Users -> "currentuser" -> Documents -> Battleground Europe
         //   TO
         //   /Users -> "currentuser" -> Documents -> WWIIOnline.
+        
+        NSLog(@"Old Settings\n - Old Game Settings found -> copying files.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying files.");
+        //  Write_Debug("Old Settings - Old Game Settings found -> copying files.");
         
         NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:bgePath];
         NSString *target;
@@ -135,9 +164,11 @@ bool CopyOldSetupFiles()
             NSString *destPath = [ww2Path stringByAppendingPathComponent:target];
             
             success = [fileManager copyItemAtPath:targetPath toPath:destPath error:&error];
-            if(success != YES)
-                //  NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",targetPath, destPath, error);
-                NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.",targetPath, destPath);
+            if(success != YES) {
+                NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",targetPath, destPath, error);
+                //  NSLog(@"Old Settings - Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.",targetPath, destPath);
+                //  Write_Debug("Old Settings - Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n",targetPath, destPath);
+            }
             error = nil;
             targetPath = @"";
         }
@@ -150,23 +181,31 @@ bool CopyOldSetupFiles()
         //   TO
         //   /Users -> "currentuser" -> Documents -> "Battleground Europe_Copied".
         
+        NSLog(@"Old Settings\n - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        //  Write_Debug("Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        
         NSURL *oldDir = [NSURL fileURLWithPath:bgePath];
-        //  NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:@"_Copied"]];
-        //  NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:folderRename] ?: @"")]];
         NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:folderRename]];
         success = [fileManager moveItemAtURL: oldDir toURL: newDir error:&error];
-        if(success != YES)
-            //  NSLog(@"Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",oldDir, newDir, error);
-            NSLog(@"Could not rename:-\n\nfrom path:\n%@,\n\nto path:\n%@.",oldDir, newDir);
-         error = nil;
+        if(success != YES) {
+            //  NSLog(@"Could not rename:-n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",oldDir, newDir, error);
+            NSLog(@"Old Settings\n - Could not rename - from path:\n%@,\n\nto path:\n%@.",oldDir, newDir);
+            //  Write_Debug("Old Settings - Could not rename:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n",oldDir, newDir);
+        } else {
+            NSLog(@"Old Settings\n - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            //  Write_Debug("Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+        }
+        error = nil;
 
-        NSAlert *alert1 = [[NSAlert alloc] init];
+        NSAlert *alert2 = [[NSAlert alloc] init];
 
-        alert1.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title2] ?: @""); // Force-unwrap those optionals!
-        alert1.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message2] ?: @"");
-        alert1.alertStyle = NSAlertStyleInformational;
+        alert2.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title2] ?: @""); // Force-unwrap those optionals!
+        alert2.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message2] ?: @"");
+        alert2.alertStyle = NSAlertStyleInformational;
         
-        [alert1 runModal];
+        [alert2 runModal];
         copyFiles = true;
     }
     
@@ -222,11 +261,7 @@ const char* macAppPath()
     static const char *targetPathFSR;
     
     NSBundle *main = [NSBundle mainBundle];
-    //  NSString *tempString = main.executablePath;
     targetPathFSR = [main.bundlePath UTF8String];
-
-    //  NSString *resourcePath = [main pathForResource:@"ww2" ofType:@"icns"];
-    //  NSURL *appDir = [main URLForResource:@"ww2" withExtension:@"icns"];
     
     return targetPathFSR;
 }
@@ -251,10 +286,6 @@ const char* macDocsPath()
     NSBundle *main = [NSBundle mainBundle];
     static NSURL *targetPathDir = [main resourceURL];
     targetPathDir = [targetPathDir URLByAppendingPathComponent:@"docs"];
-    
-    //NSString *docsPath = [main resourceURL];
-    
-    //targetPathFSR = [targetPathDir UTF8String];
     targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
     
     return targetPathFSR;

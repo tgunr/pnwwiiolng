@@ -21,12 +21,12 @@
 
 #include <string>
 #include "fiostructure.h"
-#include <direct.h>  //  for _getcwd.
 
 #if platOS == OS_WIN32
 #include <shellapi.h>
 #include <shlobj.h>
 #define errno (*_errno())
+#include <direct.h>  //  for _getcwd.
 #endif
 
 LOGICAL				WantedCopyOldSetup = TRUE;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnLine folder.
@@ -654,8 +654,8 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
     if (returnValue != NULL)
     {
         //  /Users -> "currentuser" -> Documents -> WWIIOnline
-        wwiiolpath_string userDocumentsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
-        userDocumentsPath = userDocumentsPath;
+        wwiiolpath_string macUserDocumentsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
+        userDocumentsPath = macUserDocumentsPath;
         userDocumentsPathSet = TRUE;
     }
     else
@@ -823,8 +823,12 @@ bool GetExePath(wwiiolpath_string &outFullPath, wwiiolpath_string &outExeName)
 wwiiolpath_string fioGetCurrentWorkingPath()
 {
     char buffer[MAX_PATH];
-    //  char *answer = getcwd(buffer, sizeof(buffer));
+    
+#if platOS == OS_WIN32
 	char *answer = _getcwd(buffer, sizeof(buffer));
+#else
+    char *answer = getcwd(buffer, sizeof(buffer));
+#endif
     wwiiolpath_string retVal;
     Char2Wstring(answer, retVal, strlen(answer));
     
@@ -841,8 +845,12 @@ LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath)
         return FALSE;
     
     Wstring2Char(targetPath, buffer, MAX_PATH);
-    //  int result = chdir(buffer);
-	int result = _chdir(buffer);
+    
+#if platOS == OS_WIN32
+    int result = _chdir(buffer);
+#else
+    int result = chdir(buffer);
+#endif
     
     if (result == 0)
         retVal = TRUE;

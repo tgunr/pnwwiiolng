@@ -725,8 +725,9 @@ namespace Fio
 #else
 		tmpPath += L"/";
 		tmpPath += tmpFilename;
+        Wstring2Char(tmpPath, path, PN_MAX_PATH);
 
-		unlink(tmpPath.c_str());
+		unlink(path);
 #endif
 	}
 

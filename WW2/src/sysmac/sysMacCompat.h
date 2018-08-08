@@ -47,7 +47,7 @@ extern void PostModalErrorDialog(const char *title, const char *message);
 extern void chAppDir();
 extern const char *macPreferencesPath();
 
-extern bool CopyOldSetupFiles();
+extern bool CopyOldSetupFiles_MAC();
 extern const char *macAppPath();
 extern const char *macDataPath();
 extern const char* macDocsPath();

@@ -77,18 +77,10 @@ namespace {
 		return result;
 	}
 
-	char* os_file_path(char* path) {
+    char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
 			if ( *s == WRONG_PATHSEP_C )
 				*s = OS_PATHSEP_C;
-		}
-		return path;
-	}
-
-	wchar_t* os_file_path(wchar_t* path) {
-		for ( wchar_t* s = path ; *s; ++s ) {
-			if ( *s == WRONG_PATHSEP_WC )
-				*s = OS_PATHSEP_WC;
 		}
 		return path;
 	}
@@ -145,17 +137,20 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname)
 #else
 	strsafecpy(name, rawname);
 #endif
-
-	wwiiolpath_string returnBuffer = L"";
+    
+    wwiiolpath_string returnBuffer = L"";
 	wwiiolpath_string returnPath = L"";
+    wwiiolpath_string tmp;
+    
+    Char2Wstring(os_file_path(name), tmp, PN_MAX_PATH);
 
 	fiodGetPrepath_WC(returnBuffer);
 	returnPath = returnBuffer += OS_PATHSEP_W;
-	returnPath = returnPath += os_file_path(name);
+    returnPath = returnPath += tmp;
 	retValue = returnPath.length();
 
-	wcscpy(path, returnPath.c_str());
-	
+	Wstring2Char(returnPath, path, PN_MAX_PATH);
+    
 	return retValue;
 }
 

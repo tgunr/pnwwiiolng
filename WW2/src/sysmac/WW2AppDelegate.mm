@@ -529,9 +529,11 @@ extern NSString *WebActionOriginalURLKey;
     //  Setup the data paths
     fioInit();
     
-    //  Check for the existance of a previous Battleground Europe install.
+    //  Check for the existance of a previous Battleground Europe install for config settings.
     //  /Users -> "currentuser" -> Documents -> Battleground Europe
-    CopyOldSetupFiles();
+    if (WantedCopyOldSetup == TRUE) {
+        CopyOldSetupFiles_MAC();
+    }
 
     if (!mngoptParse()) {
         [NSApp terminate:self];
