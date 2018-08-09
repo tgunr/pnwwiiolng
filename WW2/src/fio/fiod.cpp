@@ -77,13 +77,25 @@ namespace {
 		return result;
 	}
 
-    char* os_file_path(char* path) {
+#if platOS == OS_WIN32
+	wchar_t* os_file_path(wchar_t* path) {
+		for (wchar_t* s = path; *s; ++s) {
+			if (*s == WRONG_PATHSEP_WC)
+				*s = OS_PATHSEP_WC;
+		}
+		return path;
+	}
+
+#else
+	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
 			if ( *s == WRONG_PATHSEP_C )
 				*s = OS_PATHSEP_C;
 		}
 		return path;
 	}
+#endif
+
 }
 
 //==============================================================================
@@ -140,9 +152,13 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname)
     
     wwiiolpath_string returnBuffer = L"";
 	wwiiolpath_string returnPath = L"";
-    wwiiolpath_string tmp;
+    wwiiolpath_string tmp = L"";
     
-    Char2Wstring(os_file_path(name), tmp, PN_MAX_PATH);
+#if platOS == OS_WIN32
+	tmp = std::wstring(os_file_path(name));
+#else
+	Char2Wstring(os_file_path(name), tmp, PN_MAX_PATH);
+#endif
 
 	fiodGetPrepath_WC(returnBuffer);
 	returnPath = returnBuffer += OS_PATHSEP_W;

@@ -134,7 +134,7 @@ int fioOpen(const char* const filename)
 				fd = fiodOpen(fn);
 			break;
 
-		//  ISDIRECTORY = 0: local directory (WantDataDir - Want to run out od a Data directory. Set by commandline).
+		//  ISDIRECTORY = 0: local directory (WantDataDir - Want to run out of a Data directory. Set by commandline).
 		case ISDIRECTORY:
 		default:
 			fd = fiodOpen(fn);

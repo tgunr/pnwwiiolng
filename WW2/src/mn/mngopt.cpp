@@ -138,8 +138,16 @@ LOGICAL mngoptParse()
         Wstring2Char(WW2_exeDataPath, DataPath, sizeof(DataPath));
 	
 	if (WantedDataPath == L"" && WantDataDir == TRUE)
-        Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
-		//  WantedDataPath = DataPath;
+	{
+#if platOS == OS_WIN32
+		if (DataPath[wcslen(DataPath) - 1] == '\\')
+			DataPath[wcslen(DataPath) - 1] = 0;
+
+		WantedDataPath = DataPath;
+#else
+		Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
+#endif
+	}
 
 	char*	ptr;
 

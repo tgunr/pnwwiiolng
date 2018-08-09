@@ -887,7 +887,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #ifdef EVENT_LOG
 	Enable_Log(LOG_ALL, TRUE); // Always want this stuff logged
 
-	Write_Debug("Command line: %s", GetCommandLineA());
+	Write_Debug("Command line:\n%s\n", GetCommandLineA());
 
 	GetWindowsVersion(nullptr, nullptr);
 
