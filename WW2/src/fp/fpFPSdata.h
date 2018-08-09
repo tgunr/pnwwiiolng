@@ -116,7 +116,6 @@ enum fpsWeaponTypes
 	FG42G,
 	CARCANO,
 	BERETTA38,
-    M1A1CARBINE,
 	NUM_WEAPONS
 };
 // tolua_end

@@ -188,7 +188,6 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"fg42g",
 	"carcano",
 	"beretta38",
-	"m1a1carbine",
 };
 
 const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
@@ -299,7 +298,6 @@ const SCHAR* weapNameStrings[NUM_WEAPONS] =
 	(SCHAR *)"fg42g",
 	(SCHAR *)"carcano",
 	(SCHAR *)"beretta38",
-	(SCHAR *)"m1a1carbine",
 };
 
 class fpFPSVisLoadoutsLoader : public XMLLoader2<fpFPSVisLoadoutsLoader>
@@ -1207,9 +1205,6 @@ void fpFPSDataReadFPSFile()
 		case beretta38File_hash:
 			_fpFPSDataReadWeaponFile(BERETTA38, varData);
 		break;
-        case m1a1carbineFile_hash:
-            _fpFPSDataReadWeaponFile(M1A1CARBINE, varData);
-        break;
 
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
@@ -2560,26 +2555,6 @@ void fpFPSDataInit ()
 	arms_anim_files[BERETTA38][CRAWL]       = FPS_DIR "beretta38\\arms\\arms_beretta38_crawl";
 	arms_anim_files[BERETTA38][SPRINT]      = FPS_DIR "beretta38\\arms\\arms_beretta38_sprint";
 	arms_anim_files[BERETTA38][SIT]         = FPS_DIR "beretta38\\arms\\arms_beretta38_lowered";
-
-    weap_anim_files[M1A1CARBINE][RELOAD]      = FPS_DIR "m1a1carbine\\weapon\\weap_m1a1_reload";
-    weap_anim_files[M1A1CARBINE][STAND_FIRE]  = FPS_DIR "m1a1carbine\\weapon\\weap_m1a1_fire";
-    weap_anim_files[M1A1CARBINE][CROUCH_FIRE] = FPS_DIR "m1a1carbine\\weapon\\weap_m1a1_fire";
-    weap_anim_files[M1A1CARBINE][AIM_FIRE]    = FPS_DIR "m1a1carbine\\weapon\\weap_m1a1_fire";
-    weap_anim_files[M1A1CARBINE][RECYCLE]     = FPS_DIR "m1a1carbine\\weapon\\weap_m1a1_reload";
-    arms_anim_files[M1A1CARBINE][RELOAD]      = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_reload";
-    arms_anim_files[M1A1CARBINE][STAND_FIRE]  = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_fire";
-    arms_anim_files[M1A1CARBINE][CROUCH_FIRE] = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_fire";
-    arms_anim_files[M1A1CARBINE][AIM_FIRE]    = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_aimFire";
-    arms_anim_files[M1A1CARBINE][RECYCLE]     = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_reload";
-    arms_anim_files[M1A1CARBINE][LOWER]       = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_lowered";
-    arms_anim_files[M1A1CARBINE][IDLE]        = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_neutral";
-    arms_anim_files[M1A1CARBINE][KNEEL]       = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_neutral";
-    arms_anim_files[M1A1CARBINE][AIM]         = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_aim";
-    arms_anim_files[M1A1CARBINE][TROT]        = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_neutral";
-    arms_anim_files[M1A1CARBINE][CREEP]       = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_neutral";
-    arms_anim_files[M1A1CARBINE][CRAWL]       = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_crawl";
-    arms_anim_files[M1A1CARBINE][SPRINT]      = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_sprint";
-    arms_anim_files[M1A1CARBINE][SIT]         = FPS_DIR "m1a1carbine\\arms\\arms_m1a1_lowered";
 
 	// BRIDGE_REPAIR animation files
 	arms_anim_files[BRIDGE_REPAIR][STAND_FIRE] = FPS_DIR "satchel\\animations\\fire\\satchel-fire(1)";
