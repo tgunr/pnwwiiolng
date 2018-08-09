@@ -961,7 +961,7 @@ _idleEndpoint(ENDPOINT& endpoint)
 	_checkEndpointTimeouts(endpoint);
 }
 
-#if defined(WINDOWS_VERSION)
+#if platOS == OS_WIN32
 static void
 _endpointError(const char* const text, ENDPOINT& endpoint, const SINT32 err)
 {
@@ -1179,7 +1179,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 void
 ENDPOINT::updateSocketEvents()
 {
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	const UINT32 slot = m_impl->pollSlot();
 	// Since slot is now unsigned, negative values
 	// will be really big.
@@ -1214,7 +1214,7 @@ ENDPOINT::updateSocketEvents()
 }
 
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 static void _pollAddEndpoint(ENDPOINT& endpoint)
 {
 	nfds_t slot;
@@ -1266,7 +1266,7 @@ static void _pollRemoveEndpoint(ENDPOINT& endpoint)
 void
 teulMRecvRemoveFromPoll(ENDPOINT& endpoint)
 {
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	if ( endpoint.socket != INVALID_SOCKET )
 	{
 		// set these here since _pollSet keys off of INVALID_SOCKET
@@ -1288,7 +1288,7 @@ teulMRecvRemoveFromPoll(ENDPOINT& endpoint)
 #endif
 }
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 {
 	endpoint.updateSocketEvents();
@@ -1306,7 +1306,7 @@ void teulMRecvUpdatePoll(ENDPOINT& /* endpoint */)
 
 void teulMRecvAddToPoll(ENDPOINT& endpoint)
 {
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	if ( PN_UNLIKELY((endpoint.state() == IS_DEAD) | (endpoint.socket == INVALID_SOCKET)) )
 	{
 		dbugLog(_FLA, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
@@ -1320,7 +1320,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 #endif
 }
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 static void
 _pollSet()
 {
@@ -1361,7 +1361,7 @@ _pollSet()
 }
 #endif
 
-#if !defined(WINDOWS_VERSION)
+#if platOS != OS_WIN32
 static void
 _pollSocketsInner(TeulTimeMS duration_)
 {
@@ -1401,31 +1401,6 @@ _pollSetIsEmpty()
 }
 #endif
 
-#if platOS != OS_WIN32 || platBuild == BUILD_SERVER
-static void
-_pollSockets(TeulTimeMS duration_)
-{
-	//////////////////////////////////////// Unix version
-	if ( PN_UNLIKELY(_pollSetIsEmpty()) )
-	{
-		// Yield CPU for a short period of time.
-		if ( duration_ > 0 )
-			std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
-		return;
-	}
-
-	const TeulTimeMS cutoff = teulClock64 + duration_;
-	do
-	{
-		const TeulTimeMS remainder = cutoff - teulClock64;
-		_pollSocketsInner(remainder);
-		teulSyncClock();
-	}
-	while ( cutoff > teulClock64 );
-}
-#endif
-
-#if platOS == OS_WIN32 && platBuild != BUILD_SERVER
 static void
 _pollSockets(TeulTimeMS duration_)
 {
@@ -1439,7 +1414,6 @@ _pollSockets(TeulTimeMS duration_)
 
 	_pollSocketsInner(duration_);
 }
-#endif
 
 static void
 _attemptDecryption(DATA_GRAM* dgram, UCHAR* const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
@@ -1495,10 +1469,10 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	return true;
 }
 
-#if platBuild == BUILD_SERVER
 static void
 _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
+#if platBuild == BUILD_SERVER
 	if ( endpoint.m_parent == nullptr || !endpoint.isFromClient() )
 		return;
 
@@ -1545,13 +1519,8 @@ _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 		return;
 
 	endpoint.doError(ETEUL_ILLEGAL_TICKS, &sample);
-}
-#else
-static void
-_processTicks(ENDPOINT& /*endpoint*/, const Teul::PacketHeader& /*header*/)
-{
-}
 #endif
+}
 
 static void
 _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
@@ -1748,7 +1717,7 @@ ENDPOINT::setWritesPending(const bool pending_)
 
 	m_writesPending = pending_;
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	const UINT32 slot = m_impl->pollSlot();
 	// Since slot is now unsigned, negative values
 	// will be really big.
