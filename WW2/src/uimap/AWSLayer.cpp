@@ -169,7 +169,7 @@ void AWSLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, int sc
 	char label[10];
 	label[0]			= 0;
 
-	float scale			= mv->Width() / ((mv->Scale() > 8) ? 8.0f: mv->Scale());
+	float scale			= mv->Width() / mv->Scale();
 	int font			= mv->GetFont();
 //	float fontheight	= ctx->FontHeight(font);
 	float scaled		= 1.5f/scale;

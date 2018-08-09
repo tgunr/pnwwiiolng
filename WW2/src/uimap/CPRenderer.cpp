@@ -879,8 +879,10 @@ void CPMapBridgeObject::DrawSelf(SuperCellMapView* mv)
 	float iconsize = _renderer->iconsize / iconscale;
 	phui::BoxVerts box;
 
-	if(mv->Scale() > 8)
-		iconscale = mv->Width()/8.0f;
+	if (mv->Scale() > 8) {
+		iconscale = mv->Width() / 8.0f;
+		iconsize = _renderer->iconsize / iconscale;
+	}
 
 	float iconx = (float)_cp.PosX()/SDM_SUPERCELL_SIZE - iconsize/2.0f;
 	float icony = (float)_cp.PosY()/SDM_SUPERCELL_SIZE - iconsize/2.0f;
