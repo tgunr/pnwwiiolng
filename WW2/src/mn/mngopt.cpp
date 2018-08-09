@@ -140,12 +140,21 @@ LOGICAL mngoptParse()
 	if (WantedDataPath == L"" && WantDataDir == TRUE)
 	{
 #if platOS == OS_WIN32
-		if (DataPath[wcslen(DataPath) - 1] == '\\')
-			DataPath[wcslen(DataPath) - 1] = 0;
+        //  Remove the trailing path separator (\\ = \), if present.
+        if (DataPath[wcslen(DataPath) - 1] == '\\')
+        {
+            DataPath[wcslen(DataPath) - 1] = 0;
+        }
 
 		WantedDataPath = DataPath;
 #else
-		Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
+        //  Remove the trailing path separator (/), if present.
+        if (DataPath[strlen(DataPath) - 1] == '/')
+        {
+            DataPath[strlen(DataPath) - 1] = 0;
+        }
+
+        Char2Wstring(DataPath, WantedDataPath, _MAX_PATH);
 #endif
 	}
 
