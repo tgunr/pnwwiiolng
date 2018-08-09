@@ -217,7 +217,7 @@ ADD_LIBRARY(teulserver STATIC
     teul/teulBits.h teul/teulPack.cpp teul/teulPacket.cpp teul/teulPacket.h
     teul/teulTransmission.cpp teul/teulTransmission.h
     teul/teulTransport.cpp
-    teul/teulUtils.cpp teul/teulUtils.h
+    teul/teulUtils.cpp teul/teulUtils.h teul/teulTime.h
     wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
     auth/authPack.cpp auth/authPack.h
     auth/authGameMessages.cpp auth/authGameMessages.h auth/authTypes.h auth/authServerTypes.h

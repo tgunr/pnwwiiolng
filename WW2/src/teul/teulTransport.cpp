@@ -429,7 +429,7 @@ teulInitTransport(LogMode logType
 #endif
 #endif
 
-	teulSyncClock();
+	teulInitClock();
 
 	_transportInited = true;
 

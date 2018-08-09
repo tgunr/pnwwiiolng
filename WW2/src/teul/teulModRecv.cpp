@@ -63,8 +63,6 @@ using namespace Teul;
 
 #include "teul/teulConstants.h"
 
-#undef CHECK_TIME
-
 #define COMMAND_UPDATE_INTERVAL	10
 
 #define MAX_POLL_SOCK	16384
@@ -739,18 +737,7 @@ _recvDatagram(ENDPOINT& endpoint)
 static bool
 _handleReceive(ENDPOINT& endpoint)
 {
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS startRX = teulClock64;
-#endif
-
 	SINT32 theErr = _recvDatagram(endpoint);
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS endRX = teulClock64;
-	if ( endRX - startRX > 1 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
-#endif
 
 	if ( PN_UNLIKELY(theErr < 0) )
 	{
@@ -773,18 +760,7 @@ _handleReceive(ENDPOINT& endpoint)
 	{
 		return true;
 	}
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS startCB = teulClock64;
-#endif
 	_routeCALLBACKs(endpoint);
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS endCB = teulClock64;
-	if ( endCB - startCB > 10 )
-		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%" PR64BitUT "ms", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
-#endif
-
 	return false;
 }
 
@@ -792,12 +768,6 @@ static void
 _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 {
 	SINT32		count = 0, loopCount = 0;
-
-#ifdef CHECK_TIME
-	teulSyncClock();
-	TeulTimeMS	readTime64 = teulClock64;
-	TeulTimeMS	interval;
-#endif
 
 	_lastPXferTotal = totalPacketsXfer;
 
@@ -1397,11 +1367,6 @@ _pollSocketsInner(TeulTimeMS duration_)
 {
 	SINT32	retval = 0;
 
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS startTime = teulClock64;
-#endif
-
 	TIMER_USE_HERE
 
 	auto pollFds = &pollData.fd[0];
@@ -1421,15 +1386,6 @@ _pollSocketsInner(TeulTimeMS duration_)
 		_runPollEndpoints(pollData.fd, pollData.m_size, numfds);
 		TIMER_STOP("tmi_idle_rpe");
 	}
-
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS interval = teulClock64 - startTime;
-	if ( PN_UNLIKELY(interval > 20) )
-	{
-		dbugLog(_FLW, "STALL fds:%u size:%" PRSizeT ". poll interval=%" PR64BitUT "ms", numfds, pollData.m_size, interval);
-	}
-#endif
 }
 
 static bool
@@ -1655,24 +1611,8 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 		return;
 	}
 
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS startCB = teulClock64;
-	TIMER_RESET
-#endif
 	UCHAR* const dataStart = (UCHAR*)(&hdr[1]);	// Immediately after the header.
 	callback->processCallback(endpoint, dataStart, dgram->m_size - sizeof(*hdr));
-#ifdef CHECK_TIME
-	teulSyncClock();
-	const TeulTimeMS endCB = teulClock64;
-	if ( endCB - startCB > 5 )
-	{
-		dbugLog(_FLA, "STALL t:%d. cb:%u,%u interval=%" PR64BitUT "ms", endpoint.teulIndex(), hdr->m_callX, hdr->m_callY, endCB - startCB);
-		TIMER_REPORT(1)
-	}
-#endif
-
-	return;
 }
 
 static void

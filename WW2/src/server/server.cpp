@@ -1702,7 +1702,6 @@ void _connectToController()
 	TeulTimeMS timeout = teulClock64 + controllerTimeout;
 	while ( !s_controllerConnected && teulClock64 < timeout ) {
 		teulUpdateTransport(1);
-		teulSyncClock();
 	}
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
