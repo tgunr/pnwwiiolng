@@ -491,10 +491,12 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 		//else
 
          */
-
+		
+		// Max zoomed out scale
 		if (mv->MapScale() < 0.01)
 		{
-			width = height = 1000.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
+			// Reduces the scale from 100km to 25km
+			width = height = 500.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
 		}
 		else 
 		{
@@ -601,7 +603,8 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	width = 1000.0f/SDM_SUPERCELL_SIZE/mapscale;
 	if (mapscale < 0.01)
 	{
-		width = width / 2.0;
+		// 25km
+		width = width / 4;
 	}
 	height = 16 / iconscale;
 	x = 0; //-120/iconscale;
@@ -616,9 +619,11 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	phui::draw_gl_quad(box.verts, uv);
 
 	char scalestr[32];
+	// Max zoomed out scale
 	if (mapscale < 0.01)
 	{
-		snprintf(scalestr, 31, "%.0f km", (1.0 / mapscale) / 2.0);
+		// Reduces the scale from 100km to 25km
+		snprintf(scalestr, 31, "%.0f km", (1.0 / mapscale) / 4.0);
 	}
 	else if (mapscale <= 1)
 	{
