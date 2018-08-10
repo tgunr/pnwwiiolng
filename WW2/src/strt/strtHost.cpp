@@ -432,7 +432,7 @@ _housekeeping()
 	}
 
 	if ( teulClock64 >= nextSecond ) {
-		dbugLog(_FLI, "strat _housekeeping Second procesing, scheduled");
+		dbugLog(_FLD, "strat _housekeeping Second procesing, scheduled");
 		nextSecond += 1000;
 		if (nextSecond < teulClock64) {
 			nextSecond = teulClock64;
@@ -482,14 +482,14 @@ _housekeeping()
 		bInitiateHalfSecProcessing = false;
 
 		if (bInitiateSecProcessing) {
-			dbugLog(_FLI, "strat _housekeeping Half Second processing subverted");
+			dbugLog(_FLD, "strat _housekeeping Half Second processing subverted");
 		}
 		return nextHouseKeep;
 	}
 
 	if (bInitiateSecProcessing)
 	{
-		dbugLog(_FLI, "strat _housekeeping Second procesing, activated");
+		dbugLog(_FLD, "strat _housekeeping Second procesing, activated");
 		strtProcessResupply();
 		stratProcessLuaEventQueue();
 		bInitiateSecProcessing = false;
