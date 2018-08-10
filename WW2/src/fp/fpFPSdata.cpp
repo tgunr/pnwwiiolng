@@ -70,7 +70,7 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
 	FPS_DIR "arms\\armsmesh-britinf", // Americans
-	FPS_DIR "arms\\armsmesh-germinf" // Italians
+	FPS_DIR "arms\\armsmesh-germinf", // Italians
 	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack
 	FPS_DIR "arms\\armsmesh-britinf", // American Para NoPack
 	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack Self
@@ -101,7 +101,7 @@ const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\german-legs",
 	FPS_DIR "legs\\french-legs",
 	FPS_DIR "legs\\brit-legs", // Americans
-	FPS_DIR "legs\\german-legs" // Italians
+	FPS_DIR "legs\\german-legs", // Italians
 	FPS_DIR "legs\\brit-legs", // American Para Pack
 	FPS_DIR "legs\\brit-legs", // American Para NoPack
 	FPS_DIR "legs\\brit-legs", // American Para Pack Self
