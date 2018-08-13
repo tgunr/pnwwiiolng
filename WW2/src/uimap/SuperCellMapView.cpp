@@ -89,7 +89,7 @@ SuperCellMapView::SuperCellMapView() : View(),
 	_panscale(0),
 	_minPanX(-25.0f),
 	_minPanY(210.0f),
-	_maxPanX(41.0f),// How far East
+	_maxPanX(51.0f),// How far East
 	_maxPanY(283.0f),// How far North
 	_startpanscale(0),
 	_stoppanscale(0),
