@@ -54,8 +54,8 @@
 
 
 ; ===  Script Debug.  ========================================================
-#define ScriptDebug "yes"
-; #define ScriptDebug "no"    ;Default
+; #define ScriptDebug "yes"
+#define ScriptDebug "no"    ;Default
 
 
 ; ===  Game Install Root Names.  =============================================
@@ -388,7 +388,7 @@ PreviousInstall={#InstallerVersionInfoDescription}. . .  is unable to continue.%
 RequireFullInstall={#InstallerVersionInfoDescription}. . .  is unable to continue.%n%nThis Patcher  REQUIRES  an installed version to patch.%n%nPlease download and run the Current Full Installer.
 IncompatablePatch={#InstallerVersionInfoDescription}. . .  is unable to continue.%n%nThis Patcher is incompatable with your installed version.%n%nPlease Uninstall your installed version,%nthen download and run the Current Full Installer.
 SavedSettingsFound=An older version of the Game Settings has been found%n%nDo you wish to re-use them?
-RenamedDIR=The Directory:%n%1 has been re-named to:%n%2_Copied.
+RenamedDIR=The Directory:%n%1 has been re-named to:%n%2_Copied_%3.
 
 [InstallDelete]
 
@@ -948,6 +948,7 @@ var
   RootDestiantionPath: string;
   RootFolderName: string;
 
+  TimeStamp: string;
   TempText: string;
 
 begin
@@ -1005,8 +1006,9 @@ begin
 
   if ( FileCopySucess = true ) then begin
     if SetCurrentDir( Trim( ExpandConstant( '{userdocs}' ))) then begin
-      if  RenameFile( RootFolderName, RootFolderName + '_Copied' ) then begin
-        MsgText := FmtMessage( CustomMessage('RenamedDIR'), [ RootFolderName, RootFolderName ]);
+      TimeStamp := GetDateTimeString('yyymmdd_hhnnss', ' ', ' ');
+      if  RenameFile( RootFolderName, RootFolderName + '_Copied_' + TimeStamp ) then begin
+        MsgText := FmtMessage( CustomMessage('RenamedDIR'), [ RootFolderName, RootFolderName, TimeStamp ]);
         MsgYN := MsgBox( MsgText, mbInformation, mb_ok );
 
       end;
