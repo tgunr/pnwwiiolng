@@ -535,19 +535,17 @@ const char* g_serverName = "stratd";
 int
 main(int argc, const char* argv[])
 {
-	// static? because we're main and we don't need to waste stack space on these,
-	// but they also don't need to be visible outside of our scope.
-	static std::vector<std::string> s_luaCmds;
-	static bool s_initOnly = false;
-	static bool s_debug = false;
+	std::vector<std::string> luaCmds;
+	bool initOnly = false;
+	bool debug = false;
 
 	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
 		{ "--lua-cmd", "Execute lua code after initializing.", true,
-			[](const char* code) { s_luaCmds.emplace_back(code); }, nullptr },
-		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; }, nullptr },
-		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; }, nullptr, }
+			[&](const char* code) { luaCmds.emplace_back(code); }, nullptr },
+		{ "--init-only", "Terminate after loading strat data.", false, [&](const char*) { initOnly = true; }, nullptr },
+		{ "--debug", "Enable verbose + console logging", false, [&](const char*) { debug = true; }, nullptr, }
 	});
-	if ( !s_debug ) {
+	if ( !debug ) {
 		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	} else {
@@ -583,18 +581,16 @@ main(int argc, const char* argv[])
 
 	strtInitializeStratSystem();
 
-	if ( s_luaCmds.empty() == false ) {
-		for ( auto&& code : s_luaCmds ) {
-			dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
-			Lua::RunObject("--lua-cmd", code);
-			auto results = Lua::Results();
-			for ( auto&& line : results ) {
-				printf("lua: %s\n", line.c_str());
-			}
-		}
-	}
-
-	if ( s_initOnly ) {
+    for ( auto&& code : luaCmds ) {
+        dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+        Lua::RunObject("--lua-cmd", code);
+        auto results = Lua::Results();
+        for ( auto&& line : results ) {
+            printf("lua: %s\n", line.c_str());
+        }
+    }
+	
+	if ( initOnly ) {
 		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
 		return 0;
 	}
