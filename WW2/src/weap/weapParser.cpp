@@ -302,19 +302,20 @@ static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
 static bool
 _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 {
-	static ARG_SPEC argSpec[] = {	{T_INT,4}
-									,{T_STRING,MAX_CNAME_SIZE}
-									,{T_STRING,3}
-									,{T_INT,4}
-									,{T_INT,4}
+	static ARG_SPEC argSpec[] = {	{T_INT,4}						// Type Id
+									,{T_STRING,MAX_CNAME_SIZE}	// Blitz Name
+									,{T_STRING,3}								// Alloc?
+									,{T_INT,4}									// #L?
+									,{T_INT,4}									// #M?
 
-									,{T_STRING,2}
-									,{T_STRING,MAX_CNAME_SIZE}
+									,{T_STRING,2}								// Rel?
+									,{T_STRING,MAX_CNAME_SIZE}	// Association
 
-									,{T_INT,4}		// LOD
-									,{T_INT,4}		// AlertDistance
-									,{T_INT,4}		// SPEED
-									,{T_INT,4}};	// VALUE
+									,{T_INT,4}									// LOD
+									,{T_INT,4}									// AlertDistance
+									,{T_INT,4}									// SPEED
+									,{T_INT,4}									// VALUE
+									,{T_STRING, MAX_CNAME_SIZE}}; // Full Name
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
 
@@ -335,7 +336,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 			throw "multiple definitions of vehicle";
 
 		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue
-									, args[4].dvalue, args[7].dvalue * 100, args[8].dvalue, args[9].dvalue, args[10].dvalue
+									, args[4].dvalue, args[7].dvalue * 100, args[8].dvalue, args[9].dvalue, args[10].dvalue, args[11].svalue
 									);
 		g_weaponPtrs.emplace_back(weapon);
 
@@ -348,7 +349,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 		weapon->m_enemyBias =  DEFAULT_EY_BIAS_SLOTS;
 
 		// put bias code here
-		for (i=11; i < numArgs && args[i].svalue[0] !='\0'; i++)
+		for (i=12; i < numArgs && args[i].svalue[0] !='\0'; i++)
 		{
 			if (args[i].baseType == T_STRING)
 			{
