@@ -506,22 +506,14 @@ teulInitEndpoints(ERROR_FUNCTION const endpointErrorFn)
 void 
 teulEndpointBackchannels()
 {
-	if (_endpoints.empty() == false)
-	{
-		const size_t numEndpoints = _endpoints.size();
-		for (size_t i = 0; i < numEndpoints; i++)
-		{
-			ENDPOINT& endpoint = _endpoints[i];
-			if (endpoint.m_pairdUdpConn != nullptr)
-			{
-				if (endpoint.m_pairdUdpConn->isConnected() || endpoint.m_pairdUdpConn->isConnecting() ||
-					(endpoint.m_pairdUdpConn->isServer() && endpoint.m_pairdUdpConn->isInitialized()) )
-				{
-					endpoint.m_pairdUdpConn->update();
-				}
-			}
-		}
-	}
+    for (ENDPOINT& endpoint : _endpoints) {
+        if (endpoint.m_pairdUdpConn &&
+            ((endpoint.m_pairdUdpConn->isConnected() || endpoint.m_pairdUdpConn->isConnecting()) ||
+            (endpoint.m_pairdUdpConn->isServer() && endpoint.m_pairdUdpConn->isInitialized())))
+        {
+            endpoint.m_pairdUdpConn->update();
+        }
+    }
 }
 
 void
