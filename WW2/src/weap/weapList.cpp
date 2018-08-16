@@ -440,9 +440,9 @@ _getAccessValue(const char* key)
 }
 
 WEAPON::WEAPON(const WEAPON_SPEC withSpec
-				, const char* Name, const char* withAccess
+				, const char* Name, const char* FullName, const char* withAccess
 				, UINT16 unitCount
-				, UINT32 lod_cm, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue, const char* FullName
+				, UINT32 lod_cm, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
 				)
 	: m_spec(withSpec)
 	, m_access(_getAccessValue(withAccess))

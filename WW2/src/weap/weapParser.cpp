@@ -303,19 +303,19 @@ static bool
 _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 {
 	static ARG_SPEC argSpec[] = {	{T_INT,4}						// Type Id
-									,{T_STRING,MAX_CNAME_SIZE}	// Blitz Name
-									,{T_STRING,3}								// Alloc?
-									,{T_INT,4}									// #L?
-									,{T_INT,4}									// #M?
+									,{T_STRING,MAX_CNAME_SIZE}		// Blitz Name
+									,{T_STRING, MAX_CNAME_SIZE} 	// Full Name
+									,{T_STRING,3}					// Alloc?
+									,{T_INT,4}						// #L?
+									,{T_INT,4}						// #M?
 
-									,{T_STRING,2}								// Rel?
-									,{T_STRING,MAX_CNAME_SIZE}	// Association
+									,{T_STRING,2}					// Rel?
+									,{T_STRING,MAX_CNAME_SIZE}		// Association
 
-									,{T_INT,4}									// LOD
-									,{T_INT,4}									// AlertDistance
-									,{T_INT,4}									// SPEED
-									,{T_INT,4}									// VALUE
-									,{T_STRING, MAX_CNAME_SIZE}}; // Full Name
+									,{T_INT,4}						// LOD
+									,{T_INT,4}						// AlertDistance
+									,{T_INT,4}						// Speed
+									,{T_INT,4}};					// CVC Value
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
 
@@ -335,8 +335,8 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 		if ( weapLookup(thisSpec) != nullptr )
 			throw "multiple definitions of vehicle";
 
-		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue
-									, args[4].dvalue, args[7].dvalue * 100, args[8].dvalue, args[9].dvalue, args[10].dvalue, args[11].svalue
+		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue, args[3].svalue
+									, args[5].dvalue, args[6].dvalue * 100, args[7].dvalue, args[10].dvalue, args[11].dvalue
 									);
 		g_weaponPtrs.emplace_back(weapon);
 

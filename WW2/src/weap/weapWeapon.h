@@ -25,8 +25,8 @@ struct WEAPON
 {
 	WEAPON() : m_spec(NULL_WEAP_SPEC), m_modified(false) { name[0] = fullName[0] = 0; }
 //tolua_end
-	WEAPON(const WEAPON_SPEC spec, const char* Name, const char* access
-				, UINT16 count, UINT32 lod, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue, const char* FullName
+	WEAPON(const WEAPON_SPEC spec, const char* Name, const char* FullName, const char* access
+				, UINT16 count, UINT32 lod, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
 				);
 //tolua_begin
 	~WEAPON();
