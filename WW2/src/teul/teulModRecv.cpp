@@ -813,6 +813,15 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		if ( (revents & POLLOUT) != 0 )
 		{
+            if ( endpoint.protocol == PROTOCOL_TCP )
+            {
+                if ( endpoint.state() == IS_OPENING && !endpoint.m_connected )
+                {
+                    // looks like the TCP connection is open, double check
+                    _checkConnectTCP(endpoint);
+                    continue;                      // service the next endpoint
+                }
+            }
             endpoint.pushSendQueue();
 		}
 
@@ -827,13 +836,8 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
                     TIMER_STOP_ADD(rpe_accept);
                     continue;
                 }
-                if ( endpoint.state() == IS_OPENING && !endpoint.m_connected )
-                {
-                    // looks like the TCP connection is open, double check
-                    _checkConnectTCP(endpoint);
-                    continue;                      // service the next endpoint
-                }
-            } else if ( _handleReceive(endpoint) ) {
+            }
+            if ( _handleReceive(endpoint) ) {
 				continue;
             }
 		}
@@ -1117,8 +1121,8 @@ _pollSocketsInner(TeulTimeMS remainder)
 
 			if ((eventData.lNetworkEvents & FD_WRITE) != 0)
 			{
-				endpoint.setWritesPending(false);
-			}
+                endpoint.pushSendQueue();
+            }
 
 			if ((eventData.lNetworkEvents & (FD_READ | FD_OOB)) != 0)
 			{
