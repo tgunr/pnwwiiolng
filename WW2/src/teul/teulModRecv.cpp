@@ -804,39 +804,38 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		ENDPOINT& endpoint = *(it->second);
 
-		if ( (endpoint.m_inUse == false) | (endpoint.socket == INVALID_SOCKET) )
+		if ( (endpoint.m_inUse == false) || (endpoint.socket == INVALID_SOCKET) )
 		{
 			dbugLog(_FLI,"t:%d attempted used of invalid endpoint", endpoint.teulIndex());
 			teulMRecvRemoveFromPoll(endpoint);
 			continue;
 		}
 
-		if ( endpoint.protocol == PROTOCOL_TCP )
-		{
-			if (endpoint.state() == IS_LISTENING )
-			{
-				TIMER_START
-				_acceptConnectTCP(endpoint);
-				TIMER_STOP_ADD(rpe_accept);
-				continue;
-			}
-			if ( endpoint.state() == IS_OPENING && !endpoint.m_connected )
-			{
-				// looks like the TCP connection is open, double check
-				_checkConnectTCP(endpoint);
-				continue;					  // service the next endpoint
-			}
-		}
-
 		if ( (revents & POLLOUT) != 0 )
 		{
-			endpoint.setWritesPending(false);
+            endpoint.pushSendQueue();
 		}
 
 		if ( (revents & POLLIN) != 0 )
 		{
-			if ( _handleReceive(endpoint) == true )
+            if ( endpoint.protocol == PROTOCOL_TCP )
+            {
+                if (endpoint.state() == IS_LISTENING )
+                {
+                    TIMER_START
+                    _acceptConnectTCP(endpoint);
+                    TIMER_STOP_ADD(rpe_accept);
+                    continue;
+                }
+                if ( endpoint.state() == IS_OPENING && !endpoint.m_connected )
+                {
+                    // looks like the TCP connection is open, double check
+                    _checkConnectTCP(endpoint);
+                    continue;                      // service the next endpoint
+                }
+            } else if ( _handleReceive(endpoint) ) {
 				continue;
+            }
 		}
 
 #if defined(POLLRDHUP)
@@ -1193,10 +1192,10 @@ ENDPOINT::updateSocketEvents()
 #else
 	pollData.fd[slot].events = POLLHUP | POLLIN;
 #endif
-	pollData.fd[slot].revents = 0;
+    if ( ((protocol == PROTOCOL_TCP) && (state() == IS_OPENING) && (!m_connected)) || (!m_impl->m_sendQueue.empty()) )
+        pollData.fd[slot].events |= POLLOUT;
 
-	if ( ((protocol == PROTOCOL_TCP) && (state() == IS_OPENING) && (!m_connected)) || (!m_impl->m_sendQueue.empty()) )
-		pollData.fd[slot].events |= POLLOUT;
+	pollData.fd[slot].revents = 0;
 
 	if (pollData.m_maxSock == INVALID_SOCKET)
 		pollData.m_maxSock = socket;
@@ -1712,26 +1711,6 @@ ENDPOINT::setConnected()
 void
 ENDPOINT::setWritesPending(const bool pending_)
 {
-	if ( m_writesPending == pending_ )
-		return;
-
 	m_writesPending = pending_;
-
-#if platOS != OS_WIN32
-	const UINT32 slot = m_impl->pollSlot();
-	// Since slot is now unsigned, negative values
-	// will be really big.
-	if ( PN_UNLIKELY(slot >= pollData.CAPACITY) )
-	{
-		return;
-	}
-	int events = pollData.fd[slot].events & ~POLLOUT;
-	if ( !m_impl->m_sendQueue.empty() )
-		events |= POLLOUT;
-	pollData.fd[slot].events = events;
-#else
 	updateSocketEvents();
-#endif
-
-	pushSendQueue();
 }

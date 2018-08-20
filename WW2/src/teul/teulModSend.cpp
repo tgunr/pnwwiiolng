@@ -145,13 +145,18 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		inetAddress.sin_addr.s_addr = htonl( address );
 		inetAddress.sin_port = htons( targetPort );
 	}
-
-	const ssize_t result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
+    
+    ssize_t result = -1;
+    
+    do {
+	    result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
+    } while (result == -1 && dbugGetErrno() == PLAT_EINTR);
+    
 	if ( PN_UNLIKELY(result < 0) )
 	{
 		// Check for an interrupted send attempt.
 		const int err = dbugGetErrno();
-		if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
+		if ( (err != PLAT_EAGAIN) && (err != PLAT_EWOULDBLOCK) )
 		{
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
 						, teulIndex(), PRA_SOCKET(socket)
@@ -213,14 +218,14 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 	}
 
 	// If there's no send queue, try and send the data directly.
-	if ( m_impl->m_sendQueue.empty() == true )
+	if ( m_impl->m_sendQueue.empty() )
 	{
 		// dbugLog(_FLD, "writing direct 1st time: bytesToSend = %d ", packetBytes);
 		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
 		// dbugLog(_FLD, "address of packet obj = %p", &packet);
 
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
-		// Anything but a partial send, the sender handles.
+
 		if ( PN_UNLIKELY(result < 0) )
 		{
             return result;
@@ -267,10 +272,7 @@ EndpointImpl::FreeFirstPacketInSendQueue()
 SINT32
 ENDPOINT::pushSendQueue()
 {
-	if ( m_writesPending == true )
-		return 0;
-
-	while ( m_inUse == true && m_closed == false && m_impl->m_sendQueue.empty() == false )
+	while ( m_inUse && !m_closed && !m_impl->m_sendQueue.empty() )
 	{
 		Teul::Packet* packet = m_impl->m_sendQueue.front();
 		const size_t sentBytes = packet->sentBytes();
@@ -283,25 +285,27 @@ ENDPOINT::pushSendQueue()
 		// dbugLog(_FLD, "address for write to start from = %p", data);
 
 		const SINT32 result = writeData(data, remainingBytes, packet->address(), packet->port());
-		// Result will be less than sendbytes if it is an error (negative),
-		// close (0) or smaller number of bytes.
-		if ( result <= 0 )
-		{
-			setWritesPending(true);
+		// Result will be less than sendbytes if it is an error (negative), or smaller number of bytes.
+		if ( result < 0 ) {
 			return result;
 		}
+
 #ifdef DEBUG_SEND_PACKET
 		dbugLog(_FLD, "t:%d SendPacketCont [%u:%u] : %d/%u bytes",
 		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
 		        result, remainingBytes);
 #endif
 		packet->addBytesSent((size_t)result);
-		if ( packet->sentBytes() >= packet->packetSizeBytes() )
-		{
-			// We appear to have sent the data.
+		if ( packet->sentBytes() >= packet->packetSizeBytes() ) {
+			// Sent the whole packet
 			m_impl->FreeFirstPacketInSendQueue();
-		}
+		} else {
+            // Hit flow control again. Break out for now.
+            return 0;
+        }
 	}
+    // If we get down here, we successfully drained the entire queue.
+    setWritesPending(false);
 
 	return 0;
 }
@@ -342,22 +346,13 @@ Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 	m_sent = 0;
 
 	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
-	if ( PN_UNLIKELY(result <= 0) )
+	if ( PN_UNLIKELY(result < 0) )
 	{
-		int err = 0;
-		// Connection closed.
-		if ( result == 0 )
-		{
-			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " closed during send err:%d", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), dbugGetErrno());
-		}
-		else
-		{
-			err = dbugGetErrno();
-			// Failed to send.
-			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d(%d) send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result, err);
-		}
+        // Failed to send.
+        // Don't dbugGetErrno() here. We already did that in sendData().
+        dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result);
 		teulClose(endpoint, Teul::Closing::SendFail);
-		return err;
+		return result;
 	}
 
 	return result;
