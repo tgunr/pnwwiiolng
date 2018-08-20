@@ -305,16 +305,9 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	static ARG_SPEC argSpec[] = {	{T_INT,4}						// Type Id
 									,{T_STRING,MAX_CNAME_SIZE}		// Blitz Name
 									,{T_STRING, MAX_CNAME_SIZE} 	// Full Name
-									,{T_STRING,3}					// Alloc?
-									,{T_INT,4}						// #L?
-									,{T_INT,4}						// #M?
-
-									,{T_STRING,2}					// Rel?
-									,{T_STRING,MAX_CNAME_SIZE}		// Association
-
+									,{T_STRING,3}					// Min Rank access
 									,{T_INT,4}						// LOD
-									,{T_INT,4}						// AlertDistance
-									,{T_INT,4}						// Speed
+									,{T_INT,4}						// Alert Distance
 									,{T_INT,4}};					// CVC Value
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
@@ -336,7 +329,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 			throw "multiple definitions of vehicle";
 
 		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue, args[3].svalue
-									, args[5].dvalue, args[6].dvalue * 100, args[7].dvalue, args[10].dvalue, args[11].dvalue
+									, args[4].dvalue * 100, args[5].dvalue, args[6].dvalue
 									);
 		g_weaponPtrs.emplace_back(weapon);
 
@@ -349,7 +342,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 		weapon->m_enemyBias =  DEFAULT_EY_BIAS_SLOTS;
 
 		// put bias code here
-		for (i=12; i < numArgs && args[i].svalue[0] !='\0'; i++)
+		for (i=7; i < numArgs && args[i].svalue[0] !='\0'; i++)
 		{
 			if (args[i].baseType == T_STRING)
 			{
