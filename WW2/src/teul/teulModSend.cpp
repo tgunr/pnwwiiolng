@@ -147,24 +147,11 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 	}
 
 	const ssize_t result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
-	if ( PN_UNLIKELY(result <= 0) )
+	if ( PN_UNLIKELY(result < 0) )
 	{
-		// Socket closed.
-		if ( result == 0 )
-		{
-			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " socket closed on sendto for %" PRSizeT " bytes to %u,%u [%u,%hu] attempt"
-						, teulIndex(), PRA_SOCKET(socket)
-						, sizeInBytes
-						, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port
-						);
-			teulClose(*this, Teul::Closing::Closed);
-			dbugSetErrno(Teul::Closing::Closed);
-			return -Teul::Closing::Closed;
-		}
-
 		// Check for an interrupted send attempt.
 		const int err = dbugGetErrno();
-		if ( (err != PLAT_EAGAIN) & (err != PLAT_EINTR) & (err != PLAT_EWOULDBLOCK) )
+		if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
 		{
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
 						, teulIndex(), PRA_SOCKET(socket)
