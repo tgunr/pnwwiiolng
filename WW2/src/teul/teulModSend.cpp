@@ -242,15 +242,9 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 		// Partial or blocked send falls thru and queues the remainder.
 	}
 
-#if defined(ALLOW_TEUL_PACKET_MOVE)
-	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
-#else
 	Teul::Packet* const copy = s_delayedPackets.New(packet);
 	copy->addBytesSent(packet.sentBytes());
-#endif
-
 	m_impl->m_sendQueue.push_back(copy);
-
 	setWritesPending(true);
 
 	return static_cast<SINT32>(packetBytes);

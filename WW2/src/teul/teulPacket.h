@@ -42,13 +42,8 @@ public:
 	Packet(PacketId id);
 	//! Default/receive constructor.
 	Packet() {}
-#if defined(ALLOW_TEUL_PACKET_MOVE)
-	//! Move constructor
-	Packet(Packet&& moveRef);
-#else
 	Packet(Packet&& moveRef) = delete;
 	Packet& operator = (Packet&& rhs) = delete;
-#endif
 
 	//! Construct and populate with a copy of an existing object.
 	template<typename T>
