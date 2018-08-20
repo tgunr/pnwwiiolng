@@ -171,7 +171,9 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 	dbugLog(_FLD, "%" PRSsizeT " bytes sent %" PRSizeT " requested", result, sizeInBytes);
 
-	lastDataSent.makeCurrent();
+    if (result > 0) {
+	    lastDataSent.makeCurrent();
+    }
 
 	return result;
 }
@@ -221,13 +223,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 		// Anything but a partial send, the sender handles.
 		if ( PN_UNLIKELY(result < 0) )
 		{
-			// If the error was the result of an interruption, then lets just queue the packet
-			// and give it a retry later on.
-			const SINT32 err = dbugGetErrno();
-			if ( (err != PLAT_EAGAIN) && (err != PLAT_EINTR) && (err != PLAT_EWOULDBLOCK) )
-			{
-				return result;
-			}
+            return result;
 		}
 		if ( result > 0 )
 		{
