@@ -2157,7 +2157,7 @@ std::string strtGetFactoryList(WWII_COUNTRY forCountry)
         char buffer[512];
 
         if (obj->m_country == forCountry) {
-            strprintf(buffer, "%s: %u%% (%c%c%c) ", obj->name, obj->percentDamage, obj->facility->cp->name[0], obj->facility->cp->name[1], obj->facility->cp->name[2]);
+            strprintf(buffer, "%s: %u%% (%.3s) ", obj->name, obj->percentDamage, obj->facility->cp->name);
         } else {
 			// If someone else besides the orginal owner owns this factory, make a note of it
             strprintf(buffer, "%s: %u%% (OWNER: %s) ", obj->name, obj->percentDamage, _countryCode[obj->m_country]);
