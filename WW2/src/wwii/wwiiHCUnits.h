@@ -121,6 +121,7 @@ public:
 	bool isBrigade() const { return m_type == HCU_BRIGADE; }
 	bool isDivision() const { return m_type == HCU_DIVISION; }
 	bool isGarrison() const { return m_type == HCU_GARRISON;  }
+	bool isDisabled() const { return m_disabled; }
 
 	bool isMarineUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_SEA; }
 
@@ -130,7 +131,9 @@ public:
 
 	bool isTrainingUnit() const { return m_training; }
 
-	void setCountry(WWII_COUNTRY newCountry) { m_countryID = newCountry;};
+	void setCountry(WWII_COUNTRY newCountry) { m_countryID = newCountry;}
+
+	void setDisabled(bool disabled) { m_disabled = disabled; }
 
 	////
 	// Static functions
@@ -176,6 +179,7 @@ protected:
 	HCUnit*			m_parent;			// So we can climb the tree
 	bool			m_registered;		// Whether we are the registered instance
 	bool			m_training;
+	bool            m_disabled;
 
 private:
 	void lookupParent();

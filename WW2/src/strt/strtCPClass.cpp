@@ -1592,21 +1592,61 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
 
 				if (toeTemplate)
 				{
-					unit->purgeResupply(true);
+					// Remove the old toe template
 					unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
-
+					// Set the new countries toe template
 					unit->setToeTemplateHeader(toeTemplate);
-
 					// Subscribe to the template and have it populate our vehicle list
 					// Note: This gives us "default" equipment levels (i.e. full)
-					// we will need to read in any stored levels from the database later.
 					toeTemplate->subscribe(unit, unit->toe());
-
+					// Clear all supply.
+					unit->purgeResupply(true);
 					// Reset supply and announce the country change to map, chat and clients.
-					unit->resetGarrison();
+					unit->announceGarrisonCountryChange();
+					// Restart supply with trickle timer.
+					unit->restartGarrisonSupply();
 				}
 			}
 		}
 	}
 
+}
+
+void CPStruct::disableAllGarrisons()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				unit->setDisabled(true);
+				dbugLog(_FLW, "Garrison %s has been disabled"
+					, unit->name());
+			}
+		}
+	}
+}
+
+
+void CPStruct::enableAllGarrisons()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				unit->setDisabled(false);
+				dbugLog(_FLW, "Garrison %s has been enabled"
+					, unit->name());
+			}
+		}
+	}
 }

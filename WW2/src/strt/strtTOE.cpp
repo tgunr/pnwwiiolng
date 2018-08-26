@@ -171,6 +171,8 @@ TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 
 	m_subscribers.erase(unit);
 
+	unit->clearTOEInstance();
+
 	toe.clear();
 }
 

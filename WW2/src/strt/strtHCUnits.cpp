@@ -88,6 +88,12 @@ StratHCUnit::addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate)
 		m_toe.insert(std::make_pair(weaponTemplate.spec(), TOE_::WeaponInstance(weaponTemplate, *this, weaponTemplate.capacity())));
 }
 
+void StratHCUnit::clearTOEInstance()
+{
+	if (!isTrainingUnit())
+		m_toe.clear();
+}
+
 //////////////////////////////////////////////////////////////////////
 // Work out how the percentage supply level
 
@@ -1306,18 +1312,13 @@ StratHCUnit::reset()
 		m_fallbackCP = nullptr;
 }
 
+////////////////////////////////////////////////////////////////////////
+// Restarts a Garrisons supply and initiates the trickle timer.
+
 void
-StratHCUnit::resetGarrison()
+StratHCUnit::restartGarrisonSupply()
 {
-	// Purge all resupply
-	purgeResupply(true);
-
-	// Tell the map host and chat host that the garrison has changed country
-	// map host forwards it on to all clients.
-	announceGarrisonCountryChange();
-
-	// Reset the supply queue
-	restartSupply(0, 0, false);
+	restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, false);
 }
 
 //////////////////////////////////////////////////////////////////////

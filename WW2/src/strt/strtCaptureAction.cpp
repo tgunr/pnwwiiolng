@@ -269,13 +269,6 @@ CaptureAction::ChangeOwner()
 	//Set the side correctly for the facility and all its objects
 	m_facility.setCountry(m_newCountry);
 
-	// Remove all Garrison supply and unsubscribe from the toe template.
-	//m_cp.removeAllGarrisonsSupply();
-
-	// Change the country of all Garrisons in this cp
-	// Sends it to chat and map hosts, map sends it to all clients.
-	m_cp.changeAllGarrisonCountries(m_newCountry);
-
 	// Set the owner of all objects of this facility to this country
 	_setObjectsOwner(m_facility.objectList, m_newSide, m_newCountry);
 
@@ -473,6 +466,9 @@ CaptureAction::SetControl() const
 							, facility->name, facility->uOID
 							, m_cp.controllingSide);
 					strtCloseBase(*facility);
+
+					// Disable the Garrison
+					m_cp.disableAllGarrisons();
 				}
 				else
 				{
@@ -486,6 +482,8 @@ CaptureAction::SetControl() const
 					{
 						strtCloseBase(*facility);
 						strtOpenBase(*facility);
+						// Enable the Garrison
+						m_cp.enableAllGarrisons();
 					}
 				}
 
@@ -611,6 +609,10 @@ CaptureAction::ApplyEffects() const
 				strtCloseFirebase(*(link->firebase));
 			}
 		}
+
+		// Change the country of all Garrisons in this cp
+		// Sends it to chat and map hosts, map sends it to all clients.
+		m_cp.changeAllGarrisonCountries(m_newCountry);
 
 	}
 

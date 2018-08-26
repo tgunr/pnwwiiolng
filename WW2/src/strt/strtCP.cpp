@@ -1505,9 +1505,9 @@ CPStruct::restartSupplies()
 		if ( it->second->isDivision() == false && it->second->isBrigade() == false && it->second->isGarrison() == false )
 			continue;
 		StratHCUnit* unit = (StratHCUnit*)it->second;
-		unit->restartSupply(host_config.supply.trickleStart_m * 60, host_config.supply.trickleTime_m * 60, false);
+			unit->restartSupply(host_config.supply.trickleStart_m * 60, host_config.supply.trickleTime_m * 60, false);
+		}
 	}
-}
 
 //////////////////////////////////////////////////////////////////////
 //

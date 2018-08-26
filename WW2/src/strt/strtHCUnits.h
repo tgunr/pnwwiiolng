@@ -71,8 +71,8 @@ public:
 	// Reset the unit to its original position and spawn lists.
 	void reset();
 
-	// Reset supply and announce the country change to map, chat and clients.
-	void resetGarrison();
+	// reset Garrison supply (Initiates the trickle timer)
+	void restartGarrisonSupply();
 
 	// Write this stuff to the database
 	void save() const;
@@ -185,6 +185,8 @@ public:
 
 //tolua_end
 	void addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate);
+
+	void clearTOEInstance();
 
 	void CheckResupplyStatus(bool fullCheck);
 

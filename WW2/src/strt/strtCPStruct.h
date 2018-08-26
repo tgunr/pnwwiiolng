@@ -284,6 +284,9 @@ public:
 	// Changes the country and the toe Template header for all Garrisons in this cp.
 	void changeAllGarrisonCountries(WWII_COUNTRY countryID);
 
+	void disableAllGarrisons();
+	void enableAllGarrisons();
+
 	void setTableStates(bool isNewObjective = false);
 
 	// Is a particular side allowed to spawn here?
