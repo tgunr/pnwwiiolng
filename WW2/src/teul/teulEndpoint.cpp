@@ -880,7 +880,7 @@ EndpointImpl::Reset()
 	recvQueue.clear();
 	while ( m_sendQueue.empty() == false )
 	{
-		FreeFirstPacketInSendQueue();
+		freeFirstPacketInSendQueue();
 	}
 	m_version = 0;
 	m_cryptVersion = 0;

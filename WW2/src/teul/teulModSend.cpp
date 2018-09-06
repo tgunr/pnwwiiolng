@@ -232,7 +232,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 // Free the first packet in an endpoint's send queue.
 
 void
-EndpointImpl::FreeFirstPacketInSendQueue()
+EndpointImpl::freeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
 	m_sendQueue.pop_front();
@@ -271,7 +271,7 @@ ENDPOINT::pushSendQueue()
 		packet->addBytesSent((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() ) {
 			// Sent the whole packet
-			m_impl->FreeFirstPacketInSendQueue();
+			m_impl->freeFirstPacketInSendQueue();
 		} else {
             // Hit flow control again. Break out for now.
             return 0;
