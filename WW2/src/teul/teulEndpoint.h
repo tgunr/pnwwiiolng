@@ -193,7 +193,7 @@ public:
 
 private:
 	//! Write the actual data to the socket.
-	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
+	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port);
 
 #if platBuild == BUILD_SERVER
 public:

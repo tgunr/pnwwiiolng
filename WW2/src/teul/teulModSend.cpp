@@ -84,8 +84,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR pr
 }
 
 #if platBuild == BUILD_SERVER
-SINT32
-ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
+SINT32 ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 {
 	ABORT_IF_EX(protocol != PROTOCOL_CTRL, "ENDPOINT::sendRaw only allowed on CTRL interfaces");
 	return ::send(socket, (const char*)data, sizeInBytes, 0);
@@ -95,40 +94,39 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 //////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
-SINT32
-ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
+SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port)
 {
     ssize_t result = -1;
     struct sockaddr_in *realAddress = nullptr, possibleAddrStorage = destSockAddress;
     socklen_t realAddressLength = 0;
     
-    // Address of NULL is identical to calling send(), so we only set up the
-    // destination address for non-TCP endpoints. Note: sendto() will scream
-    // EISCONN for any non-NULL address, even if it's the connected peer's.
+    // Passing NULL for destination is identical to calling send(), and sendto()
+    // will scream EISCONN for anything but NULL on a TCP socket, so only set
+    // the destination address for UDP endpoints.
 	if (protocol != PROTOCOL_TCP && protocol != PROTOCOL_CTRL) {
         realAddress = &possibleAddrStorage;
         realAddressLength = sizeof(possibleAddrStorage);
         if (address) {
             realAddress->sin_family = AF_INET;
             realAddress->sin_addr.s_addr = htonl(address);
-            realAddress->sin_port = htons(port ? (UINT16)port : WWII::Net::Ports::PrivateBcast);
+            realAddress->sin_port = htons(port ? port : WWII::Net::Ports::PrivateBcast);
         }
     }
     
     do {
-	    result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)realAddress, realAddressLength);
-    } while (result == -1 && dbugGetErrno() == PLAT_EINTR);
+	    result = ::sendto(socket, data, sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
+    } while (PN_UNLIKELY(result == -1 && dbugGetErrno() == PLAT_EINTR));
     
 	if (PN_UNLIKELY(result < 0)) {
 		int err = dbugGetErrno();
         
 		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {
-          dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
-          return 0;
+            dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
+            return 0;
         } else {
 			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " error on send %" PRSizeT " bytes, err:%d",
                     teulIndex(), PRA_SOCKET(socket), sizeInBytes, err);
-			return -ETEUL_ENOSPC_SEND_SOCKET;
+			return -err;
 		}
 	}
 
@@ -142,8 +140,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 //////////////////////////////////////////////////////////////////////
 // Try to send or queue a packet to a socket.
 
-SINT32
-ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
+SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
@@ -154,67 +151,51 @@ ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
     //      - if a client, must also be connected
 	if (protocolPreference == PROTOCOL_UDP &&
 		m_pairdUdpConn != nullptr && m_pairdUdpConn->isInitialized() &&
-		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected()))
-	{
+		(m_pairdUdpConn->isServer() || m_pairdUdpConn->isConnected())
 #if platBuild == BUILD_SERVER
-        if (host_config.netcode3Enabled)
+        && host_config.netcode3Enabled
 #endif
-            // No need to encrypt, RakNet has its own encryption
-            if (m_pairdUdpConn->send(packet, *this))
-                return static_cast<SINT32>(packetBytes);
+    ) {
+        // No need to encrypt, RakNet has its own encryption
+        if (m_pairdUdpConn->send(packet, *this)) {
+            return static_cast<SINT32>(packetBytes);
+        }
 	}  // fall through if sending failed - transmit via normal path
 
 	packet.header().m_tag = ++this->m_impl->sentTag;
 
 	// Encrypt the data.
-	if (packet.header().packetType() != Teul::Tokens::Unencrypted)
-	{
+	if (packet.header().packetType() != Teul::Tokens::Unencrypted) {
 		encrypt(packet.encryptable(), packet.header().packetSizeBytes());
 	}
 
-	// If there's no send queue, try and send the data directly.
-	if ( m_impl->m_sendQueue.empty() )
-	{
-		// dbugLog(_FLD, "writing direct 1st time: bytesToSend = %d ", packetBytes);
-		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
-		// dbugLog(_FLD, "address of packet obj = %p", &packet);
+    ssize_t result = 0;
+    
+    // If there's no send queue, try the send immediately.
+	if (m_impl->m_sendQueue.empty()) {
+		result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 
-		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
-
-		if ( PN_UNLIKELY(result < 0) )
-		{
+		if (PN_UNLIKELY(result < 0)) {
             return result;
 		}
-		if ( result > 0 )
-		{
-			const size_t sent = (size_t) result;
-#ifdef DEBUG_SEND_PACKET
-			dbugLog(_FLD, "t:%d SendPacketInit [%u:%u] : %d/%u bytes",
-			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
-			        result, packet.packetSizeBytes());
-#endif
-			packet.addBytesSent(sent);
-			if ( packet.sentBytes() >= packetBytes )
-			{
-				return static_cast<SINT32>(packetBytes);
-			}
-		}
-		// Partial or blocked send falls thru and queues the remainder.
-	}
+        ABORT_IF_EX(static_cast<UINT32>(result) > packetBytes, "Sent %" PRSsizeT " bytes but only tried to send %u bytes!", result, packetBytes);
+    }
 
-	Teul::Packet* const copy = s_delayedPackets.New(packet);
-	copy->addBytesSent(packet.sentBytes());
-	m_impl->m_sendQueue.push_back(copy);
-	setWritesPending(true);
-
-	return static_cast<SINT32>(packetBytes);
+    packet.addBytesSent(result);
+    if (PN_UNLIKELY(packet.sentBytes() < packetBytes)) {
+        // Entire packet not yet sent, queue it.
+        Teul::Packet* const copy = s_delayedPackets.New(packet);
+        copy->addBytesSent(packet.sentBytes());
+        m_impl->m_sendQueue.push_back(copy);
+        setWritesPending(true);
+    }
+	return static_cast<SINT32>(packetBytes); // always returns entire size even if send was partial?
 }
 
 //////////////////////////////////////////////////////////////////////
 // Free the first packet in an endpoint's send queue.
 
-void
-EndpointImpl::freeFirstPacketInSendQueue()
+void EndpointImpl::freeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
 	m_sendQueue.pop_front();
@@ -224,66 +205,50 @@ EndpointImpl::freeFirstPacketInSendQueue()
 //////////////////////////////////////////////////////////////////////
 // Try to drain the send queue of a socket.
 
-SINT32
-ENDPOINT::pushSendQueue()
+SINT32 ENDPOINT::pushSendQueue()
 {
-	while ( m_inUse && !m_closed && !m_impl->m_sendQueue.empty() )
-	{
+	while (m_inUse && !m_closed && !m_impl->m_sendQueue.empty()) {
 		Teul::Packet* packet = m_impl->m_sendQueue.front();
-		const size_t sentBytes = packet->sentBytes();
-		const size_t remainingBytes = packet->packetSizeBytes() - sentBytes;
-		void* data = (char*)packet->packet() + sentBytes;
+		size_t sentBytes = packet->sentBytes();
+		size_t remainingBytes = packet->packetSizeBytes() - sentBytes;
+		void* data = static_cast<char *>(packet->packet()) + sentBytes;
 
-		// dbugLog(_FLD, "writing off of queue: sentBytes = %d, packet->packetSizeBytes = %d, remaining = %d", sentBytes, packet->packetSizeBytes(), remainingBytes);
-		// dbugLog(_FLD, "start of packet address = %p", packet->packet());
-		// dbugLog(_FLD, "address of packet obj = %p", packet);
-		// dbugLog(_FLD, "address for write to start from = %p", data);
-
-		const SINT32 result = writeData(data, remainingBytes, packet->address(), packet->port());
-		// Result will be less than sendbytes if it is an error (negative), or smaller number of bytes.
-		if ( result < 0 ) {
+		ssize_t result = writeData(data, remainingBytes, packet->address(), packet->port());
+		if (PN_UNLIKELY(result < 0)) {
 			return result;
 		}
+        ABORT_IF_EX(static_cast<size_t>(result) > remainingBytes, "Sent %" PRSsizeT " bytes but only tried to send %" PRSizeT " bytes!", result, remainingBytes);
 
-#ifdef DEBUG_SEND_PACKET
-		dbugLog(_FLD, "t:%d SendPacketCont [%u:%u] : %d/%u bytes",
-		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
-		        result, remainingBytes);
-#endif
-		packet->addBytesSent((size_t)result);
-		if ( packet->sentBytes() >= packet->packetSizeBytes() ) {
-			// Sent the whole packet
-			m_impl->freeFirstPacketInSendQueue();
-		} else {
+		packet->addBytesSent(result);
+		if (PN_UNLIKELY(packet->sentBytes() < packet->packetSizeBytes())) {
             // Hit flow control again. Break out for now.
             return 0;
         }
+
+        // Sent the whole packet
+        m_impl->freeFirstPacketInSendQueue();
 	}
+
     // If we get down here, we successfully drained the entire queue.
     setWritesPending(false);
-
 	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-SINT32
-Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
+SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
-	if ( PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) )
-	{
+    static_assert(sizeof(Teul::PacketHeader::tag_t) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet must agree on tag size");
+
+	if (PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING)) {
 		dbugLog(_FLA, "t:%d tried to send to non-open endpoint [st:%d]", endpoint.teulIndex(), endpoint.state());
 		return -ENOTCONN;
 	}
+	ABORT_IF_EX(header().m_tag != 0 && header().packetType() != Teul::Tokens::Unencrypted, "tried to re-send a Teul::Packet");
 
-	ABORT_IF_EX(header().m_tag != 0 && header().packetType() != Teul::Tokens::Unencrypted
-					, "tried to re-send a Teul::Packet");
-
-	static_assert( sizeof(header().m_tag) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet disagree on tag size" );
-
+    teulSyncClock();
 #if platBuild == BUILD_CLIENT
-	teulSyncClock();
 	header().m_tick = (Teul::PacketHeader::tick_t)teulClock64;
 #else
 	// Send the client back it's tick plus the amount of time elapsed
@@ -292,22 +257,20 @@ Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 	header().m_tick = endpoint.m_impl->m_lastPacketTick + (Teul::PacketHeader::tick_t)(teulClock64 - endpoint.m_impl->m_lastTickRx);
 #endif
 
-	// The packet size, as far as* teulkit* is concerned ...
-	// doesn't include the prefix.
-	const size_t psb = packetSizeBytes();
-	const size_t payloadBytes = psb - UnencryptedBytes;
-	header().packetSizeBytes(payloadBytes);
-	ABORT_IF(header().packetSizeBytes() != payloadBytes);
+	// The packet size, as far as Teul is concerned. Doesn't include the prefix.
+	size_t psb = packetSizeBytes();
+	size_t payloadBytes = psb - UnencryptedBytes;
+    
+	header().setPacketSizeBytes(payloadBytes);
+	ABORT_IF_EX(header().packetSizeBytes() != payloadBytes, "Teul has developed a reality distortion field");
 	m_sent = 0;
 
-	const SINT32 result = endpoint.sendPacket(*this, protocolPreference);
-	if ( PN_UNLIKELY(result < 0) )
-	{
-        // Failed to send.
-        // Don't dbugGetErrno() here. We already did that in sendData().
+	SINT32 result = endpoint.sendPacket(*this, protocolPreference);
+    
+	if (PN_UNLIKELY(result < 0)) {
+        // Failed to send. Don't dbugGetErrno() here. We already did that in sendData().
         dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result);
 		teulClose(endpoint, Teul::Closing::SendFail);
-		return result;
 	}
 
 	return result;
@@ -330,35 +293,33 @@ teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protoco
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32
-teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK& object)
+SINT32 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK& object)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if ( PN_UNLIKELY(theEndpoint == nullptr) )
-	{
-		dbugLog(_FLA, "t:%d null endpoint", teulIndex);
+    
+	if (PN_UNLIKELY(!theEndpoint)) {
+		dbugLog(_FLA, "t:%d " PRF_CALLBACK " invalid endpoint in send-to callback", teulIndex, PRA_CALLBACK(object));
 		return -EINVAL;
 	}
 
 	// Temporarily save the dest address.
 	sockaddr_in savedDestAddress = theEndpoint->destSockAddress;
-	theEndpoint->destSockAddress.sin_addr.s_addr = htonl( address );
-	if ( port == 0 )
-		theEndpoint->destSockAddress.sin_port = theEndpoint->localSockAddress.sin_port;
-	else
-		theEndpoint->destSockAddress.sin_port = htons(port);
+    
+	theEndpoint->destSockAddress.sin_addr.s_addr = htonl(address);
+    theEndpoint->destSockAddress.sin_port = port ? htons(port) : theEndpoint->localSockAddress.sin_port;
 
-	// Make sure we populate the local network address components if
-	// we appear to be sending to a broadcast address.
-	static const UINT32 netMask = 0x00ffffff;
-	if ( (theEndpoint->destSockAddress.sin_addr.s_addr & netMask) == 0 )
-		theEndpoint->destSockAddress.sin_addr.s_addr |= (theEndpoint->localSockAddress.sin_addr.s_addr & netMask);
-	if ( (theEndpoint->destSockAddress.sin_addr.s_addr & ~netMask) == 0)
-		theEndpoint->destSockAddress.sin_addr.s_addr |= (theEndpoint->localSockAddress.sin_addr.s_addr & ~netMask);
+	// Ensure the local network address components are populated if sending to a broadcast address.
+	constexpr UINT32 broadcastNetMask = 0x00ffffff;
+    
+	if ((theEndpoint->destSockAddress.sin_addr.s_addr & broadcastNetMask) == 0) {
+		theEndpoint->destSockAddress.sin_addr.s_addr |= (theEndpoint->localSockAddress.sin_addr.s_addr & broadcastNetMask);
+    }
+	if ((theEndpoint->destSockAddress.sin_addr.s_addr & ~broadcastNetMask) == 0) {
+		theEndpoint->destSockAddress.sin_addr.s_addr |= (theEndpoint->localSockAddress.sin_addr.s_addr & ~broadcastNetMask);
+    }
 
-	const SINT32 retval = teulModSendCALLBACKe(*theEndpoint, object);
+	SINT32 retval = teulModSendCALLBACKe(*theEndpoint, object);
 
 	theEndpoint->destSockAddress = savedDestAddress;
-
 	return retval;
 }

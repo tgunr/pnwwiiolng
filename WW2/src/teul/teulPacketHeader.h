@@ -19,7 +19,7 @@ namespace Teul
 		UINT32 packetType() const { return m_prefix[0] >> 4; }
 		void packetType(UINT32 type_) { m_prefix[0] = static_cast<uint8_t>((type_ << 4) | (m_prefix[0] & 0x0fU)); }
 		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0fU) * 65536U) | (m_prefix[1] * 256U) | (m_prefix[2]); }
-		void packetSizeBytes(UINT32 size_)
+		void setPacketSizeBytes(UINT32 size_)
 		{
 			// preserve the upper 4 bits of [0] which represent the packet type,
 			// but completely replace the lower four bits
@@ -46,3 +46,4 @@ namespace Teul
 }
 
 static_assert(sizeof(Teul::PacketHeader) == 8, "Teul::PacketHeader should be 8 bytes");
+static_assert(std::is_standard_layout<Teul::PacketHeader>::value, "Teul::PacketHeader must be PoD");

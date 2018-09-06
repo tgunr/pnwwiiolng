@@ -18,7 +18,7 @@ Teul::Packet::Packet(PacketId id)
 	, m_port(0)
 {
 	header().packetType(Teul::Tokens::Encrypted);
-	header().packetSizeBytes(headerSizeBytes());
+	header().setPacketSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
 	header().m_callX = id.m_x;
 	header().m_callY = id.m_y;
