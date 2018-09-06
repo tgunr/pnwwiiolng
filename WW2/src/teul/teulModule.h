@@ -9,9 +9,6 @@
 
 extern TeulTimeMS lastUpdateTime;
 
-extern UINT32 totalPacketsRecv;
-extern UINT32 totalPacketsXfer;
-
 /* Basic functions */
 SINT32 teulModIdle(const TeulTimeMS duration);
 SINT32 teulModShutdown();

@@ -83,10 +83,6 @@ static TeulTimeMS	maxDelta	= 0;
 SINT32 _updatesPerSec = 0;
 SINT32 _updatesThisSec = 0;
 
-//static UINT32 _lastPSendTotal = 0;
-//static UINT32 _lastPRecvTotal = 0;
-static UINT32 _lastPXferTotal = 0;
-
 #if defined(WINDOWS_VERSION)
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
 static size_t		maxSock;
@@ -639,8 +635,6 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		else
 #endif
 		{
-			++totalPacketsRecv;
-			++totalPacketsXfer;
 			++packets;
 
 			const UINT32 dgramSize = hdr->packetSizeBytes() + Teul::Packet::UnencryptedBytes;
@@ -768,8 +762,6 @@ static void
 _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 {
 	SINT32		count = 0, loopCount = 0;
-
-	_lastPXferTotal = totalPacketsXfer;
 
 	for ( size_t slot = 0; slot < maxSlots && count < numSlots; ++slot )
 	{
@@ -1032,8 +1024,6 @@ static UINT64 g_idleInstance = 0;
 static void
 _pollSocketsInner(TeulTimeMS remainder)
 {
-	_lastPXferTotal = totalPacketsXfer;
-
 	// Make ourselves re-entrant by aborting if someone else comes along and
 	// processes any endpoints.
 	const UINT64 idleInstance = ++g_idleInstance;
@@ -1383,8 +1373,6 @@ _pollSocketsInner(TeulTimeMS duration_)
 	// are there any sockets that need reading?
 	if ( numfds > 0 )
 	{
-		_lastPXferTotal = totalPacketsXfer;
-
 		TIMER_START
 		_runPollEndpoints(pollData.fd, pollData.m_size, numfds);
 		TIMER_STOP("tmi_idle_rpe");

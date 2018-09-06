@@ -24,26 +24,8 @@
 #include "wwii/wwiiConfig.h"
 #include "mem/memPool.h"
 
-UINT32 totalPacketsSent;
-UINT32 totalPacketsRecv;
-UINT32 totalPacketsXfer;
-
 // Maximum send buffer of 4096Kb.
 static Mem::Pool<Teul::Packet, 256 * 4096 / sizeof(Teul::Packet)> s_delayedPackets;
-
-//////////////////////////////////////////////////////////////////////
-
-void teulInitSend()
-{
-	totalPacketsSent = 0;
-	totalPacketsRecv = 0;
-	totalPacketsXfer = 0;
-}
-
-void teulCleanupSend()
-{
-	s_delayedPackets.Cleanup();
-}
 
 //////////////////////////////////////////////////////////////////////
 // Pack the "outdata" for a callback and send it to the specified

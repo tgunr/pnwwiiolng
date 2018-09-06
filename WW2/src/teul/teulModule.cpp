@@ -202,10 +202,8 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 
 	dbugWrite(_FLN, "intitializing teul module version: %s", Teul::VersionString);
 
-	extern void teulInitSend();
 	extern void teulInitModRecv();
 
-	teulInitSend();
 	teulInitModRecv();
 
 	teulInitEndpoints(errFnPtr);
@@ -270,8 +268,6 @@ teulModShutdown()
 	teulCleanupEndpoints();
 
 	// Shutdown the Mod subsystems
-	extern void teulCleanupSend();
-	teulCleanupSend();
 	extern void teulCleanupModRecv();
 	teulCleanupModRecv();
 
