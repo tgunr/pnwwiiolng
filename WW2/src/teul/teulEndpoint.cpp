@@ -9,28 +9,12 @@
 //
 // Originating Programmer: Martin Poulin
 
-#if platOS == OS_LINUX || platOS == OS_MACOS
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <netinet/tcp.h>
-	#include <arpa/inet.h>
-	#include <sys/un.h>
-	#include <sys/ioctl.h>
-	#include <limits.h>
-	#include <sys/types.h>
-#elif platOS == OS_WIN32
-	#include <sys/types.h>
-	#include <winsock2.h>
-	#include <windows.h>
-#endif
-
 #include <string.h>
 #include "include/inplace_vector.h"
 #include <queue>
 #include "teul/teulBasic.h"
 #include "teul/teulModule.h"
 #include "teul/teulPacket.h"
-#include "teul/teulSockConfig.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointIdleList.h"
 #include "teul/teulEndpointImpl.h"

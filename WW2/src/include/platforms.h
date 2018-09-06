@@ -146,6 +146,12 @@
 #include <io.h>
 #include <time.h>
 #include <direct.h>
+#include <winsock2.h>
+#include <WinInet.h>
+#include <Winineti.h>
+#include <WinIoCtl.h>
+#include <Ws2tcpip.h>
+#include <iphlpapi.h>
 
 #ifndef stricmp
 # define stricmp(x,y) _stricmp(x,y)
@@ -189,6 +195,11 @@ using fullpath_t = wchar_t;
 #define WRONG_PATHSEP_W L"/"
 #define WRONG_PATHSEP_WC L'/'
 
+using socklen_t = SINT32;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
+
 static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
     return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
 }
@@ -210,6 +221,17 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 // Equivalents for macOS/Linux
 #elif platOS == OS_MACOS || platOS == OS_LINUX
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include <sys/un.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <ifaddrs.h>
+
 using fullpath_t = char;
 #define PATHLit(s) s
 #define PRpathT "s"
@@ -223,6 +245,13 @@ using fullpath_t = char;
 #define WRONG_PATHSEP_C '\\'
 #define WRONG_PATHSEP_W L"\\"
 #define WRONG_PATHSEP_WC L'\\'
+
+using SOCKET = int;
+constexpr const SOCKET INVALID_SOCKET = -1;
+constexpr const int SOCKET_ERROR = -1;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
 
 static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
     *fdp = open(path, oflag, cmode);

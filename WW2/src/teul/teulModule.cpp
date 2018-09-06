@@ -9,9 +9,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <fcntl.h>
-#include <signal.h>
-
 #include "mem/mem.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
@@ -23,7 +20,6 @@
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulModCalls.h"
 #include "teul/teulModule.h"
-#include "teul/teulSockConfig.h"
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
@@ -32,27 +28,13 @@
 #include "include/configVars.h"
 
 #if platOS == OS_WIN32
-#include <winsock2.h>
-#include <WinInet.h>
-#include <Winineti.h>
-#include <WinIoCtl.h>
-#include <Ws2tcpip.h>
 #pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
-#include <iphlpapi.h>
 #pragma comment(lib, "IPHLPAPI.lib")
-#else
-#include <sys/ioctl.h>
-#include <sys/socket.h>
 #endif
 
 #if platBuild == BUILD_SERVER
 #include "server/serverInterfaceDescription.h"
-#endif
-
-#if platOS != OS_WIN32
-	#include <sys/types.h>
-	#include <ifaddrs.h>
 #endif
 
 #define EXT_TOKENS		0x8000000

@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -23,7 +24,9 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <queue>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <numeric>
@@ -65,7 +68,6 @@
 #include "inst/instTypes.h"
 #include "teul/teulPacket.h"
 #include "weap/weapWeapon.h"
-#include "teul/teulEndpoint.h"
 #include "chat/chatLStringIDs.h"
 #include "str/stringLib.h"
 

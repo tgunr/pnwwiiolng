@@ -1661,6 +1661,7 @@
 		FA5CDD461CD339D100F93668 /* build_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = build_info.hpp; path = src/build_info.hpp; sourceTree = "<group>"; };
 		FA78BDEB1D9082FA0042FBF0 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
 		FABC5C1920720BCA00AF2510 /* en */ = {isa = PBXFileReference; fileEncoding = 2483028224; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		FAF9F2BF21412997000D78C7 /* precompile_includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = precompile_includes.h; sourceTree = "<group>"; };
 		FAFA9A042082890900CB7918 /* authClientMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authClientMessages.h; sourceTree = "<group>"; };
 		FAFA9A052082890900CB7918 /* authConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authConstants.h; sourceTree = "<group>"; };
 		FAFA9A062082890900CB7918 /* authBypassOTP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authBypassOTP.h; sourceTree = "<group>"; };
@@ -2054,6 +2055,7 @@
 		081049C2103DD2310065E0E2 /* include */ = {
 			isa = PBXGroup;
 			children = (
+				FAF9F2BF21412997000D78C7 /* precompile_includes.h */,
 				FAFA9A1420828EF700CB7918 /* platforms.h */,
 				081049C7103DD2310065E0E2 /* defs.h */,
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,

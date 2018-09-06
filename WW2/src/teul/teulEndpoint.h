@@ -1,4 +1,3 @@
-#pragma once
 // This module provides high-level access to the transport
 // functions used in the teul API.
 //
@@ -8,10 +7,10 @@
 //
 // Originating Programmer: Martin Poulin
 
+#pragma once
 #include "teul/teulEnums.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulTimeMS.h"
-#include "teul/teulSockTypes.h"		// For SOCKET
 #include "teul/teulFuncTypes.h"
 #include "RakNetTypes.h"
 

@@ -201,6 +201,7 @@ INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
+	include/platforms.h include/precompile_includes.h
     server/server.cpp server/server.h
     server/serverReleaseTypeEnum.h
     server/serverLuaInterface.cpp

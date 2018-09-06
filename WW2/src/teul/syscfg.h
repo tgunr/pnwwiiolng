@@ -7,6 +7,17 @@
 // header file.
 // Originating Programmer : Stephen W. Evans
 
+#if !defined(WIN32) && !defined(WIN64) // OS_WIN32 is not available before platforms.h
+
+#define HAVE_UNISTD_H 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_SYSLOG_H 1
+#define HAVE_SIGNAL_H 1
+#define HAVE_ARPA_INET_H 1
+#define HAVE_SIGACTION 1
+
+#endif
+
 #include "include/platforms.h"
 
 #include "teul/teulBasic.h"

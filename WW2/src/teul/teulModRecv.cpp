@@ -9,15 +9,17 @@
 //
 // Originating Programmer: Martin Poulin
 
-//#define DEBUG_RECV_PACKET
-
 #include "mem/mem.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverServerInfo.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConstants.h"
+#include "teul/teulEndpoint.h"
+#include "teul/teulEndpointImpl.h"
 #include "teul/teulEndpointIdleList.h"
 #include "teul/teulModule.h"
+#include "teul/teulModCalls.h"
 #include "teul/teulPackers.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
@@ -27,32 +29,6 @@
 #include "wwii/wwiiNetPorts.h"
 
 using namespace Teul;
-
-#if platOS == OS_WIN32
-# define WINDOWS_VERSION
-# define VALID_SOCKET(n) ( (n) != (INVALID_SOCKET) )
-#else
-# define NIX_VERSION
-# define VALID_SOCKET(n) ( (n) >= (0) )
-#endif
-
-#if defined(NIX_VERSION)
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <poll.h>
-#include <fcntl.h>
-#endif
-
-#if defined(WINDOWS_VERSION)
-#include <winsock2.h>
-#endif
-
-#include "teul/teulEndpoint.h"
-#include "teul/teulEndpointImpl.h"
-#include "teul/teulModCalls.h"
-#include "teul/teulSockConfig.h"
-
-#include "teul/teulConstants.h"
 
 #define COMMAND_UPDATE_INTERVAL	10
 
@@ -74,7 +50,7 @@ static TeulTimeMS	maxDelta	= 0;
 SINT32 _updatesPerSec = 0;
 SINT32 _updatesThisSec = 0;
 
-#if defined(WINDOWS_VERSION)
+#if platOS == OS_WIN32
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
 static size_t		maxSock;
 static bool			_needSetFs = true;
@@ -103,7 +79,7 @@ static void	_pollSockets(TeulTimeMS duration_);
 
 static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 static void _pollSet();
 #endif
 
@@ -194,7 +170,7 @@ teulReleaseDatagram(DATA_GRAM* gram)
 
 void teulInitModRecv()
 {
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	dbugLog(_FLI, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
 
 	memset(&pollData, 0, sizeof(pollData));
@@ -243,10 +219,10 @@ _checkConnectTCP(ENDPOINT& endpoint)
 {
 	SINT32 retval;
 	socklen_t len;
-	sockval_t error;
+	int error;
 	const SOCKET& sock = endpoint.socket;
 
-#if defined(WINDOWS_VERSION)
+#if platOS == OS_WIN32
 	retval = connect(sock, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
 	error = dbugGetErrno();
 	dbugWrite(_FLN, "t:%d sock:" PRF_SOCKET " check connect err:%d retval:%d"
@@ -272,7 +248,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 						, endpoint.teulIndex(), PRA_SOCKET(sock), retval);
 //		return 0;
 	}
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 	else
 	{
 		dbugWrite(_FLM, "t:%d sock:" PRF_SOCKET " check connect err:%d rev:%d"
@@ -338,11 +314,15 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		}
 
 		// set socket to non-blocking.
+#if platOS == OS_WIN32
 		const SINT32 retval = ioctlsocket(newSock, FIONBIO, &argp);
+#else
+		const SINT32 retval = ioctl(newSock, FIONBIO, &argp);
+#endif
 		if ( PN_UNLIKELY(retval < 0) )
 		{
 			dbugLog(_FLA, "t:%d could not accept connection", endpoint.teulIndex());
-			closesocket(newSock);
+			OS_CLOSESOCKET(newSock);
 			continue;
 		}
 
@@ -352,7 +332,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
 		{
 			shutdown(newSock, 0x02);
-			closesocket(newSock);
+			OS_CLOSESOCKET(newSock);
 			continue;
 		}
 
@@ -573,14 +553,6 @@ _recvfromStream(ENDPOINT& endpoint)
 			// might not be fatal, might just be wait condition
 			return retval;
 		}
-#ifdef DEBUG_RECV_PACKET
-		const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
-		// Note that the start logic above will make it so every packet starts with three bytes.
-		dbugLog(_FLD, "t:%d RecvPacket%s [%u:%u] : %u(+%d)/%u bytes",
-		        endpoint.teulIndex(), endpoint.m_readBufferUsed < dgram.m_size ? "Cont" : "End",
-		        dgram.contents->m_callX, dgram.contents->m_callY,
-		        endpoint.m_readBufferUsed, retval, dgram.m_size);
-#endif
 
 		// Don't pass here until we've read all of the payload.
 		if ( endpoint.m_readBufferUsed < datagramSize )
@@ -605,7 +577,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 	socklen_t sockSize = sizeof(dgram->sockAddress);
 
 	UINT32 packets = 0;
-	while ( VALID_SOCKET(endpoint.socket) )
+	while ( endpoint.socket != INVALID_SOCKET )
 	{
 		if ( ! dgram)
 			dgram = teulGetDatagram(Teul::MaxMTU + 4);
@@ -657,7 +629,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 SINT32
 _recvDatagram(ENDPOINT& endpoint)
 {
-	if ( PN_UNLIKELY(!VALID_SOCKET(endpoint.socket)) )
+	if ( PN_UNLIKELY(endpoint.socket == INVALID_SOCKET) )
 		return -EINVAL;
 
 	SINT32 retval = -1;
@@ -714,7 +686,7 @@ _recvDatagram(ENDPOINT& endpoint)
 	return retval;
 }
 
-#if defined(NIX_VERSION)
+#if platOS != OS_WIN32
 //////////////////////////////////////////////////////////////////////
 // Process a receive event on an endpoint.
 // Returns true if the connection got closed.
