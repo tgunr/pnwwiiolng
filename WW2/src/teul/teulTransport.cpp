@@ -22,8 +22,6 @@
 #include "teul/teulTime.h"
 #include "teul/teulVersion.h"
 
-#include "host/hostTiming.h"
-
 #if platOS != OS_WIN32
 #include <netdb.h>
 #include <arpa/inet.h>

@@ -26,15 +26,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
 
-#include "host/hostTiming.h"
-#if defined(ENABLE_HOST_TIMERS)
-namespace Timers
-{
-	std::vector<std::pair<const char*, UINT64>> timings;
-	TeulTimeMS nextReport = 0ULL;
-}
-#endif
-
 using namespace Teul;
 
 #if platOS == OS_WIN32
@@ -823,9 +814,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
             {
                 if (endpoint.state() == IS_LISTENING )
                 {
-                    TIMER_START
                     _acceptConnectTCP(endpoint);
-                    TIMER_STOP_ADD(rpe_accept);
                     continue;
                 }
             }
@@ -1360,12 +1349,8 @@ _pollSocketsInner(TeulTimeMS duration_)
 {
 	SINT32	retval = 0;
 
-	TIMER_USE_HERE
-
 	auto pollFds = &pollData.fd[0];
-	TIMER_START
 	int numfds = retval = poll(pollFds, pollData.m_size, duration_);
-	TIMER_STOP("tmi_idle_poll");
 
 	if (PN_UNLIKELY(retval < 0 && dbugGetErrno() != PLAT_EINTR))
 		LogAbort("illegal return %d from _poll",retval);
@@ -1373,9 +1358,7 @@ _pollSocketsInner(TeulTimeMS duration_)
 	// are there any sockets that need reading?
 	if ( numfds > 0 )
 	{
-		TIMER_START
 		_runPollEndpoints(pollData.fd, pollData.m_size, numfds);
-		TIMER_STOP("tmi_idle_rpe");
 	}
 }
 
@@ -1629,7 +1612,6 @@ teulModIdle(const TeulTimeMS duration_)
 	if ( duration_ == 0 )
 		std::this_thread::yield();
 
-	TIMER_RESET
 	teulSyncClock();
 
 	// At 1s intervals, count stats, kill dead endpoints
@@ -1674,11 +1656,7 @@ teulModIdle(const TeulTimeMS duration_)
 
 	lastIdleCycle = teulClock64;
 
-	TIMER_USE_HERE
-
-	TIMER_START
 	teulIdleEndpoints();
-	TIMER_STOP("tmi_idle");
 
 	teulSyncClock();
 	interval = teulClock64 - std::min(teulClock64, lastIdleCycle);

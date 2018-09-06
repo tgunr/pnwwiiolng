@@ -18,8 +18,6 @@
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiCallbacks.h"
 
-#include "host/hostTiming.h"
-
 TEUL_CALLBACK* TEUL_CALLBACK::s_callbackArray[256][256];
 
 TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* const ci);
@@ -178,9 +176,6 @@ _doAction(ENDPOINT& endpoint
 		  , UCHAR* const data
 		  , const SINT32 dataSize_bytes)
 {
-	TIMER_USE_HERE
-	TIMER_START
-
 	if (callback.outData == nullptr)
 	{
 		static char tempData[Teul::MaxPacket * 2];
@@ -204,13 +199,9 @@ _doAction(ENDPOINT& endpoint
 	actionObj.fromAddress = ntohl(from.sin_addr.s_addr);
 	actionObj.fromPort = ntohs(from.sin_port);
 
-	TIMER_STOP("doact:start")
-
 	dbugLog(_FLD, "t:%d executing callback " PRF_CALLBACK " size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), dataSize_bytes);
 
-	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);
-	TIMER_STOP("doact:recv")
 
 	if (PN_UNLIKELY(retval < 0))
 		dbugLog(_FLA, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
