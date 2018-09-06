@@ -22,23 +22,14 @@
 #include "wwii/wwiiNetPorts.h"
 #include "teul/raknetConn.h"
 #include "wwii/wwiiConfig.h"
+#include "mem/memPool.h"
 
 UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
 UINT32 totalPacketsXfer;
 
-#if platOS == OS_LINUX || platOS == OS_MACOS
-# define SOCK_SEND_FLAGS (MSG_DONTWAIT)
-# include <sys/socket.h>
-#else
-# define SOCK_SEND_FLAGS 0
-#endif
-
-// Maximum send buffer of 256Kb.
-
-#include "mem/memPool.h"
-
-static Mem::Pool<Teul::Packet, 16 * 4096 / sizeof(Teul::Packet)> s_delayedPackets;
+// Maximum send buffer of 4096Kb.
+static Mem::Pool<Teul::Packet, 256 * 4096 / sizeof(Teul::Packet)> s_delayedPackets;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -115,7 +106,7 @@ SINT32
 ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 {
 	ABORT_IF_EX(protocol != PROTOCOL_CTRL, "ENDPOINT::sendRaw only allowed on CTRL interfaces");
-	return ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
+	return ::send(socket, (const char*)data, sizeInBytes, 0);
 }
 #endif
 
@@ -125,61 +116,44 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
-	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
-	{
-		// dbugLog(_FLD, "about to send sub-packet");
-	 	SINT32 retval = ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
-		// dbugLog(_FLD, "Write result %d", retval);
-		if (retval > 0)
-			dbugOutputPacket( (*this), false, data, retval );
-		return retval;
-	}
-
-	// Apply the default port.
-	const UINT16 targetPort = port ? (UINT16) port : (UINT16) WWII::Net::Ports::PrivateBcast;
-
-	sockaddr_in inetAddress = destSockAddress;
-	if ( address != 0 )
-	{
-		inetAddress.sin_family = AF_INET;
-		inetAddress.sin_addr.s_addr = htonl( address );
-		inetAddress.sin_port = htons( targetPort );
-	}
-    
     ssize_t result = -1;
+    struct sockaddr_in *realAddress = nullptr, possibleAddrStorage = destSockAddress;
+    socklen_t realAddressLength = 0;
+    
+    // Address of NULL is identical to calling send(), so we only set up the
+    // destination address for non-TCP endpoints. Note: sendto() will scream
+    // EISCONN for any non-NULL address, even if it's the connected peer's.
+	if (protocol != PROTOCOL_TCP && protocol != PROTOCOL_CTRL) {
+        realAddress = &possibleAddrStorage;
+        realAddressLength = sizeof(possibleAddrStorage);
+        if (address) {
+            realAddress->sin_family = AF_INET;
+            realAddress->sin_addr.s_addr = htonl(address);
+            realAddress->sin_port = htons(port ? (UINT16)port : WWII::Net::Ports::PrivateBcast);
+        }
+    }
     
     do {
-	    result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
+	    result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)realAddress, realAddressLength);
     } while (result == -1 && dbugGetErrno() == PLAT_EINTR);
     
-	if ( PN_UNLIKELY(result < 0) )
-	{
-		// Check for an interrupted send attempt.
-		const int err = dbugGetErrno();
-		if ( (err != PLAT_EAGAIN) && (err != PLAT_EWOULDBLOCK) )
-		{
-			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
-						, teulIndex(), PRA_SOCKET(socket)
-						, sizeInBytes
-						, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port
-						, err
-						);
+	if (PN_UNLIKELY(result < 0)) {
+		int err = dbugGetErrno();
+        
+		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {
+          dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
+          return 0;
+        } else {
+			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " error on send %" PRSizeT " bytes, err:%d",
+                    teulIndex(), PRA_SOCKET(socket), sizeInBytes, err);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
-		else
-		{
-			dbugLog(_FLD, "::sendto returned code %d, try again return", err);
-		}
-
-		return 0;
 	}
 
 	dbugLog(_FLD, "%" PRSsizeT " bytes sent %" PRSizeT " requested", result, sizeInBytes);
-
     if (result > 0) {
 	    lastDataSent.makeCurrent();
     }
-
 	return result;
 }
 
@@ -189,7 +163,6 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 SINT32
 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference)
 {
-
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
 	// First check to see if this should be sent via a RakNet backchannel
