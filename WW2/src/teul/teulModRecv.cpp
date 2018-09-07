@@ -31,16 +31,25 @@
 using namespace Teul;
 
 static constexpr const TeulTimeMS ENDPOINT_IDLE_INTERVAL = 500;
-static constexpr const size_t NUM_DATAGRAM_SIZES = 16;
-static constexpr const size_t DATAGRAM_ROUNDING = 1024;    // round datagram sizes up to this.
-static constexpr const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * DATAGRAM_ROUNDING;
 
 struct DATA_GRAM
 {
+    static constexpr const size_t NORMAL_ROUNDING = 256;   // round datagram sizes up to this.
+    static_assert((NORMAL_ROUNDING & (NORMAL_ROUNDING - 1)) == 0, "pooled datagram rounding must be power of 2");
+
+    static constexpr const size_t HUGE_ROUNDING = 4096;    // round uncached datagram sizes up to this.
+    static_assert((HUGE_ROUNDING & (HUGE_ROUNDING - 1)) == 0, "unpooled datagram rounding must be power of 2");
+
+    static constexpr const size_t NUM_DATAGRAM_SIZES = 16;
+    static_assert((NUM_DATAGRAM_SIZES & (NUM_DATAGRAM_SIZES - 1)) == 0, "nuber of pooled datagram buckets must be power of 2");
+
+    static constexpr const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * NORMAL_ROUNDING;
+    static_assert((LARGEST_POOLED_SIZE & (LARGEST_POOLED_SIZE - 1)) == 0, "calculated max pooling size must be power of 2");
+
     struct sockaddr_in    sockAddress;
-    Teul::PacketHeader*    contents;    //!< Points to the beginning of the packet data.
-    UINT32                m_size;        //!< Size of the entire object (might be smaller than allocated size)
-    UINT32                m_reqSize;    //!< Original requested size of bucket
+    Teul::PacketHeader*   contents;    //!< Points to the beginning of the packet data.
+    UINT32                m_size;      //!< Size of the entire object (might be smaller than allocated size)
+    UINT32                m_reqSize;   //!< Original requested size of bucket
 };
 
 static size_t   	numTeulUpdates = 0;
@@ -53,7 +62,6 @@ static TeulTimeMS   _lastIdle = 0;
 
 static fd_set 		master_readfs, master_writefs;
 static size_t		maxSock;
-static bool			_needSetFs = true;
 
 #else
 
@@ -75,75 +83,74 @@ static void _pollSet();
 static void    _pollSockets(TeulTimeMS duration_);
 static void    _routeCALLBACKs(ENDPOINT& inEndpoint);
 
-// To save ourselves having to look up endpoints later...
 using SocketToEndpointMap = std::unordered_map<SOCKET, ENDPOINT*>;
 static SocketToEndpointMap socketToEndpoint;
 
-static std::array<std::stack<DATA_GRAM*>, NUM_DATAGRAM_SIZES> s_freeDatagrams;
+static std::array<std::stack<DATA_GRAM*>, DATA_GRAM::NUM_DATAGRAM_SIZES> s_freeDatagrams;
 
 //////////////////////////////////////////////////////////////////////
-// Given a requested data size, work out the best buffer size for it
-
-template<size_t roundingValue>
+// Pooled and unpooled datagram management
 static inline size_t _roundDatagramSize(size_t size)
 {
-	static_assert(roundingValue && (roundingValue & (roundingValue - 1)) == 0, "roundingValue must be a power of 2");
-	return ((size + sizeof(DATA_GRAM)) + (roundingValue - 1)) & ~(roundingValue - 1);
+    size_t rounding = (size <= DATA_GRAM::LARGEST_POOLED_SIZE ? DATA_GRAM::NORMAL_ROUNDING : DATA_GRAM::HUGE_ROUNDING);
+    
+	return ((size + sizeof(DATA_GRAM)) + (rounding - 1)) & ~(rounding - 1);
 }
 
-static DATA_GRAM* _getNextDatagram(size_t size)
+DATA_GRAM *teulGetDatagram(const UINT32 size)
 {
-	assert(size > 0);
-	if (PN_UNLIKELY(size <= 0))
-		return nullptr;
+    assert(size > 0 && "datagram request size must be nonzero"); // ABORT_IF() is not debug-only
 
-	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
-	// Determine if the packet is in the range of sizes we try to pool.
-	if (PN_LIKELY(allocSize <= LARGEST_POOLED_SIZE))
-	{
-		const size_t bucketNo = (allocSize / DATAGRAM_ROUNDING) - 1;
-		auto& bucket = s_freeDatagrams[bucketNo];
-		if (bucket.empty() == false)
-		{
-			DATA_GRAM* gram = bucket.top();
+	size_t allocSize = _roundDatagramSize(size);
+
+	// If the request is small enough to be pooled and there's something available, grab it.
+	if (PN_LIKELY(allocSize <= DATA_GRAM::LARGEST_POOLED_SIZE)) {
+        size_t bucketIdx = (allocSize / DATA_GRAM::NORMAL_ROUNDING) - 1;
+        assert(bucketIdx < s_freeDatagrams.size() && "The laws of physics are now held in abeyance.");
+        
+		auto& bucket = s_freeDatagrams[bucketIdx];
+        
+		if (!bucket.empty()) {
+			DATA_GRAM *datagram = bucket.top();
+            
 			bucket.pop();
-			return gram;
+            datagram->m_size = size; // reset datagram's initial size; req size and contents don't need resetting
+			return datagram;
 		}
-	}
-	else
-	{
-		// use more aggressive, 4k (page size) rounding for big packets.
-		allocSize = _roundDatagramSize<DATAGRAM_ROUNDING * 4>(size);
-	}
-	return static_cast<DATA_GRAM*>(memCalloc(1, allocSize));
+    }
+    
+    // Need a new allocation.
+    DATA_GRAM *newDatagram = static_cast<DATA_GRAM *>(std::calloc(1, allocSize));
+
+    newDatagram->contents = reinterpret_cast<Teul::PacketHeader *>(newDatagram + 1);
+    newDatagram->m_size = size;
+    newDatagram->m_reqSize = allocSize; // actual size
+    return newDatagram;
 }
 
-DATA_GRAM *
-teulGetDatagram(const UINT32 size)
+void teulReleaseDatagram(DATA_GRAM *datagram)
 {
-	DATA_GRAM* gram = _getNextDatagram(size);
-	// Point contents to memory immediately AFTER the gram header.
-	gram->contents = (Teul::PacketHeader*)(gram + 1);
-	gram->m_size = size;		// The actual size (for now size requested)
-	gram->m_reqSize = size;		// The actual requested size.
-
-	return gram;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Release a datagram - if it fits into the cache buckets, put it there.
-
-void
-teulReleaseDatagram(DATA_GRAM* gram)
-{
-	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_reqSize);
-	if (PN_LIKELY(allocSize <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
-		s_freeDatagrams[(allocSize / DATAGRAM_ROUNDING) - 1].push(gram);
-	else
-	{
-		memFree(gram);
+    assert(datagram->m_reqSize == _roundDatagramSize(datagram->m_reqSize) && "Datagram allocation size corrupted");
+    assert(datagram->contents == reinterpret_cast<Teul::PacketHeader *>(datagram + 1) && "Datagram contents pointer was moved");
+    
+    if (PN_LIKELY(datagram->m_reqSize < DATA_GRAM::LARGEST_POOLED_SIZE)) {
+        s_freeDatagrams[(datagram->m_reqSize / DATA_GRAM::NORMAL_ROUNDING) - 1].push(datagram);
+    } else {
+		std::free(datagram);
 	}
 }
+
+#if DEBUG
+UNUSED_DECL static void _cleanupDatagramPool()
+{
+    for (std::stack<DATA_GRAM *> & bucket : s_freeDatagrams) {
+        while (!bucket.empty()) {
+            std::free(bucket.top());
+            bucket.pop();
+        }
+    }
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Initialize module
@@ -165,20 +172,6 @@ void teulInitModRecv()
 
 	_lastIdle = teulClock64;
 	lastTeulUpdate = teulClock64;
-}
-
-void teulCleanupModRecv()
-{
-	for (size_t i = 0; i < s_freeDatagrams.size(); ++i)
-	{
-		auto& bucket = s_freeDatagrams[i];
-		dbugLog(_FLN, "Freeing %" PRSizeT "Kb DATA_GRAMs: %" PRSizeT "", (i * DATAGRAM_ROUNDING) / 1024, bucket.size());
-		while (bucket.empty() == false)
-		{
-			memFree(bucket.top());
-			bucket.pop();
-		}
-	}
 }
 
 static void
@@ -1234,7 +1227,6 @@ void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 #else
 void teulMRecvUpdatePoll(ENDPOINT& /* endpoint */)
 {
-	_needSetFs = true;
 }
 #endif
 

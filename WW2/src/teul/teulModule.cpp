@@ -249,10 +249,6 @@ teulModShutdown()
 	// Free up the memory the endpoints are using
 	teulCleanupEndpoints();
 
-	// Shutdown the Mod subsystems
-	extern void teulCleanupModRecv();
-	teulCleanupModRecv();
-
 #if platOS == OS_WIN32
 	WSACleanup( );
 #endif

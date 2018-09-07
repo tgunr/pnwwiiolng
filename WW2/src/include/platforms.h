@@ -34,6 +34,11 @@
 # error "Clang 3.6 or newer, GCC 4.8 or newer, or VS2015 or newer is required."
 #endif
 
+// Provide this for all compilers
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#endif
+
 #if __is_Clang()
 
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
@@ -53,6 +58,11 @@
 #define FALLTHROUGH [[fallthrough]]
 #else
 #define FALLTHROUGH [[clang::fallthrough]]
+#endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
 #endif
 
 #elif __is_GCC()
@@ -83,6 +93,11 @@
 #else
 #define FALLTHROUGH
 #endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
+#endif
 
 #else
 
@@ -100,6 +115,11 @@
 #define DISABLE_WARNING(warning)
 #define POP_WARNINGS()
 #define FALLTHROUGH __fallthrough
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL // __pragma(warning(suppress:4100)) - unsuitable because it applies globally, not to the single decl
+#endif
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
