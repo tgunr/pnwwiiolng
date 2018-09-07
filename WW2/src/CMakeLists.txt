@@ -761,7 +761,7 @@ IF ( MSVC )
                   "/W0" )
 ELSE()
 	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
-                  "-Wno-unused-function" )
+                  "-Wno-unused-function -Wno-zero-as-null-pointer-constant" )
 ENDIF()
 TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR})
 

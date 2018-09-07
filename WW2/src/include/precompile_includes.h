@@ -26,6 +26,7 @@
 #include <memory>
 #include <queue>
 #include <set>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <vector>

@@ -30,32 +30,33 @@
 
 using namespace Teul;
 
-#define COMMAND_UPDATE_INTERVAL	10
+static constexpr const TeulTimeMS ENDPOINT_IDLE_INTERVAL = 500;
+static constexpr const size_t NUM_DATAGRAM_SIZES = 16;
+static constexpr const size_t DATAGRAM_ROUNDING = 1024;    // round datagram sizes up to this.
+static constexpr const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * DATAGRAM_ROUNDING;
 
-#define MAX_POLL_SOCK	16384
-#define ENDPOINT_IDLE_INTERVAL 500
+struct DATA_GRAM
+{
+    struct sockaddr_in    sockAddress;
+    Teul::PacketHeader*    contents;    //!< Points to the beginning of the packet data.
+    UINT32                m_size;        //!< Size of the entire object (might be smaller than allocated size)
+    UINT32                m_reqSize;    //!< Original requested size of bucket
+};
 
-#if platOS == OS_WIN32 && CHECK_PERFORMANCE
-static SINT32 iterations;
-static _int64 first, last, diff, freq;
-static FLOAT64	dur, min, max, average, total;
-
-#endif
-
-SINT32	numTeulUpdates = 0;
+static size_t   	numTeulUpdates = 0;
 static TeulTimeMS	lastTeulUpdate = 0;
 static TeulTimeMS	averageDelta = 0;
-static TeulTimeMS	maxDelta	= 0;
-
-SINT32 _updatesPerSec = 0;
-SINT32 _updatesThisSec = 0;
+static TeulTimeMS	maxDelta = 0;
+static TeulTimeMS   _lastIdle = 0;
 
 #if platOS == OS_WIN32
-static fd_set 		master_readfs, master_writefs;//, exceptfs;
+
+static fd_set 		master_readfs, master_writefs;
 static size_t		maxSock;
 static bool			_needSetFs = true;
+
 #else
-// Linux uses "poll()" for checking sockets for events.
+
 struct POLL_STRUCT
 {
 	static const size_t CAPACITY = Teul::MaxConnections;
@@ -66,40 +67,19 @@ struct POLL_STRUCT
 };
 const size_t POLL_STRUCT::CAPACITY;
 static POLL_STRUCT pollData;
+
+static void _pollSet();
+
 #endif
+
+static void    _pollSockets(TeulTimeMS duration_);
+static void    _routeCALLBACKs(ENDPOINT& inEndpoint);
 
 // To save ourselves having to look up endpoints later...
-#include <map>
-using SocketToEndpoint = std::map<SINT32, ENDPOINT*>;
-static SocketToEndpoint socketToEndpoint;
+using SocketToEndpointMap = std::unordered_map<SOCKET, ENDPOINT*>;
+static SocketToEndpointMap socketToEndpoint;
 
-static TeulTimeMS	_lastIdle;
-
-static void	_pollSockets(TeulTimeMS duration_);
-
-static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
-
-#if platOS != OS_WIN32
-static void _pollSet();
-#endif
-
-static const socklen_t SockAddrLen = sizeof(struct sockaddr_in);
-
-struct DATA_GRAM
-{
-	struct sockaddr_in	sockAddress;
-	Teul::PacketHeader*	contents;	//!< Points to the beginning of the packet data.
-	UINT32				m_size;		//!< Size of the entire object (might be smaller than allocated size)
-	UINT32				m_reqSize;	//!< Original requested size of bucket
-};
-
-#include <stack>
-#include <array>
-
-static const size_t NUM_DATAGRAM_SIZES = 16;
-static const size_t DATAGRAM_ROUNDING = 1024;	// round datagram sizes up to this.
 static std::array<std::stack<DATA_GRAM*>, NUM_DATAGRAM_SIZES> s_freeDatagrams;
-static const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * DATAGRAM_ROUNDING;
 
 //////////////////////////////////////////////////////////////////////
 // Given a requested data size, work out the best buffer size for it
@@ -238,9 +218,9 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		endpoint.lastDataRecv.makeCurrent();
 		endpoint.lastDataSent.makeCurrent();
 
-		len = SockAddrLen;
+		len = sizeof(struct sockaddr_in);
 		getsockname(sock, (struct sockaddr*)&endpoint.localSockAddress, &len);
-		assert( len == SockAddrLen );
+		assert(len == sizeof(struct sockaddr_in));
 		endpoint.setConnected();
 		retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 		if (PN_UNLIKELY(retval < 0))
@@ -255,12 +235,12 @@ _checkConnectTCP(ENDPOINT& endpoint)
 						, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
 		if (error == PLAT_EINTR || error == EROFS)
 		{
-			len = SockAddrLen;
+			len = sizeof(struct sockaddr_in);
 			if (getsockopt(sock, SOL_SOCKET, SO_ERROR, err, &len) == 0 && error == 0)
 			{
 				endpoint.lastDataRecv.makeCurrent();
 				endpoint.lastDataSent.makeCurrent();
-				len = SockAddrLen;
+				len = sizeof(struct sockaddr_in);
 				getsockname(sock, (struct sockaddr*) &endpoint.localSockAddress, &len);
 				dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " open err:%d retval:%d"
 							, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
@@ -305,7 +285,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
 	for ( ; ; )
 	{
-		socklen_t len = SockAddrLen;
+		socklen_t len = sizeof(struct sockaddr_in);
 		SOCKET newSock = accept(endpoint.socket, (struct sockaddr*) &endpoint.fromSockAddress, &len);
 		if ( newSock == INVALID_SOCKET )
 		{
@@ -346,9 +326,9 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 #endif
 
 		// Look up the address of our side of the socket.
-		len = SockAddrLen;
+		len = sizeof(struct sockaddr_in);
 		getsockname(newSock, (sockaddr*)&newEndpoint->localSockAddress, &len);
-		assert( len == SockAddrLen );
+		assert(len == sizeof(struct sockaddr_in));
 
 		// endpoints created inherit the parents backchannel
 		newEndpoint->m_pairdUdpConn = endpoint.m_pairdUdpConn;
@@ -747,7 +727,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		count++;
 
-		SocketToEndpoint::iterator it = socketToEndpoint.find(sock);
+		auto it = socketToEndpoint.find(sock);
 		if ( it == socketToEndpoint.end() )
 		{
 			// not sure how we get here yet but I know its bad...
@@ -1591,13 +1571,9 @@ teulModIdle(const TeulTimeMS duration_)
 	if ( PN_UNLIKELY(interval > 1000) )
 	{
 		//time to recalc updates per sec
-		_updatesPerSec = _updatesThisSec;
-		_updatesThisSec = 0;
 		lastUpdateTime = teulClock64;
 		teulKillDeadEndpoints();
 	}
-
-	_updatesThisSec++;
 
 	_pollSockets(duration_);
 
