@@ -114,7 +114,7 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
     }
     
     do {
-	    result = ::sendto(socket, data, sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
+	    result = ::sendto(socket, static_cast<char *>(data), sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
     } while (PN_UNLIKELY(result == -1 && dbugGetErrno() == PLAT_EINTR));
     
 	if (PN_UNLIKELY(result < 0)) {
