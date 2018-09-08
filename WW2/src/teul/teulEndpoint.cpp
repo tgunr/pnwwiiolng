@@ -784,14 +784,17 @@ void
 ENDPOINT::doError(const SINT32 error, void* data)
 {
 	ERROR_FUNCTION errorFunction = this->errorFn;
-	if ( this->m_parent != nullptr && ((state() == IS_OPENING) | (errorFunction == nullptr)) )
+    
+	if (this->m_parent && (state() == IS_OPENING || !errorFunction)) {
 		errorFunction = this->m_parent->errorFn;
-
-	if ( errorFunction == nullptr )
+    }
+    if (!errorFunction) {
 		errorFunction = _endpointErrorFn;
+    }
 
-	if ( errorFunction != nullptr )
-		(errorFunction)(this->teulIndex(), (UCHAR*)data, 0, nullptr, error);
+	if (errorFunction) {
+		errorFunction(this->teulIndex(), (UCHAR*)data, 0, nullptr, error);
+    }
 }
 
 void

@@ -168,114 +168,78 @@ void teulInitModRecv()
 	_pollSet();
 #endif
 
-	socketToEndpoint.clear();
+    // This assertion is here only because there used to be a list clear here
+    // which serves no sensible purpose.
+    assert(socketToEndpoint.size() == 0 && "Why wouldn't the endpoint list be clear at startup?");
 
 	_lastIdle = teulClock64;
 	lastTeulUpdate = teulClock64;
 }
 
-static void
-_connectionRefused(ENDPOINT& endpoint, const SINT32 error)
+static void _connectionRefused(ENDPOINT& endpoint, const SINT32 error)
 {
-	dbugLog(_FLA, "t:%d connection refused.", endpoint.teulIndex());
+	dbugLog(_FLA, "t:%d connection refused", endpoint.teulIndex());
 
-	dbugSetErrno(error);
 	endpoint.doError(error);
 	teulClose(endpoint, Teul::Closing::Refused);
-
-	dbugSetErrno(error);
 }
 
-
-static void
-_checkConnectTCP(ENDPOINT& endpoint)
+static void _checkConnectTCP(ENDPOINT& endpoint)
 {
-	SINT32 retval;
-	socklen_t len;
-	int error;
 	const SOCKET& sock = endpoint.socket;
 
-#if platOS == OS_WIN32
-	retval = connect(sock, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
-	error = dbugGetErrno();
-	dbugWrite(_FLN, "t:%d sock:" PRF_SOCKET " check connect err:%d retval:%d"
-					, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
-//	if (retval < 0 && error == EISCONN)
-#else
-	char* err = (char*) &error;
-	len = sizeof(error);
-	retval = getsockopt(sock, SOL_SOCKET, SO_ERROR, err, &len);
-	if ( retval == 0 && error == 0 )
-#endif
-	{
-		endpoint.lastDataRecv.makeCurrent();
-		endpoint.lastDataSent.makeCurrent();
-
-		len = sizeof(struct sockaddr_in);
-		getsockname(sock, (struct sockaddr*)&endpoint.localSockAddress, &len);
-		assert(len == sizeof(struct sockaddr_in));
-		endpoint.setConnected();
-		retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
-		if (PN_UNLIKELY(retval < 0))
-			dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d"
-						, endpoint.teulIndex(), PRA_SOCKET(sock), retval);
-//		return 0;
-	}
 #if platOS != OS_WIN32
-	else
-	{
-		dbugWrite(_FLM, "t:%d sock:" PRF_SOCKET " check connect err:%d rev:%d"
-						, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
-		if (error == PLAT_EINTR || error == EROFS)
-		{
-			len = sizeof(struct sockaddr_in);
-			if (getsockopt(sock, SOL_SOCKET, SO_ERROR, err, &len) == 0 && error == 0)
-			{
-				endpoint.lastDataRecv.makeCurrent();
-				endpoint.lastDataSent.makeCurrent();
-				len = sizeof(struct sockaddr_in);
-				getsockname(sock, (struct sockaddr*) &endpoint.localSockAddress, &len);
-				dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " open err:%d retval:%d"
-							, endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
-				endpoint.setConnected();
-				retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
-				if ( retval < 0 )
-				{
-					dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " couldn't send to new connection err:%d"
-								, endpoint.teulIndex(), PRA_SOCKET(sock), retval);
-					teulClose(endpoint, Teul::Closing::ConnSend);
-				}
-//				return 0;
-			}
-			else
-			{
-				dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " connect error, closing", endpoint.teulIndex(), PRA_SOCKET(sock));
-				teulClose(endpoint, Teul::Closing::ConnError);
-//				return -ENOTCONN;
-			}
-		}
-		else if ( error == ECONNREFUSED )
-		{
-			_connectionRefused(endpoint, error);
-		}
-		else
-		{
-			dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " open err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error, retval);
-			dbugSetErrno(error);
-//			return -error;
-		}
-	}
+    int sockerr = 0;
+	socklen_t errlen = sizeof(sockerr);
+	int gsoret = getsockopt(sock, SOL_SOCKET, SO_ERROR, &sockerr, &errlen);
+    
+	if (gsoret != 0 || sockerr != 0) {
+        dbugWrite(_FLM, "t:%d sock:" PRF_SOCKET " check connect err:%d rev:%d", endpoint.teulIndex(), PRA_SOCKET(sock), sockerr, gsoret);
+        if (sockerr == ECONNREFUSED) {
+            _connectionRefused(endpoint, sockerr);
+        } else {
+            dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " open err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), sockerr, gsoret);
+            endpoint.doError(sockerr);
+            teulClose(sockerr, Teul::Closing::ConnError);
+        }
+        return;
+    }
 #endif
+    
+    endpoint.lastDataRecv.makeCurrent();
+    endpoint.lastDataSent.makeCurrent();
+
+    socklen_t addrlen = sizeof(struct sockaddr_in);
+
+    if (PN_UNLIKELY(getsockname(sock, (struct sockaddr *)&endpoint.localSockAddress, &addrlen) < 0)) {
+        int error = dbugGetErrno();
+        dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " getsockname failed err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error);
+        // It seems ridiculous to close out the endpoint here, but there isn't much else sane to do.
+        endpoint.doError(error);
+        teulClose(endpoint, Teul::Closing::ConnectFail);
+        return;
+    }
+    
+    assert(addrlen == sizeof(struct sockaddr_in));
+    endpoint.setConnected();
+
+    SINT32 synret = teulModSendCALLBACKe(endpoint, *SYN_TOKEN);
+
+    if (PN_UNLIKELY(synret < 0)) {
+        dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), synret);
+        endpoint.doError(synret);
+        teulClose(endpoint, Teul::Closing::ConnError);
+    }
 }
 
-static void
-_acceptConnectTCP(ENDPOINT& endpoint)
+static void _acceptConnectTCP(ENDPOINT& endpoint)
 {
 	u_long argp = 1;
 
 	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
+    
 	for ( ; ; )
 	{
 		socklen_t len = sizeof(struct sockaddr_in);

@@ -378,7 +378,7 @@ _connectSocket(ENDPOINT& endpoint)
 		// this connection is not a done deal, yet.
 		// Any of EAGAIN, EWOULDBLOCK or EINPROGRESS means that
 		// it's begun, but not finished.
-		const bool inProgress = (error == PLAT_EAGAIN) | (error == PLAT_EWOULDBLOCK) | (error == PLAT_EINPROGRESS);
+		const bool inProgress = (error == PLAT_EAGAIN) || (error == PLAT_EWOULDBLOCK) || (error == PLAT_EINPROGRESS);
 		if ( ! inProgress )
 			throw Teul::OpenError(error, "connect() call failed");
 
@@ -612,10 +612,10 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
         // Returning here results in an infinite loop
 
 	if ( (inEndpoint.state() < IS_CLOSING)
-		& (inEndpoint.state() != IS_LISTENING)
-		& (inEndpoint.protocol != PROTOCOL_TCP)
-		& (inEndpoint.protocol != PROTOCOL_UDB)
-		& (inEndpoint.protocol != PROTOCOL_CTRL)
+		&& (inEndpoint.state() != IS_LISTENING)
+		&& (inEndpoint.protocol != PROTOCOL_TCP)
+		&& (inEndpoint.protocol != PROTOCOL_UDB)
+		&& (inEndpoint.protocol != PROTOCOL_CTRL)
 		)
 	{
 		inEndpoint.m_state = IS_CLOSING;
