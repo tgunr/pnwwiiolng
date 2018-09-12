@@ -586,7 +586,7 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 	endpoint.m_impl->Reset();
 
 	endpoint.protocol = (UCHAR)protocol;
-	endpoint.m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL);
+	endpoint.m_peer = (protocol == PROTOCOL_UDB) || (protocol == PROTOCOL_CTRL);
 
 	endpoint.m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING);
 

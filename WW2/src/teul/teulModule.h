@@ -25,3 +25,5 @@ void teulMRecvUpdatePoll(ENDPOINT& endpoint);
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint);
 
 UINT32 teulElapsedTotal(UINT32 newTotal, UINT32 oldTotal);
+
+void teulConfigureEndpointSocket(ENDPOINT& endpoint);

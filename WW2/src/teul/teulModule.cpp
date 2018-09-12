@@ -282,8 +282,7 @@ static const size_t TcpSndBufSize = 4 * 1024;
 static const size_t UdpRcvBufSize = 64 * 1024;
 static const size_t UdpSndBufSize = 64 * 1024;
 
-static void
-_configureEndpointSocket(ENDPOINT& endpoint)
+void teulConfigureEndpointSocket(ENDPOINT& endpoint)
 {
 #if platOS != OS_WIN32 // Windows does not use the same meanings for these
     fcntl(endpoint.socket, F_SETFL, fcntl(endpoint.socket, F_GETFL) | O_NONBLOCK | O_CLOEXEC);
@@ -490,7 +489,7 @@ teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL pr
 		if ( newEndpoint->socket == INVALID_SOCKET )
 			throw Teul::OpenError("socket() failed");
 
-		_configureEndpointSocket(*newEndpoint);
+		teulConfigureEndpointSocket(*newEndpoint);
 
 		switch ( newEndpoint->protocol )
 		{

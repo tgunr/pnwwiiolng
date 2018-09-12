@@ -234,90 +234,56 @@ static void _checkConnectTCP(ENDPOINT& endpoint)
 
 static void _acceptConnectTCP(ENDPOINT& endpoint)
 {
-	u_long argp = 1;
-
 	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
+    struct sockaddr_in newFromAddress, newLocalAddress;
+    socklen_t len = sizeof(struct sockaddr_in);
+    SOCKET newSock = INVALID_SOCKET;
     
-	for ( ; ; )
-	{
-		socklen_t len = sizeof(struct sockaddr_in);
-		SOCKET newSock = accept(endpoint.socket, (struct sockaddr*) &endpoint.fromSockAddress, &len);
-		if ( newSock == INVALID_SOCKET )
-		{
-			// Nothing to accept, we've drained the socket of incoming connections.
-			return;
-		}
+    while ((newSock = accept(endpoint.socket, reinterpret_cast<struct sockaddr *>(&newFromAddress), &len)) != INVALID_SOCKET) {
+        assert(len == sizeof(struct sockaddr_in));
+        if (getsockname(newSock, reinterpret_cast<struct sockaddr *>(&newLocalAddress), &len) != 0) {
+            int error = dbugGetErrno();
+            dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " getsockname failed err:%d", endpoint.teulIndex(), PRA_SOCKET(newSock), error);
+            OS_CLOSESOCKET(newSock);
+            break;
+        }
+        
+        dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " accepted connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
+        ENDPOINT *newEndpoint = teulCreateEndpoint(false, endpoint.timeout, static_cast<PROTOCOL>(endpoint.protocol));
+        if (PN_UNLIKELY(!newEndpoint)) {
+            OS_CLOSESOCKET(newSock);
+            break;
+        }
+        newEndpoint->socket = newSock;
+        newEndpoint->fromSockAddress = newFromAddress;
+        newEndpoint->localSockAddress = newLocalAddress;
+        teulConfigureEndpointSocket(*newEndpoint);
 
-		// set socket to non-blocking.
-#if platOS == OS_WIN32
-		const SINT32 retval = ioctlsocket(newSock, FIONBIO, &argp);
-#else
-		const SINT32 retval = ioctl(newSock, FIONBIO, &argp);
-#endif
-		if ( PN_UNLIKELY(retval < 0) )
-		{
-			dbugLog(_FLA, "t:%d could not accept connection", endpoint.teulIndex());
-			OS_CLOSESOCKET(newSock);
-			continue;
-		}
-
-		dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
-
-		ENDPOINT* newEndpoint = teulCreateEndpoint(false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
-		if ( PN_UNLIKELY(newEndpoint == nullptr) )
-		{
-			shutdown(newSock, 0x02);
-			OS_CLOSESOCKET(newSock);
-			continue;
-		}
-
-		newEndpoint->setConnected();
-		newEndpoint->m_parent = &endpoint;
-		newEndpoint->socket = newSock;
+        newEndpoint->setConnected();
+        newEndpoint->m_parent = &endpoint;
 #if platBuild == BUILD_SERVER
-		newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
-#else
-		newEndpoint->m_peer = false;
+        newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
 #endif
-
-		// Look up the address of our side of the socket.
-		len = sizeof(struct sockaddr_in);
-		getsockname(newSock, (sockaddr*)&newEndpoint->localSockAddress, &len);
-		assert(len == sizeof(struct sockaddr_in));
-
-		// endpoints created inherit the parents backchannel
-		newEndpoint->m_pairdUdpConn = endpoint.m_pairdUdpConn;
-		newEndpoint->fromSockAddress = endpoint.fromSockAddress;
-
-		// If we only have a partial address, use the local address to fill it out.
-		static const UINT32 netMask = 0x00ffffff;
-		if ( (newEndpoint->fromSockAddress.sin_addr.s_addr & netMask) == 0 )
-				newEndpoint->fromSockAddress.sin_addr.s_addr |= (newEndpoint->localSockAddress.sin_addr.s_addr & netMask);
-		newEndpoint->destSockAddress = newEndpoint->fromSockAddress;
-
-		char remoteIP[32];
-		teulGetAddress(newEndpoint->destAddress(), remoteIP, sizeof(remoteIP));
-		char localIP[32];
-		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
-
-		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%" PR64BitUT ")"
-					, endpoint.teulIndex()
-					, remoteIP, newEndpoint->fromPort()
-					, localIP, newEndpoint->localPort()
-					, newEndpoint->teulIndex()
-					, PRA_SOCKET(newSock)
-					, (teulClock64 - _lastIdle)
-					);
-
-#if platOS != OS_WIN32
-		newEndpoint->setRcvBufferSize(16 * 1024);
-		newEndpoint->setSndBufferSize(4 * 1024);
-#endif
-//			teulModReadSet();
-		teulMRecvAddToPoll(*newEndpoint);
-	}
+        if ((newEndpoint->fromSockAddress.sin_addr.s_addr & 0x00ffffff) == 0) {
+            newEndpoint->fromSockAddress.sin_addr.s_addr |= (newEndpoint->localSockAddress.sin_addr.s_addr & 0x00ffffff);
+        }
+        teulMRecvAddToPoll(*newEndpoint);
+        
+        // Just use the unsafe one-arg form of teulGetAddress(), the whole thing's a trainwreck anyway.
+        dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET,
+            endpoint.teulIndex(), teulGetAddress(newEndpoint->destAddress()), newEndpoint->fromPort(),
+            teulGetAddress(newEndpoint->localAddress()), newEndpoint->localPort(), PRA_SOCKET(newSock), newEndpoint->teulIndex());
+    }
+    int error = dbugGetErrno();
+    if (error == PLAT_EAGAIN || error == PLAT_EWOULDBLOCK) {
+        ; // no more connections to accept
+    } else if (error == PLAT_EINTR) {
+        ; // let it come around again
+    } else {
+        dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " accept error: %d", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), error);
+    }
 }
 
 static SINT32
