@@ -579,32 +579,23 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 	return 0;
 }
 
-static void
-_releaseEndpoint(ENDPOINT* const inEndpoint)
-{
-	if ( inEndpoint->m_closed == false )
-	{
-		inEndpoint->doError(ECONNABORTED);
-		inEndpoint->shutdown();
-	}
-}
-
 void teulClose(ENDPOINT& inEndpoint)
 {
-	if( ! inEndpoint.m_inUse )
+	if (!inEndpoint.m_inUse) {
 		return;
+    }
 
 	// When an error occurs, the full cycle of shutdown may bring us back here.
-	if ( inEndpoint.state() == IS_DEAD )
-	{
-//		dbugLog(_FLD, "t:%d endpoint already IS_DEAD", inEndpoint->teulIndex());
+	if (inEndpoint.state() == IS_DEAD) {
+        //dbugLog(_FLD, "t:%d endpoint already IS_DEAD", inEndpoint->teulIndex());
 		return;
 	}
 
     dbugLog(_FLD, "t:%d closing st:%u cl:%s", inEndpoint.teulIndex(), inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
-	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
+	if (inEndpoint.state() < IS_CLOSING || !inEndpoint.m_closed) {
 		inEndpoint.doError(ENOTCONN);
         // Returning here results in an infinite loop
+    }
 
 	if ( (inEndpoint.state() < IS_CLOSING)
 		&& (inEndpoint.state() != IS_LISTENING)
@@ -614,15 +605,17 @@ void teulClose(ENDPOINT& inEndpoint)
 		)
 	{
 		inEndpoint.m_state = IS_CLOSING;
-		_releaseEndpoint(&inEndpoint);
+        if (!inEndpoint.m_closed) {
+            inEndpoint.doError(ECONNABORTED);
+            inEndpoint.shutdown();
+        }
 		return;
 	}
 
 	// NOTE:
 	//    This check is needed because the call to doError above **may** result in teulClose being re-entrant.
 	//    If this happens the endpoing state will be dead and we should not continue, so we check again.
-	if ( inEndpoint.state() != IS_DEAD )
-	{
+	if (inEndpoint.state() != IS_DEAD) {
 		// check status of paired backchannel, if client release - it'll get recreated when they log back in
 		RakNetChannel::disconnectPeer(&inEndpoint);
     
