@@ -797,23 +797,13 @@ ENDPOINT::doError(const SINT32 error, void* data)
     }
 }
 
-void
-ENDPOINT::shutdown()
+void ENDPOINT::shutdown()
 {
-	if ( this->socket != INVALID_SOCKET )
-	{
-		::shutdown(this->socket, 2);		// Shutdown both sides of the connection.
+	if (this->socket != INVALID_SOCKET) {
 		OS_CLOSESOCKET(this->socket);
-
-#ifdef DEV_BUILD
 		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
-#endif
-
-		this->socket = INVALID_SOCKET;
-
 		teulMRecvRemoveFromPoll(*this);
 	}
-
 	this->m_closed = true;
 }
 
