@@ -30,41 +30,32 @@ static Mem::Pool<Teul::Packet, 256 * 4096 / sizeof(Teul::Packet)> s_delayedPacke
 // Pack the "outdata" for a callback and send it to the specified
 // endpoint destination.
 
-SINT32
-teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
+SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
 {
-	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
-	{
+	if (PN_UNLIKELY(endpoint.state() == IS_DEAD)) {
 		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " endpoint not open, state:%d callback " PRF_CALLBACK ""
 					, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(), PRA_CALLBACK(callback));
 		return -ETEUL_CB_CONN_DEAD;
 	}
 
 	dbugLog(_FLD, "t:%d sending callback " PRF_CALLBACK "", endpoint.teulIndex(), PRA_CALLBACK(callback));
-
-	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
-	{
+	if (PN_UNLIKELY(!callback.m_sendAction)) {
 		dbugLog(_FLA, "no action for callback " PRF_CALLBACK "", PRA_CALLBACK(callback));
 		return -ETEUL_CB_SEND_NULL;
 	}
 
-	// All packers need an ACTION_OBJECT, and we
-	ACTION_OBJECT actionObj;
+    Teul::Packet outgoing(Teul::PacketId(callback.callX(), callback.callY()));
+    outgoing.reserve(Teul::MaxPacket);
+
+	ACTION_OBJECT actionObj(outgoing.writePointer(), 0, -1);
 	actionObj.teulIndex = endpoint.teulIndex();
 	actionObj.endpoint = &endpoint;
 	actionObj.actionObj = &callback;
 	actionObj.localRawData = callback.outData;
 
-	Teul::Packet outgoing(Teul::PacketId(callback.callX(), callback.callY()));
-	outgoing.reserve(Teul::MaxPacket);
-
-	actionObj.packed = (UCHAR*)outgoing.writePointer();
-	actionObj.offset = 0;
-	actionObj.m_size_bytes = -1;
-
 	const SINT32 packedSizeBits = (callback.m_sendAction)(&actionObj);
-	if ( PN_UNLIKELY(packedSizeBits < 0) )
-	{
+    ABORT_IF_EX(packedSizeBits >= Teul::MaxPacket * 8, "Data was too big for packet, it's just luck that you didn't crash already!");
+	if (PN_UNLIKELY(packedSizeBits < 0)) {
 		// probable data corruption
 		dbugLog(_FLA, "t:%d cb:" PRF_CALLBACK " pack failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), packedSizeBits);
 		return packedSizeBits;
@@ -73,8 +64,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR pr
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
 	const SINT32 sendResult = outgoing.send(endpoint, protocolPreference);
-	if ( PN_UNLIKELY(sendResult < 0) )
-	{
+	if (PN_UNLIKELY(sendResult < 0)) {
 		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
 		return sendResult;
 	}
@@ -87,7 +77,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR pr
 
 SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port)
 {
-    ssize_t result = -1;
+    ssize_t result = INVALID_SOCKET;
     struct sockaddr_in *realAddress = nullptr, possibleAddrStorage = destSockAddress;
     socklen_t realAddressLength = 0;
     
@@ -104,13 +94,13 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
         }
     }
     
+    int err = 0;
+    
     do {
 	    result = ::sendto(socket, static_cast<char *>(data), sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
-    } while (PN_UNLIKELY(result == -1 && dbugGetErrno() == PLAT_EINTR));
+    } while (PN_UNLIKELY(result == INVALID_SOCKET && (err = dbugGetErrno()) == PLAT_EINTR));
     
 	if (PN_UNLIKELY(result < 0)) {
-		int err = dbugGetErrno();
-        
 		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {
             dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
             return 0;
@@ -260,7 +250,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
     
 	if (PN_UNLIKELY(result < 0)) {
         // Failed to send. Don't dbugGetErrno() here. We already did that in sendData().
-        dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result);
+        dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
 		teulClose(endpoint);
 	}
 
