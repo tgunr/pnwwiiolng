@@ -204,7 +204,6 @@ ADD_LIBRARY(teulserver STATIC
 	include/platforms.h include/precompile_includes.h
     server/server.cpp server/server.h
     server/serverReleaseTypeEnum.h
-    server/serverLuaInterface.cpp
     server/serverMessages.cpp server/serverMessages.h
     server/serverPeers.cpp server/serverPeers.h
     server/serverTransfer.cpp server/serverTransfer.h

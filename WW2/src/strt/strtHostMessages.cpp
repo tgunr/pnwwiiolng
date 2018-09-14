@@ -844,67 +844,6 @@ SERIAL_NUMBER_REQUEST::receive(SINT32 teulIndex, SERIAL_NUMBER_REQUEST& incoming
 }
 
 //////////////////////////////////////////////////////////////////////
-// Execute a Lua script.
-
-static SINT32
-_recvLua(ACTION_OBJECT* const a)
-{
-	const UINT32 bytes = a->sizeInBytes();
-	if ( bytes <= 1 )	// null byte is included
-		return a->offset;
-
-	const char* const input = (char*)(a->packed);
-	if ( input[bytes - 1] != '\0' )
-	{
-		char sender[81];
-		if (a->endpoint)
-			teulGetAddress(a->endpoint->fromAddress(), sender, sizeof(sender));
-		else
-			strsafecpy(sender, "?.?.?.?");
-		dbugLog(_FLW, "t:%d ip:%s ignoring non-nul-terminated input", a->teulIndex, sender);
-		return -EINVAL;
-	}
-
-	dbugLog(_FLI, "luaSrc: received command: %s", input);
-
-	if ( input[0] == ';' )
-	{
-		std::string object(cv_luaPath.GetString());
-		object += input + 1;
-		object += ".lua";
-		Lua::RunScript(object.c_str());
-	}
-	else
-	{
-		char sender[81];
-		strprintf(sender, "t:%d ip:%s", a->teulIndex, (a->endpoint ? teulGetAddress(a->endpoint->fromAddress()) : "?.?.?.?"));
-		std::string object(input);
-		Lua::RunObject(sender, object);
-	}
-
-	Lua::SCRIPT_RESULTS& results = Lua::Results();
-	dbugLog(_FLI, "luaSrv: returning %" PRSizeT " lines of results", results.size());
-	Lua::SCRIPT_RESULTS::iterator it;
-	std::string reply = "";
-	for ( it = results.begin(); it != results.end(); ++it )
-	{
-		reply += *it;
-	}
-
-	dbugLog(_FLI, "reply:[%s]", reply.c_str());
-	reply += LUA_END_SEQ;
-
-	const size_t lenWithNullByte = reply.length() + 1;
-	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y), reply.c_str(), lenWithNullByte);
-	outgoing.setUnencrypted();
-	outgoing.send(a->teulIndex);
-
-	results.clear();
-
-	return a->offset;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Receive a capture contribution event
 
 static SINT32
@@ -1081,27 +1020,12 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Host-host and luaclient messages.
-
-static SINT32
-_registerInterHostCallbacks()
-{
-	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
-	{
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	}
-	END_CALLBACK_REGISTRATION(Host::CallbackX)
-}
-
-//////////////////////////////////////////////////////////////////////
 // Public functions
 
 //Installs our callbacks
 SINT32
 strtHostInstallCallbacks()
 {
-	_registerInterHostCallbacks();
-
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);

@@ -654,8 +654,6 @@ main(int argc, const char* argv[])
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	serverOpenLuaClientInterface();
-
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
 
 	TeulTimeMS tick100ms = 0;
