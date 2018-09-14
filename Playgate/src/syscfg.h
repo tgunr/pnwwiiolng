@@ -24,7 +24,6 @@
 #include "weap/weapDefs.h"
 #include "weap/weapSpec.h"
 #include "teul/teulBasic.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulKit.h"

@@ -690,7 +690,7 @@ main(int argc, const char* argv[])
 		}
 	}
 
-	teulClose(mapConnection, Teul::Closing::MapSrvClose);
+	teulClose(mapConnection);
 
 	wwiiIRCChannelMessage("-sys", "[[ Shutting down normally ]]");
 	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_EXITED);

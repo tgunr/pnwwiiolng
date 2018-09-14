@@ -59,7 +59,6 @@
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiBranchEnums.h"
 #include "teul/teulTime.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulKit.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPackers.h"

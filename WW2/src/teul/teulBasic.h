@@ -63,8 +63,8 @@ SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void
 SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data, const UCHAR protocol=PROTOCOL_UNDEF);
 
 //! Close a local connection. will not work until its opened.
-void teulClose(const SINT32 teulIndex, const UINT32 reason=0);
-void teulClose(ENDPOINT&, const UINT32 reason=0);
+void teulClose(const SINT32 teulIndex);
+void teulClose(ENDPOINT&);
 
 //! Converts a doted quad string to a UINT32 host address.
 //! @param[in]	address			IP address to convert.

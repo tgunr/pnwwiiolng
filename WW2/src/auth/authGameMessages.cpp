@@ -15,7 +15,6 @@
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
 
@@ -220,13 +219,13 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 	catch (std::exception& e)
 	{
 		dbugLog(_FLA, "t:%d %s. off:%d, sr:%d, ar:%d", a->teulIndex, e.what(), a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginExcept);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 	catch ( ... )
 	{
 		dbugLog(_FLA, "t:%d !!!Unhandled exception!!! off:%d, sr:%d, ar:%d", a->teulIndex, a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginErr);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 }

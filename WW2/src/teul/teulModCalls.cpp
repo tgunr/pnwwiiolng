@@ -72,7 +72,8 @@ _actionSendRST_TOKEN(ACTION_OBJECT* /*a*/)
 static SINT32
 _actionRecvRST_TOKEN(ACTION_OBJECT* const a)
 {
-	teulClose(*a->endpoint, Teul::Closing::RstToken);
+    dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " closing due to received RST", a->endpoint->teulIndex(), PRA_SOCKET(a->endpoint->socket));
+	teulClose(*a->endpoint);
 	return a->offset;
 }
 
@@ -89,7 +90,7 @@ _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*
 	}
 
 	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
-	teulClose(*inEndpoint, Teul::Closing::SynErr);
+	teulClose(*inEndpoint);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -293,7 +294,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 		if ( retval < 0)
 		{
 			dbugLog(_FLA, "t:%d cant send SYN_ACK_ACK callback", a->endpoint->teulIndex());
-			teulClose(*a->endpoint, Teul::Closing::SynAckAckFail);
+			teulClose(*a->endpoint);
 			///ISSUE Should this really be -retval?
 			return -retval;
 		}
@@ -305,7 +306,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 	else
 	{
 		dbugLog(_FLA, "t:%d failed to connect endpoint", a->endpoint->teulIndex());
-		teulClose(*a->endpoint, Teul::Closing::ConnectFail);
+		teulClose(*a->endpoint);
 	}
 
 	return a->offset;
@@ -373,7 +374,7 @@ _actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
 		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
 		if ( FYN_TOKEN != nullptr )
 			teulModSendCALLBACKe(*inEndpoint, *FYN_TOKEN);
-		teulClose(*inEndpoint, Teul::Closing::FynRx);
+		teulClose(*inEndpoint);
 	}
 
 	return teulModSendCALLBACKe(*inEndpoint, *FYN_ACK_TOKEN);
@@ -396,7 +397,7 @@ _actionRecvFYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Rx FAK");
 
-	teulClose(*a->endpoint, Teul::Closing::FynAck);
+	teulClose(*a->endpoint);
 	return 0;
 }
 

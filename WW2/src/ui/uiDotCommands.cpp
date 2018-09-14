@@ -64,7 +64,6 @@
 #include "sdm/StratDB.h"
 #include "spt/sptmain.h"
 #include "str/stringLib.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulKit.h"
 #include "tools/lightTool.h"
 #include "trn/speedgrass.h"
@@ -1828,7 +1827,7 @@ static int dot_conn(const char* line)
 	else if(!stricmp(command, "close") && state->connection)
 	{
 		uiChatPrintLine(L"Closing %ls state!", state->DisplayName());
-		teulClose(state->Index(), error);
+		teulClose(state->Index());
 	}
 
     return DC_HANDLED;
@@ -2192,7 +2191,7 @@ static SINT32 dot_imapkey(const char* line)
 
 static SINT32 dot_discohost(const char* line)
 {
-	teulClose(PlayerClient()->CellConnection(), Teul::Closing::DiscoCell);
+	teulClose(PlayerClient()->CellConnection());
 	return DC_HANDLED;
 }
 
@@ -2202,7 +2201,7 @@ static SINT32 dot_discohost(const char* line)
 
 static SINT32 dot_discochat(const char* line)
 {
-	teulClose(PlayerClient()->ChatConnection(), Teul::Closing::DiscoChat);
+	teulClose(PlayerClient()->ChatConnection());
 	return DC_HANDLED;
 }
 

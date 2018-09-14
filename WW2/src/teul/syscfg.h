@@ -21,7 +21,6 @@
 #include "include/platforms.h"
 
 #include "teul/teulBasic.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"

@@ -288,7 +288,7 @@ Teul::Connection::close()
 	// Look away, look away! Teul shenanigans!
 	ENDPOINT* const ep = teulGetEndpoint(teulIndex);
 	if ( ep != nullptr && ep->m_inUse && ep->state() < IS_CLOSING )
-		teulClose(*ep, Teul::Closing::ClientConnClose);
+		teulClose(*ep);
 	// Ok, you can look again now.
 
 	m_finished = m_disposable = true;

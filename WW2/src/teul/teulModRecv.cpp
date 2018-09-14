@@ -181,7 +181,7 @@ static void _connectionRefused(ENDPOINT& endpoint, const SINT32 error)
 	dbugLog(_FLA, "t:%d connection refused", endpoint.teulIndex());
 
 	endpoint.doError(error);
-	teulClose(endpoint, Teul::Closing::Refused);
+	teulClose(endpoint);
 }
 
 static void _checkConnectTCP(ENDPOINT& endpoint)
@@ -200,7 +200,7 @@ static void _checkConnectTCP(ENDPOINT& endpoint)
         } else {
             dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " open err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), sockerr, gsoret);
             endpoint.doError(sockerr);
-            teulClose(sockerr, Teul::Closing::ConnError);
+            teulClose(sockerr);
         }
         return;
     }
@@ -216,7 +216,7 @@ static void _checkConnectTCP(ENDPOINT& endpoint)
         dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " getsockname failed err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error);
         // It seems ridiculous to close out the endpoint here, but there isn't much else sane to do.
         endpoint.doError(error);
-        teulClose(endpoint, Teul::Closing::ConnectFail);
+        teulClose(endpoint);
         return;
     }
     
@@ -228,7 +228,7 @@ static void _checkConnectTCP(ENDPOINT& endpoint)
     if (PN_UNLIKELY(synret < 0)) {
         dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), synret);
         endpoint.doError(synret);
-        teulClose(endpoint, Teul::Closing::ConnError);
+        teulClose(endpoint);
     }
 }
 
@@ -320,7 +320,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 
 			// Tear down all of the teulkit abstractions over the socket and
 			// send notification to the application.
-			teulClose(endpoint, Teul::Closing::Closed);
+			teulClose(endpoint);
 			return retval;
 		}
 	}
@@ -338,7 +338,7 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 			_connectionRefused(endpoint, err);
 		} else {
 			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " read err:%d retval:%d", endpoint.teulIndex(), PRA_SOCKET(sock), err, retval);
-			teulClose(endpoint, Teul::Closing::ReadErr);
+			teulClose(endpoint);
 			dbugSetErrno(err);
 		}
 	}
@@ -377,7 +377,7 @@ _startNewPacket(ENDPOINT& endpoint)
 		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d garbage packet prefix %u", endpoint.teulIndex(), token);
-		teulClose(endpoint, Teul::Closing::Prefix);
+		teulClose(endpoint);
 		return -EINVAL;
 	}
 
@@ -402,7 +402,7 @@ _startNewPacket(ENDPOINT& endpoint)
 		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d invalid packet size: %" PRSizeT, endpoint.teulIndex(), size);
-		teulClose(endpoint, Teul::Closing::BadSize);
+		teulClose(endpoint);
 		return -EINVAL;
 	}
 
@@ -610,7 +610,7 @@ _handleReceive(ENDPOINT& endpoint)
 			else
 			{
 				dbugLog(_FLI, "t:%d endpoint error %d; closing", endpoint.teulIndex(), theErr);
-				teulClose(endpoint, Teul::Closing::RecvError);
+				teulClose(endpoint);
 				return true;
 			}
 		}
@@ -702,7 +702,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 		if ( PN_UNLIKELY((revents & POLLRDHUP) != 0) )
 		{
 			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
-			teulClose(endpoint, Teul::Closing::RemoteDisc);
+			teulClose(endpoint);
 			continue;
 		}
 #endif
@@ -710,7 +710,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 		if ( PN_UNLIKELY((revents & POLLHUP) != 0) )
 		{
 			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " socket terminated", endpoint.teulIndex(), PRA_SOCKET(sock));
-			teulClose(endpoint, Teul::Closing::LocalDisc);
+			teulClose(endpoint);
 			continue;
 		}
 	}
@@ -808,7 +808,7 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
 					, endpoint.timeout
 					, elapsed
 					);
-		teulClose(endpoint, Teul::Closing::Timeout);
+		teulClose(endpoint);
 	}
 }
 
@@ -826,7 +826,7 @@ _endpointError(const char* const text, ENDPOINT& endpoint, const SINT32 err)
 {
 	dbugLog(_FLA, "t:%d endpoint connect error %d (%s), closing", endpoint.teulIndex(), err, text);
 	endpoint.doError(err);
-	teulClose(endpoint, Teul::Closing::EndpointError);
+	teulClose(endpoint);
 }
 
 static bool
@@ -994,7 +994,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 						else
 						{
 							dbugLog(_FLI, "t:%d recv error:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), errNo, teulClock64);
-							teulClose(endpoint, Teul::Closing::RcvDgramError);
+							teulClose(endpoint);
 						}
 						continue;
 					}
@@ -1019,7 +1019,7 @@ _pollSocketsInner(TeulTimeMS remainder)
 			else if (eventData.lNetworkEvents & FD_CLOSE)
 			{
 				dbugLog(_FLI, "t:%d close code:%d, closing. time:%" PR64BitUT "", endpoint.teulIndex(), eventData.iErrorCode[FD_CLOSE_BIT], teulClock64);
-				teulClose(endpoint, Teul::Closing::FDClose);
+				teulClose(endpoint);
 				continue;
 			}
 
@@ -1308,7 +1308,7 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 						, endpoint.teulIndex()
 						, static_cast<UINT32>(header.m_tag), static_cast<UINT32>(prevTag), static_cast<UINT32>(expectTag));
 		endpoint.doError(ETEUL_ILLEGAL_PACKET_ORDER);
-		teulClose(endpoint, ETEUL_ILLEGAL_PACKET_ORDER);
+		teulClose(endpoint);
 		return false;
 	}
 

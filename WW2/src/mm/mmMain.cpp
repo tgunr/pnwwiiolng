@@ -71,7 +71,6 @@
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
@@ -405,7 +404,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player != nullptr)
 	{
-		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
+		teulClose(player->teulIndex());
 		player->setDisconnected();
 	}
 }

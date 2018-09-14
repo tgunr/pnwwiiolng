@@ -20,7 +20,6 @@
 #include "auth/authGame.h"
 #include "auth/authHostMessages.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "include/infoHostMessages.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiIRC.h"
@@ -187,7 +186,7 @@ _releaseConnection(const SINT32 teulIndex)
 	delete cdata;
 
 	dbugLog(_FLD, "t:%d connection closed", teulIndex);
-	teulClose(teulIndex, Teul::Closing::AuthRelease);
+	teulClose(teulIndex);
 
 	return;
 }

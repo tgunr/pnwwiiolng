@@ -249,7 +249,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 		SINT32 wasIndex = psn->teulIndex;
 		ServerManager::SetPlayerTeulIndex(psn, -1);
 		///TODO: What if its not open? Check for ENOTCONN?
-		teulClose(wasIndex, Teul::Closing::PlayerRelease);
+		teulClose(wasIndex);
 	}
 }
 
@@ -462,7 +462,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		dbugLog(_FLD, "t:%d attempt to release null player", teulIndex);
 
 		if ( teulIndex >= 0)
-			teulClose(teulIndex, Teul::Closing::NullPlayerRelease);
+			teulClose(teulIndex);
 
 		return -ENOENT;
 	}
@@ -492,7 +492,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		else	if ( teulIndex >= 0)
 		{
 			ServerManager::SetPlayerTeulIndex(psn, -1);
-			teulClose(teulIndex, Teul::Closing::ReleaseEconn);
+			teulClose(teulIndex);
 		}
 
 		break;

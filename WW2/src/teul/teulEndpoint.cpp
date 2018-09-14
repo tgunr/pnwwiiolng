@@ -67,7 +67,7 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 	for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
 	{
 		if ( *it != nullptr )
-			teulClose(*(*it), Teul::Closing::OrderlyShutdown);
+			teulClose(*(*it));
 	}
 }
 

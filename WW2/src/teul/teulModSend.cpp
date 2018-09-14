@@ -12,7 +12,6 @@
 //#define DEBUG_SEND_PACKET
 
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulKit.h"
@@ -270,7 +269,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 	if (PN_UNLIKELY(result < 0)) {
         // Failed to send. Don't dbugGetErrno() here. We already did that in sendData().
         dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result);
-		teulClose(endpoint, Teul::Closing::SendFail);
+		teulClose(endpoint);
 	}
 
 	return result;

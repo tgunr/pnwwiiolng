@@ -72,7 +72,6 @@
 #include "strt/strtUpdaterHostMessages.h"
 #include "strt/strtUpdaterSupportMessages.h"
 #include "teul/teulBlipRepeater.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulHousekeeper.h"
@@ -663,7 +662,7 @@ _exitPlayer(Player& player)
 	{
 		dbugLog(_FLA, "t:%d p:%u no player data", teulIndex, player.playerID());
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex, Teul::Closing::ExitNoPlayer);
+			teulClose(teulIndex);
 	}
 	else
 	{
@@ -672,7 +671,7 @@ _exitPlayer(Player& player)
 		player.Release(teulIndex, Server::ReleaseType::EConn);
 
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex, Teul::Closing::ExitWithPlayer);
+			teulClose(teulIndex);
 	}
 }
 
@@ -2622,7 +2621,7 @@ hostSmiteCustomer(const playerid_t playerID)
 
 	if ( player->teulIndex() >= 0 )
 	{
-		teulClose(player->teulIndex(), Teul::Closing::Smite);
+		teulClose(player->teulIndex());
 	}
 }
 

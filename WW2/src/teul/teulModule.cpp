@@ -13,7 +13,6 @@
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointIdleList.h"
@@ -238,8 +237,9 @@ teulModShutdown()
 	for ( auto it = idleEndpoints.begin(), end = idleEndpoints.end(); it != end; )
 	{
 		ENDPOINT* const endpoint = *(it++);
-		if ( PN_LIKELY(endpoint != nullptr) )
-			teulClose(*endpoint, Teul::Closing::Shutdown);
+		if (PN_LIKELY(endpoint != nullptr)) {
+			teulClose(*endpoint);
+        }
 	}
 
 	teulModIdle(10);
@@ -592,8 +592,7 @@ _releaseEndpoint(ENDPOINT* const inEndpoint)
 	}
 }
 
-void
-teulClose(ENDPOINT& inEndpoint, const UINT32 code)
+void teulClose(ENDPOINT& inEndpoint)
 {
 	if( ! inEndpoint.m_inUse )
 		return;
@@ -605,7 +604,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 		return;
 	}
 
-	dbugLog(_FLD, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
+    dbugLog(_FLD, "t:%d closing st:%u cl:%s", inEndpoint.teulIndex(), inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if ( inEndpoint.state() < IS_CLOSING || inEndpoint.m_closed == false )
 		inEndpoint.doError(ENOTCONN);
         // Returning here results in an infinite loop
@@ -640,11 +639,10 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 	}
 }
 
-void
-teulClose(const SINT32 teulIndex, const UINT32 code)
+void teulClose(const SINT32 teulIndex)
 {
-	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if ( theEndpoint != nullptr )
-		teulClose(*theEndpoint, code ? (UINT32)code : (UINT32)Teul::Closing::TeulClose);
+	if (ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex)) {
+        teulClose(*theEndpoint);
+    }
 }
 
