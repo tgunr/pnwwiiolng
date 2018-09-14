@@ -47,15 +47,4 @@ namespace Teul
 	enum { MaxEndpointSendErrors = 128 };
 
 	enum { BufferSize = 16384 };
-
-	namespace Tokens
-	{
-		//! 4-bit markers marker used to indicate start of a teul frame.
-		enum
-		{
-			Encrypted			=	9		// 1001
-		,	Unencrypted			=	6		// 0110
-		};
-	}
 }
-

@@ -6,6 +6,14 @@
 
 namespace Teul
 {
+    //! 4-bit markers marker used to indicate start of a teul frame.
+    enum class PacketToken: uint8_t {
+        Encrypted   = 9, // 1001
+        Unencrypted = 6, // 0110
+    };
+
+    constexpr const size_t PacketPrefixBytes = 3; // 4 bytes of type, 20 bits of size
+
 #pragma pack(push, 1)
 	//! @struct Teul::PacketHeader
 	//! @brief Wire-format of the packet header.
@@ -15,9 +23,17 @@ namespace Teul
 		using tag_t = unsigned char;		// Used for the tag.
 		using tick_t = unsigned short;	    // Tick transport.
 		using callxy_t = unsigned char;	    // For callback X/Y values.
-	public:
-		UINT32 packetType() const { return m_prefix[0] >> 4; }
-		void packetType(UINT32 type_) { m_prefix[0] = static_cast<uint8_t>((type_ << 4) | (m_prefix[0] & 0x0fU)); }
+    
+        PacketHeader() = default;
+        // Obvious precondition: prefixBuffer is at least PacketPrefixBytes byets long
+        PacketHeader(char * const prefixBuffer) : PacketHeader() { ::memcpy(&m_prefix[0], prefixBuffer, sizeof(m_prefix)); }
+    
+		uint8_t packetType() const { return m_prefix[0] >> 4; }
+		void setPacketType(uint8_t type_) { m_prefix[0] = (type_ << 4) | (m_prefix[0] & 0x0fU); }
+
+        PacketToken packetToken() const { return static_cast<PacketToken>(packetType()); }
+        void setPacketToken(PacketToken token_) { setPacketType(static_cast<uint8_t>(token_)); }
+
 		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0fU) * 65536U) | (m_prefix[1] * 256U) | (m_prefix[2]); }
 		void setPacketSizeBytes(UINT32 size_)
 		{
@@ -30,7 +46,7 @@ namespace Teul
 
 		//// Unencrypted
 		//! Packet type and size, 3 bytes
-		uint8_t		m_prefix[3];
+		uint8_t		m_prefix[PacketPrefixBytes];
 		//// Encrypted
 		//! ID of this packet.
 		tag_t		m_tag;		// CAUTION: Do not move; teulModRecv depends on it.

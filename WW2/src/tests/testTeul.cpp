@@ -448,9 +448,6 @@ struct Role
 		if ( tTeulPkt.isEnabled() == false )
 			return;
 
-		// UnencryptedBytes is supposed to be '3'.
-		static_assert(Teul::Packet::UnencryptedBytes == 3, "Code depends on size of UnencryptedBytes being 3");
-
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
 		Teul::Packet packet(Teul::PacketId(Role::Test_X, Role::PacketTest_Y));

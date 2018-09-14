@@ -196,6 +196,7 @@ private:
     friend void _controllerConnect(ENDPOINT& endpoint); // for server.cpp
 };
 
+static_assert(sizeof(ENDPOINT().m_readAheadBuffer) == Teul::PacketPrefixBytes, "Endpoint readahead buffer size must match packet prefix");
 
 /* Basic functions */
 
@@ -213,3 +214,4 @@ void		teulKillDeadEndpoints();
 
 //! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
 bool		teulHasFreeEndpoints();
+

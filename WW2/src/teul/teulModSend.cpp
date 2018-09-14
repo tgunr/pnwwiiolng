@@ -146,7 +146,7 @@ SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference
 	packet.header().m_tag = ++this->m_impl->sentTag;
 
 	// Encrypt the data.
-	if (packet.header().packetType() != Teul::Tokens::Unencrypted) {
+	if (packet.header().packetToken() != Teul::PacketToken::Unencrypted) {
 		encrypt(packet.encryptable(), packet.header().packetSizeBytes());
 	}
 
@@ -226,7 +226,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 		dbugLog(_FLA, "t:%d tried to send to non-open endpoint [st:%d]", endpoint.teulIndex(), endpoint.state());
 		return -ENOTCONN;
 	}
-	ABORT_IF_EX(header().m_tag != 0 && header().packetType() != Teul::Tokens::Unencrypted, "tried to re-send a Teul::Packet");
+	ABORT_IF_EX(header().m_tag != 0 && header().packetToken() != Teul::PacketToken::Unencrypted, "tried to re-send a Teul::Packet");
 
     teulSyncClock();
 #if platBuild == BUILD_CLIENT
@@ -240,7 +240,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 
 	// The packet size, as far as Teul is concerned. Doesn't include the prefix.
 	size_t psb = packetSizeBytes();
-	size_t payloadBytes = psb - UnencryptedBytes;
+	size_t payloadBytes = psb - Teul::PacketPrefixBytes;
     
 	header().setPacketSizeBytes(payloadBytes);
 	ABORT_IF_EX(header().packetSizeBytes() != payloadBytes, "Teul has developed a reality distortion field");

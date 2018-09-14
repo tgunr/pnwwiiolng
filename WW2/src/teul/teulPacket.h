@@ -71,7 +71,6 @@ public:
 public:
 	enum { DefaultLocalDataSize = 256 };
 	enum { GrowthRate = 256 };
-	enum { UnencryptedBytes = 3 };	// Start token and packet size unencrypted.
 
 private:
 	//! Data for this packet.
@@ -235,10 +234,10 @@ public:
 	//! @note This points to a part of the header.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	UCHAR* encryptable() noexcept { return m_data + UnencryptedBytes; }
+	UCHAR* encryptable() noexcept { return m_data + Teul::PacketPrefixBytes; }
 
 	//! Get the size of the envelope section of the header
-	static UINT32 envelopeSizeBytes() noexcept { return headerSizeBytes() - UnencryptedBytes; }
+	static UINT32 envelopeSizeBytes() noexcept { return headerSizeBytes() - Teul::PacketPrefixBytes; }
 	//! Get the size of the envelope section of the header
 	static UINT32 envelopeSizeBits() noexcept { return envelopeSizeBytes() * 8; }
 

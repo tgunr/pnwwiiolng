@@ -17,7 +17,7 @@ Teul::Packet::Packet(PacketId id)
 	, m_address(0)
 	, m_port(0)
 {
-	header().packetType(Teul::Tokens::Encrypted);
+	header().setPacketToken(Teul::PacketToken::Encrypted);
 	header().setPacketSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
 	header().m_callX = id.m_x;
@@ -172,7 +172,7 @@ Teul::Packet::sendTo(ENDPOINT& endpoint_, const UINT32 destAddress_, const UINT1
 SINT32
 Teul::Packet::receive(ENDPOINT& endpoint_)
 {
-	if ( PN_UNLIKELY(header().packetType() != Teul::Tokens::Encrypted && header().packetType() != Teul::Tokens::Unencrypted) )
+	if ( PN_UNLIKELY(header().packetToken() != Teul::PacketToken::Encrypted && header().packetToken() != Teul::PacketToken::Unencrypted) )
 	{
 		dbugLog(_FLW, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
 		return -EINVAL;
@@ -219,7 +219,7 @@ Teul::PacketHeader::maskSizeValue(UINT32 cryptVersion, const UINT64& seed, UINT3
 void
 Teul::Packet::setUnencrypted() noexcept
 {
-	header().packetType(Teul::Tokens::Unencrypted);
+	header().setPacketToken(Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -228,7 +228,7 @@ Teul::Packet::setUnencrypted() noexcept
 bool
 Teul::Packet::wantsEncryption() const noexcept
 {
-	return (header().packetType() != Teul::Tokens::Unencrypted);
+	return (header().packetToken() != Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////

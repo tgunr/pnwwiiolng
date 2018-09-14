@@ -208,8 +208,9 @@ ADD_LIBRARY(teulserver STATIC
     server/serverPeers.cpp server/serverPeers.h
     server/serverTransfer.cpp server/serverTransfer.h
     str/stringLib.cpp str/stringLib.h
+    teul/teulBasic.h
     teul/teulCallback.cpp teul/teulCallback.h
-    teul/teulEndpoint.cpp teul/teulEndpoint.h teul/teulEndpointImpl.h
+    teul/teulEndpointDefs.h teul/teulEndpoint.cpp teul/teulEndpoint.h teul/teulEndpointImpl.h
     teul/teulMicroWebServer.cpp teul/teulMicroWebServer.h include/pnThread.h
     teul/teulModCalls.cpp teul/teulModCalls.h
     teul/teulModRecv.cpp teul/teulModSend.cpp teul/teulModule.cpp teul/teulModule.h
@@ -539,7 +540,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     strt/strtChatTypes.cpp strt/strtChatTypes.h
     strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-    teul/teulBasic.h wwii/wwiiCallbacks.h
+    wwii/wwiiCallbacks.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
