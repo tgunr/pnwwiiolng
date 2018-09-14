@@ -1653,7 +1653,7 @@ _broadcastRxConnect(ENDPOINT& endpoint)
 
 #include "src/controllerGameIntro.h"
 
-static void
+void
 _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
@@ -1669,12 +1669,13 @@ _controllerConnect(ENDPOINT& endpoint)
 	intro.m_processType = Server::serverType;
 	intro.m_token = s_controllerToken;
 
-	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
+	auto result = endpoint.writeData(reinterpret_cast<char *>(&intro), sizeof(intro), 0, 0);
 	if ( result < 0 ) {
-		if ( dbugGetErrno() == ECONNREFUSED )
-			LogAbort("Connection to controller refused.");
-		else
-			LogAbort("Unable to greet controller because %d", dbugGetErrno());
+		if (result == -ECONNREFUSED) {
+			LogAbort("Connection to controller refused (not running?).");
+		} else {
+			LogAbort("Unable to greet controller because %d", -result);
+        }
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }

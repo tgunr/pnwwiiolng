@@ -193,11 +193,7 @@ public:
 private:
 	//! Write the actual data to the socket.
 	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port);
-
-#if platBuild == BUILD_SERVER
-public:
-	SINT32 writeRaw(const void* const data, const size_t sizeInBytes) noexcept;
-#endif
+    friend void _controllerConnect(ENDPOINT& endpoint); // for server.cpp
 };
 
 
