@@ -1,12 +1,12 @@
 #pragma once
-// Created: Fri Mar 20 13:18:58 CST 2009
-// Copyright (C) PlayNet, Inc 2009-2011 - All rights reserved.
-// Not for redistribution.
+// Created: Thu May 18 11:20:59 2000
+// Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
+// Not to be distributed in API form except as part of a
+// compiled library.
 //
-// Describes the DBHANDLE class, the wrapper around
-// the MYSQL connection used by the dbse daemon.
-// Overloaded operator allows it to be used like a
-// MYSQL* pointer.
+// The header file for the Database Wrapper stuff
+//
+// Originating Programmer: Shane "Elmo" Wickson
 
 #include <mysql.h>
 
@@ -51,3 +51,11 @@ public:
 };
 
 extern DBHANDLE dbh;
+
+//Connects to all the databases that are passed to it.
+//The first parameter is an array of pointers to connection structs, and the
+//	second parameter is the number of structures to use out of that array
+
+DB::handle_t* dbseGetConnection();
+
+const char* escapeString(const char* src, char* dest, size_t destSize);

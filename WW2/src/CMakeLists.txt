@@ -268,7 +268,7 @@ ADD_LIBRARY( wwiilib STATIC
     wwii/wwiiUTF.cpp wwii/wwiiUTF.h
     score/scoreActor.cpp score/scoreActor.h
     src/io_mapped_file.cpp include/io_mapped_file.h
-    src/mydbQuery.cpp include/mydbQuery.h src/myDbseWrapper.cpp
+    src/mydbQuery.cpp include/mydbQuery.h include/dbseWrapper.h src/myDbseWrapper.cpp
     wwii/wwiiDBConfig.cpp wwii/wwiiDBConfig.h wwii/wwiiDBThreads.cpp wwii/wwiiDBThreads.h
     wwii/wwiiSerialNumber.cpp wwii/wwiiSerialNumber.h
     wwii/wwiiSortieManager.cpp wwii/wwiiSortieManager.h
@@ -539,8 +539,6 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     strt/strtChatTypes.cpp strt/strtChatTypes.h
     strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-    dbse/dbseClient.cpp dbse/dbseClient.h dbse/dbseTypes.h dbse/dbseConstants.h
-    dbse/dbseClientMessages.cpp dbse/dbseClientMessages.h
     teul/teulBasic.h wwii/wwiiCallbacks.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"

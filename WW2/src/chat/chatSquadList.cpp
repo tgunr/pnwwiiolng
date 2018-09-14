@@ -17,8 +17,6 @@
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulEndpointDefs.h"
-#include "chat/chatdbSquadXchg.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatWhoList.h"
 #include "chat/chatData.h"

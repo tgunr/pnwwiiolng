@@ -8,7 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatList.h"
 #include "chat/chatMissionInviteMsg.h"
 #include "chat/chatPlayer.h"
@@ -20,7 +19,6 @@
 #include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatSquadCreate.h"
 #include "chat/chatSaveChannels.h"
-#include "chat/chatdbSquadXchg.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiSquads.h"
 #include "wwii/wwiiDBThreads.h"

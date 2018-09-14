@@ -19,7 +19,6 @@
 #include "auth/authPlaygateTypes.h"
 #include "auth/authGame.h"
 #include "auth/authHostMessages.h"
-#include "dbse/dbseHandle.h"
 #include "teul/teulAuth.h"
 #include "teul/teulClosingEnums.h"
 #include "include/infoHostMessages.h"

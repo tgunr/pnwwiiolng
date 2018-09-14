@@ -188,7 +188,7 @@ DBQuery & DBRow API
 	}
 */
 
-#include "dbse/dbseHandle.h"
+#include "include/dbseWrapper.h"
 
 // If you want to execute a really simple query and you don't
 // want the result set, don't care how long it takes, and
