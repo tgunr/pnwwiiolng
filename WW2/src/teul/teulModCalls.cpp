@@ -43,8 +43,6 @@ TEUL_CALLBACK*		SYN_TOKEN;
 
 TEUL_CALLBACK*		SYN_ACK_TOKEN;
 TEUL_CALLBACK*		SYN_ACK_ACK_TOKEN;
-TEUL_CALLBACK*		FYN_TOKEN;
-TEUL_CALLBACK*		FYN_ACK_TOKEN;
 TEUL_CALLBACK*		KLIVE_TOKEN;
 TEUL_CALLBACK*		KLIVE_ACK_TOKEN;
 TEUL_CALLBACK*		Teul::ConnectionInstruction::s_callback;
@@ -55,26 +53,6 @@ TEUL_CALLBACK*		Teul::ConnectionInstruction::s_callback;
 static void
 _errorCALLBACK(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
 {
-}
-
-//////////////////////////////////////////////////////////////////////
-///TODO: Make this generally available as the nullptr callback.
-
-// base TM callbacks
-static SINT32
-_actionSendRST_TOKEN(ACTION_OBJECT* /*a*/)
-{
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static SINT32
-_actionRecvRST_TOKEN(ACTION_OBJECT* const a)
-{
-    dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " closing due to received RST", a->endpoint->teulIndex(), PRA_SOCKET(a->endpoint->socket));
-	teulClose(*a->endpoint);
-	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -351,59 +329,6 @@ _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 
 static SINT32
-_actionSendFYN_TOKEN(ACTION_OBJECT* const a)
-{
-	_report(a, "Tx FYN");
-
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static SINT32
-_actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
-{
-	_report(a, "Rx FYN");
-
-	ENDPOINT* const inEndpoint = teulGetEndpoint(a->teulIndex);
-	if ( (inEndpoint == nullptr) | (FYN_ACK_TOKEN == nullptr) )
-		return -EINVAL;
-
-	if ( inEndpoint->state() < IS_CLOSING )
-	{
-		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
-		if ( FYN_TOKEN != nullptr )
-			teulModSendCALLBACKe(*inEndpoint, *FYN_TOKEN);
-		teulClose(*inEndpoint);
-	}
-
-	return teulModSendCALLBACKe(*inEndpoint, *FYN_ACK_TOKEN);
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static SINT32
-_actionSendFYN_ACK_TOKEN(ACTION_OBJECT* const a)
-{
-	_report(a, "Tx FAK");
-
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static SINT32
-_actionRecvFYN_ACK_TOKEN(ACTION_OBJECT* const a)
-{
-	_report(a, "Rx FAK");
-
-	teulClose(*a->endpoint);
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static SINT32
 _packKLIVE_TOKEN (PackMode mode, UCHAR* const data, SINT32 offset, KDATA* kt, SINT32 /*size*/)
 {
 	return teulPackUCHAR(mode, data, offset, &kt->random, 8);
@@ -523,13 +448,6 @@ teulInitModCallbacks()
 	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";
 	ci.error		= _errorCALLBACK;
 
-	ci.callY		= TM_RST_TOKEN_Y;				// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_RST_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendRST_TOKEN;			// how to send data
-	ci.recvAction	= _actionRecvRST_TOKEN;			// how to receive data
-
-	RST_TOKEN	= teulAllocSystemCallback( &ci );
-
 	// following callbacks use the errSYN_CALLBACK  error handler which closes the connetion
 	ci.error		= _errorSYN_CALLBACK;
 
@@ -556,23 +474,7 @@ teulInitModCallbacks()
 	SYN_ACK_ACK_TOKEN	= teulAllocSystemCallback( &ci );
 
 
-	ci.callY		= TM_FYN_TOKEN_Y;				// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_FYN_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendFYN_TOKEN;			// how to send data
-	ci.recvAction	= _actionRecvFYN_TOKEN;			// how to receive data
-
-	FYN_TOKEN	= teulAllocSystemCallback( &ci );
-
-
-	ci.callY		= TM_FYN_ACK_TOKEN_Y;			// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_FYN_ACK_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendFYN_ACK_TOKEN;		// how to send data
-	ci.recvAction	= _actionRecvFYN_ACK_TOKEN;		// how to receive data
-
-	FYN_ACK_TOKEN	= teulAllocSystemCallback( &ci );
-
-
-	// following callbqcks use the generic _errorCallback that does nothing at this time
+	// following callbacks use the generic _errorCallback that does nothing at this time
 	ci.error		= _errorCALLBACK;
 
 	ci.callY		= TM_KLIVE_TOKEN_Y;				// the Y position in the callback matrix

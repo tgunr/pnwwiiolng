@@ -584,9 +584,6 @@ _releaseEndpoint(ENDPOINT* const inEndpoint)
 {
 	if ( inEndpoint->m_closed == false )
 	{
-		if ( inEndpoint->socket != INVALID_SOCKET )
-			teulModSendCALLBACKe(*inEndpoint, *FYN_TOKEN);
-
 		inEndpoint->doError(ECONNABORTED);
 		inEndpoint->shutdown();
 	}

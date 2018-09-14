@@ -760,14 +760,14 @@ _checkEndpointState(ENDPOINT& endpoint)
 	case IS_CLOSING:
 		if (!endpoint.m_reliable)
 		{
-			if (endpoint.m_closed == false)
+			if (!endpoint.m_closed)
 			{
 				dbugWrite(_FLN,"IS_CLOSING");
 				endpoint.doError(ENOTCONN);
-			}
-			if ( ((endpoint.m_closed == false) || (endpoint.lastKliveSent.elapsed() >= Teul::FynNeeded)) && (FYN_TOKEN != nullptr) )
-			{
-				teulModSendCALLBACKe(endpoint, *FYN_TOKEN);
+                // We used to send a FYN_TOKEN here. This has absolutely no value and serves absolutely no purpose.
+                // Close out the damned endpoint already. Oh BTW, we only do this for UDP sockets, not TCP. How TCP
+                // sockets get clsoed out the rest of the way I don't even know yet.
+                teulClose(endpoint);
 			}
 		}
 	break;

@@ -39,7 +39,6 @@ namespace Teul
 
 	enum { MinKliveNeeded = 1000 };
 	enum { MaxKliveNeeded = 10000 };
-	enum { FynNeeded = 1000 };
 	enum { EndpointUpdateInterval = 1000 };
 
 	enum { MinEndpointTimeout = MinKliveNeeded * KlivesPerTimeout };
