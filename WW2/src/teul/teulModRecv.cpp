@@ -376,7 +376,7 @@ static ssize_t _continuePacket(ENDPOINT& endpoint)
 	return readVal;
 }
 
-static ssize_t _recvfromStream(ENDPOINT& endpoint)
+static ssize_t _recvOneFromStream(ENDPOINT& endpoint)
 {
 	if (!endpoint.m_impl->m_curDatagram) {
 		ssize_t retval = _startNewPacket(endpoint);
@@ -409,7 +409,7 @@ static ssize_t _recvfromStream(ENDPOINT& endpoint)
 	return static_cast<ssize_t>(datagramSize);
 }
 
-static ssize_t _recvfromPacketSource(ENDPOINT& endpoint)
+static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 {
 	DATA_GRAM *dgram = nullptr;
 	socklen_t addrLen = sizeof(dgram->sockAddress);
@@ -467,7 +467,7 @@ ssize_t _recvDatagram(ENDPOINT& endpoint)
         case PROTOCOL_TCP:
         case PROTOCOL_CTRL:
             do {
-                result = _recvfromStream(endpoint);
+                result = _recvOneFromStream(endpoint);
                 if (result == -PLAT_EAGAIN || result == -PLAT_EWOULDBLOCK) {
                     // need to wait for more data, bail
                     break;
@@ -480,7 +480,7 @@ ssize_t _recvDatagram(ENDPOINT& endpoint)
             break;
         case PROTOCOL_UDB:
         case PROTOCOL_UDP:
-            result = _recvfromPacketSource(endpoint);
+            result = _recvManyFromPacketSource(endpoint);
             if (result > 0) {
                 endpoint.lastDataRecv.makeCurrent();
             }
