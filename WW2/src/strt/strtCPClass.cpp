@@ -568,10 +568,84 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 			strtConvertFacility(*facility, toCountry, force, quietly);
 	}
 
+	bool justCaptured = true; //This is needed to trigger town status check because town status may not have changed as a result of capture
+	checkTownStatus(this, justCaptured);
+
 	// Clear out the routeing
 	resetRouteing();
 
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Check the status of cp and update all linked cps recursively.
+
+void
+CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
+{
+	FacilityStruct* facility;
+	TOWN_STATUS oldStatus = cp->m_townstatus;
+	TOWN_STATUS newStatus = INACTIVE;
+//	dbugLog(_FLN, "1: Town status check for %s. Current town status: %d.", cp->name, oldStatus);
+
+	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
+	{
+		LinkStruct* outLink = *it;
+		if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+			continue;
+
+		CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
+//		dbugLog(_FLN, "2: %s is outgoing linked to %s", cp->name, otherCP->name);
+
+		if ((otherCP->ControllingSide() != cp->ControllingSide()) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+		{
+			//Linked town is enemy
+			newStatus = FRONT_LINE;
+		}
+		else
+			if (otherCP->m_townstatus == FRONT_LINE)
+			{
+				if (newStatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
+					newStatus = BACK_LINE;
+			}
+			else
+				if (cp->m_townstatus == BACK_LINE)
+				{
+					if (newStatus != FRONT_LINE && newStatus != BACK_LINE) //Dont change to lower status if higher status has been detected
+						newStatus = REAR_LINE;
+				}
+	}
+
+	if (newStatus == REAR_LINE) //Set to INACTIVE if no airfield or naval base
+	{
+		newStatus = INACTIVE;
+
+		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+			newStatus = REAR_LINE;
+		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
+			newStatus = REAR_LINE;
+	}
+
+	cp->m_townstatus = newStatus;
+
+	if (newStatus != oldStatus || justCaptured) //Capture or change of town status must trigger check of linked towns
+	{
+		//	RefreshTownGarrisonDisplay(Town) //mikemudd - Haven't considered this yet
+		justCaptured = false;
+
+		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it)
+		{
+			LinkStruct* outLink = *it;
+			if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+				continue;
+
+			CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
+			dbugLog(_FLN, "3: About to do town status check for %s.", otherCP->name);
+			checkTownStatus(otherCP, justCaptured);
+
+		}
+	}
+	dbugLog(_FLN, "4: Town status check complete for %s. Old town status: %d New town status: %d.", cp->name, oldStatus, newStatus);
 }
 
 //////////////////////////////////////////////////////////////////////

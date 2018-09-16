@@ -121,6 +121,16 @@ struct CSAFE_CPStruct
 //tolua_begin
 };
 
+enum TOWN_STATUS
+{
+	INACTIVE = 0,
+	REAR_LINE,
+	BACK_LINE,
+	FRONT_LINE,
+	// Add new statuses here
+	MAX_TOWN_STATUS
+};
+
 class CPStruct : public CSAFE_CPStruct
 {
 public:
@@ -137,6 +147,7 @@ public:
 		, m_units()
 		, m_value(0)
 		, m_brigades()
+		, m_townstatus(INACTIVE)
 	{}
 
 	~CPStruct()
@@ -216,6 +227,8 @@ public:
 
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
 
+	void checkTownStatus(CPStruct *, bool);
+	
 	void checkHCUnits();
 
 	bool enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility);
@@ -313,7 +326,9 @@ public:
 	// How much our current brigade occupants make us worth
 	UINT32				m_value;
 
-//tolua_end
+	TOWN_STATUS				m_townstatus;
+
+	//tolua_end
 	ACTIVE_BRIGADES		m_brigades;
 
 private:

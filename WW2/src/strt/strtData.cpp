@@ -814,8 +814,11 @@ _checkCPLinks()
 			}
 			else
 			{
-				if ( isValidSide(otherCP->side) && otherCP->country != WWII_CHINA )	// Russia is neutral-hostile
+				if (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)	// Russia is neutral-hostile
+				{
 					strtEnemyLink(*cp, true);
+					cp->m_townstatus = FRONT_LINE;
+				}
 
 				facility->m_outgoingLink->setEnabled(false);
 				facility->m_incomingLink->setEnabled(false);
@@ -834,6 +837,69 @@ _checkCPLinks()
 
 	dbugLog(_FLN,"finished cp link inits for %u cps", totalCPs);
 #endif
+}
+
+static void
+_setTownStatus()
+{
+	SINT64 totalBL = 0;
+	SINT64 totalFL = 0;
+	SINT64 totalRL = 0;
+	SINT64 totalIN = 0;
+	SINT64 totalChecked = 0;
+	CPStruct* cp;
+//	FacilityStruct* facility;
+
+	for (cp = Strat::cpList; cp != nullptr; cp = cp->next)
+	{
+		bool hasAirOrNavalbase = false;
+		totalChecked++;
+
+		//Default status is INACTIVE. Set status to REAR_LINE if there is an air base or a naval base
+		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+			hasAirOrNavalbase = true;
+		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
+			hasAirOrNavalbase = true;
+
+		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
+		{
+			LinkStruct* outLink = *it;
+			if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+				continue;
+
+			const CPStruct* const otherCP = outLink->endDepot->cp;
+			if (otherCP->m_townstatus == FRONT_LINE && (cp->m_townstatus == INACTIVE))
+			{
+				cp->m_townstatus = BACK_LINE;
+				dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
+				totalBL++;
+			}
+		}
+		if (cp->m_townstatus == INACTIVE)
+		{
+			if (hasAirOrNavalbase)
+				cp->m_townstatus = REAR_LINE;
+			else
+				totalIN++;
+//			dbugLog(_FLN, "Set INACTIVE town status init for %s", cp->name);
+		}
+		if (cp->m_townstatus == REAR_LINE)
+		{
+			totalRL++;
+			dbugLog(_FLN, "Set REAR_LINE town status init for %s", cp->name);
+		}
+		if (cp->m_townstatus == FRONT_LINE)
+		{
+			totalFL++;
+			dbugLog(_FLN, "Set FRONT_LINE town status init for %s", cp->name);
+		}
+	}
+
+  	dbugLog(_FLN, "finished town status inits for %u front line cps", totalFL);
+	dbugLog(_FLN, "finished town status inits for %u back line cps", totalBL);
+	dbugLog(_FLN, "finished town status inits for %u rear line cps", totalRL);
+	dbugLog(_FLN, "finished town status inits for %u inactive cps", totalIN);
+	dbugLog(_FLN, "finished town status inits for %u cps", totalChecked);
 }
 
 static void
@@ -878,6 +944,8 @@ strtInitializeStratData()
 	_resetAllObjects();
 
 	_checkCPLinks();
+
+	_setTownStatus();
 
 	_checkSupplyLinks();
 
