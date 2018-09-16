@@ -3174,6 +3174,13 @@ void persGunsightDrawFPSScope(int type)
 
             break;
         }
+    case AMERICAN_PARA_PACK:
+    case AMERICAN_PARA_NOPACK:
+    case AMERICAN_PARA_PACK_SELF:
+        {
+            _drawscope(_yankscope, 1.0f);
+            break;
+        }
     case FRENCH_INFANTRY:
         {
 			if(fpsTrooper.activeWeaponNumber >= 0 && fpsTrooper.weaponPositionModel[fpsTrooper.activeWeaponNumber] == BAZOOKA)
