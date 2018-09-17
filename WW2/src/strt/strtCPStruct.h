@@ -124,8 +124,8 @@ struct CSAFE_CPStruct
 enum TOWN_STATUS
 {
 	INACTIVE = 0,
-	REAR_LINE,
 	BACK_LINE,
+	RESERVE,
 	FRONT_LINE,
 	// Add new statuses here
 	MAX_TOWN_STATUS

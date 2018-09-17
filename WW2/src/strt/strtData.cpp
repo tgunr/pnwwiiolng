@@ -855,7 +855,7 @@ _setTownStatus()
 		bool hasAirOrNavalbase = false;
 		totalChecked++;
 
-		//Default status is INACTIVE. Set status to REAR_LINE if there is an air base or a naval base
+		//Default status is INACTIVE. Set status to BACK_LINE if there is an air base or a naval base
 		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
 			hasAirOrNavalbase = true;
 		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
@@ -870,23 +870,23 @@ _setTownStatus()
 			const CPStruct* const otherCP = outLink->endDepot->cp;
 			if (otherCP->m_townstatus == FRONT_LINE && (cp->m_townstatus == INACTIVE))
 			{
-				cp->m_townstatus = BACK_LINE;
-				dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
+				cp->m_townstatus = RESERVE;
+				dbugLog(_FLN, "Set RESERVE town status init for %s", cp->name);
 				totalBL++;
 			}
 		}
 		if (cp->m_townstatus == INACTIVE)
 		{
 			if (hasAirOrNavalbase)
-				cp->m_townstatus = REAR_LINE;
+				cp->m_townstatus = BACK_LINE;
 			else
 				totalIN++;
 //			dbugLog(_FLN, "Set INACTIVE town status init for %s", cp->name);
 		}
-		if (cp->m_townstatus == REAR_LINE)
+		if (cp->m_townstatus == BACK_LINE)
 		{
 			totalRL++;
-			dbugLog(_FLN, "Set REAR_LINE town status init for %s", cp->name);
+			dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
 		}
 		if (cp->m_townstatus == FRONT_LINE)
 		{
