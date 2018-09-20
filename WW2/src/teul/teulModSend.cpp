@@ -32,14 +32,14 @@ static Mem::Pool<Teul::Packet, 256 * 4096 / sizeof(Teul::Packet)> s_delayedPacke
 
 SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const UCHAR protocolPreference)
 {
-	if (PN_UNLIKELY(endpoint.state() == IS_DEAD)) {
+	if (endpoint.state() == IS_DEAD) {
 		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " endpoint not open, state:%d callback " PRF_CALLBACK ""
 					, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(), PRA_CALLBACK(callback));
 		return -ETEUL_CB_CONN_DEAD;
 	}
 
 	dbugLog(_FLD, "t:%d sending callback " PRF_CALLBACK "", endpoint.teulIndex(), PRA_CALLBACK(callback));
-	if (PN_UNLIKELY(!callback.m_sendAction)) {
+	if (!callback.m_sendAction) {
 		dbugLog(_FLA, "no action for callback " PRF_CALLBACK "", PRA_CALLBACK(callback));
 		return -ETEUL_CB_SEND_NULL;
 	}
@@ -55,7 +55,7 @@ SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const U
 
 	const SINT32 packedSizeBits = (callback.m_sendAction)(&actionObj);
     ABORT_IF_EX(packedSizeBits >= Teul::MaxPacket * 8, "Data was too big for packet, it's just luck that you didn't crash already!");
-	if (PN_UNLIKELY(packedSizeBits < 0)) {
+	if (packedSizeBits < 0) {
 		// probable data corruption
 		dbugLog(_FLA, "t:%d cb:" PRF_CALLBACK " pack failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), packedSizeBits);
 		return packedSizeBits;
@@ -64,7 +64,7 @@ SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const U
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
 	const SINT32 sendResult = outgoing.send(endpoint, protocolPreference);
-	if (PN_UNLIKELY(sendResult < 0)) {
+	if (sendResult < 0) {
 		dbugLog(_FLW, "t:%d callback " PRF_CALLBACK " send failed:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), sendResult);
 		return sendResult;
 	}
@@ -98,9 +98,9 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
     
     do {
 	    result = ::sendto(socket, static_cast<char *>(data), sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
-    } while (PN_UNLIKELY(result == INVALID_SOCKET && (err = dbugGetErrno()) == PLAT_EINTR));
+    } while (result == INVALID_SOCKET && (err = dbugGetErrno()) == PLAT_EINTR);
     
-	if (PN_UNLIKELY(result < 0)) {
+	if (result < 0) {
 		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {
             dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
             return 0;
@@ -156,14 +156,14 @@ SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference
 	if (m_impl->m_sendQueue.empty()) {
 		result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 
-		if (PN_UNLIKELY(result < 0)) {
+		if (result < 0) {
             return result;
 		}
         ABORT_IF_EX(static_cast<UINT32>(result) > packetBytes, "Sent %" PRSsizeT " bytes but only tried to send %u bytes!", result, packetBytes);
     }
 
     packet.addBytesSent(result);
-    if (PN_UNLIKELY(packet.sentBytes() < packetBytes)) {
+    if (packet.sentBytes() < packetBytes) {
         // Entire packet not yet sent, queue it.
         Teul::Packet* const copy = s_delayedPackets.New(packet);
         copy->addBytesSent(packet.sentBytes());
@@ -195,13 +195,13 @@ SINT32 ENDPOINT::pushSendQueue()
 		void* data = static_cast<char *>(packet->packet()) + sentBytes;
 
 		ssize_t result = writeData(data, remainingBytes, packet->address(), packet->port());
-		if (PN_UNLIKELY(result < 0)) {
+		if (result < 0) {
 			return result;
 		}
         ABORT_IF_EX(static_cast<size_t>(result) > remainingBytes, "Sent %" PRSsizeT " bytes but only tried to send %" PRSizeT " bytes!", result, remainingBytes);
 
 		packet->addBytesSent(result);
-		if (PN_UNLIKELY(packet->sentBytes() < packet->packetSizeBytes())) {
+		if (packet->sentBytes() < packet->packetSizeBytes()) {
             // Hit flow control again. Break out for now.
             return 0;
         }
@@ -222,7 +222,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
     static_assert(sizeof(Teul::PacketHeader::tag_t) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet must agree on tag size");
 
-	if (PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING)) {
+	if (endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) {
 		dbugLog(_FLA, "t:%d tried to send to non-open endpoint [st:%d]", endpoint.teulIndex(), endpoint.state());
 		return -ENOTCONN;
 	}
@@ -248,7 +248,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 
 	SINT32 result = endpoint.sendPacket(*this, protocolPreference);
     
-	if (PN_UNLIKELY(result < 0)) {
+	if (result < 0) {
         // Failed to send. Don't dbugGetErrno() here. We already did that in sendData().
         dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
 		teulClose(endpoint);
@@ -259,16 +259,14 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32
-teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protocol)
+SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object, const UCHAR protocol)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if (PN_UNLIKELY(theEndpoint == nullptr))
-	{
+    
+	if (!theEndpoint) {
 		dbugLog(_FLA, "t:%d " PRF_CALLBACK " invalid endpoint in send callback", teulIndex, PRA_CALLBACK(object));
 		return -EINVAL;
 	}
-
 	return teulModSendCALLBACKe(*theEndpoint, object, protocol);
 }
 
@@ -278,7 +276,7 @@ SINT32 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
     
-	if (PN_UNLIKELY(!theEndpoint)) {
+	if (!theEndpoint) {
 		dbugLog(_FLA, "t:%d " PRF_CALLBACK " invalid endpoint in send-to callback", teulIndex, PRA_CALLBACK(object));
 		return -EINVAL;
 	}
