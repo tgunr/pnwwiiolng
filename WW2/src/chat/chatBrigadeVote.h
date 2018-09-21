@@ -25,7 +25,7 @@ public:
 	//  TOREMOVE - election for removal of a player (60s veto window)
 	//	REMOVING - player in the process of being removed/resigned/replaced (60s window)
 	//	REPLACING - player being replaced at end of timeout
-	enum Mode { NOMINATION, OFFER, TOREMOVE, REMOVING, TOREPLACE, TOMOVE, TOATTACK, TOCLEAR, TODEFEND, MAX_VOTE_MODES };
+	enum Mode { NOMINATION, OFFER, TOREMOVE, REMOVING, TOREPLACE, TOMOVE, TOATTACK, TOCLEAR, TODEFEND, CHANGECOUNTRY, MAX_VOTE_MODES };
 
 	Vote(Mode voteMode, BrigadeControl::BRIGADE_ACTION_REQ forAction, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, const FULL_OBJ_ID origin=nullObjID)
 		: m_voteMode(voteMode), m_forAction(forAction)

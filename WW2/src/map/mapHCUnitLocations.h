@@ -57,6 +57,9 @@ public:
 	// Shared member functions
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
+	SINT32 receive(SINT32 teulIndex);
+
+
 public:
 	// Members
 	UINT32		m_unitID;
@@ -65,3 +68,4 @@ public:
 };
 
 using HC_UNIT_COUNTRY_CHANGES = teul_network_array<HCUnitCountryChange>;
+

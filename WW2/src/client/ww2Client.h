@@ -65,6 +65,7 @@ struct ClientData;
 struct ClientClassData;
 struct ChatServerInfo;
 class HCUnitCountryChange;
+class GarrisonCountryChangeReq;
 
 namespace Chat
 {
@@ -181,6 +182,7 @@ public:
 	virtual int RequestMissionWeapCancel();
 	virtual int RequestMissionCrew(unsigned int numcrew);
 	virtual int RequestMissionPostList(FULL_OBJ_ID const&);
+	virtual int RequestGarrisonCountryChange(FULL_OBJ_ID cp, WWII_COUNTRY const& country);
 	virtual int RequestJoin(WEAPON_SERIAL const&, ChatHandle const&);
 	virtual int SendAcceptCrew(unsigned int joinrequestid);
 	virtual int ExitMission(bool cancel=false);
@@ -242,6 +244,7 @@ public:
 	virtual void ProcessCrewBailed(FE_CREW_BAILED const&) {}
 	virtual void ProcessForcedCellExit(unsigned int exitCode) {}
 	virtual void ProcessGameTimeUpdate(Host::TimeUpdate const&) {}
+	virtual void ProcessGarrisonCountryChangeReq(GarrisonCountryChangeReq const&);
 	virtual void ProcessWorldUpdate(WORLD_UPDATE const&);
 	virtual void ProcessMissionLaunchUpdate(MISS_LAUNCH_UPDATE const&);
 	virtual void ProcessMissionResults(MISSION_RESULTS const&);

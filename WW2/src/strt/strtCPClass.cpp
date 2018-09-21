@@ -1592,6 +1592,8 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
 
 				if (toeTemplate)
 				{
+                    // Clear all supply.
+                    //unit->purgeResupply(true);
 					// Remove the old toe template
 					unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
 					// Set the new countries toe template
@@ -1600,7 +1602,7 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
 					// Note: This gives us "default" equipment levels (i.e. full)
 					toeTemplate->subscribe(unit, unit->toe());
 					// Clear all supply.
-					unit->purgeResupply(true);
+					//unit->purgeResupply(true);
 					// Reset supply and announce the country change to map, chat and clients.
 					unit->announceGarrisonCountryChange();
 					// Restart supply with trickle timer.

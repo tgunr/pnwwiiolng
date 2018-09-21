@@ -371,6 +371,7 @@ _voting(const ChatHandle sponsor, UINT32 action, const char* description, UINT32
 	,	"toattack"
 	,	"toclear"
 	,	"todefend"
+	,   "changecountry"
 	};
 	dbugLog(_FLI, "%s %s(in %u) %s %s %s %d"
 					, sponsorCallsign.c_str()

@@ -15,6 +15,7 @@
 #include "chat/chatConstants.h"
 #include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "include/configVars.h"
@@ -26,13 +27,13 @@
 #include "server/server.h"
 #include "server/serverPeers.h"
 #include "strt/strtAttackOrder.h"
+#include "strt/strtCP.h"
+#include "strt/strtCPFlags.h"
+#include "strt/strtCPStruct.h"
 #include "strt/strtCaptureContribution.h"
 #include "strt/strtCaptureScore.h"
 #include "strt/strtCaptureState.h"
 #include "strt/strtConstants.h"
-#include "strt/strtCPFlags.h"
-#include "strt/strtCP.h"
-#include "strt/strtCPStruct.h"
 #include "strt/strtDamageQueueEntry.h"
 #include "strt/strtData.h"
 #include "strt/strtEnemyReport.h"
@@ -44,8 +45,8 @@
 #include "strt/strtJoinList.h"
 #include "strt/strtMain.h"
 #include "strt/strtMission.h"
-#include "strt/strtObjectiveStats.h"
 #include "strt/strtObjectStruct.h"
+#include "strt/strtObjectiveStats.h"
 #include "strt/strtPack.h"
 #include "strt/strtServerTypes.h"
 #include "strt/strtSpawn.h"
@@ -72,44 +73,45 @@
 extern UINT32 strtGetNextSerial();
 extern UINT32 g_chatPopulations[];
 
-TEUL_CALLBACK* STRT_SEND_MAP_CONNECTION_REQ;
+TEUL_CALLBACK *STRT_SEND_MAP_CONNECTION_REQ;
 
-static	TEUL_CALLBACK* _SEND_MM_POST_ACCEPT;
-static	TEUL_CALLBACK* _SEND_MM_POST_DENY;
-static	TEUL_CALLBACK* _SEND_MM_JOIN_ACCEPT;
-static	TEUL_CALLBACK* _SEND_MM_JOIN_DENY;
-static	TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
-static	TEUL_CALLBACK* _XCHG_MM_CAPACITY;
+static TEUL_CALLBACK *_SEND_MM_POST_ACCEPT;
+static TEUL_CALLBACK *_SEND_MM_POST_DENY;
+static TEUL_CALLBACK *_SEND_MM_JOIN_ACCEPT;
+static TEUL_CALLBACK *_SEND_MM_JOIN_DENY;
+static TEUL_CALLBACK *_XCHG_MM_SPAWN_GRANT;
+static TEUL_CALLBACK *_XCHG_MM_CAPACITY;
+static TEUL_CALLBACK *_XCHG_MM_GARRISON_COUNTRY_CHANGE;
 
-static	TEUL_CALLBACK* _SEND_SYNC_CPS;
-static	TEUL_CALLBACK* _SEND_SYNC_FACILITIES;
-static	TEUL_CALLBACK* _SEND_SYNC_BUILDINGS;
+static TEUL_CALLBACK *_SEND_SYNC_CPS;
+static TEUL_CALLBACK *_SEND_SYNC_FACILITIES;
+static TEUL_CALLBACK *_SEND_SYNC_BUILDINGS;
 
 static bool _allowSyncing = false;
 
 template <class Type>
-class SyncQueue : public std::vector<Type*>
+class SyncQueue : public std::vector<Type *>
 {
 public:
-	bool queue(Type* t)
+	bool queue(Type *t)
 	{
-		if ( t == nullptr || !_allowSyncing || t->m_needsSync )
+		if (t == nullptr || !_allowSyncing || t->m_needsSync)
 			return false;
 		this->push_back(t);
 		t->m_needsSync = true;
 		return true;
 	}
 
-	Type* next()
+	Type *next()
 	{
-		if ( this->empty() )
+		if (this->empty())
 			return nullptr;
-		Type* t = this->front();
+		Type *t = this->front();
 		this->erase(this->begin());
-		if ( !t->m_needsSync )
+		if (!t->m_needsSync)
 			return nullptr;
 		t->m_needsSync = false;
-		return (Type*)t;
+		return (Type *)t;
 	}
 };
 
@@ -151,9 +153,9 @@ strtQueueCPStatus(CPStruct* cp)
 	_cpQueue.queue(cp);
 }
 
-static void _populateEntry(Teul::Packet& outgoing, const FacilityStruct* fac)
+static void _populateEntry(Teul::Packet &outgoing, const FacilityStruct *fac)
 {
-	auto& entry = outgoing.allocate<StratUpdates>();
+	auto &entry = outgoing.allocate<StratUpdates>();
 
 	entry.m_fullObjID = fac->fullObjID;
 	entry.m_owner = (UCHAR)fac->country;
@@ -162,17 +164,17 @@ static void _populateEntry(Teul::Packet& outgoing, const FacilityStruct* fac)
 	entry.u_extra.m_capture.m_counter = fac->m_captureCounter;
 	entry.u_extra.m_capture.m_lastChange = teulTime() - fac->m_captureStateChanged;
 	entry.m_flags = (UCHAR)fac->flags;
-	if ( fac->isOpen() )
+	if (fac->isOpen())
 		entry.m_flags |= CP_STAT_OPEN;
 	else
 		entry.m_flags &= ~CP_STAT_OPEN;
 }
 
-static void _populateEntry(Teul::Packet& outgoing, const CPStruct* cp)
+static void _populateEntry(Teul::Packet &outgoing, const CPStruct *cp)
 {
-	auto& entry = outgoing.allocate<StratUpdates>();
+	auto &entry = outgoing.allocate<StratUpdates>();
 
-	assert( cp->fullObjID.id != 0 );
+	assert(cp->fullObjID.id != 0);
 	entry.m_fullObjID = cp->fullObjID;
 	entry.m_owner = (UCHAR)cp->country;
 	entry.u_extra.m_controller = (UCHAR)cp->controllingCountry;
@@ -185,22 +187,22 @@ static void _populateEntry(Teul::Packet& outgoing, const CPStruct* cp)
 void
 strtSendChatInitialUpdates()
 {
-	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST);
-	if ( endpoint == nullptr )
+	ENDPOINT *endpoint = serverPeerEndpointByType(CHAT_HOST);
+	if (endpoint == nullptr)
 		return;
 
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 	UINT32 entries = 0;
 
-	CPStruct* cp = strtGetCPList();
-	while ( cp != nullptr )
+	CPStruct *cp = strtGetCPList();
+	while (cp != nullptr)
 	{
 		// Bridges have totally BS data in them
-		if ( !cp->isBridge() )
+		if (!cp->isBridge())
 		{
 			// Write the facilities
-			FacilityStruct* fac = cp->facilityList;
-			while ( fac != nullptr )
+			FacilityStruct *fac = cp->facilityList;
+			while (fac != nullptr)
 			{
 				_populateEntry(outgoing, fac);
 				++entries;
@@ -215,7 +217,7 @@ strtSendChatInitialUpdates()
 		cp = cp->next;
 	}
 
-	if ( outgoing.empty() == false )
+	if (outgoing.empty() == false)
 		outgoing.send(*endpoint);
 
 	dbugLog(_FLI, "synced %u strat objects for chat host", entries);
@@ -226,37 +228,37 @@ strtBroadcastStratUpdates()
 {
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 
-	FacilityStruct* fac = nullptr;
-	while ( (fac = _facilityQueue.next()) != nullptr )
+	FacilityStruct *fac = nullptr;
+	while ((fac = _facilityQueue.next()) != nullptr)
 	{
 		_populateEntry(outgoing, fac);
 	}
 
-	CPStruct* cp = nullptr;
-	while ( (cp = _cpQueue.next()) != nullptr )
+	CPStruct *cp = nullptr;
+	while ((cp = _cpQueue.next()) != nullptr)
 	{
 		_populateEntry(outgoing, cp);
 	}
 
-	ObjectStruct* obj = nullptr;
-	while ( (obj = _objectQueue.next()) != nullptr )
+	ObjectStruct *obj = nullptr;
+	while ((obj = _objectQueue.next()) != nullptr)
 	{
-		auto& entry = outgoing.allocate<StratUpdates>();
+		auto &entry = outgoing.allocate<StratUpdates>();
 		entry.m_fullObjID = obj->fullObjID;
 		entry.m_flags = obj->effectiveVisLevel();
 		entry.u_extra.m_buildingDamagedBy = obj->m_damagedBy;
 	}
 
-	if ( outgoing.empty() == false )
+	if (outgoing.empty() == false)
 	{
 		serverSendPacketToPeers(outgoing);
 	}
 }
 
 SINT32
-strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool cancelled)
+strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL &weaponSerial, bool cancelled)
 {
-	MM_POST_EXPIRED expired { customerID, weaponSerial, cancelled };
+	MM_POST_EXPIRED expired{customerID, weaponSerial, cancelled};
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_EXPIRED_Y), expired);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
@@ -271,7 +273,7 @@ strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPatter
 
 SINT32 strtBroadcastConfigUpdate()
 {
-	for ( auto i = 0; i < MAX_COUNTRIES; ++i )
+	for (auto i = 0; i < MAX_COUNTRIES; ++i)
 	{
 		host_config.routDestination[i] = (routDestination[i] ? routDestination[i]->fullObjID.Key() : 0ULL);
 	}
@@ -281,42 +283,42 @@ SINT32 strtBroadcastConfigUpdate()
 
 SINT32 strtSendMMCrewBailed(UINT32 commanderID, UINT32 crewID)
 {
-	MM_CREW_BAILED bailed { commanderID, crewID };
+	MM_CREW_BAILED bailed{commanderID, crewID};
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_CREW_BAILED_Y), bailed);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32 strtSendMMJoinDeny(UINT32 crewID, UINT32 reasonCode)
 {
-	MM_JOIN_DENY deny { crewID, reasonCode };
+	MM_JOIN_DENY deny{crewID, reasonCode};
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), deny);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, ChatHandle crewHandle)
 {
-	MM_JOIN_LIST_RESPONSE response { commandID, crewID, crewHandle };
+	MM_JOIN_LIST_RESPONSE response{commandID, crewID, crewHandle};
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_LIST_Y), response);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
-//A lot smarter than the rest of the send functions, this function actually
+// A lot smarter than the rest of the send functions, this function actually
 // breaks the CP information inside this supercell into chunks that can
 // be sent easily
 SINT32
-strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
+strtSyncCPs(UINT32 address, UINT16 port, Supercell *sc)
 {
-	//Return an error if handed a NULL
+	// Return an error if handed a NULL
 	if (sc == nullptr)
 		return -1;
 
-	//Technically, a no-op is a success. :)
+	// Technically, a no-op is a success. :)
 	if (sc->numCPs == 0)
 		return 0;
 
 	UINT32 i, f;
-	UINT32 startID=0;
-	STRT_SYNC_CPS& syncCPs = strtGetSyncCPs();
+	UINT32 startID = 0;
+	STRT_SYNC_CPS &syncCPs = strtGetSyncCPs();
 	SINT32 fretval = 0, retval = 0, numLeft = 0;
 
 	syncCPs.sx = sc->x;
@@ -325,26 +327,26 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 	while (startID < sc->numCPs)
 	{
 		numLeft = sc->numCPs - startID;
-		//Figure out how many cps to send
+		// Figure out how many cps to send
 		if (numLeft > STRT_CPS_PER_SYNC)
 			syncCPs.numEntries = STRT_CPS_PER_SYNC;
 		else
 			syncCPs.numEntries = numLeft;
 
-		//Set our startID
+		// Set our startID
 		syncCPs.startID = startID;
 
 #ifdef DEBUG_SYNC
 		dbugLog(_FLD,"syncing server %s cps in supercell %d:%d, sending %d cps, from %d to %d"
 				, teulGetAddress(address), syncCPs.sx, syncCPs.sy, syncCPs.numEntries, syncCPs.startID, syncCPs.startID + syncCPs.numEntries - 1);
 #endif
-		//Make the message
-		for ( i = 0, f = startID; i < syncCPs.numEntries; ++i, ++f)
+		// Make the message
+		for (i = 0, f = startID; i < syncCPs.numEntries; ++i, ++f)
 		{
-			CPStruct* cp = &sc->cps[f];
+			CPStruct *cp = &sc->cps[f];
 			syncCPs.info[i].uOID = cp->uOID;
-			syncCPs.info[i].owner = (UCHAR) cp->country;
-			syncCPs.info[i].control = (UCHAR) cp->controllingCountry;
+			syncCPs.info[i].owner = (UCHAR)cp->country;
+			syncCPs.info[i].control = (UCHAR)cp->controllingCountry;
 			syncCPs.info[i].flags = cp->flags;
 
 #ifdef DEBUG_SYNC
@@ -353,144 +355,144 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 #endif
 		}
 
-		//Send the message
+		// Send the message
 		retval = teulSendTo(Server::broadcastIndex, address, port, _SEND_SYNC_CPS, &syncCPs);
 
 		if (retval < 0)
 		{
-			dbugLog(_FLA,"Error sending syncCPs to stratUpdater!");
+			dbugLog(_FLA, "Error sending syncCPs to stratUpdater!");
 			fretval = retval;
 		}
 
-		//Set the next startID
-		startID+=syncCPs.numEntries;
+		// Set the next startID
+		startID += syncCPs.numEntries;
 	}
 
 	return fretval;
 }
 
-//A lot smarter than the rest of the send functions, this function actually
+// A lot smarter than the rest of the send functions, this function actually
 // breaks the facility information inside this supercell into chunks that can
 // be sent easily
-SINT32 strtSyncFacilities(UINT32 address, UINT16 port, Supercell* sc)
+SINT32 strtSyncFacilities(UINT32 address, UINT16 port, Supercell *sc)
 {
-	//Return an error if handed a NULL
+	// Return an error if handed a NULL
 	if (sc == nullptr)
 		return -1;
 
-	//Technically, a no-op is a success. :)
+	// Technically, a no-op is a success. :)
 	if (sc->numFacilities == 0)
 		return 0;
 
 	UINT32 i, f;
-	UINT32 startID=0;
-	STRT_SYNC_FACILITIES& syncFacilities = strtGetSyncFacilities();
+	UINT32 startID = 0;
+	STRT_SYNC_FACILITIES &syncFacilities = strtGetSyncFacilities();
 	SINT32 fretval = 0, retval = 0, numLeft = 0;
 
 	syncFacilities.sx = sc->x;
 	syncFacilities.sy = sc->y;
 
-	const char* destination = teulGetAddress(address);
+	const char *destination = teulGetAddress(address);
 
 	while (startID < sc->numFacilities)
 	{
 		numLeft = sc->numFacilities - startID;
-		//Figure out how many facilities to send
+		// Figure out how many facilities to send
 		if (numLeft > STRT_FACILITIES_PER_SYNC)
 			syncFacilities.numEntries = STRT_FACILITIES_PER_SYNC;
 		else
 			syncFacilities.numEntries = numLeft;
 
-		//Set our startID
+		// Set our startID
 		syncFacilities.startID = startID;
 
 		dbugLog(_FLD,"syncing server %s facilities in supercell %d:%d, sending %d facilities, from %d to %d"
 					, destination, syncFacilities.sx, syncFacilities.sy, syncFacilities.numEntries, syncFacilities.startID, syncFacilities.startID + syncFacilities.numEntries - 1);
 
-		//Make the message
-		for ( i = 0, f = startID; i < syncFacilities.numEntries; ++i, ++f )
+		// Make the message
+		for (i = 0, f = startID; i < syncFacilities.numEntries; ++i, ++f)
 		{
 			syncFacilities.uOID[i] = sc->facilities[f].uOID;
-			syncFacilities.country[i] = (UCHAR) (sc->facilities[f].country | ((sc->facilities[f].isOpen()) ? FAC_OPEN_FLAG : 0));
-			syncFacilities.captureStage[i] = (UINT8) (sc->facilities[f].m_captureStage);
+			syncFacilities.country[i] = (UCHAR)(sc->facilities[f].country | ((sc->facilities[f].isOpen()) ? FAC_OPEN_FLAG : 0));
+			syncFacilities.captureStage[i] = (UINT8)(sc->facilities[f].m_captureStage);
 			syncFacilities.captureCounter[i] = (sc->facilities[f].m_captureCounter);
-			syncFacilities.captureStateChanged[i] = (UINT32) (teulTime() - sc->facilities[f].m_captureStateChanged);
+			syncFacilities.captureStateChanged[i] = (UINT32)(teulTime() - sc->facilities[f].m_captureStateChanged);
 #ifdef DEBUG_SYNC
 			dbugLog(_FLD,"facility %d => %u open %d sending %x",f, sc->facilities[f].uOID, sc->facilities[f].isOpen(), syncFacilities.country[f]);
 #endif
 		}
 
-		//Send the message
+		// Send the message
 		retval = teulSendTo(Server::broadcastIndex, address, port, _SEND_SYNC_FACILITIES, &syncFacilities);
 
 		if (retval < 0)
 		{
-			dbugLog(_FLA,"Error sending syncFacilities to stratUpdater!");
+			dbugLog(_FLA, "Error sending syncFacilities to stratUpdater!");
 			fretval = retval;
 		}
 
-		//Set the next startID
-		startID+=syncFacilities.numEntries;
+		// Set the next startID
+		startID += syncFacilities.numEntries;
 	}
 
 	return fretval;
 }
 
-//A lot smarter than the rest of the send functions, this function actually
+// A lot smarter than the rest of the send functions, this function actually
 // breaks the object information inside this supercell into chunks that can
 // be sent easily
-SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell* sc)
+SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell *sc)
 {
-	//Return an error if handed a NULL
+	// Return an error if handed a NULL
 	if (sc == nullptr)
 		return -1;
 
-	//Technically, a no-op is a success. :)
+	// Technically, a no-op is a success. :)
 	if (sc->numObjects == 0)
 		return 0;
 
 	UINT32 i, f;
-	UINT32 startID=0;
-	STRT_SYNC_BUILDINGS& syncBuildings = strtGetSyncBuildings();
+	UINT32 startID = 0;
+	STRT_SYNC_BUILDINGS &syncBuildings = strtGetSyncBuildings();
 	SINT32 fretval = 0, retval = 0, numLeft = 0;
 
 	syncBuildings.sx = sc->x;
 	syncBuildings.sy = sc->y;
 
-	const char* destination = teulGetAddress(address);
+	const char *destination = teulGetAddress(address);
 
 	while (startID < sc->numObjects)
 	{
 		numLeft = sc->numObjects - startID;
-		//Figure out how many objects to send
-		if ( numLeft > STRT_BUILDINGS_PER_SYNC)
+		// Figure out how many objects to send
+		if (numLeft > STRT_BUILDINGS_PER_SYNC)
 			syncBuildings.numEntries = STRT_BUILDINGS_PER_SYNC;
 		else
 			syncBuildings.numEntries = numLeft;
 
-		//Set our startID
+		// Set our startID
 		syncBuildings.startID = startID;
 
-//#ifdef DEBUG_SYNC
+		//#ifdef DEBUG_SYNC
 		dbugLog(_FLD,"syncing server %s objects in supercell %d:%d, sending %u objects, from %u to %u"
 				, destination, syncBuildings.sx, syncBuildings.sy, syncBuildings.numEntries, syncBuildings.startID, syncBuildings.startID + syncBuildings.numEntries - 1);
-//#endif
-		//Make the message
-		for ( i = 0, f = startID; i < syncBuildings.numEntries; ++i, ++f )
+		//#endif
+		// Make the message
+		for (i = 0, f = startID; i < syncBuildings.numEntries; ++i, ++f)
 		{
-			syncBuildings.vislevel[i] = (UCHAR) sc->objects[f].effectiveVisLevel();
+			syncBuildings.vislevel[i] = (UCHAR)sc->objects[f].effectiveVisLevel();
 		}
 
-		//Send the message
+		// Send the message
 		retval = teulSendTo(Server::broadcastIndex, address, port, _SEND_SYNC_BUILDINGS, &syncBuildings);
 
 		if (retval < 0)
 		{
-			dbugLog(_FLA,"Error sending syncBuildings to stratUpdater!");
+			dbugLog(_FLA, "Error sending syncBuildings to stratUpdater!");
 			fretval = retval;
 		}
 
-		//Set the next startID
+		// Set the next startID
 		startID += syncBuildings.numEntries;
 	}
 
@@ -502,39 +504,39 @@ strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request,
 {
 	MM_CAPACITY_RESPONSE response;
 
-	if ( strtProcessCapacityRequest(request, response, destFacilityID, vehicleDelivered) < 0 )
+	if (strtProcessCapacityRequest(request, response, destFacilityID, vehicleDelivered) < 0)
 	{
 		dbugLog(_FLA, "recieved unprocessible capacity request for facility " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(request.facility));
 	}
 
-	//Send the response
+	// Send the response
 	if ((teulSend(teulIndex, _XCHG_MM_CAPACITY, &response)) < 0)
 	{
-		dbugLog(_FLA,"error sending capacity response");
+		dbugLog(_FLA, "error sending capacity response");
 		return false;
 	}
 
 	return true;
 }
 
-static SINT32 _recvEnemyReport(ACTION_OBJECT* const a)
+static SINT32 _recvEnemyReport(ACTION_OBJECT *const a)
 {
 	STRAT_ENEMY_REPORT report;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &report, sizeof(STRAT_ENEMY_REPORT));
 
-	if ( a->offset > 0 )
+	if (a->offset > 0)
 	{
-		dbugLog(_FLI,"received enemy report for vehicle " PRF_WEAPON_SERIAL "", PRA_WEAPON_SERIAL(report.enemyReported));
+		dbugLog(_FLI, "received enemy report for vehicle " PRF_WEAPON_SERIAL "", PRA_WEAPON_SERIAL(report.enemyReported));
 
-		if (! strtAddEnemyReport(report))
+		if (!strtAddEnemyReport(report))
 			return -EINVAL;
 	}
 
 	return a->offset;
 }
 
-static SINT32 _recvMMPostRequest(ACTION_OBJECT* const a)
+static SINT32 _recvMMPostRequest(ACTION_OBJECT *const a)
 {
 	MM_POST_REQUEST postRequest;
 	MM_POST_ACCEPT postAccept;
@@ -554,24 +556,24 @@ static SINT32 _recvMMPostRequest(ACTION_OBJECT* const a)
 
 	if (strtProcessPostRequest(a->teulIndex, postRequest, postAccept, postDeny))
 	{
-		if (teulSend(a->teulIndex,_SEND_MM_POST_ACCEPT,&postAccept) < 0)
-			dbugLog(_FLA,"Error sending mm post accept");
+		if (teulSend(a->teulIndex, _SEND_MM_POST_ACCEPT, &postAccept) < 0)
+			dbugLog(_FLA, "Error sending mm post accept");
 	}
 	else
 	{
-		if (teulSend(a->teulIndex,_SEND_MM_POST_DENY,&postDeny) < 0)
-			dbugLog(_FLA,"Error sending mm post deny");
+		if (teulSend(a->teulIndex, _SEND_MM_POST_DENY, &postDeny) < 0)
+			dbugLog(_FLA, "Error sending mm post deny");
 	}
 
 	return a->offset;
 }
 
-static SINT32 _sendMMPostAccept(ACTION_OBJECT* const a)
+static SINT32 _sendMMPostAccept(ACTION_OBJECT *const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_ACCEPT));
 }
 
-static SINT32 _sendMMPostDeny(ACTION_OBJECT* const a)
+static SINT32 _sendMMPostDeny(ACTION_OBJECT *const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_DENY));
 }
@@ -581,7 +583,7 @@ _recvMMPostListRequest(ACTION_OBJECT* const a)
 {
 	MM_POST_LIST_REQUEST postListRequest;
 
-	a->offset =  teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postListRequest, sizeof(MM_POST_LIST_REQUEST));
+	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postListRequest, sizeof(MM_POST_LIST_REQUEST));
 
 #ifdef DEBUG
 	dbugLog(_FLD,"postListReq: %d %d:%d:%d:%d:%d", postListRequest.crewID, postListRequest.facility.cell.ox, postListRequest.facility.cell.oy, postListRequest.facility.id, postListRequest.facility.objClass, postListRequest.facility.objType);
@@ -592,11 +594,11 @@ _recvMMPostListRequest(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32 _recvMMJoinRequest(ACTION_OBJECT* const a)
+static SINT32 _recvMMJoinRequest(ACTION_OBJECT *const a)
 {
-MM_JOIN_REQUEST joinRequest;
-MM_JOIN_ACCEPT joinAccept;
-MM_JOIN_DENY joinDeny;
+	MM_JOIN_REQUEST joinRequest;
+	MM_JOIN_ACCEPT joinAccept;
+	MM_JOIN_DENY joinDeny;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &joinRequest, sizeof(MM_JOIN_REQUEST));
 
@@ -608,47 +610,47 @@ MM_JOIN_DENY joinDeny;
 
 	if (strtProcessJoinRequest(joinRequest, joinAccept, joinDeny))
 	{
-		if (teulSend(a->teulIndex,_SEND_MM_JOIN_ACCEPT,&joinAccept) < 0)
-			dbugLog(_FLA,"Error sending mm join accept");
+		if (teulSend(a->teulIndex, _SEND_MM_JOIN_ACCEPT, &joinAccept) < 0)
+			dbugLog(_FLA, "Error sending mm join accept");
 	}
 	else
 	{
-		if (teulSend(a->teulIndex,_SEND_MM_JOIN_DENY,&joinDeny) < 0)
-			dbugLog(_FLA,"Error sending mm join deny");
+		if (teulSend(a->teulIndex, _SEND_MM_JOIN_DENY, &joinDeny) < 0)
+			dbugLog(_FLA, "Error sending mm join deny");
 	}
 	return a->offset;
 }
 
-static SINT32 _sendMMJoinAccept(ACTION_OBJECT* const a)
+static SINT32 _sendMMJoinAccept(ACTION_OBJECT *const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_JOIN_ACCEPT));
 }
 
-static SINT32 _sendMMJoinDeny(ACTION_OBJECT* const a)
+static SINT32 _sendMMJoinDeny(ACTION_OBJECT *const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_JOIN_DENY));
 }
 
-static SINT32 _recvMMSpawnGrantRequest(ACTION_OBJECT* const a)
+static SINT32 _recvMMSpawnGrantRequest(ACTION_OBJECT *const a)
 {
-MM_SPAWN_GRANT_REQUEST spawnGrantRequest;
-MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
+	MM_SPAWN_GRANT_REQUEST spawnGrantRequest;
+	MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &spawnGrantRequest, sizeof(MM_SPAWN_GRANT_REQUEST));
 
 	dbugLog(_FLD, "spawnGrantRequest: %d %d:%d:%d:%d:%d %d:%d:%d:%d", spawnGrantRequest.weaponSerial.serial, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id, spawnGrantRequest.weaponSerial.source.objClass, spawnGrantRequest.weaponSerial.source.objType, spawnGrantRequest.weaponSerial.spec.wCountry, spawnGrantRequest.weaponSerial.spec.wCategory, spawnGrantRequest.weaponSerial.spec.wClass, spawnGrantRequest.weaponSerial.spec.wType);
 
 	const bool success = strtProcessSpawnGrantRequest(spawnGrantRequest, spawnGrantResponse);
-	if ( success )
+	if (success)
 	{
-		//serious hack here!!!
+		// serious hack here!!!
 		MM_CAPACITY_REQUEST mmCapacityReq;
 		MM_CAPACITY_RESPONSE mmCapacityResponse;
 
 		mmCapacityReq.facility = spawnGrantRequest.facility;
 		if (strtProcessCapacityRequest(mmCapacityReq, mmCapacityResponse, nullObjID, false) < 0)
 		{
-			//cry
+			// cry
 			dbugLog(_FLA, "couldn't process process capacity request for x:%d y:%d id:%d"
 						,spawnGrantRequest.facility.cell.ox
 						,spawnGrantRequest.facility.cell.oy
@@ -658,12 +660,12 @@ MM_SPAWN_GRANT_RESPONSE spawnGrantResponse;
 	}
 
 	if ((teulSend(a->teulIndex, _XCHG_MM_SPAWN_GRANT, &spawnGrantResponse)) < 0)
-		dbugLog(_FLA,"Error sending spawn grant response");
+		dbugLog(_FLA, "Error sending spawn grant response");
 
 	return a->offset;
 }
 
-static SINT32 _sendMMSpawnGrantResponse(ACTION_OBJECT* const a)
+static SINT32 _sendMMSpawnGrantResponse(ACTION_OBJECT *const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_SPAWN_GRANT_RESPONSE));
 }
@@ -677,7 +679,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	dbugLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
-	if ( !strtProcessJoinListRequest(a->teulIndex, request) )
+	if (!strtProcessJoinListRequest(a->teulIndex, request))
 	{
 		dbugLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
 		strtSendMMJoinDeny(request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
@@ -687,7 +689,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 }
 
 
-static SINT32 _recvMMPostInfoUpdate(ACTION_OBJECT* const a)
+static SINT32 _recvMMPostInfoUpdate(ACTION_OBJECT *const a)
 {
 	MM_POST_INFO_UPDATE update;
 
@@ -701,7 +703,7 @@ static SINT32 _recvMMPostInfoUpdate(ACTION_OBJECT* const a)
 }
 
 
-static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
+static SINT32 _recvMMPostCancel(ACTION_OBJECT *const a)
 {
 	MM_POST_CANCEL postCancel;
 
@@ -713,9 +715,9 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 					);
 }
 
-static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
+static SINT32 _recvWeaponsReturn(ACTION_OBJECT *const a)
 {
-	WeaponsReturn& incoming = *(WeaponsReturn*)(a->packed);
+	WeaponsReturn &incoming = *(WeaponsReturn *)(a->packed);
 
 	dbugLog(_FLD,"_recvWeaponsReturn: %u (%s/%s%s)"
 			, incoming.m_sortieID
@@ -750,16 +752,16 @@ static SINT32
 _recvSyncDamageList(ACTION_OBJECT* const a)
 {
 #ifdef DEBUG_HEAVY
-	dbugLog(_FLD,"Recieved %u damage messages from stratUpdater %s",numItems, teulGetAddress(a->fromAddress));
+	dbugLog(_FLD, "Recieved %u damage messages from stratUpdater %s", numItems, teulGetAddress(a->fromAddress));
 #endif
 
 	// The cell sends a raw stream of DAMAGE_QUEUE entries.
-	const DAMAGE_QUEUE_ENTRY* const entries = (DAMAGE_QUEUE_ENTRY*)(a->packed);
+	const DAMAGE_QUEUE_ENTRY *const entries = (DAMAGE_QUEUE_ENTRY *)(a->packed);
 	const size_t numEntries = a->sizeInBytes() / sizeof(*entries);
 	FULL_OBJ_ID fullObjID;
-	for ( size_t i = 0; i < numEntries; ++i )
+	for (size_t i = 0; i < numEntries; ++i)
 	{
-		const DAMAGE_QUEUE_ENTRY& entry = entries[i];
+		const DAMAGE_QUEUE_ENTRY &entry = entries[i];
 		fullObjID.FromKey(entry.objectKey);
 		strtDamage(fullObjID, entry.damageJoules, entry.weapon, entry.playerID);
 	}
@@ -770,12 +772,12 @@ _recvSyncDamageList(ACTION_OBJECT* const a)
 bool
 _requestRequiresWeaponReturn(const MM_CAPACITY_REQUEST& request, SINT32 teulIndex)
 {
-	if ( request.rtb != RTB_SUCCESS )
+	if (request.rtb != RTB_SUCCESS)
 		return false;
 
 	// Can we find valid data for this user climbing into a vehicle?
-	WeapJoinRequestNode* const joinNode = WeapJoinRequestNode::Lookup(request.customerID);
-	if ( joinNode == nullptr || joinNode->m_joinList == nullptr || joinNode->m_joinList->m_weapon == nullptr )
+	WeapJoinRequestNode *const joinNode = WeapJoinRequestNode::Lookup(request.customerID);
+	if (joinNode == nullptr || joinNode->m_joinList == nullptr || joinNode->m_joinList->m_weapon == nullptr)
 		return false;
 
 	dbugLog(_FLD, "queueing capacity request for %u to ti:%d", request.customerID, teulIndex);
@@ -788,7 +790,7 @@ _requestRequiresWeaponReturn(const MM_CAPACITY_REQUEST& request, SINT32 teulInde
 static SINT32
 _recvMMCapacityRequest(ACTION_OBJECT* const a)
 {
-	if ( (size_t)a->sizeInBytes() < sizeof(MM_CAPACITY_REQUEST) )
+	if ((size_t)a->sizeInBytes() < sizeof(MM_CAPACITY_REQUEST))
 	{
 		dbugLog(_FLA, "illegal capacity request");
 		return -EINVAL;
@@ -805,7 +807,7 @@ _recvMMCapacityRequest(ACTION_OBJECT* const a)
 
 	// If this is an RTB_SUCCESS, then there is a chance we will reserve the vehicle,
 	// so we need to attach this request to the join node for that vehicle
-	if ( _requestRequiresWeaponReturn(request, a->teulIndex) )
+	if (_requestRequiresWeaponReturn(request, a->teulIndex))
 		return a->offset;
 
 	strtReplyToCapacityRequest(a->teulIndex, request, nullObjID, false);
@@ -819,22 +821,22 @@ _sendMMCapacityResponse(ACTION_OBJECT* const a)
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_CAPACITY_RESPONSE));
 }
 
-static SINT32 _sendSyncCPs(ACTION_OBJECT* const a)
+static SINT32 _sendSyncCPs(ACTION_OBJECT *const a)
 {
-	return strtPackSyncCPs(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_CPS*) a->localRawData, 0);
+	return strtPackSyncCPs(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_CPS *)a->localRawData, 0);
 }
 
-static SINT32 _sendSyncFacilities(ACTION_OBJECT* const a)
+static SINT32 _sendSyncFacilities(ACTION_OBJECT *const a)
 {
-	return strtPackSyncFacilities(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_FACILITIES*) a->localRawData, 0);
+	return strtPackSyncFacilities(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_FACILITIES *)a->localRawData, 0);
 }
 
-static SINT32 _sendSyncBuildings(ACTION_OBJECT* const a)
+static SINT32 _sendSyncBuildings(ACTION_OBJECT *const a)
 {
-	return strtPackSyncBuildings(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_BUILDINGS*) a->localRawData, 0);
+	return strtPackSyncBuildings(TEUL_PACK, a->packed, a->offset, (STRT_SYNC_BUILDINGS *)a->localRawData, 0);
 }
 
-template<>
+template <>
 SINT32
 SERIAL_NUMBER_REQUEST::receive(SINT32 teulIndex, SERIAL_NUMBER_REQUEST& incoming)
 {
@@ -850,11 +852,11 @@ static SINT32
 _recvLua(ACTION_OBJECT* const a)
 {
 	const UINT32 bytes = a->sizeInBytes();
-	if ( bytes <= 1 )	// null byte is included
+	if (bytes <= 1) // null byte is included
 		return a->offset;
 
-	const char* const input = (char*)(a->packed);
-	if ( input[bytes - 1] != '\0' )
+	const char *const input = (char *)(a->packed);
+	if (input[bytes - 1] != '\0')
 	{
 		char sender[81];
 		if (a->endpoint)
@@ -867,7 +869,7 @@ _recvLua(ACTION_OBJECT* const a)
 
 	dbugLog(_FLI, "luaSrc: received command: %s", input);
 
-	if ( input[0] == ';' )
+	if (input[0] == ';')
 	{
 		std::string object(cv_luaPath.GetString());
 		object += input + 1;
@@ -882,11 +884,11 @@ _recvLua(ACTION_OBJECT* const a)
 		Lua::RunObject(sender, object);
 	}
 
-	Lua::SCRIPT_RESULTS& results = Lua::Results();
+	Lua::SCRIPT_RESULTS &results = Lua::Results();
 	dbugLog(_FLI, "luaSrv: returning %" PRSizeT " lines of results", results.size());
 	Lua::SCRIPT_RESULTS::iterator it;
 	std::string reply = "";
-	for ( it = results.begin(); it != results.end(); ++it )
+	for (it = results.begin(); it != results.end(); ++it)
 	{
 		reply += *it;
 	}
@@ -910,26 +912,26 @@ _recvLua(ACTION_OBJECT* const a)
 static SINT32
 _recvCaptureContrib(ACTION_OBJECT* const a)
 {
-	//dbugLog(_FLN, "Strat receive capture contrib.");
+	// dbugLog(_FLN, "Strat receive capture contrib.");
 
-	if ( a->canRead<Strat::CaptureContributionEvent>() == false )
+	if (a->canRead<Strat::CaptureContributionEvent>() == false)
 		return -EINVAL;
 
-	auto& event = a->read<Strat::CaptureContributionEvent>();
+	auto &event = a->read<Strat::CaptureContributionEvent>();
 	dbugLog(_FLD, "p:%u c:%s v:%u m:%u f:%u hcu:%u status:%u"
 					, event.m_playerID, Chat::Name(event.m_handle).c_str(), event.m_sortieID
 					, event.m_missionID, event.m_facilityID, event.m_unitID
 					, event.m_status
 					);
 
-	FacilityStruct* forFacility = strtGetFacilityByOID(event.m_facilityID);
-	if ( nullptr == forFacility )
+	FacilityStruct *forFacility = strtGetFacilityByOID(event.m_facilityID);
+	if (nullptr == forFacility)
 	{
 		dbugLog(_FLA, "p:%u c:%s %s: invalid facilityID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_facilityID);
 		return -EINVAL;
 	}
-	HCUnit* forUnit = HCUnit::Lookup(event.m_unitID);
-	if ( nullptr == forUnit )
+	HCUnit *forUnit = HCUnit::Lookup(event.m_unitID);
+	if (nullptr == forUnit)
 	{
 		dbugLog(_FLA, "p:%u c:%s %s: invalid unitID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_unitID);
 		return -EINVAL;
@@ -946,14 +948,14 @@ _recvCaptureContrib(ACTION_OBJECT* const a)
 static SINT32
 _recvPopulationNotice(ACTION_OBJECT* const a)
 {
-	for ( UINT32 i = 0; i < MAX_SIDES; ++i )
+	for (UINT32 i = 0; i < MAX_SIDES; ++i)
 	{
 		g_chatPopulations[i] = a->read<UINT32>();
 	}
 
 	dbugLog(_FLI, "Unpacked chat population notice; Allies: %u, Axis: %u", g_chatPopulations[ALLIED], g_chatPopulations[AXIS]);
 
-		// Set total players
+	// Set total players
 	g_chatPopulations[WWII_NO_SIDE] = g_chatPopulations[ALLIED] + g_chatPopulations[AXIS];
 
 	// Recalculate the objective limits
@@ -968,7 +970,7 @@ _recvPopulationNotice(ACTION_OBJECT* const a)
 static SINT32
 _recvAttackOrder(ACTION_OBJECT* const a)
 {
-	AttackOrder& order = a->read<AttackOrder>();
+	AttackOrder &order = a->read<AttackOrder>();
 	order.process();
 	return a->offset;
 }
@@ -977,14 +979,14 @@ void
 AttackOrder::process()
 {
 	m_result = SCMD_NO_EFFECT;
-	CPStruct* cp = strtGetCPorBridge(m_target);
-	HCUnit* unit = HCUnit::Lookup((UINT32)m_brigadeID);
+	CPStruct *cp = strtGetCPorBridge(m_target);
+	HCUnit *unit = HCUnit::Lookup((UINT32)m_brigadeID);
 
-	if ( cp == nullptr )
+	if (cp == nullptr)
 	{
 		dbugLog(_FLA, "AttackOrder(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(m_target));
 	}
-	else if ( unit == nullptr )
+	else if (unit == nullptr)
 	{
 		dbugLog(_FLA, "AttackOrder(%u) invalid unit", m_brigadeID);
 		return;
@@ -993,20 +995,20 @@ AttackOrder::process()
 	{
 		switch (m_orderType)
 		{
-		case ORD_ATTACK:
-			dbugLog(_FLD, "received ORD_ATTACK order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
-			m_result = cp->requestAttack(m_execute, m_brigadeID);
-		break;
-		case ORD_DEFEND:
-			dbugLog(_FLD, "received ORD_DEFEND order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
-			m_result = cp->requestDefend(unit->side(), m_execute);
-		break;
-		case ORD_CLEAR:
-			dbugLog(_FLD, "received ORD_CLEAR order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
-			m_result = cp->requestClear(unit->side(), m_delay, m_execute);
-		break;
-		default:
-			LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
+			case ORD_ATTACK:
+				dbugLog(_FLD, "received ORD_ATTACK order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
+				m_result = cp->requestAttack(m_execute, m_brigadeID);
+				break;
+			case ORD_DEFEND:
+				dbugLog(_FLD, "received ORD_DEFEND order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
+				m_result = cp->requestDefend(unit->side(), m_execute);
+				break;
+			case ORD_CLEAR:
+				dbugLog(_FLD, "received ORD_CLEAR order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
+				m_result = cp->requestClear(unit->side(), m_delay, m_execute);
+				break;
+			default:
+				LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
 		}
 	}
 	dbugLog(_FLD, " result: %u", m_result);
@@ -1020,7 +1022,7 @@ bool
 CPStruct::placeAttackObjective(const StratHCUnit* byUnit)
 {
 	static const ChatHandle systemID = chatGetHandle("SYSTEM");
-	if ( byUnit == nullptr )
+	if (byUnit == nullptr)
 		return false;
 	AttackOrder order(systemID, byUnit->unitID(), fullObjID, ORD_ATTACK, true);
 	order.process();
@@ -1033,16 +1035,16 @@ CPStruct::placeAttackObjective(const StratHCUnit* byUnit)
 static SINT32
 _recvWeaponListRequest(ACTION_OBJECT* const a)
 {
-	if ( a->canRead<WeaponListRequest>() == false )
+	if (a->canRead<WeaponListRequest>() == false)
 		return -EINVAL;
-	auto& request = a->read<WeaponListRequest>();
+	auto &request = a->read<WeaponListRequest>();
 
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
-	auto& reply = outgoing.construct<FacilityWeaponList>(request.m_playerID, request.m_fullObjID);
+	auto &reply = outgoing.construct<FacilityWeaponList>(request.m_playerID, request.m_fullObjID);
 	try
 	{
-		FacilityStruct* facility = strtGetFacility(request.m_fullObjID);
-		if ( facility == nullptr )
+		FacilityStruct *facility = strtGetFacility(request.m_fullObjID);
+		if (facility == nullptr)
 		{
 			dbugLog(_FLI, "p:%u hc:%u requested unknown facility " PRF_FULL_OBJ_ID ""
 							, request.m_playerID, request.m_brigadeID
@@ -1052,11 +1054,11 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 		}
 
 		UINT32 supplyingBrigade = strtGetSupplyingUnit(*facility, request.m_brigadeID);
-		if ( supplyingBrigade == 0 )
+		if (supplyingBrigade == 0)
 			supplyingBrigade = request.m_brigadeID;
 
-		StratHCUnit* unit = StratHCUnit::Lookup(supplyingBrigade);
-		if ( unit == nullptr )
+		StratHCUnit *unit = StratHCUnit::Lookup(supplyingBrigade);
+		if (unit == nullptr)
 		{
 			dbugLog(_FLI, "p:%u requested FWL for unknown brigade %u"
 							, request.m_playerID, request.m_brigadeID
@@ -1064,10 +1066,10 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 			throw FacilityWeaponList::_INVALID;
 		}
 
-		if ( !reply.populate(*unit, *facility, request.m_playerID, request.m_permMask) )
+		if (!reply.populate(*unit, *facility, request.m_playerID, request.m_permMask))
 			throw FacilityWeaponList::_INVALID;
 	}
-	catch ( FacilityWeaponList::REASON_CODE& reason )
+	catch (FacilityWeaponList::REASON_CODE &reason)
 	{
 		reply.m_status = reason;
 		// Don't send any weapons, and make the client wait before auto-refreshing.
@@ -1080,23 +1082,91 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
+static SINT32 _recvMMGarrisonCountryChangeRequest(ACTION_OBJECT *const a)
+{
+	GarrisonCountryChangeReq request(a);
+    request.strtProcessRequest();
+    //dbugLog(_FLD, "GarrisonCountryChangeReq received on strat host from %d to change CP %u to country %u ", request.m_clientsTeulIndex, request.m_cp.id, request.m_country);
+    return teulSend(a->teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, &request);
+}
+
+void GarrisonCountryChangeReq::strtProcessRequest()
+{
+	if (m_result == GCR_REQUESTING)
+	{
+		CPStruct *cp = strtGetCP(m_cp);
+		if (cp == nullptr)
+		{
+			dbugLog(_FLI, "GarrisonCountryChangeReq(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(m_cp));
+		}
+		else
+		{
+			if (cp->isContested())
+			{
+				m_result = GCR_FAILED_HAS_OBJECTIVE;
+                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is contested.");
+			}
+			else if (wwiiSide(m_country) != wwiiSide(cp->country))
+			{
+				m_result = GCR_FAILED_WRONG_OWNER;
+                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the other side.");
+			}
+            else if (m_country == cp->country)
+            {
+                m_result = GCR_FAILED_OWNER_ALREADY;
+                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the requested country already.");
+            }
+            // TODO Add some checks here for percentages of UK, French and US towns already on the front line.
+
+            if (m_result == GCR_REQUESTING)
+            {
+                if (cp->changeOwnership(m_country, true, true))
+                {
+                    cp->changeAllGarrisonCountries(m_country);
+                    m_result = GCR_APPROVED;
+                    dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %d to change CP %u to country %u ", m_clientsTeulIndex, m_cp.id, m_country);
+                }
+                else
+                {
+                    dbugLog(_FLI, "GarrisonCountryChangeReq cp->changeOwnership failed for %s whilst changing from country %u to %u",
+                            cp->name, cp->country, m_country);
+                    m_result = GCR_FAILED;
+                }
+            }
+		}
+	}
+}
+
+
+SINT32 GarrisonCountryChangeReq::sendToMap(SINT32 teulIndex) 
+{ 
+    return teulSend(teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, this); 
+}
+
+
+static SINT32 _sendMMGarrisonCountryChangeResponse(ACTION_OBJECT *const a)
+{
+	GarrisonCountryChangeReq *request = (GarrisonCountryChangeReq *)(a->localRawData);
+    //dbugLog(_FLD, "GarrisonCountryChangeResponse is being sent to the map host from strat with a client teulindex of %d to change CP %u to country %u ", request->m_clientsTeulIndex, request->m_cp.id, request->m_country);
+    return request->packer(TEUL_PACK, a);
+}
+
 //////////////////////////////////////////////////////////////////////
 // Host-host and luaclient messages.
 
-static SINT32
-_registerInterHostCallbacks()
-{
+static SINT32 
+_registerInterHostCallbacks(){
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
-	{
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	}
-	END_CALLBACK_REGISTRATION(Host::CallbackX)
+    {
+        REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
+    }
+    END_CALLBACK_REGISTRATION(Host::CallbackX)
 }
 
 //////////////////////////////////////////////////////////////////////
 // Public functions
 
-//Installs our callbacks
+// Installs our callbacks
 SINT32
 strtHostInstallCallbacks()
 {
@@ -1108,6 +1178,7 @@ strtHostInstallCallbacks()
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_RECEIVER(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest);
 		REGISTER_RECVSEND(STRT_MM_CAPACITY_Y, _recvMMCapacityRequest, _sendMMCapacityResponse, _XCHG_MM_CAPACITY);
+		REGISTER_RECVSEND(STRT_MM_GARRISON_COUNTRY_CHANGE_Y, _recvMMGarrisonCountryChangeRequest, _sendMMGarrisonCountryChangeResponse, _XCHG_MM_GARRISON_COUNTRY_CHANGE);
 
 		REGISTER_RECEIVER(STRT_SYNC_DAMAGE_LIST_Y, _recvSyncDamageList);
 		REGISTER_RECEIVER(STRT_MM_POST_REQ_Y, _recvMMPostRequest);
@@ -1143,7 +1214,7 @@ strtHostInstallCallbacks()
 void
 strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
-	//dbugLog(_FLN, "Strat strtSendCaptureScoreNotice()");
+	// dbugLog(_FLN, "Strat strtSendCaptureScoreNotice()");
 
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));
@@ -1157,12 +1228,11 @@ strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 void
 strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable)
 {
-	//dbugLog(_FLN, "Strat send capture state.");
+	// dbugLog(_FLN, "Strat send capture state.");
 
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureState_Y));
-	auto& state = outgoing.allocate<CaptureState>();
+	auto &state = outgoing.allocate<CaptureState>();
 	state.populate(facility, forSide, rate, spawnable);
 
 	serverSendPacketToType(outgoing, CELL_HOST);
 }
-

@@ -37,6 +37,8 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiOpinionPoll.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
+#include "strt/strtMapMessages.h"
 
 #define SPAWN_AT_DEPOTS
 
@@ -51,6 +53,7 @@ static	TEUL_CALLBACK*	_XCHG_MISSION_LIST;
 static	TEUL_CALLBACK*	_SEND_HCUNIT_LIST;
 static	TEUL_CALLBACK*	_SEND_ARENA_DESCRIPTION;
 static	TEUL_CALLBACK*	_SEND_TUT_PROGRESS;
+static	TEUL_CALLBACK*	_XCHG_GARRISON_COUNTRY_CHANGE;
 
 SINT32
 HCUnitList::send(SINT32 teulIndex)
@@ -166,10 +169,28 @@ _sendBrigadeSelectResponse(ACTION_OBJECT* const a)
 	return bs->packer(TEUL_PACK, a);
 }
 
+// Receive a Garrison country change request from a client and forward it onto the Strat host.
+SINT32
+_recvGarrisonCountryChangeRequest(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq request(a);
+    request.m_clientsTeulIndex = a->teulIndex;
+	//dbugLog(_FLD, "GarrisonCountryChangeReq received on map host from %d to change CP %u to country %u ", request.m_clientsTeulIndex, request.m_cp.id, request.m_country);
+	return strtSendGarrisonCountryChangeRequest(request);
+}
+
+SINT32
+_sendGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq* gcc = (GarrisonCountryChangeReq*)(a->localRawData);
+	//dbugLog(_FLD, "GarrisonCountryChangeResponce is being sent to the client.");
+	return gcc->packer(TEUL_PACK, a);
+}
+
 SINT32
 BrigadeSelection::send(SINT32 teulIndex)
 {
-	dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
+	//dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
 	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this);
 }
 
@@ -208,6 +229,19 @@ SINT32
 ArenaDescription::send(SINT32 teulIndex)
 {
 	return teulSend(teulIndex, _SEND_ARENA_DESCRIPTION, this);
+}
+
+SINT32
+mmhostToClientGarrisonCountryChange(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq request(a);
+    //dbugLog(_FLD, "GarrisonCountryChangeResponse received from strat with a client teulindex of %i to change CP %i to country %i Now sending back to the client. ", request.m_clientsTeulIndex, request.m_cp, request.m_country);
+	return request.sendToClient(request.m_clientsTeulIndex);
+}
+
+// Request a objective list
+SINT32 GarrisonCountryChangeReq::sendToClient(SINT32 teulIndex) {
+	return teulSend(teulIndex, _XCHG_GARRISON_COUNTRY_CHANGE, this);
 }
 
 namespace Map
@@ -293,6 +327,7 @@ HostInstallCallbacks()
 		REGISTER_RECVSEND(Map::XCHG_BRIGADE_LIST_Y, _recvBrigadeListRequest, _sendBrigadeListResponse, _XCHG_BRIGADE_LIST);
 		REGISTER_RECVSEND(Map::XCHG_BRIGADE_SELECT_Y, _recvBrigadeSelectRequest, _sendBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);
 		REGISTER_RECVSEND(Map::XCHG_MISSION_LIST_Y, _recvMissionListRequest, _sendMissionListResponse, _XCHG_MISSION_LIST);
+		REGISTER_RECVSEND(Map::_XCHG_GARRISON_COUNTRY_CHANGE_Y, _recvGarrisonCountryChangeRequest, _sendGarrisonCountryChangeResponse, _XCHG_GARRISON_COUNTRY_CHANGE);
 
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
 		REGISTER_MSG_SENDER(Map::HC_UNIT_COUNTRY_CHANGE_Y, HC_UNIT_COUNTRY_CHANGES);

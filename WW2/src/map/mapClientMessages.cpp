@@ -26,6 +26,7 @@
 #include "wwii/wwiiOpinionPoll.h"
 #include "wwii/wwiiPack.h"
 #include "map/mapSupercellVislevelXfer.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 static	TEUL_CALLBACK*	MAP_SEND_EXIT_WWIIOL;
 static	TEUL_CALLBACK*	_XCHG_PERSONA_LIST;
@@ -34,6 +35,7 @@ static	TEUL_CALLBACK*	_XCHG_BRIGADE_LIST;
 static	TEUL_CALLBACK*	_XCHG_BRIGADE_SELECT;
 static	TEUL_CALLBACK*	_XCHG_MISSION_LIST;
 static	TEUL_CALLBACK*	_XCHG_TUT_PROGRESS;
+static	TEUL_CALLBACK*  _XCHG_GARRISON_COUNTRY_CHANGE;
 
 #if platOS == OS_WIN32
 #include <io.h>
@@ -441,6 +443,16 @@ BrigadeSelection::send(SINT32 teulIndex)
 	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this);
 }
 
+SINT32
+GarrisonCountryChangeReq::send(SINT32 teulIndex, FULL_OBJ_ID cp, WWII_COUNTRY const& country)
+{
+	m_result = GCR_REQUESTING;
+	m_cp = cp;
+	m_country = country;
+
+	return teulSend(teulIndex, _XCHG_GARRISON_COUNTRY_CHANGE, this);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 // Request a mission list
@@ -482,6 +494,24 @@ Tutorial::GroupProgress::send(SINT32 chatIndex)
 
 //////////////////////////////////////////////////////////////////////
 
+
+static SINT32
+_sendGarrisonCountryChangeRequest(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq* request = (GarrisonCountryChangeReq*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
+}
+
+
+static SINT32
+_recvGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq gcc(a);
+	gcc.receive(a->teulIndex);
+	return a->offset;
+}
+
+
 SINT32
 mapInstallClientCallbacks()
 {
@@ -497,6 +527,7 @@ mapInstallClientCallbacks()
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);
 		REGISTER_SENDRECV(Map::XCHG_MISSION_LIST_Y, _sendMissionListRequest, _recvMissionListResponse, _XCHG_MISSION_LIST);
+		REGISTER_SENDRECV(Map::_XCHG_GARRISON_COUNTRY_CHANGE_Y, _sendGarrisonCountryChangeRequest, _recvGarrisonCountryChangeResponse, _XCHG_GARRISON_COUNTRY_CHANGE);
 
 		REGISTER_MSG_RECEIVER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
 		REGISTER_MSG_RECEIVER(Map::SWING_METER_Y, SWING_METER_MSG);

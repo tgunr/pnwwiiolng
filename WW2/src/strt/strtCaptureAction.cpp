@@ -279,10 +279,10 @@ CaptureAction::ChangeOwner()
 	{
 		m_leftContention = true;
 
-		if ( m_cp.side != m_newSide )
-		{
+		//if ( m_cp.side != m_newSide )
+		//{
 			m_setOwner = true;
-		}
+		//}
 	}
 	else if ( m_cp.isContested() == false && m_cp.facilitiesOwned[m_newSide] == 1 )
 	{
