@@ -215,6 +215,7 @@ using fullpath_t = wchar_t;
 #define WRONG_PATHSEP_W L"/"
 #define WRONG_PATHSEP_WC L'/'
 
+using nfds_t = UINT32; // values of this type are not actually used on Windows but we don't want to ifdef the declarations
 using socklen_t = SINT32;
 
 // Unfortunately, RakNet thinks it's clever and owns the universe and can do
@@ -311,11 +312,13 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 #define PLAT_EAGAIN EAGAIN
 #define PLAT_EINPROGRESS WSAEINPROGRESS
 #define PLAT_ECONNREFUSED WSAECONNREFUSED
+#define PLAT_ECONNABORTED WSAECONNRESET
 #else
 #define PLAT_EWOULDBLOCK EWOULDBLOCK
 #define PLAT_EINTR EINTR
 #define PLAT_EAGAIN EAGAIN
 #define PLAT_EINPROGRESS EINPROGRESS
 #define PLAT_ECONNREFUSED ECONNREFUSED
+#define PLAT_ECONNABORTED ECONNABORTED
 #endif
 

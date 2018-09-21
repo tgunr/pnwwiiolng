@@ -396,7 +396,7 @@ teulRemoveEndpoint(ENDPOINT* endpoint)
 
 	if ( endpoint->m_closed == false )
 	{
-		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", endpoint->teulIndex());
+		dbugLog(_FLA, "t:%d tried to remove unclosed endpoint", endpoint->teulIndex());
 		endpoint->doError(ECONNABORTED);
 		endpoint->shutdown();
 	}
@@ -558,6 +558,8 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 ENDPOINT*
 teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protocol)
 {
+    ABORT_IF(protocol != PROTOCOL_TCP && protocol != PROTOCOL_UDP && protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL);
+    
 	teulSyncClock();  // for granular reporting, previously all our callers did this
 
 	if (PN_UNLIKELY(teulHasFreeEndpoints() == false)) {
@@ -601,42 +603,16 @@ teulCreateEndpoint(const bool isListening, SINT32 timeout, const PROTOCOL protoc
 	// each packet to the same.  Specifying a different timeout for
 	// a callback will over-ride this for a packet.
 
-	switch (protocol)
-	{
-		case PROTOCOL_TCP:
-		case PROTOCOL_UDP:
-		case PROTOCOL_UDB:
-		case PROTOCOL_CTRL:
-			endpoint.fromSockAddress.sin_family = AF_INET;
-			endpoint.localSockAddress.sin_family = AF_INET;
-			endpoint.destSockAddress.sin_family = AF_INET;
-			break;
-
-		default:
-			dbugSetErrno(EINVAL);
-			dbugLog(_FLA, "error allocating endpoint, invalid protocol");
-			teulFreeEndpoint(&endpoint);
-			return nullptr;
-	}
+    endpoint.fromSockAddress.sin_family = AF_INET;
+    endpoint.localSockAddress.sin_family = AF_INET;
+    endpoint.destSockAddress.sin_family = AF_INET;
 
 	endpoint.m_impl->m_version = Teul::VersionNumber;
 	endpoint.m_impl->m_cryptVersion = (endpoint.protocol == PROTOCOL_TCP && !endpoint.m_peer) ? Teul::BaseVersion : 0x0000;
 	endpoint.m_impl->m_txCrypt.newSeed();
 	endpoint.m_impl->m_rxCrypt.setSeed(0ULL);
-//	endpoint.m_recvCrypt = endpoint.m_sendCrypt;
 
-	switch (protocol)
-	{
-	case PROTOCOL_UDP:
-	case PROTOCOL_UDB:
-	case PROTOCOL_CTRL:
-		endpoint.m_reliable = false;
-		break;
-	case PROTOCOL_TCP:
-	default:
-		endpoint.m_reliable = true;
-		break;
-	}
+    endpoint.m_reliable = (protocol == PROTOCOL_TCP);
 
 	idleEndpoints.push_back(&endpoint);
 	endpoint.m_inUse = true;
@@ -861,7 +837,7 @@ EndpointImpl::Reset()
 	}
 	m_version = 0;
 	m_cryptVersion = 0;
-	pollSlot(-1);
+	setPollSlot(std::numeric_limits<nfds_t>::max());
 	kliveInterval = 0;
 	m_lastPacketTick = 0;
 }

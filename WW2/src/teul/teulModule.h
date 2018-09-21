@@ -21,8 +21,7 @@ SINT32 teulModSendCALLBACKe(ENDPOINT& inEndpoint, TEUL_CALLBACK& object, const U
 SINT32 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK& object);
 
 void teulMRecvAddToPoll(ENDPOINT& endpoint);
-void teulMRecvUpdatePoll(ENDPOINT& endpoint);
-void teulMRecvRemoveFromPoll(ENDPOINT& endpoint);
+void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction = true);
 
 UINT32 teulElapsedTotal(UINT32 newTotal, UINT32 oldTotal);
 

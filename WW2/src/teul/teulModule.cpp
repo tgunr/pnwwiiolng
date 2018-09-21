@@ -573,9 +573,7 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 
 	inEndpoint.m_state = IS_OPEN;
 	inEndpoint.setConnected();
-
-	teulMRecvUpdatePoll(inEndpoint);
-
+    inEndpoint.updateSocketEvents();
 	return 0;
 }
 
@@ -597,36 +595,17 @@ void teulClose(ENDPOINT& inEndpoint)
         // Returning here results in an infinite loop
     }
 
-	if ( (inEndpoint.state() < IS_CLOSING)
-		&& (inEndpoint.state() != IS_LISTENING)
-		&& (inEndpoint.protocol != PROTOCOL_TCP)
-		&& (inEndpoint.protocol != PROTOCOL_UDB)
-		&& (inEndpoint.protocol != PROTOCOL_CTRL)
-		)
-	{
-		inEndpoint.m_state = IS_CLOSING;
-        if (!inEndpoint.m_closed) {
-            inEndpoint.doError(ECONNABORTED);
-            inEndpoint.shutdown();
-        }
-		return;
-	}
-
-	// NOTE:
-	//    This check is needed because the call to doError above **may** result in teulClose being re-entrant.
-	//    If this happens the endpoing state will be dead and we should not continue, so we check again.
-	if (inEndpoint.state() != IS_DEAD) {
-		// check status of paired backchannel, if client release - it'll get recreated when they log back in
-		RakNetChannel::disconnectPeer(&inEndpoint);
+	// endpoint.doError() may have recursed, so check the state again
+	if (inEndpoint.state() == IS_DEAD) {
+        return;
+    }
     
-		// dispose of socket
-		inEndpoint.shutdown();
-
-		inEndpoint.m_state = IS_DEAD;
-		inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
-
-		teulRemoveEndpoint(&inEndpoint);
-	}
+    // check status of paired backchannel, if client release - it'll get recreated when they log back in
+    RakNetChannel::disconnectPeer(&inEndpoint);
+    inEndpoint.shutdown();
+    inEndpoint.m_state = IS_DEAD;
+    inEndpoint.m_doTimeoutCheck = false;	// stop checking timeouts on me.
+    teulRemoveEndpoint(&inEndpoint);
 }
 
 void teulClose(const SINT32 teulIndex)
