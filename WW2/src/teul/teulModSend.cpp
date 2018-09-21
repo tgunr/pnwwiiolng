@@ -251,7 +251,13 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 	if (result < 0) {
         // Failed to send. Don't dbugGetErrno() here. We already did that in sendData().
         dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
-		teulClose(endpoint);
+        // This is a HORRIBLE hack to allow us to avoid recursion during initial connection of an endpoint.
+        // This call to teulClose() is the only potential point of recursion into teulUpdateTransport() as
+        // the code is currently written, and we need to avoid it during TCP connection. This should be
+        // removed as soon as possible.
+        if (header().m_callX != 0 || header().m_callY != 5) {
+		    teulClose(endpoint);
+        }
 	}
 
 	return result;
