@@ -1082,6 +1082,9 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Receive a GarrisonCountryChangeReq from the map host
+
 static SINT32 _recvMMGarrisonCountryChangeRequest(ACTION_OBJECT *const a)
 {
 	GarrisonCountryChangeReq request(a);
@@ -1089,6 +1092,9 @@ static SINT32 _recvMMGarrisonCountryChangeRequest(ACTION_OBJECT *const a)
     //dbugLog(_FLD, "GarrisonCountryChangeReq received on strat host from %d to change CP %u to country %u ", request.m_clientsTeulIndex, request.m_cp.id, request.m_country);
     return teulSend(a->teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, &request);
 }
+
+//////////////////////////////////////////////////////////////////////
+// Process a GarrisonCountryChangeReq
 
 void GarrisonCountryChangeReq::strtProcessRequest()
 {
@@ -1101,10 +1107,10 @@ void GarrisonCountryChangeReq::strtProcessRequest()
 		}
 		else
 		{
-			if (cp->isContested())
+			if (cp->isObjective() || cp->islinkedToAnAO())
 			{
 				m_result = GCR_FAILED_HAS_OBJECTIVE;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is contested.");
+                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP has an Objective or is linked to one.");
 			}
 			else if (wwiiSide(m_country) != wwiiSide(cp->country))
 			{
@@ -1143,6 +1149,8 @@ SINT32 GarrisonCountryChangeReq::sendToMap(SINT32 teulIndex)
     return teulSend(teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, this); 
 }
 
+//////////////////////////////////////////////////////////////////////
+// Used by strat to respond to a GarrisonCountryChangeReq from the map host.
 
 static SINT32 _sendMMGarrisonCountryChangeResponse(ACTION_OBJECT *const a)
 {

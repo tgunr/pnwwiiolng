@@ -247,6 +247,8 @@ public:
 	bool isEnemyLinked() const { return m_enemyLinked; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
+    bool islinkedToAnAO();
+
 	LinkStruct* link(UINT32 i) const;
 	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
 	LinkStruct* linkTo(const CPStruct* rhs) const;

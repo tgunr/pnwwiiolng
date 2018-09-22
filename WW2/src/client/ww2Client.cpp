@@ -2093,7 +2093,7 @@ void Client::ProcessGarrisonCountryChangeReq(GarrisonCountryChangeReq const& gar
     break;
     case GCR_FAILED_HAS_OBJECTIVE:
     {
-        uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country denied, you can't change a CP that is either attacking or defending.");
+        uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country change denied, you can't change a CP that is either attacking or defending or linked to an attack.");
     }
     break;
     case GCR_FAILED:
