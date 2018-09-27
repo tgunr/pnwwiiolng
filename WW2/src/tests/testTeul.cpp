@@ -317,7 +317,7 @@ struct Role
 
 		Dprintf("teulTransport initialized.\n");
 
-		dbugLog(_FLI, "teulTransport initialized.\n");
+		dbugLog(_FLI, "teulTransport initialized.");
 	}
 
 	//////////////////////////////////////////////////////////////

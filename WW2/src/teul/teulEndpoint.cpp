@@ -775,9 +775,9 @@ ENDPOINT::doError(const SINT32 error, void* data)
 void ENDPOINT::shutdown()
 {
 	if (this->socket != INVALID_SOCKET) {
+        teulMRecvRemoveFromPoll(*this);
 		OS_CLOSESOCKET(this->socket);
 		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
-		teulMRecvRemoveFromPoll(*this);
 	}
 	this->m_closed = true;
 }

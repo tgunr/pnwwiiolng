@@ -41,7 +41,7 @@ struct DATA_GRAM
     static_assert((HUGE_ROUNDING & (HUGE_ROUNDING - 1)) == 0, "unpooled datagram rounding must be power of 2");
 
     static constexpr const size_t NUM_DATAGRAM_SIZES = 16;
-    static_assert((NUM_DATAGRAM_SIZES & (NUM_DATAGRAM_SIZES - 1)) == 0, "nuber of pooled datagram buckets must be power of 2");
+    static_assert((NUM_DATAGRAM_SIZES & (NUM_DATAGRAM_SIZES - 1)) == 0, "number of pooled datagram buckets must be power of 2");
 
     static constexpr const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * NORMAL_ROUNDING;
     static_assert((LARGEST_POOLED_SIZE & (LARGEST_POOLED_SIZE - 1)) == 0, "calculated max pooling size must be power of 2");
@@ -123,7 +123,7 @@ static DATA_GRAM *teulAllocDatagram(const UINT32 size)
 
 void teulReleaseDatagram(DATA_GRAM *datagram)
 {
-    assert(datagram->m_reqSize == _roundDatagramSize(datagram->m_reqSize) && "Datagram allocation size corrupted");
+    assert(datagram->m_reqSize == _roundDatagramSize(datagram->m_reqSize - sizeof(DATA_GRAM)) && "Datagram allocation size corrupted");
     assert(datagram->contents == reinterpret_cast<Teul::PacketHeader *>(datagram + 1) && "Datagram contents pointer was moved");
     
     if (datagram->m_reqSize < DATA_GRAM::LARGEST_POOLED_SIZE) {
@@ -589,7 +589,6 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
 static void _pollAddEndpoint(ENDPOINT& endpoint)
 {
     if (endpoint.state() == IS_DEAD || endpoint.socket == INVALID_SOCKET) {
-        dbugLog(_FLA, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
         return;
     }
 
@@ -610,6 +609,14 @@ static void _pollAddEndpoint(ENDPOINT& endpoint)
 
 void teulMRecvAddToPoll(ENDPOINT& endpoint)
 {
+    // This check is made in _pollAddEndpoint() as well, but we want to ignore the
+    // error silently there, while logging it for this case. This allows _pollRegenerateSet()
+    // to avoid having to deal with the dead endpoints list while still tracking when we
+    // do an add that isn't part of that logic.
+    if (endpoint.state() == IS_DEAD || endpoint.socket == INVALID_SOCKET) {
+        dbugLog(_FLA, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
+        return;
+    }
     _pollAddEndpoint(endpoint);
     dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(),
@@ -618,11 +625,8 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
 {
-    assert(endpoint.state() > IS_OPEN);
-    
     if (endpoint.socket != INVALID_SOCKET) {
         socketToEndpoint.erase(endpoint.socket);
-        endpoint.socket = INVALID_SOCKET;
     }
 
     nfds_t slot = endpoint.m_impl->pollSlot();
@@ -668,9 +672,13 @@ static void _pollSocketsInner(TeulTimeMS duration_)
     int error = 0;
     
     do {
+#if platOS != OS_WIN32
         pollret = poll(&pollData.fd[0], pollData.m_size, duration_);
-    } while (pollret < 0 && (error = dbugGetErrno()) != PLAT_EINTR);
-    
+#else
+        pollret = WSAPoll(&pollData.fd[0], pollData.m_size, duration_);
+#endif
+    } while (pollret < 0 && (error = dbugGetErrno()) == PLAT_EINTR);
+
     if (pollret < 0) {
         LogAbort("poll returned error %d, and all poll errors are fatal", error);
     }

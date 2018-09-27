@@ -381,8 +381,6 @@ _connectSocket(ENDPOINT& endpoint)
 		endpoint.lastDataRecv.makeCurrent();
 		endpoint.lastDataSent.makeCurrent();
 
-		assert( endpoint.m_impl->pollSlot() < 0 );
-
 		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 
 		break;
