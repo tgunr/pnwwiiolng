@@ -100,7 +100,7 @@ static DATA_GRAM *teulAllocDatagram(const UINT32 size)
 	size_t allocSize = _roundDatagramSize(size);
 
 	// If the request is small enough to be pooled and there's something available, grab it.
-	if (PN_LIKELY(allocSize <= DATA_GRAM::LARGEST_POOLED_SIZE)) {
+	if (allocSize <= DATA_GRAM::LARGEST_POOLED_SIZE) {
         size_t bucketIdx = (allocSize / DATA_GRAM::NORMAL_ROUNDING) - 1;
         assert(bucketIdx < s_freeDatagrams.size() && "The laws of physics are now held in abeyance.");
         
@@ -129,7 +129,7 @@ void teulReleaseDatagram(DATA_GRAM *datagram)
     assert(datagram->m_reqSize == _roundDatagramSize(datagram->m_reqSize) && "Datagram allocation size corrupted");
     assert(datagram->contents == reinterpret_cast<Teul::PacketHeader *>(datagram + 1) && "Datagram contents pointer was moved");
     
-    if (PN_LIKELY(datagram->m_reqSize < DATA_GRAM::LARGEST_POOLED_SIZE)) {
+    if (datagram->m_reqSize < DATA_GRAM::LARGEST_POOLED_SIZE) {
         s_freeDatagrams[(datagram->m_reqSize / DATA_GRAM::NORMAL_ROUNDING) - 1].push(datagram);
     } else {
 		std::free(datagram);
@@ -196,7 +196,7 @@ static ssize_t _checkConnectTCP(ENDPOINT& endpoint)
 
     socklen_t addrlen = sizeof(struct sockaddr_in);
 
-    if (PN_UNLIKELY(getsockname(sock, (struct sockaddr *)&endpoint.localSockAddress, &addrlen) == SOCKET_ERROR)) {
+    if (getsockname(sock, (struct sockaddr *)&endpoint.localSockAddress, &addrlen) == SOCKET_ERROR) {
         int error = dbugGetErrno();
         dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " getsockname failed during connect err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), error);
         return -error;
@@ -207,7 +207,7 @@ static ssize_t _checkConnectTCP(ENDPOINT& endpoint)
 
     SINT32 synret = teulModSendCALLBACKe(endpoint, *SYN_TOKEN);
 
-    if (PN_UNLIKELY(synret < 0)) {
+    if (synret < 0) {
         dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " new connection send failed err:%d", endpoint.teulIndex(), PRA_SOCKET(sock), -synret);
         return synret;
     }
@@ -252,7 +252,7 @@ static ssize_t _acceptConnectTCP(ENDPOINT& endpoint)
         
         dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " accepted connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
         ENDPOINT *newEndpoint = teulCreateEndpoint(false, endpoint.timeout, static_cast<PROTOCOL>(endpoint.protocol));
-        if (PN_UNLIKELY(!newEndpoint)) {
+        if (!newEndpoint) {
             // this happens only if we're completely out of endpoints at the Teul layer
             OS_CLOSESOCKET(newSock);
             return -EMFILE;
@@ -451,7 +451,7 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 
 ssize_t _recvDatagram(ENDPOINT& endpoint)
 {
-	if (PN_UNLIKELY(endpoint.socket == INVALID_SOCKET)) {
+	if (endpoint.socket == INVALID_SOCKET) {
 		return -EINVAL;
     }
     
@@ -486,7 +486,7 @@ static ssize_t _handleReceive(ENDPOINT& endpoint)
     
     assert(!safe_isEAGAIN(-result) && result != -PLAT_EINTR); // we're supposed to have translated EAGAIN into a success value and ignored EINTR
     
-    if (PN_UNLIKELY(result < 0)) {
+    if (result < 0) {
         dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " receive error:%" PRSsizeT, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
         return result;
     }
@@ -836,7 +836,7 @@ static bool _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& h
 	const Teul::PacketHeader::tag_t expectTag = prevTag + (Teul::PacketHeader::tag_t)1;
 
 	// The new tag should be *exactly* one higher than the old
-	if ( PN_UNLIKELY(header.m_tag != expectTag) )
+	if ( header.m_tag != expectTag )
 	{
 		dbugLog(_FLW, "t:%d out of order packet rx:%u, prev:%u, expected:%u"
 						, endpoint.teulIndex()
@@ -863,7 +863,7 @@ _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	// behind the host. If the client gets more than a few ms
 	// ahead of the host, we know they are speed hacking.
 
-	if ( PN_UNLIKELY(endpoint.m_haveTicks == false) )	// true briefly at the start of a connection.
+	if ( endpoint.m_haveTicks == false )	// true briefly at the start of a connection.
 	{
 		endpoint.m_impl->m_lastPacketTick = header.m_tick;
 		endpoint.m_haveTicks = true;
@@ -887,13 +887,13 @@ _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	endpoint.m_impl->m_lastTickRx = teulClock64;
 
 	// Only evaluate every 8th packet.
-	if ( PN_LIKELY((endpoint.m_impl->recvTag & 7) > 0) )
+	if ( (endpoint.m_impl->recvTag & 7) > 0 )
 		return;
 
 	teulSyncClock();
 	Teul::TickSample sample(endpoint.m_created.elapsed(), endpoint.m_tickAccumulation);
 
-	if ( PN_LIKELY(sample.delta > -100) )
+	if ( sample.delta > -100 )
 		return;
 
 	const FLOAT64 minRatio = host_config.arena.speedHackRatio;
@@ -919,7 +919,7 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 		// when the state == IS_OPENING, we only accept SYN tokens.
 		// if they aren't recognized we assume that the encryption has failed
 		// and try a different encryption
-		if ( PN_UNLIKELY(_isValidSynData(hdr, payloadSize_bytes) == false) )
+		if ( _isValidSynData(hdr, payloadSize_bytes) == false )
 		{
 			dbugLog(_FLA, "t:%d non-syn data in opening mode", endpoint.teulIndex());
 			dbugSetErrno(EINVAL);
@@ -936,7 +936,7 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	// check for someone hacking our TCP stream by deleting packets...
 	if ( endpoint.m_reliable )
 	{
-		if ( PN_UNLIKELY(! _checkPacketOrdering(endpoint, *hdr)) )
+		if ( ! _checkPacketOrdering(endpoint, *hdr) )
 			return;
 		_processTicks(endpoint, *hdr);
 	}
@@ -944,13 +944,13 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	//_updateRecvError(curEndpoint->li, dataHeader.tag, dataHeader.mode);
 
 	TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
-	if ( PN_UNLIKELY(callback == nullptr) )
+	if ( callback == nullptr )
 	{
 		dbugLog(_FLW, "t:%d ip:%s cb:%u,%u callback does not exist", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
 	}
 
-	if ( PN_UNLIKELY(hdr->m_callX == Teul::Serv::CallbackX && endpoint.teulIndex() >= 0 && !(endpoint.m_peer)) )
+	if ( hdr->m_callX == Teul::Serv::CallbackX && endpoint.teulIndex() >= 0 && !(endpoint.m_peer) )
 	{
 		dbugLog(_FLA,"t:%d ip:%s cb:%d,%d callback access denied", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
@@ -1003,7 +1003,7 @@ teulIdleEndpoints()
 		ENDPOINT* const endpoint = *it;
 		++it;
 
-		if ( PN_LIKELY(endpoint != nullptr) )
+		if ( endpoint != nullptr )
 			_idleEndpoint(*endpoint);
 	}
 }
@@ -1018,7 +1018,7 @@ teulModIdle(const TeulTimeMS duration_)
 
 	// At 1s intervals, count stats, kill dead endpoints
 	TeulTimeMS interval = teulClock64 - std::min(teulClock64, lastUpdateTime);
-	if ( PN_UNLIKELY(interval > 1000) )
+	if ( interval > 1000 )
 	{
 		//time to recalc updates per sec
 		lastUpdateTime = teulClock64;
@@ -1042,7 +1042,7 @@ teulModIdle(const TeulTimeMS duration_)
 #else
 	static const TeulTimeMS AlertInterval_ms = 75;
 #endif
-	if ( PN_UNLIKELY(interval > duration_ + AlertInterval_ms) )
+	if ( interval > duration_ + AlertInterval_ms )
 		dbugLog(_FLA, "STALL. teulModIdle interval=%" PR64BitUT "", interval);
 
 	_lastIdle = teulClock64;
@@ -1063,7 +1063,7 @@ teulModIdle(const TeulTimeMS duration_)
 #else
 	static const TeulTimeMS idleLimit = 25;
 #endif
-	if ( PN_UNLIKELY(interval > idleLimit + duration_) )
+	if ( interval > idleLimit + duration_ )
 		dbugLog(_FLA, "STALL. idle endpoints interval=%" PR64BitUT "ms", interval);
 
 	return 0;
