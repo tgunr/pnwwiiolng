@@ -271,6 +271,8 @@ static ssize_t _acceptConnectTCP(ENDPOINT& endpoint)
             newEndpoint->fromSockAddress.sin_addr.s_addr |= (newEndpoint->localSockAddress.sin_addr.s_addr & 0x00ffffff);
         }
         
+        teulMRecvAddToPoll(*newEndpoint);
+        
         // Just use the unsafe one-arg form of teulGetAddress(), the whole thing's a trainwreck anyway.
         dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET,
             endpoint.teulIndex(), teulGetAddress(newEndpoint->destAddress()), newEndpoint->fromPort(),
@@ -505,21 +507,16 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
         return;
     }
     
-    // If a reentrancy cancellation point is hit, we need to apply any pending poll-regenerate
-    // flag; a reentrant frame below us possibly already did it, but we can't prove whether or
-    // not that happened. Multiple regenerations are inefficient but otherwise harmless.
-    bool needPollRegenerate = false;
+    // Use RAII semantics to force regenerate of the pollset even if we hit a cancellation point.
+    // This is not hugely efficient, but it has the virtue that we'll never leave the pollset in a weird state.
+    struct _PollRegenerator {
+        _PollRegenerator() {}
+        ~_PollRegenerator() { _pollRegenerateSet(); }
+    } _regenerator;
+    
     uint64_t currentPollGeneration = pollGeneration.fetch_add(1, std::memory_order_relaxed);
-    #define pollCancellationPoint() do { \
-        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) { \
-            if (needPollRegenerate) { _pollRegenerateSet(); } \
-            return; \
-        } \
-    } while (0)
-
-	for (size_t slot = 0; slot < maxSlots; ++slot) {
-        pollCancellationPoint();
-        
+    
+    for (size_t slot = 0; slot < maxSlots; ++slot) {
 		pollfd& sfd = fdArray[slot];
   
         if (sfd.fd < 0 || sfd.revents == 0) {
@@ -539,7 +536,6 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
 
         auto revents = std::exchange(sfd.revents, 0); // Reset the pollfd and save the value we're checking for now.
         ssize_t error = 0;
-        bool closeCondition = false;
 
 		if (error == 0 && (revents & POLLOUT) != 0) {
             if (endpoint.protocol == PROTOCOL_TCP && endpoint.state() == IS_OPENING && !endpoint.m_connected) {
@@ -551,8 +547,11 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
 
 		if (error == 0 && (revents & POLLIN) != 0) {
             if (endpoint.protocol == PROTOCOL_TCP && endpoint.state() == IS_LISTENING) {
+                // Via teulMRecvAddToPoll(), this can change our underlying poll set out from underneath us in
+                // the middle of the loop. However, we guarantee by "the code is just written this way for now"
+                // that it will only ever add more endpoints to the existing poll data; as a result the maximal
+                // side effect is that we will service some endpoints earlier than others, which is harmless.
                 error = _acceptConnectTCP(endpoint);
-                needPollRegenerate = true;
             } else {
                 error = _handleReceive(endpoint);
             }
@@ -560,8 +559,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
 
 		if ((revents & POLLHUP) != 0 || (revents & POLLERR) != 0) { // check for HUP and ERR even if an error occurred above
 			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " socket disconnected", endpoint.teulIndex(), PRA_SOCKET(sfd.fd));
-            closeCondition = true;
-            if (error == 0) {
+            if (error == 0) { // Don't overwrite any existing error
                 error = -ECONNRESET; // getsockopt(SO_ERROR) has a small chance of telling us more on some platforms, but it's not worth it
             }
 		}
@@ -578,31 +576,25 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
         // reentrant calls into this machinery.
         if (error < 0) {
             endpoint.doError(-error);
-            closeCondition = true;
-        }
-        
-        if (closeCondition) {
             teulClose(endpoint);
         }
         
-        pollCancellationPoint();
-        
-        // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many
-        // cases. There is no need for a cancellation point after it, as it will be the first thing that
-        // happens on the next loop iteration, and if the loop terminates, it doesn't matter.
+        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) {
+            return;
+        }
+
+        // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many cases.
         _routeCALLBACKs(endpoint);
-    }
-    #undef pollCancellationPoint
-    
-    // Register any freshly accepted connections with the poll machinery.
-    if (needPollRegenerate) {
-        _pollRegenerateSet();
+
+        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) {
+            return;
+        }
     }
 }
 
-void teulMRecvAddToPoll(ENDPOINT& endpoint)
+static void _pollAddEndpoint(ENDPOINT& endpoint)
 {
-    if (PN_UNLIKELY(endpoint.state() == IS_DEAD || endpoint.socket == INVALID_SOCKET)) {
+    if (endpoint.state() == IS_DEAD || endpoint.socket == INVALID_SOCKET) {
         dbugLog(_FLA, "t:%d attempt to add an invalid endpoint to poll", endpoint.teulIndex());
         return;
     }
@@ -620,7 +612,11 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
     ++pollData.m_count;
     endpoint.m_impl->setPollSlot(slotIdx);
     endpoint.updateSocketEvents();
-    
+}
+
+void teulMRecvAddToPoll(ENDPOINT& endpoint)
+{
+    _pollAddEndpoint(endpoint);
     dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(),
                 endpoint.m_impl->pollSlot(), static_cast<size_t>(pollData.m_count));
@@ -652,7 +648,6 @@ void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket),
                 endpoint.state(), slot, static_cast<size_t>(pollData.m_count));
 
-
     if (pollData.m_count < pollData.m_size / 2 && permitCompaction) {
         // If the global poll structure has more holes than entries, compact it by rebuild.
         _pollRegenerateSet();
@@ -667,7 +662,7 @@ static void _pollRegenerateSet()
 
     for (ENDPOINT * const endpoint : idleEndpoints) {
         assert(endpoint);
-        teulMRecvAddToPoll(*endpoint);
+        _pollAddEndpoint(*endpoint);
     }
 
     dbugLog(_FLN, "set up %" PRSizeT " sockets for poll, max " PRF_SOCKET, static_cast<size_t>(pollData.m_count), PRA_SOCKET(pollData.m_maxSock));
