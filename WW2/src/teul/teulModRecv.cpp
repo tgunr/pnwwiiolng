@@ -528,7 +528,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
 
 		ENDPOINT& endpoint = *(it->second);
 
-		if (!endpoint.m_inUse || endpoint.socket == INVALID_SOCKET || endpoint.state() > IS_CLOSING) {
+		if (!endpoint.m_inUse || endpoint.socket == INVALID_SOCKET || endpoint.state() > IS_OPEN) {
 			dbugLog(_FLI,"t:%d sock:" PRF_SOCKET " slot:%" PRSizeT " poll signaled for invalid or dead endpoint", endpoint.teulIndex(), PRA_SOCKET(sfd.fd), slot);
 			teulMRecvRemoveFromPoll(endpoint, false); // disallow compaction to avoid invalidating our loop
 			continue;
@@ -624,7 +624,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
 
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
 {
-    assert(endpoint.state() >= IS_CLOSING);
+    assert(endpoint.state() > IS_OPEN);
     
     if (endpoint.socket != INVALID_SOCKET) {
         socketToEndpoint.erase(endpoint.socket);
@@ -665,7 +665,7 @@ static void _pollRegenerateSet()
         _pollAddEndpoint(*endpoint);
     }
 
-    dbugLog(_FLN, "set up %" PRSizeT " sockets for poll, max " PRF_SOCKET, static_cast<size_t>(pollData.m_count), PRA_SOCKET(pollData.m_maxSock));
+    dbugLog(_FLD, "set up %" PRSizeT " sockets for poll, max " PRF_SOCKET, static_cast<size_t>(pollData.m_count), PRA_SOCKET(pollData.m_maxSock));
 }
 
 static void _pollSocketsInner(TeulTimeMS duration_)
@@ -683,16 +683,14 @@ static void _pollSocketsInner(TeulTimeMS duration_)
     _runPollEndpoints(pollData.fd, pollData.m_size, pollret);
 }
 
-static bool _pollSetIsEmpty()
-{
-    // Data consistency check
-    assert(idleEndpoints.empty() ? pollData.m_size == 0 : pollData.m_size > 0);
-    return idleEndpoints.empty();
-}
-
 static void _pollSockets(TeulTimeMS duration_)
 {
-    if (_pollSetIsEmpty()) {
+    // Data consistency check
+    // Leaving this commented out for now because it can actually fail in practice due to reentrancy
+    // of the teulUpdateTransport() machinery
+    //assert(idleEndpoints.empty() ? pollData.m_size == 0 : pollData.m_size > 0);
+    
+    if (idleEndpoints.empty()) {
         // Yield CPU, even if duration is zero
         std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
     } else {
@@ -700,76 +698,54 @@ static void _pollSockets(TeulTimeMS duration_)
     }
 }
 
+static void _sendEndpointKlive(ENDPOINT& endpoint)
+{
+    assert(KLIVE_TOKEN != nullptr);
+    
+    if (!endpoint.m_doTimeoutCheck) {
+        return;
+    }
+    
+    if (endpoint.lastKliveSent.elapsed() < endpoint.m_impl->kliveInterval) {
+        return;
+    }
+    
+#if defined(DEBUG_CONNECTIONS)
+    dbugLog(_FLD, "t:%d sending klive", endpoint.teulIndex());
+#endif
+
+    // Warning: Can reenter.
+    SINT32 sendResult = teulModSendCALLBACKe(endpoint, *KLIVE_TOKEN);
+    
+    if (sendResult >= 0) {
+        endpoint.lastKliveSent.makeCurrent();
+    }
+    // Do NOT attempt to report an endpoint error here; teulModSendCALLBACKe() already did so.
+}
 
 static void _checkEndpointState(ENDPOINT& endpoint)
 {
     switch (endpoint.state())
     {
         // Connection is doing handshakes, etc.
-    case IS_OPENING:
-    break;
+        case IS_OPENING:
+            break;
 
-    case IS_LISTENING:
-    break;
+        // Connection is a listener
+        case IS_LISTENING:
+            break;
 
         // Connection has opened, needs to do keep-alive.
-    case IS_OPEN:
-        if ( endpoint.m_doTimeoutCheck )
-        {
-            const TeulDeltaMS timeSinceLastKlive = endpoint.lastKliveSent.elapsed();
-#if defined(DEBUG_CONNECTIONS)
-            dbugLog(_FLD, "t:%d dtc:true tslk:%" PR64BitUT " kli:%" PR64BitUT "", endpoint.teulIndex(), timeSinceLastKlive, (UINT64)endpoint.m_impl->kliveInterval);
-#endif
-            if ( timeSinceLastKlive >= (TeulDeltaMS)(UINT64)endpoint.m_impl->kliveInterval )
-            {
-#if defined(DEBUG_CONNECTIONS)
-                dbugLog(_FLD, " sending klive");
-#endif
-                const bool oldNagleValue = endpoint.setNagleEnabled(false);
-                const SINT32 sendResult = PN_LIKELY(KLIVE_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *KLIVE_TOKEN) : -EINVAL;
-                if(sendResult >= 0)
-                {
-                    endpoint.lastKliveSent.makeCurrent();
-                    endpoint.setNagleEnabled(oldNagleValue);
-                }
-                else
-                    endpoint.doError(ETEUL_CONNECTION_STALLED);
-            }
-        }
+        case IS_OPEN:
+            _sendEndpointKlive(endpoint);
+            break;
 
-    break;
-
-        // Connection is negotiating shutdown.
-    case IS_CLOSING:
-        if (!endpoint.m_reliable)
-        {
-            if (!endpoint.m_closed)
-            {
-                dbugWrite(_FLN,"IS_CLOSING");
-                endpoint.doError(ENOTCONN);
-                // We used to send a FYN_TOKEN here. This has absolutely no value and serves absolutely no purpose.
-                // Close out the damned endpoint already. Oh BTW, we only do this for UDP sockets, not TCP. How TCP
-                // sockets get clsoed out the rest of the way I don't even know yet.
-                teulClose(endpoint);
-            }
-        }
-    break;
-
-        // Connection has completed its close and is now dead.
-    case IS_CLOSED:
-        if(  endpoint.m_closed == false )
-        {
-            dbugWrite(_FLN,"IS_CLOSED");
-            endpoint.doError(ENOTCONN);
-        }
-    break;
-
-    case IS_DEAD:
         // It may reach this state, but why would it still be here?
-    break;
+        case IS_DEAD:
+            break;
 
-    default:
-        LogAbort("t:%d endpoint in unknown state %d", endpoint.teulIndex(), endpoint.state());
+        default:
+            LogAbort("t:%d endpoint in unknown state %d", endpoint.teulIndex(), endpoint.state());
     }
 }
 
@@ -783,7 +759,7 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
     if ( elapsed <= (TeulDeltaMS)endpoint.timeout )
         return;
 
-    if (endpoint.state() <= IS_CLOSED)
+    if (endpoint.state() < IS_DEAD)
     {
         printf("t:%d timeout\n", endpoint.teulIndex());
         dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms"
@@ -972,12 +948,6 @@ _executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 	case IS_LISTENING:
 		ABORT_IF_EX(hdr->m_callX != Teul::Module::CallbackX, "t:%d listening sockets must NOT receive callbacks", endpoint.teulIndex());
 	break;
-	case IS_CLOSING:
-		if ( hdr->m_callX != Teul::Module::CallbackX )
-		{
-			// Ignore stuff trying to arrive while we're trying to close.
-			return;
-		}
 	default:
 	break;
 	}

@@ -222,7 +222,7 @@ SINT32 Teul::Packet::send(ENDPOINT& endpoint, const UCHAR protocolPreference)
 {
     static_assert(sizeof(Teul::PacketHeader::tag_t) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet must agree on tag size");
 
-	if (endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) {
+	if (endpoint.state() == IS_LISTENING || endpoint.state() == IS_DEAD) {
 		dbugLog(_FLA, "t:%d tried to send to non-open endpoint [st:%d]", endpoint.teulIndex(), endpoint.state());
 		return -ENOTCONN;
 	}

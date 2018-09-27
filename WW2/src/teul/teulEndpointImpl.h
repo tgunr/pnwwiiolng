@@ -49,7 +49,7 @@ struct EndpointImpl
 	UINT16			m_version;				//!< Currently negotiated version.
 	UINT16			m_cryptVersion;			//!< Version to use for encryption.
 	nfds_t			m_pollSlot;				//!< Position within the "poll" array under Linux/MacOS.
-	UINT16			kliveInterval;			//!< Time between keep alives.
+	TeulTimeMS		kliveInterval;			//!< Time between keep alives.
 	UINT16			m_lastPacketTick;		//!< Tick of the previous packet.
 };
 

@@ -532,21 +532,20 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 
 	if ( timeout == 0 || state() == IS_LISTENING || protocol == PROTOCOL_UDB || protocol == PROTOCOL_CTRL )
 	{
-		m_impl->kliveInterval = Teul::MaxKliveNeeded;
+		m_impl->kliveInterval = Teul::MaxKliveInterval;
 		m_doTimeoutCheck = false;
 	}
 	else
 	{
-		SINT32 interval = timeout / Teul::KlivesPerTimeout;
-		if ( interval < Teul::MinKliveNeeded && Teul::MinKliveNeeded < timeout )
-			interval = Teul::MinKliveNeeded;
-		if ( interval > Teul::MaxKliveNeeded )
-			interval  = Teul::MaxKliveNeeded;
-		m_impl->kliveInterval = (UINT16)interval;
+		TeulTimeMS interval = timeout / Teul::KlivesPerTimeout;
+		if ( interval < Teul::MinKliveInterval && Teul::MinKliveInterval < timeout )
+			interval = Teul::MinKliveInterval;
+		if ( interval > Teul::MaxKliveInterval )
+			interval  = Teul::MaxKliveInterval;
+		m_impl->kliveInterval = interval;
 		m_doTimeoutCheck = true;
 #if defined(DEBUG_CONNECTIONS)
-		dbugLog(_FLD, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval);
-		printf("t:%d timeout:%u, iv:%u, dtc:true\n", teulIndex(), timeout_, interval);
+		dbugLog(_FLD, "t:%d timeout:%u, iv:%" PR64BitUT ", dtc:true", teulIndex(), timeout_, interval);
 #endif
 	}
 
