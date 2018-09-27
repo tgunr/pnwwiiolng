@@ -189,8 +189,15 @@ function _scoreAOPotential(unit, origin, link, target, country)
 end
 
 ----------------------------------------------------------------------
--- Pick the underdog country of a given side
+-- Is the USA deployed In-Game. Tier 3+ usually.
+function _isUSA_Deployed()
+	--  Pre US deployment / NOT Deployed = false
+	--  Post US deployment / Deployed = true
 
+	return activeCountry(WWII_USA) --  per glue.lua Note: This is very likley to always return true from the initial reading.
+end
+
+-- Pick the underdog country of a given side
 function gameAOChooseAlliedCountry(forSide)
 
 	if forSide == AXIS then return WWII_GERMANY end
@@ -198,28 +205,63 @@ function gameAOChooseAlliedCountry(forSide)
 	local cp, neighbor
 	local french = 0
 	local brit = 0
+	local usa = 0
+	
+	if _isUSA_Deployed == false then
+	--  Pre US deployment / NOT Deployed
 
-	for cp in allCityCPs() do
-		if cp:isAttackObjective(ALLIED) then
-			for neighbor in allNeighbors(cp) do
-				if neighbor.country == WWII_FRANCE then
-					french = french + 1
-				elseif neighbor.country == WWII_ENGLAND then
-					brit = brit + 1
+		for cp in allCityCPs() do
+			if cp:isAttackObjective(ALLIED) then
+				for neighbor in allNeighbors(cp) do
+					if neighbor.country == WWII_FRANCE then
+						french = french + 1
+					elseif neighbor.country == WWII_ENGLAND then
+						brit = brit + 1
+					end
 				end
 			end
 		end
+
+		if french == 0 or brit > french then
+			return WWII_FRANCE
+		else
+			return WWII_ENGLAND
+		end
+
+	else
+	--  Post US deployment / Deployed
+
+		for cp in allCityCPs() do
+			if cp:isAttackObjective(ALLIED) then
+				for neighbor in allNeighbors(cp) do
+					if neighbor.country == WWII_FRANCE then
+						french = french + 1
+					elseif neighbor.country == WWII_ENGLAND then
+						brit = brit + 1
+					elseif neighbor.country == WWII_USA then
+						usa = usa + 1
+					end
+				end
+			end
+		end
+
+		if usa == 0 or (brit + french) > usa then
+			return WWII_USA
+		else
+			if french == 0 or brit > french then
+				return WWII_FRANCE
+			else
+				return WWII_ENGLAND
+			end
+		end
 	end
-
-	if french == 0 or brit > french then return WWII_FRANCE else return WWII_ENGLAND end
-
 end
 
 ----------------------------------------------------------------------
 -- Check if a unit is a worthwhile candidate
 
 function _isCandidateUnit(unit)
-	if unit:isBrigade() == false then return false end
+	if unit:isBrigade() == false and unit:isGarrison() == false then return false end
 	if unit:offMap() == true then return false end
 	local cp = unit:homeCP()
 	if cp == nil then return false end
