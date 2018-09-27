@@ -573,14 +573,14 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
             teulClose(endpoint);
         }
         
-        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) {
+        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
             return;
         }
 
         // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many cases.
         _routeCallbacks(endpoint);
 
-        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) {
+        if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
             return;
         }
     }
