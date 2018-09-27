@@ -293,15 +293,13 @@ static ssize_t _receiveTCP(ENDPOINT& endpoint, void * const ioData, size_t *ioSi
             dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " tcp close: read err:%d", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), error);
             return -error;
         } else {
-            // This shouldn't happen in reality, since getting here means we were told data was available
-            // on the socket. But, networking is weird, so just in case, we treat it as zero data received.
-            dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " tcp read returned EAGAIN?", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
+            // for EAGAIN we return the error with no logging
+            return -error;
         }
     } else if (recvRet == 0) {
         dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " tcp close: EOF", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
         return -EPIPE;
     } else {
-        endpoint.lastDataRecv.makeCurrent();
         *ioSize = static_cast<size_t>(recvRet);
     }
     return 0;
@@ -453,8 +451,11 @@ ssize_t _recvDatagram(ENDPOINT& endpoint)
     switch (endpoint.protocol) {
         case PROTOCOL_TCP:
         case PROTOCOL_CTRL:
-            while ((result = _recvOneFromStream(endpoint)) == 0) {
+            result = _recvOneFromStream(endpoint);
+            if (result == 0) {
                 endpoint.lastDataRecv.makeCurrent();
+            } else if (safe_isEAGAIN(-result)) {
+                result = 0; // EAGAIN is not a real error here.
             }
             break;
         case PROTOCOL_UDB:
