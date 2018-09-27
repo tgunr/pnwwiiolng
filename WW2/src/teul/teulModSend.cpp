@@ -77,7 +77,7 @@ SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback, const U
 
 SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port)
 {
-    ssize_t result = INVALID_SOCKET;
+    ssize_t result = SOCKET_ERROR;
     struct sockaddr_in *realAddress = nullptr, possibleAddrStorage = destSockAddress;
     socklen_t realAddressLength = 0;
     
@@ -98,7 +98,7 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
     
     do {
 	    result = ::sendto(socket, static_cast<char *>(data), sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
-    } while (result == INVALID_SOCKET && (err = dbugGetErrno()) == PLAT_EINTR);
+    } while (result == SOCKET_ERROR && (err = dbugGetErrno()) == PLAT_EINTR);
     
 	if (result < 0) {
 		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {

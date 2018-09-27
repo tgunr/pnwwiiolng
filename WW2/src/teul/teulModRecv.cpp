@@ -211,7 +211,6 @@ static ssize_t _checkConnectTCP(ENDPOINT& endpoint)
 
 static ssize_t _acceptConnectTCP(ENDPOINT& endpoint)
 {
-	dbugLog(_FLD, "t:%d entered _acceptConnectTCP, time:%" PR64BitUT "", endpoint.teulIndex(), teulClock64);
 	// Multiple simultaneous incoming connections may only generate a single "event", so while we
 	// are here, we should try and drain any/all incoming connections queued up (hence the loop).
     struct sockaddr_in newFromAddress, newLocalAddress;
