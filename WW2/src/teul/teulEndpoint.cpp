@@ -355,7 +355,7 @@ public:
 		// vector back so that we retain the original pre-sized allocation.
 		if ( ! m_endpoints.empty() ) {
 			dbugLog(_FLM | STD_ERR, "processing %" PRSizeT " dead endpoints", m_endpoints.size());
-			auto eps = std::move(m_endpoints);
+            auto eps = std::exchange(m_endpoints, {});
 			for (auto* ep : eps) {
 				teulFreeEndpoint(ep);
 			}
@@ -827,11 +827,11 @@ EndpointImpl::Reset()
 	recvTag = 0;
 	sentTag = 0;
 	assert( m_curDatagram == nullptr );
-	for (auto it = recvQueue.begin(), end = recvQueue.end(); it != end; ++it)
-		teulReleaseDatagram(*it);
-	recvQueue.clear();
-	while ( m_sendQueue.empty() == false )
-	{
+    for (auto * const dgram : m_recvQueue) {
+		teulReleaseDatagram(dgram);
+    }
+	m_recvQueue.clear();
+	while (!m_sendQueue.empty()) {
 		freeFirstPacketInSendQueue();
 	}
 	m_version = 0;

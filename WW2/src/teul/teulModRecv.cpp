@@ -50,13 +50,10 @@ struct DATA_GRAM
     Teul::PacketHeader*   contents;    //!< Points to the beginning of the packet data.
     UINT32                m_size;      //!< Size of the entire object (might be smaller than allocated size)
     UINT32                m_reqSize;   //!< Original requested size of bucket
+    
+    inline char * decryptedDataStart() const { return reinterpret_cast<char * const>(&contents->m_tag); }
+    inline char * callbackPayload() const { return reinterpret_cast<char * const>(contents + 1); } // eww
 };
-
-static size_t   	numTeulUpdates = 0;
-static TeulTimeMS	lastTeulUpdate = 0;
-static TeulTimeMS	averageDelta = 0;
-static TeulTimeMS	maxDelta = 0;
-static TeulTimeMS   _lastIdle = 0;
 
 struct POLL_STRUCT
 {
@@ -72,7 +69,7 @@ static POLL_STRUCT pollData;
 static void _pollRegenerateSet();
 
 static void    _pollSockets(TeulTimeMS duration_);
-static void    _routeCALLBACKs(ENDPOINT& inEndpoint);
+static void    _routeCallbacks(ENDPOINT& inEndpoint);
 
 using SocketToEndpointMap = std::unordered_map<SOCKET, ENDPOINT*>;
 static SocketToEndpointMap socketToEndpoint;
@@ -165,9 +162,6 @@ void teulInitModRecv()
     // This assertion is here only because there used to be a list clear here
     // which serves no sensible purpose.
     assert(socketToEndpoint.size() == 0 && "Why wouldn't the endpoint list be clear at startup?");
-
-	_lastIdle = teulClock64;
-	lastTeulUpdate = teulClock64;
 }
 
 static ssize_t _checkConnectTCP(ENDPOINT& endpoint)
@@ -400,7 +394,7 @@ static ssize_t _recvOneFromStream(ENDPOINT& endpoint)
 	}
 
     dbugOutputPacket(endpoint, true, endpoint.m_impl->m_curDatagram->contents, endpoint.m_readBufferUsed);
-	endpoint.m_impl->recvQueue.push_back(endpoint.m_impl->m_curDatagram);
+	endpoint.m_impl->m_recvQueue.push_back(endpoint.m_impl->m_curDatagram);
 	endpoint.m_impl->m_curDatagram = nullptr;
 	endpoint.m_readBufferUsed = 0;
 	return 0;
@@ -441,7 +435,7 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 #endif
         } else {
             dgram->m_size = dgram->contents->packetSizeBytes() + Teul::PacketPrefixBytes;
-            endpoint.m_impl->recvQueue.push_back(dgram.release());
+            endpoint.m_impl->m_recvQueue.push_back(dgram.release());
         }
     } while (error == 0 || error == PLAT_EINTR); // this is here to avoid writing while(true)
     
@@ -584,7 +578,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
         }
 
         // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many cases.
-        _routeCALLBACKs(endpoint);
+        _routeCallbacks(endpoint);
 
         if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed)) {
             return;
@@ -706,7 +700,7 @@ static void _sendEndpointKlive(ENDPOINT& endpoint)
         return;
     }
     
-    if (endpoint.lastKliveSent.elapsed() < endpoint.m_impl->kliveInterval) {
+    if (endpoint.lastKliveSent.elapsed() < static_cast<TeulDeltaMS>(endpoint.m_impl->kliveInterval)) {
         return;
     }
     
@@ -803,14 +797,14 @@ void ENDPOINT::updateSocketEvents()
     }
 }
 
-static void _attemptDecryption(DATA_GRAM* dgram, UCHAR* const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
+static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
 {
     if (dgram->contents->packetToken() == Teul::PacketToken::Unencrypted) {
         return;
     }
     ABORT_UNLESS(dgram->contents->packetToken() == Teul::PacketToken::Encrypted);
 
-    endpoint.decrypt(decrypted, payloadSize);
+    endpoint.decrypt(reinterpret_cast<unsigned char * const>(decrypted), payloadSize);
 }
 
 static bool _isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)
@@ -832,252 +826,197 @@ static bool _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& h
 {
 	static_assert(sizeof(Teul::PacketHeader::tag_t) == sizeof(EndpointImpl().recvTag), "Endpoint and Packet disagree on size of packet tags");
 
-	const Teul::PacketHeader::tag_t prevTag = (Teul::PacketHeader::tag_t)endpoint.m_impl->recvTag;
-	const Teul::PacketHeader::tag_t expectTag = prevTag + (Teul::PacketHeader::tag_t)1;
+	Teul::PacketHeader::tag_t prevTag = endpoint.m_impl->recvTag;
+	Teul::PacketHeader::tag_t expectTag = prevTag + 1;
 
 	// The new tag should be *exactly* one higher than the old
-	if ( header.m_tag != expectTag )
-	{
-		dbugLog(_FLW, "t:%d out of order packet rx:%u, prev:%u, expected:%u"
-						, endpoint.teulIndex()
-						, static_cast<UINT32>(header.m_tag), static_cast<UINT32>(prevTag), static_cast<UINT32>(expectTag));
-		endpoint.doError(ETEUL_ILLEGAL_PACKET_ORDER);
-		teulClose(endpoint);
+	if (header.m_tag != expectTag) {
+		dbugLog(_FLW, "t:%d out of order packet rx:%hhu, prev:%hhu, expected:%hhu",
+                        endpoint.teulIndex(), header.m_tag, prevTag, expectTag);
 		return false;
 	}
-
-	endpoint.m_impl->recvTag = (UINT16)header.m_tag;
-
+	endpoint.m_impl->recvTag = header.m_tag;
 	return true;
 }
 
-static void
-_processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
+static void _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
 #if platBuild == BUILD_SERVER
-	if ( endpoint.m_parent == nullptr || !endpoint.isFromClient() )
+	if (!endpoint.m_parent || !endpoint.isFromClient()) {
 		return;
+    }
 
-	// The host assigns the created time when the TCP session is
-	// started; so the client time should lag a few milliseconds
-	// behind the host. If the client gets more than a few ms
-	// ahead of the host, we know they are speed hacking.
+	// The host assigns the created time when the TCP session is started; so the client time should lag
+    // a few milliseconds behind the host. If the client gets more than a few ms ahead of the host, we
+    // know they are speed hacking.
 
-	if ( endpoint.m_haveTicks == false )	// true briefly at the start of a connection.
-	{
-		endpoint.m_impl->m_lastPacketTick = header.m_tick;
-		endpoint.m_haveTicks = true;
+	if (!endpoint.m_haveTicks) { // true briefly at the start of a connection.
+        endpoint.m_impl->m_lastPacketTick = header.m_tick;
+        endpoint.m_haveTicks = true;
 	}
 
-	TeulTimeMS newTick = (TeulTimeMS)header.m_tick;
-	const TeulTimeMS lastTick = (TeulTimeMS)endpoint.m_impl->m_lastPacketTick;
-	if ( newTick < lastTick )
-	{
-		// ensure the value can never be negative
-		const TeulTimeMS adjusted = newTick | (1ULL << (sizeof(header.m_tick) * 8));
-		newTick = adjusted;
-	}
-	const TeulTimeMS delta = newTick - lastTick;
+    // Below logic relies on it being safe to treat the tick values as signed.
+    // Tick values are 64 bits, which in signed form gives 300 million years of
+    // leeway. That might just barely last long enough for this code to actually
+    // get a proper rewrite.
+    assert(endpoint.m_impl->m_lastPacketTick < std::numeric_limits<TeulDeltaMS>::max());
 
-	if ( delta > 0 )
-		endpoint.m_tickAccumulation += delta;
+	TeulDeltaMS newTick = static_cast<TeulDeltaMS>(header.m_tick);
+	TeulDeltaMS lastTick = static_cast<TeulDeltaMS>(endpoint.m_impl->m_lastPacketTick);
+    TeulTimeMS delta = static_cast<TeulTimeMS>(std::llabs(newTick - lastTick)); // both values are guaranteed positive; this can not underflow
+    
+    endpoint.m_tickAccumulation += delta;
 
 	// Save the value.
 	endpoint.m_impl->m_lastPacketTick = header.m_tick;
 	endpoint.m_impl->m_lastTickRx = teulClock64;
 
-	// Only evaluate every 8th packet.
-	if ( (endpoint.m_impl->recvTag & 7) > 0 )
+	// Only evaluate every 8th packet for speedhack.
+	if ((endpoint.m_impl->recvTag & 7) > 0) {
 		return;
+    }
 
 	teulSyncClock();
+
 	Teul::TickSample sample(endpoint.m_created.elapsed(), endpoint.m_tickAccumulation);
 
-	if ( sample.delta > -100 )
+	if (sample.delta > -100) { // In other words, if the client is less than 100ms ahead of the host
 		return;
+    }
 
-	const FLOAT64 minRatio = host_config.arena.speedHackRatio;
-	if ( (minRatio >= 1.0) & (sample.ratio < minRatio) )
+	FLOAT64 minRatio = host_config.arena.speedHackRatio;
+    
+    // All is well if detection is set above 1.0 (off) or the client:host ratio is below the threshold
+	if (minRatio >= 1.0 & sample.ratio < minRatio) {
 		return;
-
+    }
+    
+    // Oops. Fire a speedhack error.
+    // Do NOT teulClose(); we don't want to tip off the hacker of the detection.
 	endpoint.doError(ETEUL_ILLEGAL_TICKS, &sample);
 #endif
 }
 
-static void
-_executeCallbacks(ENDPOINT& endpoint, DATA_GRAM* const dgram)
+static void _executeCallback(ENDPOINT& endpoint, DATA_GRAM* const dgram)
 {
-	Teul::PacketHeader* const hdr = dgram->contents;
-	UCHAR* const decryptedData = &hdr->m_tag;
-
-	const UINT32 payloadSize_bytes = dgram->m_size - Teul::PacketPrefixBytes;
+	Teul::PacketHeader * const hdr = dgram->contents;
+	char * const decryptedData = dgram->decryptedDataStart();
+	size_t payloadSize_bytes = dgram->m_size - Teul::PacketPrefixBytes;
+    
 	_attemptDecryption(dgram, decryptedData, payloadSize_bytes, endpoint);
 
-	switch ( endpoint.state() )
+	switch (endpoint.state())
 	{
-	case IS_OPENING:
-		// when the state == IS_OPENING, we only accept SYN tokens.
-		// if they aren't recognized we assume that the encryption has failed
-		// and try a different encryption
-		if ( _isValidSynData(hdr, payloadSize_bytes) == false )
-		{
-			dbugLog(_FLA, "t:%d non-syn data in opening mode", endpoint.teulIndex());
-			dbugSetErrno(EINVAL);
-			return;
-		}
-	break;
-	case IS_LISTENING:
-		ABORT_IF_EX(hdr->m_callX != Teul::Module::CallbackX, "t:%d listening sockets must NOT receive callbacks", endpoint.teulIndex());
-	break;
-	default:
-	break;
-	}
+        case IS_OPENING:
+            // when the state == IS_OPENING, we only accept SYN tokens.
+            // if they aren't recognized we assume that the encryption has failed
+            // and try a different encryption
+            if (!_isValidSynData(hdr, payloadSize_bytes)) {
+                dbugLog(_FLA, "t:%d non-syn data in opening mode", endpoint.teulIndex());
+                return;
+            }
+            break;
+        case IS_LISTENING:
+            ABORT_IF_EX(hdr->m_callX != Teul::Module::CallbackX, "t:%d listening sockets must NOT receive callbacks", endpoint.teulIndex());
+            break;
+        default:
+            break;
+    }
 
 	// check for someone hacking our TCP stream by deleting packets...
-	if ( endpoint.m_reliable )
-	{
-		if ( ! _checkPacketOrdering(endpoint, *hdr) )
+	if (endpoint.m_reliable) {
+		if (!_checkPacketOrdering(endpoint, *hdr)) {
+            // This can recurse but we're already expecting that here.
+            endpoint.doError(ETEUL_ILLEGAL_PACKET_ORDER);
+            teulClose(endpoint);
 			return;
+        }
 		_processTicks(endpoint, *hdr);
 	}
 
-	//_updateRecvError(curEndpoint->li, dataHeader.tag, dataHeader.mode);
+	TEUL_CALLBACK * const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
 
-	TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(hdr->m_callX, hdr->m_callY);
-	if ( callback == nullptr )
-	{
-		dbugLog(_FLW, "t:%d ip:%s cb:%u,%u callback does not exist", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
+	if (!callback) {
+		dbugLog(_FLA, "t:%d ip:%s cb:%u,%u callback does not exist", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
 	}
 
-	if ( hdr->m_callX == Teul::Serv::CallbackX && endpoint.teulIndex() >= 0 && !(endpoint.m_peer) )
-	{
+	if (hdr->m_callX == Teul::Serv::CallbackX && !endpoint.m_peer) {
 		dbugLog(_FLA,"t:%d ip:%s cb:%d,%d callback access denied", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hdr->m_callX, hdr->m_callY);
 		return;
 	}
 
-	UCHAR* const dataStart = (UCHAR*)(&hdr[1]);	// Immediately after the header.
-	callback->processCallback(endpoint, dataStart, dgram->m_size - sizeof(*hdr));
+	callback->processCallback(endpoint, reinterpret_cast<UCHAR * const>(dgram->callbackPayload()), dgram->m_size - sizeof(Teul::PacketHeader));
 }
 
-static void
-_routeCALLBACKs(ENDPOINT& endpoint)
+static void _routeCallbacks(ENDPOINT& endpoint)
 {
-	EndpointImpl& impl = *endpoint.m_impl;
-	while ( impl.recvQueue.empty() == false )
-	{
-		DATA_GRAM* const datagram = impl.recvQueue.front();
-		impl.recvQueue.erase(impl.recvQueue.begin());
+	while (!endpoint.m_impl->m_recvQueue.empty()) {
+		DATA_GRAM * const datagram = endpoint.m_impl->m_recvQueue.front();
+		endpoint.m_impl->m_recvQueue.pop_front();
 
-		// Temporarily set the endpoint address to correspond to the sender
-		// so that we can respond symmetrically.
-		const struct sockaddr_in saveFromAddress = endpoint.fromSockAddress;
+		// Temporarily set the endpoint address to correspond to the sender so responses "just work".
+        // This is really bad and should be fixed.
+		auto saveFromAddress = endpoint.fromSockAddress;
+        
 		endpoint.fromSockAddress = datagram->sockAddress;
-
-		_executeCallbacks(endpoint, datagram);
-
+		_executeCallback(endpoint, datagram); // this can reenter!
 		endpoint.fromSockAddress = saveFromAddress;
 
 		teulReleaseDatagram(datagram);
 	}
 }
 
-UINT32
-teulElapsedTotal(UINT32 newTotal, UINT32 oldTotal)
+#ifdef DEBUG
+static constexpr const TeulTimeMS AlertInterval_ms = 2 * 1000;
+#else
+static constexpr const TeulTimeMS AlertInterval_ms = 75;
+#endif
+
+SINT32 teulModIdle(const TeulTimeMS duration_)
 {
-	UINT32 total;
-	if ( newTotal >= oldTotal)
-		total = newTotal - oldTotal;
-	else
-		total = (0xffffffff-oldTotal) + newTotal;
-
-	return total;
-}
-
-static void
-teulIdleEndpoints()
-{
-	ENDPOINT_LIST::iterator it = idleEndpoints.begin();
-	while ( it != idleEndpoints.end() )
-	{
-		ENDPOINT* const endpoint = *it;
-		++it;
-
-		if ( endpoint != nullptr )
-			_idleEndpoint(*endpoint);
-	}
-}
-
-SINT32
-teulModIdle(const TeulTimeMS duration_)
-{
-	if ( duration_ == 0 )
-		std::this_thread::yield();
-
 	teulSyncClock();
 
-	// At 1s intervals, count stats, kill dead endpoints
-	TeulTimeMS interval = teulClock64 - std::min(teulClock64, lastUpdateTime);
-	if ( interval > 1000 )
-	{
-		//time to recalc updates per sec
-		lastUpdateTime = teulClock64;
+	// At 1s intervals, kill dead endpoints
+    static TeulTimeMS lastDeadEndpointsCleanup = 0;
+    
+	if (teulClock64 - std::min(teulClock64, lastDeadEndpointsCleanup) > 1000) {
+		lastDeadEndpointsCleanup = teulClock64;
 		teulKillDeadEndpoints();
 	}
 
+    // Poll sockets. This will yield the CPU for at least one context switch even if duration is zero.
 	_pollSockets(duration_);
 
-	numTeulUpdates++;
-
-	interval = teulClock64 - std::min(teulClock64, lastTeulUpdate);
-	averageDelta += interval;		// divide by numTeulUpdates to get average
-	maxDelta = std::max(interval, maxDelta);
-
-	// Can't merge with _lastIdle because this gets set elsewhere too
-	lastTeulUpdate = teulClock64;
-
-	interval = teulClock64 - std::min(teulClock64, _lastIdle);
-#ifdef DEBUG
-	static const TeulTimeMS AlertInterval_ms = 2 * 1000;
-#else
-	static const TeulTimeMS AlertInterval_ms = 75;
-#endif
-	if ( interval > duration_ + AlertInterval_ms )
-		dbugLog(_FLA, "STALL. teulModIdle interval=%" PR64BitUT "", interval);
-
-	_lastIdle = teulClock64;
-
+    // Warn about teul stalls (failure to give the network stack a CPU slice to use for updating)
+    static TeulTimeMS lastModIdle = 0;
+    
+	if (teulClock64 - std::min(teulClock64, lastModIdle) > duration_ + AlertInterval_ms && lastModIdle != 0) {
+		dbugLog(_FLW, "STALL. teulModIdle interval=%" PR64BitUT "", teulClock64 - std::min(teulClock64, lastModIdle));
+    }
+	lastModIdle = teulClock64;
+    
+    // Only run the endpoint idles (klives and timeouts) every 500ms
 	static TeulTimeMS lastIdleCycle = teulClock64;
-	interval = teulClock64 - std::min(teulClock64, lastIdleCycle);
-	if ( interval < ENDPOINT_IDLE_INTERVAL )
-		return 0;
 
+	if (teulClock64 - std::min(teulClock64, lastIdleCycle) >= ENDPOINT_IDLE_INTERVAL) {
+        for (ENDPOINT * const ep : idleEndpoints) {
+            if (ep) {
+                _idleEndpoint(*ep);
+            }
+        }
+    }
 	lastIdleCycle = teulClock64;
-
-	teulIdleEndpoints();
-
-	teulSyncClock();
-	interval = teulClock64 - std::min(teulClock64, lastIdleCycle);
-#ifdef BETA_RELEASE
-	static const TeulTimeMS idleLimit = 50;
-#else
-	static const TeulTimeMS idleLimit = 25;
-#endif
-	if ( interval > idleLimit + duration_ )
-		dbugLog(_FLA, "STALL. idle endpoints interval=%" PR64BitUT "ms", interval);
-
 	return 0;
 }
 
-void
-ENDPOINT::setConnected()
+void ENDPOINT::setConnected()
 {
 	m_connected = true;
 	updateSocketEvents();
 }
 
-void
-ENDPOINT::setWritesPending(const bool pending_)
+void ENDPOINT::setWritesPending(const bool pending_)
 {
 	m_writesPending = pending_;
 	updateSocketEvents();

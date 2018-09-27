@@ -41,8 +41,6 @@
 // Higher than SOMAXCONN.
 enum { MAX_ACCEPT_BACKLOG = 1024 };
 
-TeulTimeMS lastUpdateTime;
-
 extern void teulInitEndpoints(ERROR_FUNCTION const);
 
 //////////////////////////////////////////////////////////////////////
@@ -192,7 +190,6 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 	teulInitModCallbacks();
 
 	teulSyncClock();
-	lastUpdateTime = teulClock64;
 
 #if platBuild == BUILD_SERVER
 	_getHostIPAddresses();

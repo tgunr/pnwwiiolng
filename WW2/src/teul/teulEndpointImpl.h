@@ -32,8 +32,7 @@ struct EndpointImpl
 	WWII::Cryptographer<false>	m_rxCrypt;		//!< Receiving decryptor.
 	TeulTimeMS					m_lastTickRx;	//!< When we received the last tick.
 
-	using DatagramQueue = std::vector<struct DATA_GRAM*>;
-	DatagramQueue	recvQueue;
+	std::deque<struct DATA_GRAM *> m_recvQueue;
 	std::deque<Teul::Packet*> m_sendQueue;
 
 	//! Buffer of data currently being read from socket.
@@ -43,13 +42,13 @@ struct EndpointImpl
 //	struct event*	m_readEvt;				//!< libEvent read event.
 //	struct event*	m_writeEvt;			//!< libEvent write event.
 
-	UCHAR			recvTag;				//!< Last packet received.
-	UCHAR			sentTag;				//!< Last packet sent.
+	Teul::PacketHeader::tag_t recvTag;				//!< Last packet received.
+	Teul::PacketHeader::tag_t sentTag;				//!< Last packet sent.
 
 	UINT16			m_version;				//!< Currently negotiated version.
 	UINT16			m_cryptVersion;			//!< Version to use for encryption.
 	nfds_t			m_pollSlot;				//!< Position within the "poll" array under Linux/MacOS.
 	TeulTimeMS		kliveInterval;			//!< Time between keep alives.
-	UINT16			m_lastPacketTick;		//!< Tick of the previous packet.
+	TeulTimeMS		m_lastPacketTick;		//!< Tick of the previous packet.
 };
 

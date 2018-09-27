@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-extern TeulTimeMS lastUpdateTime;
-
 /* Basic functions */
 SINT32 teulModIdle(const TeulTimeMS duration);
 SINT32 teulModShutdown();
@@ -22,7 +20,5 @@ SINT32 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL
 
 void teulMRecvAddToPoll(ENDPOINT& endpoint);
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction = true);
-
-UINT32 teulElapsedTotal(UINT32 newTotal, UINT32 oldTotal);
 
 void teulConfigureEndpointSocket(ENDPOINT& endpoint);
