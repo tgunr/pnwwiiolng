@@ -1351,10 +1351,6 @@ _illegalPacketSequence(SINT32 teulIndex)
 	if ( persona == nullptr )
 		return;
 
-	// Give them a grace period after reconnecting
-	if ( persona->isInGracePeriod(60) )
-		return;
-
 	dbugLog(_FLW, "t:%d p:%u invalid packet sequence", teulIndex, persona->playerID());
 
 	if ( !host_config.arena.checksums || !persona->m_flags.canEject )
