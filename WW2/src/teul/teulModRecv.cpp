@@ -749,45 +749,37 @@ static void _checkEndpointState(ENDPOINT& endpoint)
     }
 }
 
-void
-_checkEndpointTimeouts(ENDPOINT& endpoint)
+void _checkEndpointTimeouts(ENDPOINT& endpoint)
 {
-    if ( ! endpoint.m_doTimeoutCheck || endpoint.timeout == 0 )
+    if (!endpoint.m_doTimeoutCheck || endpoint.timeout == 0 || endpoint.state() == IS_DEAD) {
         return;
-
-    const TeulDeltaMS elapsed = (TeulDeltaMS)(teulClock64 - endpoint.lastDataRecv.time());
-    if ( elapsed <= (TeulDeltaMS)endpoint.timeout )
-        return;
-
-    if (endpoint.state() < IS_DEAD)
-    {
-        printf("t:%d timeout\n", endpoint.teulIndex());
-        dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms"
-                    , endpoint.teulIndex()
-                    , endpoint.timeout
-                    , elapsed
-                    );
-        teulClose(endpoint);
     }
+
+    TeulDeltaMS elapsed = (TeulDeltaMS)(teulClock64 - endpoint.lastDataRecv.time());
+    
+    if (elapsed <= endpoint.timeout) {
+        return;
+    }
+
+    printf("t:%d timeout\n", endpoint.teulIndex());
+    dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms",
+                endpoint.teulIndex(), endpoint.timeout, elapsed);
+    teulClose(endpoint);
 }
 
-static void
-_idleEndpoint(ENDPOINT& endpoint)
+static void _idleEndpoint(ENDPOINT& endpoint)
 {
     _checkEndpointState(endpoint);
-
     _checkEndpointTimeouts(endpoint);
 }
 
-void
-ENDPOINT::updateSocketEvents()
+void ENDPOINT::updateSocketEvents()
 {
-#if platOS != OS_WIN32
-	const UINT32 slot = m_impl->pollSlot();
-	// Since slot is now unsigned, negative values
-	// will be really big.
-	if ( slot >= pollData.CAPACITY )
+	nfds_t slot = m_impl->pollSlot();
+    
+	if (slot == std::numeric_limits<nfds_t>::max()) {
 		return;
+    }
 
 	socketToEndpoint[socket] = this;
 	pollData.fd[slot].fd = socket;
@@ -796,60 +788,49 @@ ENDPOINT::updateSocketEvents()
 #else
 	pollData.fd[slot].events = POLLHUP | POLLIN;
 #endif
-    if ( ((protocol == PROTOCOL_TCP) && (state() == IS_OPENING) && (!m_connected)) || (!m_impl->m_sendQueue.empty()) )
+    
+    // Ask for writeability if we're a TCP socket that's waiting for connect() completion, or if
+    // we have data to send.
+    if ((protocol == PROTOCOL_TCP && state() == IS_OPENING && !m_connected) || !m_impl->m_sendQueue.empty()) {
         pollData.fd[slot].events |= POLLOUT;
-
+    }
 	pollData.fd[slot].revents = 0;
 
-	if (pollData.m_maxSock == INVALID_SOCKET)
+	if (pollData.m_maxSock == INVALID_SOCKET) {
 		pollData.m_maxSock = socket;
-	else
+	} else {
 		pollData.m_maxSock = std::max(pollData.m_maxSock, socket);
-#else
-	auto flags = FD_READ | FD_OOB | FD_CLOSE;
-	if ( m_connected == false )
-		flags |= FD_CONNECT | FD_ACCEPT;
-	if ( !m_impl->m_sendQueue.empty() )
-		flags |= FD_WRITE;
-
-	WSAEventSelect(socket, eventObject, flags);
-#endif
+    }
 }
 
-static void
-_attemptDecryption(DATA_GRAM* dgram, UCHAR* const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
+static void _attemptDecryption(DATA_GRAM* dgram, UCHAR* const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
 {
-	if ( dgram->contents->packetToken() == Teul::PacketToken::Unencrypted )
-		return;
-	ABORT_UNLESS(dgram->contents->packetToken() == Teul::PacketToken::Encrypted);
+    if (dgram->contents->packetToken() == Teul::PacketToken::Unencrypted) {
+        return;
+    }
+    ABORT_UNLESS(dgram->contents->packetToken() == Teul::PacketToken::Encrypted);
 
-	endpoint.decrypt(decrypted, payloadSize);
+    endpoint.decrypt(decrypted, payloadSize);
 }
 
-static bool
-_isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)
+static bool _isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)
 {
-	if ( PN_UNLIKELY(payloadSize < 2) )
-		return false;
-	if ( PN_LIKELY(header->m_callX == Teul::Module::CallbackX) )
-	{
-		switch ( header->m_callY )
-		{
-		case TM_SYN_TOKEN_Y:
-		case TM_SYN_ACK_TOKEN_Y:
-		case TM_SYN_ACK_ACK_TOKEN_Y:
-			return true;
-		default:
-			break;
+	if (payloadSize >= Teul::PacketPrefixBytes && header->m_callX == Teul::Module::CallbackX) {
+		switch (header->m_callY) {
+            case TM_SYN_TOKEN_Y:
+            case TM_SYN_ACK_TOKEN_Y:
+            case TM_SYN_ACK_ACK_TOKEN_Y:
+                return true;
+            default:
+                break;
 		}
 	}
 	return false;
 }
 
-static bool
-_checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
+static bool _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 {
-	static_assert( sizeof(Teul::PacketHeader::tag_t) == sizeof(endpoint.m_impl->recvTag), "Endpoint and Packet disagree on size of packet tags" );
+	static_assert(sizeof(Teul::PacketHeader::tag_t) == sizeof(EndpointImpl().recvTag), "Endpoint and Packet disagree on size of packet tags");
 
 	const Teul::PacketHeader::tag_t prevTag = (Teul::PacketHeader::tag_t)endpoint.m_impl->recvTag;
 	const Teul::PacketHeader::tag_t expectTag = prevTag + (Teul::PacketHeader::tag_t)1;

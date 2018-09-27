@@ -41,7 +41,7 @@ namespace Teul
 	enum { MaxKliveInterval = 10000 };
 	enum { EndpointUpdateInterval = 1000 };
 
-	enum { MinEndpointTimeout = MinKliveNeeded * KlivesPerTimeout };
+	enum { MinEndpointTimeout = MinKliveInterval * KlivesPerTimeout };
 	enum { AnyIndex = -1001 };
 
 	enum { MaxEndpointSendErrors = 128 };
