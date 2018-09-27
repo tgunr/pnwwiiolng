@@ -212,21 +212,14 @@ _doAction(ENDPOINT& endpoint
 // this routine not only executes callbacks but also relays callbacks not
 // destined for this module to the appropriate interface either directly
 // with _relayCALLBACK() or _routeCALLBACK().
-SINT32
-TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
+SINT32 TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
 {
-	if ( PN_UNLIKELY(recvAction() == nullptr) )
-	{
+	if (!recvAction()) {
 		dbugLog(_FLA, "t:%d " PRF_CALLBACK " null action", endpoint_.teulIndex(), PRA_CALLBACK(*this));
 		return -EINVAL;
 	}
 
-	const SINT32 result = _doAction(endpoint_, *this, callData_, dataSize_bytes);
-	if ( PN_UNLIKELY(result == -ETEUL_CB_REQ_DATA) )
-	{
-		endpoint_.sendError(ETEUL_CB_REQ_DATA);
-	}
-	return result;
+	return _doAction(endpoint_, *this, callData_, dataSize_bytes);
 }
 
 SINT32
