@@ -220,11 +220,13 @@ using socklen_t = SINT32;
 
 // Unfortunately, RakNet thinks it's clever and owns the universe and can do
 // whatever it pleases. It's quite wrong about this. We thus use this horrible
-// workaround to change INVALID_SOCKET from a macro to a constant (as we've made
-// it on macOS/Linux builds), so our other workaround for RakNet's pointless
-// horsing around will work properly.
+// workaround to change INVALID_SOCKET and SOCKET_ERROR from a macro to a
+// constant (as we've made it on macOS/Linux builds), so our other workaround
+// for RakNet's pointless horsing around will work properly.
 #undef INVALID_SOCKET
+#undef SOCKET_ERROR
 constexpr const SOCKET INVALID_SOCKET = static_cast<SOCKET>(~0);
+constexpr const int SOCKET_ERROR = -1;
 
 #define PRF_SOCKET "%d"
 #define PRA_SOCKET(s) (static_cast<int>(s))
