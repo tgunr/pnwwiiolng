@@ -487,7 +487,7 @@ static ssize_t _handleReceive(ENDPOINT& endpoint)
     return result;
 }
 
-static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSlots)
+static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
 {
     // This generation counter allows us to track reentrancy of the teul processing machinery.
     // It doesn't strictly need to be atomic, but making it so enforces better usage. Each check
@@ -495,10 +495,6 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
     // processing loop. Since we use relaxed ordering for all operations on the atomic, we don't
     // take any memory barrier overhead on x86.
     static std::atomic_uint64_t pollGeneration(0);
-    
-    if (numSlots == 0) {
-        return;
-    }
     
     // Use RAII semantics to force regenerate of the pollset even if we hit a cancellation point.
     // This is not hugely efficient, but it has the virtue that we'll never leave the pollset in a weird state.
@@ -512,7 +508,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots, int numSl
     for (size_t slot = 0; slot < maxSlots; ++slot) {
 		pollfd& sfd = fdArray[slot];
   
-        if (sfd.fd < 0 || sfd.revents == 0) {
+        if (sfd.fd == INVALID_SOCKET || sfd.revents == 0) {
             continue;
         }
         
@@ -679,18 +675,19 @@ static void _pollSocketsInner(TeulTimeMS duration_)
 
     if (pollret == SOCKET_ERROR) {
         LogAbort("poll returned error %d, and all poll errors are fatal", error);
+    } else if (pollret > 0) {
+        _runPollEndpoints(pollData.fd, pollData.m_size);
     }
-    _runPollEndpoints(pollData.fd, pollData.m_size, pollret);
 }
 
 static void _pollSockets(TeulTimeMS duration_)
 {
     // Data consistency check
-    // Leaving this commented out for now because it can actually fail in practice due to reentrancy
-    // of the teulUpdateTransport() machinery
+    // Leaving this commented out for now because it can actually fail in practice due to cleanup of
+    // dead endpoints being delayed.
     //assert(idleEndpoints.empty() ? pollData.m_size == 0 : pollData.m_size > 0);
     
-    if (idleEndpoints.empty()) {
+    if (pollData.m_size == 0) {
         // Yield CPU, even if duration is zero
         std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
     } else {

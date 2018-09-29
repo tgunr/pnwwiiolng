@@ -283,6 +283,9 @@ void teulConfigureEndpointSocket(ENDPOINT& endpoint)
 {
 #if platOS != OS_WIN32 // Windows does not use the same meanings for these
     fcntl(endpoint.socket, F_SETFL, fcntl(endpoint.socket, F_GETFL) | O_NONBLOCK | O_CLOEXEC);
+#else
+    u_long onValue = 1;
+    ioctlsocket(endpoint.socket, FIONBIO, &onValue);
 #endif
 
 	endpoint.setRcvBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize );
