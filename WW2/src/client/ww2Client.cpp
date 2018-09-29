@@ -2781,6 +2781,13 @@ const PersonaSummary* Client::GetSavedPersona() const
 	return nullptr;
 }
 
+// This is used when the country of a Garrison is changed.
+void ww2::Client::SetSelectedPersonaCountry(WWII_COUNTRY newCountry)
+{
+	_classdata->personaselected.m_countryID = newCountry;
+
+}
+
 BrigadeSelection const& Client::BrigadeSelected() const
 {
 	return _classdata->brigadeselected;

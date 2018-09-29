@@ -367,6 +367,7 @@ public:
 	void SavePersona(int type = -1); // -1 == save all attributes
 	const PersonaSummary* GetPersona(int country = -1, int branch = -1) const;
 	const PersonaSummary* GetSavedPersona() const;
+	void SetSelectedPersonaCountry(WWII_COUNTRY newCountry);
 
 	void SetSpawnOverride(double x, double y, double z);
 	void SetPosition(double x, double y, double z);

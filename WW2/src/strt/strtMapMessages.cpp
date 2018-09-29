@@ -581,14 +581,14 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 	return 0;
 }
 
-// Send an Objective list request to Strat.
+// Send a Garrison country change request to Strat.
 static SINT32 _sendMMGarrisonCountryChangeRequest(ACTION_OBJECT* const a)
 {
 	GarrisonCountryChangeReq* request = (GarrisonCountryChangeReq*)(a->localRawData);
 	return request->packer(TEUL_PACK, a);
 }
 
-// Objective list response from Strat.
+// Garrison country change response from Strat.
 static SINT32 _recvMMGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
 {
 	dbugLog(_FLD, "GarrisonCountryChangeReq received on map host from strat.");

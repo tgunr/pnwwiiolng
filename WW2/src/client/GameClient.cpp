@@ -1855,6 +1855,15 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 			if (unitloc.m_country != WWII_NO_COUNTRY)
 			{
 				unit->setCountry(unitloc.m_country);
+
+				//If we have this unit selected then we need to update our selected persona country.
+				if (Client::BrigadeSelected().m_detail.brigadeID() == unitloc.m_unitID)
+				{
+					Client::SetSelectedPersonaCountry(unitloc.m_country);
+					SavePersona(SAVE_COUNTRY);
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
 			}
 		}
 	}
