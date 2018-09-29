@@ -59,7 +59,6 @@ struct POLL_STRUCT
 {
 	static const size_t CAPACITY = Teul::MaxConnections;
 	struct pollfd	fd[CAPACITY];
-	SOCKET		m_maxSock;
 	nfds_t		m_size;
 	nfds_t		m_count;
 };
@@ -656,14 +655,13 @@ static void _pollRegenerateSet()
 {
     pollData.m_count = 0;
     pollData.m_size = 0;
-    pollData.m_maxSock = INVALID_SOCKET;
-
+    
     for (ENDPOINT * const endpoint : idleEndpoints) {
         assert(endpoint);
         _pollAddEndpoint(*endpoint);
     }
 
-    dbugLog(_FLD, "set up %" PRSizeT " sockets for poll, max " PRF_SOCKET, static_cast<size_t>(pollData.m_count), PRA_SOCKET(pollData.m_maxSock));
+    dbugLog(_FLD, "set up %" PRSizeT " sockets for poll", static_cast<size_t>(pollData.m_count));
 }
 
 static void _pollSocketsInner(TeulTimeMS duration_)
@@ -797,12 +795,6 @@ void ENDPOINT::updateSocketEvents()
         pollData.fd[slot].events |= POLLOUT;
     }
 	pollData.fd[slot].revents = 0;
-
-	if (pollData.m_maxSock == INVALID_SOCKET) {
-		pollData.m_maxSock = socket;
-	} else {
-		pollData.m_maxSock = std::max(pollData.m_maxSock, socket);
-    }
 }
 
 static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
