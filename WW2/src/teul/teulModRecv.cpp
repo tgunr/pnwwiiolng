@@ -675,9 +675,9 @@ static void _pollSocketsInner(TeulTimeMS duration_)
 #else
         pollret = WSAPoll(&pollData.fd[0], pollData.m_size, duration_);
 #endif
-    } while (pollret < 0 && (error = dbugGetErrno()) == PLAT_EINTR);
+    } while (pollret == SOCKET_ERROR && (error = dbugGetErrno()) == PLAT_EINTR);
 
-    if (pollret < 0) {
+    if (pollret == SOCKET_ERROR) {
         LogAbort("poll returned error %d, and all poll errors are fatal", error);
     }
     _runPollEndpoints(pollData.fd, pollData.m_size, pollret);
@@ -784,9 +784,9 @@ void ENDPOINT::updateSocketEvents()
 	socketToEndpoint[socket] = this;
 	pollData.fd[slot].fd = socket;
 #if defined(POLLRDHUP)
-	pollData.fd[slot].events = POLLHUP | POLLRDHUP | POLLIN;
+	pollData.fd[slot].events = POLLRDHUP | POLLIN;
 #else
-	pollData.fd[slot].events = POLLHUP | POLLIN;
+	pollData.fd[slot].events = POLLIN;
 #endif
     
     // Ask for writeability if we're a TCP socket that's waiting for connect() completion, or if
