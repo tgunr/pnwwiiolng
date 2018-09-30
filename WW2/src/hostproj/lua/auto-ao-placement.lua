@@ -9,6 +9,13 @@
     fall below the threshold, it endeavours to find a fair and
     relatively even fight. Some weight is given to the whereabouts
     of players in game, with some biasing against armor.
+
+    DEV-2508-re-write-the-auto-ao-placement.lua-script - 2018-09-28
+    Revision for 1.36 James10 (Mathew J Hogan):
+	- Include Garrison units in the selection procedure.
+	- Determine if the US is in-game.
+	- Include the US in the selection procedure.
+	- Auto AO's are initiated by GARRISON UNITS ONLY. (Dev Meeting: 2018-09-30)
 ]]--
 
 ----------------------------------------------------------------------
