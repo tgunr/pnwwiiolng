@@ -198,10 +198,22 @@ end
 ----------------------------------------------------------------------
 -- Is the USA deployed In-Game. Tier 3+ usually.
 function _isUSA_Deployed()
+
+	local usDeployed = false
+
 	--  Pre US deployment / NOT Deployed = false
 	--  Post US deployment / Deployed = true
 
-	return activeCountry(WWII_USA) --  per glue.lua Note: This is very likley to always return true from the initial reading.
+	for unit in allStratHCUnits() do
+		if unit.country == WWII_USA then
+			if unit.uOID ~= routDestination[USA].uOID then
+				usDeployed = true
+				break
+			end
+		end
+	end
+
+	return usDeployed
 end
 
 -- Pick the underdog country of a given side
@@ -268,7 +280,8 @@ end
 -- Check if a unit is a worthwhile candidate
 
 function _isCandidateUnit(unit)
-	if unit:isBrigade() == false and unit:isGarrison() == false then return false end
+	-- if unit:isBrigade() == false and unit:isGarrison() == false then return false end  --  Removed Dev Meeting: 2018-09-30  --
+	if unit:isGarrison() == false then return false end
 	if unit:offMap() == true then return false end
 	local cp = unit:homeCP()
 	if cp == nil then return false end
