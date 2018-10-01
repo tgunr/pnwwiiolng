@@ -79,7 +79,7 @@ ${SRC}/crypt/hash/Skein512.cpp
 ${SRC}/crypt/SecureCompare.cpp)
 target_link_libraries(libcatcrypt libcatcommon)
 if (WIN32)
-    target_link_libraries(libcatcrypt rpcrt4.lib iphlpapi.lib psapi.lib advapi32.lib)
+    target_link_libraries(libcatcrypt rpcrt4.lib iphlpapi.lib psapi.lib advapi32.lib ${SRC}/../lib/cat/big_x64.lib)
 endif (WIN32)
 
 # Math
