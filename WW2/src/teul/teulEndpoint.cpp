@@ -55,33 +55,28 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 	Teul::ENDPOINT_LIST eps = idleEndpoints;
 
 #if platBuild == BUILD_SERVER
-	// Make a copy.
-	if ( errorCode != 0 )
-	{
-		for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
-		{
-			(*it)->sendError(errorCode);
+	if (errorCode != 0) {
+		for (auto ep : eps) {
+			ep->sendError(errorCode);
 		}
 	}
 #endif
-	for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
-	{
-		if ( *it != nullptr )
-			teulClose(*(*it));
+    
+    eps = idleEndpoints;
+    
+	for (auto ep : eps) {
+		if (ep != nullptr) {
+			teulClose(*ep);
+        }
 	}
 }
 
 //////////////////////////////////////////////////////////////////////
 // Encrypt outgoing data.
 
-void
-ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
+void ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 {
-	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
-	{
-#ifdef DEBUG_ENCRYPTION
-		printf("Encrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
-#endif
+	if (m_impl->m_cryptVersion >= Teul::TeulV2) {
 		m_impl->m_txCrypt.translate(stream, bytes);
 	}
 }
@@ -89,14 +84,9 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 //////////////////////////////////////////////////////////////////////
 // Decrypt incoming data.
 
-void
-ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
+void ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 {
-	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
-	{
-#ifdef DEBUG_ENCRYPTION
-		printf("Decrypt %p %d [%u] seed %" PR64BitUT "\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
-#endif
+	if (m_impl->m_cryptVersion >= Teul::TeulV2) {
 		m_impl->m_rxCrypt.translate(stream, bytes);
 	}
 }

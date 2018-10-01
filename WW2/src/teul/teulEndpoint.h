@@ -87,15 +87,15 @@ public:
 	UCHAR				protocol;
 	UCHAR				m_readAheadBuffer[3];	//! Read-ahead buffer for storing token & size.
 
-	bool				m_inUse : 1;			// check if the endpoint is in use before we remove it DOH!!
-	bool				m_connected : 1;
-	bool				m_reliable : 1;
-	bool				m_doTimeoutCheck : 1;
-	bool				m_closed : 1;
-	bool				m_writesPending : 1;
-	bool				m_haveTicks : 1;		// False until we've started recording ticks.
-	bool				m_peer : 1;			// Peering connection.
-	bool				m_rakNetEnabled : 1;	
+	bool				m_inUse;			// check if the endpoint is in use before we remove it DOH!!
+	bool				m_connected;
+	bool				m_reliable;
+	bool				m_doTimeoutCheck;
+	bool				m_closed;
+	bool				m_writesPending;
+	bool				m_haveTicks;		// False until we've started recording ticks.
+	bool				m_peer;			// Peering connection.
+	bool				m_rakNetEnabled;	
 
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
