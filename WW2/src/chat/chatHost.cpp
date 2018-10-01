@@ -2392,7 +2392,6 @@ void
 _acceptPlayerConnection(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN, "t:%d player connection from %s:%hu", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
-	endpoint.setNagleEnabled(true);
 }
 
 //////////////////////////////////////////////////////////////////////

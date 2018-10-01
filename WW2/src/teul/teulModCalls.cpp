@@ -367,12 +367,9 @@ _actionRecvKLIVE_TOKEN(ACTION_OBJECT* const a)
 
 	a->offset = _packKLIVE_TOKEN(TEUL_UNPACK, a->packed, a->offset, &kt, 0);
 
-	const bool oldNagleValue = a->endpoint->setNagleEnabled(false);
 	KLIVE_ACK_TOKEN->outData = &kt;				// point to the struct
 	teulModSendCALLBACKe(*a->endpoint, *KLIVE_ACK_TOKEN);	// send it
 	KLIVE_ACK_TOKEN->outData = nullptr;
-	if ( oldNagleValue == true )
-		a->endpoint->setNagleEnabled(oldNagleValue);
 
 	return a->offset;
 }

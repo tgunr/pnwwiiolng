@@ -148,10 +148,6 @@ public:
 	//! Try to drain the write queue.
 	SINT32 pushSendQueue();
 
-	//! Enable or disable nagle's algorithm.
-	//! @return Prior state of the nagle algorithm.
-	bool setNagleEnabled(bool);
-
 	//! Attempt to send a packet, or queue it if we cannot
 	//! send it immediately.
 	SINT32 sendPacket(Teul::Packet& packet, const UCHAR protocolPreference);
@@ -208,4 +204,3 @@ void		teulKillDeadEndpoints();
 
 //! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
 bool		teulHasFreeEndpoints();
-

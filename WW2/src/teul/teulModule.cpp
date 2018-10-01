@@ -281,36 +281,33 @@ static const size_t UdpSndBufSize = 64 * 1024;
 
 void teulConfigureEndpointSocket(ENDPOINT& endpoint)
 {
+    u_long onValue = 1;
+
 #if platOS != OS_WIN32 // Windows does not use the same meanings for these
     fcntl(endpoint.socket, F_SETFL, fcntl(endpoint.socket, F_GETFL) | O_NONBLOCK | O_CLOEXEC);
 #else
-    u_long onValue = 1;
     ioctlsocket(endpoint.socket, FIONBIO, &onValue);
 #endif
 
-	endpoint.setRcvBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize );
-	endpoint.setSndBufferSize( endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize );
+	endpoint.setRcvBufferSize(endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize);
+	endpoint.setSndBufferSize(endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize);
 
-	if ( endpoint.protocol == PROTOCOL_TCP || endpoint.protocol == PROTOCOL_CTRL )
-	{
+	if (endpoint.protocol == PROTOCOL_TCP || endpoint.protocol == PROTOCOL_CTRL) {
 		// Disable Nagle so data doesn't wait to be pushed.
-		endpoint.setNagleEnabled(false);
+        setsockopt(endpoint.socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<char const *>(&onValue), sizeof(onValue));
 
 		// Listening sockets need to re-allow use of the address on close.
-		if ( endpoint.state() == IS_LISTENING ) {
 #if platOS != OS_WIN32 // Windows does not use the same meaning for this
-            setsockopt(endpoint.socket, SOL_SOCKET, SO_REUSEADDR, (const int []){ 1 }, sizeof(int));
-#endif
+		if (endpoint.state() == IS_LISTENING) {
+            setsockopt(endpoint.socket, SOL_SOCKET, SO_REUSEADDR, reinterpret_cast<char const *>(&onValue), sizeof(onValue));
         }
-#if platOS == OS_MACOS
-        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int []){ 1 }, sizeof(int));
 #endif
-	}
-	else if ( endpoint.protocol == PROTOCOL_UDB )
-	{
+#if platOS == OS_MACOS
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, reinterpret_cast<char const *>(&onValue), sizeof(onValue));
+#endif
+	} else if (endpoint.protocol == PROTOCOL_UDB) {
 		// UDB sockets need to be broadcast-enabled.
-		int bcast = 1;
-		setsockopt(endpoint.socket, SOL_SOCKET, SO_BROADCAST, (char*)&bcast, sizeof(bcast));
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<char const *>(&onValue), sizeof(onValue));
 	}
 }
 

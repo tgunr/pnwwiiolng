@@ -91,77 +91,39 @@ void ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	}
 }
 
-#define SZ_MAX_BUFF       1600                            // Largest size hex text area to display not including extra for trailer (header info)
-#define NUM_TAIL_AMT      8                               // For oversized packets, number of hex bytes to show at tail end
-#define SZ_HEX_DIG_TEXT   3                               // Length of each printed hex digit - which includes a space
-#define NUM_MAX_HDR_BYTES (SZ_MAX_BUFF / SZ_HEX_DIG_TEXT) // Number of heading bytes that can be displayed in the buffer allotted
-
 //////////////////////////////////////////////////////////////////////
 // Format a packet for dbug display output (if configured)
-void
-ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetBytes )
+void ENDPOINT::_dbugOutputPacket(bool isRecv, const uint8_t *input, size_t packetBytes)
 {
-	static const char *STR_CONTINUATION = " ... ";
+    static constexpr const size_t SZ_MAX_BUFF = 1600;
+    static constexpr const size_t NUM_TAIL_AMT = 8;
+    static constexpr const size_t SZ_HEX_DIG_TEXT = 3;
+    static constexpr const size_t NUM_MAX_HDR_BYTES = SZ_MAX_BUFF / SZ_HEX_DIG_TEXT;
+	static constexpr const char * const STR_CONTINUATION = " ... ";
+    static constexpr const char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+    static constexpr const size_t BUFFER_SZ = SZ_MAX_BUFF + NUM_TAIL_AMT * SZ_HEX_DIG_TEXT + sizeof(STR_CONTINUATION);
 
 	// NOTE: Actual buffer is the maximux header area plus all the fixed trailer information.
-	auto debugBuff = std::make_unique<char []>(SZ_MAX_BUFF + NUM_TAIL_AMT * SZ_HEX_DIG_TEXT + strlen(STR_CONTINUATION) + 1);
-	debugBuff[0] = 0;
-	char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
-	char charToHex[SZ_HEX_DIG_TEXT+1] = {};
-	charToHex[2] = ' ';
-	charToHex[SZ_HEX_DIG_TEXT] = 0;
-
-	size_t i = 0;
-	for ( ; i < packetBytes && i < NUM_MAX_HDR_BYTES; i++)
-	{
+	auto debugBuff = std::make_unique<char []>(BUFFER_SZ);
+	char charToHex[SZ_HEX_DIG_TEXT+1] = { 0, 0, ' ', 0 };
+    
+	for (size_t i = 0; i < packetBytes && i < NUM_MAX_HDR_BYTES; i++) {
 		charToHex[0] = hex[input[i] >> 4];
 		charToHex[1] = hex[input[i] & 0xf];
-		strncat(debugBuff.get(), charToHex, sizeof(debugBuff));
+        strlcat(debugBuff.get(), charToHex, BUFFER_SZ);
 	}
 
-	if (i >= NUM_MAX_HDR_BYTES)
-	{
-		strncat(debugBuff.get(), STR_CONTINUATION, sizeof(debugBuff));
-		for ( i = NUM_TAIL_AMT; i > 0; i--)
-		{
-			size_t backupAmt = packetBytes - i;
-			charToHex[0] = hex[input[backupAmt] >> 4];
-			charToHex[1] = hex[input[backupAmt] & 0xf];
-			strncat(debugBuff.get(), charToHex, sizeof(debugBuff));
-			}
-		}
+	if (packetBytes >= NUM_MAX_HDR_BYTES) {
+		strlcat(debugBuff.get(), STR_CONTINUATION, BUFFER_SZ);
+		for (size_t i = NUM_TAIL_AMT; i > 0; i--) {
+			charToHex[0] = hex[input[packetBytes - i] >> 4];
+			charToHex[1] = hex[input[packetBytes - i] & 0xf];
+			strlcat(debugBuff.get(), charToHex, BUFFER_SZ);
+        }
+    }
 
-	if (!isRecv)
-		dbugLog(_FLD, "Sending MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
-		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
-	else
-		dbugLog(_FLD, "Receiving MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
-		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
-}
-
-//////////////////////////////////////////////////////////////////////
-// Nagle's algorithm is designed to delay small packets to allow for
-// some aggregation of payloads and reduce header:payload overhead.
-//
-// We used to disable it for all connections, but it may not be
-// required for all of our connections.
-
-bool
-ENDPOINT::setNagleEnabled(bool enabled_)
-{
-	int previousValue = 0;
-	socklen_t argLen = sizeof(previousValue);
-	getsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (char*)&previousValue, &argLen);
-
-	// Find the previous value of nagle.
-	// To enable nagle, set TCP_NODELAY to FALSE.
-	const int argValue = enabled_ ? 0 : 1;
-	if ( previousValue != argValue )
-	{
-		setsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&argValue, sizeof(argValue));
-	}
-
-	return (previousValue == 0);
+    dbugLog(_FLD, "%s MSG (%" PRSizeT " bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
+            isRecv ? "Receiving" : "Sending", packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 }
 
 //////////////////////////////////////////////////////////////////////
