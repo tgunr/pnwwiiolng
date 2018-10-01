@@ -34,11 +34,11 @@
 #include <thread>
 #include <mutex>
 
-#if defined(HAVE_UNISTD_H)
+#if __has_include(<unistd.h>)
 #include <unistd.h>
 #endif
 
-#if defined(HAVE_SYS_PARAM_H)
+#if __has_include(<sys/param.h>)
 #include <sys/param.h>
 #endif
 

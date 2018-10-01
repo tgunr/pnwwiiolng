@@ -28,8 +28,6 @@ IF ( MSVC )
 
     IF ( BUILD_BITNESS EQUAL 64 )
         ADD_COMPILE_OPTIONS( "/arch:AVX" )
-    ELSE()
-        ADD_COMPILE_OPTIONS( "/arch:SSE2" )
     ENDIF()
 
     IF ( CMAKE_BUILD_TYPE MATCHES Debug )
