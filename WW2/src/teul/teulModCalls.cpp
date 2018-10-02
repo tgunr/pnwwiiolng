@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-//#define DEBUG_CONNECTIONS
-
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 #include "teul/teulCallbackStruct.h"

@@ -14,6 +14,8 @@
 #include "teul/teulFuncTypes.h"
 #include "RakNetTypes.h"
 
+//#define DEBUG_CONNECTIONS
+
 class RakNetChannel;
 
 namespace Teul

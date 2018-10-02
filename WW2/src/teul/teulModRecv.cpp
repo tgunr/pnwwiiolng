@@ -705,7 +705,7 @@ static void _sendEndpointKlive(ENDPOINT& endpoint)
         return;
     }
     
-#if defined(DEBUG_CONNECTIONS)
+#ifdef DEBUG_CONNECTIONS
     dbugLog(_FLD, "t:%d sending klive", endpoint.teulIndex());
 #endif
 

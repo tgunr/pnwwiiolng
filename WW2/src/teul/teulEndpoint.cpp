@@ -20,9 +20,6 @@
 #include "teul/teulVersion.h"
 #include "teul/raknetConn.h"
 
-//#define DEBUG_ENCRYPTION
-//#define DEBUG_CONNECTIONS
-
 using ENDPOINT_ARRAY = std::array<ENDPOINT, Teul::MaxConnections>;
 using ENDPOINT_IMPL_ARRAY = std::array<EndpointImpl, Teul::MaxConnections>;
 
