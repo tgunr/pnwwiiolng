@@ -15,6 +15,7 @@
 #include "auth/authPack.h"
 #include "auth/authClientMessages.h"
 #include "teul/teulAuth.h"
+#include "teul/teulEndpoint.h"
 #include "auth/authConstants.h"
 #include "auth/authTypes.h"
 #include "comm/commPlaygateMessages.h"
@@ -74,10 +75,10 @@ _callbackError(
                , const SINT32 error
                )
 {
-    const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
+    ENDPOINT * const ep = teulGetEndpoint(teulIndex);
 
     dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
-        teulIndex, teulGetAddress(dest.first), dest.second, error
+        teulIndex, teulGetAddress(ep ? ep->destAddress() : Teul::INVALID_INDEX), ep ? ep->destPort() : -1, error
     );
 }
 

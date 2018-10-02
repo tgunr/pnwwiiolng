@@ -531,7 +531,9 @@ _updatePresenter(const SINT32 teulIndex, ARENA_REQ& request, UINT32 platform)
 		return false;
 	}
 
-	UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
+
 	dbugLog(_FLI, "t:%d user on ip %s needs presenter upgrade from version %s.  sending them to %s"
 				, teulIndex, teulGetAddress(destAddress), teulGetAddress(request.presenterVersion), launch.data);
 	return true;
@@ -668,7 +670,8 @@ void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 		return;
 	}
 
-	UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	Auth::ClientData* cdata = new Auth::ClientData(teulIndex, platform, destAddress, request.oVersion, request.username, (char*)request.password);
 
 	teulSetPersonaData(teulIndex, cdata);
@@ -1244,7 +1247,8 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	char appVer[64+1], ipStr[64+1];
 
 	// Get the local network address excluding the last octet.
-	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 localAddress = ep ? ep->localAddress() : Teul::INVALID_INDEX;
 
 	UINT32 destAddress = bestServer.extAddress;
 
@@ -1292,7 +1296,8 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	dispatch.m_appVersion = request.appVersion & clientMask;
 
 	//send dispatch message
-	UINT32 clientAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 clientAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	_sendDispatch(dispatch, reply.otp, clientAddress, bestServer.teulIndex);
 }
 
@@ -1317,7 +1322,9 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 	UINT32 platform = 0;
 
 	char ip[64+1];
-	cdata.address = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+
+    cdata.address = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	strsafecpy(ip, teulGetAddress(cdata.address));
 
 	platform = cdata.platform;
@@ -1693,7 +1700,9 @@ Auth::LoginRequest::process(const SINT32 teulIndex)
 	}
 
 	// Get teul's information about this connection such as IP address etc.
-	const UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
+
 	dbugLog(_FLI, "t:%d auth login request plat:%u ip:%s ov:%u c:%s p:%s"
 					, teulIndex
 					, m_platform

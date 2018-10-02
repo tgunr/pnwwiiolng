@@ -24,10 +24,6 @@ namespace Teul
 
 	// Get a textual id for an error (default is "error").
 	const char* GetErrorName(SINT32 code);
-	//! Get the local address/port of an endpoint.
-	std::pair<UINT32, UINT16> GetLocal(SINT32 teulIndex);
-	//! Get the remote address/port of an endpoint.
-	std::pair<UINT32, UINT16> GetRemote(SINT32 teulIndex);
 
 	//! Set the name of the current application.
 	void SetAppName(const char* _name);
@@ -41,9 +37,6 @@ namespace Teul
 	bool IsTransportInited();
 	//! Is the transport closing?
 	bool IsTransportClosing();
-
-	//! Get the address of an endpoint, as long as it's connected/open.
-	ENDPOINT* GetConnectedEndpoint(const SINT32 teulIndex);
 
 	//! Look up a single IP address (host order) for a given name.
 	//! Returns the first IP from the list returned by getaddrinfo.
@@ -98,15 +91,6 @@ const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferS
 //!							wait forever.
 //! @ingroup not-thread-safe
 void teulUpdateTransport(const TeulTimeMS duration=0ULL);
-
-//! Get the local address of a given teul index.
-//! @param[in]	teulIndex		Index of the connection to query.
-//! @return Teul::INVALID_INDEX if the index is not valid.
-UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
-//! Get the remote address of a given teul index.
-//! @param[in]	teulIndex		Index of the connection to query.
-//! @return Teul::INVALID_INDEX if the index is not valid.
-UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
 
 // close all connections and the debugger. (teul go bye bye)
 void teulCloseTransport();

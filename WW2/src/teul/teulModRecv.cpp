@@ -17,7 +17,6 @@
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
-#include "teul/teulEndpointIdleList.h"
 #include "teul/teulModule.h"
 #include "teul/teulModCalls.h"
 #include "teul/teulPackers.h"
@@ -122,6 +121,10 @@ static DATA_GRAM *teulAllocDatagram(const UINT32 size)
 
 void teulReleaseDatagram(DATA_GRAM *datagram)
 {
+    if (!datagram) {
+        return;
+    }
+    
     assert(datagram->m_reqSize == _roundDatagramSize(datagram->m_reqSize - sizeof(DATA_GRAM)) && "Datagram allocation size corrupted");
     assert(datagram->contents == reinterpret_cast<Teul::PacketHeader *>(datagram + 1) && "Datagram contents pointer was moved");
     

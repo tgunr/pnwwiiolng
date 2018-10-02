@@ -19,10 +19,7 @@ class RakNetChannel;
 namespace Teul
 {
 	class Packet;
-}
 
-namespace Teul
-{
 #if platBuild == BUILD_SERVER
         static const size_t MaxConnections = 6000;
         static const size_t MaxClusterUsers = 5000;
@@ -39,8 +36,10 @@ namespace Teul
 	// number of concurrent connections.
 	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4);
 #endif
-}
 
+    typedef std::deque<ENDPOINT *> ENDPOINT_LIST;
+    extern Teul::ENDPOINT_LIST idleEndpoints;
+}
 
 struct EndpointImpl;
 typedef std::map<RakNet::RakNetGUID, ENDPOINT *> GUID_ENDPOINT_MAP;
@@ -51,20 +50,8 @@ typedef std::map<RakNet::RakNetGUID, ENDPOINT *> GUID_ENDPOINT_MAP;
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes ) silence_unused_parameter_warning(ep, bIsRecv, bpInput, szBytes)
 #endif
 
-struct 	ENDPOINT
+struct ENDPOINT
 {
-public:
-	///! Set the OS "receive buffer" size.
-	///! Aligns size to a 4Kb boundary, only allows growth.
-	///! Typically, the operating system doubles this to allow for overheads.
-	int setRcvBufferSize(UINT32 newSize);
-	///! Set the OS "send buffer" size.
-	///! Aligns size to a 4Kb boundary, only allows growth.
-	///! Typically, the operating system doubles this to allow for overheads.
-	int setSndBufferSize(UINT32 newSize);
-
-	enum { MaxRcvBufferSize = 16 * 1024, MaxSndBufferSize = 128 * 1024 };
-
 public:
 	//! Query the endpoint's internal identifier (Teul Index).
 	SINT32 teulIndex() const { return m_teulIndex; }

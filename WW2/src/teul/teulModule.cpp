@@ -15,7 +15,6 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
-#include "teul/teulEndpointIdleList.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulModCalls.h"
 #include "teul/teulModule.h"
@@ -272,12 +271,16 @@ _setEndpointPeerState(ENDPOINT& endpoint)
 // Socket configuration.
 
 // TCP sockets are generally WAN, so they have different buffer sizes.
-static const size_t TcpRcvBufSize = 8 * 1024;
-static const size_t TcpSndBufSize = 4 * 1024;
+static constexpr const size_t TcpRcvBufSize = 8 * 1024;
+static constexpr const size_t TcpSndBufSize = 4 * 1024;
 
 // UDP sockets are all LAN and need large buffers.
-static const size_t UdpRcvBufSize = 64 * 1024;
-static const size_t UdpSndBufSize = 64 * 1024;
+static constexpr const size_t UdpRcvBufSize = 64 * 1024;
+static constexpr const size_t UdpSndBufSize = 64 * 1024;
+
+static constexpr const size_t sockbufChunkSize = 4096;        // 4Kb - must be power of 2.
+static constexpr const size_t sockbufChunkMask = sockbufChunkSize - 1;
+
 
 void teulConfigureEndpointSocket(ENDPOINT& endpoint)
 {
@@ -289,8 +292,16 @@ void teulConfigureEndpointSocket(ENDPOINT& endpoint)
     ioctlsocket(endpoint.socket, FIONBIO, &onValue);
 #endif
 
-	endpoint.setRcvBufferSize(endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize);
-	endpoint.setSndBufferSize(endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize);
+    u_long rcvBufSize = static_cast<u_long>(((endpoint.protocol == PROTOCOL_TCP ? TcpRcvBufSize : UdpRcvBufSize) + sockbufChunkSize) & (~sockbufChunkMask));
+    u_long sndBufSize = static_cast<u_long>(((endpoint.protocol == PROTOCOL_TCP ? TcpSndBufSize : UdpSndBufSize) + sockbufChunkSize) & (~sockbufChunkMask));
+
+#if defined(DEV_BUILD)
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting rcvbuf to %lu bytes", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), rcvBufSize);
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting sndbuf to %lu bytes", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sndBufSize);
+#endif
+
+    setsockopt(endpoint.socket, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const *>(&rcvBufSize), sizeof(rcvBufSize));
+    setsockopt(endpoint.socket, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const *>(&sndBufSize), sizeof(sndBufSize));
 
 	if (endpoint.protocol == PROTOCOL_TCP || endpoint.protocol == PROTOCOL_CTRL) {
 		// Disable Nagle so data doesn't wait to be pushed.
@@ -587,7 +598,6 @@ void teulClose(ENDPOINT& inEndpoint)
     dbugLog(_FLD, "t:%d closing st:%u cl:%s", inEndpoint.teulIndex(), inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 	if (!inEndpoint.m_closed) {
 		inEndpoint.doError(ENOTCONN);
-        // Returning here results in an infinite loop
     }
 
 	// endpoint.doError() may have recursed, so check the state again

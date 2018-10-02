@@ -9,6 +9,16 @@
 static std::vector<SINT32> g_bulkConnections;
 static bool g_inBulkTest = false;
 
+namespace Teul
+{
+    inline ENDPOINT *GetEndpointIfConnected(const SINT32 teulIndex)
+    {
+        ENDPOINT *ep = teulGetEndpoint(teulIndex);
+        
+        return ep && ep->state() == IS_OPEN && !ep->m_closed && ep->m_connected ? ep : nullptr;
+    }
+}
+
 struct ClientRole : public Role
 {
 	public:
@@ -325,9 +335,9 @@ struct ClientRole : public Role
 				{
 	loop:
 					teulUpdateTransport(0);
-					if ( Teul::GetConnectedEndpoint(0) == nullptr )
+					if ( Teul::GetEndpointIfConnected(0) == nullptr )
 						throw Teul::Error("Connection 0 closed unexpectedly.", 0);
-					if ( Teul::GetConnectedEndpoint(1) == nullptr )
+					if ( Teul::GetEndpointIfConnected(1) == nullptr )
 						throw Teul::Error("Connection 1 closed unexpectedly.", 1);
 
 					if ( g_bulkConnections.size() < expectedIndexes.size() )
@@ -454,13 +464,13 @@ struct ClientRole : public Role
 				// Check the endpoints, see where they are at.
 				ENDPOINT* endpoint;
 
-				endpoint = Teul::GetConnectedEndpoint(0);
+				endpoint = Teul::GetEndpointIfConnected(0);
 				if ( (endpoint != nullptr) != firstConnIsOpen )
 					throw Teul::IterationError(i, "First connection in wrong state", 0);
 				if (!firstConnIsOpen)
 					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 0);
 
-				endpoint = Teul::GetConnectedEndpoint(1);
+				endpoint = Teul::GetEndpointIfConnected(1);
 				if ( (endpoint != nullptr) != secondConnIsOpen )
 					throw Teul::IterationError(i, "Second connection in wrong state", 0);
 				if (!secondConnIsOpen)
@@ -778,9 +788,9 @@ struct ClientRole : public Role
 		SendRandom(m_teulIndex, s_cbHello, "final via unrel");
 		SendRandom(m_teulIndex, s_cbRelHello, "final via rel");
 
-		if ( Teul::GetConnectedEndpoint(1) != nullptr )
+		if ( Teul::GetEndpointIfConnected(1) != nullptr )
 			throw Teul::Error("Second endpoint is still showing 'connected' after close", 0);
-		if ( Teul::GetConnectedEndpoint(0) == nullptr )
+		if ( Teul::GetEndpointIfConnected(0) == nullptr )
 			throw Teul::Error("We lost the primary endpoint", 0);
 
 		// If the "killserver" test is enabled, we send the "shutdown" callback.
@@ -839,7 +849,7 @@ struct ClientRole : public Role
 		const TeulTimeMS startTime = teulClock64;
 		const TeulTimeMS cutoff = teulClock64 + Config::ConnectTimeoutMS + 100;
 
-		while ( s_lastError == 0 && Teul::GetConnectedEndpoint(teulIndex) == nullptr && teulClock64 <= cutoff )
+		while ( s_lastError == 0 && Teul::GetEndpointIfConnected(teulIndex) == nullptr && teulClock64 <= cutoff )
 		{
 			// Loiter for 100ms letting teulKit do it's thing.
 			teulUpdateTransport(5);

@@ -91,11 +91,12 @@ _callbackError(
 	, const SINT32 error
 	)
 {
-	const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
+	ENDPOINT *const ep = teulGetEndpoint(teulIndex);
+
 	playgate.AlertOK(GetLoc(ERROR_DEBUG
 								, teulIndex
-								, teulGetAddress(dest.first)
-								, dest.second
+								, teulGetAddress(ep ? ep->destAddress() : Teul::INVALID_INDEX)
+								, ep ? ep->destPort() : -1
 								, error));
 }
 
