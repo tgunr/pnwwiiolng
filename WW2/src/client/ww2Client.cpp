@@ -2905,7 +2905,7 @@ bool ww2::Client::InitTeul(void) {
 
 	char dbugFileName[21];
 	strprintf(dbugFileName, "wwiiClient");
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr);
 	if ( err > -1 ) {
 		err = commInstallClientCallbacks() 	|
 			chatInstallClientCallbacks()	|

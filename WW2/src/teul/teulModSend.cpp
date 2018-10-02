@@ -105,8 +105,8 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
             dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
             return 0;
         } else {
-			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " error on send %" PRSizeT " bytes, err:%d",
-                    teulIndex(), PRA_SOCKET(socket), sizeInBytes, err);
+			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " error on send %" PRSizeT " bytes to %s:%u, err:%d",
+                    teulIndex(), PRA_SOCKET(socket), sizeInBytes, teulGetAddress(address), port, err);
 			return -err;
 		}
 	}

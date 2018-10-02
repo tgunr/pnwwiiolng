@@ -1612,7 +1612,7 @@ serverGetAuthIP()
 	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	UINT32 address = Teul::GetSingleIP(authName);
 
 	ABORT_IF_EX(address == 0, "Unable to resolve auth address '%s'", authName);
 	return address;
@@ -1929,7 +1929,7 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 
 	memInit();
 
-	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
+	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 #ifndef NDEBUG

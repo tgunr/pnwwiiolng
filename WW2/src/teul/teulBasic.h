@@ -17,8 +17,6 @@ enum { TEUL_UNPACK, TEUL_PACK };
 namespace Teul
 {
 	enum class Mode { Unpack, Pack };
-	using LoggingFn = void(*)(const char* const, ...);
-	extern LoggingFn g_logFnPtr;
 
 	static const UINT32 INVALID_INDEX = ~0U	;		//!< Value used for "Invalid Index".
 
@@ -42,9 +40,6 @@ namespace Teul
 	//! Returns the first IP from the list returned by getaddrinfo.
 	//! \return IP address in host order or zero.
 	UINT32 GetSingleIP(const char* const name);
-
-	//! Look up all IPs for a given hostname.
-	bool GetIPs(const char* const name, std::vector<UINT32>& ips);
 } // namespace Teul
 
 //! Send data through a callback on a given connection.
@@ -107,10 +102,6 @@ ObjType_* teulGetConnectionData(SINT32 teulIndex_)
 {
 	return static_cast<ObjType_*>(teulGetPersonaData(teulIndex_));
 }
-
-void teulSetNetworkMask(UINT32 address);
-
-UINT32 teulMaskNetworkAddress(UINT32 address);
 
 // if you detect an error in your data handler use this function to forward it to
 // the callbacks error handler. mode == TEUL_PACK or TEUL_UNPACK for whether

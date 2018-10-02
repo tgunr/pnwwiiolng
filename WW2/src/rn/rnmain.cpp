@@ -353,9 +353,6 @@ void rnconnectToServer(void) {
 	else
 		teulGetHost(PN_product_version_string, &appversion);
 
-	if ( teulMaskNetworkAddress(0) == 0 )
-		teulSetNetworkMask(GameHost);
-
 	if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
 		throw ClientNetError("connect.fail");
 

@@ -22,3 +22,7 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint);
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction = true);
 
 void teulConfigureEndpointSocket(ENDPOINT& endpoint);
+
+SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port,
+                          CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel);
+void teulModStartup(ERROR_FUNCTION);

@@ -144,7 +144,7 @@ static void _getHostIPAddresses()
 }
 #endif
 
-SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
+void teulModStartup(ERROR_FUNCTION errFnPtr)
 {
 #if platBuild == BUILD_SERVER && platOS != OS_WIN32
 	signal(SIGPIPE, SIG_IGN);
@@ -162,7 +162,6 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 #if platBuild == BUILD_SERVER
 	_getHostIPAddresses();
 #endif
-	return 0;
 }
 
 using ADDRESS_LIST = std::vector<UINT32>;
