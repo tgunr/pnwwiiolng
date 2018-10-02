@@ -100,8 +100,8 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
 	    result = ::sendto(socket, static_cast<char *>(data), sizeInBytes, 0, (struct sockaddr *)realAddress, realAddressLength);
     } while (result == SOCKET_ERROR && (err = dbugGetErrno()) == PLAT_EINTR);
     
-	if (result < 0) {
-		if (err == PLAT_EAGAIN || err == PLAT_EWOULDBLOCK) {
+	if (result == SOCKET_ERROR) {
+		if (safe_isEAGAIN(err)) {
             dbugLog(_FLD, "::sendto returned code %d, probably no space in kernel bufs", err);
             return 0;
         } else {
@@ -111,7 +111,7 @@ SINT32 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UIN
 		}
 	}
 
-	dbugLog(_FLD, "%" PRSsizeT " bytes sent %" PRSizeT " requested", result, sizeInBytes);
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " %" PRSsizeT " bytes sent %" PRSizeT " requested", teulIndex(), PRA_SOCKET(socket), result, sizeInBytes);
     if (result > 0) {
 	    lastDataSent.makeCurrent();
     }

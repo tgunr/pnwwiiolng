@@ -530,6 +530,8 @@ const char* Teul::GetErrorName(SINT32 error)
 // This will often recurse the Teul network logic.
 void ENDPOINT::doError(const SINT32 error, void* data)
 {
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " taking error %d", teulIndex(), PRA_SOCKET(socket), error);
+
 	ERROR_FUNCTION errorFunction = this->errorFn;
     
 	if (this->m_parent && (state() == IS_OPENING || !errorFunction)) {

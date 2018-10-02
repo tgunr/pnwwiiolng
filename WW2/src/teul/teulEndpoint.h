@@ -191,3 +191,8 @@ void		teulKillDeadEndpoints();
 
 //! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
 bool		teulHasFreeEndpoints();
+
+template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+static inline constexpr bool safe_isEAGAIN(T const value) {
+    return value == PLAT_EAGAIN || value == PLAT_EWOULDBLOCK;
+}

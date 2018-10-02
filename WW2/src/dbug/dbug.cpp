@@ -482,7 +482,7 @@ SINT32	dbugGetErrno()
 }
 
 // OS-provided basename() on POSIX systems is bad.
-static const char* sane_basename(const char* const filepath) noexcept
+const char* sane_basename(const char* const filepath) noexcept
 {
 	const char* slash = strrchr(filepath, '\\');
 	if (PN_UNLIKELY(!slash))

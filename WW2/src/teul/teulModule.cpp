@@ -104,7 +104,7 @@ static void _getHostIPAddresses()
 	
     for (auto curAddr = pAddresses; curAddr != nullptr; curAddr = curAddr->Next) {
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
-		if (curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress || (curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY) != 0) {
+		if (curAddr->OperStatus != IfOperStatusUp || !curAddr->FirstUnicastAddress || (curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY) != 0) {
 			continue;
         }
         

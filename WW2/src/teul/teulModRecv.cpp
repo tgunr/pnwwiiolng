@@ -74,11 +74,6 @@ static SocketToEndpointMap socketToEndpoint;
 
 static std::array<std::stack<DATA_GRAM*>, DATA_GRAM::NUM_DATAGRAM_SIZES> s_freeDatagrams;
 
-template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
-static inline constexpr bool safe_isEAGAIN(T const value) {
-    return value == PLAT_EAGAIN || value == PLAT_EWOULDBLOCK;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Pooled and unpooled datagram management
 static inline size_t _roundDatagramSize(size_t size)
@@ -290,7 +285,7 @@ static ssize_t _receiveTCP(ENDPOINT& endpoint, void * const ioData, size_t *ioSi
         recvRet = recv(endpoint.socket, static_cast<char *>(ioData), *ioSize, 0);
     } while (recvRet == SOCKET_ERROR && (error = dbugGetErrno()) == PLAT_EINTR);
     
-    if (recvRet < 0) {
+    if (recvRet == SOCKET_ERROR) {
         if (!safe_isEAGAIN(error)) {
             dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " tcp close: read err:%d", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), error);
             return -error;
