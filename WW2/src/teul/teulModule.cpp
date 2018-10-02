@@ -35,115 +35,87 @@
 #include "server/serverInterfaceDescription.h"
 #endif
 
-#define EXT_TOKENS		0x8000000
-
 // Higher than SOMAXCONN.
 enum { MAX_ACCEPT_BACKLOG = 1024 };
 
-extern void teulInitEndpoints(ERROR_FUNCTION const);
-
 //////////////////////////////////////////////////////////////////////
-// Retrieve a list of the IP addresses this host has on eth0.
+// Retrieve a list of the IP addresses this host has on its primary interface.
 
 #if platBuild == BUILD_SERVER
-static void
-_getHostIPAddresses()
+static void _getHostIPAddresses()
 {
 #if platOS == OS_LINUX || platOS == OS_MACOS
-	static const char* primaryInterfaceName = cv_defaultInterface.GetString();
+	const char *primaryInterfaceName = cv_defaultInterface.GetString();
 
 	// Get a list of IPv4 network interfaces.
-	struct ifaddrs* ifap = nullptr;
-	if ( getifaddrs(&ifap) == -1 || ifap == nullptr )
+	struct ifaddrs *ifap = nullptr;
+    
+	if (getifaddrs(&ifap) < 0 || ifap == nullptr) {
 		LogAbort("Unable to get network interfaces");
+    }
 
 	// Get the addresses of upto MaxHostIPs interfaces.
-	auto& ifNo = Server::myInterface.numIP;
-	ifNo = 0;
-	for ( auto ifa = ifap; ifa != nullptr; ifa = ifa->ifa_next)
-	{
-		if ( ifa->ifa_addr == nullptr || ifa->ifa_addr->sa_family != AF_INET )
-			continue;
+    struct ifaddrs *pIntf = nullptr;
 
-		if ( strcmp(ifa->ifa_name, primaryInterfaceName) != 0 )
-			continue;
-
-		Server::myInterface.pid = getpid();
-		Server::myInterface.addr[ifNo].naddr = ((struct sockaddr_in*)(ifa->ifa_addr))->sin_addr.s_addr;
-		Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[ifNo].naddr);
-		dbugLog(_FLI, "read index %u interface %s, ip %s pid %u"
-					, ifNo
-					, ifa->ifa_name
-					, teulGetAddress(Server::myInterface.addr[ifNo].ip)
-					, Server::myInterface.pid
-					//, Server::myInterface.id
-					);
-
-		++ifNo;
-		if ( ifNo >= Server::InterfaceDescription::MaxHostIPs )
-			break;
-	}
-
+    Server::myInterface.pid = getpid();
+    Server::myInterface.numIP = 0;
+	for (auto ifa = ifap; ifa && Server::myInterface.numIP <= Server::InterfaceDescription::MaxHostIPs; ifa = ifa->ifa_next, ++Server::myInterface.numIP) {
+        if (!ifa->ifa_addr) {
+            dbugLog(_FLN, "Skipping interface %s because it has no address", ifa->ifa_name);
+            continue;
+        }
+        if (ifa->ifa_addr->sa_family != AF_INET) {
+            dbugLog(_FLN, "Skipping interface %s because it is not an IPv4 interface", ifa->ifa_name);
+            continue;
+        }
+        
+        if (!pIntf && strcasecmp(ifa->ifa_name, primaryInterfaceName) == 0) {
+            pIntf = ifa;
+        }
+        
+        Server::myInterface.addr[Server::myInterface.numIP].naddr = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr)->sin_addr.s_addr;
+        Server::myInterface.addr[Server::myInterface.numIP].ip = ntohl(Server::myInterface.addr[Server::myInterface.numIP].naddr);
+        dbugLog(_FLI, "read index %u interface %s, ip %s",
+                    Server::myInterface.numIP,
+                    ifa->ifa_name,
+                    teulGetAddress(Server::myInterface.addr[Server::myInterface.numIP].ip));
+    }
+    
+    if (!pIntf) {
+        LogAbort("Can't find primary interface %s", primaryInterfaceName);
+    }
 	freeifaddrs(ifap);
 #elif platOS == OS_WIN32
 	PIP_ADAPTER_ADDRESSES pAddresses = nullptr;
 	DWORD outBufLen = 32 * 1024;	// Start with 32Kb of buffer to retrieve data.
 	DWORD dwRetVal = ERROR_BUFFER_OVERFLOW;
-
 	DWORD getAddrFlags = GAA_FLAG_INCLUDE_PREFIX | GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST;
-
-	for ( UINT32 attempt = 0; dwRetVal == ERROR_BUFFER_OVERFLOW && attempt < 6; ++attempt )
-	{
-		if (pAddresses)
-			memFree(pAddresses);
-		pAddresses = static_cast<PIP_ADAPTER_ADDRESSES>(memAlloc(outBufLen));
-		ABORT_IF_EX(pAddresses == nullptr, "Failed to allocate memory for listing network interfaces.");
-		dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, nullptr, pAddresses, &outBufLen);
-	}
-
-	ABORT_IF_EX(dwRetVal == ERROR_BUFFER_OVERFLOW, "Unable to retrieve network interfaces.");
+    
+    pAddresses = static_cast<PIP_ADAPTER_ADDRESSES>(::calloc(1, outBufLen));
+    dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, nullptr, pAddresses, &outBufLen);
+    if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
+        ::free(pAddresses);
+        pAddresses = static_cast<PIP_ADAPTER_ADDRESSES>(::calloc(1, outBufLen));
+        dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, nullptr, pAddresses, &outBufLen);
+    }
+    ABORT_IF_EX(dwRetVal != ERROR_SUCCESS, "Unable to retrieve network interfaces.");
 
 	PIP_ADAPTER_ADDRESSES preferredIf = nullptr;
-	for ( auto curAddr = pAddresses; curAddr != nullptr; curAddr = curAddr->Next )
-	{
+	
+    for (auto curAddr = pAddresses; curAddr != nullptr; curAddr = curAddr->Next) {
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
-		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == nullptr )
+		if (curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress || (curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY) != 0) {
 			continue;
-		if ( curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY )
-			continue;
-
-		switch (curAddr->IfType)
-		{
-		case IF_TYPE_PPP:
-		case IF_TYPE_SOFTWARE_LOOPBACK:
-		case IF_TYPE_TUNNEL:
-		case IF_TYPE_IEEE1394:
-			continue;
-		break;
-		default:
-		break;
-		}
-
-		// Try to improve on any previous interface address.
-		if (preferredIf)
-		{
-			if (curAddr->FirstDnsServerAddress == nullptr)
-				continue;
-			if (preferredIf->FirstDnsServerAddress)
-			{
-#if (NTDDI_VERSION >= NTDDI_VISTA)
-				if (curAddr->FirstGatewayAddress == nullptr)
-					continue;
-#endif
-			}
-		}
-
+        }
+        
+		// The current interface is a better choice than what came before if it has at least one DNS server and Gateway.
+		if (preferredIf && (!curAddr->FirstDnsServerAddress || !curAddr->FirstGatewayAddress)) {
+            continue;
+        }
 		preferredIf = curAddr;
 	}
 
-	ABORT_IF_EX(preferredIf == nullptr
-				, "Unable to determine primary network adapter. "
-				  "If you need to specify an interface, set 'DEFAULT_IFACE' to the friendly name of the adapter.");
+	ABORT_IF_EX(!preferredIf, "Unable to determine primary network adapter. Warning: Unfortunately, DEFAULT_IFACE does not work on Windows.");
 
 	Server::myInterface.pid = static_cast<UINT32>(GetCurrentProcessId());
 
@@ -167,7 +139,7 @@ _getHostIPAddresses()
 						);
 	}
 
-	memFree(pAddresses);
+	::free(pAddresses);
 #endif
 }
 #endif
@@ -178,34 +150,28 @@ SINT32 teulModStartup(ERROR_FUNCTION errFnPtr)
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	dbugWrite(_FLN, "intitializing teul module version: %s", Teul::VersionString);
+	dbugLog(_FLN, "intitializing teul module version: %s", Teul::VersionString);
 
 	extern void teulInitModRecv();
+    extern void teulInitEndpoints(ERROR_FUNCTION const);
 
 	teulInitModRecv();
-
 	teulInitEndpoints(errFnPtr);
-
 	teulInitModCallbacks();
-
 	teulSyncClock();
-
 #if platBuild == BUILD_SERVER
 	_getHostIPAddresses();
 #endif
-
 	return 0;
 }
 
 using ADDRESS_LIST = std::vector<UINT32>;
 
 #if platBuild == BUILD_SERVER
-void
-teulGetAddresses(ADDRESS_LIST& addresses)
+void teulGetAddresses(ADDRESS_LIST& addresses)
 {
 	addresses.clear();
-	for ( UINT32 i = 0; i < Server::myInterface.numIP; ++i )
-	{
+	for (UINT32 i = 0; i < Server::myInterface.numIP; ++i) {
 		addresses.push_back(Server::myInterface.addr[i].ip);
 	}
 }
@@ -214,57 +180,51 @@ namespace Teul
 {
 	bool IsMyAddress(UINT32 address_)
 	{
-		if ( address_ == INADDR_LOOPBACK )
+		if (address_ == INADDR_LOOPBACK) {
 			return true;
-		for ( UINT32 i = 0; i < Server::myInterface.numIP; ++i )
-		{
-			if ( Server::myInterface.addr[i].ip == address_ )
+        }
+		for (UINT32 i = 0; i < Server::myInterface.numIP; ++i) {
+			if (Server::myInterface.addr[i].ip == address_) {
 				return true;
+            }
 		}
 		return false;
 	}
 }
 #endif
 
-SINT32
-teulModShutdown()
+SINT32 teulModShutdown()
 {
 	using namespace Teul;
-	for ( auto it = idleEndpoints.begin(), end = idleEndpoints.end(); it != end; )
-	{
-		ENDPOINT* const endpoint = *(it++);
-		if (PN_LIKELY(endpoint != nullptr)) {
-			teulClose(*endpoint);
+	
+    for (auto *ep : idleEndpoints) {
+        if (ep) {
+            teulClose(*ep);
         }
-	}
+    }
 
 	teulModIdle(10);
-
 	teulKillDeadEndpoints();
-
 	// Free up the memory the endpoints are using
 	teulCleanupEndpoints();
-
 #if platOS == OS_WIN32
-	WSACleanup( );
+	WSACleanup();
 #endif
 	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Update the m_peer flag of an endpoint.
-
-static void
-_setEndpointPeerState(ENDPOINT& endpoint)
+static void _setEndpointPeerState(ENDPOINT& endpoint)
 {
 #if platBuild == BUILD_SERVER
-	if ( endpoint.protocol == PROTOCOL_UDB || endpoint.protocol == PROTOCOL_CTRL || endpoint.state() == IS_LISTENING )
+	if (endpoint.protocol == PROTOCOL_UDB || endpoint.protocol == PROTOCOL_CTRL || endpoint.state() == IS_LISTENING ||
+        (endpoint.protocol == PROTOCOL_TCP && static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < MAX_SERVER_TYPE)
+    ) {
 		endpoint.m_peer = true;
-	else if ( endpoint.protocol == PROTOCOL_TCP && (static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < (UINT32)MAX_SERVER_TYPE) )
-		endpoint.m_peer = true;
-#else
-	endpoint.m_peer = false;
+    } else
 #endif
+	endpoint.m_peer = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -345,244 +305,203 @@ private:
 // Prepare a socket for listening -- bind it to the listen address,
 // and tell the operating system to listen.
 
-static void
-_bindAndListen(ENDPOINT& endpoint)
+static void _bindAndListen(ENDPOINT& endpoint)
 {
-	if ( bind(endpoint.socket, (struct sockaddr*) &endpoint.localSockAddress, sizeof(endpoint.localSockAddress)) < 0 )
+	if (bind(endpoint.socket, (struct sockaddr*) &endpoint.localSockAddress, sizeof(endpoint.localSockAddress)) < 0) {
 		throw Teul::OpenError("bind failed");
-
-	if ( listen(endpoint.socket, MAX_ACCEPT_BACKLOG) < 0 )
+    }
+    if (listen(endpoint.socket, MAX_ACCEPT_BACKLOG) < 0) {
 		throw Teul::OpenError("listen failed");
-
+    }
 	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " listening socket on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 }
 
 //////////////////////////////////////////////////////////////////////
 // Start an outgoing connection.
-
-static void
-_connectSocket(ENDPOINT& endpoint)
+static void _connectSocket(ENDPOINT& endpoint)
 {
-	// Start the connection process. Give the OS a few chances to allocate an address for us.
-	for (size_t attempt = 0; attempt < 64; ++attempt)
-	{
-		int connectResult = connect(endpoint.socket, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
-		if ( connectResult >= 0 )
-			break;
-
-		const SINT32 error = dbugGetErrno();
-
-		if ( error == PLAT_ECONNREFUSED )
-			throw Teul::OpenError(error, "connection refused");
-
-		if ( error == EADDRNOTAVAIL )
-			continue;
-
-		// Since our sockets are configured as non-blocking,
-		// it's VERY unlikely the connection will happen this
-		// quickly - packets have to be exchanged, etc. So the
-		// operating system will return an error to tell us that
-		// this connection is not a done deal, yet.
-		// Any of EAGAIN, EWOULDBLOCK or EINPROGRESS means that
-		// it's begun, but not finished.
-		const bool inProgress = (error == PLAT_EAGAIN) || (error == PLAT_EWOULDBLOCK) || (error == PLAT_EINPROGRESS);
-		if ( ! inProgress )
-			throw Teul::OpenError(error, "connect() call failed");
-
-		endpoint.lastDataRecv.makeCurrent();
-		endpoint.lastDataSent.makeCurrent();
-
-		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
-
-		break;
-	}
+	// Start the connection process.
+    int connectResult = 0;
+    int connectErr = 0;
+    
+    do {
+        connectResult = connect(endpoint.socket, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
+    } while (connectResult == SOCKET_ERROR && (connectErr = dbugGetErrno()) == PLAT_EINTR);
+   
+    if (connectResult != SOCKET_ERROR || connectErr == PLAT_EWOULDBLOCK || connectErr == PLAT_EINPROGRESS) {
+        endpoint.lastDataRecv.makeCurrent();
+        endpoint.lastDataSent.makeCurrent();
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
+        return;
+    } else {
+        throw Teul::OpenError(connectErr, "connect() call failed");
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
 // Open a stream socket.
-
-static void
-_openStream(ENDPOINT& endpoint)
+static void _openStream(ENDPOINT& endpoint)
 {
-	if (endpoint.state() == IS_LISTENING )
+	if (endpoint.state() == IS_LISTENING) {
 		_bindAndListen(endpoint);
-	else if ( endpoint.state() == IS_OPENING )
+	} else if (endpoint.state() == IS_OPENING) {
 		_connectSocket(endpoint);
-	else
+	} else {
 		throw Teul::OpenError(EINVAL, "invalid socket state during open");
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
 // Bind a socket for a datagram (UDP) connection.
-
-static void
-_bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
+static void _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 {
-	socklen_t len = sizeof(sockAddr);	// Needed for getsockname.
+	socklen_t len = sizeof(sockAddr);
 
-	if ( bind(endpoint.socket, (struct sockaddr*)&sockAddr, len) < 0 )
+	if (bind(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), len) == SOCKET_ERROR) {
 		throw Teul::OpenError("bind() failed");
+    }
 
-	if ( getsockname(endpoint.socket, (struct sockaddr*)&sockAddr, &len) < 0 )
+	if (getsockname(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), &len) == SOCKET_ERROR) {
 		throw Teul::OpenError("getsockname() failed after bind");
+    }
 
-	dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " bound to fam:%u addr:%s port:%hu"
-					, endpoint.teulIndex()
-					, PRA_SOCKET(endpoint.socket)
-					, sockAddr.sin_family
-					, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr))
-					, sockAddr.sin_port
-					);
+	dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " bound to fam:%u addr:%s port:%hu",
+					endpoint.teulIndex(),
+					PRA_SOCKET(endpoint.socket),
+					sockAddr.sin_family,
+					teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)),
+					sockAddr.sin_port);
 }
 
-// inActive : true if the TCP socket is to be used to send, false if used to listen/receive
-SINT32
-teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel)
+//////////////////////////////////////////////////////////////////////
+// Open a teul connection
+SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port,
+                          CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel)
 {
-	if (PN_UNLIKELY(Teul::IsTransportClosing())) {
+	if (Teul::IsTransportClosing()) {
 		dbugLog(_FLM, "open connection refused: transport closing");
 		return -EDEADLK;
 	}
 
 	struct sockaddr_in sockAddress;
+    
 	memset(&sockAddress, 0, sizeof(sockAddress));
 	sockAddress.sin_family = AF_INET;
 	sockAddress.sin_addr.s_addr = htonl(host);
 	sockAddress.sin_port = htons(port);
 
 	ENDPOINT* newEndpoint = teulCreateEndpoint(listening, timeout, protocol);
-	if ( PN_UNLIKELY(newEndpoint == nullptr) )
-	{
-		return -ENOSPC;	// could not allocate buffer for endpoint
-	}
 
+	if (newEndpoint) {
+		return -EMFILE;
+	}
 	newEndpoint->connectFn = connectFn;
 	newEndpoint->errorFn = errorFn;
-
-	// create the socket
 	newEndpoint->socket = INVALID_SOCKET;
 
-	if (newEndpoint->state() == IS_LISTENING)
-	{
+	if (newEndpoint->state() == IS_LISTENING) {
 		newEndpoint->localSockAddress = sockAddress;
-	}
-	else
-	{
+	} else {
 		newEndpoint->fromSockAddress = sockAddress;
 		newEndpoint->destSockAddress = sockAddress;
 
-		if (newEndpoint->protocol == PROTOCOL_UDB )
-		{
+		if (newEndpoint->protocol == PROTOCOL_UDB) {
 			newEndpoint->localSockAddress = sockAddress;
-
 			// Translate the destination address into a broadcast.
 			newEndpoint->destSockAddress.sin_addr.s_addr |= 0xff000000;
-		}
-		else
-		{
+		} else {
 			newEndpoint->destSockAddress = sockAddress;
-
 			// Listen on all addresses, with an auto-port.
-			newEndpoint->localSockAddress.sin_addr.s_addr = htonl( INADDR_ANY );
+			newEndpoint->localSockAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 			newEndpoint->localSockAddress.sin_port = htons(0);
 		}
 	}
+    
+    try {
+        switch (newEndpoint->protocol) {
+            case PROTOCOL_TCP:
+            case PROTOCOL_CTRL:
+                newEndpoint->socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+                if (newEndpoint->socket == INVALID_SOCKET) {
+                    throw Teul::OpenError("socket(SOCK_STREAM) failed");
+                }
+                teulConfigureEndpointSocket(*newEndpoint);
+                _openStream(*newEndpoint);
+                break;
+            case PROTOCOL_UDP:
+            case PROTOCOL_UDB:
+                newEndpoint->socket = socket(AF_INET, SOCK_DGRAM, 0);
+                if (newEndpoint->socket == INVALID_SOCKET) {
+                    throw Teul::OpenError("socket(SOCK_DGRAM) failed");
+                }
+                teulConfigureEndpointSocket(*newEndpoint);
+                _bindDgramSocket(*newEndpoint, newEndpoint->localSockAddress);
+                break;
+        }
+        _setEndpointPeerState(*newEndpoint);
+        if (newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL) {
+            newEndpoint->m_state = IS_OPEN; // broadcast and control sockets are immediately open and connected
+            newEndpoint->setConnected();
+            newEndpoint->doConnect();
+        } else if (newEndpoint->state() != IS_LISTENING && !newEndpoint->m_reliable) {
+            SINT32 sendErr = teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN); // Send SYN immediately on UDP connection sockets
+            
+            if (sendErr < 0) {
+                throw Teul::OpenError(-sendErr, "failed to send new connection open");
+            }
+        }
+        teulMRecvAddToPoll(*newEndpoint);
+    } catch (Teul::OpenError& e) {
+        const char *errStr = Teul::GetErrorName(e.errNo);
 
-	bool useTCP = (newEndpoint->protocol == PROTOCOL_TCP || newEndpoint->protocol == PROTOCOL_CTRL);
-	newEndpoint->socket = socket(AF_INET, useTCP ? SOCK_STREAM : SOCK_DGRAM, 0);
-	try
-	{
-		if ( newEndpoint->socket == INVALID_SOCKET )
-			throw Teul::OpenError("socket() failed");
-
-		teulConfigureEndpointSocket(*newEndpoint);
-
-		switch ( newEndpoint->protocol )
-		{
-		case PROTOCOL_TCP:
-		case PROTOCOL_CTRL:
-			_openStream(*newEndpoint);
-		break;
-		case PROTOCOL_UDP:
-		case PROTOCOL_UDB:
-			_bindDgramSocket(*newEndpoint, newEndpoint->localSockAddress);
-		break;
-		default:
-			throw Teul::OpenError(EINVAL, "internal error (protocol)");
-		}
-
-		_setEndpointPeerState(*newEndpoint);
-
-		if (newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL)
-		{
-			// tell the app we are connected
-			newEndpoint->m_state = IS_OPEN;
-			newEndpoint->setConnected();
-			newEndpoint->doConnect();
-		}
-		else if (newEndpoint->state() != IS_LISTENING && (newEndpoint->m_reliable == false))
-		{
-			const SINT32 error = (SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN) : -EINVAL;
-			if ( error < 0 ) {
-				throw Teul::OpenError(error, "couldn't send to new connection");
-			}
-		}
-
-		teulMRecvAddToPoll(*newEndpoint);
-	}
-	catch ( Teul::OpenError& e )
-	{
-		const char* err = strerror(abs(e.errNo));
-		if ( err == nullptr )
-			err = "unknown";
-
-		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s"
-					, newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket)
-					, e.errNo, err, e.msg
-					);
-
+		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s", newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket), e.errNo, errStr, e.msg);
 		newEndpoint->doError(e.errNo);
 		newEndpoint->shutdown();
 		teulFreeEndpoint(newEndpoint);
-
 		return e.errNo < 0 ? e.errNo : -EINVAL;
 	}
 
 	// Backchannels may exist on listening hosts and clients
-	if (initBackChannel)
-	{
+    assert(!initBackChannel || newEndpoint->state() != IS_LISTENING); // listening endpoints never have backchannels
+
+	if (initBackChannel) {
 		newEndpoint->m_pairdUdpConn = new RakNetChannel(0, listening, port, newEndpoint);
 		newEndpoint->m_pairdUdpConn->init();
 	}
-
-
 	return newEndpoint->teulIndex();
 }
 
+//////////////////////////////////////////////////////////////////////
+// Mark an endpoint fully connected (TCP connect completed)
+// This is HORRIBLY mis-factored relative to the UDB/CTRL endpoint handling above
 SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 {
-	if (PN_UNLIKELY(inEndpoint.state() != IS_OPENING))
-	{
+	if (inEndpoint.state() != IS_OPENING) {
 		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint.state());
 		return -EINVAL;
 	}
 
-	if ( inEndpoint.m_reliable == false )
-	{
-		SINT32 retval = connect(inEndpoint.socket, (struct sockaddr*)&inEndpoint.destSockAddress, sizeof(inEndpoint.destSockAddress));
-		if ( retval < 0 )
-		{
-			dbugWrite(_FLA, "t:%d couldn't connect socket",inEndpoint.teulIndex());
-			return retval;
+	if (!inEndpoint.m_reliable) {
+        int connErr = 0, connRes = 0;
+        
+        do {
+		    connRes = connect(inEndpoint.socket, reinterpret_cast<struct sockaddr *>(&inEndpoint.destSockAddress), sizeof(inEndpoint.destSockAddress));
+        } while (connRes == SOCKET_ERROR && (connErr = dbugGetErrno()) == PLAT_EINTR);
+        
+		if (connRes == SOCKET_ERROR) {
+			dbugLog(_FLA, "t:%d couldn't connect socket",inEndpoint.teulIndex());
+			return -connErr;
 		}
 	}
-
 	inEndpoint.m_state = IS_OPEN;
 	inEndpoint.setConnected();
     inEndpoint.updateSocketEvents();
 	return 0;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Tear down an endpoint.
+// This is one of the worst offenders of reentrancy in all Teul's network logic.
 void teulClose(ENDPOINT& inEndpoint)
 {
 	if (!inEndpoint.m_inUse) {
@@ -613,10 +532,11 @@ void teulClose(ENDPOINT& inEndpoint)
     teulRemoveEndpoint(&inEndpoint);
 }
 
+//////////////////////////////////////////////////////////////////////
+// Tear down a endpoint by index.
 void teulClose(const SINT32 teulIndex)
 {
 	if (ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex)) {
         teulClose(*theEndpoint);
     }
 }
-
