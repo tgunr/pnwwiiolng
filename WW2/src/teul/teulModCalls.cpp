@@ -152,7 +152,7 @@ static SINT32 _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 	_status("rx", "SYN", token.version, a->endpoint);
 
 	// Temporarily make dest the same as from then restore it.
-	const sockaddr_in savedDestAddress = std::exchange(a->endpoint->destSockAddress, a->endpoint->fromSockAddress);
+	sockaddr_in savedDestAddress = std::exchange(a->endpoint->destSockAddress, a->endpoint->fromSockAddress);
 
 	a->offset = teulModSendCALLBACKe(*a->endpoint, *SYN_ACK_TOKEN);	// send it
 	a->endpoint->destSockAddress = savedDestAddress;
@@ -223,7 +223,6 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
     a->endpoint->setTimeout(token.timeout); // use the timeout given.
     a->endpoint->m_impl->m_version = version;
     a->endpoint->m_impl->m_rxCrypt.setSeed(token.seed);
-    a->endpoint->m_impl->m_cryptVersion = version;
 	dbugLog(_FLD, "t:%d at:%d negotiated teul version:%04x timeout: %d", a->teulIndex, a->endpoint->teulIndex(), a->endpoint->m_impl->m_version, token.timeout);
 
 	_status("rx", "SAK", token.version, a->endpoint);
@@ -246,6 +245,7 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
         return sendErr;
     }
 
+    a->endpoint->m_impl->m_cryptVersion = version;
     a->endpoint->doConnect();
 	return a->offset;
 }

@@ -392,7 +392,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 
 	ENDPOINT* newEndpoint = teulCreateEndpoint(listening, timeout, protocol);
 
-	if (newEndpoint) {
+	if (!newEndpoint) {
 		return -EMFILE;
 	}
 	newEndpoint->connectFn = connectFn;
