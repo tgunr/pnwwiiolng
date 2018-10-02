@@ -236,7 +236,7 @@ bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 {
 	bool retVal = false;
 
-	if(!stricmp(name.c_str(), check))
+	if(!strcasecmp(name.c_str(), check))
 	{
 		stack.clear();
 
