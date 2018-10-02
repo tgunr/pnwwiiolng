@@ -108,12 +108,12 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 //////////////////////////////////////////////////////////////////////
 // Macro: Only print output if debugOutput is enabled.
 
-#define Dprintf(...) { if ( Config::debugOutput == true ) printf("[D] " __VA_ARGS__); }
+#define Dprintf(m, ...) { if ( Config::debugOutput == true ) printf("%s:%d [D] " m, sane_basename(__FILE__), __LINE__, ## __VA_ARGS__); }
 
 //////////////////////////////////////////////////////////////////////
 // Macro: Only print output if infoOutput is enabled.
 
-#define Iprintf(...) { if ( Config::infoOutput == true ) printf("[I] " __VA_ARGS__); }
+#define Iprintf(m, ...) { if ( Config::infoOutput == true ) printf("%s:%d [I] " m, sane_basename(__FILE__), __LINE__, ## __VA_ARGS__); }
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -521,11 +521,15 @@ struct Role
 		if ( packet.packetCapacityBytes() != Teul::Packet::DefaultLocalDataSize + Teul::Packet::GrowthRate  )
 			throw Teul::Error("Adding second copy of string caused unexpected capacity growth.", packet.packetCapacityBytes());
 
+        Dprintf("sending packet to t:%d\n", teulIndex);
 		SINT32 result = packet.send(teulIndex);
-		if ( result < 0 )
-			throw Teul::Error("Teul::Packet send failed", result);
-
-		Iprintf("Teul::Packet sent: %u [%u of %u].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
+		if (result < 0 && result != -EPIPE) {
+			throw Teul::IndexError(teulIndex, "Teul::Packet send failed", result);
+        } else if (result >= 0) {
+		    Iprintf("Teul::Packet sent: %u [%u of %u].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
+        } else {
+            Iprintf("Teul::Packet was not sent due to connection loss\n");
+        }
 	}
 
 };

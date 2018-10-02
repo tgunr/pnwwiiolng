@@ -416,7 +416,7 @@ struct ClientRole : public Role
 		Iprintf("Sending [%u] %s\n", randomNo, detail);
 		SINT32 result = teulSend(teulIndex, callback, &randomNo);
 		if ( result < 0 )
-			throw Teul::Error("SendRandom failed", result);
+			throw Teul::IndexError(teulIndex, "SendRandom failed", result);
 
 		WaitForHelloReply();
 
@@ -789,9 +789,9 @@ struct ClientRole : public Role
 		SendRandom(m_teulIndex, s_cbRelHello, "final via rel");
 
 		if ( Teul::GetEndpointIfConnected(1) != nullptr )
-			throw Teul::Error("Second endpoint is still showing 'connected' after close", 0);
+			throw Teul::IndexError(1, "Second endpoint is still showing 'connected' after close", 0);
 		if ( Teul::GetEndpointIfConnected(0) == nullptr )
-			throw Teul::Error("We lost the primary endpoint", 0);
+			throw Teul::IndexError(0, "We lost the primary endpoint", 0);
 
 		// If the "killserver" test is enabled, we send the "shutdown" callback.
 		if ( tKillServer.isEnabled() )
