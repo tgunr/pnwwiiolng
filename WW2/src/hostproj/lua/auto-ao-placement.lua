@@ -10,7 +10,7 @@
     relatively even fight. Some weight is given to the whereabouts
     of players in game, with some biasing against armor.
 
-    DEV-2508-re-write-the-auto-ao-placement.lua-script - 2018-09-28
+    DEV-2508-re-write-the-auto-ao-placement.lua-script - 2018-10-04
     Revision for 1.36 James10 (Mathew J Hogan):
 	- Include Garrison units in the selection procedure.
 	- Determine if the US is in-game.
@@ -34,31 +34,42 @@ if not (gameAOPlacementEnabled or gameAOPlacements) then
 	gameAOMinInfantryStrength = 60		-- Must be 60% or higher
 end
 
+function _sendMessages(msg)
+	--  systemMessage(msg)
+	--  print(msg)
+	log('M', 'autoao', msg)
+end
+
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 -- true/false, check if this cp is a valid ao origin
 
 function _validOriginForAO(cp, forSide)
-
 	-- Citys only
 	if not cp:isCity() then return false end
+
 	-- Must be our town
 	if cp.side ~= forSide then return false end
+
 	-- Frontline towns
 	if cp.numLinks <= 0 or cp:isEnemyLinked() == false then return false end
+
 	-- Needs to have a brigade to attack with
 	if cp:numUnits() <= 0 then return false end
+
 	-- Ignore "out of play" towns
 	if cp.country == WWII_CHINA or cp.country == WWII_RUSSIA then return false end
+
 	-- Ignore the 'offmap' towns
 	if cp.uOID == routDestination[ENGLAND].uOID or
-				cp.uOID == routDestination[FRANCE].uOID or
-				cp.uOID == routDestination[GERMANY].uOID or
-				cp.uOID == routDestination[USA].uOID then
+			cp.uOID == routDestination[FRANCE].uOID or
+			cp.uOID == routDestination[GERMANY].uOID or
+			cp.uOID == routDestination[USA].uOID then
 		return false
 	end
-	return true
 
+	--  _sendMessages("_validOriginForAO - ".._sideNameAdj[forSide])
+	return true
 end
 
 ----------------------------------------------------------------------
@@ -84,10 +95,10 @@ function _scoreAOPotential(unit, origin, link, target, country)
 	-- Never pick a town with heavy armor ews unless the favor is returned
 	if target:hasHeavyArmorEWS() == true and origin:hasHeavyArmorEWS() == false then return 0 end
 
+	-- Selected Unit Infantry Supply greater than the Minimum desired strength.
 	local infStr = unit:getSupplyPctg(INFANTRY)
 	if infStr < gameAOMinInfantryStrength then return 0 end
 
-	-- Make sure it's an enemy city
 	-- Start the score with the number of infantry present.
 	local attackingInf = target:getPlayers(origin.side, INFANTRY)
 	local defendingInf = target:getPlayers(target.side, INFANTRY)
@@ -190,24 +201,32 @@ function _scoreAOPotential(unit, origin, link, target, country)
 
 	score = math.floor(score)
 
-	log('D', 'autoao', "Considering " .. unit:name() .. " : " .. origin.name .. " => " .. target.name .. " (" ..score ..")" .. str)
+	local msg = "Considering " .. unit:name() .. " : " .. origin.name .. " => " .. target.name .. " (" ..score ..")" .. str
+
+	log('D', 'autoao', msg)
+	--  log('W', 'autoao', msg)
 
 	return score
 end
 
 ----------------------------------------------------------------------
--- Is the USA deployed In-Game. Tier 3+ usually.
-function _isUSA_Deployed()
+----------------------------------------------------------------------
+-- Returns true/false. Is the USA deployed In-Game. Tier 3+ usually.
+-- True = US Personas are Active. False = US Personas are Inactive.
+function isUSA_Deployed()
 
 	local usDeployed = false
+
+	--  _sendMessages("US set to Undeployed")
 
 	--  Pre US deployment / NOT Deployed = false
 	--  Post US deployment / Deployed = true
 
 	for unit in allStratHCUnits() do
-		if unit.country == WWII_USA then
-			if unit.uOID ~= routDestination[USA].uOID then
+		if unit:country() == WWII_USA then
+			if unit:homeCPID() ~= routDestination[USA].uOID then
 				usDeployed = true
+				--  _sendMessages("US set to Deployed")
 				break
 			end
 		end
@@ -216,6 +235,8 @@ function _isUSA_Deployed()
 	return usDeployed
 end
 
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 -- Pick the underdog country of a given side
 function gameAOChooseAlliedCountry(forSide)
 
@@ -226,7 +247,7 @@ function gameAOChooseAlliedCountry(forSide)
 	local brit = 0
 	local usa = 0
 	
-	if _isUSA_Deployed == false then
+	if isUSA_Deployed() == false then
 	--  Pre US deployment / NOT Deployed
 
 		for cp in allCityCPs() do
@@ -277,20 +298,24 @@ function gameAOChooseAlliedCountry(forSide)
 end
 
 ----------------------------------------------------------------------
+----------------------------------------------------------------------
 -- Check if a unit is a worthwhile candidate
 
 function _isCandidateUnit(unit)
 	-- if unit:isBrigade() == false and unit:isGarrison() == false then return false end  --  Removed Dev Meeting: 2018-09-30  --
 	if unit:isGarrison() == false then return false end
+	if unit:movementType() ~= BRANCH_LAND then return false end
 	if unit:offMap() == true then return false end
 	local cp = unit:homeCP()
 	if cp == nil then return false end
 	if cp.numLinks <= 0 or cp:isEnemyLinked() == false then return false end
 	if cp.country == WWII_CHINA or cp.country == WWII_RUSSIA then return false end
-	if unit:movementType() ~= BRANCH_LAND then return false end
+
+	--  _sendMessages("isCandidateUnit - "..unit:name().." = ".._sideNameAdj[unit:side()])
 	return true
 end
 
+----------------------------------------------------------------------
 ----------------------------------------------------------------------
 -- AO Placement Candidate Selection
 
@@ -337,7 +362,6 @@ function gameAOCandidateSelection (forSide)
 	end
 
 	return result
-
 end
 
 ----------------------------------------------------------------------
@@ -360,10 +384,13 @@ function _schedulePlacement(forSide, time, warnings)
 end
 
 ----------------------------------------------------------------------
+----------------------------------------------------------------------
 -- Called when a side has spare attack objective capacity to provide
 -- an opportunity for automatic placement of AOs by the system.
 
 function gameSpareAOCapacity (forSide)
+
+	--  _sendMessages("gameSpareAOCapacity - ".._sideNameAdj[forSide])
 
 	-- You must set gameAOPlacementEnabled to true to enable this functionality
 	if gameAOPlacementEnabled == false or host_config:isArenaOpen() == false then
@@ -490,6 +517,9 @@ function gameAOListCandidates (forSide)
 			local rcp = options.best[i]
 			if i > 1 then str = str .. ", " end
 			str = str .. rcp.name
+
+		--  _sendMessages("gameAOListCandidates - ".._sideNameAdj[forSide]..": "..rcp.name)
+
 		end
 		chatSendHCMessage(forSide, LSTR_GENERIC, locstr('aoCandidates', str))
 	else
@@ -517,4 +547,3 @@ function testAOPlacement(forSide)
 	end
 	warn(options.numCandidates .. " candidates: " .. str)
 end
-
