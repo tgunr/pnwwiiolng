@@ -359,72 +359,66 @@ static SINT32 _recvError(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-
-SINT32
-teulInitModCallbacks()
+SINT32 teulInitModCallbacks()
 {
-	Teul::CallbackInit ci{};
+    Teul::CallbackInit ci;
 
-	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
-	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";
+    ci.callX = Teul::Module::CallbackX;
+    ci.callXName = TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";
 
-	ci.callY		= TM_SYN_TOKEN_Y;                // the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendSYN_TOKEN;            // how to send data
-	ci.recvAction	= _actionRecvSYN_TOKEN;			// how to receive data
+    // SYN
+    ci.callY = TM_SYN_TOKEN_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_SYN_TOKEN_Y" : "";
+    ci.sendAction = _actionSendSYN_TOKEN;
+    ci.recvAction = _actionRecvSYN_TOKEN;
+    SYN_TOKEN = teulAllocSystemCallback(&ci);
 
-	SYN_TOKEN	= teulAllocSystemCallback(&ci);
+    // SYN-ACK
+    ci.callY = TM_SYN_ACK_TOKEN_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_SYN_ACK_TOKEN_Y" : "";
+    ci.sendAction = _actionSendSYN_ACK_TOKEN;
+    ci.recvAction = _actionRecvSYN_ACK_TOKEN;
+    SYN_ACK_TOKEN = teulAllocSystemCallback(&ci);
+    
+    // SYN-ACK-ACK
+    ci.callY = TM_SYN_ACK_ACK_TOKEN_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_SYN_ACK_ACK_TOKEN_Y" : "";
+    ci.sendAction = _actionSendSYN_ACK_TOKEN;
+    ci.recvAction = _actionRecvSYN_ACK_ACK_TOKEN;
+    SYN_ACK_ACK_TOKEN = teulAllocSystemCallback(&ci);
 
-	ci.callY		= TM_SYN_ACK_TOKEN_Y;			// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_ACK_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
-	ci.recvAction	= _actionRecvSYN_ACK_TOKEN;		// how to receive data
+    // KLIVE
+    ci.callY = TM_KLIVE_TOKEN_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_KLIVE_TOKEN_Y" : "";
+    ci.sendAction = _actionSendKLIVE_TOKEN;
+    ci.recvAction = _actionRecvKLIVE_TOKEN;
+    KLIVE_TOKEN = teulAllocSystemCallback(&ci);
 
-	SYN_ACK_TOKEN	= teulAllocSystemCallback(&ci);
+    // KLIVE-ACK
+    ci.callY = TM_KLIVE_ACK_TOKEN_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_KLIVE_ACK_TOKEN_Y" : "";
+    ci.sendAction = _actionSendKLIVE_ACK_TOKEN;
+    ci.recvAction = _actionRecvKLIVE_ACK_TOKEN;
+    KLIVE_ACK_TOKEN = teulAllocSystemCallback(&ci);
 
-
-	ci.callY		= TM_SYN_ACK_ACK_TOKEN_Y;		// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_ACK_ACK_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
-	ci.recvAction	= _actionRecvSYN_ACK_ACK_TOKEN;	// how to receive data
-
-	SYN_ACK_ACK_TOKEN	= teulAllocSystemCallback(&ci);
-
-	ci.callY		= TM_KLIVE_TOKEN_Y;				// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendKLIVE_TOKEN;		// how to send data
-	ci.recvAction	= _actionRecvKLIVE_TOKEN;		// how to receive data
-
-	KLIVE_TOKEN	= teulAllocSystemCallback(&ci);
-
-	ci.callY		= TM_KLIVE_ACK_TOKEN_Y;			// the Y position in the callback matrix
-	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_ACK_TOKEN_Y" : "";
-	ci.sendAction	= _actionSendKLIVE_ACK_TOKEN;	// how to send data
-	ci.recvAction	= _actionRecvKLIVE_ACK_TOKEN;	// how to receive data
-
-	KLIVE_ACK_TOKEN	= teulAllocSystemCallback(&ci);
-
-    // Callback indicating a connection needs to be sent/received.
-    ci.callY        = TM_CONNECTION_INSTRUCTION_Y;
-    ci.callYName    = TEUL_PACKET_NAMES ? "TM_CONNECTION_INSTRUCTION_Y" : "";
-    ci.sendAction   = _sendConnectionInstruction;
-    ci.recvAction   = _recvConnectionInstruction;
-
+    // CONNECTION-INSTRUCTION
+    ci.callY = TM_CONNECTION_INSTRUCTION_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_CONNECTION_INSTRUCTION_Y" : "";
+    ci.sendAction = _sendConnectionInstruction;
+    ci.recvAction = _recvConnectionInstruction;
     Teul::ConnectionInstruction::s_callback = teulAllocSystemCallback(&ci);
 
-    // Error callback
-	ci.callY = TM_ERROR_Y;
-	ci.callYName = TEUL_PACKET_NAMES ? "TM_ERROR_Y" : "";
-	ci.recvAction = _recvError;
+    // ERR
+    ci.callY = TM_ERROR_Y;
+    ci.callYName = TEUL_PACKET_NAMES ? "TM_ERROR_Y" : "";
+    ci.recvAction = _recvError;
+    teulAllocSystemCallback(&ci);
 
-	teulAllocSystemCallback(&ci);
-
-	return 0;
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Have an endpoint send an error to the remote side.
-
 void ENDPOINT::sendError(const SINT32 error_)
 {
 	if (teulIndex() < 0 || !m_inUse || m_closed) {
@@ -436,7 +430,6 @@ void ENDPOINT::sendError(const SINT32 error_)
 
 //////////////////////////////////////////////////////////////////////
 // Send error to an endpoint.
-
 void teulSendError(const SINT32 teulIndex, const SINT32 error)
 {
 	if (ENDPOINT* const endpoint = teulGetEndpoint(teulIndex)) {
