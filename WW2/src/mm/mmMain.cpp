@@ -75,7 +75,6 @@
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulVersion.h"
 #include "weap/weapList.h"

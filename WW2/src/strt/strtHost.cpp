@@ -43,7 +43,6 @@
 #include "strt/strtTOE.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"

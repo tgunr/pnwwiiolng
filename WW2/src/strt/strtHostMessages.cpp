@@ -59,7 +59,6 @@
 #include "strt/strtWeaponsReturn.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulUtils.h"
 #include "weap/weapWeapon.h"
 #include "wwii/wwiiCallbacks.h"

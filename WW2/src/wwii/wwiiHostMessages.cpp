@@ -17,7 +17,6 @@
 #include "wwii/wwiiTypes.h"
 
 #if defined(IS_MAP_HOST)
-#include "teul/teulServer.h"
 #include "map/mapDB.h"
 #include "chat/chatConstants.h"
 #include "mm/mmMain.h"

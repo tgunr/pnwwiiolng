@@ -42,7 +42,6 @@
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
 #include "teul/teulMicroWebServer.h"

@@ -29,3 +29,13 @@ enum PROTOCOL
 	PROTOCOL_UNDEF
 };
 
+// The base packer modes.
+enum PACKER_MODE
+{
+	TEUL_UNPACK,
+	TEUL_PACK
+};
+
+// The mask for "send directly to"
+// TODO: Do we need this?
+#define DIRECT_MASK 0x000000ff

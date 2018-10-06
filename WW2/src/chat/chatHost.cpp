@@ -83,7 +83,6 @@
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"

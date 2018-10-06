@@ -19,7 +19,6 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 

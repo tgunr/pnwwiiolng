@@ -12,8 +12,6 @@
 
 struct ENDPOINT;
 
-enum { TEUL_UNPACK, TEUL_PACK };
-
 namespace Teul
 {
 	enum class Mode { Unpack, Pack };
@@ -49,6 +47,9 @@ namespace Teul
 //!	@param[in]	data			Pointer to the data.
 SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void* const data, const UCHAR protocol=PROTOCOL_UNDEF);
 SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data, const UCHAR protocol=PROTOCOL_UNDEF);
+
+//! Send data through a callback on a given connection with a specified destination.
+SINT32 teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* object, void*  data);
 
 //! Close a local connection. will not work until its opened.
 void teulClose(const SINT32 teulIndex);

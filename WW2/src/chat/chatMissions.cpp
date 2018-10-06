@@ -33,7 +33,6 @@
 #include "server/serverPeers.h"
 #include "str/stringLib.h"
 #include "teul/teulEndpointDefs.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiServerTrackedObject.h"
