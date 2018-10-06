@@ -59,7 +59,7 @@ static void _getHostIPAddresses()
 
     Server::myInterface.pid = getpid();
     Server::myInterface.numIP = 0;
-	for (auto ifa = ifap; ifa && Server::myInterface.numIP <= Server::InterfaceDescription::MaxHostIPs; ifa = ifa->ifa_next, ++Server::myInterface.numIP) {
+	for (auto ifa = ifap; ifa && Server::myInterface.numIP <= Server::InterfaceDescription::MaxHostIPs; ifa = ifa->ifa_next) {
         if (!ifa->ifa_addr) {
             dbugLog(_FLN, "Skipping interface %s because it has no address", ifa->ifa_name);
             continue;
@@ -79,6 +79,7 @@ static void _getHostIPAddresses()
                     Server::myInterface.numIP,
                     ifa->ifa_name,
                     teulGetAddress(Server::myInterface.addr[Server::myInterface.numIP].ip));
+        ++Server::myInterface.numIP;
     }
     
     if (!pIntf) {
