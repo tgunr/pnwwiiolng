@@ -80,15 +80,6 @@ namespace {
 #endif
 
 
-// Helper macros for cleaning up all the client/server ifdefs.
-#if platBuild == BUILD_SERVER
-# define ON_SERVER( _expr_ ) _expr_
-# define ON_CLIENT( _expr_ )
-#else
-# define ON_SERVER( _expr_ )
-# define ON_CLIENT( _expr_ ) _expr_
-#endif
-
 #define P2_BASE			10000	// Fast X/Y is position expressed in 100ms.
 
 #define FIRST_TIME_TURRET_SIZE ((8*sizeof(turret_t))+1)

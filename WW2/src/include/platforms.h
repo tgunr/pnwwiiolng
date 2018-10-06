@@ -28,6 +28,26 @@
 # error "No build defined by compiler"
 #endif
 
+// Helper macros for cleaning up all the client/server ifdefs.
+#if platBuild == BUILD_SERVER
+# define ON_SERVER(...) __VA_ARGS__
+# define ON_CLIENT(...)
+#elif platBuild == BUILD_CLIENT
+# define ON_SERVER(...)
+# define ON_CLIENT(...) __VA_ARGS__
+#endif
+
+// Helpers for conditionalizing on debug more cleanly as well.
+#if defined(DEBUG) && !defined(NDEBUG)
+# define DEBUG_ONLY(...) __VA_ARGS__
+# define RELEASE_ONLY(...)
+#elif !defined(DEBUG) && defined(NDEBUG)
+# define DEBUG_ONLY(...)
+# define RELEASE_ONLY(...) __VA_ARGS__
+#else
+# error "One and only one of DEBUG or NDEBUG must be defined by compiler"
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // Check actual compiler - Clang 3.6, GCC 4.8, or VS2015
 #if !__check_Clang_version(3,6) && !__check_GCC_version(4,8) && !__check_MSVC_version(19)
