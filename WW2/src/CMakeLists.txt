@@ -167,14 +167,6 @@ INCLUDE( cmakeincludes/HostConfiguration.cmake )
 INCLUDE( cmakeincludes/Dependencies.cmake )
 
 ####################################
-## Set up the OMG parser commands
-INCLUDE( cmakeincludes/BuildOMGgen.cmake )
-
-# And the actual OMG files we generate
-ADD_OMG_TARGET( omg/omgMissionSortieData )
-ADD_OMG_TARGET( omg/omgChat )
-
-####################################
 ## Run build_info.py to get build_info.cpp
 # Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
 # runs always; easiest way to avoid the run-when-needed default behaviors.
@@ -295,8 +287,8 @@ ADD_LIBRARY( wwiilib STATIC
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
-	omg/omgChat.cxx omg/omgChat.hxx
-	omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
+	chat/omgChat.cpp chat/omgChat.h
+	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
@@ -530,7 +522,8 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h chat/chatBrigadeVote.h
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
     chat/chatMissionInvite.cpp chat/chatMissionInvite.h
-    chat/chatMissionMember.cpp chat/chatMissionMember.h chat/chatMissions.cpp chat/chatMissions.h
+    chat/chatMissionMember.cpp chat/chatMissionMember.h
+    chat/chatMissions.cpp chat/chatMissions.h chat/chatMissionTypes.h
     chat/chatConstants.h
     chat/chatMultiCrew.cpp chat/chatMultiCrew.h
     wwii/wwiiPack.h

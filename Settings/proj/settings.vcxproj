@@ -248,9 +248,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\WW2\proj\win\WW2.targets" />
-  </ImportGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties RESOURCE_FILE="settings.rc" />

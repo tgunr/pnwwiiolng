@@ -39,7 +39,7 @@
 
 // WWIIOL specific.
 #include "strt/strtCPFlags.h"
-#include "omg/omgChat.hxx"
+#include "chat/omgChat.h"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
