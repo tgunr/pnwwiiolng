@@ -103,13 +103,6 @@ ObjType_* teulGetConnectionData(SINT32 teulIndex_)
 	return static_cast<ObjType_*>(teulGetPersonaData(teulIndex_));
 }
 
-// if you detect an error in your data handler use this function to forward it to
-// the callbacks error handler. mode == TEUL_PACK or TEUL_UNPACK for whether
-// the error is detected in the send or recv CALLBACK.
-SINT32 teulPostCallbackError(const SINT32 teulIndex
-									, const UCHAR* const data, const SINT32 size
-									, const struct TEUL_CALLBACK* const object, const SINT32 error);
-
 //! Send an error code to the process at the remote end of a connection.
 void teulSendError(const SINT32 teulIndex, const SINT32 errorCode);
 

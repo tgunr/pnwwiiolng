@@ -64,25 +64,6 @@ static SINT32 _recvAPP_LAUNCH(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Callback invoked when a callback encounters an error.
-
-static void
-_callbackError(
-               const SINT32 teulIndex
-               , const UCHAR* const data
-               , const SINT32 size
-               , const TEUL_CALLBACK* object
-               , const SINT32 error
-               )
-{
-    ENDPOINT * const ep = teulGetEndpoint(teulIndex);
-
-    dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
-        teulIndex, teulGetAddress(ep ? ep->destAddress() : Teul::INVALID_INDEX), ep ? ep->destPort() : -1, error
-    );
-}
-
-//////////////////////////////////////////////////////////////////////
 // Register a callback.
 
 TEUL_CALLBACK*
@@ -99,7 +80,6 @@ commInstallMessage(
     ci.callY         = MessageNumber;
     ci.sendAction    = SendFunc;
     ci.recvAction    = ReceiveFunc;
-    ci.error         = _callbackError;
 
     return (teulAllocCallback(&ci));
 }

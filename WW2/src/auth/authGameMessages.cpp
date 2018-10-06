@@ -56,7 +56,6 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 	memset(&ci,0,sizeof(ci));
 
 	//Global values
-	ci.error		= _errorFn;
 	ci.callX		= Auth::CallbackX;
 
 	//The recv function setup
@@ -147,11 +146,6 @@ static SINT32 _sendGameCapacity(ACTION_OBJECT* const a)
 static SINT32 _sendServerLoad(ACTION_OBJECT* const a)
 {
 	return authPackSERVER_LOAD(TEUL_PACK, a->packed, a->offset, (AUTH_SERVER_LOAD*) a->localRawData, sizeof(AUTH_SERVER_LOAD));
-}
-
-static void _errorFn(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
-{
-	dbugLog(_FLA, "t:%d auth connection error %d", teulIndex, error);
 }
 
 //Send function

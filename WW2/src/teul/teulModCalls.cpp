@@ -43,26 +43,6 @@ TEUL_CALLBACK* KLIVE_ACK_TOKEN;
 TEUL_CALLBACK* Teul::ConnectionInstruction::s_callback;
 
 //////////////////////////////////////////////////////////////////////
-///TODO: Make this generally available as the null error handler.
-static void _errorCALLBACK(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
-{
-}
-
-//////////////////////////////////////////////////////////////////////
-
-static void _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
-{
-	ENDPOINT * const inEndpoint = teulGetEndpoint(teulIndex);
-    
-	if (!inEndpoint) {
-		dbugLog(_FLA, "t:%d illegal index when processing SYN error", teulIndex);
-		return;
-	}
-	dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " errorSYN: closing error %d clock:%" PR64BitUT "", teulIndex, PRA_SOCKET(inEndpoint->socket), error, teulClock64);
-	teulClose(*inEndpoint);
-}
-
-//////////////////////////////////////////////////////////////////////
 static SINT32 _packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN_STRUCT* const tokenRef, SINT32 /*size*/)
 {
     // Introduce some noise to scramble seeds.
@@ -387,24 +367,20 @@ teulInitModCallbacks()
 
 	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
 	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";
-	ci.error		= _errorCALLBACK;
-
-	// following callbacks use the errSYN_CALLBACK  error handler which closes the connetion
-	ci.error		= _errorSYN_CALLBACK;
 
 	ci.callY		= TM_SYN_TOKEN_Y;                // the Y position in the callback matrix
 	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendSYN_TOKEN;            // how to send data
 	ci.recvAction	= _actionRecvSYN_TOKEN;			// how to receive data
 
-	SYN_TOKEN	= teulAllocSystemCallback( &ci );
+	SYN_TOKEN	= teulAllocSystemCallback(&ci);
 
 	ci.callY		= TM_SYN_ACK_TOKEN_Y;			// the Y position in the callback matrix
 	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvSYN_ACK_TOKEN;		// how to receive data
 
-	SYN_ACK_TOKEN	= teulAllocSystemCallback( &ci );
+	SYN_ACK_TOKEN	= teulAllocSystemCallback(&ci);
 
 
 	ci.callY		= TM_SYN_ACK_ACK_TOKEN_Y;		// the Y position in the callback matrix
@@ -412,24 +388,21 @@ teulInitModCallbacks()
 	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvSYN_ACK_ACK_TOKEN;	// how to receive data
 
-	SYN_ACK_ACK_TOKEN	= teulAllocSystemCallback( &ci );
-
-	// following callbacks use the generic _errorCallback that does nothing at this time
-	ci.error		= _errorCALLBACK;
+	SYN_ACK_ACK_TOKEN	= teulAllocSystemCallback(&ci);
 
 	ci.callY		= TM_KLIVE_TOKEN_Y;				// the Y position in the callback matrix
 	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendKLIVE_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvKLIVE_TOKEN;		// how to receive data
 
-	KLIVE_TOKEN	= teulAllocSystemCallback( &ci );
+	KLIVE_TOKEN	= teulAllocSystemCallback(&ci);
 
 	ci.callY		= TM_KLIVE_ACK_TOKEN_Y;			// the Y position in the callback matrix
 	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendKLIVE_ACK_TOKEN;	// how to send data
 	ci.recvAction	= _actionRecvKLIVE_ACK_TOKEN;	// how to receive data
 
-	KLIVE_ACK_TOKEN	= teulAllocSystemCallback( &ci );
+	KLIVE_ACK_TOKEN	= teulAllocSystemCallback(&ci);
 
     // Callback indicating a connection needs to be sent/received.
     ci.callY        = TM_CONNECTION_INSTRUCTION_Y;
@@ -437,14 +410,14 @@ teulInitModCallbacks()
     ci.sendAction   = _sendConnectionInstruction;
     ci.recvAction   = _recvConnectionInstruction;
 
-    Teul::ConnectionInstruction::s_callback = teulAllocSystemCallback( &ci );
+    Teul::ConnectionInstruction::s_callback = teulAllocSystemCallback(&ci);
 
     // Error callback
 	ci.callY = TM_ERROR_Y;
 	ci.callYName = TEUL_PACKET_NAMES ? "TM_ERROR_Y" : "";
 	ci.recvAction = _recvError;
 
-	teulAllocSystemCallback( &ci );
+	teulAllocSystemCallback(&ci);
 
 	return 0;
 }

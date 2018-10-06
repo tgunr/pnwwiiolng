@@ -22,32 +22,6 @@ TEUL_CALLBACK* TEUL_CALLBACK::s_callbackArray[256][256];
 
 TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* const ci);
 
-// Callback Errors are handled differently here. This routine simply
-// executes the Callback error routine that is found in the ERROR_STRUCT.
-SINT32
-teulPostCallbackError(const SINT32 teulIndex, const UCHAR* const data, const SINT32 size, const TEUL_CALLBACK* const object, const SINT32 error)
-{
-	if ( object == nullptr && data == nullptr )
-		return -EINVAL;
-
-	const TEUL_CALLBACK* const callback = (object == nullptr) ? TEUL_CALLBACK::Lookup(data) : object;
-	if (callback == nullptr)
-		return -EINVAL;
-
-	if ( callback->error == nullptr )
-	{
-		dbugLog(_FLA, "t:%d missing error handler for " PRF_CALLBACK "", teulIndex, PRA_CALLBACK(*callback));
-		return 0;
-	}
-
-	dbugLog(_FLW, "executing error for " PRF_CALLBACK "", PRA_CALLBACK(*callback));
-
-	// Invoke the error handler.
-	(callback->error)(teulIndex, data, size, callback, error);
-
-	return 0;
-}
-
 // This routine initializes a TEUL_CALLBACK structure and points
 // to it from the callback array.
 TEUL_CALLBACK*
@@ -92,8 +66,6 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 		realObject->outData = nullptr;
 		realObject->inData = nullptr;
 	}
-
-	realObject->error = ci->error;
 
 	return realObject;
 }
