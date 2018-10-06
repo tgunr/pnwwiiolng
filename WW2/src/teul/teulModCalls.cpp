@@ -55,12 +55,12 @@ static SINT32 _packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, s
 	return offset;
 }
 
-static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
-{
-#ifdef DEBUG_CONNECTIONS
-	dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
-#endif
-}
+//static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
+//{
+//#ifdef DEBUG_CONNECTIONS
+//    dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
+//#endif
+//}
 
 static inline void _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
@@ -77,7 +77,7 @@ static inline void _status(const char* const doing, const char* const what, UINT
 static SINT32
 _actionSendSYN_TOKEN(ACTION_OBJECT* const a)
 {
-	_report(a, "Tx SYN");
+	//_report(a, "Tx SYN");
 
     assert(a->endpoint);
 
@@ -117,7 +117,7 @@ static UINT16 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* cons
 // Host (accepter) receives a SYN token.
 static SINT32 _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 {
-	_report(a, "Rx SYN");
+	//_report(a, "Rx SYN");
 
     assert(a->endpoint);
 
@@ -157,7 +157,7 @@ static SINT32 _packSYN_ACK_TOKEN(PackMode mode, UCHAR* const data, SINT32 offset
 // The host (accepter) sends a SYN_ACK token.
 static SINT32 _actionSendSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	_report(a, "Tx SAK");
+	//_report(a, "Tx SAK");
 
     assert(a->endpoint);
 
@@ -178,7 +178,7 @@ static SINT32 _actionSendSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 // The client (connectee) receives a SYN_ACK token.
 static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	_report(a, "Rx SAK");
+	//_report(a, "Rx SAK");
 
     assert(a->endpoint);
 
@@ -187,7 +187,7 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 	}
 
 	if (a->endpoint->state() == IS_OPEN) {
-        // This logic used to just re-send the SAA token. That's wrong.
+        // This logic previously re-sent the SAA token instead of erroring. That's wrong.
         dbugLog(_FLA, "t:%d duplicate SYN-ACK token received, dropping connection", a->teulIndex);
         teulClose(*a->endpoint);
 		return -EALREADY;
@@ -233,7 +233,7 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 // The host (accepter) receives an ACK_ACK token.
 static SINT32 _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	_report(a, "Rx SAA");
+	//_report(a, "Rx SAA");
 
 	assert(a->endpoint);
 
