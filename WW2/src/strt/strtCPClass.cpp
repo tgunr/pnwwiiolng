@@ -35,6 +35,7 @@
 #include "strt/strtSupplyPropagator.h"
 #include "strt/strtTypes.h"
 #include "teul/teulTime.h"
+#include "strt/strtTOE.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 
@@ -1592,6 +1593,7 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
 
 				if (toeTemplate)
 				{
+					strtClearTOESaveList(*unit);
                     // Clear all supply.
                     //unit->purgeResupply(true);
 					// Remove the old toe template
