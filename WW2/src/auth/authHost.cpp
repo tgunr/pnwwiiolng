@@ -1249,7 +1249,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	// Get the local network address excluding the last octet.
     ENDPOINT *ep = teulGetEndpoint(teulIndex);
     UINT32 localAddress = ep ? ep->localAddress() : Teul::INVALID_INDEX;
-
+    UINT32 clientAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	UINT32 destAddress = bestServer.extAddress;
 
 	//hack since teulGetAddress sucks
@@ -1296,8 +1296,6 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	dispatch.m_appVersion = request.appVersion & clientMask;
 
 	//send dispatch message
-    ENDPOINT *ep = teulGetEndpoint(teulIndex);
-    UINT32 clientAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	_sendDispatch(dispatch, reply.otp, clientAddress, bestServer.teulIndex);
 }
 
@@ -1604,10 +1602,10 @@ authGetGameList(const SINT32 teulIndex)
 
 	///TODO: Notify the client of this problem.
 	// No data until you are logged in.
-	if (cdata == NULL)
+	if (!cdata)
 	{
 		dbugLog(_FLW, "t:%d GetGameList with no cdata", teulIndex);
-		return NULL;
+		return nullptr;
 	}
 	const std::vector<UCHAR>& clientSubs = cdata->m_subscribedArenaIDs;
 	
