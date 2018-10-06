@@ -16,7 +16,7 @@
 #include <cwchar>
 
 #include "dbug/dbug.h"
-#include "dbug/dbugExtErrors.h"
+#include "teul/teulExtErrors.h"
 
 #include "wwii/wwiiOwnershipEnums.h"
 #include "chat/chatHandle.h"

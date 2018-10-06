@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
 #include <mysql.h>

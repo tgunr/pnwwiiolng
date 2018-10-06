@@ -52,7 +52,7 @@
 #include "include/strprintf.h"
 #include "include/defs.h"
 #include "dbug/dbug.h"
-#include "dbug/dbugExtErrors.h"
+#include "teul/teulExtErrors.h"
 
 #include "wwii/wwiiHash.h"
 #include "chat/chatHandle.h"

@@ -1580,7 +1580,7 @@
     <ClInclude Include="..\..\src\ogl\GLCounter.h">
       <Filter>ogl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\dbug\dbugExtErrors.h">
+    <ClInclude Include="..\..\src\teul\teulExtErrors.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h">

@@ -1006,7 +1006,7 @@
     <ClInclude Include="..\..\src\comm\commConstants.h" />
     <ClInclude Include="..\..\src\comm\commPackers.h" />
     <ClInclude Include="..\..\src\comm\commTypes.h" />
-    <ClInclude Include="..\..\src\dbug\dbugExtErrors.h" />
+    <ClInclude Include="..\..\src\teul\teulExtErrors.h" />
     <ClInclude Include="..\..\src\dd\ddp.h" />
     <ClInclude Include="..\..\src\dd\dx3dinfo.h" />
     <ClInclude Include="..\..\src\di\dimain.h" />
