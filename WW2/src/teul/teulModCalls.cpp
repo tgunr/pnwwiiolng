@@ -283,7 +283,9 @@ static SINT32 _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 	_status("rx", "SAA", token.version, a->endpoint);
 	teulConnectENDPOINT(*a->endpoint);
 
-	dbugWrite(_FLN, "RecvSYN_ACK_ACK: parent: %d index:%d", a->endpoint->m_parent->teulIndex(), a->endpoint->teulIndex());
+#ifdef DEBUG_CONNECTIONS
+	dbugLog(_FLD, "RecvSYN_ACK_ACK: parent: %d index:%d", a->endpoint->m_parent->teulIndex(), a->endpoint->teulIndex());
+#endif
 	a->endpoint->m_parent->doAccept(*a->endpoint);
 
 	return a->offset;

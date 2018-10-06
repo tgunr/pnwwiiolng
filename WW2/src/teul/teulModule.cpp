@@ -65,7 +65,7 @@ static void _getHostIPAddresses()
             continue;
         }
         if (ifa->ifa_addr->sa_family != AF_INET) {
-            dbugLog(_FLN, "Skipping interface %s because it is not an IPv4 interface", ifa->ifa_name);
+            dbugLog(_FLN, "Skipping interface %s because it is not an IPv4 interface (family %hhu)", ifa->ifa_name, ifa->ifa_addr->sa_family);
             continue;
         }
         
@@ -441,7 +441,6 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
         if (newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL) {
             newEndpoint->m_state = IS_OPEN; // broadcast and control sockets are immediately open and connected
             newEndpoint->setConnected();
-            newEndpoint->doConnect();
         } else if (newEndpoint->state() != IS_LISTENING && !newEndpoint->m_reliable) {
             SINT32 sendErr = teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN); // Send SYN immediately on UDP connection sockets
             

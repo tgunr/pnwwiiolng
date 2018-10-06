@@ -432,7 +432,7 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
             dgram->m_size = dgram->contents->packetSizeBytes() + Teul::PacketPrefixBytes;
             assert(dgram->m_size == readVal && "Datagram's calculated size doesn't match amount of data read");
 #ifdef DEBUG_CONNECTIONS
-            dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recvfrom %" PRSsizeT " bytes (dgram %lu bytes)", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), readVal, dgram->m_size);
+            dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recvfrom %" PRSsizeT " bytes (dgram %u bytes)", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), readVal, dgram->m_size);
 #endif
             endpoint.m_impl->m_recvQueue.push_back(dgram.release());
         }
@@ -498,6 +498,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
     // processing loop. Since we use relaxed ordering for all operations on the atomic, we don't
     // take any memory barrier overhead on x86.
     static std::atomic_uint64_t pollGeneration(0);
+    uint64_t currentPollGeneration = pollGeneration.fetch_add(1, std::memory_order_relaxed);
     
     // Use RAII semantics to force regenerate of the pollset even if we hit a cancellation point.
     // This is not hugely efficient, but it has the virtue that we'll never leave the pollset in a weird state.
@@ -505,8 +506,6 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
         _PollRegenerator() {}
         ~_PollRegenerator() { _pollRegenerateSet(); }
     } _regenerator;
-    
-    uint64_t currentPollGeneration = pollGeneration.fetch_add(1, std::memory_order_relaxed);
     
     for (size_t slot = 0; slot < maxSlots; ++slot) {
 		pollfd& sfd = fdArray[slot];
@@ -552,7 +551,7 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
 		if ((revents & POLLHUP) != 0 || (revents & POLLERR) != 0) { // check for HUP and ERR even if an error occurred above
 			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " socket disconnected", endpoint.teulIndex(), PRA_SOCKET(sfd.fd));
             if (error == 0) { // Don't overwrite any existing error
-                error = -ECONNRESET; // getsockopt(SO_ERROR) has a small chance of telling us more on some platforms, but it's not worth it
+                error = -EPIPE; // getsockopt(SO_ERROR) has a small chance of telling us more on some platforms, but it's not worth it
             }
 		}
         
@@ -567,7 +566,12 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
         // can be minimized by reviewing all endpoint error functions and minimizing their own
         // reentrant calls into this machinery.
         if (error < 0) {
-            endpoint.doError(-error);
+            if (error != -EPIPE) {
+                // Don't do this if the error was EPIPE; that means we got a POLLHUP or a POLLERR or recv() returned zero
+                // teulClose() will already fire an ENOTCONN that various subsystems are expecting. Of course this means
+                // we could mask a legit EPIPE from some other source, but we've tried to minimize that possibility.
+                endpoint.doError(-error);
+            }
             teulClose(endpoint);
         }
         
