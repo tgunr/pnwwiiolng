@@ -124,7 +124,8 @@ static SINT32 _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
             teulClose(*a->endpoint);
             return -EALREADY;
         case IS_LISTENING:
-            LogAbort("t:%d received SYN on a listener?", a->endpoint->teulIndex());
+            ABORT_IF_EX(a->endpoint->protocol == PROTOCOL_TCP || a->endpoint->protocol == PROTOCOL_CTRL, "t:%d received SYN on a listener", a->endpoint->teulIndex());
+            FALLTHROUGH;
         default:
             break;
     }
@@ -201,7 +202,8 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
             teulClose(*a->endpoint);
             return -EALREADY;
         case IS_LISTENING:
-            LogAbort("t:%d received SAK on a listener?", a->endpoint->teulIndex());
+            ABORT_IF_EX(a->endpoint->protocol == PROTOCOL_TCP || a->endpoint->protocol == PROTOCOL_CTRL, "t:%d received SAK on a listener", a->endpoint->teulIndex());
+            FALLTHROUGH;
         default:
             break;
     }
@@ -266,7 +268,8 @@ static SINT32 _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
             teulClose(*a->endpoint);
             return -EALREADY;
         case IS_LISTENING:
-            LogAbort("t:%d received SAA on a listener?", a->endpoint->teulIndex());
+            ABORT_IF_EX(a->endpoint->protocol == PROTOCOL_TCP || a->endpoint->protocol == PROTOCOL_CTRL, "t:%d received SAA on a listener", a->endpoint->teulIndex());
+            FALLTHROUGH;
         default:
             break;
 	}
