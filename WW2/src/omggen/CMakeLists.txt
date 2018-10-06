@@ -1,15 +1,8 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
 PROJECT(OMGgen)
 
-#SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-#SET( CMAKE_CXX_STANDARD 14 )
-# Unfortunately, the above doesn't work until CMake 3.1
-#ADD_COMPILE_OPTIONS( "-std=gnu++14" )
-# And unfortunately, that doesn't work either because it breaks pure-C files
-IF ( NOT MSVC )
-	SET( CMAKE_CXX_FLAGS "-std=gnu++14" CACHE STRING "" FORCE )
-	SET( CMAKE_C_FLAGS "-std=gnu11" CACHE STRING "" FORCE )
-ENDIF()
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_CXX_STANDARD 14 )
 
 # Need Bison and Flex for OMGgen; use embedded versions on Windows and macOS
 IF ( WIN32 )
@@ -23,9 +16,9 @@ ENDIF()
 FIND_PACKAGE( BISON REQUIRED )
 FIND_PACKAGE( FLEX REQUIRED )
 
+# Generate the Bison and Flex commands
 BISON_TARGET( OMGParser
     "${CMAKE_CURRENT_SOURCE_DIR}/omggen.y" "${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.cpp"
-    COMPILE_FLAGS "--report=all"
     DEFINES_FILE "${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.h"
 )
 FLEX_TARGET( OMGLexer
@@ -35,13 +28,14 @@ FLEX_TARGET( OMGLexer
 )
 ADD_FLEX_BISON_DEPENDENCY( OMGLexer OMGParser )
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR} .)
+# Add the outputs and source dir to the includes
+INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} )
 
+# Build OMGgen itself
 ADD_EXECUTABLE(OMGgen
-    omggen.l omggen.y
     omggen.cpp omggen.h
-    ${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.cpp ${CMAKE_CURRENT_BINARY_DIR}/omggen.tab.h
-    ${CMAKE_CURRENT_BINARY_DIR}/omggen.yy.cpp ${CMAKE_CURRENT_BINARY_DIR}/omggen.yy.h
+    ${BISON_OMGParser_OUTPUTS}
+    ${FLEX_OMGLexer_OUTPUTS} ${FLEX_OMGLexer_OUTPUT_HEADER}
 )
 ADD_DEFINITIONS("-DYY_NO_UNPUT")
 ADD_DEFINITIONS("-DYY_NO_INPUT")
