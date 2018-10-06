@@ -234,7 +234,6 @@ commInstallMessage(
 	ci.callY         = MessageNumber;
 	ci.sendAction    = SendFunc;
 	ci.recvAction    = ReceiveFunc;
-	ci.error         = _callbackError;
 
 	return teulAllocCallback(&ci);
 }
