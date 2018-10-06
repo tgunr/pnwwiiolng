@@ -188,7 +188,6 @@ static void _releaseEndpoint(ENDPOINT& endpoint)
 
 #ifdef DEV_BUILD
 	dbugLog(_FLD, "t:%d pushed to freeList (%" PRSizeT " endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
-	dbugWrite(_FLN, "t:%d released", endpoint.teulIndex());
 #endif
 	endpoint.m_inUse = false;
 }

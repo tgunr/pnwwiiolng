@@ -683,9 +683,9 @@ static void _pollSockets(TeulTimeMS duration_)
     // Data consistency check
     // Leaving this commented out for now because it can actually fail in practice due to cleanup of
     // dead endpoints being delayed.
-    //assert(idleEndpoints.empty() ? pollData.m_size == 0 : pollData.m_size > 0);
+    //assert(idleEndpoints.empty() ? pollData.m_count == 0 : pollData.m_count > 0);
     
-    if (pollData.m_size == 0) {
+    if (pollData.m_count == 0) {
         // Yield CPU, even if duration is zero
         std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
     } else {

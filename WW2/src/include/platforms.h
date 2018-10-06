@@ -251,7 +251,6 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#include <signal.h>
 #include <sys/un.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>

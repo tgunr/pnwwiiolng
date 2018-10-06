@@ -476,7 +476,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 {
 	if (inEndpoint.state() != IS_OPENING) {
-		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint.state());
+		dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " st:%d bad state for connect", inEndpoint.teulIndex(), PRA_SOCKET(inEndpoint.socket), inEndpoint.state());
 		return -EINVAL;
 	}
 

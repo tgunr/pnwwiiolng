@@ -33,6 +33,7 @@
 #include <numeric>
 #include <thread>
 #include <mutex>
+#include <signal.h>
 
 #if __has_include(<unistd.h>)
 #include <unistd.h>
