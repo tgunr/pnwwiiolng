@@ -176,7 +176,7 @@ struct ServerRole : public Role
 
 	void OpenListener()
 	{
-		const SINT32 teulIndex = teulOpenListen(Config::TestPort, acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+		const SINT32 teulIndex = teulOpenListen(Config::TestPort, Config::protocol == PROTOCOL_UDB ? nullptr : acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpenListen failed", teulIndex);
 

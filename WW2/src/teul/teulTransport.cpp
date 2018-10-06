@@ -68,8 +68,7 @@ bool teulGetHost(const char *address_, UINT32 *host_)
 // When the connection is open and connected this function will execute a user function.
 void ENDPOINT::doConnect()
 {
-    assert(protocol == PROTOCOL_TCP || protocol == PROTOCOL_UDP);
-	if (this->connectFn) {
+    if (this->connectFn) {
 		dbugLog(_FLN, "t:%d connected calling callback", this->teulIndex());
 		this->connectFn(*this);
 	}

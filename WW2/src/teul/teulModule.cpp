@@ -358,10 +358,12 @@ static void _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 	socklen_t len = sizeof(sockAddr);
 
 	if (bind(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), len) == SOCKET_ERROR) {
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to bind to fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), sockAddr.sin_port);
 		throw Teul::OpenError("bind() failed");
     }
 
 	if (getsockname(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), &len) == SOCKET_ERROR) {
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to get local binding for fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), sockAddr.sin_port);
 		throw Teul::OpenError("getsockname() failed after bind");
     }
 
@@ -442,6 +444,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
         if (newEndpoint->protocol == PROTOCOL_UDB || newEndpoint->protocol == PROTOCOL_CTRL) {
             newEndpoint->m_state = IS_OPEN; // broadcast and control sockets are immediately open and connected
             newEndpoint->setConnected();
+            newEndpoint->doConnect();
         } else if (newEndpoint->state() != IS_LISTENING && !newEndpoint->m_reliable) {
             SINT32 sendErr = teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN); // Send SYN immediately on UDP connection sockets
             

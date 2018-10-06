@@ -831,7 +831,7 @@ struct ClientRole : public Role
 	{
 		GetHostAddress();
 		// Now attempt to open a connection to the server.
-		const SINT32 teulIndex = teulOpenSend(hostAddress, Config::TestPort, connectFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+		const SINT32 teulIndex = teulOpenSend(hostAddress, Config::TestPort, Config::protocol == PROTOCOL_UDB ? nullptr : connectFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpen failed", teulIndex);
 
