@@ -645,11 +645,6 @@ void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
     dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%d count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket),
                 endpoint.state(), slot, static_cast<size_t>(pollData.m_count));
-
-    if (pollData.m_count < pollData.m_size / 2 && permitCompaction) {
-        // If the global poll structure has more holes than entries, compact it by rebuild.
-        _pollRegenerateSet();
-    }
 }
 
 static void _pollRegenerateSet()
