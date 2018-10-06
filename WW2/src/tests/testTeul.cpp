@@ -558,12 +558,14 @@ TEUL_CALLBACK* Role::s_cbUnregistered;
 static void
 _usage(const char* const argv[], const bool listTests)
 {
-	printf("FAIL: Usage: %s [options] [--test=<testname>] [--skip=<testname>] {client | server}\n", argv[0]);
+	printf("FAIL: Usage: %s [options] [--test=<testname>] [--skip=<testname>] [--udp|--udb] {client | server}\n", argv[0]);
 	printf("Options:\n");
 	printf("  --debug\n\tEnable debug output.\n");
 	printf("  --host=ad.dr.e.ss\n\tSpecifies the IP address for client mode to connect to.\n");
 	printf("  --quiet\n\tDisables informational ([I]) output.\n");
 	printf("  --iterfactor=nnn\n\tNumber of times to repeat iterative tests [default: 1].\n");
+    printf("  --udp\n\tRun tests with UDP sockets instead of TCP.\n");
+    printf("  --udb\n\tRun tests with UDP broadcast sockets instead of TCP.\n");
 
 	if ( listTests == false )
 		printf("  --tests\n\tList all of the registered tests.\n");
@@ -573,7 +575,7 @@ _usage(const char* const argv[], const bool listTests)
 		for ( auto it = TestItem::s_index.begin(), end = TestItem::s_index.end(); it != end; ++it )
 		{
 			const TestItem& test = *it->second;
-			printf("--test=%s\n\t%s\n", test.name(), test.description());
+			printf("--[test|skip]=%s\n\t%s\n", test.name(), test.description());
 		}
 	}
 	exit(-1);
