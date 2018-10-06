@@ -40,6 +40,7 @@ TEUL_CALLBACK* SYN_ACK_TOKEN;
 TEUL_CALLBACK* SYN_ACK_ACK_TOKEN;
 TEUL_CALLBACK* KLIVE_TOKEN;
 TEUL_CALLBACK* KLIVE_ACK_TOKEN;
+TEUL_CALLBACK* Teul::ConnectionInstruction::s_callback;
 
 //////////////////////////////////////////////////////////////////////
 ///TODO: Make this generally available as the null error handler.
@@ -344,6 +345,25 @@ static SINT32 _actionRecvKLIVE_ACK_TOKEN(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
+static SINT32 _recvConnectionInstruction(ACTION_OBJECT* const a)
+{
+    Teul::ConnectionInstruction connIns(a);
+    
+    if (connIns.receive(a->teulIndex) < 0) {
+        return -EINVAL;
+    }
+    return a->offset;
+}
+
+//////////////////////////////////////////////////////////////////////
+static SINT32 _sendConnectionInstruction(ACTION_OBJECT* const a)
+{
+    Teul::ConnectionInstruction *connIns = reinterpret_cast<Teul::ConnectionInstruction *>(a->localRawData);
+    
+    return connIns->packer(TEUL_PACK, a);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Receive an error on a teulIndex.
 
 static SINT32 _recvError(ACTION_OBJECT* const a)
@@ -410,6 +430,14 @@ teulInitModCallbacks()
 	ci.recvAction	= _actionRecvKLIVE_ACK_TOKEN;	// how to receive data
 
 	KLIVE_ACK_TOKEN	= teulAllocSystemCallback( &ci );
+
+    // Callback indicating a connection needs to be sent/received.
+    ci.callY        = TM_CONNECTION_INSTRUCTION_Y;
+    ci.callYName    = TEUL_PACKET_NAMES ? "TM_CONNECTION_INSTRUCTION_Y" : "";
+    ci.sendAction   = _sendConnectionInstruction;
+    ci.recvAction   = _recvConnectionInstruction;
+
+    Teul::ConnectionInstruction::s_callback = teulAllocSystemCallback( &ci );
 
     // Error callback
 	ci.callY = TM_ERROR_Y;
