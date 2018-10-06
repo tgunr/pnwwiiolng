@@ -383,8 +383,8 @@ UINT32 ENDPOINT::setTimeout(const UINT32 timeout_)
         }
 		m_impl->kliveInterval = interval;
 		m_doTimeoutCheck = true;
-#if defined(DEBUG_CONNECTIONS)
-		dbugLog(_FLD, "t:%d timeout:%u, iv:%" PR64BitUT ", dtc:true", teulIndex(), timeout_, interval);
+#ifdef DEBUG_CONNECTIONS
+		dbugLog(_FLD, "t:%d timeout:%u iv:%" PR64BitUT, teulIndex(), timeout_, interval);
 #endif
 	}
 	lastKliveSent.makeCurrent();

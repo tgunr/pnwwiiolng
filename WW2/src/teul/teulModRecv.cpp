@@ -29,8 +29,6 @@
 
 using namespace Teul;
 
-static constexpr const TeulTimeMS ENDPOINT_IDLE_INTERVAL = 500;
-
 struct DATA_GRAM
 {
     static constexpr const size_t NORMAL_ROUNDING = 256;   // round datagram sizes up to this.
@@ -966,46 +964,43 @@ static void _routeCallbacks(ENDPOINT& endpoint)
 	}
 }
 
-#ifdef DEBUG
-static constexpr const TeulTimeMS AlertInterval_ms = 2 * 1000;
-#else
-static constexpr const TeulTimeMS AlertInterval_ms = 75;
-#endif
-
 SINT32 teulModIdle(const TeulTimeMS duration_)
 {
 	teulSyncClock();
 
 	// At 1s intervals, kill dead endpoints
+    static constexpr const TeulTimeMS kDeadEndpointCleanupInterval = 1000;
     static TeulTimeMS lastDeadEndpointsCleanup = 0;
     
-	if (teulClock64 - std::min(teulClock64, lastDeadEndpointsCleanup) > 1000) {
-		lastDeadEndpointsCleanup = teulClock64;
+	if (teulClock64 - lastDeadEndpointsCleanup >= kDeadEndpointCleanupInterval) { // monotonic clock never goes backwards; clock is guaranteed >= last value
 		teulKillDeadEndpoints();
+        lastDeadEndpointsCleanup = teulClock64;
 	}
 
     // Poll sockets. This will yield the CPU for at least one context switch even if duration is zero.
 	_pollSockets(duration_);
 
     // Warn about teul stalls (failure to give the network stack a CPU slice to use for updating)
+    static constexpr const TeulTimeMS kNetworkStallWarningThreshold = DEBUG_ONLY(2000) RELEASE_ONLY(75); // this is syntactically silly but works
     static TeulTimeMS lastModIdle = 0;
     
-	if (teulClock64 - std::min(teulClock64, lastModIdle) > duration_ + AlertInterval_ms && lastModIdle != 0) {
-		dbugLog(_FLW, "STALL. teulModIdle interval=%" PR64BitUT "", teulClock64 - std::min(teulClock64, lastModIdle));
+	if (teulClock64 - lastModIdle > duration_ + kNetworkStallWarningThreshold && lastModIdle != 0) {
+		dbugLog(_FLW, "STALL. teulModIdle interval=%" PR64BitUT "", teulClock64 - lastModIdle);
     }
 	lastModIdle = teulClock64;
     
     // Only run the endpoint idles (klives and timeouts) every 500ms
-	static TeulTimeMS lastIdleCycle = teulClock64;
+    static constexpr const TeulTimeMS kEndpointIdlingInterval = 500;
+	static TeulTimeMS lastIdleCycle = 0;
 
-	if (teulClock64 - std::min(teulClock64, lastIdleCycle) >= ENDPOINT_IDLE_INTERVAL) {
+	if (teulClock64 - lastIdleCycle >= kEndpointIdlingInterval) {
         for (ENDPOINT * const ep : idleEndpoints) {
             if (ep) {
                 _idleEndpoint(*ep);
             }
         }
+        lastIdleCycle = teulClock64;
     }
-	lastIdleCycle = teulClock64;
 	return 0;
 }
 
