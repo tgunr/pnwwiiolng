@@ -170,18 +170,16 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	WWII::SendString(peers, addr);
 #endif
 
-	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP);
-
 	switch (activate.serverType)
 	{
 	case MAP_HOST:
 		checkThemeChange(activate.theme);
-		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
+		clientActivateMap(a->teulIndex,TRUE, activate.hostIP, activate.port);
 		_updatesSent = 0;
 		break;
 	case CELL_HOST:
-		wwiiBackChannelConnect(activate.teulIndex, teulGetAddress(maskedAddr), activate.port, a->teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
-		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
+		wwiiBackChannelConnect(activate.teulIndex, teulGetAddress(activate.hostIP), activate.port, a->teulIndex, activate.playerID, activate.otp, reinterpret_cast<char *>(activate.pkey));
+		clientActivateCell(a->teulIndex, TRUE, activate.hostIP, activate.port);
 		_updatesSent = 0;
 		break;
 	case CHAT_HOST:
