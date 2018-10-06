@@ -13,6 +13,7 @@
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
 #include "teul/teulPacketHeader.h"
@@ -175,8 +176,10 @@ _doAction(ENDPOINT& endpoint
 
 	const SINT32 retval = callback.recvAction()(&actionObj);
 
-	if (PN_UNLIKELY(retval < 0))
+	if (retval < 0 && (callback.callX() != Teul::Module::CallbackX || retval != -ENOTCONN)) {
+        // Don't log ENOTCONN on system callbacks, as that typically means "quickly dropped connection"
 		dbugLog(_FLA, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
+    }
 
 	return retval;
 }

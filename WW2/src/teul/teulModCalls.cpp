@@ -55,13 +55,6 @@ static SINT32 _packSYN_TOKEN( PackMode mode, UCHAR* const data, SINT32 offset, s
 	return offset;
 }
 
-//static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
-//{
-//#ifdef DEBUG_CONNECTIONS
-//    dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
-//#endif
-//}
-
 static inline void _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
 #ifdef DEBUG_CONNECTIONS
@@ -77,8 +70,6 @@ static inline void _status(const char* const doing, const char* const what, UINT
 static SINT32
 _actionSendSYN_TOKEN(ACTION_OBJECT* const a)
 {
-	//_report(a, "Tx SYN");
-
     assert(a->endpoint);
 
 	struct SYN_TOKEN_STRUCT token;
@@ -117,9 +108,26 @@ static UINT16 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* cons
 // Host (accepter) receives a SYN token.
 static SINT32 _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 {
-	//_report(a, "Rx SYN");
-
     assert(a->endpoint);
+
+    switch (a->endpoint->state()) {
+        case IS_DEAD:
+            // The endpoint may be dead when SYN comes in if the TCP-layer connection was dropped before
+            // the callback was routed. This can happen if the endpoint received the packet in the same
+            // poll loop in which the disconnect event came in.
+#ifdef DEBUG_CONNECTIONS
+            dbugLog(_FLD, "t:%d ignoring SYN on dead endpoint", a->endpoint->teulIndex());
+#endif
+            return -ENOTCONN;
+        case IS_OPEN:
+            dbugLog(_FLA, "t:%d duplicate SYN received, dropping connection", a->endpoint->teulIndex());
+            teulClose(*a->endpoint);
+            return -EALREADY;
+        case IS_LISTENING:
+            LogAbort("t:%d received SYN on a listener?", a->endpoint->teulIndex());
+        default:
+            break;
+    }
 
 	struct SYN_TOKEN_STRUCT token;
 
@@ -157,8 +165,6 @@ static SINT32 _packSYN_ACK_TOKEN(PackMode mode, UCHAR* const data, SINT32 offset
 // The host (accepter) sends a SYN_ACK token.
 static SINT32 _actionSendSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	//_report(a, "Tx SAK");
-
     assert(a->endpoint);
 
 	struct SYN_TOKEN_STRUCT token;
@@ -178,20 +184,27 @@ static SINT32 _actionSendSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 // The client (connectee) receives a SYN_ACK token.
 static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	//_report(a, "Rx SAK");
-
     assert(a->endpoint);
 
-	if (a->endpoint->state() == IS_LISTENING) {
-		LogAbort("someone sent a SYN_ACK to the listen port!! This is a critical programmer error.");
-	}
-
-	if (a->endpoint->state() == IS_OPEN) {
-        // This logic previously re-sent the SAA token instead of erroring. That's wrong.
-        dbugLog(_FLA, "t:%d duplicate SYN-ACK token received, dropping connection", a->teulIndex);
-        teulClose(*a->endpoint);
-		return -EALREADY;
-	}
+    switch (a->endpoint->state()) {
+        case IS_DEAD:
+            // The endpoint may be dead when SAK comes in if the TCP-layer connection was dropped before
+            // the callback was routed. This can happen if the endpoint received the packet in the same
+            // poll loop in which the disconnect event came in.
+#ifdef DEBUG_CONNECTIONS
+            dbugLog(_FLD, "t:%d ignoring SAK on dead endpoint", a->endpoint->teulIndex());
+#endif
+            return -ENOTCONN;
+        case IS_OPEN:
+            // This logic previously re-sent the SAA token instead of erroring. That was just plain wrong.
+            dbugLog(_FLA, "t:%d duplicate SAK received, dropping connection", a->endpoint->teulIndex());
+            teulClose(*a->endpoint);
+            return -EALREADY;
+        case IS_LISTENING:
+            LogAbort("t:%d received SAK on a listener?", a->endpoint->teulIndex());
+        default:
+            break;
+    }
 
 	struct SYN_TOKEN_STRUCT token;
 
@@ -233,18 +246,29 @@ static SINT32 _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 // The host (accepter) receives an ACK_ACK token.
 static SINT32 _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	//_report(a, "Rx SAA");
-
 	assert(a->endpoint);
 
 	struct SYN_TOKEN_STRUCT token;
     
 	a->offset = _packSYN_ACK_TOKEN(TEUL_UNPACK, a->packed, a->offset, &token, 0);	// when probe was sent
 
-	if (a->endpoint->state() == IS_OPEN) {
-		dbugLog(_FLA, "t:%d duplicate SYN-ACK-ACK token received, dropping connection", a->endpoint->teulIndex());
-        teulClose(*a->endpoint);
-		return -EALREADY;
+    switch (a->endpoint->state()) {
+        case IS_DEAD:
+            // The endpoint may be dead when SAA comes in if the TCP-layer connection was dropped before
+            // the callback was routed. This can happen if the endpoint received the packet in the same
+            // poll loop in which the disconnect event came in.
+#ifdef DEBUG_CONNECTIONS
+            dbugLog(_FLD, "t:%d ignoring SAA on dead endpoint", a->endpoint->teulIndex());
+#endif
+            return -ENOTCONN;
+        case IS_OPEN:
+            dbugLog(_FLA, "t:%d duplicate SAA received, dropping connection", a->endpoint->teulIndex());
+            teulClose(*a->endpoint);
+            return -EALREADY;
+        case IS_LISTENING:
+            LogAbort("t:%d received SAA on a listener?", a->endpoint->teulIndex());
+        default:
+            break;
 	}
 
 	UINT16 version = _negotiateVersionNumber(token.version, a->endpoint);
@@ -254,7 +278,7 @@ static SINT32 _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
     a->endpoint->destSockAddress = a->endpoint->fromSockAddress;
 
 	_status("rx", "SAA", token.version, a->endpoint);
-	teulConnectENDPOINT( *a->endpoint );
+	teulConnectENDPOINT(*a->endpoint);
 
 	dbugWrite(_FLN, "RecvSYN_ACK_ACK: parent: %d index:%d", a->endpoint->m_parent->teulIndex(), a->endpoint->teulIndex());
 	a->endpoint->m_parent->doAccept(*a->endpoint);

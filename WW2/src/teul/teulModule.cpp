@@ -475,10 +475,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 // This is HORRIBLY mis-factored relative to the UDB/CTRL endpoint handling above
 SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 {
-	if (inEndpoint.state() != IS_OPENING) {
-		dbugLog(_FLA,"t:%d sock:" PRF_SOCKET " st:%d bad state for connect", inEndpoint.teulIndex(), PRA_SOCKET(inEndpoint.socket), inEndpoint.state());
-		return -EINVAL;
-	}
+    assert(inEndpoint.state() == IS_OPENING);
 
 	if (!inEndpoint.m_reliable) {
         int connErr = 0, connRes = 0;
@@ -492,7 +489,12 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 			return -connErr;
 		}
 	}
-	inEndpoint.m_state = IS_OPEN;
+    if (inEndpoint.m_state == IS_OPENING) {
+        // just in case we built release and the assert above would've failed, don't overwrite IS_DEAD
+        // this conditional is completely worthless in practice but unfortunately it's not safe to make
+        // any assumptions with this code, even those guarded by assertions
+	    inEndpoint.m_state = IS_OPEN;
+    }
 	inEndpoint.setConnected();
     inEndpoint.updateSocketEvents();
 	return 0;

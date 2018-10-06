@@ -298,6 +298,9 @@ static ssize_t _receiveTCP(ENDPOINT& endpoint, void * const ioData, size_t *ioSi
         return -EPIPE;
     } else {
         *ioSize = static_cast<size_t>(recvRet);
+#ifdef DEBUG_CONNECTIONS
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recv %" PRSizeT " bytes", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), *ioSize);
+#endif
     }
     return 0;
 }
@@ -429,6 +432,10 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 #endif
         } else {
             dgram->m_size = dgram->contents->packetSizeBytes() + Teul::PacketPrefixBytes;
+            assert(dgram->m_size == readVal && "Datagram's calculated size doesn't match amount of data read");
+#ifdef DEBUG_CONNECTIONS
+            dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recvfrom %" PRSsizeT " bytes (dgram %lu bytes)", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), readVal, dgram->m_size);
+#endif
             endpoint.m_impl->m_recvQueue.push_back(dgram.release());
         }
     } while (error == 0 || error == PLAT_EINTR); // this is here to avoid writing while(true)
@@ -672,6 +679,9 @@ static void _pollSocketsInner(TeulTimeMS duration_)
     } while (pollret == SOCKET_ERROR && (error = dbugGetErrno()) == PLAT_EINTR);
 
     if (pollret == SOCKET_ERROR) {
+#ifdef DEBUG_CONNECTIONS
+		dbugLog(_FLA, "poll() error %d; m_size == %u, m_count == %u", error, pollData.m_size, pollData.m_count);
+#endif
         LogAbort("poll returned error %d, and all poll errors are fatal", error);
     } else if (pollret > 0) {
         _runPollEndpoints(pollData.fd, pollData.m_size);
@@ -756,7 +766,6 @@ void _checkEndpointTimeouts(ENDPOINT& endpoint)
         return;
     }
 
-    printf("t:%d timeout\n", endpoint.teulIndex());
     dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%" PR64BitT "ms",
                 endpoint.teulIndex(), endpoint.timeout, elapsed);
     teulClose(endpoint);
