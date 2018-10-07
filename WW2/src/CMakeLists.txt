@@ -109,6 +109,14 @@ OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers."
 # Disable building and use of auth host (for cluster-on-a-box/controller testing)
 OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
 
+# Disable the build info generator (speeds up building during development)
+# Only valid in debug builds
+IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+	OPTION( PN_NO_BUILD_INFO    "Disable the build_info.cpp generator (Debug only)" OFF )
+ELSE()
+	SET( PN_NO_BUILD_INFO OFF CACHE BOOL "Disables generating build_info.cpp" FORCE )
+ENDIF()
+
 # If the user is building a Debug build, enable SANITIZE options.
 IF ( NOT MSVC )
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
@@ -170,23 +178,32 @@ INCLUDE( cmakeincludes/Dependencies.cmake )
 ## Run build_info.py to get build_info.cpp
 # Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
 # runs always; easiest way to avoid the run-when-needed default behaviors.
-ADD_CUSTOM_COMMAND(
-    OUTPUT build_info.stamp
-    BYPRODUCTS build_info.cpp
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
-    COMMAND
-        ${PYTHON_EXECUTABLE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
-        host
-        ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating build information"
-    VERBATIM
-)
-SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
+IF ( PN_NO_BUILD_INFO )
+	# If bypassing build info generation was requested, substitute hardcoded info instead
+	SET( BUILD_INFO_FILES ${CMAKE_CURRENT_SOURCE_DIR}/build_info.generic.cpp )
+ELSE()
+	ADD_CUSTOM_COMMAND(
+		OUTPUT build_info.stamp
+		BYPRODUCTS build_info.cpp
+		MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
+		COMMAND
+			${PYTHON_EXECUTABLE}
+			${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
+			host
+			${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Generating build information"
+		VERBATIM
+	)
+	SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
+	SET( BUILD_INFO_FILES
+		${CMAKE_CURRENT_BINARY_DIR}/build_info.stamp
+		${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp
+	)
+ENDIF()
 
-add_subdirectory(../../Libraries/RakNet ./RakNet)
-
+####################################
 # RakNet
+ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
 SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
 INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
 
@@ -243,7 +260,7 @@ SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 ####################################
 ## wwii library common to everything, when it isn't broken by target definitions
 ADD_LIBRARY( wwiilib STATIC
-    build_info.cpp build_info.stamp
+    ${BUILD_INFO_FILES}
     chat/chatHandle.cpp chat/chatHandle.h chat/chatName.h
     chat/chatPackers.cpp chat/chatTimeInterval.cpp chat/chatTimeInterval.h
     dbug/dbug.cpp dbug/dbug.h
