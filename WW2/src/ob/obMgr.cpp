@@ -124,7 +124,7 @@ PoolModel*  obmgrAddModelToPool(const char* path, LOGICAL forceModelLoading, UIN
 
 			if(fd < 0)
 			{
-				Write_Log(LOG_OLD, LOG_INFO, "* %s missing from the archive *   <<< ========================================================", str.c_str());
+				Write_Log(LOG_OLD, LOG_INFO, "* %s missing from the archive *", str.c_str());
 				return 0;
 			}
 

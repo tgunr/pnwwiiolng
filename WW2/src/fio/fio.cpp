@@ -694,20 +694,6 @@ namespace Fio
 		return fioUserFile(Fio::LogFileName(), "a");
 	}
 
-	/*
-	void DeleteLogFile()
-	{
-			fullpath_t path[PN_MAX_PATH];
-			WITH ( UsingUserdir() )
-				GetFullPath(path, Fio::LogFileName());
-	#if platOS == OS_WIN32
-			_wunlink(path);
-	#else
-			unlink(path);
-	#endif
-	}
-	*/
-
 	void DeleteLogFile()
 	{
 		fullpath_t path[PN_MAX_PATH];

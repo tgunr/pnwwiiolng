@@ -278,10 +278,6 @@ void rnlogoSplash()
 	fioSet(ISDIRECTORY);
 
 	const char* texFile;
-    
-    char buffer[MAX_PATH];
-    //  char *answer = getcwd(buffer, sizeof(buffer));
-    char *answer = getcwd(NULL, 0);
 
 	if(_isWidescreen()) texFile = _wideSplashScreen;
 	else texFile = _stdSplashScreen;

@@ -797,7 +797,6 @@ SINT32		retval, i, miplevels;
 				size = width * height * textures[texid].comp[0];
 			}
 
-            /*--MJH  Disabled to reduce spamming of the log.
 			Write_Debug("Texture image details: "
 						" Image is %12s,"
 						" Width: %4d,"
@@ -809,7 +808,6 @@ SINT32		retval, i, miplevels;
 						height,
 						format,
 						size);
-			*/
 
 			if (!HandleGLError(TRUE))
 			{
