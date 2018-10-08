@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -483,6 +483,7 @@
 		E9C1BDE21E462B00001FD5B0 /* raknetConn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */; };
 		E9C3FB6F1EE1A8DC00872413 /* multiClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
+		FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B31ECF289F00A9977E /* authSteam.h */; };
 		FA06C3B61ECF2CD400A9977E /* authSteam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA06C3B21ECF289F00A9977E /* authSteam.cpp */; };
 		FA06C3B81ED0DCDF00A9977E /* sysLaunchUrl.h in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */; };
 		FA06C3BA1EDCA67E00A9977E /* json.hpp in Headers */ = {isa = PBXBuildFile; fileRef = FA06C3B91EDCA67E00A9977E /* json.hpp */; };
@@ -1616,14 +1617,14 @@
 		E9C1BDD41E461EE6001FD5B0 /* liblibcattunnel.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblibcattunnel.a; path = lib/mac/liblibcattunnel.a; sourceTree = "<group>"; };
 		E9C1BDDA1E461F1E001FD5B0 /* raknetConn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = raknetConn.cpp; path = teul/raknetConn.cpp; sourceTree = "<group>"; };
 		E9C1BDDC1E461F2F001FD5B0 /* raknetConn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = raknetConn.h; sourceTree = "<group>"; };
-		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClientHelp.h; sourceTree = "<group>"; };
-		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClient.h; sourceTree = "<group>"; };
-		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiClient.cpp; sourceTree = "<group>"; };
+		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClientHelp.h; path = mc/multiClientHelp.h; sourceTree = "<group>"; };
+		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multiClient.h; path = mc/multiClient.h; sourceTree = "<group>"; };
+		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multiClient.cpp; path = mc/multiClient.cpp; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
-		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authSteam.cpp; sourceTree = "<group>"; };
-		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = authSteam.h; sourceTree = "<group>"; };
+		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = authSteam.cpp; path = auth/authSteam.cpp; sourceTree = "<group>"; };
+		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authSteam.h; path = auth/authSteam.h; sourceTree = "<group>"; };
 		FA06C3B71ED0DCDF00A9977E /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysLaunchUrl.h; path = src/sys/sysLaunchUrl.h; sourceTree = SOURCE_ROOT; };
-		FA06C3B91EDCA67E00A9977E /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = ../Libraries/json/src/json.hpp; sourceTree = SOURCE_ROOT; };
+		FA06C3B91EDCA67E00A9977E /* json.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = json.hpp; path = ../../Libraries/json/src/json.hpp; sourceTree = "<group>"; };
 		FA06C3BB1EE18C8B00A9977E /* sysSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sysSteam.cpp; path = src/sys/sysSteam.cpp; sourceTree = SOURCE_ROOT; };
 		FA06C3BC1EE18C8B00A9977E /* sysSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysSteam.h; path = src/sys/sysSteam.h; sourceTree = SOURCE_ROOT; };
 		FA06C3BF1EE18D0A00A9977E /* jsAuthHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsAuthHandler.cpp; sourceTree = "<group>"; };
@@ -1631,13 +1632,9 @@
 		FA06C3C31EE18D5900A9977E /* clientConnections.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnections.cpp; sourceTree = "<group>"; };
 		FA06C3C41EE18D5900A9977E /* clientConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientConnections.h; sourceTree = "<group>"; };
 		FA06C3CB1EE2660200A9977E /* phui.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = phui.xcodeproj; path = ../Libraries/phui/proj.mac/phui.xcodeproj; sourceTree = "<group>"; };
-<<<<<<< HEAD
 		FA06C3D61EE3AB3200A9977E /* authDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authDefaults.h; path = auth/authDefaults.h; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../ww2assets/readme.rtf; sourceTree = "<group>"; };
-=======
 		FA06C3D61EE3AB3200A9977E /* authDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = authDefaults.h; sourceTree = "<group>"; };
-		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
->>>>>>> develop
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
 		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "../ww2assets/osmac/placeholder-background.png"; sourceTree = "<group>"; };
@@ -1653,6 +1650,7 @@
 		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
 		FA37D7501C937F7100013187 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = proj/mac/Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		FA3B631A1D613BA500A5A810 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = proj/mac/HockeySDK.framework; sourceTree = "<group>"; };
 		FA3CF9891F01C1F600C54395 /* gr2Object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gr2Object.cpp; sourceTree = "<group>"; };
 		FA3CF98B1F01C67D00C54395 /* gr2Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gr2Object.h; sourceTree = "<group>"; };
@@ -3442,6 +3440,7 @@
 				082CF7EC120222EB00A60CC2 /* oalOSX.h in Headers */,
 				082CF7EE120222EB00A60CC2 /* oalSource.h in Headers */,
 				082CF82A12022CF700A60CC2 /* al.h in Headers */,
+				FA06C3B51ECF289F00A9977E /* authSteam.h in Headers */,
 				082CF82B12022CF700A60CC2 /* alc.h in Headers */,
 				082CF82C12022CF700A60CC2 /* CAAtomicStack.h in Headers */,
 				082CF82D12022CF700A60CC2 /* CAByteOrder.h in Headers */,
@@ -3618,15 +3617,16 @@
 				};
 			};
 			buildConfigurationList = 0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */;
-			compatibilityVersion = "Xcode 8.0";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
-				Base,
-				en,
+				English,
 				Japanese,
 				French,
 				German,
+				Base,
+				en,
 			);
 			mainGroup = 20286C29FDCF999611CA2CEA /* WW2OL */;
 			projectDirPath = "";
@@ -4176,7 +4176,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				FA37D7501C937F7100013187 /* Base */,
-				FABC5C1920720BCA00AF2510 /* en */,
+				FA37D7551C937F9800013187 /* en */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";

@@ -22,7 +22,6 @@
     <ProjectGuid>{4F492374-DC5C-47D0-AE9F-7DF7A50FDECB}</ProjectGuid>
     <RootNamespace>teulKit</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

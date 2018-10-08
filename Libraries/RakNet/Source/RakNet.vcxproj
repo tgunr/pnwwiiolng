@@ -14,7 +14,6 @@
     <ProjectGuid>{143F9B67-C223-4F2D-B8F9-B644CA710CA6}</ProjectGuid>
     <RootNamespace>RakNet</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

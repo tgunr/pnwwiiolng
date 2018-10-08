@@ -30,7 +30,6 @@
     <ProjectGuid>{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}</ProjectGuid>
     <RootNamespace>libiconv</RootNamespace>
     <Keyword>Win32Proj</Keyword>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

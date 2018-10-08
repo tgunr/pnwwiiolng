@@ -110,7 +110,6 @@ SINT8			HackID[128];		// used for hacker detection (comes from playgate only)
 LOGICAL			AltFont;            // testing if true use alternate UI font
 SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
-SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
 LOGICAL         UseSteamLogin = FALSE; // We should use Steam to authenticate our login
 LOGICAL         LaunchSettingsOnly = FALSE; //do not launch settings
@@ -185,7 +184,6 @@ LOGICAL			g_enableVSync;	    // Lock the frame rate to refresh rate
 SINT32			ShadowSizeSelect;	// A number representing shadow texture size											// (1-8) means "2^n"
 											// (1-8) means "2^n"
 											// 0 means "No Shadows"
-SINT8			Playarc[_MAX_PATH]; // path the archiver, usually just "playarc"
 /**/
 
 SINT32           nErrorCode;         // Set to any user specified error code
@@ -286,6 +284,7 @@ UINT32			CurrentConv; // Current airplane gun convergence setting
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
 SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gAuthServerPort[64];
+char             gAuthRelayURL[128]; // Auth relay URL override
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
 

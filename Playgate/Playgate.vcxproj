@@ -22,7 +22,6 @@
     <ProjectGuid>{A755190B-E034-45F3-A255-75DCEE000361}</ProjectGuid>
     <RootNamespace>Playgate</RootNamespace>
     <Keyword>MFCProj</Keyword>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

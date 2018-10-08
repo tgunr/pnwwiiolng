@@ -87,6 +87,10 @@ SuperCellMapView::SuperCellMapView() : View(),
 	_pandirx(0),
 	_pandiry(0),
 	_panscale(0),
+	_minPanX(-25.0f),
+	_minPanY(210.0f),
+	_maxPanX(51.0f),// How far East
+	_maxPanY(283.0f),// How far North
 	_startpanscale(0),
 	_stoppanscale(0),
     _panlength(0),
@@ -488,6 +492,16 @@ bool SuperCellMapView::MouseDrag (float x, float y, int button, bool start)
 	float scx, scy;
 	scx = _dragscx - (x - _dragx) / Width()  * _scacross;
 	scy = _dragscy - (y - _dragy) / Height() * _scacross;
+
+	// Make sure that we don't pan the map too far.
+	if (scx < _minPanX)
+		scx = _minPanX;
+	if (scx > _maxPanX)
+		scx = _maxPanX;
+	if (scy < _minPanY)
+		scy = _minPanY;
+	if (scy > _maxPanY)
+		scy = _maxPanY;
 
 	SetPositionSuperCell(scx, scy);
 

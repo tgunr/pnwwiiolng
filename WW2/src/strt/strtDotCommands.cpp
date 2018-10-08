@@ -541,7 +541,7 @@ _makeList(CPStruct* cp, const OOBMessage& message)
 }
 
 //////////////////////////////////////////////////////////////////////
-// The ".own" of firebases
+// The ".own" of firebases and factories
 
 static bool
 _bridgeOwnership(const std::string& title, CPStruct* cp, ObjectStruct* bridge, OOBMessage& message)
@@ -571,7 +571,7 @@ _factoryOwnership(FacilityStruct* fac, OOBMessage& message)
 	}
 
 	if ( factories == 0 )
-		return RESPOND("%s has no factories. If you believe this is an error, please /report this for the developers' attention.", fac->name);
+		return RESPOND("%s has no factories. If you believe this is an error, please report it by using the /bug command.", fac->name);
 
 	damage /= factories;
 	if ( damage >= 100 )
@@ -2442,11 +2442,11 @@ extern std::string strtGetFactoryList(WWII_COUNTRY forCountry);
 static bool
 _dotFactories(char* arguments, OOBMessage& message)
 {
-	std::string result = "UK: " + strtGetFactoryList(WWII_ENGLAND);
+	std::string result = "British Factories: " + strtGetFactoryList(WWII_ENGLAND);
 	RESPOND("%s", result.c_str());
-	result = "FR: " + strtGetFactoryList(WWII_FRANCE);
+	result = "French Factories: " + strtGetFactoryList(WWII_FRANCE);
 	RESPOND("%s", result.c_str());
-	result = "DE: " + strtGetFactoryList(WWII_GERMANY);
+	result = "German Factories: " + strtGetFactoryList(WWII_GERMANY);
 	RESPOND("%s", result.c_str());
 	return true;
 }

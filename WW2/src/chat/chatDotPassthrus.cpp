@@ -138,6 +138,12 @@ public:
 	}
 } dotRDP;
 
+class DotFactories : public DotPassthru
+{
+public:
+	DotFactories() : DotPassthru("factories", "List all factories and their current state", NO_MASK, LSTR_FACTORIES_USAGE, LSTR_FACTORIES_DETAIL) { }
+} dotFactories;
+
 class DotRedeploy : public DotPassthru
 {
 public:

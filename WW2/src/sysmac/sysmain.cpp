@@ -70,7 +70,7 @@ int sysmain()
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
         if (frames % 100 == 0) {
-            Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
+            //Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
         }
 #endif
     }

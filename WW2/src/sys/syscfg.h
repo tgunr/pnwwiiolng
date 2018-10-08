@@ -71,9 +71,6 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #pragma warning (disable: 4800) // shut the #$!@ up
 
-#ifndef snprintf
-# define snprintf _snprintf
-#endif
 #ifndef usleep
 # define usleep(n) Sleep((n))
 #endif

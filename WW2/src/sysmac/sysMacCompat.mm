@@ -392,7 +392,7 @@ const char* macUserDocumentsPath()
                              error:nullptr];
             targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
             
-            // We're giving the prefs folder the permissions it would otherwise have
+            // We're giving the docs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
             [[NSFileManager defaultManager]
                 createDirectoryAtURL:targetPathDir
@@ -496,11 +496,12 @@ LOGICAL syslaunchurl(const char* url, LOGICAL local)
     return TRUE;
 }
 
-bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response)
+bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response, uint64_t &errorCode)
 {
     NSURL *url = [NSURL URLWithString:@(request.url.c_str())];
     
     if (!url) {
+        errorCode = std::numeric_limits<uint64_t>::max(); // bit of a kludge, but what the hey
         return false;
     }
     
@@ -520,6 +521,14 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
     NSData *resultData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&urlResponse error:&error];
     
     if (!resultData) {
+        // This is evil as hell, but: We "know" that none of the error codes we're even remotely likely to run into
+        // will exceed 32 bits, and we "know" that any of the error domains we care about will be uniquely identifiable
+        // by the first few characters of their raw string value. It's hacky, but it lets us encode enough info to
+        // know what's going on without any other context.
+        errorCode = (static_cast<uint64_t>(static_cast<uint32_t>(error.code)) << 32) |
+                    // Technically we're exceeding the lifetime of the data's bytes pointer, but in practice, not gonna be a problem.
+                    // The assumption is made that domain has at least 6 characters. We'll crash if that's wrong, but we don't really care, it's hideously unlikely.
+                    *reinterpret_cast<const uint32_t *>([[error.domain substringWithRange:NSRange{ 2, 4 }] dataUsingEncoding:NSUTF8StringEncoding].bytes);
         return false;
     }
     

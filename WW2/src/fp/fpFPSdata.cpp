@@ -70,7 +70,10 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
 	FPS_DIR "arms\\armsmesh-britinf", // Americans
-	FPS_DIR "arms\\armsmesh-germinf" // Italians
+	FPS_DIR "arms\\armsmesh-germinf", // Italians
+	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack
+	FPS_DIR "arms\\armsmesh-britinf", // American Para NoPack
+	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack Self
 };
 
 const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
@@ -97,8 +100,11 @@ const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
 	FPS_DIR "legs\\french-legs",
-	FPS_DIR "legs\\brit-legs", // americans
-	FPS_DIR "legs\\german-legs" // Italians
+	FPS_DIR "legs\\brit-legs", // Americans
+	FPS_DIR "legs\\german-legs", // Italians
+	FPS_DIR "legs\\brit-legs", // American Para Pack
+	FPS_DIR "legs\\brit-legs", // American Para NoPack
+	FPS_DIR "legs\\brit-legs", // American Para Pack Self
 };
 
 const SCHAR* hud_icons[NUM_ICONS] =
@@ -224,7 +230,10 @@ const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"deml",
 	"frml",
 	"usarmy",
-	"itarmy"
+	"itarmy",
+	"uspara",
+	"usparanopack",
+	"usparaself"
 };
 
 const SCHAR* weapNameStrings[NUM_WEAPONS] =
@@ -2627,11 +2636,13 @@ void fpFPSDataInit ()
 	default_arms_tex_names[BRITISH_PARA_PACK] = "british_torso";
 	default_arms_tex_names[FRENCH_PARA_PACK] = "french_torso";
 	default_arms_tex_names[GERMAN_PARA_PACK] = "german_torso";
+	default_arms_tex_names[AMERICAN_PARA_PACK] = "american_torso";
 
 	memset (replacement_arms_tex_names, 0, sizeof (replacement_arms_tex_names));
 	replacement_arms_tex_names[BRITISH_PARA_PACK] = "brit_torso_para";
 	replacement_arms_tex_names[FRENCH_PARA_PACK] = "french_torso_para";
 	replacement_arms_tex_names[GERMAN_PARA_PACK] = "germ_torso_para";
+	replacement_arms_tex_names[AMERICAN_PARA_PACK] = "american_torso_para";
 
 	// init weapon sight tables
 	for(int i = 0; i < NUM_WEAPONS; i++)
