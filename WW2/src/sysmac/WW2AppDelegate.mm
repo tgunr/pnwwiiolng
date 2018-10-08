@@ -550,7 +550,7 @@ extern NSString *WebActionOriginalURLKey;
     
     // Set up anti-hack stuff - not needed on macOS but do it for good measure anyway
     NetFrameSync::InitializeHashes();
-    
+
     Fio::DeleteLogFile();
 
 #ifdef DEBUG_WW2
@@ -601,7 +601,15 @@ extern NSString *WebActionOriginalURLKey;
 #endif
     
     if (!InitSteam()) {
-        // abort
+        // alert and abort
+        NSString *appName = [NSBundle.mainBundle objectForInfoDictionaryKey:(__bridge NSString *)kCFBundleNameKey];
+        NSString *steamMissingTitle = NSLocalizedString(@"steam_not_running", @"Oops, Steam isn't running!");
+        NSString *steamMissingDetail = NSLocalizedString(@"steam_not_running_detail", @"This is the Steam version of %@ and can't be run directly. Try launching the game from Steam.");
+        NSError *error = [NSError errorWithDomain:PGErrorDomain code:0 userInfo:@{
+            NSLocalizedDescriptionKey: steamMissingTitle,
+            NSLocalizedRecoverySuggestionErrorKey: [NSString stringWithFormat: steamMissingDetail, appName],
+        }];
+        [NSApp presentError:error];
         [NSApp terminate:self];
         return;
     }

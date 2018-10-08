@@ -455,6 +455,9 @@ struct LANGANDCODEPAGE
 
 #endif	//	EVENT_LOG
 
+/*
+
+<<<<<<< HEAD
 //////////////////////////////////////////////////////////////////////
 //	void SetupFPU(bool enableExceptions)
 //
@@ -525,6 +528,11 @@ void SetupFPU(bool enableExceptions)
 
 	configHasBeenPrinted	= true;
 }
+
+=======
+>>>>>>> develop
+
+*/
 
 //#ifndef BETA_RELEASE
 #ifdef ANTIHACK
@@ -773,7 +781,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Write_Debug("CoInitializeEx FAILED with error: %x", hr);
     }
 
-	SetupFPU(true);
 	memInit();
 
 #ifdef DIRECT3D
