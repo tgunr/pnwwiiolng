@@ -132,6 +132,8 @@ struct EchoPacketHeader
 	UINT32		m_size;				// How big the data is.
 
 	UINT16		m_count;			// Number of entries.
+    
+    UINT16      m_padding = 0;
 
 	UCHAR		m_data[1200];
 
@@ -432,9 +434,10 @@ struct Role
 				throw Teul::IterationError(i, "Teul::Packet has bad data", data[i]);
 		}
 
-		UINT32* testValue = (UINT32*)(data + textSize + Teul::Packet::DefaultLocalDataSize);
-		if ( *testValue != Config::Test32BitValue )
-			throw Teul::Error("Got wrong 32-bit test value", *testValue);
+		UINT32 testValue = 0;
+        memcpy(&testValue, data + textSize + Teul::Packet::DefaultLocalDataSize, sizeof(testValue));
+		if ( testValue != Config::Test32BitValue )
+			throw Teul::Error("Got wrong 32-bit test value", testValue);
 
 		if ( memcmp(data + textSize + Teul::Packet::DefaultLocalDataSize + sizeof(UINT32), Config::teulPacketString, textSize) != 0 )
 			throw Teul::Error("Tail copy of test string is wrong", 0);

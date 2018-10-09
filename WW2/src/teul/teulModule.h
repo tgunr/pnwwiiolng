@@ -26,3 +26,10 @@ void teulConfigureEndpointSocket(ENDPOINT& endpoint);
 SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port,
                           CONNECT_FUNCTION connectFn, ERROR_FUNCTION errorFn, const bool initBackChannel);
 void teulModStartup(ERROR_FUNCTION);
+
+// If this flag is set, instead of doing the Teul crypto operations purely "in-place", the
+// code will copy the data into a properly aligned data buffer, do the crypto on that buffer,
+// and then copy the data back into the expected place. This is highly inefficient, but in
+// some cases may still actually be less expensive than the guaranteed misaligned loads and
+// stores the crypto performs on the data otherwise.
+//#define FIX_CRYPTO_MISALIGNMENT
