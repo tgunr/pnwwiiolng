@@ -372,7 +372,7 @@ static void _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 					PRA_SOCKET(endpoint.socket),
 					sockAddr.sin_family,
 					teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)),
-					sockAddr.sin_port);
+					ntohs(sockAddr.sin_port));
 }
 
 //////////////////////////////////////////////////////////////////////

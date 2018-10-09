@@ -28,10 +28,13 @@ PROJECT( WW2GameHosts LANGUAGES C CXX )
 # RakNet
 # Ridiculously, this has to be all the way up here, otherwise, RakNet will pick
 # up a bunch of build settings not intended for it, which screws up the stupid
-# thing a surprising amount.
-ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
-SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
-INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+# thing a surprising amount. Oh wait. That's only on UNIX/macOS. On Windows this
+# actually makes RakNet unable to link, because Windows is an infantile OS in 2018.
+IF( NOT WIN32 )
+	ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
+	SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+	INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+ENDIF( NOT WIN32 )
 
 ####################################
 ## Require C++14
@@ -182,6 +185,18 @@ INCLUDE( cmakeincludes/HostConfiguration.cmake )
 ####################################
 ## Check various dependencies.
 INCLUDE( cmakeincludes/Dependencies.cmake )
+
+####################################
+# RakNet
+# Ridiculously, this has to be all the way down here, otherwise, RakNet will miss
+# a bunch of build settings required for it to build correctly. Oh wait. That's
+# only on Windows. On UNIX/macOS this makes RakNet pick up a bunch of garbage
+# build setitings, because Windows is an infantile OS in 2018.
+IF( WIN32 )
+	ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
+	SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+	INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+ENDIF( WIN32 )
 
 ####################################
 ## Run build_info.py to get build_info.cpp
