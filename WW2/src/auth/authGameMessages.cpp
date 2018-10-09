@@ -43,9 +43,6 @@ static SINT32 _sendPlayerLoginReply(ACTION_OBJECT* const a);
 static SINT32 _sendServerLoad(ACTION_OBJECT* const a);
 static SINT32 _sendGameCapacity(ACTION_OBJECT* const a);
 
-//error function declaration
-static void _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
-
 //This function installs our two callbacks
 SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 {
