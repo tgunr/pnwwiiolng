@@ -50,7 +50,7 @@ ELSE()
         # Every warning ever, then shut off the ones we don't want
         ADD_COMPILE_OPTIONS( "-Weverything" )
         ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
-        ADD_COMPILE_OPTIONS( "-Wno-error=c++11-narrowing" "-Wno-packed" "-Wno-pedantic" )
+        ADD_COMPILE_OPTIONS( "-Wno-packed" "-Wno-pedantic" )
         ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
         ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
         ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )
