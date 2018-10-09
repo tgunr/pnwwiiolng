@@ -76,7 +76,7 @@ u32 cat::GetThreadID()
 #elif defined(CAT_OS_LINUX) || defined(CAT_OS_BSD) || defined(CAT_OS_OSX) || defined(CAT_OS_APPLE)
 
 #if defined(CAT_OS_APPLE)
-	s32 thread_id = syscall(SYS_gettid);
+	s32 thread_id = -1;
 #else
     s32 thread_id = syscall(__NR_gettid);
 #endif

@@ -25,6 +25,15 @@ ENDIF()
 PROJECT( WW2GameHosts LANGUAGES C CXX )
 
 ####################################
+# RakNet
+# Ridiculously, this has to be all the way up here, otherwise, RakNet will pick
+# up a bunch of build settings not intended for it, which screws up the stupid
+# thing a surprising amount.
+ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
+SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+
+####################################
 ## Require C++14
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 SET( CMAKE_CXX_STANDARD 14 )
@@ -200,12 +209,6 @@ ELSE()
 		${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp
 	)
 ENDIF()
-
-####################################
-# RakNet
-ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
-SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
-INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
 
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
