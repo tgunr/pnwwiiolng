@@ -174,9 +174,29 @@ struct ServerRole : public Role
 	//////////////////////////////////////////////////////////////
 	// Open the listen interface.
 
+    private:
+    UINT32 hostAddress;
+
+    private:
+    void GetHostAddress()
+    {
+        // Test hostname lookup.
+        UINT32 address = Teul::GetSingleIP(Config::serverName);
+        if ( address == 0U || address == ~0U )
+            throw Teul::Error("Teul::GetSingleIP failed", address);
+        hostAddress = address;
+    }
+
 	void OpenListener()
 	{
-		const SINT32 teulIndex = teulOpenListen(Config::TestPort, Config::protocol == PROTOCOL_UDB ? nullptr : acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        SINT32 teulIndex = -1;
+        
+        if (Config::protocol == PROTOCOL_UDB) {
+            GetHostAddress();
+            teulIndex = teulOpenListenHost(hostAddress, Config::TestPort, nullptr, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        } else {
+		    teulIndex = teulOpenListen(Config::TestPort, acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        }
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpenListen failed", teulIndex);
 

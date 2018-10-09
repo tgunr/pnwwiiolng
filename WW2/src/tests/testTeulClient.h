@@ -834,6 +834,9 @@ struct ClientRole : public Role
 		const SINT32 teulIndex = teulOpenSend(hostAddress, Config::TestPort, Config::protocol == PROTOCOL_UDB ? nullptr : connectFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpen failed", teulIndex);
+        if (Config::protocol == PROTOCOL_UDB) {
+            Connected();
+        }
 
 		m_teulIndex = teulIndex;
 		Dprintf("teulOpenSend() index %d\n", m_teulIndex);
