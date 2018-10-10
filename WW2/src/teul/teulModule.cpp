@@ -464,7 +464,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 	}
 
 	// Backchannels may exist on listening hosts and clients
-    assert(!initBackChannel || newEndpoint->state() != IS_LISTENING); // listening endpoints never have backchannels
+    //assert(!initBackChannel || newEndpoint->state() != IS_LISTENING); // listening endpoints never have backchannels
 
 	if (initBackChannel) {
 		newEndpoint->m_pairdUdpConn = new RakNetChannel(0, listening, port, newEndpoint);
