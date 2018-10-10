@@ -46,6 +46,7 @@ ELSE()
 
     IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Use cheap list of stupid options for GCC
+        LINK_LIBRARIES( "-lbsd" )
     ELSE()
         # Every warning ever, then shut off the ones we don't want
         ADD_COMPILE_OPTIONS( "-Weverything" )

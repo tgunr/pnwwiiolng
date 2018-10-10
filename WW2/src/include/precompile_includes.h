@@ -43,6 +43,10 @@
 #include <sys/param.h>
 #endif
 
+#if __has_include(<bsd/string.h>)
+#include <bsd/string.h>
+#endif
+
 ////////// PLAYNET SYSTYPES NEEDS TO GO HERE
 
 #include "include/systypes.h"
