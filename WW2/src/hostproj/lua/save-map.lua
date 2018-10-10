@@ -45,6 +45,8 @@ function autosaveMapState(filename)
 end
 
 local mapfilename = "map-state"
+
+-- TODO: Make this use the LUA_PATH config var, to match _restoreMapState() in strtHost.cpp
 local mapfile = "/playnet/wwiiol/lua/"..mapfilename..".lua"
 
 function loadMapState(filename)
