@@ -191,10 +191,13 @@ struct ServerRole : public Role
 	{
         SINT32 teulIndex = -1;
         
+#if platBuild == BUILD_SERVER
         if (Config::protocol == PROTOCOL_UDB) {
             GetHostAddress();
             teulIndex = teulOpenListenHost(hostAddress, Config::TestPort, nullptr, Config::ConnectTimeoutMS, Config::protocol, errorFn);
-        } else {
+        } else
+#endif
+        {
 		    teulIndex = teulOpenListen(Config::TestPort, acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
         }
 		if ( teulIndex < 0 )
