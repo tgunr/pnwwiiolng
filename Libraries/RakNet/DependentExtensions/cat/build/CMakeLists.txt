@@ -17,8 +17,7 @@ SET(INC ${PARENT_DIR}/include/ )
 SET(TESTS ${PARENT_DIR}/tests/)
 
 include_directories(${INC})
-link_directories(${LIB}/cat)
-set(LIBRARY_OUTPUT_PATH ${LIB}/cat)
+link_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Common
 add_library(libcatcommon STATIC

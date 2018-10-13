@@ -25,6 +25,11 @@ ENDIF()
 PROJECT( WW2GameHosts LANGUAGES C CXX )
 
 ####################################
+## Require C++14
+SET( CMAKE_CXX_STANDARD_REQUIRED ON )
+SET( CMAKE_CXX_STANDARD 14 )
+
+####################################
 # RakNet
 # Ridiculously, this has to be all the way up here, otherwise, RakNet will pick
 # up a bunch of build settings not intended for it, which screws up the stupid
@@ -35,11 +40,6 @@ IF( NOT WIN32 )
 	SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
 	INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
 ENDIF( NOT WIN32 )
-
-####################################
-## Require C++14
-SET( CMAKE_CXX_STANDARD_REQUIRED ON )
-SET( CMAKE_CXX_STANDARD 14 )
 
 ####################################
 ## Determine bitness
