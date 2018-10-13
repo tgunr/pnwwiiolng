@@ -69,10 +69,12 @@ static void _getHostIPAddresses()
             continue;
         }
         
-        if (!pIntf && strcasecmp(ifa->ifa_name, primaryInterfaceName) == 0) {
-            pIntf = ifa;
+        if (strcasecmp(ifa->ifa_name, primaryInterfaceName) != 0) {
+            dbugLog(_FLN, "Skipping interface %s because it's not the primary interface (%s)", ifa->ifa_name, primaryInterfaceName);
+            continue;
         }
         
+        pIntf = ifa;
         Server::myInterface.addr[Server::myInterface.numIP].naddr = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr)->sin_addr.s_addr;
         Server::myInterface.addr[Server::myInterface.numIP].ip = ntohl(Server::myInterface.addr[Server::myInterface.numIP].naddr);
         dbugLog(_FLI, "read index %u interface %s, ip %s",
@@ -358,12 +360,12 @@ static void _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 	socklen_t len = sizeof(sockAddr);
 
 	if (bind(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), len) == SOCKET_ERROR) {
-        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to bind to fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), sockAddr.sin_port);
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to bind to fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), ntohs(sockAddr.sin_port));
 		throw Teul::OpenError("bind() failed");
     }
 
 	if (getsockname(endpoint.socket, reinterpret_cast<struct sockaddr *>(&sockAddr), &len) == SOCKET_ERROR) {
-        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to get local binding for fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), sockAddr.sin_port);
+        dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " failed to get local binding for fam:%u addr:%s port:%hu", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), sockAddr.sin_family, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr)), ntohs(sockAddr.sin_port));
 		throw Teul::OpenError("getsockname() failed after bind");
     }
 
