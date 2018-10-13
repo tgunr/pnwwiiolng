@@ -339,7 +339,7 @@ strtSaveTOESupplies()
 
 void strtClearTOESaveList(StratHCUnit& unit)
 {
-	for (auto it = toeSaveList.begin(), end = toeSaveList.end(); it != end;)
+	for (auto it = toeSaveList.begin(); it != toeSaveList.end();)
 	{
 		TOE_::WeaponInstance& entry = *it->first;
 
