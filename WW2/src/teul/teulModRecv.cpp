@@ -248,6 +248,7 @@ static ssize_t _acceptConnectTCP(ENDPOINT& endpoint)
         newEndpoint->socket = newSock;
         newEndpoint->fromSockAddress = newFromAddress;
         newEndpoint->localSockAddress = newLocalAddress;
+        newEndpoint->destSockAddress = newEndpoint->fromSockAddress;
         teulConfigureEndpointSocket(*newEndpoint);
 
         newEndpoint->setConnected();
