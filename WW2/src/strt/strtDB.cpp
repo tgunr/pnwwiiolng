@@ -10,7 +10,6 @@
 #include "strt/strtProtos.h"
 
 #include "wwii/wwiiDBConfig.h"
-#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"

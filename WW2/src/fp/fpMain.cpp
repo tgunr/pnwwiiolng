@@ -151,11 +151,11 @@ int fpAdjustLoader::getIndex(const char* type, const char* name)
 	// -1 means default
 	// 0 and greater are real pose and move types
 	// less than -1 are artificial stand ins
-	if(!stricmp("pose", type) && !stricmp("dead", name))
+	if(!strcasecmp("pose", type) && !strcasecmp("dead", name))
 	{
 		return -2;
 	}
-	else if(!stricmp("pose", type) && !stricmp("emote", name))
+	else if(!strcasecmp("pose", type) && !strcasecmp("emote", name))
 	{
 		return -3;
 	}

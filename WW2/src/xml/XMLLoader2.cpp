@@ -5,10 +5,6 @@
 #include "ui/uiMain.h" // for ui fio callbacks
 #endif
 
-#if platOS!=OS_WIN32
-#define stricmp strcasecmp
-#endif
-
 const char* xmlTrimString(const char* value)
 {
 	static char buffer[MAX_XML_TRIM_SIZE + 1]{};
@@ -31,7 +27,7 @@ bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char*
 		switch(type)
 		{
 			case XML_DATA_BOOL:
-				*(bool*)value = (!stricmp((const char*)data, "true")) ? true: false;
+				*(bool*)value = (!strcasecmp((const char*)data, "true")) ? true: false;
 			break;
 			case XML_DATA_SINT:
 				*(int*)value = atoi((const char*)data);

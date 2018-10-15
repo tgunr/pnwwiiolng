@@ -29,7 +29,6 @@ SINT32 teulInitTransport(LogMode logType
 						, const char* name
 						, ERROR_FUNCTION errorFnPtr
 						, void (*killFnPtr)(int /*signo*/)
-						, Teul::LoggingFn const logFnPtr=nullptr
 						);
 
 //	there are 48 local connections "built in" to the teul system, and each
@@ -87,9 +86,9 @@ SINT32 teulOpenListenHost(const UINT32 ipAddress
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.
 // [initBackChannel] set to true if this connection should establish a UDP (Raknet) backchannel to host
-SINT32 teulOpenSend(UINT32 Host, const UINT16 portNumber
+SINT32 teulOpenSend(UINT32 Host, UINT16 portNumber
 					, CONNECT_FUNCTION connectFnPtr
-					, const SINT32 timeout, const PROTOCOL protocol
+					, SINT32 timeout, PROTOCOL protocol
 					, ERROR_FUNCTION errorFnPtr
-					, const bool initBackChannel = false);
+					, bool initBackChannel = false);
 

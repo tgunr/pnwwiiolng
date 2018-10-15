@@ -47,7 +47,6 @@ developer's callback routine can check the size instead.
 
 struct TEUL_CALLBACK
 {
-	ERROR_FUNCTION error;			// Error handling function (or null).
 	UINT32		timeout;			// how long do we try to send data (zero for connection default)
 									// to delayTeimout;
 	void*		inData;				// pointer to the input object

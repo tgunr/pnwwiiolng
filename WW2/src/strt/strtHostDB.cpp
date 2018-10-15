@@ -15,7 +15,6 @@
 #include "wwii/wwiiSerialNumber.h"
 
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"

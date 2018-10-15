@@ -28,7 +28,6 @@
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
 #include "strt/strtProtos.h"
-#include "teul/teulServer.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"

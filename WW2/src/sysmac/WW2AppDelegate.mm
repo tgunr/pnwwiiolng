@@ -3,6 +3,7 @@
 #include "syscfg.h"
 #include "build_info.hpp"
 #import "WW2AppDelegate.h"
+#include "teul/teulEndpoint.h"
 #include "sysmain.h"
 #include "sys/sysSteam.h"
 #include "vars.h"

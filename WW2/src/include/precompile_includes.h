@@ -16,6 +16,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
@@ -23,19 +24,27 @@
 #include <list>
 #include <map>
 #include <memory>
+#include <queue>
 #include <set>
+#include <stack>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include <numeric>
 #include <thread>
 #include <mutex>
+#include <signal.h>
 
-#if defined(HAVE_UNISTD_H)
+#if __has_include(<unistd.h>)
 #include <unistd.h>
 #endif
 
-#if defined(HAVE_SYS_PARAM_H)
+#if __has_include(<sys/param.h>)
 #include <sys/param.h>
+#endif
+
+#if __has_include(<bsd/string.h>)
+#include <bsd/string.h>
 #endif
 
 ////////// PLAYNET SYSTYPES NEEDS TO GO HERE
@@ -47,7 +56,7 @@
 #include "include/strprintf.h"
 #include "include/defs.h"
 #include "dbug/dbug.h"
-#include "dbug/dbugExtErrors.h"
+#include "teul/teulExtErrors.h"
 
 #include "wwii/wwiiHash.h"
 #include "chat/chatHandle.h"
@@ -55,7 +64,6 @@
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiBranchEnums.h"
 #include "teul/teulTime.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulKit.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPackers.h"
@@ -65,7 +73,6 @@
 #include "inst/instTypes.h"
 #include "teul/teulPacket.h"
 #include "weap/weapWeapon.h"
-#include "teul/teulEndpoint.h"
 #include "chat/chatLStringIDs.h"
 #include "str/stringLib.h"
 

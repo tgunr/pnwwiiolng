@@ -13,7 +13,7 @@
 #include <mutex>
 
 #include "teul/teulTime.h"					// For teulClock64
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
 static std::mutex textMutex;

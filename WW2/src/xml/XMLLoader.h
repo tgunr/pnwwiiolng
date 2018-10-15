@@ -142,8 +142,8 @@
 
 /********* defines **********/
 #define XML_GET_USERDATA(type,name) (type)(*(xmlDataMap*)userData)["name"]
-#define XML_CMP_STRINGS(s1,s2) !stricmp((const char*)(s1), (const char*)(s2))
-#define XML_IS_NODETYPE(type) !stricmp((const char*)node->name, "type")
+#define XML_CMP_STRINGS(s1,s2) !strcasecmp((const char*)(s1), (const char*)(s2))
+#define XML_IS_NODETYPE(type) !strcasecmp((const char*)node->name, "type")
 #define XML_TAG_HANDLER(handler) bool handler(XMLLoader* loader, xmlNode* node, bool first, void* userData)
 #define XML_PROCESS_CHILDREN(data) \
 for(xmlNodePtr child = node->children; child; child = child->next) \

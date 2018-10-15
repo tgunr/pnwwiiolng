@@ -13,42 +13,15 @@
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiCallbacks.h"
 
-#include "host/hostTiming.h"
-
 TEUL_CALLBACK* TEUL_CALLBACK::s_callbackArray[256][256];
 
 TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* const ci);
-
-// Callback Errors are handled differently here. This routine simply
-// executes the Callback error routine that is found in the ERROR_STRUCT.
-SINT32
-teulPostCallbackError(const SINT32 teulIndex, const UCHAR* const data, const SINT32 size, const TEUL_CALLBACK* const object, const SINT32 error)
-{
-	if ( object == nullptr && data == nullptr )
-		return -EINVAL;
-
-	const TEUL_CALLBACK* const callback = (object == nullptr) ? TEUL_CALLBACK::Lookup(data) : object;
-	if (callback == nullptr)
-		return -EINVAL;
-
-	if ( callback->error == nullptr )
-	{
-		dbugLog(_FLA, "t:%d missing error handler for " PRF_CALLBACK "", teulIndex, PRA_CALLBACK(*callback));
-		return 0;
-	}
-
-	dbugLog(_FLW, "executing error for " PRF_CALLBACK "", PRA_CALLBACK(*callback));
-
-	// Invoke the error handler.
-	(callback->error)(teulIndex, data, size, callback, error);
-
-	return 0;
-}
 
 // This routine initializes a TEUL_CALLBACK structure and points
 // to it from the callback array.
@@ -94,8 +67,6 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 		realObject->outData = nullptr;
 		realObject->inData = nullptr;
 	}
-
-	realObject->error = ci->error;
 
 	return realObject;
 }
@@ -178,9 +149,6 @@ _doAction(ENDPOINT& endpoint
 		  , UCHAR* const data
 		  , const SINT32 dataSize_bytes)
 {
-	TIMER_USE_HERE
-	TIMER_START
-
 	if (callback.outData == nullptr)
 	{
 		static char tempData[Teul::MaxPacket * 2];
@@ -204,16 +172,14 @@ _doAction(ENDPOINT& endpoint
 	actionObj.fromAddress = ntohl(from.sin_addr.s_addr);
 	actionObj.fromPort = ntohs(from.sin_port);
 
-	TIMER_STOP("doact:start")
-
 	dbugLog(_FLD, "t:%d executing callback " PRF_CALLBACK " size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), dataSize_bytes);
 
-	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);
-	TIMER_STOP("doact:recv")
 
-	if (PN_UNLIKELY(retval < 0))
+	if (retval < 0 && (callback.callX() != Teul::Module::CallbackX || retval != -ENOTCONN)) {
+        // Don't log ENOTCONN on system callbacks, as that typically means "quickly dropped connection"
 		dbugLog(_FLA, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
+    }
 
 	return retval;
 }
@@ -221,21 +187,14 @@ _doAction(ENDPOINT& endpoint
 // this routine not only executes callbacks but also relays callbacks not
 // destined for this module to the appropriate interface either directly
 // with _relayCALLBACK() or _routeCALLBACK().
-SINT32
-TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
+SINT32 TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
 {
-	if ( PN_UNLIKELY(recvAction() == nullptr) )
-	{
+	if (!recvAction()) {
 		dbugLog(_FLA, "t:%d " PRF_CALLBACK " null action", endpoint_.teulIndex(), PRA_CALLBACK(*this));
 		return -EINVAL;
 	}
 
-	const SINT32 result = _doAction(endpoint_, *this, callData_, dataSize_bytes);
-	if ( PN_UNLIKELY(result == -ETEUL_CB_REQ_DATA) )
-	{
-		endpoint_.sendError(ETEUL_CB_REQ_DATA);
-	}
-	return result;
+	return _doAction(endpoint_, *this, callData_, dataSize_bytes);
 }
 
 SINT32

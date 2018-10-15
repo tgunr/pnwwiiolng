@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
 #include <mysql.h>
@@ -71,13 +70,11 @@
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulVersion.h"
 #include "weap/weapList.h"
@@ -405,7 +402,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player != nullptr)
 	{
-		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
+		teulClose(player->teulIndex());
 		player->setDisconnected();
 	}
 }

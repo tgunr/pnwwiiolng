@@ -46,6 +46,7 @@
 #include "chat/chatBrigadeControlList.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatMotds.h"
+#include "chat/omgChat.h"
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
@@ -56,7 +57,6 @@
 #include "strt/strtTypes.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
-#include "omg/omgChat.hxx"
 #include "teul/raknetConn.h"
 
 using namespace ww2;
@@ -2905,7 +2905,7 @@ bool ww2::Client::InitTeul(void) {
 
 	char dbugFileName[21];
 	strprintf(dbugFileName, "wwiiClient");
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr);
 	if ( err > -1 ) {
 		err = commInstallClientCallbacks() 	|
 			chatInstallClientCallbacks()	|

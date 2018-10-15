@@ -326,7 +326,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, userdir, path) ) {
-		dbugLog(_FLW, "Could not open file %s @ " PRpathT, filename, path);
+		dbugLog(_FLW, "Could not open file %s @ %" PRpathT, filename, path);
 		return -1;
 	}
 
