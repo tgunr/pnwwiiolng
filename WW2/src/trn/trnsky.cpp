@@ -1966,9 +1966,7 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle) / -10.0);
 
-		t = std::max(t, 0.8f);
-		t = std::min(t, 1.0f);
-		t = 1.0f - t;
+		t = 1.0f - std::max(std::min(t, 1.0f), 0.8f);
 
 		Red = t * s->_skyclearambient.r;
 		Green = t * s->_skyclearambient.g;
@@ -2001,8 +1999,7 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle) / 15.0);
 
-		t = std::max(t, 0.8f);
-		t = std::min(t, 1.0f);
+		t = std::max(std::min(t, 1.0f), 0.8f);
 
 		Red = t * s->_skyclearambient.r;
 		Green = t * s->_skyclearambient.g;
@@ -2193,8 +2190,7 @@ static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle - 10.0) / -20.0);
 
-		t = std::max(t, 0.8f);
-		t = std::min(t, 1.0f);
+		t = std::max(std::min(t, 1.0f), 0.8f);
 
 		light->light.dcvAmbient.r = t * s->_skynightambient.r;
 		light->light.dcvAmbient.g = t * s->_skynightambient.g;
