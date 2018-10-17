@@ -458,7 +458,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
     } catch (Teul::OpenError& e) {
         const char *errStr = Teul::GetErrorName(e.errNo);
 
-		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s", newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket), e.errNo, errStr, e.msg);
+		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open(p:%d, host: %s:%u) error:%d [%s] %s", newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket), protocol, teulGetAddress(host), port, e.errNo, errStr, e.msg);
 		newEndpoint->doError(e.errNo);
 		newEndpoint->shutdown();
 		teulFreeEndpoint(newEndpoint);
