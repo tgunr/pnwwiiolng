@@ -305,8 +305,7 @@ Player::mirrorToCellHost(Server::ServerInfo* const server)
 	auto mirror = new PersonaMirrorTo<CELL_HOST>(pxd, server, "cell");
 	server->mirrorPlayer(mirror);
 
-	UINT8 cell_ip = static_cast<UINT8>(GetPublicAddress(server->stats.address) & 0xff);
-	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, cell_ip, server->stats.port, OTP());
+	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, GetPublicAddress(server->stats.address), server->stats.port, OTP());
 	const SINT32 retval = connIns.send(teulIndex());
 
 	m_lastSpawnedTo = server->stats.address;

@@ -514,6 +514,10 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
         ~_PollRegenerator() { _pollRegenerateSet(); }
     } _regenerator;
     
+    // poll() may or may not have blocked for a non-trivial duration; re-sync the clock to keep
+    // things sane.
+    teulSyncClock();
+
     for (size_t slot = 0; slot < maxSlots; ++slot) {
 		pollfd& sfd = fdArray[slot];
   
@@ -878,18 +882,10 @@ static void _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
         endpoint.m_impl->m_lastPacketTick = header.m_tick;
         endpoint.m_haveTicks = true;
 	}
-
-    // Below logic relies on it being safe to treat the tick values as signed.
-    // Tick values are 64 bits, which in signed form gives 300 million years of
-    // leeway. That might just barely last long enough for this code to actually
-    // get a proper rewrite.
-    assert(endpoint.m_impl->m_lastPacketTick < std::numeric_limits<TeulDeltaMS>::max());
-
-	TeulDeltaMS newTick = static_cast<TeulDeltaMS>(header.m_tick);
-	TeulDeltaMS lastTick = static_cast<TeulDeltaMS>(endpoint.m_impl->m_lastPacketTick);
-    TeulTimeMS delta = static_cast<TeulTimeMS>(std::llabs(newTick - lastTick)); // both values are guaranteed positive; this can not underflow
     
-    endpoint.m_tickAccumulation += delta;
+    // The m_tick counter in packets wraps every 65 seconds or so. By doing this subtraction with
+    // only 16 bits we guarantee that wraparound (where new < old) still gives the correct result.
+    endpoint.m_tickAccumulation += (header.m_tick - endpoint.m_impl->m_lastPacketTick);
 
 	// Save the value.
 	endpoint.m_impl->m_lastPacketTick = header.m_tick;
@@ -900,18 +896,16 @@ static void _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 		return;
     }
 
-	teulSyncClock();
-
 	Teul::TickSample sample(endpoint.m_created.elapsed(), endpoint.m_tickAccumulation);
 
 	if (sample.delta > -100) { // In other words, if the client is less than 100ms ahead of the host
 		return;
     }
 
-	FLOAT64 minRatio = host_config.arena.speedHackRatio;
+	FLOAT64 minRatio = static_cast<FLOAT64>(host_config.arena.speedHackRatio);
     
     // All is well if detection is set above 1.0 (off) or the client:host ratio is below the threshold
-	if (minRatio >= 1.0 & sample.ratio < minRatio) {
+	if (minRatio >= 1.0 && sample.ratio < minRatio) {
 		return;
     }
     

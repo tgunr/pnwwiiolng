@@ -49,6 +49,6 @@ struct EndpointImpl
 	UINT16			m_cryptVersion;			//!< Version to use for encryption.
 	nfds_t			m_pollSlot;				//!< Position within the "poll" array under Linux/MacOS.
 	TeulTimeMS		kliveInterval;			//!< Time between keep alives.
-	TeulTimeMS		m_lastPacketTick;		//!< Tick of the previous packet.
+	Teul::PacketHeader::tick_t		m_lastPacketTick;		//!< Tick of the previous packet.
 };
 

@@ -588,7 +588,7 @@ Teul::ConnectionInstruction::packer(PackMode mode, ACTION_OBJECT* const a)
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_role, 8);
 	a->packer(mode, m_hostIP);
 #if platBuild == BUILD_SERVER
-	UINT32 seed = rand();
+	UINT32 seed = random();
 #else
 	UINT32 seed = m_otp ^ 0xdeadbeef;
 #endif
