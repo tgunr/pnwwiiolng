@@ -330,7 +330,7 @@ static ssize_t _startNewTCPPacket(ENDPOINT& endpoint)
 	if (totalRead < Teul::PacketPrefixBytes) {
 		dbugLog(_FLD, "t:%d underrun reading packet prefix, waiting for more data.", endpoint.teulIndex());
 		endpoint.m_readBufferUsed = totalRead;
-		return 0;
+		return -PLAT_EAGAIN;
 	}
 
 	ABORT_IF_EX(partialHeader.packetSizeBytes() > Teul::MaxAllowedPacketSize_bytes, "You done messed up some math somewhere.");
@@ -357,7 +357,7 @@ static ssize_t _continueTCPPacket(ENDPOINT& endpoint)
 	ssize_t readVal = _receiveTCP(endpoint, readBuffer, &readSize);
     
 	if (readVal < 0) {
-		return static_cast<SINT32>(readVal);
+		return readVal;
 	}
 	endpoint.m_readBufferUsed += static_cast<size_t>(readSize);
 	return 0;
@@ -385,7 +385,7 @@ static ssize_t _recvOneFromStream(ENDPOINT& endpoint)
 
 		// Don't progress further until we've read the entire payload.
 		if (endpoint.m_readBufferUsed < datagramSize) {
-			return 0;
+			return -PLAT_EAGAIN;
 		}
 	}
 
@@ -485,7 +485,6 @@ static ssize_t _handleReceive(ENDPOINT& endpoint)
     
     if (result < 0) {
         dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " receive error:%" PRSsizeT, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
-        return result;
     }
 
     return result;
