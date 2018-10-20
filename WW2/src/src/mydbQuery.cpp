@@ -97,18 +97,6 @@ DBQuery::_finish(bool thorough)
 	}
 }
 
-#ifdef DB_USE_SQLITE
-//////////////////////////////////////////////////////////////////////
-// Throw an error for an sqlite3 connection
-
-static void
-_throwSqlite3Error(DB::handle_t* handle)
-{
-	std::string error = sqlite3_errmsg(m_conn);
-	throw std::logic_error(error);
-}
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Check for a result set and make a smart decision as to whether
 // to call _handleResult or _handleNoResult

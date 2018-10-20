@@ -36,7 +36,6 @@
 #include "map/mapData.h"
 #include "map/mapDB.h"
 #include "map/mapHostMessages.h"
-#include "map/mapMinuteBalance.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapThreads.h"
@@ -1263,7 +1262,6 @@ main(int argc, const char* argv[])
 			mapSendChatUpdates
 		,	mapProcessLogins
 		,	mapSendHCUpdates
-		,	mapChargeMinutes
 		,	nullptr
 		};
 		static Housekeeper housekeeper(functions);
