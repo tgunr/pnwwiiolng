@@ -485,10 +485,8 @@ _errExit(const WWII_ERROR_INFO& info, const Player& player, const UINT32 platfor
 	}
 
 	std::string error = info.data.piExitInfo.errorMessage.string;
-//	DB::handle_t* conn = threadsOpenDBConnection(false);
 	DBThread::EscapeString(src);
 	DBThread::EscapeString(error);
-//	threadsCloseDBConnection(conn);
 
 	player.log(_FLN, "Received PIEXIT ver %s exit info type %u at %s:%u: %s"
 						, clientVersion, info.errorType
