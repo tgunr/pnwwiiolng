@@ -141,6 +141,18 @@ strtEnemyLink(CPStruct& cp, bool state)
 	}
 }
 
+void
+strtFrontlineLink(CPStruct& cp, bool state)
+{
+	cp.m_frontlineLinked = state;
+	if (state)
+		cp.flags |= CP_STAT_FRONTLINE_LINKED;
+	else
+	{
+		cp.flags &= ~CP_STAT_FRONTLINE_LINKED;
+	}
+}
+
 static inline void
 _checkSupplyLinksIn(const Supercell& sc)
 {
@@ -791,6 +803,7 @@ _checkCPLinks()
 		cp->numLinks = 0;
 		cp->numOpenLinks = 0;
 		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
 
 		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]
 			; facility != nullptr
@@ -822,6 +835,11 @@ _checkCPLinks()
 
 				facility->m_outgoingLink->setEnabled(false);
 				facility->m_incomingLink->setEnabled(false);
+			}
+			if ((otherCP->ControllingSide() == cp->ControllingSide()) && otherCP->m_townstatus == FRONT_LINE)
+			{
+				strtFrontlineLink(*cp, true);
+				cp->m_townstatus = RESERVE;
 			}
 		}
 
@@ -896,10 +914,10 @@ _setTownStatus()
 	}
 
   	dbugLog(_FLN, "finished town status inits for %u front line cps", totalFL);
-	dbugLog(_FLN, "finished town status inits for %u back line cps", totalBL);
-	dbugLog(_FLN, "finished town status inits for %u rear line cps", totalRL);
+	dbugLog(_FLN, "finished town status inits for %u reserve cps", totalBL);
+	dbugLog(_FLN, "finished town status inits for %u back line cps", totalRL);
 	dbugLog(_FLN, "finished town status inits for %u inactive cps", totalIN);
-	dbugLog(_FLN, "finished town status inits for %u cps", totalChecked);
+	dbugLog(_FLN, "finished town status inits for %u total cps", totalChecked);
 }
 
 static void

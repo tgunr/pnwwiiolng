@@ -165,7 +165,7 @@ CPRenderer::CPRenderer()
 	showcps = showcivilian = showarmy = showairforce = shownavy = showdepots = showbridges = true;
 	shownames = showcpnames = showfacnames = false;
 	showicons = showflags = showclutter = true;
-	showsmallcps = showlargecps = showews = showfront = showrear = showairfields = showports = true;
+	showsmallcps = showlargecps = showews = showfront = showreserve = showbackline = showrear = showairfields = showports = true;
 	showobjectives = showbrigades = showdeployments = showorders = showmydivision = true;
 
 	playerposx = playerposy = 0;
@@ -239,6 +239,10 @@ void CPRenderer::FilterStrat(const char* name, const unsigned char* value)
 		showews = phui::UIXMLbool(value);
 	else if(strcmp("showfront", name) == 0)
 		showfront = phui::UIXMLbool(value);
+	else if (strcmp("showreserve", name) == 0)
+		showreserve = phui::UIXMLbool(value);
+	else if (strcmp("showbackline", name) == 0)
+		showbackline = phui::UIXMLbool(value);
 	else if(strcmp("showrear", name) == 0)
 		showrear = phui::UIXMLbool(value);
 	else if(strcmp("showairfields", name) == 0)
@@ -968,16 +972,20 @@ bool CPMapObject::ObjectVisible() const
 {
 	unsigned int cpflags = _cp.StratFlags(true);
 	return _mouseover || _selected || _childselected || _renderer->showcps ||
-		   (_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
-		   (_renderer->showfront && cpflags & CP_STAT_ENEMY_LINKED) ||
-		   (_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
-		   (_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
-		   (_renderer->showbrigades && _bestunit) ||
-		   (_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
-		   (_renderer->showports && cpflags & CP_STAT_HAS_NAVYBASE) ||
-		   (_renderer->showdeployments && cpflags & (CP_STAT_HAS_RARE_NAVY | CP_STAT_HAS_RARE_AIR | CP_STAT_HAS_RARE_INF)) ||
-		   (_renderer->showorders && cpflags & (CP_STAT_OWN_HAAC | CP_STAT_FALLBACK | CP_STAT_OVERRUN)) ||
-		   (_renderer->showmydivision && _mybase);
+		(_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
+		(_renderer->showfront && cpflags & CP_STAT_ENEMY_LINKED) ||
+		(_renderer->showreserve && cpflags & CP_STAT_FRONTLINE_LINKED) ||
+//		(_renderer->showbackline && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ||
+//		(_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
+		(_renderer->showbackline && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
+		(_renderer->showrear && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED))) ||
+		(_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
+		(_renderer->showbrigades && _bestunit) ||
+		(_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
+		(_renderer->showports && cpflags & CP_STAT_HAS_NAVYBASE) ||
+		(_renderer->showdeployments && cpflags & (CP_STAT_HAS_RARE_NAVY | CP_STAT_HAS_RARE_AIR | CP_STAT_HAS_RARE_INF)) ||
+		(_renderer->showorders && cpflags & (CP_STAT_OWN_HAAC | CP_STAT_FALLBACK | CP_STAT_OVERRUN)) ||
+		(_renderer->showmydivision && _mybase);
 }
 
 bool CPMapBridgeObject::ObjectVisible() const

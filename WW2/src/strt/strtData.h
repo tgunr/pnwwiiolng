@@ -42,6 +42,7 @@ extern void strtAddFacilityoid(FacilityStruct* newEntry, UINT16 entryNum);
 //tolua_begin
 
 extern void strtEnemyLink(CPStruct& cp, bool state);
+extern void strtFrontlineLink(CPStruct& cp, bool state);
 
 extern void strtResetObject(ObjectStruct& object);
 

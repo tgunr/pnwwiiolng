@@ -106,6 +106,7 @@ struct CSAFE_CPStruct
 
 	bool 				m_contention;
 	bool 				m_enemyLinked;
+	bool 				m_frontlineLinked;
 	bool				isUnderAttack;
 	bool				m_friendlyLinked;
 	bool				m_isSupplyCenter;
@@ -258,6 +259,7 @@ public:
 
 	bool isContested() const { return m_contention; }
 	bool isEnemyLinked() const { return m_enemyLinked; }
+	bool isFrontlineLinked() const { return m_frontlineLinked; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
 	LinkStruct* link(UINT32 i) const;

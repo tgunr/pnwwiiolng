@@ -1303,7 +1303,8 @@ TOLUA_API int tolua_strt_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"CP_STAT_HAS_RARE_GROUND",CP_STAT_HAS_RARE_GROUND);
    tolua_constant(tolua_S,"CP_STAT_HAS_RARE_NAVY",CP_STAT_HAS_RARE_NAVY);
    tolua_constant(tolua_S,"CP_STAT_HAS_RARE_AIR",CP_STAT_HAS_RARE_AIR);
-   tolua_constant(tolua_S,"CP_STAT_ENEMY_LINKED",CP_STAT_ENEMY_LINKED);
+   tolua_constant(tolua_S,"CP_STAT_ENEMY_LINKED", CP_STAT_ENEMY_LINKED);
+   tolua_constant(tolua_S,"CP_STAT_FRONTLINE_LINKED", CP_STAT_FRONTLINE_LINKED);
    tolua_constant(tolua_S,"CP_STAT_OWN_HAAC",CP_STAT_OWN_HAAC);
    tolua_constant(tolua_S,"CP_STAT_FALLBACK",CP_STAT_FALLBACK);
    tolua_constant(tolua_S,"CP_STAT_OVERRUN",CP_STAT_OVERRUN);
