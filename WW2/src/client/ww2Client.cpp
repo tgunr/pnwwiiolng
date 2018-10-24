@@ -3607,10 +3607,12 @@ void HostState::Update()
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connecting", DisplayName());
 			break;
 			case CONNECTED:
-                if (hostType == Teul::Connection::Cell)
-                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(), connection->m_serverAddr.m_hostIP - (parent->connection->m_serverAddr.m_hostIP & 0xff));
-                else
+                if (hostType == Teul::Connection::Cell) {
+                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(),
+                        (connection->m_serverAddr.m_hostIP & 0xff) - (parent->connection->m_serverAddr.m_hostIP & 0xff));
+                } else {
                     uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected", DisplayName());
+                }
                 break;
 			case FATAL:
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: fatal condition", DisplayName());
