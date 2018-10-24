@@ -583,7 +583,6 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 void
 CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 {
-	FacilityStruct* facility;
 	TOWN_STATUS oldStatus = cp->m_townstatus;
 	TOWN_STATUS newStatus = INACTIVE;
 //	dbugLog(_FLN, "1: Town status check for %s. Current town status: %d.", cp->name, oldStatus);
@@ -602,18 +601,16 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 			//Linked town is enemy
 			newStatus = FRONT_LINE;
 		}
-		else
-			if (otherCP->m_townstatus == FRONT_LINE)
-			{
-				if (newStatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
-					newStatus = RESERVE;
-			}
-			else
-				if (otherCP->m_townstatus == RESERVE)
-				{
-					if (newStatus != FRONT_LINE && newStatus != RESERVE) //Dont change to lower status if higher status has been detected
-						newStatus = BACK_LINE;
-				}
+		else if (otherCP->m_townstatus == FRONT_LINE)
+		{
+			if (newStatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
+				newStatus = RESERVE;
+		}
+		else if (otherCP->m_townstatus == RESERVE)
+		{
+			if (newStatus != FRONT_LINE && newStatus != RESERVE) //Dont change to lower status if higher status has been detected
+				newStatus = BACK_LINE;
+		}
 	}
 
 	if (newStatus == BACK_LINE) //Set to INACTIVE if no airfield or naval base
@@ -630,7 +627,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 
 	if (newStatus != oldStatus || justCaptured) //Capture or change of town status must trigger check of linked towns
 	{
-		//	RefreshTownGarrisonDisplay(Town) //mikemudd - Haven't considered this yet
+		//	Refresh Town Garrison Display mikemudd - Haven't considered this yet
 		justCaptured = false;
 
 		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it)
