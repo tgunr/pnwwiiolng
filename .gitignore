@@ -1293,6 +1293,7 @@ WW2/proj/win/teulKit/[Bb]in
 WW2/proj/win/teulKit/[Dd]ebug
 WW2/proj/win/teulKit/[Rr]elease
 WW2/proj/win/teulKit/obj
+WW2/proj/win/x64
 WW2/src/*.cc
 WW2/src/*.cmake
 WW2/src/*.html

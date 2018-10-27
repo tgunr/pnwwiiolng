@@ -86,6 +86,40 @@ static void AddArchives();
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
 
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+	DWORD neededLen = 0;
+	
+	if (CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			nullptr, &neededLen
+	)) {
+		std::string str(neededLen, 0);
+		
+		CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			const_cast<LPSTR>(str.data()), &neededLen);
+		return str;
+	} else {
+		return "";
+	}
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+	DWORD localLength = static_cast<DWORD>(*ioBufferLength);
+	if (CryptStringToBinaryA(
+		input.data(), 0, CRYPT_STRING_BASE64,
+		reinterpret_cast<BYTE *>(outputBuffer), &localLength, nullptr, nullptr
+	)) {
+		*ioBufferLength = static_cast<size_t>(localLength);
+		return true;
+	}
+	return false;
+}
+
 void decompressStatus (SINT32 archive_index)
 {
 	if (archive_index < 0)

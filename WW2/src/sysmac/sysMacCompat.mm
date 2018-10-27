@@ -1,5 +1,4 @@
 /* $Id: sysMacCompat.mm 2136 2009-11-16 03:27:03Z ahwulf@CRS $ */
-//#include <Carbon/Carbon.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -269,3 +268,20 @@ static void testHttpRequests()
 		dbugLog(_FLI, "UNIT_TEST: testHttpRequests: jsonplaceholder POST: FAILED");
 }
 #endif
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+    return [[NSData dataWithBytesNoCopy:const_cast<void *>(buffer) length:bufferLength] base64EncodedStringWithOptions:0].UTF8String;
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+    NSData *decoded = [[NSData alloc] initWithBase64EncodedString:[NSString stringWithUTF8String:input.data()] options:0];
+    
+    if (decoded) {
+        [decoded getBytes:outputBuffer length:std::min(*ioBufferLength, static_cast<size_t>(decoded.length))];
+        *ioBufferLength = std::min(*ioBufferLength, static_cast<size_t>(decoded.length));
+        return true;
+    }
+    return false;
+}
