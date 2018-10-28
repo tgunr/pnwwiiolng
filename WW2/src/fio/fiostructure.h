@@ -33,22 +33,6 @@
 using wwiiolpath_string = std::wstring;
 //  using wwiiolpath_string = std::u16string;
 
-enum enumfiostructure
-{
-							//  ??_ = WW2_: WW2.exe,    ST_: setup.exe,    PG_: Playgate.exe
-	IS_EXE_PATH,			//	??_exePath - Windows - EXE ROOT folder:  \Program * Files -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-							//	??_exePath - macOS - EXE ROOT folder:  /Applications/WWIIOnline(package) == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
-	IS_EXE_DATA_PATH,		//	??_exeDataPath - EXE Support Data folder:  \Program * Files -> WWIIOnLine -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir).
-	IS_EXE_DOCS_PATH,		//	??_exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> doc == eula.txt, license.*, regions.txt, tos.txt.
-	IS_EXE_PLAYARC_PATH,	//	??_exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
-	IS_EXE_WORKING_PATH,	//	??_exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-							//	??_exeWorkingPath - macOS - EXE Working folder:  /Library/Application Support//WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-	IS_USER_DOCUMENTS_PATH,	//	??_userDocumentsPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
-							//	??_userDocumentsPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
-	IS_USER_WORKING_PATH,	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
-	IS_ALL_PATHS			//  All of the folders.
-};
-
 LOGICAL fioStructureInit();
 LOGICAL fioStructureVerify();
 unsigned long Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit);
@@ -59,6 +43,7 @@ void GetWC(const char *sourceString, wwiiolpath_string &destinationString);
 wwiiolpath_string fioGetCurrentWorkingPath();
 LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath);
 void fioStructureForwadDeclare();  //  Dosnt "DO" anything.
+wwiiolpath_string SQL_DateTimeStamp();  //  Returns an SQL Formatted Date/Time Stamp string. YYYYMMDD-HHMMSS
 bool CopyOldSetupFiles_WIN();
 bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function);  //  Used within CopyOldSetupFiles_WIN().
 
