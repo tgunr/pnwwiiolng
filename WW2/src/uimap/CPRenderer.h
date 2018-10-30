@@ -174,7 +174,7 @@ public:
 
 	virtual void MessageReceived(phui::Message* m, phui::MessageHandler* reply);
 
-	bool showsmallcps, showlargecps, showews, showfront, showreserve, showbackline, showrear, showairfields, showports;
+	bool showsmallcps, showlargecps, showews, showfrontline, showbackline, showreserve, showrear, showairfields, showports;
 	bool showobjectives, showbrigades, showdeployments, showorders, showmydivision;
 	bool showcps, showcivilian, showarmy, showairforce, shownavy, showdepots, showbridges;
 	bool shownames, showcpnames, showfacnames, showicons, showflags, showclutter;

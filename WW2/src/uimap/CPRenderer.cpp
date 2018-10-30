@@ -165,7 +165,7 @@ CPRenderer::CPRenderer()
 	showcps = showcivilian = showarmy = showairforce = shownavy = showdepots = showbridges = true;
 	shownames = showcpnames = showfacnames = false;
 	showicons = showflags = showclutter = true;
-	showsmallcps = showlargecps = showews = showfront = showreserve = showbackline = showrear = showairfields = showports = true;
+	showsmallcps = showlargecps = showews = showfrontline = showbackline = showreserve = showrear = showairfields = showports = true;
 	showobjectives = showbrigades = showdeployments = showorders = showmydivision = true;
 
 	playerposx = playerposy = 0;
@@ -237,12 +237,12 @@ void CPRenderer::FilterStrat(const char* name, const unsigned char* value)
 		showlargecps = phui::UIXMLbool(value);
 	else if(strcmp("showews", name) == 0)
 		showews = phui::UIXMLbool(value);
-	else if(strcmp("showfront", name) == 0)
-		showfront = phui::UIXMLbool(value);
-	else if (strcmp("showreserve", name) == 0)
-		showreserve = phui::UIXMLbool(value);
+	else if(strcmp("showfrontline", name) == 0)
+		showfrontline = phui::UIXMLbool(value);
 	else if (strcmp("showbackline", name) == 0)
 		showbackline = phui::UIXMLbool(value);
+	else if (strcmp("showreserve", name) == 0)
+		showreserve = phui::UIXMLbool(value);
 	else if(strcmp("showrear", name) == 0)
 		showrear = phui::UIXMLbool(value);
 	else if(strcmp("showairfields", name) == 0)
@@ -731,14 +731,28 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					case WWII_USA:
 					case WWII_FRANCE:
 					{
-						_bestuniticon = _renderer->animFlagIcons[unit->country()];
-
-						if(alliedUnit)
-							_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
+						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
+						// Take into account the player's map preference settings aswell
+						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
+							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)))
+						{
+							_bestuniticon = _renderer->animFlagIcons[unit->country()];
+							
+							if(alliedUnit)
+								_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
+						}
 					}
 					break;
 					case WWII_GERMANY:
-						_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
+						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
+						// Take into account the player's map preference settings aswell
+						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
+							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)))
+						{
+							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
+						}
 					break;
                     default:
                         // No other valid countries right now
@@ -973,7 +987,7 @@ bool CPMapObject::ObjectVisible() const
 	unsigned int cpflags = _cp.StratFlags(true);
 	return _mouseover || _selected || _childselected || _renderer->showcps ||
 		(_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
-		(_renderer->showfront && cpflags & CP_STAT_ENEMY_LINKED) ||
+		(_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) ||
 		(_renderer->showreserve && cpflags & CP_STAT_FRONTLINE_LINKED) ||
 //		(_renderer->showbackline && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ||
 //		(_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
