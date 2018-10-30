@@ -911,6 +911,25 @@ _setTownStatus()
 			totalFL++;
 			dbugLog(_FLN, "Set FRONT_LINE town status init for %s", cp->name);
 		}
+		switch(cp->m_townstatus) 
+		{
+			case FRONT_LINE:
+				strtEnemyLink(*cp, true);
+				strtFrontlineLink(*cp, false);
+				break;
+			case RESERVE:
+				strtEnemyLink(*cp, false);
+				strtFrontlineLink(*cp, true);
+				break;
+			case INACTIVE:
+				strtEnemyLink(*cp, false);
+				strtFrontlineLink(*cp, false);
+				break;
+			case BACK_LINE:
+				strtEnemyLink(*cp, false);
+				strtFrontlineLink(*cp, false);
+				break;
+		}
 	}
 
   	dbugLog(_FLN, "finished town status inits for %u front line cps", totalFL);
