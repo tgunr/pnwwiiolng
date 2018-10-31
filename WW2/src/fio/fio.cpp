@@ -26,17 +26,19 @@ void fioInit()
 {
     LOGICAL resultValue = FALSE;
     
+    resultValue = fioStructureInit();
+    
     // Default to current directory
 #if platOS == OS_WIN32
     
     //  \User -> My Documents -> WWIIOnLine
-    resultValue = fioStructureInit();
+    //  resultValue = fioStructureInit();
     resultValue = SetCurrentDirectoryW(WW2_userDocumentsPath.c_str());
 
 #elif platOS == OS_MACOS
     
     //  /Users -> "currentuser" -> Documents -> WWIIOnline
-    resultValue = fioStructureInit();
+    //  resultValue = fioStructureInit();
     //  resultValue = fioSetCurrentWorkingPath(WW2_userDocumentsPath);
 
 #endif

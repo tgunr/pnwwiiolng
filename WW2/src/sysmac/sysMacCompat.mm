@@ -72,6 +72,16 @@ char GetOSBuild()
     return 0;
 }
 
+static NSString* WStringToNSString ( const std::wstring& Str )
+{
+    //  Convert std::wstring (wwiiolpath_string) to NSString.
+    NSString* pString = [ [ NSString alloc ]
+                         initWithBytes : (char*)Str.data()
+                         length : Str.size() * sizeof(wchar_t)
+                         encoding : CFStringConvertEncodingToNSStringEncoding ( kCFStringEncodingUTF32LE ) ];
+    return pString;
+}
+
 bool CopyOldSetupFiles_MAC()
 {
     bool copyFiles = false;
@@ -97,6 +107,7 @@ bool CopyOldSetupFiles_MAC()
     //  dbugLog(_FLI, "Old Settings - Checking for the presence of Old Game Settings.");
     //  Write_Debug("Old Settings - Checking for the presence of Old Game Settings.");
 
+    
     //  Create a folder copy date/time stamp.  =================================================
     time_t rawtime;
     struct tm * timeinfo;
@@ -210,6 +221,36 @@ bool CopyOldSetupFiles_MAC()
     }
     
     return copyFiles;
+}
+
+int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int AlertNumber = 0)
+{
+    //  NSAlertStyleWarning = 0,
+    //  NSAlertStyleInformational = 1,
+    //  NSAlertStyleCritical = 2   
+    
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    alert.messageText = WStringToNSString(boxTitle);
+    alert.informativeText = WStringToNSString(boxMessage);
+    
+    switch (AlertNumber)
+    {
+        case 1:
+            alert.alertStyle = NSAlertStyleInformational;
+            break;
+        case 2:
+            alert.alertStyle = NSAlertStyleCritical;
+            break;
+        default:
+            //  case 0
+            alert.alertStyle = NSAlertStyleWarning;
+            break;
+    }
+    
+    [alert runModal];
+    
+    return 0;
 }
 
 const char* macPreferencesPath()
@@ -424,6 +465,39 @@ const char* macUserWorkingPath()
                              error:nullptr];
             targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
             targetPathDir = [targetPathDir URLByAppendingPathComponent:@"bin"];
+            
+            // We're giving the docs folder the permissions it would otherwise have
+            // gotten by default here. Would 0750 or 0700 be a better choice?
+            [[NSFileManager defaultManager]
+                createDirectoryAtURL:targetPathDir
+                withIntermediateDirectories:YES
+                attributes:@{NSFilePosixPermissions: @(0755)
+            }
+             error:nullptr];
+            targetPathFSR = strdup(targetPathDir.fileSystemRepresentation);
+        }
+    });
+    
+    return targetPathFSR;
+}
+
+const char* macUserScreenShotsPath()
+{
+    //  /Users -> "currentuser" -> Documents -> WWIIOnline -> screenshots
+    static NSURL *targetPathDir = nil;
+    static const char *targetPathFSR = nullptr;
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        @autoreleasepool {
+            targetPathDir = [[NSFileManager defaultManager]
+                             URLForDirectory:NSDocumentDirectory
+                             inDomain:NSUserDomainMask
+                             appropriateForURL:nil
+                             create:YES
+                             error:nullptr];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            targetPathDir = [targetPathDir URLByAppendingPathComponent:@"screenshots"];
             
             // We're giving the docs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
