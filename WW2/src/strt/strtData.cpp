@@ -827,6 +827,7 @@ _checkCPLinks()
 			}
 			else
 			{
+				// Find towns that are not of the same side but linked, thus making them Frontline
 				if (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)	// Russia is neutral-hostile
 				{
 					strtEnemyLink(*cp, true);
@@ -836,7 +837,9 @@ _checkCPLinks()
 				facility->m_outgoingLink->setEnabled(false);
 				facility->m_incomingLink->setEnabled(false);
 			}
-			if ((otherCP->ControllingSide() == cp->ControllingSide()) && otherCP->m_townstatus == FRONT_LINE)
+			
+			// Find the Reserve towns by looking for towns that have the same side and where the otherCP is a Frontline town and where the town is not Frontline 
+			if ((otherCP->ControllingSide() == cp->ControllingSide()) && (otherCP->m_townstatus == FRONT_LINE) && (cp->m_townstatus != FRONT_LINE))
 			{
 				strtFrontlineLink(*cp, true);
 				cp->m_townstatus = RESERVE;
