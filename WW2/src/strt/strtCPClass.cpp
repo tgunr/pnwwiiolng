@@ -604,23 +604,23 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 		else if (otherCP->m_townstatus == FRONT_LINE)
 		{
 			if (newStatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
-				newStatus = RESERVE;
-		}
-		else if (otherCP->m_townstatus == RESERVE)
-		{
-			if (newStatus != FRONT_LINE && newStatus != RESERVE) //Dont change to lower status if higher status has been detected
 				newStatus = BACK_LINE;
+		}
+		else if (otherCP->m_townstatus == BACK_LINE)
+		{
+			if (newStatus != FRONT_LINE && newStatus != BACK_LINE) //Dont change to lower status if higher status has been detected
+				newStatus = RESERVE;
 		}
 	}
 
-	if (newStatus == BACK_LINE) //Set to INACTIVE if no airfield or naval base
+	if (newStatus == RESERVE) //Set to INACTIVE if no airfield or naval base
 	{
 		newStatus = INACTIVE;
 
 		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
-			newStatus = BACK_LINE;
+			newStatus = RESERVE;
 		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
-			newStatus = BACK_LINE;
+			newStatus = RESERVE;
 	}
 
 	cp->m_townstatus = newStatus;
