@@ -565,18 +565,20 @@ LOGICAL fioStructureInit()
 			exePlayarcPathSet = TRUE;
 		}
 		else
-            //  if errno = ENOENT - Path was not found.
-            //  This should NOT happen.
-            //  Unable to locate: Program * Files -> CRS -> WWIIOnLine -> playarc directory.
+		{
+			//  if errno = ENOENT - Path was not found.
+			//  This should NOT happen.
+			//  Unable to locate: Program * Files -> CRS -> WWIIOnLine -> playarc directory.
 #if EXE_BUILD != BUILD_EXE_SETTINGS
-            dbugLog(_FLA, "&HFFF6 - Unable to locate: Program * Files -> CRS -> WWIIOnLine -> playarc directory.  Aborting.  This should NOT Happen.");
+			dbugLog(_FLA, "&HFFF6 - Unable to locate: Program * Files -> CRS -> WWIIOnLine -> playarc directory.  Aborting.  This should NOT Happen.");
 #endif
-        exePlayarcPath = L"";
-        exePlayarcPathSet = FALSE;
-        fioStructureInit_Value = FALSE;
-        
-        //  NO FALLBACK
-        goto ERR_EXIT_POINT;
+			exePlayarcPath = L"";
+			exePlayarcPathSet = FALSE;
+			fioStructureInit_Value = FALSE;
+
+			//  NO FALLBACK
+			goto ERR_EXIT_POINT;
+		}
     }
 	else
 	{
