@@ -493,8 +493,8 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 				,	cp->numLinks
 				,	((cp->isSupplied()) ? "Yes" : "No")
 				,	(cp->isEnemyLinked()) ? "Frontline" : ""
-				,	(cp->isFrontlineLinked()) ? "Backline" : ""
-				,	(cp->flags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ? "Reserve" : ""
+				,	((!cp->isEnemyLinked()) & cp->isFrontlineLinked()) ? "Backline" : ""
+				,	(!(cp->flags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ? "Reserve" : ""
 				,	(!(cp->flags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ? "Inactive" : ""
 	);
 	if ( cp->isUnderAttack )
