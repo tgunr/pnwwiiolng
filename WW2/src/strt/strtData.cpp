@@ -946,7 +946,7 @@ _setTownStatus()
 		}
 		else
 		{
-			cp->m_townstatus == INACTIVE;
+			cp->m_townstatus = INACTIVE;
 		}
 
 		switch(cp->m_townstatus) 
