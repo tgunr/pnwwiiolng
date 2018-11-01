@@ -882,9 +882,13 @@ _setTownStatus()
 
 		//Default status is INACTIVE. Set status to BACK_LINE if there is an air base or a naval base
 		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+		{
 			hasAirOrNavalbase = true;
+		}
 		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
+		{
 			hasAirOrNavalbase = true;
+		}
 
 		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
 		{
@@ -904,16 +908,17 @@ _setTownStatus()
 			if (otherCP->m_townstatus == FRONT_LINE)
 			{
 				if (cp->m_townstatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
+				{
 					cp->m_townstatus = BACK_LINE;
+				}
 			}
 			if (otherCP->m_townstatus == BACK_LINE)
 			{
 				if (cp->m_townstatus != FRONT_LINE && cp->m_townstatus != BACK_LINE) //Dont change to lower status if higher status has been detected
+				{
 					cp->m_townstatus = RESERVE;
+				}
 			}
-
-
-
 
 /*
 			if (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)	// Russia is neutral-hostile
@@ -936,9 +941,13 @@ _setTownStatus()
 */
 		}
 		if (linkDetected)
+		{
 			totalLinked++;
+		}
 		else
+		{
 			cp->m_townstatus == INACTIVE;
+		}
 
 		switch(cp->m_townstatus) 
 		{
