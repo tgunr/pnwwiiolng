@@ -8,6 +8,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "wwii/wwiiRTBCodes.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 extern SINT32 strtInstallMapCallbacks();
 
@@ -42,3 +43,5 @@ extern SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, con
 
 extern SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join);
 
+// This function sends a Garrison country change request to the strat system.
+SINT32 strtSendGarrisonCountryChangeRequest(GarrisonCountryChangeReq& garrisonCountryChangeReq);

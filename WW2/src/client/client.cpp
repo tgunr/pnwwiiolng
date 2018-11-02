@@ -28,6 +28,7 @@
 #include "map/mapSwingMeter.h"
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 namespace Chat
 {
@@ -319,6 +320,15 @@ SINT32 MissionList::receive(SINT32 teulIndex)
 	return 0;
 }
 
+SINT32 GarrisonCountryChangeReq::receive(SINT32 teulIndex)
+{
+	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
+	if (client)
+		client->ProcessGarrisonCountryChangeReq(*this);
+
+	return 0;
+}
+
 void ResupplyIssue::process()
 {
 	// call fps stuff here
@@ -352,6 +362,26 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 
 	for ( UINT32 i = 0; i < incoming.size(); ++i )
 		client->ProcessHCUnitLocation(incoming.data(i));
+
+	incoming.clear();
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Receive a map HCUnit Locations message
+
+template<>
+SINT32 HC_UNIT_COUNTRY_CHANGES::receive(SINT32 teulIndex, HC_UNIT_COUNTRY_CHANGES& incoming)
+{
+	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
+	if (!client)
+		return 0;
+
+	Write_Debug("Receiving %u incoming unit country change", incoming.size());
+
+	for (UINT32 i = 0; i < incoming.size(); ++i)
+		client->ProcessHCUnitCountryChange(incoming.data(i));
 
 	incoming.clear();
 

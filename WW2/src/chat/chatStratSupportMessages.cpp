@@ -177,7 +177,8 @@ chatSendSCMDResult(SINT32 playerID
 }
 
 //////////////////////////////////////////////////////////////////////
-
+// Used by the stratd host
+//////////////////////////////////////////////////////////////////////
 void
 chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 {
@@ -190,6 +191,21 @@ chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 		if ( endpoint != nullptr )
 			outgoing.send(*endpoint);
 	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Used by the stratd host 
+//////////////////////////////////////////////////////////////////////
+void stratSendGarrisonCountryChange(GARRISON_COUNTRY_CHANGE_MSG & outgoing)
+{
+	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST);
+	if (endpoint != nullptr)
+		outgoing.send(*endpoint);
+
+	endpoint = serverPeerEndpointByType(MAP_HOST);
+	if (endpoint != nullptr)
+		outgoing.send(*endpoint);
+
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -263,7 +279,7 @@ BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* 
 	}
 
 	// If actionable is set, then we actually want to move the brigade
-	if ( m_actionable )
+	if (m_actionable)
 		return unit->move(callsign, cp);
 
 	// Otherwise, the caller just wants to know if its allowed
@@ -271,6 +287,38 @@ BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* 
 	dbugLog(_FLI, "%s/%s->%s: deploy permission = %u", callsign, unit->callsign(), cp->name, bmr);
 
 	return bmr;
+}
+
+
+// Used by Strat host
+template<>
+SINT32
+GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+{
+	if (incoming.action() != EXCHANGE) // We should only get exchanges
+	{
+		dbugLog(_FLA, "Invalid Unit country change msg");
+		return -EINVAL;
+	}
+
+	incoming.data().process(incoming.data().m_brigadeID, incoming.data().m_newCountryId);
+
+	return 0;
+}
+
+// Used by Strat host
+void
+GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
+{
+	HCUnit* hcUnit = HCUnit::Lookup(unitID);
+	if (hcUnit != nullptr)
+	{
+		hcUnit->setCountry(country);
+	}
+	else
+	{
+		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -287,6 +335,8 @@ chatInstallStratSupportCallbacks()
 		REGISTER_SENDER(Chat::EXCHANGE_SCMD_Y, _sendSCMDResult, _SEND_SCMD_RESULT);
 
 		REGISTER_MSG(Chat::BRIGADE_MOVE_Y, BRIGADE_MOVE_MSG);
+
+		REGISTER_MSG(Chat::GARRISON_COUNTRY_Y, GARRISON_COUNTRY_CHANGE_MSG);
 	}
 	END_CALLBACK_REGISTRATION(CHAT_X)
 }

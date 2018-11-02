@@ -56,6 +56,8 @@
 #include "include/logging.h"
 #include "teul/teulMicroWebServer.h"
 
+#include "chat/chatBrigadeMove.h"
+
 static std::mutex s_sidecountMutex;
 
 UINT64 brigadeMovementWatermark = 0LL;
@@ -2329,4 +2331,53 @@ mapPlayerInit()
 	g_logins.clear();
 
 	Teul::uWeb::s_debugServer.addVirtualFile("Player counts", "/player-balance.json", _reportPlayerDetails);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Send a Unit country change to this player.
+bool
+_sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country)
+{
+	HCUnitCountryChange entry;
+
+		entry.m_unitID = *unitID;
+		entry.m_country = *country;
+	
+		static HC_UNIT_COUNTRY_CHANGES _packet;
+		_packet.add(entry);
+
+		if (_packet.size() > 0)
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s sending a unit country change."
+				, player->teulIndex()
+				, player->playerID()
+				, player->callsign()
+			);
+			_packet.send(player->teulIndex());
+		}
+		_packet.clear();
+		return true;
+}
+
+// Map host calls this.
+void
+GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
+{
+	HCUnit* hcUnit = HCUnit::Lookup(unitID);
+	if (hcUnit != nullptr)
+	{
+		// Alter our copy of the change.
+		hcUnit->setCountry(country);
+
+		// Send the change to all connected players.
+		for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
+		{
+			Player* const player = (Player*)(*it);
+			_sendHCUnitCountryChange(player, &unitID, &country);
+		}
+	}
+	else
+	{
+		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+	}
 }

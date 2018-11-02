@@ -279,10 +279,10 @@ CaptureAction::ChangeOwner()
 	{
 		m_leftContention = true;
 
-		if ( m_cp.side != m_newSide )
-		{
+		//if ( m_cp.side != m_newSide )
+		//{
 			m_setOwner = true;
-		}
+		//}
 	}
 	else if ( m_cp.isContested() == false && m_cp.facilitiesOwned[m_newSide] == 1 )
 	{
@@ -466,6 +466,9 @@ CaptureAction::SetControl() const
 							, facility->name, facility->uOID
 							, m_cp.controllingSide);
 					strtCloseBase(*facility);
+
+					// Disable the Garrison
+					m_cp.disableAllGarrisons();
 				}
 				else
 				{
@@ -479,6 +482,8 @@ CaptureAction::SetControl() const
 					{
 						strtCloseBase(*facility);
 						strtOpenBase(*facility);
+						// Enable the Garrison
+						m_cp.enableAllGarrisons();
 					}
 				}
 
@@ -545,6 +550,21 @@ CaptureAction::LeaveContention() const
 	strtSaveCP(&m_cp);
 }
 
+void HCUnit::GetGarrisonUnits(std::list<HCUnit>& unitsList, UINT16 cpID)
+{
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID().id == cpID)
+			{
+				unitsList.push_back(*it->second);
+			}
+		}
+	}
+}
+
+
 //////////////////////////////////////////////////////////////////////
 // Finish the capture event.
 
@@ -589,6 +609,11 @@ CaptureAction::ApplyEffects() const
 				strtCloseFirebase(*(link->firebase));
 			}
 		}
+
+		// Change the country of all Garrisons in this cp
+		// Sends it to chat and map hosts, map sends it to all clients.
+		m_cp.changeAllGarrisonCountries(m_newCountry);
+
 	}
 
 	// Now that we are clear of brigades, we need to process the

@@ -63,11 +63,16 @@ public:
 	// Broadcast our current location to other servers.
 	void announceHome() const;
 
+	void announceGarrisonCountryChange() const;
+
 	// Check if we can deploy to a specific CP (not a manual move)
 	bool canDeployTo(const CPStruct* cp) const { return deployPermission(cp, false) == BMR_APPROVED; }
 
 	// Reset the unit to its original position and spawn lists.
 	void reset();
+
+	// reset Garrison supply (Initiates the trickle timer)
+	void restartGarrisonSupply();
 
 	// Write this stuff to the database
 	void save() const;
@@ -161,9 +166,12 @@ public:
 	bool offMap() const { return ( !homeCP() || homeCP() == routDestination[country()] ); }
 //tolua_end
 	const TOE_::TemplateHeader* toeTemplateHeader() const { return m_toeTemplateHeader; }
+	TOE_::TemplateHeader* toeTemplateHeader() { return m_toeTemplateHeader; }
+	void setToeTemplateHeader(TOE_::TemplateHeader* toeTemplate) { m_toeTemplateHeader = toeTemplate; }
 	const TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon) const;
 	TOE_::WeaponInstance* toeWeaponInstance(const WEAPON_SPEC weapon);
 	const TOE& toe() const { return m_toe; }
+	TOE& toe() { return m_toe; }
 //tolua_begin
 
 	void checkThrottleWindows(const FacilityStruct* facility) const;
@@ -178,6 +186,8 @@ public:
 //tolua_end
 	void addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate);
 
+	void clearTOEInstance();
+
 	void CheckResupplyStatus(bool fullCheck);
 
 	bool fetchResupplyQueue(std::vector<std::string>& result, UINT32 limit, bool listAll);
@@ -188,6 +198,8 @@ public:
 	ResupplyTicket* createResupplyTicket(TOE_::WeaponInstance& entry, bool isTransfer, UINT32 inSeconds, UINT16 units, POSTED_WEAPON* source=nullptr);
 	// Cancel a resupply ticket for me
 	void cancelResupplyTicket(ResupplyTicket* ticket);
+
+	std::string     getToeTemplateHeaderName() { return m_toeTemplateHeaderName; }
 
 private:
 	CPStruct*				m_homeCP;
@@ -203,6 +215,7 @@ private:
 
 	// Header of the TOE Template we use (or NULL)
 	TOE_::TemplateHeader* 	m_toeTemplateHeader;
+	std::string             m_toeTemplateHeaderName;
 
 	// The actual equipment we have
 	TOE						m_toe;

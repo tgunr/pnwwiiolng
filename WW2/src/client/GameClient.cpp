@@ -1844,3 +1844,31 @@ void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 	}
 }
 
+void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
+{
+	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
+
+	if (unit != nullptr)
+	{
+		if (unit->isGarrison())
+		{
+			if (unitloc.m_country != WWII_NO_COUNTRY)
+			{
+				unit->setCountry(unitloc.m_country);
+
+				//If we have this unit selected then we need to update our selected persona country.
+				if (Client::BrigadeSelected().m_detail.brigadeID() == unitloc.m_unitID)
+				{
+					Client::SetSelectedPersonaCountry(unitloc.m_country);
+					SavePersona(SAVE_COUNTRY);
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
+			}
+		}
+	}
+	else
+	{
+		clientErrorLog("Unit Invalid in country change.");
+	}
+}

@@ -140,7 +140,7 @@ BrigadeMove::process(const ChatHandle byHandle) const
 	switch (m_action)
 	{
 	case BMR_APPROVED:
-		if ( m_actionable )
+		if (m_actionable)
 			_changeHome(byHandle, m_brigadeID, m_destination);
 		else
 			chatBrigadeMoveProposal(m_brigadeID, m_destination, byHandle);
@@ -223,4 +223,20 @@ BrigadeMove::process(const ChatHandle byHandle) const
 		else if ( text )
 			player->message(LSTR_CAUTION, LSTR_GENERIC, text);
 	}
+}
+
+// Chat host uses this to change the country of an HCUnit.
+void
+GarrisonCountryChange::process(const UINT32 unitID, const WWII_COUNTRY country)
+{
+
+		HCUnit* hcUnit = HCUnit::Lookup(unitID);
+		if (hcUnit != nullptr)
+		{
+			hcUnit->setCountry(country);
+		}
+		else
+		{
+			dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+		}
 }

@@ -76,6 +76,7 @@ public:
 	virtual void ProcessBrigadeControl(BrigadeControlList const& entry) override;
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice) override;
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc) override;
+	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc) override;
 	virtual void ProcessInstanceResult(const Instance::Result& result) override;
 	virtual void ProcessInstanceList(const Instance::ClientListing* list) override;
 	virtual void ProcessMissionStatus(const Chat::MissionStatus* const) override;

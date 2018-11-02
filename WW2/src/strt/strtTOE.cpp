@@ -171,6 +171,8 @@ TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 
 	m_subscribers.erase(unit);
 
+	unit->clearTOEInstance();
+
 	toe.clear();
 }
 
@@ -332,5 +334,23 @@ strtSaveTOESupplies()
 		DBSimpleQuery(dbh, buffer);
 
 	toeSaveList.clear();
+}
+
+
+void strtClearTOESaveList(StratHCUnit& unit)
+{
+	for (auto it = toeSaveList.begin(); it != toeSaveList.end();)
+	{
+		TOE_::WeaponInstance& entry = *it->first;
+
+		if (entry.unit().unitID() == unit.unitID())
+		{
+			it = toeSaveList.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 

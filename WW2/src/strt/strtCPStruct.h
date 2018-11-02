@@ -262,6 +262,8 @@ public:
 	bool isFrontlineLinked() const { return m_frontlineLinked; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
+    bool islinkedToAnAO();
+
 	LinkStruct* link(UINT32 i) const;
 	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
 	LinkStruct* linkTo(const CPStruct* rhs) const;
@@ -292,6 +294,15 @@ public:
 	void setSupplyCenter();
 
 	void setRouteing(bool isConnected);
+
+	// Purges the supply and unsubscribes the Toe Template header of all Garrisons in this cp.
+	void removeAllGarrisonsSupply();
+
+	// Changes the country and the toe Template header for all Garrisons in this cp.
+	void changeAllGarrisonCountries(WWII_COUNTRY countryID);
+
+	void disableAllGarrisons();
+	void enableAllGarrisons();
 
 	void setTableStates(bool isNewObjective = false);
 

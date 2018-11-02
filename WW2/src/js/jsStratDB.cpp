@@ -8,6 +8,7 @@
 #include "client/GameClient.h"
 #include "strt/strtCPFlags.h"
 #include "weap/weapList.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 /************************************************************************************************
 	jsStratObject
@@ -24,6 +25,7 @@ JSFunctionSpec jsStratObject::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsStratObject, defend, 0),
 	JS_FUNCTION_SPEC(jsStratObject, clear, 0),
 	JS_FUNCTION_SPEC(jsStratObject, validmissionorigin, 0),
+	JS_FUNCTION_SPEC(jsStratObject, changegarrisoncountry, 1),
 	{0}
 };
 
@@ -240,6 +242,29 @@ JS_FUNCTION_DEF(jsStratObject, validmissionorigin)
 	return JS_TRUE;
 }
 
+/************************************************************************************************
+changegarrisoncountry
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsStratObject, changegarrisoncountry)
+{
+	if (argc < 1) return JS_FALSE;
+
+	// must be a valid strat object
+	jsStratObject* origin = phui::js::Cast<jsStratObject*>(ctx, jsobj);
+
+	if (!origin || !origin->stratobj) return JS_FALSE;
+
+	int32 country = 0;
+
+	if (argc > 0) JS_ValueToInt32(ctx, argv[0], &country);
+
+	GarrisonCountryChangeReq gcc;
+	gcc.requestChangeCountry(PlayerClient()->MapConnection(), *origin->stratobj->FullObjID(), static_cast<WWII_COUNTRY>(country));
+
+	return JS_TRUE;
+}
+
 JSBool jsStratObject::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
 	if(!stratobj) return JS_TRUE;
@@ -420,6 +445,25 @@ JSBool jsStratObject::GetProperty(JSContext* ctx, int propid, jsval* val)
 				*val = BOOLEAN_TO_JSVAL(false);
 		}
 		break;
+		//case CANCHANGECOUNTRY_PROP:
+		//{
+		//	bool canChangeCountry = false;
+
+		//	// need to attack's on brigades
+		//	if (stratobj->StratClass() == SDM_CLASS_CP)
+		//	{
+		//		
+		//		if (stratobj->Side() == wwiiSide(PlayerClient()->PersonaSelected().m_countryID))
+		//		{
+		//			if (stratobj->Side() == ALLIED)
+		//			{
+
+		//			}
+		//		}
+		//	
+		//	}
+		//}
+		//break;
 	}
 	return JS_TRUE;
 }

@@ -166,6 +166,8 @@ struct cfSUPPLY
 	UINT32	trickleTime_m;		//!< Minutes that complete trickle should take
 	UINT32	populationAdjust;	//!< Divisor for population-based rate adjustment
 	UCHAR	nomanDepots;		//!< Enable spawning at depots in adjacent friendly towns with a DO
+	UINT32	garrisonTrickleTime_m;	//!< Minutes that complete trickle should take
+	UINT32	garrisonInactiveTime_m;	//!< Minutes until a Garrison becomes active 
 };
 
 struct cfTHROTTLE

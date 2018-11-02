@@ -203,6 +203,9 @@
     <Filter Include="auth">
       <UniqueIdentifier>{e23d7e80-2e2b-4cd4-82a7-841bbda438a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="garrisons">
+      <UniqueIdentifier>{aaa59b40-a1e7-4fba-8034-adadb7dfc634}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1668,6 +1671,9 @@
     <ClInclude Include="..\..\src\miss\missionJoinRequest.h">
       <Filter>miss</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\garrisons\garrisonCountryChangeRequest.h">
+      <Filter>garrisons</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2728,6 +2734,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
       <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\garrisons\garrisonCountryChangeRequest.cpp">
+      <Filter>garrisons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

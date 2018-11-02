@@ -163,7 +163,7 @@ Chat::PersonaUpdate::PersonaUpdate(
 }
 
 //////////////////////////////////////////////////////////////////////
-// Receive a brigade move notice
+// Receive a brigade move notice (used my mmhostd)
 
 template<>
 SINT32
@@ -180,6 +180,22 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 		dbugLog(_FLD, "t:%d moving %s (#%d) to %s by %s", teulIndex, unit->name(), unit->unitID(), cp->name, Chat::Name(incoming.key()).c_str());
 		unit->setHomeCPID(data.m_destination);
 	}
+
+	return 0;
+}
+
+
+template<>
+SINT32
+GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+{
+	if (incoming.action() != EXCHANGE) // We should only get exchanges
+	{
+		dbugLog(_FLA, "Invalid Garrison country change msg");
+		return -EINVAL;
+	}
+
+	incoming.data().process(incoming.data().m_brigadeID, incoming.data().m_newCountryId);
 
 	return 0;
 }
@@ -343,6 +359,8 @@ chatInstallSupportCallbacks()
 
 		REGISTER_RECEIVER(Chat::MAP_PERSONA_UPDATE_Y, _recvMapPersonaUpdate);
 		REGISTER_RECEIVER(Chat::MAP_REFRESH_PLAYER_Y, _recvRefreshPlayer);
+
+		REGISTER_MSG(Chat::GARRISON_COUNTRY_Y, GARRISON_COUNTRY_CHANGE_MSG);
 	}
 	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

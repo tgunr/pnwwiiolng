@@ -17,3 +17,4 @@ namespace Map
 	void BroadcastSwingMeter();
 }
 
+SINT32 mmhostToClientGarrisonCountryChange(ACTION_OBJECT* const a);
