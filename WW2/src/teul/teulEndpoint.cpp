@@ -94,7 +94,7 @@ void ENDPOINT::_dbugOutputPacket(bool isRecv, const uint8_t *input, size_t packe
     static constexpr const size_t NUM_MAX_HDR_BYTES = SZ_MAX_BUFF / SZ_HEX_DIG_TEXT;
 	static constexpr const char * const STR_CONTINUATION = " ... ";
     static constexpr const char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
-    static constexpr const size_t BUFFER_SZ = SZ_MAX_BUFF + NUM_TAIL_AMT * SZ_HEX_DIG_TEXT + sizeof(STR_CONTINUATION);
+    static constexpr const size_t BUFFER_SZ = SZ_MAX_BUFF + NUM_TAIL_AMT * SZ_HEX_DIG_TEXT + sizeof(STR_CONTINUATION) + 1;
 
 	// NOTE: Actual buffer is the maximux header area plus all the fixed trailer information.
 	auto debugBuff = std::make_unique<char []>(BUFFER_SZ);

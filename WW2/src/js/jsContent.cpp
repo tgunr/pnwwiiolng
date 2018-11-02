@@ -326,49 +326,28 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
 
 		if(data->type == 5 || data->find("bodyloc") != data->end())
 		{
-			// go ahead and add something here for legacy sake
-			std::wstring wbody = L"";
-			char buf[MAX_CONTENT_VALUE+1];
-			wchar_t wbuf[MAX_CONTENT_VALUE+1];
-
-			strsafecpy(buf, data->body.c_str());
-
-			if(!WWII::ConvertChars(buf, wbuf, sizeof(wbuf)))
-				return false;
-
-			// store it in a std::wstring so wregex can operate on it
-			wbody = wbuf;
-
 			// our regular expressions
-			RENS::wregex split(L"\\n");
-			RENS::wregex kvre(L"^\\s*([\\w\\.]+)\\s*=\\s*(.+)\\s*$");
-			RENS::wregex nlre(L"\\[NL\\]");
+			std::regex split(R"x(\n)x");
+			std::regex kvre(R"x(^\s*([\w\.]+)\s*=\s*(.+)\s*$)x");
+			std::regex nlre(R"x(\[NL\])x");
 
 			// our tokenizing iterators
-			RENS::wsregex_token_iterator p(wbody.begin(), wbody.end(), split, -1);
-			RENS::wsregex_token_iterator end;
-
-			// key/value pair matches
-			RENS::wcmatch matches;
+			std::sregex_token_iterator p(data->body.begin(), data->body.end(), split, -1), end;
 
 			// iterate over all lines
-			for (;p != end; ++p)
-			{
-				std::wstring kv(p->first, p->second);
+			for (; p != end; ++p) {
+				try {
+					std::string kv(p->first, p->second);
+					// key/value pair matches
+					std::cmatch matches;
 
-				try
-				{
-					if(RENS::regex_search(kv.c_str(), matches, kvre) && matches.size() > 0)
-					{
+					if (std::regex_search(kv.c_str(), matches, kvre) && matches.size() > 0) {
                         // change [NL] into newlines
-                        static const std::wstring newline(L"\n");
-                        std::wstring nl_replaced = RENS::regex_replace(matches.str(2), nlre, newline);
-
-                        data->AddLoc(UTF8(matches.str(1).c_str()), nl_replaced.c_str());
+                        std::string nl_replaced = std::regex_replace(matches.str(2), nlre, "\n");
+						std::wstring loc = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>().from_bytes(nl_replaced);
+                        data->AddLoc(matches.str(1).c_str(), loc.c_str());
 					}
-				}
-				catch(RENS::regex& /* e */)
-				{
+				} catch(std::regex& /* e */) {
 					// skip this line
 				}
 			}
