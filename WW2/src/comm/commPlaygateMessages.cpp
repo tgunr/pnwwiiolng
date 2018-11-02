@@ -80,27 +80,6 @@ _teulKitError(
 }
 
 //////////////////////////////////////////////////////////////////////
-// Callback invoked when a callback encounters an error.
-
-static void
-_callbackError(
-	const SINT32 teulIndex
-	, const UCHAR* const /*data*/
-	, const SINT32 /*size*/
-	, const TEUL_CALLBACK* /*object*/
-	, const SINT32 error
-	)
-{
-	ENDPOINT *const ep = teulGetEndpoint(teulIndex);
-
-	playgate.AlertOK(GetLoc(ERROR_DEBUG
-								, teulIndex
-								, teulGetAddress(ep ? ep->destAddress() : Teul::INVALID_INDEX)
-								, ep ? ep->destPort() : -1
-								, error));
-}
-
-//////////////////////////////////////////////////////////////////////
 // Initialize Playgate's comm functions (network transport).
 
 bool

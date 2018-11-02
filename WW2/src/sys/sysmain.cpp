@@ -250,10 +250,13 @@ BOOL				bOsVersionInfo;
 	memset(&osvi, 0, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
+    __pragma(warning(push));
+	__pragma(warning(disable : 4996));
 	if (!(bOsVersionInfo = GetVersionEx((OSVERSIONINFO*)&osvi)))
 	{
 		return FALSE;
 	}
+	__pragma(warning(pop));
 
 	switch (osvi.dwPlatformId)
 	{

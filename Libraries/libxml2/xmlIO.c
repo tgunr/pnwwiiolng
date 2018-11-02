@@ -733,20 +733,12 @@ xmlInitPlatformSpecificIo(void)
 
     osvi.dwOSVersionInfoSize = sizeof(osvi);
 
-    if(GetVersionEx(&osvi) && (osvi.dwPlatformId == VER_PLATFORM_WIN32_NT)) {
-      xmlWrapStat = xmlWrapStatUtf8;
-      xmlWrapOpen = xmlWrapOpenUtf8;
+    xmlWrapStat = xmlWrapStatUtf8;
+    xmlWrapOpen = xmlWrapOpenUtf8;
 #ifdef HAVE_ZLIB_H
-      xmlWrapGzOpen = xmlWrapGzOpenUtf8;
+    xmlWrapGzOpen = xmlWrapGzOpenUtf8;
 #endif
-    } else {
-      xmlWrapStat = xmlWrapStatNative;
-      xmlWrapOpen = xmlWrapOpenNative;
-#ifdef HAVE_ZLIB_H
-      xmlWrapGzOpen = gzopen;
-#endif
-    }
-
+ 
     xmlPlatformIoInitialized = 1;
     return;
 }
