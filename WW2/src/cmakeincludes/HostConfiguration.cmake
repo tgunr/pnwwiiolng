@@ -28,8 +28,6 @@ IF ( MSVC )
 
     IF ( BUILD_BITNESS EQUAL 64 )
         ADD_COMPILE_OPTIONS( "/arch:AVX" )
-    ELSE()
-        ADD_COMPILE_OPTIONS( "/arch:SSE2" )
     ENDIF()
 
     IF ( CMAKE_BUILD_TYPE MATCHES Debug )
@@ -48,11 +46,12 @@ ELSE()
 
     IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Use cheap list of stupid options for GCC
+        LINK_LIBRARIES( "-lbsd" )
     ELSE()
         # Every warning ever, then shut off the ones we don't want
         ADD_COMPILE_OPTIONS( "-Weverything" )
         ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
-        ADD_COMPILE_OPTIONS( "-Wno-error=c++11-narrowing" "-Wno-packed" "-Wno-pedantic" )
+        ADD_COMPILE_OPTIONS( "-Wno-packed" "-Wno-pedantic" )
         ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
         ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
         ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )

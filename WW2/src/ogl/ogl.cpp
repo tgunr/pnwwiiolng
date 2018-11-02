@@ -235,7 +235,7 @@ SINT32		enumber;
 
 	while ((enumber = glGetError()) != GL_NO_ERROR)
 	{
-		const char* ptr;
+		const char* ptr = nullptr;
 
 		if (bMessage)
 		{

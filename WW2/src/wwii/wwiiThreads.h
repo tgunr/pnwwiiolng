@@ -9,7 +9,7 @@
 
 #include <condition_variable>
 #include "include/pnThread.h"
-#include "dbse/dbseHandle.h"
+#include "include/dbseWrapper.h"
 
 class DBQuery;
 

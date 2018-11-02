@@ -5,7 +5,7 @@ $#include "parse/countryCodes.h"
 $#include "include/systypes.h"
 $#include "include/defs.h"
 $#include "dbug/dbug.h"
-$#include "dbug/dbugExtErrors.h"
+$#include "teul/teulExtErrors.h"
 
 $#include "include/arenaLockEnums.h"
 $#include "wwii/wwiiTypes.h"

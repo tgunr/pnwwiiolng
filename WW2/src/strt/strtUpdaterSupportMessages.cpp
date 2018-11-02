@@ -21,7 +21,6 @@
 #include "host/host.h"
 #include "wwii/wwiiPlayer.h"
 #include "server/serverInterface.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiNetPorts.h"
 
 TEUL_CALLBACK*	STRT_SEND_DAMAGE;

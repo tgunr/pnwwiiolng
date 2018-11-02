@@ -13,6 +13,7 @@
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTypes.h"
+#include "chat/omgChat.h"
 #include "inst/instHost.h"				// For instAddPlayerToCampaignInstance
 #include "map/mapArenaDescription.h"
 #include "map/mapBrigades.h"
@@ -23,7 +24,6 @@
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChat.hxx"
 #include "miss/missionDamageEvent.h"
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"

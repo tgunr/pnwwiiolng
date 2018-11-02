@@ -23,7 +23,6 @@
 #include "chat/chatChannelNumber.h"
 #include "chat/chatConstants.h"
 #include "chat/chatData.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
 #include "chat/chatDotCommand.h"
@@ -65,7 +64,6 @@
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatUnitMotds.h"
 #include "chat/chatClientMessages.h"
-#include "dbse/dbseClient.h"
 #include "inst/instHostInstance.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
@@ -85,7 +83,6 @@
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
@@ -2394,7 +2391,6 @@ void
 _acceptPlayerConnection(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN, "t:%d player connection from %s:%hu", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
-	endpoint.setNagleEnabled(true);
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -145,9 +145,9 @@ bool jsContentLoader::DoNode(xmlNode* node, bool first, void* userData)
 		{
 			if(*body)
 			{
-				if(!stricmp(name, "body"))
+				if(!strcasecmp(name, "body"))
 					data->body = (const char*)body;
-				else if(!stricmp(name, "include"))
+				else if(!strcasecmp(name, "include"))
 					data->AddInclude((const char*)body);
 				else
 					(*data)[name] = (const char*)body;
@@ -316,7 +316,7 @@ bool jsContent::GetData(const char* path, jsContentData* data, bool match)
 				GetIncludePath(incPath);
 
 				// don't include ourself as that would lead to a recursive loop
-				if(!stricmp(incPath.c_str(), path))
+				if(!strcasecmp(incPath.c_str(), path))
 					continue;
 
 				if(GetData(incPath.c_str(), &include))

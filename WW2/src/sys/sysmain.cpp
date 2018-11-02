@@ -32,10 +32,6 @@
 #include "build_info.hpp"
 #include "auth/authDefaults.h"
 
-#ifdef CRASH_HANDLER
-#include "sys/crashhandler.h"
-#endif
-
 #ifdef ANTIHACK
 #include "tools/diddle.h"
 
@@ -629,10 +625,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	dbugInit(LogMode::OFF, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
-#endif
-
-#ifdef CRASH_HANDLER
-	InstallCrashHandler();
 #endif
 
 #ifdef DIRECT3D

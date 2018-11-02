@@ -9,7 +9,7 @@ namespace Host
 	{
 		MovePlayer_Y		=	0
 	,	ForceDespawn_Y
-	,	LuaPacket_Y
+	,	LuaPacket_Y // no longer used but kept so the enum stays in order
 	,	CaptureScore_Y
 	,	CaptureState_Y
 	,	ResupplyIssue_Y

@@ -17,24 +17,13 @@
 #include <fcntl.h>
 #include "fio/fio.h"
 
-#if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
+#if __has_include(<sys/sendfile.h>)
 #include <sys/sendfile.h>
 #endif
 
-#if platOS != OS_WIN32
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
-#define OS_PATHSEP "/"
-
-#else
-
-#include <winsock2.h>
+#if platOS == OS_WIN32
 #pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
-#define poll(...) WSAPoll(__VA_ARGS__)
-
 #endif
 
 #ifndef O_BINARY
@@ -877,8 +866,12 @@ bool Client::pollSocket()
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms741669(v=vs.85).aspx says:
     // "If the POLLPRI flag is set on a socket for the Microsoft Winsock provider, the WSAPoll function will fail."
     pollfd pfd{ m_clientSock, POLLIN, 0 };
+#if platOS != OS_WIN32
     int pollResult = poll(&pfd, 1, 100);
-    
+#else
+    int pollResult = WSAPoll(&pfd, 1, 100);
+#endif
+
     if (pollResult == SOCKET_ERROR) {
         // If the error was "try again" or "oops, syscall interrupt", just poll again
         if (dbugGetErrno() != EAGAIN && dbugGetErrno() != EINTR) {
@@ -1290,7 +1283,11 @@ void Server::run()
 
     while (!isCancelled()) {
         reap();
+#if platOS != OS_WIN32
         switch (poll(&listen_pollfd, 1, 100)) {
+#else
+        switch (WSAPoll(&listen_pollfd, 1, 100)) {
+#endif
             case 0: // timeout
                 continue;
             case SOCKET_ERROR:
