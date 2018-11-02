@@ -57,6 +57,7 @@ extern ObjectStruct* strtGetObject(const FULL_OBJ_ID index);
 extern LinkStruct* strtGetLink(const FULL_OBJ_ID index);
 extern FULL_OBJ_ID* strtGetFullObjID(const FULL_OBJ_ID index);
 extern CPStruct* strtGetCPFromTarget(const FULL_OBJ_ID index);
+void _setTownStatusFlags(CPStruct*);
 
 //tolua_end
 //same as above, only using FULL_ID

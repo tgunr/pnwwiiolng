@@ -949,36 +949,30 @@ _setTownStatus()
 			cp->m_townstatus = INACTIVE;
 		}
 
-		switch(cp->m_townstatus) 
+		_setTownStatusFlags(cp);
+
+		switch (cp->m_townstatus)
 		{
-			case FRONT_LINE:
-				strtEnemyLink(*cp, true);
-				strtFrontlineLink(*cp, false);
-				totalFL++;
-				dbugLog(_FLN, "Set FRONT_LINE town status init for %s", cp->name);
-				break;
-			case BACK_LINE:
-				strtEnemyLink(*cp, false);
-				strtFrontlineLink(*cp, true);
-				totalRL++;
-				dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
-				break;
-			case RESERVE:
-				strtEnemyLink(*cp, false);
-				strtFrontlineLink(*cp, false);
-				totalBL++;
-				dbugLog(_FLN, "Set RESERVE town status init for %s", cp->name);
-				break;
-			case INACTIVE:
-				strtEnemyLink(*cp, false);
-				strtFrontlineLink(*cp, false);
-				totalIN++;
-				dbugLog(_FLN, "Set INACTIVE town status init for %s", cp->name);
-				break;
-			default:
-				totalNS++;
-				dbugLog(_FLN, "No           town status set  for %s", cp->name);
-				break;
+		case FRONT_LINE:
+			totalFL++;
+			dbugLog(_FLN, "Set FRONT_LINE town status init for %s", cp->name);
+			break;
+		case BACK_LINE:
+			totalRL++;
+			dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
+			break;
+		case RESERVE:
+			totalBL++;
+			dbugLog(_FLN, "Set RESERVE town status init for %s", cp->name);
+			break;
+		case INACTIVE:
+			totalIN++;
+			dbugLog(_FLN, "Set INACTIVE town status init for %s", cp->name);
+			break;
+		default:
+			totalNS++;
+			dbugLog(_FLN, "No           town status set  for %s", cp->name);
+			break;
 		}
 	}
 
@@ -988,6 +982,30 @@ _setTownStatus()
 	dbugLog(_FLN, "finished town status inits for %u inactive cps", totalIN);
 	dbugLog(_FLN, "Towns with no status set   for %u total cps", totalNS);
 	dbugLog(_FLN, "finished town status inits for %u total cps", totalChecked);
+}
+
+static void
+_setTownStatusFlags(CPStruct* cp)
+{
+	switch (cp->m_townstatus)
+	{
+	case FRONT_LINE:
+		strtEnemyLink(*cp, true);
+		strtFrontlineLink(*cp, false);
+		break;
+	case BACK_LINE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, true);
+		break;
+	case RESERVE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	case INACTIVE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	}
 }
 
 static void

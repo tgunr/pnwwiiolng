@@ -569,7 +569,7 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 	}
 
 	bool justCaptured = true; //This is needed to trigger town status check because town status may not have changed as a result of capture
-	checkTownStatus(this, justCaptured);
+	checkTownStatus(this, justCaptured, 0);
 
 	// Clear out the routeing
 	resetRouteing();
@@ -581,11 +581,11 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 // Check the status of cp and update all linked cps recursively.
 
 void
-CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
+CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 {
 	TOWN_STATUS oldStatus = cp->m_townstatus;
 	TOWN_STATUS newStatus = INACTIVE;
-//	dbugLog(_FLN, "1: Town status check for %s. Current town status: %d.", cp->name, oldStatus);
+	dbugLog(_FLN, "1: Level %d Town status check started for %s. Current town status: %d.", recurseLevel, cp->name, oldStatus);
 
 	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
 	{
@@ -594,7 +594,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 			continue;
 
 		CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
-//		dbugLog(_FLN, "2: %s is outgoing linked to %s", cp->name, otherCP->name);
+		dbugLog(_FLN, "2: Level %d %s is outgoing linked to %s", recurseLevel, cp->name, otherCP->name);
 
 		if ((otherCP->ControllingSide() != cp->ControllingSide()) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
 		{
@@ -628,6 +628,25 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 	}
 
 	cp->m_townstatus = newStatus;
+	switch (cp->m_townstatus)
+	{
+	case FRONT_LINE:
+		strtEnemyLink(*cp, true);
+		strtFrontlineLink(*cp, false);
+		break;
+	case BACK_LINE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, true);
+		break;
+	case RESERVE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	case INACTIVE:
+		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	}
 
 	if (newStatus != oldStatus || justCaptured) //Capture or change of town status must trigger check of linked towns
 	{
@@ -641,12 +660,16 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured)
 				continue;
 
 			CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
-			dbugLog(_FLN, "3: About to do town status check for %s.", otherCP->name);
-			checkTownStatus(otherCP, justCaptured);
+			dbugLog(_FLN, "3: Level %d About to do town status check for %s.", recurseLevel, otherCP->name);
+			checkTownStatus(otherCP, justCaptured, ++recurseLevel);
 
 		}
+		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
 	}
-	dbugLog(_FLN, "4: Town status check complete for %s. Old town status: %d New town status: %d.", cp->name, oldStatus, newStatus);
+	else
+	{
+		dbugLog(_FLN, "3: Level %d No status change detected for %s. Status is %d", recurseLevel, cp->name, cp->m_townstatus);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
