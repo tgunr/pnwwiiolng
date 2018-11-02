@@ -463,7 +463,7 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 		return;
 	}
 	BETAMSG(
-		"%s(%d%s%s%s%s%s%s%s%s): "
+		"%s(%d%s%s%s%s%s%s%s): "
 			"%s owns, "
 			"%s controls, "
 			"%s orig. "
@@ -471,11 +471,11 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 			"FBs: %d. "
 			"ABs: %d (Ax:%d/Al: %d). "
 			"Links: %d/%d. "
-			"Supplied: %s."
+			"Supplied: %s. "
+			"Status: %s%s%s%s"
 				,	cp->name
 				,	cp->uOID
 				,	(cp->isContested()) ? "/Con" : ""
-				,	(cp->isEnemyLinked()) ? "/Front" : ""
 				,	(cp->isUnderAttack) ? "/EWS" : ""
 				,	(cp->modified) ? "/DB":""
 				,	(cp->flags & CP_STAT_ALLIED_ATTACK_OBJ) ? "/AlAtt":""
@@ -492,6 +492,10 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 				,	cp->numOpenLinks
 				,	cp->numLinks
 				,	((cp->isSupplied()) ? "Yes" : "No")
+				,	(cp->isEnemyLinked()) ? "Frontline" : ""
+				,	((!cp->isEnemyLinked()) & cp->isFrontlineLinked()) ? "Backline" : ""
+				,	(!(cp->flags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ? "Reserve" : ""
+				,	(!(cp->flags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ? "Inactive" : ""
 	);
 	if ( cp->isUnderAttack )
 	{

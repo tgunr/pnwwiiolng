@@ -37,6 +37,7 @@ enum
 	CP_STAT_HEAVY_ENEMY_SEA 	= 0x01000000,
 	CP_STAT_HEAVY_ENEMY_AIR 	= 0x02000000,
 	CP_STAT_MAKES_RDP			= 0x04000000,	// RDP Production Center
+	CP_STAT_FRONTLINE_LINKED	= 0x08000000,	// Reserve town
 
 	CP_STAT_RESERVED			= 0x80000000	// Reserved for packers that use 31 bits.
 };

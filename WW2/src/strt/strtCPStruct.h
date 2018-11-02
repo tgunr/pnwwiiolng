@@ -106,6 +106,7 @@ struct CSAFE_CPStruct
 
 	bool 				m_contention;
 	bool 				m_enemyLinked;
+	bool 				m_frontlineLinked;
 	bool				isUnderAttack;
 	bool				m_friendlyLinked;
 	bool				m_isSupplyCenter;
@@ -124,8 +125,8 @@ struct CSAFE_CPStruct
 enum TOWN_STATUS
 {
 	INACTIVE = 0,
-	BACK_LINE,
 	RESERVE,
+	BACK_LINE,
 	FRONT_LINE,
 	// Add new statuses here
 	MAX_TOWN_STATUS
@@ -227,7 +228,7 @@ public:
 
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
 
-	void checkTownStatus(CPStruct *, bool);
+	void checkTownStatus(CPStruct *, bool, int);
 	
 	void checkHCUnits();
 
@@ -258,6 +259,7 @@ public:
 
 	bool isContested() const { return m_contention; }
 	bool isEnemyLinked() const { return m_enemyLinked; }
+	bool isFrontlineLinked() const { return m_frontlineLinked; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
 	LinkStruct* link(UINT32 i) const;
