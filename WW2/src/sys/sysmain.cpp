@@ -3,6 +3,10 @@
 #include <Windows.h>
 #include <VersionHelpers.h>
 
+#pragma message("This bit of nonsense makes up for the ancient precompiled js.lib we're using")
+#pragma message("REMOVE THIS ASAP")
+extern "C" __declspec(dllexport) FILE *_iob[3] = {stdin, stdout, stderr};
+
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
 #include "sys/sysAntihack.h"
