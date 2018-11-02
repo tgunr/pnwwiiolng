@@ -125,8 +125,8 @@ struct CSAFE_CPStruct
 enum TOWN_STATUS
 {
 	INACTIVE = 0,
-	BACK_LINE,
 	RESERVE,
+	BACK_LINE,
 	FRONT_LINE,
 	// Add new statuses here
 	MAX_TOWN_STATUS
@@ -228,7 +228,7 @@ public:
 
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
 
-	void checkTownStatus(CPStruct *, bool);
+	void checkTownStatus(CPStruct *, bool, int);
 	
 	void checkHCUnits();
 
