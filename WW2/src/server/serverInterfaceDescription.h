@@ -11,7 +11,7 @@ namespace Server
 	{
 		UINT32	pid;		// process id
 		UINT32	numIP;
-		enum { MaxHostIPs = 4 };
+		enum { MaxHostIPs = 32 };
 		struct
 		{
 			UINT32	ip;		// address in host byte order

@@ -26,7 +26,6 @@
 #include "strt/strtObjectiveStats.h"
 #include "strt/strtObjectStruct.h"
 #include "strt/strtTypes.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"

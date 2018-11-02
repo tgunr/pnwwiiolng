@@ -15,6 +15,7 @@
 #include "auth/authPack.h"
 #include "auth/authClientMessages.h"
 #include "teul/teulAuth.h"
+#include "teul/teulEndpoint.h"
 #include "auth/authConstants.h"
 #include "auth/authTypes.h"
 #include "comm/commPlaygateMessages.h"
@@ -63,25 +64,6 @@ static SINT32 _recvAPP_LAUNCH(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Callback invoked when a callback encounters an error.
-
-static void
-_callbackError(
-               const SINT32 teulIndex
-               , const UCHAR* const data
-               , const SINT32 size
-               , const TEUL_CALLBACK* object
-               , const SINT32 error
-               )
-{
-    const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
-
-    dbugLog(_FLA, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
-        teulIndex, teulGetAddress(dest.first), dest.second, error
-    );
-}
-
-//////////////////////////////////////////////////////////////////////
 // Register a callback.
 
 TEUL_CALLBACK*
@@ -98,7 +80,6 @@ commInstallMessage(
     ci.callY         = MessageNumber;
     ci.sendAction    = SendFunc;
     ci.recvAction    = ReceiveFunc;
-    ci.error         = _callbackError;
 
     return (teulAllocCallback(&ci));
 }

@@ -34,7 +34,7 @@ UINT32 mlUtilityFindVarname(UINT32* VarNum,
 
 	for (i=0;i<MaxNames;i++, VehicleVarName += VarNameSize)
 	{
-		if (stricmp((char*)VarName, (char*)VehicleVarName) == 0)
+		if (strcasecmp((char*)VarName, (char*)VehicleVarName) == 0)
 		{
 			*VarNum = i;
 			return 0;

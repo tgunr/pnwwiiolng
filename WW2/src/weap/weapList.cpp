@@ -385,10 +385,6 @@ void weapListKill()
 	g_weaponPtrs.clear();
 }
 
-#if platOS != OS_WIN32
-# define strnicmp strncasecmp
-#endif
-
 // Find the weapon spec of a weapon by its name
 WEAPON_SPEC
 weapFindWeaponByName(const char* name)

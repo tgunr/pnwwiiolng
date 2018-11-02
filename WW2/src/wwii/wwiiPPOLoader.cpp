@@ -12,10 +12,6 @@
 
 #define XML_TAG_HANDLER_IMPL(handler) bool PPOSpecLoader::handler(xmlNode* node, bool first, void* userData)
 
-#if platOS != OS_WIN32
-#define stricmp strcasecmp
-#endif
-
 #if platBuild == BUILD_SERVER
 #define strlcpy strncpy
 #endif
@@ -122,11 +118,11 @@ XML_TAG_HANDLER_IMPL(DoParam)
 		std::string name	= xmlGetStringFromNode(node, "name");
 		std::string value	= xmlGetStringFromNode(node, "value");
 
-		if(!stricmp(name.c_str(), "modelname"))
+		if(!strcasecmp(name.c_str(), "modelname"))
 		{
 			spec->modelName = value;
 		}
-		else if(!stricmp(name.c_str(), "rayadjust"))
+		else if(!strcasecmp(name.c_str(), "rayadjust"))
 		{
 			FLOAT32 x, y, z;
 			x = y = z = 0.0f;
@@ -138,45 +134,45 @@ XML_TAG_HANDLER_IMPL(DoParam)
 				spec->rayAdjust.z = z;
 			}
 		}
-		else if(!stricmp(name.c_str(), "avoidance"))
+		else if(!strcasecmp(name.c_str(), "avoidance"))
 		{
 			spec->avoidance = atof(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "raytolerance"))
+		else if(!strcasecmp(name.c_str(), "raytolerance"))
 		{
 			spec->rayTolerance = atof(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "tilttolerance"))
+		else if(!strcasecmp(name.c_str(), "tilttolerance"))
 		{
 			spec->tiltTolerance = atof(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "viewoffset"))
+		else if(!strcasecmp(name.c_str(), "viewoffset"))
 		{
 			spec->viewOffset = atof(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "rotation"))
+		else if(!strcasecmp(name.c_str(), "rotation"))
 		{
 			spec->rotation = atof(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "cooldown"))
+		else if(!strcasecmp(name.c_str(), "cooldown"))
 		{
 			spec->coolDown = atoi(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "buildtime"))
+		else if(!strcasecmp(name.c_str(), "buildtime"))
 		{
 			spec->buildTime = atoi(value.c_str());
 		}
 		else if(checkDelimitedField(name, value, "buildflags", spec->buildFlags)) {}
 		else if(checkDelimitedField(name, value, "avoidflags", spec->avoidFlags)) {}
 		else if(checkDelimitedField(name, value, "surfaceflags", spec->surfaceFlags)) {}
-		else if(!stricmp(name.c_str(), "allowinterior"))
+		else if(!strcasecmp(name.c_str(), "allowinterior"))
 		{
 			spec->allowInterior = false;
 
-			if(!stricmp(value.c_str(), "true"))
+			if(!strcasecmp(value.c_str(), "true"))
 				spec->allowInterior = true;
 		}
-		else if(!stricmp(name.c_str(), "treecheck"))
+		else if(!strcasecmp(name.c_str(), "treecheck"))
 		{
 			FLOAT32 radius = 0.0f;
 
@@ -185,44 +181,44 @@ XML_TAG_HANDLER_IMPL(DoParam)
 		}
 		else if(checkDelimitedField(name, value, "badtextures", spec->badTextures)) {}
 		else if(checkDelimitedField(name, value, "oktextures", spec->okTextures)) {}
-		else if(!stricmp(name.c_str(), "maxspeed"))
+		else if(!strcasecmp(name.c_str(), "maxspeed"))
 		{
 			FLOAT32 speed;
 
 			if(sscanf(value.c_str(), "%f", &speed) == 1)
 				spec->maxSpeed = speed;
 		}
-		else if(!stricmp(name.c_str(), "enemyfacdist"))
+		else if(!strcasecmp(name.c_str(), "enemyfacdist"))
 		{
 			spec->enemyFacDistance = atoi(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "friendlyfacdist"))
+		else if(!strcasecmp(name.c_str(), "friendlyfacdist"))
 		{
 			spec->friendlyFacDistance = atoi(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "targetdist"))
+		else if(!strcasecmp(name.c_str(), "targetdist"))
 		{
 			spec->targetDistance = atoi(value.c_str());
 		}
-		else if(!stricmp(name.c_str(), "timeout-minutes"))
+		else if(!strcasecmp(name.c_str(), "timeout-minutes"))
 		{
 			spec->timeout = (TeulTimeMS)(strtof(value.c_str(), nullptr) * 60.0 * 1000.0);
 		}
-		else if(!stricmp(name.c_str(), "damage-threshold"))
+		else if(!strcasecmp(name.c_str(), "damage-threshold"))
 		{
 			if (isdigit(value[0]))
 				spec->damageThreshold = strtoull(value.c_str(), nullptr, 10);
 		}
-		else if(!stricmp(name.c_str(), "damage-capacity"))
+		else if(!strcasecmp(name.c_str(), "damage-capacity"))
 		{
 			if (isdigit(value[0]))
 				spec->damageCapacity = strtoull(value.c_str(), nullptr, 10);
 		}
-		else if(!stricmp(name.c_str(), "spawnable"))
+		else if(!strcasecmp(name.c_str(), "spawnable"))
 		{
 			spec->spawnable = false;
 
-			if(!stricmp(value.c_str(), "true"))
+			if(!strcasecmp(value.c_str(), "true"))
 				spec->spawnable = true;
 		}
 		else if(checkDelimitedField(name, value, "allowspawn", spec->allowSpawn)) {}
@@ -240,7 +236,7 @@ bool PPOSpecLoader::checkDelimitedField(std::string name, std::string value,
 {
 	bool retVal = false;
 
-	if(!stricmp(name.c_str(), check))
+	if(!strcasecmp(name.c_str(), check))
 	{
 		stack.clear();
 

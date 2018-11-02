@@ -370,7 +370,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 	{
 		vehVehicle* v = (vehVehicle*)FireVehicle;
 
-		if(!Online || !stricmp((const char*)v->Handle, "spamster") || !stricmp((const char*)v->Handle, "agentx"))
+		if(!Online || !strcasecmp((const char*)v->Handle, "spamster") || !strcasecmp((const char*)v->Handle, "agentx"))
 		{
 			vehanimVehicleStateAnimations& anims = v->StateAnimation;
 			FLOAT64ATT& att =  (v->ModelData) ? v->ModelData->VehicleAtt: v->PosData.Att;

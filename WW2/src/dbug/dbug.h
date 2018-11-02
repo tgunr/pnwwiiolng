@@ -112,3 +112,5 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
     #define DEBUG_ERR(fmt, ...) Write_Debug(fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) Write_Log(LOG_ALL, LOG_FATAL, fmt, ## __VA_ARGS__)
 #endif
+
+extern const char* sane_basename(const char* const filepath) noexcept;

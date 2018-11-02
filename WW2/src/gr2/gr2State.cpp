@@ -665,7 +665,7 @@ void gr2DamageState::UpdateDamageLevel()
 
 	for(int i = 0; i < (int)states.size(); i++)
 	{
-		if(!stricmp(states[i]->name.c_str(), levelName))
+		if(!strcasecmp(states[i]->name.c_str(), levelName))
 		{
 			currentState = i;
 			break;

@@ -26,7 +26,6 @@
 #include "include/arenaLockEnums.h"
 #include "server/serverInterface.h"
 #include "server/serverPlayerStatusNode.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulPacket.h"
 #include "updt/loginTypes.h"
 #include "updt/updtInfDeath.h"
@@ -346,7 +345,7 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	if ( player.m_hasExited )
 	{
-		teulClose(a->teulIndex, Teul::Closing::VJRExited);
+		teulClose(a->teulIndex);
 		return 0;
 	}
 
@@ -819,7 +818,7 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 	{
 		dbugLog(_FLA,"t:%d _recvUpdateInfo: invalid player", a->teulIndex);
 		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
-		teulClose(a->teulIndex, Teul::Closing::RUINoPersona);
+		teulClose(a->teulIndex);
 		return 0;
 	}
 

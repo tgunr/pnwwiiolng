@@ -44,7 +44,10 @@ public:
 	//! Generate a new seed.
 	void newSeed()
 	{
-		m_seed = teulClock64 + (((TeulTimeMS)rand()) << 32) + ((TeulTimeMS)rand());
+        // random() actually returns 64 bits already on 64-bit platforms, but on
+        // 32-bit platforms you need two calls to get 64 bits, so just combine
+        // the entropy if needed. XOR will mix on 64-bit and function as OR on 32.
+		m_seed = (static_cast<uint64_t>(random()) << 32) ^ static_cast<uint64_t>(random());
 	}
 
 private:

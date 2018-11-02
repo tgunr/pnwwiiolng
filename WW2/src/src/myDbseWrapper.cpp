@@ -13,7 +13,6 @@
 #include <mutex>
 #include <mysql.h>
 
-#include "dbse/dbseWrapper.h"
 #include "mem/mem.h"
 #include "wwii/wwiiThreads.h"
 #include "include/configVars.h"

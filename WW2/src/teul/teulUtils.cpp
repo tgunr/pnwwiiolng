@@ -53,21 +53,23 @@ UINT32 teulClockTime;
 //
 
 UINT32 teulClockMonoAdjust;
-std::once_flag initMonoAdjust;
 
 // 	----- teulClock
+
+// This avoids the need for a std::call_once() sequence in teulSyncClock(),
+// which is an extreme hotspot for performance.
+void teulInitClock()
+{
+    teulSyncClock();
+    teulClockMonoAdjust = time(nullptr) - teulClockTime;
+    teulClockTime += teulClockMonoAdjust;
+}
 
 //////////////////////////////////////////////////////////////////////
 // Flush the time cache and update teulClock64 and teulTime (since
 // teulTime is just teulClock64 / 1000)
-
-void
-teulSyncClock()
+void teulSyncClock()
 {
-    
-    static std::mutex oneAtATime;
-    std::lock_guard<std::mutex> lock(oneAtATime);
-    
     using namespace std::chrono;
     auto now = steady_clock::now();
     TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
@@ -80,12 +82,6 @@ teulSyncClock()
         teulClock64 = newTimeMS;
         teulClockTime = teulClockMonoAdjust + static_cast<UINT32>(newTimeMS / 1000ULL);
     }
-
-    std::call_once(initMonoAdjust, []() {
-            teulClockMonoAdjust = time(nullptr) - teulClockTime;
-            teulClockTime += teulClockMonoAdjust;
-        }
-    );
 }
 
 // wrapper for inet_ntoa.
