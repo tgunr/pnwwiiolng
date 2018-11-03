@@ -394,7 +394,6 @@
 		08977E08134CFF6C00C9DCFE /* scenMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E06134CFF6C00C9DCFE /* scenMain.cpp */; };
 		08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E0F134CFF9F00C9DCFE /* scenLua.cpp */; };
 		08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E18134D004300C9DCFE /* Texture2DArray.cpp */; };
-		08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E1D134D007B00C9DCFE /* sneaky.cpp */; };
 		0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0898699D13A2BB4C00D643A0 /* libotmac.a */; };
 		08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A428C012C93A490041B628 /* oglTextureObject.cpp */; };
 		08ACEE9E122056DC0035E877 /* glslUniformBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEE9C122056DC0035E877 /* glslUniformBlock.cpp */; };
@@ -1401,8 +1400,6 @@
 		08977E0F134CFF9F00C9DCFE /* scenLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scenLua.cpp; path = scen/scenLua.cpp; sourceTree = "<group>"; };
 		08977E10134CFF9F00C9DCFE /* scenLua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = scenLua.h; path = scen/scenLua.h; sourceTree = "<group>"; };
 		08977E18134D004300C9DCFE /* Texture2DArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Texture2DArray.cpp; sourceTree = "<group>"; };
-		08977E1C134D007B00C9DCFE /* sneaky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sneaky.h; sourceTree = "<group>"; };
-		08977E1D134D007B00C9DCFE /* sneaky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sneaky.cpp; sourceTree = "<group>"; };
 		0898699D13A2BB4C00D643A0 /* libotmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libotmac.a; path = lib/mac/libotmac.a; sourceTree = "<group>"; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
@@ -1827,8 +1824,6 @@
 		081048E4103DCFCF0065E0E2 /* draw */ = {
 			isa = PBXGroup;
 			children = (
-				08977E1C134D007B00C9DCFE /* sneaky.h */,
-				08977E1D134D007B00C9DCFE /* sneaky.cpp */,
 				0894582D130736F2009C0B65 /* TextureFont.cpp */,
 				0894582C13073604009C0B65 /* TextureFont.h */,
 				08C817B412B0271000818A11 /* FTFontReplacement.cpp */,
@@ -3945,7 +3940,6 @@
 				08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */,
 				FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */,
 				08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */,
-				08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */,
 				08477139135E279F00325E43 /* trnScenario.cpp in Sources */,
 				08BA6A9A13705A68007321C6 /* SpatialDB.cpp in Sources */,
 				FA06C3BE1EE18CE200A9977E /* sysSteam.cpp in Sources */,

@@ -898,7 +898,6 @@
     <ClInclude Include="..\..\src\draw\draw2d.h" />
     <ClInclude Include="..\..\src\draw\draw3d.h" />
     <ClInclude Include="..\..\src\draw\drawIcon.h" />
-    <ClInclude Include="..\..\src\draw\sneaky.h" />
     <ClInclude Include="..\..\src\draw\TextureFont.h" />
     <ClInclude Include="..\..\src\ez\EZLoader.h" />
     <ClInclude Include="..\..\src\ez\EZManager.h" />
@@ -1421,7 +1420,6 @@
     <ClCompile Include="..\..\src\draw\drawIcon.cpp" />
     <ClCompile Include="..\..\src\draw\FTFontAdapted.cpp" />
     <ClCompile Include="..\..\src\draw\FTFontReplacement.cpp" />
-    <ClCompile Include="..\..\src\draw\sneaky.cpp" />
     <ClCompile Include="..\..\src\draw\TextureFont.cpp" />
     <ClCompile Include="..\..\src\ez\EZLoader.cpp" />
     <ClCompile Include="..\..\src\ez\EZManager.cpp" />
