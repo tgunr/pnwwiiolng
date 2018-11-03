@@ -984,7 +984,7 @@ _setTownStatus()
 	dbugLog(_FLN, "finished town status inits for %u total cps", totalChecked);
 }
 
-static void
+void
 _setTownStatusFlags(CPStruct* cp)
 {
 	switch (cp->m_townstatus)

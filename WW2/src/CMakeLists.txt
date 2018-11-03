@@ -671,6 +671,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     strt/strtSyncData.cpp strt/strtSyncData.h
     strt/strtConstants.h strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
+	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     EXTRA_DEFINITIONS "IS_MAP_HOST"
     INSTANCING
 )
@@ -751,6 +752,7 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     strt/strtTypes.h strt/strtObjectStruct.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     list/listCL.cpp list/listCL.h list/list.h
+	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     ${STRAT_HOST_EXE}Lua.cc
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA
