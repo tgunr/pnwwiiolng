@@ -1651,6 +1651,8 @@ WW2/src/xml/.dirstamp
 /Libraries/libxml2/Makefile
 /Libraries/libxml2/config.h
 /Libraries/libxml2/libxml2-config.cmake
+/Libraries/libb64/libb64-1.2/vs2017/Debug
+/Libraries/libb64/libb64-1.2/vs2017/Release
 
 WW2.psess
 WW2/proj/win/WW2.sdf
