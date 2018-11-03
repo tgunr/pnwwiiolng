@@ -145,10 +145,11 @@
     <ClCompile Include="..\src\imapKeymap.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\imap\imap.h" />
+    <ClInclude Include="..\include\imap\imapTypes.h" />
+    <ClInclude Include="..\include\imap\xmlparse.h" />
     <ClInclude Include="..\src\cfml.h" />
     <ClInclude Include="..\src\imapInternals.h" />
-    <ClInclude Include="..\include\imap.h" />
-    <ClInclude Include="..\include\imapTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libxml2\win32\VC14\libxml2.vcxproj">
