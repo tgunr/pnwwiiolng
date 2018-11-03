@@ -30,7 +30,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IconFontBuilder", "Tools\Ic
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "phui", "Libraries\phui\proj.win32\phui-vs8.vcxproj", "{C1B372C3-12A9-45AA-9D23-4D5024926FAB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "Libraries\glew\build\vc6\glew_static.vcxproj", "{C5E233A4-EE47-427D-96E7-A3B784914109}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glew_static", "Libraries\glew\build\vs2017\glew_static.vcxproj", "{C5E233A4-EE47-427D-96E7-A3B784914109}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "teulKit", "WW2\proj\win\teulKit\teulKit.vcxproj", "{4F492374-DC5C-47D0-AE9F-7DF7A50FDECB}"
 	ProjectSection(ProjectDependencies) = postProject

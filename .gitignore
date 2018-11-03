@@ -677,6 +677,8 @@ Libraries/glew/build/vc6/obj
 Libraries/glew/build/vc6/static
 Libraries/glew/proj.mac/build
 Libraries/glew/proj.mac/glews.xcodeproj/ahwulf.perspectivev3
+Libraries/glew/build/vs2017/tmp
+Libraries/glew/lib
 Libraries/imap/proj.mac/build
 Libraries/imap/proj.mac/imapmac.xcodeproj/ahwulf.perspectivev3
 Libraries/imap/proj.win32/*.aps
