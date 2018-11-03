@@ -26,7 +26,7 @@
 #include <cwchar>
 
 #include "dbug/dbug.h"
-#include "dbug/dbugExtErrors.h"
+#include "teul/teulExtErrors.h"
 
 #include "wwii/wwiiOwnershipEnums.h"
 #include "chat/chatHandle.h"
@@ -34,7 +34,6 @@
 #include "weap/weapDefs.h"
 #include "weap/weapSpec.h"
 #include "teul/teulBasic.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulKit.h"

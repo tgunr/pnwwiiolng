@@ -9,6 +9,7 @@
 #include "auth/authPack.h"
 #include "auth/authPlaygateTypes.h"
 #include "rn/rnmain.h"
+#include "teul/teulEndpoint.h"
 #include "teul/teulKit.h"
 #include "ui/uiUTF.h"
 #include "wwii/wwiiCallbacks.h"

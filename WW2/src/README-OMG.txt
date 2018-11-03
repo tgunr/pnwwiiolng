@@ -1,5 +1,8 @@
 OMG Language.
 
+NOTE: OMGgen is no longer used or included by the WWIOL codebase. This documentation is preserved
+for historical purposes and because it contains useful general discussion about Teul usage.
+
 OMG is a code generator to eliminate the amount of boiler plate involved in using Teul.
 
 To send a non-trivial message via TeulKit 1.0 you needed the following:

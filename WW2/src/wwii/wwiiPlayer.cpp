@@ -349,7 +349,7 @@ wwiiPlayer::Release(SINT32 onTeulIndex, Server::ReleaseType releaseType)
 	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, releaseType);
 
 	if ( closeRequired )
-		teulClose(onTeulIndex, Teul::Closing::PlayerDtor);
+		teulClose(onTeulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////

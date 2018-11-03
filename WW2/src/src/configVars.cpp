@@ -375,9 +375,10 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
-		// Windows needs to have WinSock initialized to be able to
-		// resolve names for addresses.
+#if platOS == OS_WIN32
+		// Windows needs to have WinSock initialized to be able to resolve names for addresses.
 		Teul::InitializeWinsock();
+#endif
 		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();

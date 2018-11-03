@@ -12,6 +12,12 @@
  * License for more details.
  */
 
+#if defined(__clang_major__)
+_Pragma("clang diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
+#elif defined(__GNUC__)
+_Pragma("GCC diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
+#endif
+
 #define IS_DEBUG_ENABLED(s)	((s)->options & LIBIRC_OPTION_DEBUG)
 
 #include "portable.c"

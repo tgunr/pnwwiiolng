@@ -109,7 +109,7 @@ gr2StateSpec* gr2CreateStateSpec(xmlNode* node)
 
 	for(int i = 0; i < GST_NUM_TYPES; i++)
 	{
-		if(!stricmp(type.c_str(), GR2_STATE_TYPE_NAMES[i]))
+		if(!strcasecmp(type.c_str(), GR2_STATE_TYPE_NAMES[i]))
 		{
 			stateType = (GR2_STATE_TYPE)i;
 			break;
@@ -118,7 +118,7 @@ gr2StateSpec* gr2CreateStateSpec(xmlNode* node)
 
 	for(int i = 0; i < GFT_NUM_TYPES; i++)
 	{
-		if(!stricmp(flag.c_str(), GR2_FLAG_TYPE_NAMES[i]))
+		if(!strcasecmp(flag.c_str(), GR2_FLAG_TYPE_NAMES[i]))
 		{
 			flagType = (GR2_FLAG_TYPE)i;
 			break;

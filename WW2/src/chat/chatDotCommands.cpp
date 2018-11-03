@@ -1250,8 +1250,6 @@ public:
 //////////////////////////////////////////////////////////////////////
 //! @internal
 
-#include "dbug/dbugExtErrors.h"
-
 class DotTestError : public DotCommand
 {
 public:

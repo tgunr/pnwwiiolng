@@ -148,7 +148,7 @@ public:
 
 			for(int i = 0; i < WW2_FUNC_NUM_CATEGORIES; i++)
 			{
-				if(!stricmp(cat, categoryName[i]))
+				if(!strcasecmp(cat, categoryName[i]))
 				{
 					ProcessChildren(node, &i);
 					break;
@@ -186,11 +186,11 @@ public:
 
 			if(requires && *requires)
 			{
-				if(!stricmp(requires, "joystick"))
+				if(!strcasecmp(requires, "joystick"))
 					preset.requires = PRESET_REQ_JOYSTICK;
-				else if(!stricmp(requires, "mouse"))
+				else if(!strcasecmp(requires, "mouse"))
 					preset.requires = PRESET_REQ_MOUSE;
-				else if(!stricmp(requires, "keyboard"))
+				else if(!strcasecmp(requires, "keyboard"))
 					preset.requires = PRESET_REQ_KEYBOARD;
 			}
 
@@ -1508,7 +1508,7 @@ static void ww2imapSetAxisCalibration(imap_axis_calib* calib)
 
 void iac_localized_string(const char* language, int locid, char* str, int maxlen)
 {
-	if(language && stricmp(language, "english") == 0)
+	if(language && strcasecmp(language, "english") == 0)
 		strncpy(str, uiInputString(IDE_LANG_IAC, locid).c_str(), maxlen);
 	else
 		strncpy(str, uiLocString2(IDE_LANG_IAC, locid).c_str(), maxlen);
@@ -1545,7 +1545,7 @@ void iac_localized_string(const char* language, int locid, char* str, int maxlen
 
 void ww2func_localized_string(const char* language, int locid, char* str, int maxlen)
 {
-	if(language && !stricmp(language, "english"))
+	if(language && !strcasecmp(language, "english"))
 		strncpy(str, uiInputString(IDE_LANG_FUNCTION, locid).c_str(), maxlen);
 	else
 		strncpy(str, uiLocString2(IDE_LANG_FUNCTION, locid).c_str(), maxlen);
@@ -1593,7 +1593,7 @@ static int lookup_lang_id(const char* language)
 
 	for(i = 0; i < NUMBER_OF_LANGUAGES; i++)
 	{
-		if(!stricmp(g_szLanguages[i], language))
+		if(!strcasecmp(g_szLanguages[i], language))
 			return i;
 	}
 

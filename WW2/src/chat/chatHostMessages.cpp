@@ -77,7 +77,6 @@
 #include "strt/strtConstants.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"

@@ -19,7 +19,6 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 
@@ -125,15 +124,6 @@ _sendHeartBeat(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static void
-_persXferError(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
-{
-	dbugLog(_FLA, "couldn't transfer persona!");
-
-	if ( extErrorFn)
-		(extErrorFn) (teulIndex, data, size, object, error);
-}
-
 static SINT32
 _sendPersonaExit(ACTION_OBJECT* const a)
 {
@@ -224,7 +214,6 @@ serverInitCallbacks()
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 	{
 		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB);
-		PLAYER_MIRROR_CB->error = _persXferError;
 
 		REGISTER_SENDRECV(PLAYER_MIRROR_REPLY_Y, _sendPlayerMirrorReply, _recvPlayerMirrorReply, PLAYER_MIRROR_REPLY_CB);
 

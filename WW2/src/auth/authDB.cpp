@@ -12,7 +12,6 @@
 #include "teul/teulBasic.h"
 #include "teul/teulConfigVar.h"
 #include "auth/authTypes.h"
-#include "dbse/dbseHandle.h"
 #include "auth/authDB.h"
 #include "mem/mem.h"
 #include "str/stringLib.h"
