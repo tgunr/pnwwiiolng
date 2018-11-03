@@ -393,6 +393,7 @@ Libraries/freetype/objs/BuildLog.htm
 Libraries/freetype/objs/bin
 Libraries/freetype/objs/debug
 Libraries/freetype/objs/release
+Libraries/freetype/objs/vc2015
 Libraries/freetype/src/*.html
 Libraries/freetype/src/*.idb
 Libraries/freetype/src/*.mdl
