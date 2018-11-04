@@ -886,6 +886,8 @@ StratHCUnit::fallback()
 	m_fallbackCP = const_cast<CPStruct*>(findFallback());
 	if ( !fallbackCP() )
 		return false;
+	if (type() == HCU_GARRISON)
+		return false;
 
 	dbugLog(_FLI, "hcu:%u name:%s falling back from %s -> %s"
 					, unitID(), callsign()
@@ -910,6 +912,9 @@ StratHCUnit::rout()
 
 	if ( fallback() )
 		return true;
+
+	if (type() == HCU_GARRISON)
+		return false;
 
 	dbugLog(_FLI, "hcu:%u(%s) routing ", unitID(), callsign());
 
@@ -987,6 +992,11 @@ StratHCUnit::move(const char* byCallsign, CPStruct* cp)
 	if ( result != BMR_APPROVED )
 		return result;
 
+	if ( type() == HCU_GARRISON)
+	{
+		return BMR_FAILED_PERMISSION;
+	}
+
 	const bool fromOffMap = offMap();
 	const bool frontMovement = cp->isEnemyLinked() || homeCP()->isEnemyLinked();
 
@@ -1033,6 +1043,12 @@ strtDeployDivision(HCUnit* unit, CPStruct* cp, bool transferSupply)
 		return false;
 	}
 
+	if ( unit->type() == HCU_GARRISON ) 
+	{
+		dbugLog(_FLW, "Tried to rout Garrison#%u %s", unit->unitID(), unit->name());
+		return false;
+	}
+
 	StratHCUnit* const division = (StratHCUnit*)unit;
 
 	if ( division->homeCP() == cp )
@@ -1063,6 +1079,8 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 	StratHCUnit* const brigade = StratHCUnit::Lookup(brigadeID);
 	ABORT_IF(brigade == nullptr);
 	if ( brigade->isTrainingUnit() )
+		return false;
+	if ( brigade->type() == HCU_GARRISON )
 		return false;
 
 	if ( !brigade->isBrigade() )
