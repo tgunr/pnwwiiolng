@@ -34,6 +34,8 @@
 
 #include "chat/chatSupportRPCMessages.h"
 
+const int GROUP_SIZE_LIMIT=100;
+
 //////////////////////////////////////////////////////////////////////
 
 SINT32
@@ -191,14 +193,17 @@ PersonaSelection::receive(SINT32 teulIndex)
 
 //////////////////////////////////////////////////////////////////////
 
-void
-BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* const player)
+int
+BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* const player, int groupOffset)
 {
+
 	m_error = false;
 	m_count = 0;
 
-	if ( g_brigades[country][branch].empty() )
-		return;
+	if ( g_brigades[country][branch].empty() ) {
+		dbugLog(_FLN, "No brigades for this country/branch");
+		return m_count;
+	}
 
 	// Count up the players in all brigades for this country
 	BRIGADES::iterator it;
@@ -214,12 +219,14 @@ BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* con
 		}
 	}
 
+	int offset = 0;
 	BRIGADES& brigades = g_brigades[country][branch];
-	for ( it = brigades.begin(); it != brigades.end(); ++it )
+	for ( it = brigades.begin(); (it != brigades.end()) && (m_count < GROUP_SIZE_LIMIT); ++it, offset++ )
 	{
+		if (offset < groupOffset) 
+			continue;
+
 		Brigade& brigade = *(*it);
-		/*if (brigade.isGarrison())
-			continue;*/
 
 		BrigadeSummary& summary = m_summaries[m_count];
 
@@ -235,11 +242,14 @@ BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* con
 
 		m_count++;
 	}
+
+	return m_count;
 }
 
 SINT32
 BrigadeSummaries::receive(SINT32 teulIndex)
 {
+
 	Player* const player = PlayerInterface::Lookup(teulIndex);
 	if ( player == nullptr )
 	{
@@ -249,29 +259,37 @@ BrigadeSummaries::receive(SINT32 teulIndex)
 
 	try
 	{
-		// -- Check that they have a persona selected
-		if ( player->personaID() == 0 )
-			throw std::logic_error("brigade request with no persona selected");
+		m_group = 0;
+		int offset = 0;
+		do {
+			// -- Check that they have a persona selected
+			if ( player->personaID() == 0 )
+				throw std::logic_error("brigade request with no persona selected");
+	
+			// -- And check that we have a valid country/side from the persona
+			WWII_COUNTRY country = player->country();
+			if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
+				throw std::logic_error("persona selected with invalid country set");
+			if ( !activeCountries[country] )
+				throw std::logic_error("persona selected with inactive country");
+	
+			BRANCH_ENUM branch = player->branch();
+			if ( branch == BRANCH_NOT_USED || branch >= MAX_BRANCHES )
+				throw std::logic_error("persona selected with invalid branch set");
+	
+			// Populate the entry
+			int groupsAdded = populate(country, branch, player, offset);
+			offset += groupsAdded;	
+			
+			m_lastGroup = (groupsAdded < GROUP_SIZE_LIMIT);
 
-		// -- And check that we have a valid country/side from the persona
-		WWII_COUNTRY country = player->country();
-		if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-			throw std::logic_error("persona selected with invalid country set");
-		if ( !activeCountries[country] )
-			throw std::logic_error("persona selected with inactive country");
-
-		BRANCH_ENUM branch = player->branch();
-		if ( branch == BRANCH_NOT_USED || branch >= MAX_BRANCHES )
-			throw std::logic_error("persona selected with invalid branch set");
-
-		// Populate the entry
-		populate(country, branch, player);
-
-		send(teulIndex);
+			send(teulIndex);
+			m_group++;
+		} while (!m_lastGroup);
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what());
+		dbugLog(_FLA, "Error sending summaries t:%d p:%u c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what());
 
 		m_error = true;
 		m_count = 0;

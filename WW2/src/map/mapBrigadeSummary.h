@@ -51,7 +51,7 @@ static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
 static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
 // Take approx 1078 / sizeof a packed brigade summaries
-static const UINT32 MAX_LISTED_BRIGADES = 300;
+static const UINT32 MAX_LISTED_BRIGADES = 500;
 
 // The highest population rank a brigade can have - semi arbitrary number,
 // but be mindful the number fits inside the number of bits we pack
@@ -124,7 +124,7 @@ private:
 class BrigadeSummaries
 {
 public:
-	BrigadeSummaries() : m_error(false), m_count(0) { }
+	BrigadeSummaries() : m_error(false), m_lastGroup(false), m_group(0), m_count(0)  { }
 	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
     SINT32 packer(PackMode mode, ACTION_OBJECT* a);
@@ -135,11 +135,13 @@ public:
 	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
 	// Host function to populate the summaries
-	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player);
+	int populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player, int groupOffset);
 
 public:
 	bool			m_error;							// True error occured
-	UINT32			m_count;							// Number of summaries described
+	bool			m_lastGroup;							// True if this is the last group in the list
+	UINT32			m_group;							// group id for this summary group
+	UINT32			m_count;							// Number of summaries described in group
 	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES];	// Array of summaries
 };
 
