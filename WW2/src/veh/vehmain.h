@@ -321,7 +321,7 @@ struct vehVehicle
 	mlObjectData* 	VehicleObjectData; 	// 3d object data
 
 	VisualDamageBody* ChunksOfCrap;
-	struct vehVehicle *xNext;
+	struct vehVehicle *xNext = nullptr;
 // FPS and vehicle riding
 	UINT32	RideSeatNum; // special values VEH_HOIST_RIDE_SEAT, VEH_TROOPER_ON_DECK_RIDE_SEAT, VEH_TOWED_VEHICLE
 	UINT32	RideVehicleHostIndex;

@@ -1874,13 +1874,13 @@
     <ProjectReference Include="..\..\..\Libraries\ftgl\msvc\vc8\ftgl_static.vcxproj">
       <Project>{1d758eea-59c3-46e4-bef5-16dcca8c0b21}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
+    <ProjectReference Include="..\..\..\Libraries\glew\build\vs2017\glew_static.vcxproj">
       <Project>{c5e233a4-ee47-427d-96e7-a3b784914109}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
       <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\libb64\libb64-1.2\libb64\libb64.vcxproj">
+    <ProjectReference Include="..\..\..\Libraries\libb64\libb64-1.2\vs2017\libb64.vcxproj">
       <Project>{b50750de-6f66-4ac5-b1e4-9f7da631d237}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\libevent\libevent.vcxproj">
