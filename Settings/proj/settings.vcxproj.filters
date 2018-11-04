@@ -138,7 +138,7 @@
       <Filter>ww2 - src\fio</Filter>
     </ClInclude>
     <ClInclude Include="..\src\sys\syscfg.h">
-      <Filter>Settings Files</Filter>
+      <Filter>Settings Files\sys</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

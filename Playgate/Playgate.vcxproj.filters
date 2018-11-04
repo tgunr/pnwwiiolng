@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
@@ -34,62 +26,14 @@
     <Filter Include="Resource Files\Backgrounds">
       <UniqueIdentifier>{47295ee3-aa5a-440d-b560-3394e82105d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ww2src">
-      <UniqueIdentifier>{249a1159-58a2-4b9d-acfc-62c2de3c5a62}</UniqueIdentifier>
+    <Filter Include="Playgate Files">
+      <UniqueIdentifier>{8fc746b4-8e8e-407a-b403-5d8138e3abd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\include">
+      <UniqueIdentifier>{817f9c4c-d1cb-407d-91ef-09ee8e326875}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\BDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\explorer2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ftp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Label.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\launchApp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\launchAppWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\loc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LoginData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\md5c.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlayerLogon.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Playgate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\PlaygateDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\RegionSelect.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\registry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TermsOfServiceDlg.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\versionWin.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\WW2\src\comm\commPlaygateMessages.cpp">
       <Filter>WW2 - src\comm</Filter>
     </ClCompile>
@@ -99,29 +43,80 @@
     <ClCompile Include="..\WW2\src\wwii\wwiiUTF.cpp">
       <Filter>WW2 - src\wwii</Filter>
     </ClCompile>
-    <ClCompile Include="src\Antihack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\WW2\src\fio\fiostructure.cpp">
       <Filter>WW2 - src\fio</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ddp.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MoreGetRoutines.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ogl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\OglTek.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\WW2\src\src\infoMessages.cpp">
       <Filter>WW2 - src\src</Filter>
     </ClCompile>
     <ClCompile Include="..\WW2\src\src\infoPack.cpp">
       <Filter>WW2 - src\src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Antihack.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\BDialog.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ddp.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\explorer2.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ftp.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Label.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\launchApp.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\launchAppWin.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\loc.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LoginData.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\md5c.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MoreGetRoutines.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ogl.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OglTek.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerLogon.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Playgate.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlaygateDlg.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\RegionSelect.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\registry.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdafx.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TermsOfServiceDlg.cpp">
+      <Filter>Playgate Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\versionWin.cpp">
+      <Filter>Playgate Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -149,107 +144,107 @@
     <ClInclude Include="..\WW2\src\wwii\wwiiUTF.h">
       <Filter>WW2 - src\wwii</Filter>
     </ClInclude>
-    <ClInclude Include="src\ddp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\explorer2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ftp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\launchApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\launchAppWin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\loc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LoginData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\main.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\md5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ogl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\oglcfg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PlayerLogon.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Playgate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PlaygateDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RegionSelect.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\registry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SingleInstanceApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\syscfg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TermsOfServiceDlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\vars.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\versionWin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\WW2\src\fio\fiostructure.h">
       <Filter>WW2 - src\fio</Filter>
     </ClInclude>
-    <ClInclude Include="src\Label.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\pnRegion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MoreGetRoutines.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Antihack.h">
-      <Filter>Header Files</Filter>
+      <Filter>Playgate Files</Filter>
     </ClInclude>
     <ClInclude Include="src\BDialog.h">
-      <Filter>Header Files</Filter>
+      <Filter>Playgate Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ww2src\PG_platforms.h">
-      <Filter>Source Files\ww2src</Filter>
+    <ClInclude Include="src\ddp.h">
+      <Filter>Playgate Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ww2src\PG_precompile_includes.h">
-      <Filter>Source Files\ww2src</Filter>
+    <ClInclude Include="src\explorer2.h">
+      <Filter>Playgate Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\ww2src\PG_compiler_check.h">
-      <Filter>Source Files\ww2src</Filter>
+    <ClInclude Include="src\ftp.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Label.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\launchApp.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\launchAppWin.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\loc.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LoginData.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\main.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\md5.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MoreGetRoutines.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ogl.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\oglcfg.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlayerLogon.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Playgate.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlaygateDlg.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\pnRegion.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\RegionSelect.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\registry.h">
+      <Filter>Playgate Files</Filter>
     </ClInclude>
     <ClInclude Include="res\resource.h">
-      <Filter>Header Files</Filter>
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Resource.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SingleInstanceApp.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\syscfg.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\targetver.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TermsOfServiceDlg.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vars.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\versionWin.h">
+      <Filter>Playgate Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WW2\src\include\compiler_check.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WW2\src\include\platforms.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WW2\src\include\precompile_includes.h">
+      <Filter>WW2 - src\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

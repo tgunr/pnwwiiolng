@@ -17,7 +17,8 @@
 
 #include "stdafx.h"
 
-#include "ww2src\PG_platforms.h"
+//  #include "ww2src\PG_platforms.h"
+#include "include/platforms.h"
 
 
 //	------------------------------	Public Definitions

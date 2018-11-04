@@ -354,6 +354,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="..\WW2\src\include\compiler_check.h" />
+    <ClInclude Include="..\WW2\src\include\platforms.h" />
+    <ClInclude Include="..\WW2\src\include\precompile_includes.h" />
     <ClInclude Include="res\resource.h" />
     <ClInclude Include="src\Antihack.h" />
     <ClInclude Include="src\BDialog.h" />
@@ -392,9 +395,6 @@
     <ClInclude Include="src\TermsOfServiceDlg.h" />
     <ClInclude Include="src\vars.h" />
     <ClInclude Include="src\versionWin.h" />
-    <ClInclude Include="src\ww2src\PG_compiler_check.h" />
-    <ClInclude Include="src\ww2src\PG_platforms.h" />
-    <ClInclude Include="src\ww2src\PG_precompile_includes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\Playgate.rc2" />
