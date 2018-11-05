@@ -284,7 +284,7 @@ public:
 	void removeAllGarrisonsSupply();
 
 	// Changes the country and the toe Template header for all Garrisons in this cp.
-	void changeAllGarrisonCountries(WWII_COUNTRY countryID);
+	void changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange);
 
 	void disableAllGarrisons();
 	void enableAllGarrisons();

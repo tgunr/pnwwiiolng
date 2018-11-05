@@ -1128,7 +1128,7 @@ void GarrisonCountryChangeReq::strtProcessRequest()
             {
                 if (cp->changeOwnership(m_country, true, true))
                 {
-                    cp->changeAllGarrisonCountries(m_country);
+                    cp->changeAllGarrisonCountries(m_country, true);
                     m_result = GCR_APPROVED;
                     dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %d to change CP %u to country %u ", m_clientsTeulIndex, m_cp.id, m_country);
                 }

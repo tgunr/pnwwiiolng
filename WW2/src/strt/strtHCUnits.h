@@ -72,7 +72,7 @@ public:
 	void reset();
 
 	// reset Garrison supply (Initiates the trickle timer)
-	void restartGarrisonSupply();
+	void restartGarrisonSupply(bool manualChange);
 
 	// Write this stuff to the database
 	void save() const;
