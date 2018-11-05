@@ -1334,9 +1334,16 @@ StratHCUnit::reset()
 // Restarts a Garrisons supply and initiates the trickle timer.
 
 void
-StratHCUnit::restartGarrisonSupply()
+StratHCUnit::restartGarrisonSupply(bool manualChange)
 {
-	restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, false);
+	if(!manualChange){
+		
+		restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, false);
+	}
+	else
+	{
+		restartSupply(host_config.supply.movedGarrisonInactiveTime_m * 60, host_config.supply.movedGarrisonTrickleTime_m * 60, false);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////

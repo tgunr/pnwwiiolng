@@ -168,6 +168,8 @@ struct cfSUPPLY
 	UCHAR	nomanDepots;		//!< Enable spawning at depots in adjacent friendly towns with a DO
 	UINT32	garrisonTrickleTime_m;	//!< Minutes that complete trickle should take
 	UINT32	garrisonInactiveTime_m;	//!< Minutes until a Garrison becomes active 
+	UINT32	movedGarrisonTrickleTime_m;	//!< Minutes that complete trickle should take after the garrison country is manually changed
+	UINT32	movedGarrisonInactiveTime_m;	//!< Minutes until a Garrison becomes active after the garrison country is manually changed
 };
 
 struct cfTHROTTLE

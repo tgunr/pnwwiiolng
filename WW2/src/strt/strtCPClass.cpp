@@ -1649,7 +1649,7 @@ void CPStruct::removeAllGarrisonsSupply()
 }
 
 
-void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
+void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange)
 {
 
 	HCUNIT_INDEX unitList = m_units;
@@ -1706,7 +1706,7 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID)
 					// Reset supply and announce the country change to map, chat and clients.
 					unit->announceGarrisonCountryChange();
 					// Restart supply with trickle timer.
-					unit->restartGarrisonSupply();
+					unit->restartGarrisonSupply(manualChange);
 				}
 			}
 		}

@@ -612,7 +612,7 @@ CaptureAction::ApplyEffects() const
 
 		// Change the country of all Garrisons in this cp
 		// Sends it to chat and map hosts, map sends it to all clients.
-		m_cp.changeAllGarrisonCountries(m_newCountry);
+		m_cp.changeAllGarrisonCountries(m_newCountry, false);
 
 	}
 
