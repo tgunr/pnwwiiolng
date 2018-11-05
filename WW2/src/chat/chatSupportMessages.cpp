@@ -184,7 +184,8 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 	return 0;
 }
 
-
+//////////////////////////////////////////////////////////////////////
+// Receive a Garrison country change (used my mmhostd)
 template<>
 SINT32
 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
