@@ -1859,10 +1859,29 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				//If we have this unit selected then we need to update our selected persona country.
 				if (Client::BrigadeSelected().m_detail.brigadeID() == unitloc.m_unitID)
 				{
+					if (WeaponSerial().serial != 0)
+						RequestMissionWeapCancel();
+
+					if (SelectedMission().m_brigadeID == unitloc.m_unitID)
+						ExitMission();
+
+					// This is the code that I was adding to try to fix the Persona/brigade problem
+					// that happens when a Garrison country is changed.
+					// The map host doesn't honour the Brigade selection because as far as it's concerned
+					// we are already joined to that Brigade.
+					// See mapPlayer.cpp 
+					// Player::SelectBrigade(Brigade* selection)
+
+
 					Client::SetSelectedPersonaCountry(unitloc.m_country);
 					SavePersona(SAVE_COUNTRY);
+					SelectBrigade(Client::BrigadeSelected().m_detail.brigadeID(), true, true);
+					//const PersonaSummary* current = GetPersona();
+					//SelectPersona(*GetPersona(),true,true);
 					// update the jsclient
 					jsclient->UpdatePersonas();
+
+					//uiLoadView("brigades", true, true);
 				}
 			}
 		}

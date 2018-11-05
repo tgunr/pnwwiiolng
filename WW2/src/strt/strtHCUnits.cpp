@@ -65,6 +65,8 @@ StratHCUnit::announceHome() const
 	chatSendBrigadeMoveResult(outgoing);
 }
 
+// This is used by strat to broadcast a Unit country change to both the map and chat hosts.
+// Chat sends the message on to all players.
 void
 StratHCUnit::announceGarrisonCountryChange() const
 {
