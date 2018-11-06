@@ -1338,7 +1338,7 @@ StratHCUnit::reset()
 void
 StratHCUnit::restartGarrisonSupply()
 {
-	restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, false);
+	restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);
 }
 
 //////////////////////////////////////////////////////////////////////
