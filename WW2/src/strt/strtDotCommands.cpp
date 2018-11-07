@@ -2446,11 +2446,11 @@ extern std::string strtGetFactoryList(WWII_COUNTRY forCountry);
 static bool
 _dotFactories(char* arguments, OOBMessage& message)
 {
-	std::string result = "British Factories:\n" + strtGetFactoryList(WWII_ENGLAND);
+	std::string result = "British Factories: " + strtGetFactoryList(WWII_ENGLAND);
 	RESPOND("%s", result.c_str());
-	result = "French Factories:\n" + strtGetFactoryList(WWII_FRANCE);
+	result = "French Factories: " + strtGetFactoryList(WWII_FRANCE);
 	RESPOND("%s", result.c_str());
-	result = "German Factories:\n" + strtGetFactoryList(WWII_GERMANY);
+	result = "German Factories: " + strtGetFactoryList(WWII_GERMANY);
 	RESPOND("%s", result.c_str());
 	return true;
 }
