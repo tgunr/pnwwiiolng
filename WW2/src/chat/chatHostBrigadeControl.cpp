@@ -1107,8 +1107,14 @@ public:
 			throw LSTR_SEL_TARGET;
 
 		HCUnit* unit = HCUnit::Lookup(player.brigadeID());
-		if ( !unit )
+		HCUnit* unitParent;
+		if ( unit ){
+			unitParent = unit->parent();
+			if ( !unitParent )
+				throw LSTR_NO_BRIGADE;
+		}else{
 			throw LSTR_NO_BRIGADE;
+		}
 
 		BrigadeControlRequest request;
 		request.m_action = BrigadeControl::REQ_MOVE;
