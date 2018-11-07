@@ -194,4 +194,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\build_info.py" />
+    <None Include="..\build_info.bat" />
+  </ItemGroup>
 </Project>

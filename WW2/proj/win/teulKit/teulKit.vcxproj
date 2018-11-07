@@ -100,7 +100,7 @@
       </AdditionalDependencies>
     </Lib>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Command>CALL "$(SolutionDir)WW2\proj\win\build_info.bat" "$(VSInstallDir)" "$(LOCALAPPDATA)" "$(ProgramW6432)" "$(ProgramFiles)" "$(HOMEDRIVE)" "$(SolutionDir)" "$(ProjectDir)"</Command>
       <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -141,7 +141,7 @@
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Command>CALL "$(SolutionDir)WW2\proj\win\build_info.bat" "$(VSInstallDir)" "$(LOCALAPPDATA)" "$(ProgramW6432)" "$(ProgramFiles)" "$(HOMEDRIVE)" "$(SolutionDir)" "$(ProjectDir)"</Command>
       <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -182,7 +182,7 @@
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
     <PreBuildEvent>
-      <Command>python $(SolutionDir)WW2\src\build_info.py client $(ProjectDir)</Command>
+      <Command>CALL "$(SolutionDir)WW2\proj\win\build_info.bat" "$(VSInstallDir)" "$(LOCALAPPDATA)" "$(ProgramW6432)" "$(ProgramFiles)" "$(HOMEDRIVE)" "$(SolutionDir)" "$(ProjectDir)"</Command>
       <Message>Generate build_info.cpp</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
@@ -263,6 +263,10 @@
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\build_info.py" />
+    <None Include="..\build_info.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
