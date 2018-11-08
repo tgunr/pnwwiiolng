@@ -1,7 +1,6 @@
 # Server project dependencies.
 MARK_AS_ADVANCED(
     LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR
-    LUA_LIBRARIES LUA_INCLUDE_DIR
     GIT_EXECUTABLE
     LIBIRCCLIENT_FOUND
 	LIBB64_DIR
@@ -25,9 +24,9 @@ IF ( NOT GIT_EXECUTABLE )
     MESSAGE( FATAL_ERROR "A working git executable is required" )
 ENDIF()
 
-# Find Lua 5.1- but for now, pull in our embedded (outdated) one
-ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/lua51 ${CMAKE_CURRENT_BINARY_DIR}/lua51 )
-INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LUA_INCLUDE_DIR} )
+# Eventually we'll go find Lua, but for now pull in our embedded (outdated) one
+ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/lua51 )
+#INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LUA_INCLUDE_DIR} )
 SET_TARGET_PROPERTIES( lua51 PROPERTIES FOLDER "Libs" )
 
 # Ditto for tolua++ since we haven't gotten rid of it yet
