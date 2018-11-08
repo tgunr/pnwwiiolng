@@ -6,14 +6,6 @@ MARK_AS_ADVANCED(
 	LIBB64_DIR
 )
 
-# We need ncurses and readline for the lua client, but don't care on Windows
-#IF ( NOT WIN32 )
-#	FIND_PACKAGE( Readline 6.0 )
-#	IF ( NOT READLINE_FOUND )
-#		MESSAGE( FATAL_ERROR "readline library is required" )
-#	ENDIF()
-#ENDIF()
-
 # Pull in MySQL
 FIND_PACKAGE( MySQL REQUIRED )
 INCLUDE_DIRECTORIES( ${MYSQL_INCLUDE_DIR} )
@@ -88,7 +80,7 @@ IF ( BUILDING_OWN_LIBXML2 )
 	ExternalProject_Add(
 		libxml2
 		SOURCE_DIR ${LIBXML2_SOURCE_DIR}
-		CONFIGURE_COMMAND ${LIBXML2_SOURCE_DIR}/autogen.sh 
+		CONFIGURE_COMMAND ${LIBXML2_SOURCE_DIR}/autogen.sh
 			"CFLAGS=${LIBXML2_CFLAGS}" "LDFLAGS=${LIBXML2_LDFLAGS}"
 			--prefix=${LIBXML2_INSTALL_DIR}
 			--disable-shared --enable-static --disable-ipv6
