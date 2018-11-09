@@ -530,7 +530,7 @@ CPStruct::announceObjectiveWithdrawl() const
 // Change the ownership of an entire CP
 
 bool
-CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly, bool manualChange)
 {
 	if ( toCountry >= MAX_COUNTRIES )
 	{
@@ -566,7 +566,7 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 		if ( facility->type == FACILITY_FIREBASE )
 			continue;
 		if ( force || facility->country != toCountry )
-			strtConvertFacility(*facility, toCountry, force, quietly);
+			strtConvertFacility(*facility, toCountry, force, quietly, manualChange);
 	}
 
 	bool justCaptured = true; //This is needed to trigger town status check because town status may not have changed as a result of capture
@@ -574,6 +574,8 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 
 	// Clear out the routeing
 	resetRouteing();
+
+	//changeAllGarrisonCountries(toCountry, manualChange);
 
 	return true;
 }
@@ -778,7 +780,7 @@ CPStruct::clearObjective(WWII_SIDE forSide)
 						, country
 						, name
 						);
-		changeOwnership(country, false, true);
+		changeOwnership(country, false, true, false);
 	}
 
 	if ( wasAttack )

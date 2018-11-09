@@ -988,7 +988,7 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 					, _countryCode[newCountry]
 					);
 
-			return strtConvertFacility(*facility, newCountry, true, quietly);
+			return strtConvertFacility(*facility, newCountry, true, quietly, true);
 		}
 	}
 
@@ -1041,7 +1041,7 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
 		quietly = true;
 
-	if ( cp->changeOwnership(newOwner, force, quietly) )
+	if ( cp->changeOwnership(newOwner, force, quietly, true) )
 	{
 		if ( quietly )
 			LOCMESSAGE(LSTR_NOTE, (force ? LSTR_FORCED_OWNERSHIP : LSTR_CHANGED_OWNERSHIP), cp->name, _countryCode[newOwner]);

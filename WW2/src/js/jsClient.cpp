@@ -142,7 +142,6 @@ JSPropertySpec jsClient::jsproperties[] =
 	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},

@@ -226,7 +226,7 @@ public:
 	WWII_SIDE attacker() const { return m_attacker; }
 	HCUnit* attackingUnit() const { return m_attackingUnit; }
 
-	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
+	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly, bool manualChange = false);
 
 	void checkTownStatus(CPStruct *, bool, int);
 	
