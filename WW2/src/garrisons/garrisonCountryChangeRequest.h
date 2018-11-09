@@ -25,7 +25,7 @@ class GarrisonCountryChangeReq
 {
 public:
 	GarrisonCountryChangeReq() : m_result(GCR_FAILED){}
-	GarrisonCountryChangeReq(ACTION_OBJECT* const a) { a->offset = GarrisonCountryChangeReq::packer(TEUL_UNPACK, a); }
+	GarrisonCountryChangeReq(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Network exchange functions
 	SINT32 send(SINT32 teulIndex, FULL_OBJ_ID cp, WWII_COUNTRY const& country);

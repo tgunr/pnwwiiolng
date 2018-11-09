@@ -242,9 +242,9 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "supply.trickleTimeM",		TYPE_INT,	&host_config.supply.trickleTime_m,		0,		"180",	"Time from start to completion of trickle (minutes)" }
 
 ,   { "supply.garrisonTrickleTimeM",TYPE_INT,	&host_config.supply.garrisonTrickleTime_m,		0,		"180",	"Time from start to completion of trickle for a Garrison (minutes)" }
-,   { "supply.garrisonInactiveTime_m",TYPE_INT,	&host_config.supply.garrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes)" }
-,   { "supply.movedGarrisonTrickleTimeM",TYPE_INT,	&host_config.supply.movedGarrisonTrickleTime_m,		0,		"180",	"Time from start to completion of trickle for a Garrison (minutes) after the country was manually changed" }
-,   { "supply.movedGarrisonInactiveTime_m",TYPE_INT,	&host_config.supply.movedGarrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes) after the country was manually changed" }
+,   { "supply.garrisonInactiveTimeM",TYPE_INT,	&host_config.supply.garrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes)" }
+,   { "supply.mGarrisonTrickleTimeM",TYPE_INT,	&host_config.supply.movedGarrisonTrickleTime_m,		0,		"180",	"Time from start to completion of trickle for a Garrison (minutes) after the country was manually changed" }
+,   { "supply.mGarrisonInactiveTimeM",TYPE_INT,	&host_config.supply.movedGarrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes) after the country was manually changed" }
 
 ,	{ "throttle.enabled",			TYPE_BOOL,	&host_config.throttle.enabled,			0,		"y",	"Enable depot throttling" }
 ,	{ "throttle.percentage",		TYPE_BYTE,	&host_config.throttle.percentage,		100,	"5",	"Percentage equipment to expose at throttles" }
