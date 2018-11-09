@@ -1870,23 +1870,14 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 					WWII_SIDE my_side = wwiiSide(Client::BrigadeSelected().m_detail.country());
 					if (new_side == my_side)
 					{
-						// This is the code that I was adding to try to fix the Persona/brigade problem
-						// that happens when a Garrison country is changed.
-						// The map host doesn't honour the Brigade selection because as far as it's concerned
-						// we are already joined to that Brigade.
-						// See mapPlayer.cpp 
-						// Player::SelectBrigade(Brigade* selection)
-
-
 						Client::SetSelectedPersonaCountry(unitloc.m_country);
 						SavePersona(SAVE_COUNTRY);
 						SelectBrigade(Client::BrigadeSelected().m_detail.brigadeID(), true, true);
-						//const PersonaSummary* current = GetPersona();
-						//SelectPersona(*GetPersona(),true,true);
-						// update the jsclient
-						jsclient->UpdatePersonas();
-
-						//uiLoadView("brigades", true, true);
+					}
+					else
+					{
+						// ask server to choose for us
+						SelectBrigade(0, true, true);
 					}
 				}
 			}

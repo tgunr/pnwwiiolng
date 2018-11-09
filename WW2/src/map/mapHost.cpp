@@ -300,11 +300,44 @@ BrigadeSummaries::receive(SINT32 teulIndex)
 	return 0;
 }
 
+bool
+BrigadeSelection::_autoSelectCheck(Player* player, Brigade* brigade)
+{
+	bool retVal = false;
+	// if there is no brigade selected or the selected brigade belongs to the wrong side
+	// the server should choose
+	if ( brigade == nullptr || (brigade->side() != player->side()))
+	{
+		dbugLog(_FLN, "Server automatically selecting brigade for player %d", player->playerID());
+
+		// Select the training brigade for the country/branch we started
+		WWII_COUNTRY country = (brigade != nullptr)?brigade->m_countryID:player->country();
+		BRANCH_ENUM branch = (brigade != nullptr)?brigade->m_branchID:player->branch();
+		brigade = (Brigade *)HCUnit::GetTrainingUnit(country, branch);
+		if (brigade == nullptr)
+		{
+			dbugLog(_FLW, "No training unit found for country %d, branch %d", country, branch);
+			m_detail.m_unitID = 0;
+		}
+		else
+		{
+			dbugLog(_FLN, "Unit ID %d selected for player %d", brigade->m_unitID, player->playerID());
+		}
+		m_detail = *brigade;
+		mmdbSavePersonaSelection(player);
+		retVal = true;
+	}
+	return retVal;
+}
+
 SINT32
 BrigadeSelection::_query(Player* const player, const Brigade* const brigade)
 {
 	///TODO: Determine if they have permission to see this brigade
 	m_detail = *brigade;
+
+	// in case the brigade is no longer valid ...
+	_autoSelectCheck(player, (Brigade *)&m_detail);
 
 	return _sendResult(player->teulIndex(), BRIG_DETAIL);
 }
@@ -312,6 +345,9 @@ BrigadeSelection::_query(Player* const player, const Brigade* const brigade)
 SINT32
 BrigadeSelection::_select(Player* player, Brigade* brigade)
 {
+	if (_autoSelectCheck(player, brigade))
+		return _sendResult(player->teulIndex(), BRIG_SELECT);
+
 	if ( !player->SelectBrigade(brigade) )
 		return _sendResult(player->teulIndex(), BRIG_RESTRICTED);
 
@@ -332,7 +368,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 		return _sendResult(teulIndex, BRIG_ERROR);
 	}
 
-	if ( m_detail.brigadeID() == 0 )
+	if ( m_detail.brigadeID() == 0 && m_status != BRIG_SELECT )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_ID0);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with brigade id 0"
@@ -348,7 +384,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	}
 
 	Brigade* const brigade = mapFindBrigade(m_detail.brigadeID());
-	if ( brigade == nullptr )
+	if ( brigade == nullptr && m_status != BRIG_SELECT)
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_NONE, LSTR_BDESEL_REFUSED_BDE);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request for non-existant brigade %d"
