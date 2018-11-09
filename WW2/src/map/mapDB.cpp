@@ -41,6 +41,7 @@
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRank.h"
 #include "wwii/wwiiThreads.h"
+#include "mm/mmdbPersonaSelections.h"
 
 bool activeCountries[MAX_COUNTRIES];
 
@@ -841,6 +842,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 	if ( player->m_sideLockTime > 0 )
 		m_sidelocked = player->m_lastSide;
 
+	bool savePersona = false;
 	for ( size_t i = 0; i < count; ++i )
 	{
 		PersonaSummary& ps = m_summaries[i];
@@ -853,6 +855,20 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			ps.m_lastUsed = now - lastUsed;
 		else
 			ps.m_lastUsed = 0;
+
+		// Verify the brigade is for this persona is valid
+		if (ps.m_brigadeID != 0)
+		{
+			HCUnit *unit = HCUnit::Lookup(ps.m_brigadeID);
+			if (unit == nullptr || (unit->side() != wwiiSide(ps.m_countryID)))
+			{
+				Brigade * brigade = (Brigade *)HCUnit::GetTrainingUnit(ps.m_countryID, ps.m_branchID);
+				ps.m_brigadeID = brigade->brigadeID();
+				savePersona = true;
+				dbugLog(_FLD, "New unit id %d being returned for player %d, persona %d", ps.m_brigadeID, player->playerID(),
+						ps.m_personaID);
+			}
+		}
 
 		if ( lockReason == PersonaSummary::_ARENALOCK )
 		{
@@ -876,6 +892,9 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 		}
 	}
+
+	if (savePersona)
+		mmdbSavePersonaSelection(player);
 
 	m_activeMission.populate(player->activeMission());
 
