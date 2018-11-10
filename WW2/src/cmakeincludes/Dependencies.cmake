@@ -9,9 +9,10 @@ MARK_AS_ADVANCED(
 FIND_PACKAGE( MySQL REQUIRED )
 INCLUDE_DIRECTORIES( ${MYSQL_INCLUDE_DIR} )
 
-# Make sure Git is available
+# Make sure Git is available. While we don't use it further in the CMakeLists,
+# build_info needs it (unless PN_NO_BUILD_INFO is set).
 FIND_PROGRAM( GIT_EXECUTABLE NAMES git )
-IF ( NOT GIT_EXECUTABLE )
+IF ( NOT GIT_EXECUTABLE AND NOT PN_NO_BUILD_INFO )
     MESSAGE( FATAL_ERROR "A working git executable is required" )
 ENDIF()
 
