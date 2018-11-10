@@ -183,6 +183,7 @@ SINT32 teulOpenSend(UINT32 host, UINT16 portNumber, CONNECT_FUNCTION connectFnPt
 
 //////////////////////////////////////////////////////////////////////
 // libevent junk
+#if platBuild == BUILD_SERVER
 namespace Teul
 {
 	event_base* eventBase;
@@ -201,6 +202,21 @@ static void _logLibEvent(int eventLevel, const char* msg)
 	}
 	dbugLog("libevent", 0, dbugLevel, "%s", msg);
 }
+
+static void _initializeLibEvent()
+{
+    event_set_log_callback(_logLibEvent);
+
+    // Set up the configuration.
+    event_config* const cfg = event_config_new();
+    event_config_set_flag(cfg, EVENT_BASE_FLAG_NOLOCK | EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST);
+    
+    Teul::eventBase = event_base_new_with_config(cfg);
+    event_config_free(cfg);
+
+    ABORT_IF(!Teul::eventBase);
+}
+#endif
 
 #if platOS == OS_WIN32
 void Teul::InitializeWinsock()
@@ -225,20 +241,6 @@ void Teul::InitializeWinsock()
 	});
 }
 #endif
-
-static void _initializeLibEvent()
-{
-	event_set_log_callback(_logLibEvent);
-
-	// Set up the configuration.
-	event_config* const cfg = event_config_new();
-	event_config_set_flag(cfg, EVENT_BASE_FLAG_NOLOCK | EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST);
-    
-	Teul::eventBase = event_base_new_with_config(cfg);
-	event_config_free(cfg);
-
-	ABORT_IF(!Teul::eventBase);
-}
 
 // We all have to start somewhere and this one function is it for teul.
 // This function opens the debugger, on the client initializes the teul module,
@@ -272,7 +274,9 @@ SINT32 teulInitTransport(LogMode logType, const char* name, ERROR_FUNCTION error
     // In host builds, this was already done by InitializeConfigVars(), but oh well
     Teul::InitializeWinsock();
 #endif
+#if platBuild == BUILD_SERVER
     _initializeLibEvent();
+#endif
 
 	teulInitClock();
 
