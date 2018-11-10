@@ -18,7 +18,7 @@ class Event
 {
 public:
 	// Determine the number of events likely to fit into a packet.
-	enum	{ MaxPerPacket = 375 };	// Should fit comfortably inside an average packet.
+	enum	{ MaxPerPacket = 140 };	// Should fit comfortably inside an average packet.
 private:
 	FULL_OBJ_ID		m_fid;
 	UINT8			m_ownership;
