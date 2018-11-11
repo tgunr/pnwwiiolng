@@ -553,7 +553,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>
