@@ -18,7 +18,8 @@ class Event
 {
 public:
 	// Determine the number of events likely to fit into a packet.
-	enum	{ MaxPerPacket = 127 };	// Assuming 1400 byte limit at 11 bytes per packet
+	enum	{ MaxPerPacket = 375 };	// Most packets are 20 bits but some can be 68, but on average we'll
+									// consume no more than 1200 bytes in a packet with this value
 private:
 	FULL_OBJ_ID		m_fid;
 	UINT8			m_ownership;
