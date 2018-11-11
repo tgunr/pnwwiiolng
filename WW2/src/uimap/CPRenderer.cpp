@@ -459,7 +459,7 @@ void CPMapObject::DrawCPMarker(SuperCellMapView* mv)
 // this code is ugly and needs cleaning up - ramp
 void CPMapObject::DrawCP(SuperCellMapView* mv)
 {
-	Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Entering renderer for town %s", _cp.Name());
+//	Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Entering renderer for town %s", _cp.Name());
 	phui::GraphicsContext *ctx = mv->GetGraphicsContext();
 
 	glPushMatrix();
@@ -538,7 +538,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 	for(int i = 0; i < (int)_statusicons.size(); ++i)
 	{
-		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status icon for town %s", _cp.Name());
+//		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status icon for town %s", _cp.Name());
 		MapIcon &icon = _statusicons[i];
 		ctx->SetTexture(icon.id);
 		phui::box_verts_with_pos(box, offsetx, offsety, iconsize, iconsize);
@@ -549,7 +549,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	// draw the brigade icon
 	if(_bestuniticon > -1 && !TUT_MGR->IsActive())
 	{
-		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing brigade icon for town %s", _cp.Name());
+//		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing brigade icon for town %s", _cp.Name());
 		bigiconsize = (64.0f / iconscale) / 1.5f;
 
 		float ugx = -iconbuffer*2.5f;
@@ -621,7 +621,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		unsigned int limit = std::min(5U, count);
 		for(unsigned int s = 0; s < limit; ++s)
 		{
-			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
+//			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
