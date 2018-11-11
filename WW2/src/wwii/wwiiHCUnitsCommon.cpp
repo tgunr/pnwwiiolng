@@ -304,3 +304,20 @@ HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 
 	return nullptr;
 }
+
+//////////////////////////////////////////////////////////////////////
+// Return the training unit for a particular country/branch
+
+HCUnit*
+HCUnit::GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
+{
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
+	{
+		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
+			continue;
+		if ( it->second->isTrainingUnit())
+			return it->second;
+	}
+
+	return nullptr;
+}

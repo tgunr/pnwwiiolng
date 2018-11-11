@@ -17,7 +17,7 @@ class ObjectStruct;
 struct CaptureAction
 {
 	CaptureAction(class FacilityStruct& withFacility, WWII_COUNTRY withNewCountry, bool withQuietly);
-	void Execute();
+	void Execute( bool manualCapture = false);
 
 	FacilityStruct& m_facility;
 	CPStruct&		m_cp;
@@ -37,7 +37,7 @@ struct CaptureAction
 //tolua_end
 private:
 	void Announce() const;
-	void ApplyEffects() const;
+	void ApplyEffects(bool manualCapture = false) const;
 	void ChangeOwner();
 	void EnterContention() const;
 	void LeaveContention() const;

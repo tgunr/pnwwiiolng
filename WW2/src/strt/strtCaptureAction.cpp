@@ -226,7 +226,7 @@ CaptureAction::CaptureAction(FacilityStruct& withFacility, WWII_COUNTRY withNewC
 }
 
 void
-CaptureAction::Execute()
+CaptureAction::Execute(bool manualCapture)
 {
 	// Preparation
 	for ( int i = 1; i < MAX_SIDES; i++ )
@@ -569,7 +569,7 @@ void HCUnit::GetGarrisonUnits(std::list<HCUnit>& unitsList, UINT16 cpID)
 // Finish the capture event.
 
 void
-CaptureAction::ApplyEffects() const
+CaptureAction::ApplyEffects(bool manualCapture) const
 {
 	if ( m_enteredContention == true )
 		EnterContention();
@@ -610,9 +610,12 @@ CaptureAction::ApplyEffects() const
 			}
 		}
 
-		// Change the country of all Garrisons in this cp
-		// Sends it to chat and map hosts, map sends it to all clients.
-		m_cp.changeAllGarrisonCountries(m_newCountry, false);
+		if (m_facility.type == FACILITY_ARMYBASE)
+		{
+			// Change the country of all Garrisons in this cp
+			// Sends it to chat and map hosts, map sends it to all clients.
+			m_cp.changeAllGarrisonCountries(m_newCountry, manualCapture);
+		}
 
 	}
 

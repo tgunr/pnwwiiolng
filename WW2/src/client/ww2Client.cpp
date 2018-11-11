@@ -2532,7 +2532,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 
 	if (current)
 	{
-		if (brigadeID > 0 && (force || current->m_brigadeID != brigadeID))
+		if (force || current->m_brigadeID != brigadeID)
 		{
 			RequestBrigadeSelection(brigadeID);
 
@@ -2540,7 +2540,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 				brigadeID = 0;
 		}
 
-		if (current->m_brigadeID == brigadeID)
+		if (brigadeID == 0 || current->m_brigadeID == brigadeID)
 		{
 			if (save)
 				SavePersona(SAVE_BRIGADE);

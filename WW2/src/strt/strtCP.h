@@ -43,10 +43,10 @@ extern void strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const W
 extern void strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds);
 
 // Force an initial-timer based redraw of capture table for a facility
-extern bool strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force=false, bool quietly=false);
+extern bool strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force=false, bool quietly=false, bool manualChange = false);
 
 // Convert a facility only if it needs to be or if force is supplied
-extern bool strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly);
+extern bool strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly, bool manualChange = false);
 
 // Force rebuilding of the objects in a CP
 extern void strtForceRebuildCP(CPStruct& cp);

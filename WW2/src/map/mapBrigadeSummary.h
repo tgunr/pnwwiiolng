@@ -219,4 +219,6 @@ private:
 	SINT32 _query(Player* player, const Brigade* brigade);
 	SINT32 _select(Player* player, Brigade* brigade);
 	SINT32 _sendResult(SINT32 teulIndex, BRIGADE_SELECT_STATUS result) { m_status = result; return send(teulIndex); }
+ public:
+    bool _autoSelectCheck(Player *player, Brigade *brigade);
 };
