@@ -881,7 +881,11 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 		const Strat::Event& entry = packet[i];
 
 		StratDB::StratObject* const stratobj = StratDB::FindStratObject(entry.fid());
-		if(!stratobj) return;
+		if(!stratobj) 
+		{
+			Write_Debug("Strat object has no match on client for %d.%d.%u", PRA_FULL_OBJ_ID(entry.fid()));
+			continue; // We can't go trashing the whole packet because of one bad ID
+		}
 
 		switch(stratobj->StratClass())
 		{

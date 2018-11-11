@@ -227,7 +227,7 @@ public:
 	HCUnit* attackingUnit() const { return m_attackingUnit; }
 
 	bool changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly);
-	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly, bool manualChange = false);
+	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
 
 	void checkTownStatus(CPStruct *, bool, int);
 	

@@ -988,7 +988,7 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 					, _countryCode[newCountry]
 					);
 
-			return strtConvertFacility(*facility, newCountry, true, quietly, true);
+			return strtConvertFacility(*facility, newCountry, true, quietly);
 		}
 	}
 
@@ -1006,6 +1006,8 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 {
 	char* cpName = nullptr;
 	WWII_COUNTRY newOwner;
+	WWII_COUNTRY oldOwner;
+	WWII_SIDE oldSide;
 	CPStruct* cp;
 	bool quietly = false;
 	bool force = true;
@@ -1040,11 +1042,21 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	cp->m_enemyLinked;
 	cp->m_townstatus;
 
+	oldOwner = cp->country;
+	oldSide = cp->side;
+
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
 		quietly = true;
 
-	if ( cp->changeOwnership(newOwner, force, quietly, true) )
+	if ( cp->changeOwnership(newOwner, force, quietly) )
 	{
+		// If we've changed the country but not the side then we need to change the Garrison country to match.
+		// if the side had changed too then the Garrison country is changed via a CaptureAction.
+		if (cp->side == oldSide && newOwner != oldOwner)
+		{
+			cp->changeAllGarrisonCountries(newOwner, false);
+		}
+
 		if ( quietly )
 			LOCMESSAGE(LSTR_NOTE, (force ? LSTR_FORCED_OWNERSHIP : LSTR_CHANGED_OWNERSHIP), cp->name, _countryCode[newOwner]);
 		else

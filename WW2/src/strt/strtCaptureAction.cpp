@@ -381,6 +381,9 @@ CaptureAction::Announce() const
 				oldSideGCI = GCI_CP_CAPTURED;
 
 			newSideGCI = GCI_CP_ACQUIRED;
+
+			// The CP has been captured so we update the Garrison to the new country.
+			m_cp.changeAllGarrisonCountries(m_newCountry, false);
 		}
 		else
 		{
@@ -609,14 +612,6 @@ CaptureAction::ApplyEffects(bool manualCapture) const
 				strtCloseFirebase(*(link->firebase));
 			}
 		}
-
-		if (m_facility.type == FACILITY_ARMYBASE)
-		{
-			// Change the country of all Garrisons in this cp
-			// Sends it to chat and map hosts, map sends it to all clients.
-			m_cp.changeAllGarrisonCountries(m_newCountry, manualCapture);
-		}
-
 	}
 
 	// Now that we are clear of brigades, we need to process the

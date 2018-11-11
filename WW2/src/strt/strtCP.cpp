@@ -1514,7 +1514,7 @@ CPStruct::restartSupplies()
 // Capture a facility by reclaiming or taking it.
 
 bool
-strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force, bool quietly, bool manualChange)
+strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force, bool quietly)
 {
 	// Firebases are destroyed, not captured.
 	if ( facility.type == FACILITY_FIREBASE )
@@ -1563,7 +1563,7 @@ strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY h
 // existing owner. This is to avoid confusing chat spam.
 
 bool
-strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly, bool manualChange)
+strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force, bool quietly)
 {
 	dbugLog(_FLI, "converting %s from %d->%d [%s][%s]"
 					, facility.name
@@ -1582,7 +1582,7 @@ strtConvertFacility(FacilityStruct& facility, WWII_COUNTRY toCountry, bool force
 	}
 	else if ( facility.country != toCountry )
 	{
-		return strtCaptureFacility(facility, toCountry, facility.country, force, quietly, manualChange);
+		return strtCaptureFacility(facility, toCountry, facility.country, force, quietly);
 	}
 
 	return false;
