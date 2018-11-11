@@ -529,47 +529,56 @@ CPStruct::announceObjectiveWithdrawl() const
 //////////////////////////////////////////////////////////////////////
 // Change the ownership of an entire CP
 
-bool
-CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+bool CPStruct::changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly)
 {
-	if ( toCountry >= MAX_COUNTRIES )
+	dbugLog(_FLI, "%s %s %s change of ownership triggered to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
+			name, _countryName[toCountry]);
+
+	// Firstly change standard facilities
+	FacilityStruct *facility;
+	for (facility = facilityList; facility != nullptr; facility = facility->next)
 	{
-		dbugLog(_FLW, "Tried to change ownership of %s to %d (>= %d)"
-						, name
-						, toCountry
-						, MAX_COUNTRIES
-						);
+		if (facility->type == FACILITY_FIREBASE)
+			continue;
+		if (force || facility->country != toCountry)
+			strtConvertFacility(*facility, toCountry, force, quietly);
+	}
+
+	// Clear out the routeing
+//	resetRouteing();
+
+	return true;
+}
+
+bool CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+{
+	if (toCountry >= MAX_COUNTRIES)
+	{
+		dbugLog(_FLW, "Tried to change ownership of %s to %d (>= %d)", name, toCountry, MAX_COUNTRIES);
 		return false;
 	}
 
 	// If the ownership already matches, we fail unless force is true
-	if ( !force && !isContested() && wwiiSide(toCountry) == wwiiSide(country) )
+	if (!force && !isContested() && wwiiSide(toCountry) == wwiiSide(country))
 	{
-		dbugLog(_FLI, "%s.changeOwnership(%s) uneccessary - skipping"
-						, name
-						, _countryName[toCountry]
-						);
+		dbugLog(_FLI, "%s.changeOwnership(%s) uneccessary - skipping", name, _countryName[toCountry]);
 		return false;
 	}
 
-	dbugLog(_FLI, "%s %s %s change of ownership to %s"
-					, ((quietly) ? "quietly" : "visibly")
-					, ((force) ? "forcing" : "setting")
-					, name
-					, _countryName[toCountry]
-					);
+	dbugLog(_FLI, "%s %s %s change of ownership to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
+			name, _countryName[toCountry]);
 
 	// Firstly change standard facilities
-	FacilityStruct* facility;
-	for ( facility = facilityList; facility != nullptr; facility = facility->next )
+	FacilityStruct *facility;
+	for (facility = facilityList; facility != nullptr; facility = facility->next)
 	{
-		if ( facility->type == FACILITY_FIREBASE )
+		if (facility->type == FACILITY_FIREBASE)
 			continue;
-		if ( force || facility->country != toCountry )
+		if (force || facility->country != toCountry)
 			strtConvertFacility(*facility, toCountry, force, quietly);
 	}
 
-	bool justCaptured = true; //This is needed to trigger town status check because town status may not have changed as a result of capture
+	bool justCaptured = true; // This is needed to trigger town status check because town status may not have changed as a result of capture
 	checkTownStatus(this, justCaptured, 0);
 
 	// Clear out the routeing
@@ -586,9 +595,10 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 {
 	TOWN_STATUS oldStatus = cp->m_townstatus;
 	TOWN_STATUS newStatus = INACTIVE;
+	WWII_COUNTRY newCountry;
 	dbugLog(_FLN, "1: Level %d Town status check started for %s. Current town status: %d.", recurseLevel, cp->name, oldStatus);
 
-	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
+	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) // Iterate though linked towns list
 	{
 		LinkStruct* outLink = *it;
 		if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
@@ -665,6 +675,11 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 			checkTownStatus(otherCP, justCaptured, ++recurseLevel);
 
 		}
+		if (cp->changeOwnershipNoCapture(cp->controllingCountry, true, true))
+		{
+			cp->changeAllGarrisonCountries(cp->controllingCountry, true);
+		}
+
 		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
 	}
 	else

@@ -1037,6 +1037,8 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	cp = _getCPByArguments(cpName, message, false);
 	if ( cp == nullptr )
 		return false;
+	cp->m_enemyLinked;
+	cp->m_townstatus;
 
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
 		quietly = true;

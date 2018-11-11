@@ -459,7 +459,8 @@ void CPMapObject::DrawCPMarker(SuperCellMapView* mv)
 // this code is ugly and needs cleaning up - ramp
 void CPMapObject::DrawCP(SuperCellMapView* mv)
 {
-	phui::GraphicsContext* ctx = mv->GetGraphicsContext();
+	Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Entering renderer for town %s", _cp.Name());
+	phui::GraphicsContext *ctx = mv->GetGraphicsContext();
 
 	glPushMatrix();
 	ctx->DisableTexture();
@@ -537,7 +538,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 	for(int i = 0; i < (int)_statusicons.size(); ++i)
 	{
-		MapIcon& icon = _statusicons[i];
+		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status icon for town %s", _cp.Name());
+		MapIcon &icon = _statusicons[i];
 		ctx->SetTexture(icon.id);
 		phui::box_verts_with_pos(box, offsetx, offsety, iconsize, iconsize);
 		phui::draw_gl_quad(box.verts, icon.uv);
@@ -547,7 +549,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	// draw the brigade icon
 	if(_bestuniticon > -1 && !TUT_MGR->IsActive())
 	{
-		bigiconsize	= (64.0f/iconscale)/1.5f;
+		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing brigade icon for town %s", _cp.Name());
+		bigiconsize = (64.0f / iconscale) / 1.5f;
 
 		float ugx = -iconbuffer*2.5f;
 		float ugy = 0;
@@ -618,6 +621,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		unsigned int limit = std::min(5U, count);
 		for(unsigned int s = 0; s < limit; ++s)
 		{
+			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
@@ -988,10 +992,8 @@ bool CPMapObject::ObjectVisible() const
 	return _mouseover || _selected || _childselected || _renderer->showcps ||
 		(_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
 		(_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) ||
-		(_renderer->showreserve && cpflags & CP_STAT_FRONTLINE_LINKED) ||
-//		(_renderer->showbackline && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)) ||
-//		(_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
-		(_renderer->showbackline && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
+		(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) ||
+		(_renderer->showreserve && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
 		(_renderer->showrear && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED))) ||
 		(_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
 		(_renderer->showbrigades && _bestunit) ||
