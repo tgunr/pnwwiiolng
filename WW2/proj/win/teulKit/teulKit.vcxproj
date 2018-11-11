@@ -64,7 +64,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;TEUL_DETAIL_OUTPUT;DEBUG_WW2;DEBUG;CONNECTION_TEST_BUILD;WIN32;_LIB;platOS=OS_WIN32;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_ITERATOR_DEBUG_LEVEL=2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -111,7 +111,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;WIN32;NDEBUG;_LIB;platOS=OS_WIN32;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -152,7 +152,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;WIN32;NDEBUG;_LIB;platOS=OS_WIN32;MULTI_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -253,16 +253,6 @@
     <ClInclude Include="..\..\..\src\teul\teulTime.h" />
     <ClInclude Include="..\..\..\src\teul\teulUtils.h" />
     <ClInclude Include="..\..\..\src\wwii\wwiiCallbacks.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Libraries\libevent\libevent.vcxproj">
-      <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
-      <Private>true</Private>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\build_info.py" />

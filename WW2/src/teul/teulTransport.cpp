@@ -9,7 +9,13 @@
 //
 // Originating Programmer: Martin Poulin
 
+#if platBuild == BUILD_SERVER
 #include <event2/event.h>
+#endif
+
+#if platOS != OS_WIN32
+#include <netdb.h>
+#endif
 
 #include "mem/mem.h"
 #include "server/serverInterfaceDescription.h"

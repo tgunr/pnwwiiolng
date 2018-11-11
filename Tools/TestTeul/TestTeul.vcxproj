@@ -117,9 +117,6 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\libevent\libevent.vcxproj">
-      <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\RakNet\Source\RakNet.vcxproj">
       <Project>{143f9b67-c223-4f2d-b8f9-b644ca710ca6}</Project>
     </ProjectReference>

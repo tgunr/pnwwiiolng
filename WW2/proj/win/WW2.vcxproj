@@ -1880,9 +1880,6 @@
     <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
       <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\libevent\libevent.vcxproj">
-      <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\libxml2\win32\VC14\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
     </ProjectReference>
