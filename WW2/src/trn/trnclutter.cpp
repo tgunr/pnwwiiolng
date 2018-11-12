@@ -418,7 +418,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 	SINT32 ClutterType[3];
 	UINT32 ClutterNum;
 	FLOAT32 Variance;
-	const SINT8 * TexNamePtr;
+	const SINT8 * TexNamePtr = nullptr;
 	//piMATRIX Mat1,Mat2;
 	UINT32 Temp32;
 	SINT32 TempS32;

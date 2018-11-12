@@ -26,7 +26,6 @@
 #include "include/configVars.h"
 
 #if platOS == OS_WIN32
-#pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 #endif
@@ -49,7 +48,7 @@ static void _getHostIPAddresses()
 
 	// Get a list of IPv4 network interfaces.
 	struct ifaddrs *ifap = nullptr;
-    
+
 	if (getifaddrs(&ifap) < 0 || ifap == nullptr) {
 		LogAbort("Unable to get network interfaces");
     }
@@ -68,12 +67,12 @@ static void _getHostIPAddresses()
             dbugLog(_FLN, "Skipping interface %s because it is not an IPv4 interface (family %hhu)", ifa->ifa_name, ifa->ifa_addr->sa_family);
             continue;
         }
-        
+
         if (strcasecmp(ifa->ifa_name, primaryInterfaceName) != 0) {
             dbugLog(_FLN, "Skipping interface %s because it's not the primary interface (%s)", ifa->ifa_name, primaryInterfaceName);
             continue;
         }
-        
+
         pIntf = ifa;
         Server::myInterface.addr[Server::myInterface.numIP].naddr = reinterpret_cast<struct sockaddr_in *>(ifa->ifa_addr)->sin_addr.s_addr;
         Server::myInterface.addr[Server::myInterface.numIP].ip = ntohl(Server::myInterface.addr[Server::myInterface.numIP].naddr);
@@ -83,7 +82,7 @@ static void _getHostIPAddresses()
                     teulGetAddress(Server::myInterface.addr[Server::myInterface.numIP].ip));
         ++Server::myInterface.numIP;
     }
-    
+
     if (!pIntf) {
         LogAbort("Can't find primary interface %s", primaryInterfaceName);
     }
@@ -93,7 +92,7 @@ static void _getHostIPAddresses()
 	DWORD outBufLen = 32 * 1024;	// Start with 32Kb of buffer to retrieve data.
 	DWORD dwRetVal = ERROR_BUFFER_OVERFLOW;
 	DWORD getAddrFlags = GAA_FLAG_INCLUDE_PREFIX | GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST;
-    
+
     pAddresses = static_cast<PIP_ADAPTER_ADDRESSES>(::calloc(1, outBufLen));
     dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, nullptr, pAddresses, &outBufLen);
     if (dwRetVal == ERROR_BUFFER_OVERFLOW) {
@@ -104,13 +103,13 @@ static void _getHostIPAddresses()
     ABORT_IF_EX(dwRetVal != ERROR_SUCCESS, "Unable to retrieve network interfaces.");
 
 	PIP_ADAPTER_ADDRESSES preferredIf = nullptr;
-	
+
     for (auto curAddr = pAddresses; curAddr != nullptr; curAddr = curAddr->Next) {
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
 		if (curAddr->OperStatus != IfOperStatusUp || !curAddr->FirstUnicastAddress || (curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY) != 0) {
 			continue;
         }
-        
+
 		// The current interface is a better choice than what came before if it has at least one DNS server and Gateway.
 		if (preferredIf && (!curAddr->FirstDnsServerAddress || !curAddr->FirstGatewayAddress)) {
             continue;
@@ -198,7 +197,7 @@ namespace Teul
 SINT32 teulModShutdown()
 {
 	using namespace Teul;
-	
+
     for (auto *ep : idleEndpoints) {
         if (ep) {
             teulClose(*ep);
@@ -325,11 +324,11 @@ static void _connectSocket(ENDPOINT& endpoint)
 	// Start the connection process.
     int connectResult = 0;
     int connectErr = 0;
-    
+
     do {
         connectResult = connect(endpoint.socket, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
     } while (connectResult == SOCKET_ERROR && (connectErr = dbugGetErrno()) == PLAT_EINTR);
-   
+
     if (connectResult != SOCKET_ERROR || connectErr == PLAT_EWOULDBLOCK || connectErr == PLAT_EINPROGRESS) {
         endpoint.lastDataRecv.makeCurrent();
         endpoint.lastDataSent.makeCurrent();
@@ -388,7 +387,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 	}
 
 	struct sockaddr_in sockAddress;
-    
+
 	memset(&sockAddress, 0, sizeof(sockAddress));
 	sockAddress.sin_family = AF_INET;
 	sockAddress.sin_addr.s_addr = htonl(host);
@@ -420,7 +419,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
 			newEndpoint->localSockAddress.sin_port = htons(0);
 		}
 	}
-    
+
     try {
         switch (newEndpoint->protocol) {
             case PROTOCOL_TCP:
@@ -449,7 +448,7 @@ SINT32 teulOpenConnection(const bool listening, const SINT32 timeout, const PROT
             newEndpoint->doConnect();
         } else if (newEndpoint->state() != IS_LISTENING && !newEndpoint->m_reliable) {
             SINT32 sendErr = teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN); // Send SYN immediately on UDP connection sockets
-            
+
             if (sendErr < 0) {
                 throw Teul::OpenError(-sendErr, "failed to send new connection open");
             }
@@ -484,11 +483,11 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 
 	if (!inEndpoint.m_reliable) {
         int connErr = 0, connRes = 0;
-        
+
         do {
 		    connRes = connect(inEndpoint.socket, reinterpret_cast<struct sockaddr *>(&inEndpoint.destSockAddress), sizeof(inEndpoint.destSockAddress));
         } while (connRes == SOCKET_ERROR && (connErr = dbugGetErrno()) == PLAT_EINTR);
-        
+
 		if (connRes == SOCKET_ERROR) {
 			dbugLog(_FLA, "t:%d couldn't connect socket",inEndpoint.teulIndex());
 			return -connErr;
@@ -529,7 +528,7 @@ void teulClose(ENDPOINT& inEndpoint)
 	if (inEndpoint.state() == IS_DEAD) {
         return;
     }
-    
+
     // check status of paired backchannel, if client release - it'll get recreated when they log back in
     RakNetChannel::disconnectPeer(&inEndpoint);
     inEndpoint.shutdown();

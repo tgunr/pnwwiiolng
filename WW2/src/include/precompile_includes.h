@@ -33,6 +33,8 @@
 #include <numeric>
 #include <thread>
 #include <mutex>
+#include <locale>
+#include <codecvt>
 #include <signal.h>
 
 #if __has_include(<unistd.h>)

@@ -10,7 +10,6 @@
 #include "include/vars.h"
 #include "fio/fio.h"
 #include "trn/trnsky.h"
-#include "draw/sneaky.h"
 #include "ogl/GLCounter.h"
 
 #include <string>
@@ -158,7 +157,7 @@ SINT32 CFbo::createRenderCubemap(GLint filtermin,
     t.target = GL_TEXTURE_CUBE_MAP_ARB;
     t.attachment = GL_COLOR_ATTACHMENT0_EXT;
 
-    gl_GenTextures(1, &t.texture);
+    glGenTextures(1, &t.texture);
 
     // Initialize color texture
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, t.texture);
@@ -260,7 +259,7 @@ SINT32 CFbo::createRenderTexture(GLint filtermin,
     t.target = target;
     t.attachment = GL_COLOR_ATTACHMENT0_EXT;
 
-    gl_GenTextures(1, &t.texture);
+    glGenTextures(1, &t.texture);
 
     // Initialize color texture
     glBindTexture(target, t.texture);

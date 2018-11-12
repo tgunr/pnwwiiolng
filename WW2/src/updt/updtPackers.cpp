@@ -205,7 +205,7 @@ std::vector<std::wstring> updtGetNvHistory()
 	wchar_t buffer[128];
 	for ( auto it = nvHistory.begin(), end = nvHistory.end(); it != end; ++it )
 	{
-		swprintf(buffer, sizeof(buffer) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
+		swprintf(buffer, (sizeof(buffer) / sizeof(buffer[0])) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
 		result = buffer;
 		result += it->description;
 		results.push_back(result);

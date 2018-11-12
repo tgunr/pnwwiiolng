@@ -431,7 +431,7 @@ UINT32 VarNum;
 UCHAR * VarName;
 UCHAR * VarContents;
 SINT32 EngineListPos;
-mlEngineData * EngineData;
+mlEngineData * EngineData = nullptr;
 UINT32 Size;
 
 

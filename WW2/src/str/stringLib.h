@@ -100,3 +100,8 @@ bool has_prefix(const std::string &str, const std::string &prefix);
 std::string strtolower(const std::string &str);
 std::string strtoupper(const std::string &str);
 std::string strtrim(const std::string &str);
+
+// The Windows implementation of these is in sysmain.cpp
+// The macOS implementation is in sysMacCompat.cpp
+extern std::string Base64Encode(void const *buffer, size_t bufferLength);
+extern bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength);

@@ -283,7 +283,7 @@ void ReadoutView::DisplayGroundReadout()
 	}
 	else
 	{
-		swprintf(gearNum, sizeof(gearNum) - 1, L"%d", (SINT32)(TempNum + 0.5f));
+		swprintf(gearNum, (sizeof(gearNum) / sizeof(gearNum[0])) - 1, L"%d", (SINT32)(TempNum + 0.5f));
 		gear = gearNum;
 	}
 

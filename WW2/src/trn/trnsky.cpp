@@ -1912,7 +1912,7 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 	FLOAT32 Angle;
 	piVECTOR Vec, Dir;
 	FLOAT32 TempNum;
-	FLOAT32 Red,Green,Blue,Alpha;
+	FLOAT32 Red,Green,Blue,Alpha = 0.0f;
 	UINT32 Color;
 	FLOAT64VECTOR WorldOriginOffset;
 	FLOAT32 PlayerSunDotProduct;
