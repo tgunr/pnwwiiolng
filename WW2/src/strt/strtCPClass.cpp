@@ -676,10 +676,9 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 			checkTownStatus(otherCP, justCaptured, ++recurseLevel);
 
 		}
-		if (cp->changeOwnershipNoCapture(cp->controllingCountry, true, true))
-		{
-			cp->changeAllGarrisonCountries(cp->controllingCountry, true);
-		}
+
+		cp->changeOwnershipNoCapture(cp->controllingCountry, true, true);
+
 
 		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
 	}
