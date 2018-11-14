@@ -223,7 +223,7 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <CompileAs>Default</CompileAs>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <DiagnosticsFormat>Classic</DiagnosticsFormat>
       <SmallerTypeCheck>false</SmallerTypeCheck>
@@ -303,7 +303,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>
@@ -382,7 +382,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>
@@ -460,7 +460,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
@@ -699,7 +699,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>
@@ -773,7 +773,7 @@
       <CompileAs>Default</CompileAs>
       <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CompileAsManaged>false</CompileAsManaged>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>

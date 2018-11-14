@@ -64,7 +64,7 @@
       <PrecompiledHeaderFile />
       <PrecompiledHeaderOutputFile />
       <ControlFlowGuard>Guard</ControlFlowGuard>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
       <ExceptionHandling>Sync</ExceptionHandling>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <CompileAsManaged>false</CompileAsManaged>
