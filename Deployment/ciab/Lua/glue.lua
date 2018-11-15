@@ -517,7 +517,7 @@ function setCP(targetCP, country, announce, force)
  local ctry = getCountry(country)
  if type(ctry) ~= 'number' then return error("Unrecognized country "..country) end
  if force or cp.country ~= ctry then
-  cp:changeOwnership(ctry, true, not(announce))
+  cp:changeOwnershipFromScript(ctry, true, not(announce))
  end
  strtSaveCP(cp)
  return cp

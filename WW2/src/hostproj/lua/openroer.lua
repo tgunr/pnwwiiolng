@@ -8,7 +8,7 @@ function run ()
     print("No such cp: " .. name)
    end
    if cp.country ~= 1 then
-     cp:changeOwnership(WWII_ENGLAND, true, true)
+     cp:changeOwnershipFromScript(WWII_ENGLAND, true, true)
    else
     print("CP "..cp.uOID.." is already "..cp.country)
    end

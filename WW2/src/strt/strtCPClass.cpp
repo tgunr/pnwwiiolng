@@ -588,6 +588,14 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 	return true;
 }
 
+void CPStruct::changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly)
+{
+	if (changeOwnership(toCountry, force, quietly))
+	{
+		changeAllGarrisonCountries(toCountry, false);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // Check the status of cp and update all linked cps recursively.
 
@@ -596,7 +604,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 {
 	TOWN_STATUS oldStatus = cp->m_townstatus;
 	TOWN_STATUS newStatus = INACTIVE;
-	WWII_COUNTRY newCountry;
+
 	dbugLog(_FLN, "1: Level %d Town status check started for %s. Current town status: %d.", recurseLevel, cp->name, oldStatus);
 
 	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) // Iterate though linked towns list

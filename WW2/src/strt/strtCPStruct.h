@@ -228,6 +228,7 @@ public:
 
 	bool changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly);
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
+	void changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly);
 
 	void checkTownStatus(CPStruct *, bool, int);
 	
