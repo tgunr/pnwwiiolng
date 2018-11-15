@@ -587,7 +587,7 @@
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath) /KEYFILE "$(USERPROFILE)\Documents\codesigning.pfx" /TOOL "$(WindowsSdkDir_10)\bin\x86\signtool.exe"</Command>
+      <Command>python "$(SolutionDir)\WW2\proj\win\codesign.py" /VS /SIGN /DESC "World War II Online" /PASS:HERE PNww2/pn-codesign /VERBOSE $(TargetPath) /KEYFILE "$(USERPROFILE)\Documents\codesigning.pfx" /TOOL "$(WindowsSdkDir_10)\bin\$(TargetPlatformVersion)\x86\signtool.exe"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Code signing executable</Message>
