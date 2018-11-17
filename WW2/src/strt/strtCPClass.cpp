@@ -1737,6 +1737,21 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualCha
 
 }
 
+StratHCUnit * CPStruct::getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM movementType)
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit->branch() == branchID && unit->movementType() == movementType)
+		{
+			return unit;
+		}
+	}
+	return nullptr;
+}
+
 void CPStruct::disableAllGarrisons()
 {
 	HCUNIT_INDEX unitList = m_units;

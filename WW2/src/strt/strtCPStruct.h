@@ -303,6 +303,8 @@ public:
 	// Changes the country and the toe Template header for all Garrisons in this cp.
 	void changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange);
 
+	StratHCUnit* getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM movementType);
+
 	void disableAllGarrisons();
 	void enableAllGarrisons();
 

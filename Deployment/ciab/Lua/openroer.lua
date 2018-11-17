@@ -1,4 +1,4 @@
-local attempts = { "Antwerp", "Schilde", "Oostmalle", "Grobbendonk", "Geel", "Mol", "Lommel", "Leopoldsburg", "Peer", "achel", "Weert", "Maaseik", "Panningen", "Roermond West" }
+local attempts = { "Schilde", "Oostmalle", "Grobbendonk", "Geel", "Mol", "Lommel", "Leopoldsburg", "Peer", "achel", "Weert", "Maaseik", "Panningen", "Roermond West" }
 
 function run ()
  for i in ipairs(attempts) do

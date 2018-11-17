@@ -1623,6 +1623,43 @@ _returnLog(const POSTED_WEAPON* weapon, const char* message)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Attempts to return posted weapon to the Garrison in the CP that we RTB to
+
+static bool
+_returnWeaponToGarrison(POSTED_WEAPON* weapon)
+{
+	if (!weapon || !weapon->m_facility)
+		return false;
+	// Get the facility that we are attempting to return the weapon to.
+	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_brigade, false);
+	if (supplyFacility == nullptr)
+		return false;
+	if (weapon->m_brigade == nullptr)
+		return false;
+
+	if (weapon->m_facility->country == supplyFacility->country)
+	{
+		// If there is a Garrison of the same branch and movement type in the CP that we are trying to RTB to
+		// then try to deposit the weapon there.
+		StratHCUnit* newUnit = weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
+		if (newUnit)
+		{
+			if (newUnit->depositWeapons(weapon->spec(), 1, true, nullptr) == false)
+				return false;
+			_returnLog(weapon, "manually-supplied to Garrison");
+			weapon->detachReinforcement();
+			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->shortName());
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+//////////////////////////////////////////////////////////////////////
 // Attempt to return posted weapon to its brigade
 
 static bool
@@ -1767,30 +1804,56 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	}
 	else if ( rtbed == true )
 	{
-		// First attempt to deliver the equipment back to the unit it
-		// came from: if you spawn divisional equipment, it should try
-		// to return to the division before falling thru to a brigade
-		// that may be at the same town.
-		// After that, try to deliver it to your brigade at this
-		// location. If that fails, finally, "rescue" the equipment.
+		// Garrisons are able to overstock another Garrison of the same country so we first test for that
+		// If that fails we try to return it to where it came from.
+		if (m_supplyingBrigade->isGarrison())
+		{
+			if (_returnWeaponToGarrison(this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to different Garrison", m_weaponSerial.serial);
+				rescue = false;
+				if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
+					vehicleDelivered = true;
+			}
+			else if (_returnToOrigin(*this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+				rescue = false;
+			}
+			else
+			{
+				TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+				_returnLog(this, "failed to deliver");
+				rescue = true;
+			}
+		}
+		else {
+			// This for units that aren't Garrisons.
+			// First attempt to deliver the equipment back to the unit it
+			// came from: if you spawn divisional equipment, it should try
+			// to return to the division before falling thru to a brigade
+			// that may be at the same town.
+			// After that, try to deliver it to your brigade at this
+			// location. If that fails, finally, "rescue" the equipment.
 
-		if ( _returnToOrigin(*this) == true )
-		{
-			TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
-			rescue = false;
-		}
-		else if ( _returnToBrigade(this) == true )
-		{
-			TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
-			rescue = false;
-			if ( m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade )
-				vehicleDelivered = true;
-		}
-		else
-		{
-			TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
-			_returnLog(this, "failed to deliver");
-			rescue = true;
+			if (_returnToOrigin(*this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+				rescue = false;
+			}
+			else if (_returnToBrigade(this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
+				rescue = false;
+				if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
+					vehicleDelivered = true;
+			}
+			else
+			{
+				TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+				_returnLog(this, "failed to deliver");
+				rescue = true;
+			}
 		}
 	}
 

@@ -170,6 +170,14 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( armyBase->canABSupply(forUnit.side()) == false )
 			return nullptr;
 
+		if (forUnit.isGarrison())
+		{
+			if (forUnit.country() == armyBase->country)
+			{
+				return armyBase;
+			}
+		}
+
 		// Is the unit here?
 		if ( forUnit.homeCPID() != cp->fullObjID )
 			return nullptr;
