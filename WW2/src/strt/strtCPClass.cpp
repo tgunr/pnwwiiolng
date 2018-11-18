@@ -1731,6 +1731,8 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualCha
 					// Restart supply with trickle timer.
 					unit->restartGarrisonSupply(manualChange);
 				}
+
+				unit->save();
 			}
 		}
 	}

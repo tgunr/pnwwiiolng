@@ -271,12 +271,14 @@ StratHCUnit::save() const
 				", modified = now()"
 				", last_moved = %u"
 				", last_moved_by = '%s'"
+		        ", country_id = %u"
 			" WHERE unit_id = %u"
 				, homeOID
 				, fallbackOID
 				, nextMove()
 				, lastMoved()
 				, ((0LL != lastMovedBy()) ? Chat::Name(lastMovedBy()).c_str() : "SYSTEM")
+		        , country()
 				, unitID()
 				);
 }
