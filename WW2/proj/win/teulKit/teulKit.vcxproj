@@ -155,7 +155,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>platBuild=BUILD_CLIENT;WIN32;NDEBUG;_LIB;platOS=OS_WIN32;MULTI_CLIENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <PrecompiledHeader>Use</PrecompiledHeader>
