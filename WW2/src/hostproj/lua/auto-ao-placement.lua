@@ -35,6 +35,7 @@ if not (gameAOPlacementEnabled or gameAOPlacements) then
 end
 
 function _sendMessages(msg)
+
 	--  systemMessage(msg)
 	--  print(msg)
 	log('M', 'autoao', msg)
@@ -45,6 +46,7 @@ end
 -- true/false, check if this cp is a valid ao origin
 
 function _validOriginForAO(cp, forSide)
+
 	-- Citys only
 	if not cp:isCity() then return false end
 
@@ -65,6 +67,7 @@ function _validOriginForAO(cp, forSide)
 			cp.uOID == routDestination[FRANCE].uOID or
 			cp.uOID == routDestination[GERMANY].uOID or
 			cp.uOID == routDestination[USA].uOID then
+
 		return false
 	end
 
@@ -107,10 +110,10 @@ function _scoreAOPotential(unit, origin, link, target, country)
 
 	if origin:isObjective() then score = score + 1 end
 	score = score + origin.numLinks - target.numLinks
+
 	if target:numUnits() == 0 then score = score + origin.m_value end
 
 	score = score + math.floor(attackingInf / ewsHighThreshold[INFANTRY]) * 10
-
 	local str = "Init score = " .. score
 
 	-- Try to pick a fair fight
@@ -127,6 +130,7 @@ function _scoreAOPotential(unit, origin, link, target, country)
 		str = str .. " aa>da"
 		score = score + (attackingArmor / 10)
 	end
+
 	local armorBonus = math.floor(unit:getSupplyPctg(GROUND_VEHICLE) / 20)
 	if armorBonus > 2 then
 		str = str .. " +ab" .. armorBonus
@@ -137,6 +141,7 @@ function _scoreAOPotential(unit, origin, link, target, country)
 	if origin:isSupplied() == false then
 		str = str .. " !sup"
 		score = score / 2
+
 		if origin:isFriendlyLinked() == false then
 			str = str .. " !fl"
 			score = score / 2
@@ -148,6 +153,7 @@ function _scoreAOPotential(unit, origin, link, target, country)
 		if target:isSupplied() == false then
 			str = str .. " +pocket"
 			score = score * 1.5
+
 			-- HUGE bonus for retaking our towns
 			if target.originalSide == origin.side then
 				score = score * 1.25
@@ -160,6 +166,7 @@ function _scoreAOPotential(unit, origin, link, target, country)
 
 	-- Bonus for Factory Towns
 	if target.m_isSupplyCenter then
+
 		-- Particularly so if the enemy is holding one of ours!
 		if target.originalSide == origin.side then
 			str = str .. " +scos"
@@ -177,6 +184,7 @@ function _scoreAOPotential(unit, origin, link, target, country)
 			str = str .. " +fb"
 			score = score * 1.5		-- Its not under attack
 		end
+
 	elseif link.firebase then -- It has an enemy firebase, lower the score
 		str = str .. " efb"
 		score = score * 0.75
@@ -188,9 +196,12 @@ function _scoreAOPotential(unit, origin, link, target, country)
 	-- Is Origin under attack?
 	if origin:isDefendObjective(origin.side) then
 		score = score * 2
+
 		-- Is the destination the home of the attacking unit?
 		local attacker = origin:attackingUnit()
+
 		if attacker ~= nil and attacker:homeCPID() == origin.fullObjID then
+
 			-- Big bonus for attacking our attacker.
 			score = score * 3
 		end
@@ -202,7 +213,6 @@ function _scoreAOPotential(unit, origin, link, target, country)
 	score = math.floor(score)
 
 	local msg = "Considering " .. unit:name() .. " : " .. origin.name .. " => " .. target.name .. " (" ..score ..")" .. str
-
 	log('D', 'autoao', msg)
 	--  log('W', 'autoao', msg)
 
@@ -213,6 +223,7 @@ end
 ----------------------------------------------------------------------
 -- Returns true/false. Is the USA deployed In-Game. Tier 3+ usually.
 -- True = US Personas are Active. False = US Personas are Inactive.
+
 function isUSA_Deployed()
 
 	local usDeployed = false
@@ -226,6 +237,7 @@ function isUSA_Deployed()
 		if unit:country() == WWII_USA then
 			if unit:homeCPID() ~= routDestination[USA].uOID then
 				usDeployed = true
+
 				--  _sendMessages("US set to Deployed")
 				break
 			end
@@ -238,6 +250,7 @@ end
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 -- Pick the underdog country of a given side
+
 function gameAOChooseAlliedCountry(forSide)
 
 	if forSide == AXIS then return WWII_GERMANY end
@@ -246,7 +259,7 @@ function gameAOChooseAlliedCountry(forSide)
 	local french = 0
 	local brit = 0
 	local usa = 0
-	
+
 	if isUSA_Deployed() == false then
 	--  Pre US deployment / NOT Deployed
 
@@ -302,9 +315,10 @@ end
 -- Check if a unit is a worthwhile candidate
 
 function _isCandidateUnit(unit)
-	-- if unit:isBrigade() == false and unit:isGarrison() == false then return false end  --  Removed Dev Meeting: 2018-09-30  --
-	if unit:isGarrison() == false then return false end
+
+	--[[  if unit:isBrigade() == false and unit:isGarrison() == false then return false end  --  Removed Dev Meeting: 2018-09-30  ]]
 	if unit:movementType() ~= BRANCH_LAND then return false end
+	if unit:isGarrison() == false then return false end
 	if unit:offMap() == true then return false end
 	local cp = unit:homeCP()
 	if cp == nil then return false end
@@ -330,8 +344,10 @@ function gameAOCandidateSelection (forSide)
 		numCandidates = 0,
 		best = {}
 	}
+
 	local scores = {}
 	local byScore = {}
+
 	-- Look for someone to place an AO
 	-- Look for frontline, friendly towns with HC Units,
 	-- then search their neighbors for something to attack.
@@ -339,16 +355,22 @@ function gameAOCandidateSelection (forSide)
 		if unit:side() == forSide and _isCandidateUnit(unit) then
 			local cp = unit:homeCP()
 			for link in allLinksFrom(cp) do
+
 			-- check all of the links
 				local rcp = link.endDepot.cp
+
 				-- Skip towns that score nil point
 				local score = _scoreAOPotential(unit, cp, link, rcp, country)
-				if score > 0 and (scores[rcp] == nil or score > scores[rcp] or (unit:country() == country and result.candidates[rcp]:country() ~= country)) then 
+				if score > 0 and (scores[rcp] == nil or score > scores[rcp] or (unit:country() == country and result.candidates[rcp]:country() ~= country)) then
 					result.candidates[rcp] = unit
 					scores[rcp] = score
-					if not byScore[score] then byScore[score] = {} end
+					if not byScore[score] then
+						byScore[score] = {}
+					end
 					table.insert(byScore[score], rcp)
-					if score > result.maxScore then result.maxScore = score end
+					if score > result.maxScore then
+						result.maxScore = score
+					end
 				end
 			end
 		end
@@ -370,7 +392,7 @@ end
 
 function _cancelPlacements(forSide)
 	gameAOPlacements[forSide] = nil
-	gameAONotice[forSide] = gameAOWarnings 
+	gameAONotice[forSide] = gameAOWarnings
 end
 
 ----------------------------------------------------------------------
@@ -398,7 +420,7 @@ function gameSpareAOCapacity (forSide)
 		return _cancelPlacements(forSide)
 	end
 
-    -- Make sure certain values are initialized
+	-- Make sure certain values are initialized
 	if not gameAOLastSpare[forSide] or not gameAOLastCap[forSide] then
 		log('D', 'autoao', "initializing")
 		return _cancelPlacements(forSide)
@@ -408,10 +430,17 @@ function gameSpareAOCapacity (forSide)
 	local capacity = g_objectiveStats:attackCapacity()
 	local placed = g_objectiveStats:attacks(forSide)
 	local required = math.floor(capacity * gameAOMinimumRatio)
-    if gameAOMinimumRatio == 0 and gameAOMinimum > 0 then required = gameAOMinimum end
+
+	if gameAOMinimumRatio == 0 and gameAOMinimum > 0 then
+		required = gameAOMinimum
+	end
+
 	local spare = capacity - placed
 	local shortFall = required - placed
-	if shortFall <= 0 then shortFall = 0 end
+
+	if shortFall <= 0 then
+		shortFall = 0
+	end
 
 	-- Generate a presentable description of availability status
 	local stats = locstr('aoStats', capacity, _sideNameAdj[forSide], placed, spare, shortFall)
@@ -433,6 +462,7 @@ function gameSpareAOCapacity (forSide)
 		else
 			log('D', 'autoao', "placed >= required, not bumped")
 		end
+
 		_cancelPlacements(forSide)
 		return
 	end
@@ -442,29 +472,32 @@ function gameSpareAOCapacity (forSide)
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoNotice'), stats)
 		log('D', 'autoao', stats .. " considering auto-placement")
 		local noticeDelay = gameAONoticeDelay
+
 		_schedulePlacement(forSide, noticeDelay, gameAOWarnings)	-- false := first warning
 		return
 	end
 
 	-- Don't pass this point until after the scheduled time
-	if teulClockTime < gameAOPlacements[forSide] then
-		return
-	end
+	if teulClockTime < gameAOPlacements[forSide] then return end
 
 	-- Have they been given notice yet?
 	if gameAONotice[forSide] > 0 then
 		log('D', 'autoao', stats .. " working auto-placement schedule")
+
 		-- Make a nice version of it
 		local timeLeft = gameAOWarningTime * gameAONotice[forSide]
 		local interval
+
 		if timeLeft > 90 then
 			interval = locstr('aoTimeMinutes', math.ceil(timeLeft/60))
 		else
 			interval = locstr('aoTimeSeconds', timeLeft)
 		end
+
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoAttention'), stats)
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoAttention'), locstr('aoNewObjectiveSoon', interval))
 		gameAOListCandidates(forSide)
+
 		_schedulePlacement(forSide, gameAOWarningTime, gameAONotice[forSide] - 1)
 		return
 	end
@@ -474,6 +507,7 @@ function gameSpareAOCapacity (forSide)
 	if options.maxScore == 0 then
 		log('M', 'autoao', "Nowhere for an AO")
 		_schedulePlacement(forSide, gameAOWarningTime, 2)
+
 		return
 	end
 
@@ -485,6 +519,7 @@ function gameSpareAOCapacity (forSide)
 	if candidate == nil then
 		_schedulePlacement(forSide, gameAOWarningTime, 2)
 		log('W', 'autoao', stats .. " Unable to find a candidate!")
+
 		return
 	end
 
@@ -518,7 +553,7 @@ function gameAOListCandidates (forSide)
 			if i > 1 then str = str .. ", " end
 			str = str .. rcp.name
 
-		--  _sendMessages("gameAOListCandidates - ".._sideNameAdj[forSide]..": "..rcp.name)
+			--  _sendMessages("gameAOListCandidates - ".._sideNameAdj[forSide]..": "..rcp.name)
 
 		end
 		chatSendHCMessage(forSide, LSTR_GENERIC, locstr('aoCandidates', str))
@@ -533,6 +568,7 @@ end
 
 function testAOPlacement(forSide)
 	local options = gameAOCandidateSelection(forSide)
+
 	if options.numCandidates == 0 then
 		warn("No candidates")
 		return
@@ -541,9 +577,11 @@ function testAOPlacement(forSide)
 	local rcp, i
 	local size = 0
 	local str = ""
+
 	for i in options.best do
 		rcp = options.best[i]
 		if i > 1 then str = str .. ", " .. rcp.name else str = str .. rcp.name end
 	end
+
 	warn(options.numCandidates .. " candidates: " .. str)
 end
