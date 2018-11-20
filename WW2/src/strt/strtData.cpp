@@ -869,7 +869,7 @@ _setTownStatus()
 	SINT64 totalIN = 0;
 	SINT64 totalNS = 0;
 	SINT64 totalLinked = 0;
-	BOOL linkDetected = false;
+	bool linkDetected = false;
 	SINT64 totalChecked = 0;
 	CPStruct* cp;
 //	FacilityStruct* facility;
