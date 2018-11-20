@@ -576,7 +576,7 @@ StratObject::ChildList StratObject::ChildStratObjects() const
 	FindBestUnit
 *************************************************************************************************/
 
-unsigned int StratObject::FindBestUnit(int s, int c, int b) const
+unsigned int StratObject::FindBestUnit(int s, int c, int b, bool ignoreGarrisons) const
 {
 	HCUnit* best = nullptr;
 	HCUnit* unit = nullptr;
@@ -585,7 +585,7 @@ unsigned int StratObject::FindBestUnit(int s, int c, int b) const
 	{
 		unit = HCUnit::Lookup(_units[i]);
 
-		if(unit && !unit->isTrainingUnit())
+		if(unit && !unit->isTrainingUnit() && !(unit->isGarrison() && ignoreGarrisons))
 		{
 			if(!best)
 				best = unit;

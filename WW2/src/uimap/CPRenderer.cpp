@@ -714,8 +714,16 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 		// contention
 		_contended = cpflags & CP_STAT_CONTENTION;
 
-		// best brigade
-		_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0);
+		// Find the best unit that isn't a Garrison.
+		_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0, true);
+		bool garrisonOnly = false;
+		// If no best unit was found we know that it's only a Garrison in this town.
+		// we still need to get a best unit so we can find it's country.
+		if (_bestunit == 0)
+		{
+			garrisonOnly = true;
+			_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0, false);
+		}
 
 		// other unit here?
 		_altuniticon = 0;
@@ -739,7 +747,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						// Take into account the player's map preference settings aswell
 						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
 							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
-							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)))
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
+							(_renderer->showbrigades && !garrisonOnly))
 						{
 							_bestuniticon = _renderer->animFlagIcons[unit->country()];
 							
