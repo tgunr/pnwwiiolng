@@ -762,7 +762,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						// Take into account the player's map preference settings aswell
 						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
 							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
-							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)))
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
+							(_renderer->showbrigades && !garrisonOnly))
 						{
 							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
 						}
