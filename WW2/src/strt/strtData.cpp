@@ -2108,10 +2108,10 @@ _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLI, "forcing %d:%d ownership on %s from %d:%d"
-					, country, side
+	dbugLog(_FLI, "forcing ownership of %s from side: %d to %d and country: %d to %d"
 					, cp.name
-					, cp.country, cp.side
+		            , cp.side, side
+					, cp.country, country
 					);
 #endif
 
@@ -2157,11 +2157,11 @@ _cpControl(CPStruct& cp, WWII_COUNTRY country)
 	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLI, "forcing %d:%d control on %s from %d:%d"
-					, country, side
-					, cp.name
-					, cp.country, cp.side
-					);
+	dbugLog(_FLI, "forcing control of %s from side: %d to %d and country: %d to %d"
+		, cp.name
+		, cp.side, side
+		, cp.country, country
+	);
 #endif
 
 	cp.controllingSide = side;
