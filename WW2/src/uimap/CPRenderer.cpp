@@ -1294,6 +1294,31 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				}
 			}
 
+			if (cpflags & CP_STAT_ENEMY_LINKED)
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.frontline");
+				tip += L"\n";
+			}
+			if (cpflags & CP_STAT_FRONTLINE_LINKED)
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.backline");
+				tip += L"\n";
+			}
+			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.inactive");
+				tip += L"\n";
+			}
+			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.reserve");
+				tip += L"\n";
+			}
+
 			mv->SetToolTip(tip.c_str());
 		}
 		else
