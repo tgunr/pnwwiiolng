@@ -1191,6 +1191,8 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 
 			const StratDB::StratObject::UnitList& units = _cp.GetUnits();
 
+			bool display = false;
+
 			if(units.size() > 0 && !TUT_ACTIVE)
 			{
 				tip += L"\n";
@@ -1201,6 +1203,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				BrigadeControlList* oic	= nullptr;
 				unsigned int current	= 0;
 				bool foundMine			= false;
+				bool townIsEmpty        = true;
 
 				for(int i = 0; i < (int)units.size(); ++i)
 				{
@@ -1209,61 +1212,81 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 					if(unit && !unit->isTrainingUnit())
 					{
 						HCUnit* division = (unit->isBrigade()) ? unit->parent(): unit;
-
-						if(division && division->unitID() != current)
+						display = false;
+						
+						// Check whether this is a reserve town with no units in it or not.
+						if (unit->isBrigade() || unit->isDivision() ||
+							(unit->isGarrison() && (cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED |
+								CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 						{
-							current = division->unitID();
-							tip += uiUTF8toUTF16(division->m_name);
-							switch(division->country())
+							display = true;
+							townIsEmpty = false;
+						}
+
+						// If the town is not empty then we display the units that are in it on mouse over.
+						if (display)
+						{
+							if (division && division->unitID() != current)
 							{
+								current = division->unitID();
+								tip += uiUTF8toUTF16(division->m_name);
+								switch (division->country())
+								{
 								case WWII_ENGLAND:
 									tip += L" - UK";
-								break;
+									break;
 								case WWII_USA:
 									tip += L" - US";
-								break;
+									break;
 								case WWII_FRANCE:
 									tip += L" - FR";
-								break;
+									break;
 								case WWII_GERMANY:
 									tip += L" - DE";
-								break;
-                                default:
-                                    // Currently unrecognized country
-                                    break;
+									break;
+								default:
+									// Currently unrecognized country
+									break;
+								}
+								tip += L"\n";
 							}
+
+							if (unit->unitID() == myBrigadeID)
+							{
+								foundMine = true;
+								tip += L"*";
+							}
+
+							if (unit->isBrigade() || unit->isGarrison())
+							{
+								tip += L"     ";
+								tip += uiUTF8toUTF16(unit->m_name);
+							}
+							else if (unit->isDivision())
+							{
+								tip += L"     ";
+								tip += _renderer->tooltip("widgets.map.tooltip.divhq");
+							}
+
+							oic = _renderer->client ? _renderer->client->LookupBrigadeOIC(unit->unitID()) : 0;
+							if (oic && oic->m_officer)
+							{
+								tip += L" - OIC: ";
+								tip += chatGetWideCallsign(oic->m_officer);
+							}
+
 							tip += L"\n";
 						}
-
-						if(unit->unitID() == myBrigadeID)
-						{
-							foundMine = true;
-							tip += L"*";
-						}
-
-						if(unit->isBrigade() || unit->isGarrison())
-						{
-							tip += L"     ";
-							tip += uiUTF8toUTF16(unit->m_name);
-						}
-						else
-						{
-							tip += L"     ";
-							tip += _renderer->tooltip("widgets.map.tooltip.divhq");
-						}
-
-						oic = _renderer->client ? _renderer->client->LookupBrigadeOIC(unit->unitID()) : 0;
-						if(oic && oic->m_officer)
-						{
-							tip += L" - OIC: ";
-							tip += chatGetWideCallsign(oic->m_officer);
-						}
-
-						tip += L"\n";
 					}
 				}
+				// If there are no units in this town.
+				if (townIsEmpty)
+				{
+					tip += _renderer->tooltip("widgets.map.tooltip.emptytown");
+					tip += L"\n";
+				}
 
-				if(foundMine)
+				if(foundMine && display)
 				{
 					tip += L"\n";
 					tip += _renderer->tooltip("widgets.map.tooltip.yours");
