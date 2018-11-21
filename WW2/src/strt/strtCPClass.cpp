@@ -1746,7 +1746,7 @@ StratHCUnit * CPStruct::getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM move
 	for (it = unitList.begin(); it != unitList.end(); ++it)
 	{
 		StratHCUnit* unit = (StratHCUnit*)it->second;
-		if (unit->branch() == branchID && unit->movementType() == movementType)
+		if (unit->branch() == branchID && unit->movementType() == movementType && unit->isGarrison())
 		{
 			return unit;
 		}
