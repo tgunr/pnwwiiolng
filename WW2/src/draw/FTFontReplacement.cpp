@@ -58,16 +58,6 @@ extern Image* ReadDDSFile(const std::string& name);
  char id=0    x=14    y=26    width=1     height=1     xoffset=0     yoffset=25    xadvance=0     page=0  chnl=15
  */
 
-//static GLuint texID=0;
-//static int textureID=0;
-
-//static CharDataMap cmap;
-//static float lineheight;
-//static float baseline;
-//static float baseFontSize;
-//static float imageWidth;
-//static float imageHeight;
-
 static bool FontSystemInited = false;
 
 static TextureFont* font10;
@@ -236,8 +226,6 @@ bool FTFontWestern::FaceSize(const unsigned int sz)
     mSize = size;
     fontScale = mSize / mFont->baseFontSize;
 
-    //printf("size:%d scale:%.2f\n",size,fontScale);
-
     scaledBaseline = mFont->baseline * fontScale;
 
     for ( CharDataMap::iterator it = mFont->cmap.begin(); it != mFont->cmap.end(); it++ )
@@ -321,8 +309,6 @@ float FTFontWestern::Advance(const wchar_t* str)
 }
 // ------------------------------------------------------------------
 
-#define ALT_DRAW_TEXT
-
 struct FLPoint { float x,y; };
 
 template<class T>
@@ -335,8 +321,6 @@ void FTFontWestern::RenderText( const T* str, int len )
     float advance = 0.0;
 
     glBindTexture(GL_TEXTURE_2D, mFont->texID);//CHECK_GL;
-
-#ifdef ALT_DRAW_TEXT
 
     GLfloat* t = &texes[0];
     GLfloat* v = &vertexes[0];
@@ -379,54 +363,11 @@ void FTFontWestern::RenderText( const T* str, int len )
             tris++;
             advance += cdata.xadvance;
         }
-        else
-        {
-            //printf("No char %d (%lc)\n", c, c);  some char=9 in data somewhere
-        }
     }
 
     glVertexPointer( 2, GL_FLOAT, 0, &vertexes[0] );
     glTexCoordPointer( 2, GL_FLOAT, 0, &texes[0] );
-
-//    GLCounter::instance().call_glDrawArrays( GL_QUADS, 0, vertexes.size()/2 );
-
-
     glDrawArrays( GL_TRIANGLES, 0, tris*6 );
-
-#else
-
-    glBegin(GL_QUADS);
-
-    for ( int i=0; i<len; i++ )
-    {
-        wchar_t c = (wchar_t)str[i];
-        ScaledCharDataMap::iterator it = scaledChars.find(c);
-        if ( it != scaledChars.end() ) // skips non-printable character
-        {
-            ScaledCharData& cdata = (*it).second;
-
-            glTexCoord2f( (cdata.x), (cdata.y+cdata.charHeight) );
-            glVertex2f(advance+cdata.xoffset, b-(cdata.height+cdata.yoffset));
-
-            glTexCoord2f( (cdata.x+cdata.charWidth), (cdata.y+cdata.charHeight) );
-            glVertex2f(advance+cdata.width+cdata.xoffset, b-(cdata.height+cdata.yoffset));
-
-            glTexCoord2f( (cdata.x+cdata.charWidth), (cdata.y) );
-            glVertex2f(advance+cdata.width+cdata.xoffset, b-cdata.yoffset);
-
-            glTexCoord2f( (cdata.x), (cdata.y) );
-            glVertex2f(advance+cdata.xoffset, b-cdata.yoffset);
-
-            advance += cdata.xadvance;
-        }
-        else
-        {
-            //printf("No char %d (%lc)\n", c, c);
-        }
-    }
-
-    glEnd();
-#endif
 
     restoreState();
 }
@@ -435,14 +376,7 @@ void FTFontWestern::RenderText( const T* str, int len )
 
 void FTFontWestern::Render(const wchar_t* str)
 {
-    size_t len = wcslen(str);
-    if ( len >= MAX_CHAR_IN_LINE )
-    {
-        //printf("More than %lu chars in line = %lu\n", MAX_CHAR_IN_LINE, len);
-        len = MAX_CHAR_IN_LINE;
-    }
-
-    RenderText( str, len );
+    RenderText( str, std::min(MAX_CHAR_IN_LINE, wcslen(str)) );
 
 }
 
@@ -450,14 +384,7 @@ void FTFontWestern::Render(const wchar_t* str)
 
 void FTFontWestern::Render(const char* str)
 {
-    size_t len = strlen(str);
-    if ( len >= MAX_CHAR_IN_LINE )
-    {
-        //printf("More than %lu chars in line = %lu\n", MAX_CHAR_IN_LINE, len );
-        len = MAX_CHAR_IN_LINE;
-    }
-
-    RenderText( str, len );
+    RenderText( str, std::min(MAX_CHAR_IN_LINE, strlen(str)) );
 }
 
 // ------------------------------------------------------------------

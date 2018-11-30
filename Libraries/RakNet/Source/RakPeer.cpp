@@ -824,9 +824,9 @@ bool RakPeer::InitializeSecurity(cat::TunnelKeyPair &p_pair, bool bRequireClient
 	(void) public_key;
 	(void) private_key;
 	(void) bRequireClientKey;
+#endif
 
 	return false;
-#endif
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

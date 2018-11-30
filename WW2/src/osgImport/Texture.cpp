@@ -14,7 +14,6 @@
 #include "ogl/ogl.h"
 #include "osgImport/Image.h"
 #include "osgImport/Texture.h"
-#include "draw/sneaky.h"
 #include "ogl/States.h"
 
 #ifndef GL_TEXTURE_WRAP_R
@@ -138,7 +137,7 @@ unsigned int Texture::getMinimumNumberOfTextureObjectsToRetainInCache()
 Texture::TextureObject* TextureObjectManager::generateTextureObject(unsigned int /*contextID*/,GLenum target)
 {
     GLuint id;
-    gl_GenTextures( 1L, &id );
+    glGenTextures( 1L, &id );
 
     return new Texture::TextureObject(id,target);
 }
@@ -160,7 +159,7 @@ Texture::TextureObject* TextureObjectManager::generateTextureObject(unsigned int
 
     // no useable texture object found so return 0
     GLuint id;
-    gl_GenTextures( 1L, &id );
+    glGenTextures( 1L, &id );
 
     return new Texture::TextureObject(id,target,numMipmapLevels,internalFormat,width,height,depth,border);
 }

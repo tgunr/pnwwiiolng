@@ -1545,7 +1545,7 @@ UINT32 vehUpdate()
 			{
 				std::wstring intel = uiLocString("hud.hqintel.close");
 
-				swprintf(message, 128, intel.c_str(), strength.c_str());
+				swprintf(message, 255, intel.c_str(), strength.c_str());
 			}
 			else
 			{
@@ -1554,7 +1554,7 @@ UINT32 vehUpdate()
 				std::wstring intel = uiLocString("hud.hqintel.far");
 				std::wstring dir = uiLocString(keyBuffer);
 
-				swprintf(message, 128, intel.c_str(), strength.c_str(), dir.c_str());
+				swprintf(message, 255, intel.c_str(), strength.c_str(), dir.c_str());
 			}
 
 			// add game alert

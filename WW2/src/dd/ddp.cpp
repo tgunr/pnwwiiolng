@@ -611,7 +611,7 @@ static bool ddpResetWindow(void) {
 		exstyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	} else {
 		style = WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP;
-		exstyle = WS_EX_APPWINDOW;// | WS_EX_TOPMOST;
+		exstyle = WS_EX_APPWINDOW;
 	}
 
 #ifdef CENTER_WINDOW
@@ -752,28 +752,6 @@ static bool ddpResetWindow(void) {
 		wglSwapIntervalEXT(gSupportSwapInterval);
 
 	return true;
-
-	//===============================
-
-#if 0 // ???
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	x = ((rect.right - rect.left) - WantedWidth) / 2;
-	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
-
-	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
-	if ( sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
-		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy) ) {
-		if ( 320 <= LOWORD(wh) && 240 <= HIWORD(wh) ) {
-			WantedWidth = LOWORD(wh);
-			WantedHeight = HIWORD(wh);
-		}
-
-		if ( rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)) ) {
-			x = LOWORD(xy);
-			y = HIWORD(xy);
-		}
-	}
-#endif
 }
 
 bool ddpCreateWnd(void) {
@@ -1288,7 +1266,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		if (!state)
 			state = true;
 
-		dipUnacquire();
+		dipAcquire();
 		Write_Debug("WM_EXITMENULOOP");
 		break;
 	}

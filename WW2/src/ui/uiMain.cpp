@@ -381,12 +381,7 @@ int uiPostInit()
   }
 
 
-//#if GREEN_INSTALL == 1
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapbld_small.dds");
-//#else
-//	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapbld.dds");
-//#endif
-
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapcp.dds");
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/ui.dds");
 

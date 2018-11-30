@@ -295,9 +295,6 @@ void GLGraphicsContext::DrawString(unsigned int i, const char* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32_NVIDIA_WORKAROUND
-		font->Render(""); // stupid nVidia workaround
-#endif
 		font->Render(str);
 		MovePenPosition(0, font->Descender());
 	}
@@ -313,9 +310,6 @@ void GLGraphicsContext::DrawString(unsigned int i, const wchar_t* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32_NVIDIA_WORKAROUND
-		font->Render(""); // stupid nVidia workaround
-#endif
 		font->Render(str);
 		MovePenPosition(0, font->Descender());
 	}
