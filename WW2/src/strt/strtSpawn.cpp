@@ -729,7 +729,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		break;
 		case POSTED_WEAPON::_SPAWNED:
 			dbugLog(_FLA,"v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
-			response.code = SPAWN_ERROR;
+			response.code = SPAWN_RESERVATION_CANCELLED;
 			return false;
 		case POSTED_WEAPON::_FREE:
 		case POSTED_WEAPON::_CANCELLED:
@@ -743,7 +743,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	if ( !currentWeapon->spawn() )
 	{
 		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
-		response.code = SPAWN_ERROR;
+		response.code = SPAWN_WEAPON_NOT_AT_FACILITY;
 		return false;
 	}
 

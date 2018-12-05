@@ -50,9 +50,6 @@
 #include "wwii/wwiiPackBool.h"
 #include "include/wthrTimeFactors.h"
 
-#include "host/hostTiming.h"
-
-
 #if platBuild == BUILD_SERVER
 // TEMP/HACK: Hardcoded libs to occasionally send memory requests for
 namespace {
@@ -82,15 +79,6 @@ namespace {
 }
 #endif
 
-
-// Helper macros for cleaning up all the client/server ifdefs.
-#if platBuild == BUILD_SERVER
-# define ON_SERVER( _expr_ ) _expr_
-# define ON_CLIENT( _expr_ )
-#else
-# define ON_SERVER( _expr_ )
-# define ON_CLIENT( _expr_ ) _expr_
-#endif
 
 #define P2_BASE			10000	// Fast X/Y is position expressed in 100ms.
 
@@ -217,7 +205,7 @@ std::vector<std::wstring> updtGetNvHistory()
 	wchar_t buffer[128];
 	for ( auto it = nvHistory.begin(), end = nvHistory.end(); it != end; ++it )
 	{
-		swprintf(buffer, sizeof(buffer) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
+		swprintf(buffer, (sizeof(buffer) / sizeof(buffer[0])) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
 		result = buffer;
 		result += it->description;
 		results.push_back(result);
@@ -719,23 +707,11 @@ static void _initVehicleHeader(VEHICLE_UPDATE_HEADER* const vupHeader, Viewing& 
 SINT32
 updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDATE* const wu, SINT32 /*size*/)
 {
-	TIMER_USE_HERE
-		ON_SERVER(assert(wu->myVehicle != nullptr));
+	ON_SERVER(assert(wu->myVehicle != nullptr));
 	ON_SERVER(VEHICLE_UPDATE_HEADER vhdr);
-
-	TIMER_ACCUMULATOR(pack_initvh);
-	TIMER_ACCUMULATOR(pack_resrv);
-	TIMER_ACCUMULATOR(pack_head);
-	TIMER_ACCUMULATOR(pack_xltpos);
-	TIMER_ACCUMULATOR(pack_vpos);
-	TIMER_ACCUMULATOR(pack_vaux);
-	TIMER_ACCUMULATOR(pack_settur);
-	TIMER_ACCUMULATOR(pack_tur);
-	TIMER_ACCUMULATOR(pack_resize);
 
 	size_t packetSize = 0;
 	bool sizeLimitReached = false;
-
 
 	UCHAR do_framehash = (UCHAR)false;
 	ON_SERVER(
@@ -799,16 +775,13 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 		(
 			Viewing& viewing = *(wu->viewings[vehNo]);
 
-			TIMER_START
 			// Build the world update by looking for changes and
 			// sending deltas.
 			VEHICLE_UPDATE_HEADER* const vupHeader = &vhdr;
 			vupHeader->vehInfo = const_cast<SHARED_VEHICLE_INFO*>(&viewing.m_vehicle.vehicleData);
 			SHARED_VEHICLE_INFO* const vehInfo = vupHeader->vehInfo;
 			_initVehicleHeader(vupHeader, viewing);
-			TIMER_STOP_ADD(pack_initvh);
 
-			TIMER_START
 			// Server uses a Teul::Packet to provide a dynamic buffer for
 			// building the updates into. Because it's still using Teul::Pack
 			// we need to fake the data pointer at the start of each iteration
@@ -817,7 +790,6 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			wu->packet->setPayloadCapacityBytes(startingSize_bytes + 250);
 			data = (UCHAR*)wu->packet->writePointer();
 			offset = 0;
-			TIMER_STOP_ADD(pack_resrv);
 		)
 		ON_CLIENT
 		(
@@ -827,9 +799,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			vehInfo->resolution = 0;
 		)
 
-		TIMER_START
 		offset = _packVehicleHead(mode, data, offset, vupHeader, PR_NUM_BITS, wu);
-		TIMER_STOP_ADD(pack_head);
 		if ( offset < 0 )
 		{
 			dbugLog(_FLA, "couldnt pack vehicle head for vehicle slot %d", vehNo);
@@ -839,24 +809,18 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 		// The vehicle's position and orientation etc.
 		if ( vupHeader->present & PR_POSITION )
 		{
-			TIMER_START
 			// On the server, shorten the position by making it relative to
 			// where your vehicle was when we started this process.
 			ON_SERVER(  _translatePositionToOffset(vehInfo->position, *wu, vupHeader->position)  );
-			TIMER_STOP_ADD(pack_xltpos);
 
-			TIMER_START
 			offset = _packVehiclePosition(mode, data, offset, &vupHeader->position, 0);
-			TIMER_STOP_ADD(pack_vpos);
 			if ( offset < 0 )
 			{
 				dbugLog(_FLA, "couldnt pack position for vehicle slot %d", vehNo);
 				return offset;
 			}
 
-			TIMER_START
 			offset = _packVEHICLE_AUX_INFO(mode, data, offset, vehInfo, 0);
-			TIMER_STOP_ADD(pack_vaux);
 			if ( offset < 0 )
 			{
 				dbugLog(_FLA, "couldnt pack AUX_INFO for vehicle slot %d", vehNo);
@@ -876,13 +840,9 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			TURRET_HEADER turretHeader;
 			turretHeader.vehInfo	= vehInfo;
 
-			TIMER_START
 			ON_SERVER(  _setTurrets(viewing, &turretHeader.vt)  );
-			TIMER_STOP_ADD(pack_settur);
 
-			TIMER_START
 			offset = _packVehicleTurrets(mode, data, offset, &turretHeader, 0);
-			TIMER_STOP_ADD(pack_tur);
 
 			if ( offset < 0 )
 			{
@@ -902,9 +862,7 @@ updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDA
 			{
 				viewing.m_lastSent = teulClock64;
 				// Increase the actual packet size.
-				TIMER_START
-					wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
-				TIMER_STOP_ADD(pack_resize);
+				wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
 			}
 			else
 			{

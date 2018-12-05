@@ -47,3 +47,18 @@ void chatRequestRecruiter(Player* player, UCHAR language);
 //! Load a squad member list from the database.
 void chatRequestSquadMemberList(UINT32 squadID);
 void chatRequestSquadMemberListImmediate(UINT32 squadID);
+
+// For use by chatSquadControls
+#include "wwii/wwiiSquads.h"
+#include "teul/teulNetworkObject.h"
+
+class DBSquad : public Squad
+{
+public:
+    DBSquad() : Squad() {}
+    DBSquad(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
+    ~DBSquad() {}
+};
+
+using CHATDB_SQUAD_XCHG = teul_network_object<DBSquad>;
+

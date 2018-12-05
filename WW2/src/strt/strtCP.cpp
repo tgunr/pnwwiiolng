@@ -39,6 +39,7 @@
 #include "strt/strtSpawn.h"
 #include "strt/strtSupply.h"
 #include "strt/strtTypes.h"
+#include "teul/teulEndpoint.h"
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"

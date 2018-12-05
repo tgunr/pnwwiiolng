@@ -393,6 +393,7 @@ Libraries/freetype/objs/BuildLog.htm
 Libraries/freetype/objs/bin
 Libraries/freetype/objs/debug
 Libraries/freetype/objs/release
+Libraries/freetype/objs/vc2015
 Libraries/freetype/src/*.html
 Libraries/freetype/src/*.idb
 Libraries/freetype/src/*.mdl
@@ -676,6 +677,8 @@ Libraries/glew/build/vc6/obj
 Libraries/glew/build/vc6/static
 Libraries/glew/proj.mac/build
 Libraries/glew/proj.mac/glews.xcodeproj/ahwulf.perspectivev3
+Libraries/glew/build/vs2017/tmp
+Libraries/glew/lib
 Libraries/imap/proj.mac/build
 Libraries/imap/proj.mac/imapmac.xcodeproj/ahwulf.perspectivev3
 Libraries/imap/proj.win32/*.aps
@@ -1290,6 +1293,7 @@ WW2/proj/win/teulKit/[Bb]in
 WW2/proj/win/teulKit/[Dd]ebug
 WW2/proj/win/teulKit/[Rr]elease
 WW2/proj/win/teulKit/obj
+WW2/proj/win/x64
 WW2/src/*.cc
 WW2/src/*.cmake
 WW2/src/*.html
@@ -1595,8 +1599,6 @@ WW2/src/tests/testPackers
 WW2/src/tests/testTeul
 WW2/src/teul/.deps
 WW2/src/teul/.dirstamp
-WW2/src/tinyxml/.deps
-WW2/src/tinyxml/.dirstamp
 WW2/src/tolua++
 WW2/src/tools/.deps
 WW2/src/tools/.dirstamp
@@ -1637,6 +1639,11 @@ WW2/src/xml/.dirstamp
 /Libraries/tolua++/win32/Release
 /Libraries/libiconv/MSVC14/Debug
 /Libraries/libiconv/MSVC14/Release
+/Libraries/libxml2/win32/bin.msvc
+/Libraries/libxml2/win32/int.a.dll.msvc
+/Libraries/libxml2/win32/int.a.msvc
+/Libraries/libxml2/win32/int.msvc
+/Libraries/libxml2/win32/int.utils.msvc
 /Libraries/libxml2/win32/VC14/Debug
 /Libraries/libxml2/win32/VC14/Release
 /Libraries/libxml2/compile
@@ -1645,6 +1652,8 @@ WW2/src/xml/.dirstamp
 /Libraries/libxml2/Makefile
 /Libraries/libxml2/config.h
 /Libraries/libxml2/libxml2-config.cmake
+/Libraries/libb64/libb64-1.2/vs2017/Debug
+/Libraries/libb64/libb64-1.2/vs2017/Release
 
 WW2.psess
 WW2/proj/win/WW2.sdf

@@ -13,16 +13,8 @@
 #include <mutex>
 
 #include "teul/teulTime.h"					// For teulClock64
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "wwii/wwiiThreadTextQuery.h"
-
-static std::mutex textMutex;
-
-using TEXT_POOL = std::deque<char*>;
-static TEXT_POOL _pool;
-
-static int inUse = 0;
-static int allocations = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Allocate me a thread-safe buffer
@@ -32,32 +24,7 @@ threadsAllocText()
 {
 	char* p = nullptr;
 
-#if !defined(XMEMORY_DEBUG)
-	{
-		std::lock_guard<std::mutex> mutexLock(textMutex);
-
-		if ( !_pool.empty() )
-		{
-			p = _pool.back();
-			_pool.pop_back();
-		}
-
-		++inUse;
-		if ( p == nullptr )
-			++allocations;
-	}
-
-	if ( p == nullptr )
-	{
-		p = new char[TEXT_POOL_SIZE+1]; // (char*)memCalloc(1, TEXT_POOL_SIZE + 1);
-		p[TEXT_POOL_SIZE] = 0;
-	}
-#else
-	p = (char*)memCalloc(1, TEXT_POOL_SIZE + 1);
-	++inUse;
-	++allocations;
-#endif
-
+	p = reinterpret_cast<char *>(::calloc(1, TEXT_POOL_SIZE + 1));
 	return p;
 }
 
@@ -67,22 +34,15 @@ threadsAllocText()
 char*
 threadsPrintf(const char* fmt, ...)
 {
-	if ( fmt == nullptr )
-		LogAbort("%s called with NULL fmt", __FUNCTION__);
-
-	char* p = threadsAllocText();
-	if ( p == nullptr )
-		LogAbort("%s out of memory", __FUNCTION__);
-	else
-	{
-		va_list args;
-		va_start(args, fmt);
-		int bytes = vsnprintf(p, TEXT_POOL_SIZE - 1, fmt, args);
-		p[bytes] = 0;
-		va_end(args);
-	}
-
-	return p;
+    assert(fmt);
+    
+    char *p = nullptr;
+    va_list args;
+    
+    va_start(args, fmt);
+    vasprintf(&p, fmt, args);
+    va_end(args);
+    return p;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -91,14 +51,7 @@ threadsPrintf(const char* fmt, ...)
 void
 threadsFreeText(char* text)
 {
-#if !defined(XMEMORY_DEBUG)
-	std::lock_guard<std::mutex> mutexLock(textMutex);
-	_pool.push_back(text);
-#else
-	memFree(text);
-#endif
-
-	--inUse;
+	::free(text);
 }
 
 void

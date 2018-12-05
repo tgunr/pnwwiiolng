@@ -14,7 +14,6 @@
 #include <sstream>
 #include <errmsg.h>
 
-#include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "teul/teulConfigVar.h"
 #include "include/configVars.h"

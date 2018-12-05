@@ -18,7 +18,7 @@
 #include <mysql.h>
 
 #include "errmsg.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "weap/weapSpec.h"
 
 using namespace std;

@@ -1912,7 +1912,7 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 	FLOAT32 Angle;
 	piVECTOR Vec, Dir;
 	FLOAT32 TempNum;
-	FLOAT32 Red,Green,Blue,Alpha;
+	FLOAT32 Red,Green,Blue,Alpha = 0.0f;
 	UINT32 Color;
 	FLOAT64VECTOR WorldOriginOffset;
 	FLOAT32 PlayerSunDotProduct;
@@ -1966,9 +1966,7 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle) / -10.0);
 
-		t = t < 0.0f ? 0.0f : t;
-		t = t > 1.0f ? 1.0f : t;
-		t = 1.0f - t;
+		t = 1.0f - std::max(std::min(t, 1.0f), 0.8f);
 
 		Red = t * s->_skyclearambient.r;
 		Green = t * s->_skyclearambient.g;
@@ -2001,12 +1999,11 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle) / 15.0);
 
-		t = t < 0.0f ? 0.0f : t;
-		t = t > 1.0f ? 1.0f : t;
+		t = std::max(std::min(t, 1.0f), 0.8f);
 
 		Red = t * s->_skyclearambient.r;
-		Green = t *  s->_skyclearambient.g;
-		Blue = t *  s->_skyclearambient.b;
+		Green = t * s->_skyclearambient.g;
+		Blue = t * s->_skyclearambient.b;
 		light->light.dcvAmbient.set(Red, Green, Blue, 1.0);
 
 		light->light.dcvSpecular.r = (FLOAT32)(t * s->_sunnoon.r + (1.0 - t) * s->_sunset.r);
@@ -2193,8 +2190,7 @@ static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
 
 		FLOAT32 t = (FLOAT32)((Angle - 10.0) / -20.0);
 
-		t = t < 0.0f ? 0.0f : t;
-		t = t > 1.0f ? 1.0f : t;
+		t = std::max(std::min(t, 1.0f), 0.8f);
 
 		light->light.dcvAmbient.r = t * s->_skynightambient.r;
 		light->light.dcvAmbient.g = t * s->_skynightambient.g;

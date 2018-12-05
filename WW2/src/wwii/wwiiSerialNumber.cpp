@@ -12,7 +12,6 @@
 #include "wwii/wwiiSerialNumber.h"				// Our header file
 #include "wwii/wwiiDBThreads.h"
 #include "include/mydbQuery.h"
-#include "dbse/dbseHandle.h"
 
 SerialNumber::serialno_t
 SerialNumber::getNext()

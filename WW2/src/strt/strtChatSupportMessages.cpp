@@ -35,6 +35,11 @@ strtChatSupportInstallCallbacks()
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{
 		REGISTER_RECEIVER(STRT_BROADCAST_CONFIG_UPDATE_Y, _recvConfigUpdate);
+
+        // Silence a bunch of complains about unknown callbacks
+        REGISTER_RECEIVER(STRT_SYNC_CPS_Y, [] (ACTION_OBJECT * const) -> SINT32 { return 0; });
+        REGISTER_RECEIVER(STRT_SYNC_FACILITIES_Y, [] (ACTION_OBJECT * const) -> SINT32 { return 0; });
+        REGISTER_RECEIVER(STRT_SYNC_BUILDINGS_Y, [] (ACTION_OBJECT * const) -> SINT32 { return 0; });
 	}
 	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }

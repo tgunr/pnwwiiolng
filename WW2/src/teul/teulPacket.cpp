@@ -17,8 +17,8 @@ Teul::Packet::Packet(PacketId id)
 	, m_address(0)
 	, m_port(0)
 {
-	header().packetType(Teul::Tokens::Encrypted);
-	header().packetSizeBytes(headerSizeBytes());
+	header().setPacketToken(Teul::PacketToken::Encrypted);
+	header().setPacketSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
 	header().m_callX = id.m_x;
 	header().m_callY = id.m_y;
@@ -38,45 +38,6 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	setPacketSizeBytes(rhs.m_packetSizeBytes);
 	memcpy(m_data, rhs.m_data, m_packetSizeBytes);
 }
-
-//////////////////////////////////////////////////////////////////////
-// Move constructor
-
-/*
-	The downside to having a move constructor is that we can't resend
-	a packet multiple times. Until we have a mechanism that allows us
-	to specify whether a packet is copyable or not, I guess we'll have
-	to pay the hit.
-*/
-#ifdef ALLOW_TEUL_PACKET_MOVE
-Teul::Packet::Packet(Teul::Packet&& rhs)
-{
-	if (PN_UNLIKELY(&rhs == this))
-		return;
-
-	this->m_data = rhs.m_data;		// Take possession of the data,
-
-	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
-
-	// If the source is using it's local data buffer, just copy the data over
-	if (this->m_data == rhs.m_localData) {
-		// Data fits within the local data, so just copy that.
-		this->m_data = this->m_localData;
-		memcpy(this->m_localData, rhs.m_localData, rhs.m_packetSizeBytes);
-	}
-
-	// Steal the size counts.
-	this->m_packetSizeBytes = rhs.m_packetSizeBytes;
-	this->m_capacity = rhs.m_capacity;
-	this->m_sent = rhs.m_sent;
-	this->m_address = rhs.m_address;
-	this->m_port = rhs.m_port;
-
-	rhs.m_packetSizeBytes = 0;
-	rhs.m_capacity = 0;
-	rhs.m_sent = 0;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Copy operator.
@@ -211,7 +172,7 @@ Teul::Packet::sendTo(ENDPOINT& endpoint_, const UINT32 destAddress_, const UINT1
 SINT32
 Teul::Packet::receive(ENDPOINT& endpoint_)
 {
-	if ( PN_UNLIKELY(header().packetType() != Teul::Tokens::Encrypted && header().packetType() != Teul::Tokens::Unencrypted) )
+	if ( PN_UNLIKELY(header().packetToken() != Teul::PacketToken::Encrypted && header().packetToken() != Teul::PacketToken::Unencrypted) )
 	{
 		dbugLog(_FLW, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
 		return -EINVAL;
@@ -258,7 +219,7 @@ Teul::PacketHeader::maskSizeValue(UINT32 cryptVersion, const UINT64& seed, UINT3
 void
 Teul::Packet::setUnencrypted() noexcept
 {
-	header().packetType(Teul::Tokens::Unencrypted);
+	header().setPacketToken(Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -267,7 +228,7 @@ Teul::Packet::setUnencrypted() noexcept
 bool
 Teul::Packet::wantsEncryption() const noexcept
 {
-	return (header().packetType() != Teul::Tokens::Unencrypted);
+	return (header().packetToken() != Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////

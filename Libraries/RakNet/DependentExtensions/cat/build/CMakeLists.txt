@@ -17,8 +17,7 @@ SET(INC ${PARENT_DIR}/include/ )
 SET(TESTS ${PARENT_DIR}/tests/)
 
 include_directories(${INC})
-link_directories(${LIB}/cat)
-set(LIBRARY_OUTPUT_PATH ${LIB}/cat)
+link_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Common
 add_library(libcatcommon STATIC
@@ -79,7 +78,7 @@ ${SRC}/crypt/hash/Skein512.cpp
 ${SRC}/crypt/SecureCompare.cpp)
 target_link_libraries(libcatcrypt libcatcommon)
 if (WIN32)
-    target_link_libraries(libcatcrypt rpcrt4.lib iphlpapi.lib psapi.lib advapi32.lib)
+    target_link_libraries(libcatcrypt rpcrt4.lib iphlpapi.lib psapi.lib advapi32.lib ${SRC}/../lib/cat/big_x64.lib)
 endif (WIN32)
 
 # Math

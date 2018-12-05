@@ -867,9 +867,12 @@ void SuperCellMapView::Renderer::RenderSuperCells(SuperCellMapView* mv, int scx1
 
 			if(sc)
 			{
-				if(!sc->loaded && !sc->loading)
-					_loadthread->LoadSuperCell(sc);
-				else if(sc->loaded)
+				if (!sc->loaded && !sc->loading) {
+					sc->loading = true;
+					sc->Load();
+					//_loadthread->LoadSuperCell(sc);
+				}
+				if(sc->loaded)
 					sc->Draw(mv->GetGraphicsContext());
 			}
 		}
@@ -927,17 +930,7 @@ void SuperCellMapView::Renderer::LoadThread::RemoveRendererSuperCells(SuperCellM
 	std::lock_guard<std::mutex> lock(_queueMutex);
 	if ( _cells.empty() == true )
 		return;
-	SuperCellList::iterator it = _cells.begin();
-	while ( it != _cells.end() )
-	{
-		if( (*it)->renderer == r)
-		{
-			*it = _cells.back();
-			_cells.pop_back();
-		}
-		else
-			++it;
-	}
+	_cells.erase(std::remove_if(_cells.begin(), _cells.end(), [=] (SuperCell *c) { return c->renderer == r; }), _cells.end());
 }
 
 void SuperCellMapView::Renderer::LoadThread::run()

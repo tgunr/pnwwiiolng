@@ -717,7 +717,7 @@ void _modifymaterialElements(xmlNodePtr root)
     xmlNodePtr node = root;
 
     MATERIAL* materials = nullptr;
-    MATERIAL* mat;
+    MATERIAL* mat = nullptr;
 
     piGetMaterials(&materials);
 

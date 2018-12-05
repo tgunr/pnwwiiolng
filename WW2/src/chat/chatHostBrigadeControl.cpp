@@ -28,7 +28,6 @@
 #include "strt/strtChatTypes.h"
 #include "strt/strtCPFlags.h"
 #include "teul/teulPacket.h"
-#include "teul/teulClosingEnums.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 
@@ -1206,7 +1205,7 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d no persona, disconnecting", teulIndex);
-		teulClose(teulIndex, Teul::Closing::BCRNoPersona);
+		teulClose(teulIndex);
 		return;
 	}
 

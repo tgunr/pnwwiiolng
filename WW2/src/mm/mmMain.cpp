@@ -7,7 +7,6 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
 #include <mysql.h>
@@ -71,13 +70,11 @@
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulVersion.h"
 #include "weap/weapList.h"
@@ -308,8 +305,7 @@ Player::mirrorToCellHost(Server::ServerInfo* const server)
 	auto mirror = new PersonaMirrorTo<CELL_HOST>(pxd, server, "cell");
 	server->mirrorPlayer(mirror);
 
-	UINT8 cell_ip = static_cast<UINT8>(GetPublicAddress(server->stats.address) & 0xff);
-	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, cell_ip, server->stats.port, OTP());
+	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, GetPublicAddress(server->stats.address), server->stats.port, OTP());
 	const SINT32 retval = connIns.send(teulIndex());
 
 	m_lastSpawnedTo = server->stats.address;
@@ -405,7 +401,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player != nullptr)
 	{
-		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
+		teulClose(player->teulIndex());
 		player->setDisconnected();
 	}
 }

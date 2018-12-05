@@ -21,7 +21,6 @@
 #include "strt/strtUpdater.h"
 #include "strt/strtUpdaterHostMessages.h"
 #include "strt/strtUpdaterPack.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiNetPorts.h"
 

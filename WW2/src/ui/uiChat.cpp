@@ -1250,7 +1250,7 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 				if ( size == ruleSize || (rule.isPrefix && size >= ruleSize) )
 				{
 					// Does as much of the cuss as we have match?
-					if ( wstrncasecmp(sourcePtr, rule.text.c_str(), ruleSize) == 0 )
+					if ( wcsncasecmp(sourcePtr, rule.text.c_str(), ruleSize) == 0 )
 					{
 						// Found a cuss, replace it with characters from "replacements".
 						for ( UINT32 i = 0; i < ruleSize; ++i )

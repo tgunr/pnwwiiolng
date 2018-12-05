@@ -66,7 +66,7 @@ public:	virtual bool Run() override
 					// Tag should be zero.
 					CRITICAL( ExpectEqual( packet.header().m_tag, 0 ) );
 					// Token should be "RAW"
-					CRITICAL( ExpectEqual( packet.header().packetType(), Teul::Tokens::Encrypted ) );
+					CRITICAL( ExpectEqual( packet.header().packetToken(), Teul::PacketToken::Encrypted ) );
 					// Size should look good.
 					CRITICAL( ExpectEqual( packet.header().packetSizeBytes(), packet.headerSizeBytes() ) );
 
@@ -75,7 +75,7 @@ public:	virtual bool Run() override
 
 					// Changing to unencryptable should change the token.
 					packet.setUnencrypted();
-					CRITICAL( ExpectEqual( packet.header().packetType(), Teul::Tokens::Unencrypted ) );
+					CRITICAL( ExpectEqual( packet.header().packetToken(), Teul::PacketToken::Unencrypted ) );
 
 				END_SUB_STAGE( "Basic" )
 

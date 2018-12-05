@@ -3,6 +3,10 @@
 #include <Windows.h>
 #include <VersionHelpers.h>
 
+#pragma message("This bit of nonsense makes up for the ancient precompiled js.lib we're using")
+#pragma message("REMOVE THIS ASAP")
+extern "C" __declspec(dllexport) FILE *_iob[3] = {stdin, stdout, stderr};
+
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
 #include "sys/sysAntihack.h"
@@ -31,10 +35,6 @@
 #include "sn/sndsSoundTypes.h"
 #include "build_info.hpp"
 #include "auth/authDefaults.h"
-
-#ifdef CRASH_HANDLER
-#include "sys/crashhandler.h"
-#endif
 
 #ifdef ANTIHACK
 #include "tools/diddle.h"
@@ -85,6 +85,40 @@ static void AddArchives();
 
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+	DWORD neededLen = 0;
+	
+	if (CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			nullptr, &neededLen
+	)) {
+		std::string str(neededLen, 0);
+		
+		CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			const_cast<LPSTR>(str.data()), &neededLen);
+		return str;
+	} else {
+		return "";
+	}
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+	DWORD localLength = static_cast<DWORD>(*ioBufferLength);
+	if (CryptStringToBinaryA(
+		input.data(), 0, CRYPT_STRING_BASE64,
+		reinterpret_cast<BYTE *>(outputBuffer), &localLength, nullptr, nullptr
+	)) {
+		*ioBufferLength = static_cast<size_t>(localLength);
+		return true;
+	}
+	return false;
+}
 
 void decompressStatus (SINT32 archive_index)
 {
@@ -254,10 +288,13 @@ BOOL				bOsVersionInfo;
 	memset(&osvi, 0, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
+    __pragma(warning(push));
+	__pragma(warning(disable : 4996));
 	if (!(bOsVersionInfo = GetVersionEx((OSVERSIONINFO*)&osvi)))
 	{
 		return FALSE;
 	}
+	__pragma(warning(pop));
 
 	switch (osvi.dwPlatformId)
 	{
@@ -629,10 +666,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	dbugInit(LogMode::OFF, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
-#endif
-
-#ifdef CRASH_HANDLER
-	InstallCrashHandler();
 #endif
 
 #ifdef DIRECT3D
