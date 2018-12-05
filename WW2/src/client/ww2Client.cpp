@@ -51,7 +51,6 @@
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChat.hxx"
 #include "strt/strtCaptureState.h"
 #include "strt/strtClientMessages.h"
 #include "strt/strtDTL.h"
@@ -3734,7 +3733,7 @@ static void _describeState(const wchar_t *const hostName, std::wstring &into, co
 		return;
 	}
 
-	if (lastRx_ms <= 5000)
+	if (lastRx_ms <= 5000) {
 		into += LocOrStr(L"?network.state.label.ok?", L"-OK-");
 	} else {
 		wchar_t lastRx[65] = {0};
