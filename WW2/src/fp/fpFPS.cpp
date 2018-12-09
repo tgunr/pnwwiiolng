@@ -1533,6 +1533,13 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		stateFlags &= ~STATE_AIM;
 	}
 
+    // if you are moving with an LMG, no firing
+    if(HAS_ANY_BITS(stateFlags, STATE_MOVE_SLOW | STATE_MOVE_BACKWARD | STATE_STRAFE_LEFT | STATE_STRAFE_RIGHT) &&
+       fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LMG)
+    {
+        stateFlags &= ~STATE_FIRE;
+    }
+    
 	// LMGs have some special allowances for "aim"
 	if (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LMG)
 	{
@@ -9448,6 +9455,13 @@ void fpFPSForcedReload ()
 		persShakeHead("common.headshake.reloadstill");
 		return;
 	}
+    
+    // no lmg reloading while moving
+    if (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LMG && fpFPSIsMoving(.01f))
+    {
+        persShakeHead("common.headshake.reloadstill");
+        return;
+    }
 
 	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP]))
 	{
