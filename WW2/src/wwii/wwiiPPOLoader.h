@@ -55,6 +55,7 @@ public:
 		,	_PPO_CFRU								//!< Graphical effect (e.g. smoke).
 		,	_PPO_SANDBAGS							//!< Dynamically placed terrain object.
 		,	_PPO_TANKTRAP							//!< Player placed object; built on terrain sto.
+		,	_PPO_HCMSP								//!< HC (Rifle Only)  Mobile Spawn
 	};
 
 public:
