@@ -685,7 +685,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 
 		}
 
-		cp->changeOwnershipNoCapture(cp->controllingCountry, true, true);
+		cp->changeOwnershipNoCapture(cp->controllingCountry, false, true);
 
 
 		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
