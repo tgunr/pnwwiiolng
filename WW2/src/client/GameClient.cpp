@@ -1101,6 +1101,50 @@ void GameClient::ProcessBrigadeControlNotice(const BrigadeControlNotice* const n
 	uiChatPrintLineIcon(icons, color, L"%ls", text.c_str());
 }
 
+void GameClient::ProcessCPCountryChangeNotice(const CPCountryChangeNotice* const notice)
+{
+	Client::ProcessCPCountryChangeNotice(notice);
+
+	// kill the hccp if its up when you get removed and are not an HC
+	if(notice->m_notice == BrigadeControl::_REMOVED && notice->m_officer == Personas().m_callsign  && !IsHC())
+	{
+		phui::View* hccp = uiViewport()->FindView("hccp");
+		if(hccp)
+			hccp->Close();
+	}
+
+	// send to the chat system
+	unsigned int color = colorCYANALPHA;
+	int icons[CHATICON_MAX] = {-1,-1,-1};
+
+	if(notice->m_notice == BrigadeControl::_ERROR)
+	{
+		color = colorORANGEALPHA;
+		icons[2] = IDE_ICON_CAUTION;
+	}
+	else if ( notice->m_notice == BrigadeControl::_VETOED )
+	{
+		color = colorORANGEALPHA;
+		HCUnit* brigade = HCUnit::Lookup(notice->m_brigadeID);
+		icons[1] = (brigade && brigade->side() == ALLIED) ? IDE_ICON_ALLIED: IDE_ICON_AXIS;
+		icons[2] = IDE_ICON_CAUTION;
+	}
+	else if ( notice->m_notice == BrigadeControl::_PROPOSAL )
+	{
+		HCUnit* brigade = HCUnit::Lookup(notice->m_brigadeID);
+		icons[1] = (brigade && brigade->side() == ALLIED) ? IDE_ICON_ALLIED: IDE_ICON_AXIS;
+		icons[2] = IDE_ICON_HC;
+	}
+	
+
+	BrigadeControlDescriptor bcd = notice->getDescription();
+
+	std::wstring text = uiChatAssembleUILoc(bcd.label.c_str(), bcd.arg1.c_str(), bcd.arg2.c_str(), bcd.arg3.c_str(), bcd.arg4.c_str());
+	if ( bcd.major_broadcast )
+		uiGameEvent(GAMEEVENT_ALERT, 1, text.c_str());
+	uiChatPrintLineIcon(icons, color, L"%ls", text.c_str());
+}
+
 void GameClient::ProcessHCUnitLocation(const HCUnitLocation& unitloc)
 {
 	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);

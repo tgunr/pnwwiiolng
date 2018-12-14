@@ -66,6 +66,7 @@ struct ClientClassData;
 struct ChatServerInfo;
 class HCUnitCountryChange;
 class GarrisonCountryChangeReq;
+class CPCountryChangeNotice;
 
 namespace Chat
 {
@@ -275,6 +276,7 @@ public:
 	virtual void ProcessVehicleRequest(VEHICLE_REPLY const&);
 	virtual void ProcessBrigadeControl(BrigadeControlList const& entry);
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice);
+	virtual void ProcessCPCountryChangeNotice(const CPCountryChangeNotice* const notice);
 	virtual void ProcessMissionInvite(const MissionInvite& invite);
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc){}
 	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc){}

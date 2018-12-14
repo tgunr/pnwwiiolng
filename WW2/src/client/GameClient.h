@@ -75,6 +75,7 @@ public:
 	virtual void ProcessVehicleRequest(VEHICLE_REPLY const&) override;
 	virtual void ProcessBrigadeControl(BrigadeControlList const& entry) override;
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice) override;
+	virtual void ProcessCPCountryChangeNotice(const CPCountryChangeNotice* const notice) override;
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc) override;
 	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc) override;
 	virtual void ProcessInstanceResult(const Instance::Result& result) override;

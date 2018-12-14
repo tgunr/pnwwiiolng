@@ -23,6 +23,10 @@
 #include "chat/chatLStringErr.h"
 #include "chat/chatName.h"
 #include "chat/chatPlayer.h"						// For class and PlayerInterface::Lookup
+#include "chat/chatPlayer.h"
+#include "chat/chatCPCountryChange.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
+//#include "client/GameClient.h"
 #include "strt/strtAttackOrder.h"
 #include "strt/strtConstants.h"
 #include "strt/strtChatTypes.h"
@@ -323,6 +327,21 @@ _noticeToOfficers(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, UINT
 		outgoing.send(alsoPlayer->teulIndex());
 }
 
+//Notice for changing a CP's country
+
+static void
+_noticeToOfficers(UINT32 notice, UINT32 error, VOTE_PERMIT votePermit
+	, const HCUnit& unit, const ChatHandle nominee, const ChatHandle sponsor, const FULL_OBJ_ID origin = nullObjID
+	, Player* alsoPlayer = nullptr)
+{
+	CPCountryChangeNotice outgoing(notice, error, votePermit);
+	
+
+	HCUnitBroadcast::sendToOfficers(&unit, &outgoing, outgoing.s_callback);
+	if (alsoPlayer && !alsoPlayer->isActiveCommander() && alsoPlayer->teulIndex() >= 0)
+		outgoing.send(alsoPlayer->teulIndex());
+}
+
 static void
 _noticeToSide(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, const HCUnit& unit, const FULL_OBJ_ID target, const ChatHandle sponsor, UCHAR side, const FULL_OBJ_ID origin=nullObjID)
 {
@@ -460,6 +479,23 @@ BrigadeController::voteFor(Vote::Mode mode, BrigadeControl::BRIGADE_ACTION_REQ a
 
 	// Send notification to HC officers
 	_noticeToOfficers(BrigadeControl::_PROPOSAL, m_vote->m_forAction, 0, votePermitRequirement(), unit(), nominee, sponsor, duration, origin);
+}
+
+void
+CPCountryChangeNotice::VoteFor(Vote::Mode mode, CPCountryChangeNotice::Responses, const ChatHandle nominee, const ChatHandle sponsor, const FULL_OBJ_ID origin = nullObjID)
+{
+	if (m_vote)
+		throw BCERR_ALREADY_VOTING;
+
+	_voting(sponsor, nominee, unit().callsign(), mode);
+	m_vote = new Vote(mode, action, nominee, sponsor, duration, origin);
+	if (m_vote == nullptr)
+		throw BCERR_NO_VOTE_TO_VETO;
+
+	elections.insert(unit().unitID());
+
+	// Send notification to HC officers
+	_noticeToOfficers(CPCountryChangeNotice::_PROPOSAL, 0, VP_COMMANDER, unit(), nominee, sponsor, duration, origin);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1749,6 +1785,19 @@ chatBrigadeMoveProposal(UINT32 brigadeID, const FULL_OBJ_ID destination, ChatHan
 			outgoing.m_origin = origin;
 			outgoing.send(player->teulIndex());
 		}
+	}
+}
+
+void
+chatCPCountryChangeProposal(FULL_OBJ_ID cp, WWII_COUNTRY toCountry, ChatHandle byHandle) {
+	//GarrisonCountryChangeReq changeReq(cp);
+	GarrisonCountryChangeReq gcc;
+	Player* player = PlayerInterface::Lookup(byHandle);
+	if (gcc.requestChangeCountry(player->MapConnection(), cp, toCountry))
+	{
+		CPCountryChangeNotice notice(CPCountryChangeNotice::_PROPOSAL);
+		notice.send(player->teulIndex());
+		notice.VoteFor(Vote::TOMOVE, CPCountryChangeNotice::_PROPOSAL, byHandle, byHandle, cp);
 	}
 }
 
