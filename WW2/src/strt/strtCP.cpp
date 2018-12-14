@@ -1909,7 +1909,7 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 cust
 	WWII_COUNTRY oldCountry = facility->country;
 
 	// They appear to be good for capture
-	strtCaptureFacility(*facility, unit->country(), oldCountry, true, false);
+	strtCaptureFacility(*facility, facility->cp->attackingUnit()->country(), oldCountry, true, false);
 
 	// Determine if they changed things
 	bool hasTakenControl = (oldControl != unit->side() && facility->cp->controllingSide == unit->side());
