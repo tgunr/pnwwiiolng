@@ -431,7 +431,7 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 #endif
         } else {
             dgram->m_size = dgram->contents->packetSizeBytes() + Teul::PacketPrefixBytes;
-            assert(dgram->m_size == readVal && "Datagram's calculated size doesn't match amount of data read");
+            assert(dgram->m_size == static_cast<size_t>(readVal) && "Datagram's calculated size doesn't match amount of data read");
 #ifdef DEBUG_CONNECTIONS
             dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recvfrom %" PRSsizeT " bytes (dgram %u bytes)", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), readVal, dgram->m_size);
 #endif
@@ -638,9 +638,9 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
         return;
     }
     _pollAddEndpoint(endpoint);
-    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT,
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%lu count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(),
-                endpoint.m_impl->pollSlot(), static_cast<size_t>(pollData.m_count));
+                static_cast<size_t>(endpoint.m_impl->pollSlot()), static_cast<size_t>(pollData.m_count));
 }
 
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
@@ -662,9 +662,9 @@ void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
     pollData.fd[slot].fd = INVALID_SOCKET;
     --pollData.m_count;
     
-    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%d count:%" PRSizeT,
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%lu count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket),
-                endpoint.state(), slot, static_cast<size_t>(pollData.m_count));
+                endpoint.state(), static_cast<unsigned long>(slot), static_cast<size_t>(pollData.m_count));
 }
 
 static void _pollRegenerateSet()
