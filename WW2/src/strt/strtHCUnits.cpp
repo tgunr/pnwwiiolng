@@ -1348,9 +1348,9 @@ void StratHCUnit::restartGarrisonSupply(bool manualChange)
 	else
 	{
 		UINT32 currentTime_s = teulTime();
-		UINT32 startTime_s = getLastCaptureTime();
+		UINT32 startTime_s = homeCP()->getLastCaptureTime();
 		UINT32 expireTime_s = startTime_s + host_config.supply.noPenaltySwitchPeriod_m * 60;
-		if (startTime_s != 0 && (currentTime_s <= expireTime_s))
+		if (startTime_s != 0 && (wwiiSideCount(wwiiSide(country())) > 1) && (currentTime_s <= expireTime_s))
 		{
 			dbugLog(_FLN, "Garrison changed manually within no-penalty period");
 			restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);

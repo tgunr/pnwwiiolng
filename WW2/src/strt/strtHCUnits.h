@@ -201,7 +201,7 @@ public:
 
 	std::string     getToeTemplateHeaderName() { return m_toeTemplateHeaderName; }
 
-	void setLastCaptureTime(UINT32 time) { m_lastCaptureTime = time; }
+	void setLastCaptureTime(UINT32 time);
 	UINT32 getLastCaptureTime() { return m_lastCaptureTime; }
 
 private:

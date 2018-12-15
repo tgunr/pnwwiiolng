@@ -50,6 +50,25 @@ enum WWII_SIDE				//] Definitive list of in-game sides.
 	MAX_SIDES				//] Guaranteed to be greater than the highest side no.
 };
 
+// This function can be called for any mechanism that needs to know if there are multiple "functional" countries
+// on a "side".  As of 2018 only ALLIED had more than one side and AXIS had only one.  Using this function to represent the
+// ability to present country options for any particular side is prefered over hardcoding things
+static inline int wwiiSideCount(WWII_SIDE side)
+{
+	if (side == ALLIED) 
+	{
+		return 3;
+	}
+	else if (side == AXIS)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 static inline WWII_SIDE wwiiSide(UINT32 country)
 {
 	switch ( static_cast<WWII_COUNTRY>(country) )
@@ -93,3 +112,34 @@ static inline WWII_COUNTRY wwiiAdjustedCountry(UINT32 country)
 //tolua_end
 static inline bool isValidSide(WWII_SIDE n) { return (n == ALLIED || n == AXIS); }
 
+static WWII_COUNTRY fightingAllies[3] = {WWII_ENGLAND, WWII_FRANCE, WWII_USA};
+static WWII_COUNTRY fightingAxis[1] = {WWII_GERMANY};
+
+/*
+	NOT doing something nicer like the below because I'm concerned about performance given how some of these
+	methods are used frequently rather than using stored representations
+
+static std::map<WWII_SIDE, WWII_COUNTRY> fightingSides = {
+	{AXIS, WWII_GERMANY},
+	{ALLIED, WWII_ENGLAND},
+	{ALLIED, WWII_FRANCE},
+	{ALLIED, WWII_USA}
+};
+
+*/
+
+// Using this function to represent the
+// ability to present countries associated with a particular side is prefered over hardcoding things
+static inline WWII_COUNTRY * wwiiSideCountries(WWII_SIDE side)
+{
+	if (side == ALLIED)
+	{
+		return fightingAllies;
+	}
+	else if (side == AXIS)
+	{
+		return fightingAxis;
+	}
+	else
+		return nullptr;
+}
