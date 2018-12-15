@@ -175,6 +175,7 @@ int vasprintf(char **result, const char *fmt, va_list args)
 #endif
 
 #if platOS == OS_LINUX
+#include <openssl/evp.h>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 
@@ -197,7 +198,7 @@ std::string Base64Encode(void const *buffer, size_t bufferLength)
     return result;
 }
 
-bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength){
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
 {
     BIO *buffer_bio = BIO_new(BIO_s_mem());
     BIO_write(buffer_bio, input.data(), input.length());

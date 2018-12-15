@@ -18,7 +18,6 @@
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "include/configVars.h"
-#include "include/luaClient.h"
 #include "include/luaGlue.h"
 #include "miss/missionDamageEvent.h"
 #include "miss/missionPack.h"
