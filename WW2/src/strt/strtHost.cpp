@@ -401,6 +401,7 @@ _housekeeping()
 
 	static UINT32 nextFBRepairCycle = 0;
 	static TeulTimeMS nextSecond = teulClock64+1000;
+	static TeulTimeMS nextMinute = teulClock64 + 1000 * 60;
 	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
 	static UINT32 nextObjectiveUpdate = teulTime() + 5;
 	static UINT32 nextForcedSupplyRouteCheck = 0;
@@ -410,6 +411,7 @@ _housekeeping()
 	static bool bInitiateFBRepairCycle = false;
 	static bool bInitiateHalfSecProcessing = false;
 	static bool bInitiateSecProcessing = false;
+	static bool bInitiateMinProcessing = false;
 	static bool bInitiateObjectiveUpdateProcessing = false;
 	static bool bInitiateSupplyRouteCheckProcessing = false;
 	static bool bInitiateForcedSupplyRouteCheckProcessing = false;
@@ -439,6 +441,16 @@ _housekeeping()
 			dbugLog(_FLI, "Lost time, need to schedule next second processing immediately");
 		}
 		bInitiateSecProcessing = true;
+	}
+
+	if ( teulClock64 >= nextMinute ) {
+		dbugLog(_FLD, "strat _housekeeping Minute procesing, scheduled");
+		nextMinute += (1000 * 60);
+		if (nextMinute < teulClock64) {
+			nextMinute = teulClock64;
+			dbugLog(_FLD, "Lost time, need to schedule next minute processing immediately");
+		}
+		bInitiateMinProcessing = true;
 	}
 
 	if ( teulTime() >= nextObjectiveUpdate )
@@ -493,6 +505,14 @@ _housekeeping()
 		strtProcessResupply();
 		stratProcessLuaEventQueue();
 		bInitiateSecProcessing = false;
+		return nextHouseKeep;
+	}
+
+	if (bInitiateMinProcessing)
+	{
+		dbugLog(_FLI, "strat _housekeeping Minute processing, activated");
+		strtProcessGarrisons();
+		bInitiateMinProcessing = false;
 		return nextHouseKeep;
 	}
 

@@ -201,12 +201,16 @@ public:
 
 	std::string     getToeTemplateHeaderName() { return m_toeTemplateHeaderName; }
 
+	void setLastCaptureTime(UINT32 time) { m_lastCaptureTime = time; }
+	UINT32 getLastCaptureTime() { return m_lastCaptureTime; }
+
 private:
 	CPStruct*				m_homeCP;
 	CPStruct*				m_startCP;
 	CPStruct*				m_fallbackCP;
 	UINT32					m_lastMoved;
 	UINT32					m_nextMove;
+	UINT32					m_lastCaptureTime;
 	StratHCUnit*			m_next;
 	ChatHandle				m_lastMovedBy;
 	UINT32					m_facilityType;

@@ -33,6 +33,7 @@
 #include "teul/teulTime.h"
 #include "wwii/wwiiThreads.h"
 #include "strt/strtCaptureContribution.h"
+#include "chat/chatStratSupportMessages.h"
 
 #ifdef WEAP_TEST
 //Weapon testing stuff
@@ -291,4 +292,33 @@ bool
 strtIsStratInitialized()
 {
 	return _initialized;
+}
+
+void strtProcessGarrisons()
+{
+	// For garrisons that have changed side recently, put out an HC warning about country switch countdown
+	for ( auto cp = _cpList; cp ; cp = cp->next )
+	{
+		// go through each unit attached to the cp
+		for (auto myit : cp->m_units)
+		{
+			// make sure its a garrison
+			auto unit = myit.second;
+			if (unit != nullptr && unit->isGarrison())
+			{
+				UINT32 currentTime_s = teulTime();
+				UINT32 startTime_s = ((StratHCUnit *)unit)->getLastCaptureTime();
+				UINT32 expireTime_s = startTime_s + host_config.supply.noPenaltySwitchPeriod_m * 60;
+				if (startTime_s != 0 && (currentTime_s <= expireTime_s))
+				{
+					const UINT32 minutesLeft = (expireTime_s - currentTime_s) / 60;
+					char minutes[16]; // minutes left
+					snprintf(minutes, 15, "%u", minutesLeft);
+
+					// NOTE: not using stored side because it might not be updated during a country switch
+					chatSendHCMessage((WWII_SIDE)wwiiSide(unit->country()), LSTR_GARRISON_COUNTRY_CHANGE_WARNING, unit->m_name, minutes);
+				}
+			}
+		}
+	}
 }

@@ -711,6 +711,8 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	
 	// Garrisons don't change deployment so we don't need to check them.
 	if (unit->isGarrison()) {
+		// but we should log the time of the last garrison country switch
+		unit->setLastCaptureTime(teulTime());
 		return;
 	}
 	
