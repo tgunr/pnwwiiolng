@@ -39,15 +39,13 @@ IF ( MSVC )
 
 ELSE()
 
+	# Options common to all compilers on all UNIXen
 	ADD_COMPILE_OPTIONS( "-fno-omit-frame-pointer" )	# nicer stacks
     ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
     ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
     ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
 
-    IF ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang )
-        # Use cheap list of stupid options for GCC
-        LINK_LIBRARIES( "-lbsd" )
-    ELSE()
+   IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
         # Every warning ever, then shut off the ones we don't want
         ADD_COMPILE_OPTIONS( "-Weverything" )
         ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
@@ -70,47 +68,58 @@ ELSE()
         ADD_COMPILE_OPTIONS( "-Wno-missing-prototypes" "-Wno-missing-variable-declarations" )
         ADD_COMPILE_OPTIONS( "-Wno-implicit-fallthrough" )
         ADD_COMPILE_OPTIONS( "-Wno-date-time" )
+
         ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
         LINK_LIBRARIES( "-stdlib=libc++" )
-    ENDIF()
 
-    IF ( PN_SANITIZE )
-        ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-        LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-    ENDIF()
-    
-    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
-        	ADD_COMPILE_OPTIONS( "-O0" "-g3" )
-		ELSE()
+		# Clang-specific Debug and Release build options
+        IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+        	ADD_COMPILE_OPTIONS( "-O0" )
+        ELSE()
+        	ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+        ENDIF()
+
+		# Clang-specific Linux-only options
+        IF ( NOT APPLE )
+			ADD_COMPILE_OPTIONS( "-Wno-inconsistent-missing-destructor-override" "-Wno-reorder" "-Wno-cast-qual" )
+		ENDIF()
+
+		# Enable Address and Undefined Behavior Sanitizers
+		IF ( PN_SANITIZE )
+			ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+			LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+		ENDIF()
+    ELSE()
+		# Non-Clang Debug and Release build options
+		IF ( CMAKE_BUILD_TYPE MATCHES Debug )
 			ADD_COMPILE_OPTIONS( "-Og" "-g3" )
 		ENDIF()
-        ADD_DEFINITIONS( "-DDEBUG=1" )
-    ELSE()
-		# `-Os`: in 4.5.x -O3 generated better code for the Gen 3 Xeons in use, -Os is usually better.
-		# `-g`: Hack: Even RelWithDebInfo seems not to have debug symbols.
-        ADD_COMPILE_OPTIONS( "-Os" "-g" )
-        ADD_DEFINITIONS( "-DNDEBUG=1" )
-    	IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
-			# `-flto`: legacy cishness makes for significant perf gains in this codebase :(
-			# `-fwhole-program-vtables`: Defining inline dtors has pros and cons.
-			# The main con being the compiler may have to make a mess, which this option fixes.
-#			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
+
+		# Sanitizers are not available with GCC
+		IF ( PN_SANITIZE )
+			MESSAGE( FATAL_ERROR "Sanitizers are only supported with Clang" )
 		ENDIF()
     ENDIF()
-    LINK_LIBRARIES( "-lpthread" )
 
-    IF ( BUILD_BITNESS EQUAL 64 )
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64" )
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64" )
+    IF ( NOT APPLE )
+    	# Linux-only options
+        LINK_LIBRARIES( "-lbsd" "-lm" "-ldl" "-lpthread" )
+    ENDIF()
+
+	# Debug and Release build options
+    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+        ADD_DEFINITIONS( "-DDEBUG=1" )
     ELSE()
-        IF ( NOT PN_CLUSTER STREQUAL "rPI" )
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32" )
-		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32" )
-        ENDIF()
+        ADD_COMPILE_OPTIONS( "-Os" "-g" )
+        ADD_DEFINITIONS( "-DNDEBUG=1" )
+    ENDIF()
+
+    IF ( NOT CMAKE_BITNESS EQUAL BUILD_BITNESS )
+    	ADD_COMPILE_OPTIONS( "-m${BUILD_BITNESS}" )
     ENDIF()
 
 ENDIF()
 
 # Let the user specify overriding flags
+SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PN_C_FLAGS}" )
 SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PN_CXX_FLAGS}" )
