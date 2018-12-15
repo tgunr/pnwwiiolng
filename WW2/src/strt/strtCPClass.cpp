@@ -709,11 +709,6 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 		_checkUnit(unit->parent(), cp);
 	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	
-	// Garrisons don't change deployment so we don't need to check them.
-	if (unit->isGarrison()) {
-		return;
-	}
-	
 	if ( unit->canDeployTo(cp) )
 		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
@@ -734,6 +729,11 @@ CPStruct::checkHCUnits()
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
 	dbugLog(_FLI, "End");
+}
+
+void CPStruct::setLastCaptureTime(UINT32 time) 
+{
+	m_lastCaptureTime = time;
 }
 
 //////////////////////////////////////////////////////////////////////

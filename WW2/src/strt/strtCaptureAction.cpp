@@ -618,6 +618,12 @@ CaptureAction::ApplyEffects(bool manualCapture) const
 	// Bounce any brigades that should no-longer be here.
 	m_cp.checkHCUnits();
 
+	// Set the last capture time only when switching sides 
+	if (m_oldSide != m_newSide)
+	{
+		m_cp.setLastCaptureTime(teulTime());
+	}
+
 	// When we take ownership of a new town, destroy any outgoing
 	// firebases this would give us to enemy towns.
 	if ( m_leftContention == true && m_setOwner == true )
