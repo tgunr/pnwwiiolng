@@ -175,6 +175,7 @@ int vasprintf(char **result, const char *fmt, va_list args)
 #endif
 
 #if platOS == OS_LINUX
+#include <openssl/evp.h>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
 
@@ -197,7 +198,7 @@ std::string Base64Encode(void const *buffer, size_t bufferLength)
     return result;
 }
 
-bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength){
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
 {
     BIO *buffer_bio = BIO_new(BIO_s_mem());
     BIO_write(buffer_bio, input.data(), input.length());
@@ -217,5 +218,46 @@ bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBuffer
         return false;
     }
 }
+
+#elif platOS == OS_WIN32
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+    DWORD neededLen = 0;
+    
+    if (CryptBinaryToStringA(
+            reinterpret_cast<const BYTE *>(buffer), bufferLength,
+            CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+            nullptr, &neededLen
+    )) {
+        std::string str(neededLen, 0);
+        
+        CryptBinaryToStringA(
+            reinterpret_cast<const BYTE *>(buffer), bufferLength,
+            CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+            const_cast<LPSTR>(str.data()), &neededLen);
+        return str;
+    } else {
+        return "";
+    }
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+    DWORD localLength = static_cast<DWORD>(*ioBufferLength);
+    if (CryptStringToBinaryA(
+        input.data(), 0, CRYPT_STRING_BASE64,
+        reinterpret_cast<BYTE *>(outputBuffer), &localLength, nullptr, nullptr
+    )) {
+        *ioBufferLength = static_cast<size_t>(localLength);
+        return true;
+    }
+    return false;
+}
+
+#elif platOS == OS_MACOS
+
+// macOS implementation is kept in sysMacCompat.mm because it requires
+// Objective-C++ and we can't use any flavor of Objective-C in this file.
 
 #endif

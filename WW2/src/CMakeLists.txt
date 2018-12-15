@@ -226,6 +226,17 @@ ELSE()
 ENDIF()
 
 ####################################
+# maclib library, provides the Base64 implementation on macOS for the hosts
+# This is needed because the Base64 implementation uses Objective-C and that
+# needs a separate target
+IF ( APPLE )
+	FIND_LIBRARY( FOUNDATION Foundation )
+	ADD_LIBRARY(maclib STATIC sysmac/sysMacCompat.mm)
+	TARGET_LINK_LIBRARIES( maclib ${FOUNDATION} )
+	LINK_LIBRARIES( maclib ${FOUNDATION} )
+ENDIF()
+
+####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
 	include/platforms.h include/precompile_includes.h

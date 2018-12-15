@@ -1,6 +1,10 @@
 /* $Id: sysMacCompat.mm 2136 2009-11-16 03:27:03Z ahwulf@CRS $ */
 
 #include <CoreFoundation/CoreFoundation.h>
+#include <Cocoa/Cocoa.h>
+#include "platforms.h" // must come before the platBuild check in order to work
+
+#if platBuild == BUILD_CLIENT
 
 #include "sysmac/syscfg.h"
 #include "vars.h"
@@ -8,13 +12,6 @@
 #include "rnmain.h"
 #include "rnlogo.h"
 #include "sys/sysLaunchUrl.h"
-
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <Cocoa/Cocoa.h>
 
 UINT64 GetMicroSeconds(void)
 {
@@ -268,6 +265,8 @@ static void testHttpRequests()
 		dbugLog(_FLI, "UNIT_TEST: testHttpRequests: jsonplaceholder POST: FAILED");
 }
 #endif
+
+#endif // platBuild == BUILD_CLIENT
 
 std::string Base64Encode(void const *buffer, size_t bufferLength)
 {
