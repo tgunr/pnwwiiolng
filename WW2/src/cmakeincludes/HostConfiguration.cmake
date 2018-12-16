@@ -52,6 +52,7 @@ ELSE()
 	# For some reason there's no _OPTIMIZED to mean "anything not debug"...
 	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
 	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
+	LINK_LIBRARIES( "-fuse-ld=gold" )
 
 	# Every warning ever, then shut off the ones we don't want
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
