@@ -1,6 +1,6 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12.0)
 
 ####################################
 ## Initial CMake config

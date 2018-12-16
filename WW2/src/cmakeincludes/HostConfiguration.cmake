@@ -20,10 +20,10 @@ IF ( MSVC )
     )
 	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
 		ADD_COMPILE_OPTIONS( "/MTd" )
-		ADD_DEFINITIONS( "-DDEBUG=1" )
+		ADD_COMPILE_DEFINITIONS( "DEBUG=1" )
 	ELSE()
 		ADD_COMPILE_OPTIONS( "/MT" )
-		ADD_DEFINITIONS( "-DNDEBUG=1" )
+		ADD_COMPILE_DEFINITIONS( "NDEBUG=1" )
 	ENDIF()
 
     IF ( BUILD_BITNESS EQUAL 64 )
@@ -39,84 +39,57 @@ IF ( MSVC )
 
 ELSE()
 
-	# Options common to all compilers on all UNIXen
-	ADD_COMPILE_OPTIONS( "-fno-omit-frame-pointer" )	# nicer stacks
-    ADD_COMPILE_OPTIONS( "-Winvalid-pch" "-Wno-array-bounds" )
-    ADD_COMPILE_OPTIONS( "-Wno-strict-aliasing" "-Wno-unused-result" "-Wno-unknown-pragmas" )
-    ADD_COMPILE_OPTIONS( "-Wall" "-Wshadow" "-Wno-deprecated" )
+	IF ( NOT APPLE AND ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.0 ) )
+		MESSAGE( FATAL_ERROR "You need Clang6.0 or newer to build on Linux." )
+	ENDIF()
+	INCLUDE( CheckCXXSourceCompiles )
+	CHECK_CXX_SOURCE_COMPILES( "#include <__config>\nint main(){}" LIBCXX_IS_DEFAULT )
+	IF ( NOT LIBCXX_IS_DEFAULT )
+		ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
+		LINK_LIBRARIES( GENERAL "-stdlib=libc++" )
+	ENDIF()
 
-   IF ( CMAKE_CXX_COMPILER_ID MATCHES Clang )
-        # Every warning ever, then shut off the ones we don't want
-        ADD_COMPILE_OPTIONS( "-Weverything" )
-        ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
-        ADD_COMPILE_OPTIONS( "-Wno-packed" "-Wno-pedantic" )
-        ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
-        ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
-        ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )
-        ADD_COMPILE_OPTIONS( "-Wno-padded" "-Wno-undef" "-Wno-c++98-compat-pedantic" )
-        ADD_COMPILE_OPTIONS( "-Wno-used-but-marked-unused" "-Wno-c99-extensions" )
-        ADD_COMPILE_OPTIONS( "-Wno-disabled-macro-expansion" "-Wno-unused-macros" )
-        ADD_COMPILE_OPTIONS( "-Wno-unused-exception-parameter" "-Wno-global-constructors" )
-        ADD_COMPILE_OPTIONS( "-Wno-switch-enum" "-Wno-gnu-zero-variadic-macro-arguments" )
-        ADD_COMPILE_OPTIONS( "-Wno-variadic-macros" "-Wno-missing-noreturn" )
-        ADD_COMPILE_OPTIONS( "-Wno-unknown-warning-option" "-Wno-auto-import" )
-        ADD_COMPILE_OPTIONS( "-Wno-overlength-strings" "-Wno-assign-enum" )
-        ADD_COMPILE_OPTIONS( "-Wno-objc-missing-property-synthesis" )
-        ADD_COMPILE_OPTIONS( "-Wno-gnu-conditional-omitted-operand" "-Wno-old-style-cast" )
-        ADD_COMPILE_OPTIONS( "-Wno-documentation-unknown-command" "-Wno-reserved-id-macro" )
-        ADD_COMPILE_OPTIONS( "-Wno-conversion" "-Wno-weak-vtables" "-Wno-format-nonliteral" )
-        ADD_COMPILE_OPTIONS( "-Wno-missing-prototypes" "-Wno-missing-variable-declarations" )
-        ADD_COMPILE_OPTIONS( "-Wno-implicit-fallthrough" )
-        ADD_COMPILE_OPTIONS( "-Wno-date-time" )
+	# For some reason there's no _OPTIMIZED to mean "anything not debug"...
+	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
+	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
 
-        ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
-        LINK_LIBRARIES( "-stdlib=libc++" )
+	# Every warning ever, then shut off the ones we don't want
+	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+		ADD_COMPILE_OPTIONS( "-Weverything" )
+		ADD_COMPILE_OPTIONS( "-Wno-double-promotion" "-Wno-cstring-format-directive" )
+		ADD_COMPILE_OPTIONS( "-Wno-packed" "-Wno-pedantic" )
+		ADD_COMPILE_OPTIONS( "-Wno-gnu-anonymous-struct" "-Wno-cast-align" )
+		ADD_COMPILE_OPTIONS( "-Wno-covered-switch-default" "-Wno-exit-time-destructors" )
+		ADD_COMPILE_OPTIONS( "-Wno-documentation" "-Wno-unused-parameter" "-Wno-c++98-compat" )
+		ADD_COMPILE_OPTIONS( "-Wno-padded" "-Wno-undef" "-Wno-c++98-compat-pedantic" )
+		ADD_COMPILE_OPTIONS( "-Wno-used-but-marked-unused" "-Wno-c99-extensions" )
+		ADD_COMPILE_OPTIONS( "-Wno-disabled-macro-expansion" "-Wno-unused-macros" )
+		ADD_COMPILE_OPTIONS( "-Wno-unused-exception-parameter" "-Wno-global-constructors" )
+		ADD_COMPILE_OPTIONS( "-Wno-switch-enum" "-Wno-gnu-zero-variadic-macro-arguments" )
+		ADD_COMPILE_OPTIONS( "-Wno-variadic-macros" "-Wno-missing-noreturn" )
+		ADD_COMPILE_OPTIONS( "-Wno-unknown-warning-option" "-Wno-auto-import" )
+		ADD_COMPILE_OPTIONS( "-Wno-overlength-strings" "-Wno-assign-enum" )
+		ADD_COMPILE_OPTIONS( "-Wno-objc-missing-property-synthesis" )
+		ADD_COMPILE_OPTIONS( "-Wno-gnu-conditional-omitted-operand" "-Wno-old-style-cast" )
+		ADD_COMPILE_OPTIONS( "-Wno-documentation-unknown-command" "-Wno-reserved-id-macro" )
+		ADD_COMPILE_OPTIONS( "-Wno-conversion" "-Wno-weak-vtables" "-Wno-format-nonliteral" )
+		ADD_COMPILE_OPTIONS( "-Wno-missing-prototypes" "-Wno-missing-variable-declarations" )
+		ADD_COMPILE_OPTIONS( "-Wno-implicit-fallthrough" )
+		ADD_COMPILE_OPTIONS( "-Wno-date-time" )
 
-		# Clang-specific Debug and Release build options
-        IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-        	ADD_COMPILE_OPTIONS( "-O0" )
-        ELSE()
-        	ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
-        ENDIF()
+		ADD_COMPILE_DEFINITIONS( "DEBUG=1" )
+	ELSE()
+		ADD_COMPILE_DEFINITIONS( "NDEBUG=1" )
+	ENDIF ()
 
-		# Clang-specific Linux-only options
-        IF ( NOT APPLE )
-			ADD_COMPILE_OPTIONS( "-Wno-inconsistent-missing-destructor-override" "-Wno-reorder" "-Wno-cast-qual" )
-		ENDIF()
+	ADD_COMPILE_OPTIONS( "-m${BUILD_BITNESS}" "-fno-omit-frame-pointer" )
+	LINK_LIBRARIES( "-lm" "-ldl" "-lpthread" ) # Not needed on macOS, but harmless anyway
 
-		# Enable Address and Undefined Behavior Sanitizers
-		IF ( PN_SANITIZE )
-			ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-			LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-		ENDIF()
-    ELSE()
-		# Non-Clang Debug and Release build options
-		IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-			ADD_COMPILE_OPTIONS( "-Og" "-g3" )
-		ENDIF()
-
-		# Sanitizers are not available with GCC
-		IF ( PN_SANITIZE )
-			MESSAGE( FATAL_ERROR "Sanitizers are only supported with Clang" )
-		ENDIF()
-    ENDIF()
-
-    IF ( NOT APPLE )
-    	# Linux-only options
-        LINK_LIBRARIES( "-lbsd" "-lm" "-ldl" "-lpthread" )
-    ENDIF()
-
-	# Debug and Release build options
-    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_DEFINITIONS( "-DDEBUG=1" )
-    ELSE()
-        ADD_COMPILE_OPTIONS( "-Os" "-g" )
-        ADD_DEFINITIONS( "-DNDEBUG=1" )
-    ENDIF()
-
-    IF ( NOT CMAKE_BITNESS EQUAL BUILD_BITNESS )
-    	ADD_COMPILE_OPTIONS( "-m${BUILD_BITNESS}" )
-    ENDIF()
+	# Enable Address and Undefined Behavior Sanitizers
+	IF ( PN_SANITIZE )
+		ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+		LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+	ENDIF()
 
 ENDIF()
 
