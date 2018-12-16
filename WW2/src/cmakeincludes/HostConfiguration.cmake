@@ -46,7 +46,7 @@ ELSE()
 	CHECK_CXX_SOURCE_COMPILES( "#include <__config>\nint main(){}" LIBCXX_IS_DEFAULT )
 	IF ( NOT LIBCXX_IS_DEFAULT )
 		ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
-		LINK_LIBRARIES( GENERAL "-stdlib=libc++" )
+		LINK_LIBRARIES( "-stdlib=libc++" )
 	ENDIF()
 
 	# For some reason there's no _OPTIMIZED to mean "anything not debug"...
