@@ -276,7 +276,7 @@ ADD_LIBRARY(teulserver STATIC
     mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
+TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -338,17 +338,10 @@ ADD_LIBRARY( wwiilib STATIC
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
-IF (BUILDING_OWN_LIBXML2)
-	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-		ADD_DEPENDENCIES( ${Name} libxml2 )
-	ENDMACRO()
-ELSE()
-	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-	ENDMACRO()
-ENDIF()
+TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 )
+MACRO( USE_WWIILIB_ON Name )
+	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 ${MYSQL_LIBRARIES} )
+ENDMACRO()
 
 ####################################
 ## Various commandline utility executables
