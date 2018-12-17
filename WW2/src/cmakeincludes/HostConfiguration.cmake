@@ -1,9 +1,5 @@
 # Configures the compiler for building the host given the target environment etc.
 
-# For some reason there's no _OPTIMIZED to mean "anything not debug"...
-SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
-SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
-
 IF ( WIN32 )
 
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../proj/win )
@@ -14,22 +10,25 @@ IF ( WIN32 )
 
     ADD_COMPILE_OPTIONS(
     	# Debug info always, enforce for scope, C++ exceptions, precise FP
-        "/Zi" "/Zc:forScope" "/EHsc" "/fp:precise"
+        /Zi /Zc:forScope /EHsc /fp:precise
         # No comdat, always bufsec, string dedup, frame pointers, intrinsics
-        "/Gy-" "/GS" "/GF" "/Oy-" "/Oi"
+        /Gy- /GS /GF /Oy- /Oi
         # Browse inf, no fixed enum warn, no logo, SS2
-        "/FR" "/wd4480" "/nologo" "/arch:SSE2"
-        # Multi-threaded DLL with or w/o debug
-    	$<IF:$<CONFIG:Debug>,"/MTd","/MT">
+        /FR /wd4480 /nologo /arch:SSE2
     	# Inlining level 0 for debug, 2 otherwise
-    	$<IF:$<CONFIG:Debug>,"/Ob0","/Ob2">
+    	$<IF:$<CONFIG:Debug>,/Ob0,/Ob2>
     	# No opt in Debug, otherwise optimize for size
-		$<IF:$<CONFIG:Debug>,"/Od","/O1"> $<$<CONFIG:Debug>,,"/Os">
+		$<IF:$<CONFIG:Debug>,/Od,/O1> $<IF:$<CONFIG:Debug>,,/Os>
 		# Whole program opt in non-Debug
-		$<IF:$<CONFIG:Debug>,,"/GL">
+		$<IF:$<CONFIG:Debug>,,/GL>
     )
-    # For non-Debug links, remove unreference stuff and use LTO
-    LINK_LIBRARIES( OPTIMIZED "/OPT:REF" "/LTCG" )
+    #[[ Unfortunately, due to various limitations of CMake before 3.13, this will
+    	not work yet. Once Visual Studio starts shipping CMake 3.13, we can use
+    	this. Ironically, we already have so new a version on both macOS and Linux
+    	and it's VS that's being a miserable pest, as usual...
+    #]]
+    # For non-Debug links, remove unreferenced stuff and use LTO
+    #LINK_LIBRARIES( $<IF:$<CONFIG:Debug>,,/OPT:REF> $<IF:$<CONFIG:Debug>,,/LTCG> )
 
 ELSE()
 
@@ -39,11 +38,13 @@ ELSE()
 	INCLUDE( CheckCXXSourceCompiles )
 	CHECK_CXX_SOURCE_COMPILES( "#include <__config>\nint main(){}" LIBCXX_IS_DEFAULT )
 	IF ( NOT LIBCXX_IS_DEFAULT )
-		ADD_COMPILE_OPTIONS( "-stdlib=libc++" )
-		LINK_LIBRARIES( "-stdlib=libc++" )
+		ADD_COMPILE_OPTIONS( -stdlib=libc++ )
+		LINK_LIBRARIES( -stdlib=libc++ )
 	ENDIF()
 
-	LINK_LIBRARIES( "-fuse-ld=gold" )
+	IF ( LINUX )
+		LINK_LIBRARIES( $<IF:$<CONFIG:Debug>,,-fuse-ld=gold> )
+	ENDIF()
 
 	# Every warning ever, then shut off the ones we don't want
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
@@ -71,14 +72,18 @@ ELSE()
 	ELSE()
 	ENDIF ()
 
-	ADD_COMPILE_OPTIONS( "-m${BUILD_BITNESS}" "-fno-omit-frame-pointer" )
-	LINK_LIBRARIES( "-lm" "-ldl" "-lpthread" ) # Not needed on macOS, but harmless anyway
+	ADD_COMPILE_OPTIONS( -m${BUILD_BITNESS} -fno-omit-frame-pointer )
+	LINK_LIBRARIES( -lm -ldl -lpthread ) # Not needed on macOS, but harmless anyway
 
 	# Enable Address and Undefined Behavior Sanitizers
 	IF ( PN_SANITIZE )
-		ADD_COMPILE_OPTIONS( "-fstack-protector-all" "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
-		LINK_LIBRARIES( "-fsanitize=address" "-fno-common" "-fsanitize=undefined" )
+		ADD_COMPILE_OPTIONS( -fstack-protector-all -fsanitize=address -fno-common -fsanitize=undefined )
+		LINK_LIBRARIES( -fsanitize=address -fno-common -fsanitize=undefined )
 	ENDIF()
+
+	# For some reason there's no _OPTIMIZED to mean "anything not debug"...
+	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
+	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
 
 ENDIF()
 
