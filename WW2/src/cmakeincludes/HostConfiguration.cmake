@@ -1,41 +1,35 @@
 # Configures the compiler for building the host given the target environment etc.
 
-IF ( MSVC )
+# For some reason there's no _OPTIMIZED to mean "anything not debug"...
+SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
+SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
+
+IF ( WIN32 )
 
     INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../proj/win )
 
-    ADD_DEFINITIONS(
-        -D_CRT_SECURE_NO_WARNINGS=1
-        -D_CRT_NONSTDC_NO_DEPRECATE=1
-        -DWIN32
-        -DUNICODE
-        -D_UNICODE
-        -D_HAS_ITERATOR_DEBUGGING=0
-        -D_SECURE_SCL=0
-    )
+	ADD_COMPILE_DEFINITIONS( _ITERATOR_DEBUG_LEVEL=$<IF:$<CONFIG:Debug>,2,0> )
+    ADD_COMPILE_DEFINITIONS( _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE )
+    ADD_COMPILE_DEFINITIONS(  WIN32 UNICODE _UNICODE )
+
     ADD_COMPILE_OPTIONS(
-        "/Zi" "/Zc:wchar_t" "/Zc:forScope" "/EHsc" "/fp:precise"
-        "/WX-" "/FR" "/wd4480" "/wd4800"
-        "/nologo"
+    	# Debug info always, enforce for scope, C++ exceptions, precise FP
+        "/Zi" "/Zc:forScope" "/EHsc" "/fp:precise"
+        # No comdat, always bufsec, string dedup, frame pointers, intrinsics
+        "/Gy-" "/GS" "/GF" "/Oy-" "/Oi"
+        # Browse inf, no fixed enum warn, no logo, SS2
+        "/FR" "/wd4480" "/nologo" "/arch:SSE2"
+        # Multi-threaded DLL with or w/o debug
+    	$<IF:$<CONFIG:Debug>,"/MTd","/MT">
+    	# Inlining level 0 for debug, 2 otherwise
+    	$<IF:$<CONFIG:Debug>,"/Ob0","/Ob2">
+    	# No opt in Debug, otherwise optimize for size
+		$<IF:$<CONFIG:Debug>,"/Od","/O1"> $<$<CONFIG:Debug>,,"/Os">
+		# Whole program opt in non-Debug
+		$<IF:$<CONFIG:Debug>,,"/GL">
     )
-	IF ( CMAKE_BUILD_TYPE STREQUAL Debug )
-		ADD_COMPILE_OPTIONS( "/MTd" )
-		ADD_COMPILE_DEFINITIONS( "DEBUG=1" )
-	ELSE()
-		ADD_COMPILE_OPTIONS( "/MT" )
-		ADD_COMPILE_DEFINITIONS( "NDEBUG=1" )
-	ENDIF()
-
-    IF ( BUILD_BITNESS EQUAL 64 )
-        ADD_COMPILE_OPTIONS( "/arch:AVX" )
-    ENDIF()
-
-    IF ( CMAKE_BUILD_TYPE MATCHES Debug )
-        ADD_COMPILE_OPTIONS( "/Oy-" "/GF-" "/GS" "/Gy" "/Od" )
-    ELSE()
-        ADD_COMPILE_OPTIONS( "/Ob2" "/Oi" "/Ot" "/Oy" "/GT" "/GF" "/GS-" "/Gy-" "/Ox" "/GL" "/MP" )
-        LINK_LIBRARIES( "/OPT:REF" "/OPT:ICF" "/LTCG" )
-    ENDIF()
+    # For non-Debug links, remove unreference stuff and use LTO
+    LINK_LIBRARIES( OPTIMIZED "/OPT:REF" "/LTCG" )
 
 ELSE()
 
@@ -49,9 +43,6 @@ ELSE()
 		LINK_LIBRARIES( "-stdlib=libc++" )
 	ENDIF()
 
-	# For some reason there's no _OPTIMIZED to mean "anything not debug"...
-	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION ON )
-	SET ( CMAKE_INTERPROCEDURAL_OPTIMIZATION_DEBUG OFF )
 	LINK_LIBRARIES( "-fuse-ld=gold" )
 
 	# Every warning ever, then shut off the ones we don't want
@@ -77,10 +68,7 @@ ELSE()
 		ADD_COMPILE_OPTIONS( "-Wno-missing-prototypes" "-Wno-missing-variable-declarations" )
 		ADD_COMPILE_OPTIONS( "-Wno-implicit-fallthrough" )
 		ADD_COMPILE_OPTIONS( "-Wno-date-time" )
-
-		ADD_COMPILE_DEFINITIONS( "DEBUG=1" )
 	ELSE()
-		ADD_COMPILE_DEFINITIONS( "NDEBUG=1" )
 	ENDIF ()
 
 	ADD_COMPILE_OPTIONS( "-m${BUILD_BITNESS}" "-fno-omit-frame-pointer" )
@@ -93,6 +81,8 @@ ELSE()
 	ENDIF()
 
 ENDIF()
+
+ADD_COMPILE_DEFINITIONS( $<IF:$<CONFIG:Debug>,DEBUG,NDEBUG>=1 )
 
 # Let the user specify overriding flags
 SET( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PN_C_FLAGS}" )
