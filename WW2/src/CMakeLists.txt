@@ -3,21 +3,24 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.12.0)
 
 ####################################
-## Initial CMake config
-ENABLE_TESTING()
-SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes;${CMAKE_MODULE_PATH}" )
-IF ( NOT UNIX AND NOT APPLE AND NOT WIN32 )
-    MESSAGE( FATAL_ERROR "Unknown build environment, not continuing" )
+## Simplify environment
+IF( WIN32 OR APPLE )
+	SET( LINUX OFF )
+ELSEIF( UNIX )
+	SET( LINUX ON )
+ELSE()
+	MESSAGE( FATAL_ERROR "Detected neither WIN32, APPLE, nor UNIX. What system is this?" )
 ENDIF()
 
-IF ( NOT CMAKE_BUILD_TYPE )
-	MESSAGE( WARNING "No CMAKE_BUILD_TYPE specified. Assuming Debug." )
-	SET( CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE )
-ENDIF()
-SET(_BUILD_TYPES "Debug, Release, RelWithDebInfo, MinSizeRel")
-STRING(FIND ", ${_BUILD_TYPES}" "${CMAKE_BUILD_TYPE}" _BUILD_TYPE)
-IF ( NOT _BUILD_TYPE GREATER 1 )	# ',' and ' ' match against the start of the string
-	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE, expected one of ${_BUILD_TYPES}" )
+####################################
+## Initial CMake config
+LIST( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes" )
+
+SET( CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo )
+IF ( NOT CMAKE_BUILD_TYPE AND CMAKE_GENERATOR MATCHES "Ninja|Makefile" )
+	MESSAGE( FATAL_ERROR "CMAKE_BUILD_TYPE is required with ${CMAKE_GENERATOR}. Specify one of: ${CMAKE_CONFIGURATION_TYPES}" )
+ELSEIF( CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST CMAKE_CONFIGURATION_TYPES )
+	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}. Expected one of: ${CMAKE_CONFIGURATION_TYPES}" )
 ENDIF()
 
 ####################################
