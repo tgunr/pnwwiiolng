@@ -25,7 +25,11 @@ ENDIF()
 
 ####################################
 ## Declare the project (don't specify version here)
-PROJECT( WW2GameHosts LANGUAGES C CXX )
+PROJECT( WW2Hosts
+	DESCRIPTION "Hosts and utilities for World War II Online"
+	HOMEPAGE_URL "https://wwiionline.com"
+	LANGUAGES C CXX
+)
 
 ####################################
 ## Require C++14
@@ -133,11 +137,11 @@ ELSE()
 ENDIF()
 
 # If the user is building a Debug build, enable SANITIZE options.
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
 		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
 	ELSE()
-		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables Address Sanitizer, etc. on Unix builds" FORCE )
 		MARK_AS_ADVANCED( PN_SANITIZE )
 	ENDIF()
 ENDIF()
@@ -174,11 +178,8 @@ IF ( PN_BETA_RELEASE )
 ENDIF()
 
 ####################################
-## Status output
-MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
-
-####################################
 ## Generate config.h
+# TODO THIS NEEDS TO BE MOVED DOWN AND APPLY ITSELF TO THE MAIN HOSTS CONFIG TARGET
 INCLUDE( cmakeincludes/PlatformChecks.cmake )
 
 ####################################
@@ -351,7 +352,7 @@ ENDIF()
 
 ####################################
 ## Various commandline utility executables
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 
     # Chat management client
     ADD_EXECUTABLE( chatClient
@@ -373,7 +374,7 @@ IF ( NOT MSVC )
 
 ENDIF()
 
-IF ( MSVC )
+IF ( WIN32 )
 	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
 
 	# Not currently generated:
@@ -788,7 +789,7 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA
 )
-IF ( MSVC )
+IF ( WIN32 )
     SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "/W0" )
 ELSE()

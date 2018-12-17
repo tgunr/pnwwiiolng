@@ -5,8 +5,10 @@ MARK_AS_ADVANCED(
     LIBIRCCLIENT_FOUND
 )
 
-# We need PkgConfig for finding some things
-FIND_PACKAGE( PkgConfig REQUIRED )
+# We need PkgConfig for finding some things on Linux
+IF ( LINUX )
+	FIND_PACKAGE( PkgConfig REQUIRED )
+ENDIF()
 
 # Pull in MySQL
 FIND_PACKAGE( MySQL REQUIRED )
@@ -21,7 +23,6 @@ ENDIF()
 
 # Eventually we'll go find Lua, but for now pull in our embedded (outdated) one
 ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/lua51 lua51 )
-#INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LUA_INCLUDE_DIR} )
 SET_TARGET_PROPERTIES( lua51 PROPERTIES FOLDER "Libs" )
 
 # Ditto for tolua++ since we haven't gotten rid of it yet
@@ -34,9 +35,7 @@ IF ( WIN32 )
 	ADD_SUBDIRECTORY( "${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent" )
 	SET( LIBEVENT_INCLUDE_DIRS "${LIBRARIES_DIR}/libevent/include" )
 	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
-	if ( WIN32 )
-		INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS}/../WIN32-CODE )
-	ENDIF()
+	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS}/../WIN32-CODE )
 	SET_TARGET_PROPERTIES( event PROPERTIES FOLDER "Libs" )
 	SET(LIBEVENT_LIBRARIES event)
 ELSE()
@@ -44,17 +43,14 @@ ELSE()
 	INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
 ENDIF()
 
-# On Linux, make sure libcrypto is handy
-IF ( UNIX AND NOT MSVC AND NOT APPLE )
+IF ( LINUX )
+	# Need libcrypto
 	FIND_PACKAGE( OpenSSL REQUIRED )
-	INCLUDE_DIRECTORIES( SYSTEM ${OPENSSL_INCLUDE_DIR} )
-	LINK_LIBRARIES( ${OPENSSL_LIBRARIES} )
-ENDIF()
+	LINK_LIBRARIES( OpenSSL::Crypto )
 
-# On Linux, we need a modern libbsd
-IF ( UNIX AND NOT MSVC AND NOT APPLE )
-	PKG_CHECK_MODULES( LIBBSD REQUIRED libbsd>=0.9.1 )
-	LINK_LIBRARIES( ${LIBBSD_LDFLAGS} )
+	# Need a modern libbsd
+	PKG_CHECK_MODULES( LibBsd REQUIRED IMPORTED_TARGET libbsd>=0.9.1 )
+	LINK_LIBRARIES( PkgConfig::LibBsd )
 ENDIF()
 
 # Need Python for build_info.py

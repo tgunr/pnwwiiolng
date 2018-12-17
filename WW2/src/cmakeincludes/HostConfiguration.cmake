@@ -33,8 +33,8 @@ IF ( WIN32 )
 
 ELSE()
 
-	IF ( NOT APPLE AND ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.0 ) )
-		MESSAGE( FATAL_ERROR "You need Clang6.0 or newer to build on Linux." )
+	IF ( LINUX AND ( NOT CMAKE_CXX_COMPILER_ID MATCHES Clang OR CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0 ) )
+		MESSAGE( FATAL_ERROR "You need Clang 7 or newer to build on Linux." )
 	ENDIF()
 	INCLUDE( CheckCXXSourceCompiles )
 	CHECK_CXX_SOURCE_COMPILES( "#include <__config>\nint main(){}" LIBCXX_IS_DEFAULT )
