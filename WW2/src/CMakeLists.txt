@@ -58,27 +58,30 @@ ELSEIF ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 ELSE ()
 	MESSAGE( FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}" )
 ENDIF ()
-
 MARK_AS_ADVANCED( CMAKE_BITNESS )
-MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit" )
 
 OPTION( PN_BUILD_32BIT "Enable 32-bit build" OFF )
 IF ( WIN32 OR CMAKE_BITNESS EQUAL 32 )
 	MARK_AS_ADVANCED( PN_BUILD_32BIT )
 ENDIF()
 
-# You *HAVE* to supply this on the command line when you first
-# build the cache in order for this to work, otherwise CMake
-# will not re-check library paths and will use the wrong
-# libs.
 IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
-	SET(BUILD_BITNESS 64)
+	SET( BUILD_BITNESS 64 )
 ELSE ( )
-	SET(BUILD_BITNESS 32)
+	SET( BUILD_BITNESS 32 )
 ENDIF ( )
-
 MARK_AS_ADVANCED( BUILD_BITNESS )
-MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
+
+IF ( APPLE AND NOT BUILD_BITNESS EQUAL 64 )
+	MESSAGE( FATAL_ERROR "It is no longer possible to build 32-bit hosts on macOS" )
+ELSEIF ( LINUX AND NOT CMAKE_BITNESS EQUAL BUILD_BITNESS )
+	MESSAGE( WARNING "You are building ${BUILD_BITNESS}-bit on a ${CMAKE_BITNESS}-bit machine. This is probably a bad idea." )
+ELSEIF ( WIN32 AND NOT BUILD_BITNESS EQUAL 32 )
+	MESSAGE( FATAL_ERROR
+		"The 64-bit host build is temporarily unsupported on Win32 due to problems with libxml2 prebuilts." )
+ENDIF()
+
+MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit, build is ${BUILD_BITNESS}-bit" )
 
 ####################################
 ## Executable names
