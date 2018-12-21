@@ -98,7 +98,7 @@ ELSE()
 #			ADD_COMPILE_OPTIONS( "-flto" "-fwhole-program-vtables" )
 		ENDIF()
     ENDIF()
-    LINK_LIBRARIES( "-lpthread" )
+    LINK_LIBRARIES( "-lpthread" "-lm" "-ldl" )
 
     IF ( BUILD_BITNESS EQUAL 64 )
 		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64" )
