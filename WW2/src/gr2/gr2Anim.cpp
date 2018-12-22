@@ -5536,7 +5536,7 @@ SINT32 gr2AnimHitMapLocation(SINT32 boneNum)
 
 FLOAT64 gr2AnimGetLocationThickness(SINT32 boneNum)
 {
-	static FLOAT64 PERSON_THICKNESS[4] = {0.0004, 0.0012, 0.001, 0.001};
+	static FLOAT64 PERSON_THICKNESS[4] = {0.0055, 0.0065, 0.0012, 0.0025};
 
 	return (fpHitMap[boneNum] >= 0 && fpHitMap[boneNum] < FP_HIT_LOCATION_NUM)
 				? (PERSON_THICKNESS[fpHitMap[boneNum]]) : 0;

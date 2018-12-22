@@ -34,8 +34,12 @@
 #include <thread>
 #include <mutex>
 #include <locale>
-#include <codecvt>
+#include <fstream>
 #include <signal.h>
+
+#if __has_include(<codecvt>)
+#include <codecvt>
+#endif
 
 #if __has_include(<unistd.h>)
 #include <unistd.h>
