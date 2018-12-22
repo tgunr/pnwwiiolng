@@ -19,6 +19,7 @@
 #define IN_LIBXML
 #include "libxml.h"
 
+#include <inttypes.h>
 #include <limits.h>
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
