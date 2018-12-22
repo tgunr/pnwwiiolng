@@ -1,12 +1,18 @@
 /* $Id: sysMacCompat.mm 2136 2009-11-16 03:27:03Z ahwulf@CRS $ */
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #include "platforms.h" // must come before the platBuild check in order to work
 
 #if platBuild == BUILD_CLIENT
 
+// Warning: gltypes.h must be included AFTER glew.h.
+// AppKit pulls in gltypes.h
+// syscfg.h pulls in glew.h
+// Therefore syscfg.h must be included before AppKit.
+// This is an absurd bit of ordering that would break horribly if we ever managed to convert to modules.
 #include "sysmac/syscfg.h"
+#include <sys/time.h>
+#import <AppKit/AppKit.h>
 #include "vars.h"
 #include "ddp.h"
 #include "rnmain.h"
