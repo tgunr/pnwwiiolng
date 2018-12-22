@@ -203,7 +203,6 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
     t->hasalpha = t->comp[0] == 4;
     t->hdevtex[0] = 1;
     t->suffix = optionalFileSuffix;
-    t->ext = ext;
     t->flags = flags;
     t->transparentColor = transparentColor;
     
@@ -242,8 +241,8 @@ static int reloadTexture(int texid, TEXTURE *t )
 {
 
     // if the target file dosn't exist OR the current texture suffix is the same as the newly set suffix, ignore, otherwise reload
-    std::string fileName = t->name + optionalFileSuffix + t->ext;
-    if (!fioFileExists(t->name, optionalFileSuffix, t->ext) || (t->suffix == optionalFileSuffix))
+    std::string fileName = t->name + optionalFileSuffix + t->getExtension();
+    if (!fioFileExists(t->name, optionalFileSuffix, t->getExtension()) || (t->suffix == optionalFileSuffix))
     {
         return 0;
     }
@@ -343,7 +342,6 @@ void ldReloadTextures()
             
             // if the texture suffix is different than current suffix
             if (t->suffix != optionalFileSuffix) {
-                std::string fName = t->name + t->ext;
                 reloadTexture(textureId, t);
 //                reloadTexture(fName, flags, tc, textureId);
             }
