@@ -149,6 +149,7 @@ public:
 		, m_value(0)
 		, m_brigades()
 		, m_townstatus(INACTIVE)
+		, m_lastCaptureTime(0)
 	{}
 
 	~CPStruct()
@@ -348,6 +349,9 @@ public:
 	//tolua_end
 	ACTIVE_BRIGADES		m_brigades;
 
+	void setLastCaptureTime(UINT32 time);
+	UINT32 getLastCaptureTime() { return m_lastCaptureTime; }
+
 private:
 	//// Helper functions
 
@@ -359,6 +363,8 @@ private:
 
 	// Internal part of clearObjective
 	void _removeObjective(WWII_SIDE forSide);
+
+	UINT32	m_lastCaptureTime;
 
 public:
 //tolua_begin

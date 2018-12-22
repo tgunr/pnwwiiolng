@@ -1109,7 +1109,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 			std::wstring tip;
 
 			int objective		= 0;
-			int cpflags			= _cp.StratFlags(true);
+			unsigned int cpflags	= _cp.StratFlags(true);
 			int side			= _renderer->client ? (_renderer->client->PersonaSelected().m_countryID == 4) ? 2:1 : 0;
 			UINT32 myBrigadeID	= _renderer->client ? _renderer->client->BrigadeSelected().m_detail.brigadeID() : 0;
 
@@ -1214,6 +1214,11 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 						HCUnit* division = (unit->isBrigade()) ? unit->parent(): unit;
 						display = false;
 						
+						if (unit->isGarrison() &&
+							(cpflags & CP_STAT_ENEMY_LINKED) &&
+							(unit->branch() == BRANCH_AIR))
+							continue;
+						
 						// Check whether this is a reserve town with no units in it or not.
 						if (unit->isBrigade() || unit->isDivision() ||
 							(unit->isGarrison() && (cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED |
@@ -1300,18 +1305,21 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				tip += _renderer->tooltip("widgets.map.tooltip.frontline");
 				tip += L"\n";
 			}
+			else
 			if (cpflags & CP_STAT_FRONTLINE_LINKED)
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.backline");
 				tip += L"\n";
 			}
+			else
 			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.inactive");
 				tip += L"\n";
 			}
+			else
 			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";

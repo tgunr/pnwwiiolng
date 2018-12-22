@@ -614,7 +614,7 @@ BrigadeController::requestNominate(Player* sponsor, const ChatHandle officerHand
 		throw BCERR_CANT_NOMINATE_HC;
 	if ( nominee->permissions(CAN_OIC) == false )
 		throw BCERR_NOMINEE_CANT_OIC;
-	if ( !unit().isBrigade() )
+	if (!unit().isBrigade() && !unit().isGarrison())
 		throw BCERR_WRONG_BRIGADE;
 	_requirePlayerInBrigade(nominee, unit());
 	if ( nominee->leadingBrigade() )

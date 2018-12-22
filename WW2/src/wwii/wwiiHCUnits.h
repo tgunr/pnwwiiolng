@@ -78,7 +78,7 @@ public:
 	UINT32 parentID() const { return m_parentID; }
 	HCUnit* parent() const { return m_parent; }
 	WWII_COUNTRY country() const { return m_countryID; }
-	WWII_SIDE side() const { return ( m_countryID == 4 ) ? AXIS : ALLIED; }
+	WWII_SIDE side() const { return wwiiSide(m_countryID); }
 	BRANCH_ENUM branch() const { return m_branchID; }
 	FULL_OBJ_ID homeCPID() const { return m_homeCPID; }
 	BRANCH_ENUM movementType() const { return m_movementType; }

@@ -39,4 +39,4 @@ extern bool strtIsStratInitialized();
 
 extern void strtInitializeStratSystem();
 extern void strtShutdownStratSystem();
-
+extern void strtProcessGarrisons();
