@@ -79,71 +79,10 @@ static std::map<int, std::vector<rc> > rowcolumn;
 #define INDICE_SIZE                 6
 #define IALLOC_SIZE                 INDICE_SIZE * 1000
 
-// Used for billboards since std::vector resize does a mem copy
-template<typename Type>
-class FakeVector
-{
-private:
-	enum { GrowthRate = 128 } ;	// Grow in units of 128. MUST BE POWER OF 2.
-	enum { GrowthMask = GrowthRate - 1 };
-public:
-    FakeVector() : _data(0), _size(0), _capacity(0)
-	{
-		reserve(1024);
-	}
-    ~FakeVector()
-    {
-		FreeData();
-    }
-
-    unsigned int capacity() const {return _capacity;}
-    unsigned int size() const {return _size;}
-
-    bool empty() const {return _size == 0;}
-
-	void FreeData()
-	{
-        if(_data)
-        {
-            memFree(_data);
-            _data = nullptr;
-        }
-	}
-
-    void reserve(unsigned int newcap)
-    {
-		newcap = (newcap + GrowthMask) & (~GrowthMask);
-        if(!_data)
-        {
-            _data = (Type*)memAlloc(sizeof(Type) * newcap);
-        }
-        // realloc fails in debug
-        else
-        {
-            void* old = _data;
-            _data = (Type*)memAlloc(sizeof(Type) * newcap);
-            memcpy(_data, old, sizeof(Type) * _size);
-            memFree(old);
-        }
-
-        _capacity = newcap;
-    }
-
-    void resize(unsigned int newsize) {_size = newsize;}
-    const Type& operator [](unsigned int position) const {return _data[position];}
-    Type& operator [](unsigned int position) {return _data[position];}
-    void clear() {_size = 0;}
-
-private:
-    Type* _data;
-    unsigned int _size;
-    unsigned int _capacity;
-};
-
 #define VisLimit    3200.0f
 
-static std::map<int, float *> windMatrices;      // vector of float pointers storing wind matrices for each matrix defined by SpeedWind
-using TreeMap = std::multimap<OBJECT*, Tree*>;
+static std::unordered_map<int, float *> windMatrices;      // vector of float pointers storing wind matrices for each matrix defined by SpeedWind
+using TreeMap = std::unordered_multimap<OBJECT*, Tree*>;
 static TreeMap objectTreeMap;
 
 static std::vector<float> windRustleAngles;     // table of leaf rustle angles shared by all base trees
@@ -165,10 +104,10 @@ static std::vector<int> dotcommands;
 
 static colliderQuery* TreeCollider = nullptr;
 
-static FakeVector<float> billboards[MAX_TREE_TYPES];
-static FakeVector<float> horizbillboards[MAX_TREE_TYPES];
-static FakeVector<unsigned short> billboardindices[MAX_TREE_TYPES];
-static FakeVector<unsigned short> horizbillboardindices[MAX_TREE_TYPES];
+static std::vector<float> billboards[MAX_TREE_TYPES];
+static std::vector<float> horizbillboards[MAX_TREE_TYPES];
+static std::vector<unsigned short> billboardindices[MAX_TREE_TYPES];
+static std::vector<unsigned short> horizbillboardindices[MAX_TREE_TYPES];
 
 static int billboardindiceoffset[MAX_TREE_TYPES] = {0};
 static int horizbillboardindiceoffset[MAX_TREE_TYPES] = {0};
