@@ -102,8 +102,6 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
             ttype = TEXTURE_TGA;
         else if(name.find(".bmp") != std::string::npos)
             ttype = TEXTURE_BMP;
-        else
-            ttype = TEXTURE_NONE;
 
         str.erase(pos, str.length()-pos);
     }
