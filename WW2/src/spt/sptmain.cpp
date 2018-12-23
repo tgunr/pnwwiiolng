@@ -139,41 +139,42 @@ static CSpeedWind* speedwind = nullptr;
 
 //---------------------------------------------------------------------
 
-void Tree::attach(OBJECT& o) {
+void Tree::attach(OBJECT& o_) {
 	detach();
-	this->o = &o;
+	this->o = &o_;
 
 #if DEBUG_WW2
-	// Make sure we're not adding trees to the treemap twice.
-	auto rng = objectTreeMap.equal_range(&o);
-	for ( auto it = rng.first ; it != rng.second ; ++it ) {
-		assert ( it->second != this );
-	}
+    // Make sure we're not adding trees to the treemap twice.
+    // C++17: for (auto && [it, end] = objectTreeMap.equal_range(this->o); it != end; ++it)
+    auto rng = objectTreeMap.equal_range(this->o);
+    for (auto it = rng.first; it != rng.second; ++it) {
+        assert(it->second != this);
+    }
 #endif
 
-	objectTreeMap.insert(std::make_pair(&o, this));
+	objectTreeMap.insert(std::make_pair(this->o, this));
 }
 
 
 void Tree::detach() {
-	if ( ! o )
-		return;
+    if (!this->o) {
+        return;
+    }
 
-	// Make sure we're not removing trees to the treemap twice.
 	auto rng = objectTreeMap.equal_range(o);
-	for ( auto it = rng.first ; it != rng.second ; ++it ) {
-		if ( it->second != this ) continue;
+    for (auto it = rng.first; it != rng.second; ++it) {
+        if (it->second == this) {
+            objectTreeMap.erase(it);
+            if (this->o->treePtr == this) {
+                this->o->treePtr = nullptr;
+            }
+            this->o = nullptr;
+            return;
+        }
+    }
 
-		objectTreeMap.erase(it);
-
-		if ( o->treeID == (UINT32)this )
-			o->treeID = (UINT32)nullptr;
-		return;
-	}
-
-	// If we didn't return during the loop,
-	// we didn't find this tree in the map.
-	assert ( false );
+    // If we didn't return during the loop, we didn't find this tree in the map.
+    assert(false);
 }
 
 /*---------------------------------------------------------------------
@@ -2676,14 +2677,12 @@ void sptExitApp()
 Function: sptCollideWithTree
 Description:
 ---------------------------------------------------------------------*/
-bool sptCollideWithTree(unsigned int address,
+bool sptCollideWithTree(Tree *tree,
                         piVECTOR const* pt1,
                         piVECTOR const* pt2,
                         piVECTOR* collidePt,
                         float* time)
 {
-    Tree* tree = (Tree*)address;//treeDataGetTree(id);
-
     if(!tree)
         return false;
 
@@ -2974,7 +2973,7 @@ bool sptCollideWithCluster(OBJECT* o,
 
         collides++;
 
-        if(sptCollideWithTree((unsigned int)tree, p1, p2, collisionpoint, t))
+        if(sptCollideWithTree(tree, p1, p2, collisionpoint, t))
         {
 //            printf("Found after %d checks with %d collides\n",counter,collides);
             return true;
@@ -3766,7 +3765,7 @@ unsigned int sptAddTree(OBJECT* o,
             o->pos.y -= (o->bbox[0].y + o->bbox[1].y) * 0.5f;
 
             o->maxrad = tree->radius;
-            o->treeID = (unsigned int)tree;
+            o->treePtr = tree;
         }
     }
 

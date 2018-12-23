@@ -51,6 +51,7 @@ struct TreeInstance
 
     OBJECT* o;
 };
+struct Tree;
 
 enum ENUMTREEPARTS
 {
@@ -82,7 +83,7 @@ extern void sptDrawOn(int type, bool draw);
 extern bool sptmainInit();
 extern bool sptDrawTreeShadowCasters();
 
-extern bool sptCollideWithTree(unsigned int address,
+extern bool sptCollideWithTree(Tree *address,
                         piVECTOR const* pt1,
                         piVECTOR const* pt2,
                         piVECTOR* collidePt,

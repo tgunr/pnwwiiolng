@@ -227,6 +227,8 @@ class RenderStateSet;
 class oglMaterial;
 #endif
 
+struct Tree;
+
 namespace ogl	{class MeshContext;}
 
 struct OBJECT
@@ -245,7 +247,7 @@ struct OBJECT
 	UINT32				flags;			// Object flags 1
 	UINT32				flag2;			// Object flags 2
     UINT32              flag3;          // Object flags 3
-    UINT32              treeID = 0;     // ID of speedtree object
+    Tree                *treePtr;       // Pointer to speedtree object
 	float               createtime;     // When an FX was created.
 	float               updatetime;     // When an FX was last updated.
 	void*				lpspare;		// Object spare pointer
