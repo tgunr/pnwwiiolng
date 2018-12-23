@@ -38,7 +38,7 @@ static int totaltrees = 0;
 
 static std::vector<float> billboardTexCoords;
 
-static ref_ptr<oglVertexBuffer> vbo;
+static oglVertexBuffer *vbo;
 
 using TreeSet = std::unordered_set<unsigned int>;
 static TreeSet activetrees;
@@ -59,7 +59,7 @@ static void addToFreeList(Tree* t);
 ------------------------------------------------------------------*/
 oglVertexBuffer* treeDataGetVBO()
 {
-    return vbo.get();
+    return vbo;
 }
 
 /*-----------------------------------------------------------------
