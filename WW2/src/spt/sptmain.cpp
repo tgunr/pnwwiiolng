@@ -100,7 +100,7 @@ static std::vector<Tree*> shadowTrees[MAX_TREE_TYPES];
 
 static std::vector<Tree*> threeD[MAX_TREE_TYPES];
 static std::vector<Tree*> bblist[MAX_TREE_TYPES];
-static std::vector<int> dotcommands;
+static std::vector<Tree*> dotcommands;
 
 static colliderQuery* TreeCollider = nullptr;
 
@@ -797,8 +797,6 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
     TDTL_TREES& octet = dtl->m_trees[TRNINDEX(r, c)];
     TDTL_TREES::iterator itr = octet.begin();
 
-    unsigned int address = 0;
-
     Vec3d world;
     world.set(WorldOriginOffset);
 
@@ -812,9 +810,7 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
             continue;
         }
 
-        address = (*itr);
-
-        Tree* t = (Tree*)address;
+        Tree *t = (*itr);
 
         if(!t) continue;
 
@@ -3164,14 +3160,12 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
             lowz = z;
         }
 
-        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[o->trnum], pos64, false, changecluster);
+        Tree *t = sptAddTree(o, types[ii] - 1, &trndtl[o->trnum], pos64, false, changecluster);
 
-        if(address == 0)
+        if (!t)
         {
             continue;
         }
-
-        Tree* t = (Tree*)address;
 
         if(!IS_BUSH(t->isbush_isclutter_base))
         {
@@ -3227,13 +3221,11 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
 Function: releaseFromOctet
 Description:
 ---------------------------------------------------------------------*/
-static void releaseFromOctet(unsigned int address)
+static void releaseFromOctet(Tree *tree)
 {
-    Tree* tree = (Tree*)address;
-
     if(tree->octet && !tree->octet->empty())
     {
-        TDTL_TREES::iterator find = tree->octet->find(address);
+        TDTL_TREES::iterator find = tree->octet->find(tree);
 
         if(find != tree->octet->end())
         {
@@ -3246,7 +3238,7 @@ static void releaseFromOctet(unsigned int address)
 Function: sptFreeTreeByID
 Description:
 ---------------------------------------------------------------------*/
-void sptFreeTreeByID(unsigned int address)
+void sptFreeTreeByID(Tree *address)
 {
     if(treeDataIsValid(address))
     {
@@ -3269,7 +3261,7 @@ void sptFreeTreeByObject(OBJECT* key)
 	for ( auto it = rng.first ; it != rng.second ; ) {
 		// Removing the tree will automatically remove the node in the tree map.
 		auto free = it++ ;
-		sptFreeTreeByID((unsigned int)free->second);
+		sptFreeTreeByID(free->second);
 	}
 
 	key->flag2 &= ~OBJECT_SPEEDTREE;
@@ -3395,7 +3387,7 @@ static bool determineOctet(Tree* t, TERRAIN_DETAIL* dtl)
 
 #endif
 	t->octet = &dtl->m_trees[octet];
-	t->octet->insert((unsigned int)t);
+	t->octet->insert(t);
 
     return true;
 }
@@ -3418,7 +3410,7 @@ static void freeDotCommandTrees()
 Function: sptAddTreeCommand
 Description: Dot command for tree testing
 ---------------------------------------------------------------------*/
-unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, float shadow)
+Tree * sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, float shadow)
 {
     extern LOGICAL trnmainFindSupercell(SINT16* scx, SINT16* scy, piVECTOR* p);
 
@@ -3435,7 +3427,7 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
     if(!tree)
         return 0;
 
-    int id = 0;
+    Tree *id = nullptr;
 
     piVECTOR p;
 
@@ -3665,7 +3657,7 @@ Description:
 const int numRotations = 12;
 static int rotations[numRotations] = { 0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330 };
 
-unsigned int sptAddTree(OBJECT* o,
+Tree *       sptAddTree(OBJECT* o,
                         int base,
                         TERRAIN_DETAIL* dtl,
                         FLOAT64VECTOR& pos,
@@ -3779,7 +3771,7 @@ unsigned int sptAddTree(OBJECT* o,
 
     determineCollisionMatrix(tree);
 
-    return (unsigned int)tree;
+    return tree;
 }
 
 /*---------------------------------------------------------------------
@@ -3962,7 +3954,7 @@ Description: Free octet clutter
 ---------------------------------------------------------------------*/
 void sptFreeClutter(TDTL_TREES* trees)
 {
-    std::vector<unsigned int> remove;
+    std::vector<Tree *> remove;
 
     for(int i = SDM_SUPERCELL_OCTETS_XY; i != 0; --i)
     {
@@ -3996,7 +3988,7 @@ Description: Free octet trees
 ---------------------------------------------------------------------*/
 void sptFreeTrees(TDTL_TREES* trees)
 {
-    std::vector<unsigned int> remove;
+    std::vector<Tree *> remove;
 
     for(int i = SDM_SUPERCELL_OCTETS_XY; i != 0; --i)
     {

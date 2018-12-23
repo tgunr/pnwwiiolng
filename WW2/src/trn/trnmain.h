@@ -16,7 +16,7 @@
 
 	struct trncdDTLCollider;
 
-	using TDTL_TREES = std::unordered_set<UINT32>;
+	using TDTL_TREES = std::unordered_set<Tree *>;
 
 	struct TERRAIN_DETAIL
 	{

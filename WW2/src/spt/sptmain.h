@@ -100,7 +100,7 @@ extern bool sptCollideWithCluster(OBJECT* o,
                            float* t,
                            int* tri);
 
-extern unsigned int sptAddTree(OBJECT* o,
+extern Tree *sptAddTree(OBJECT* o,
                         int base,
                         TERRAIN_DETAIL* dtl,
                         FLOAT64VECTOR& pos,
@@ -108,8 +108,8 @@ extern unsigned int sptAddTree(OBJECT* o,
                         bool changecluster = false);
 
 extern void sptFreeTreeByObject(OBJECT* o);
-extern void sptFreeTreeByID(UINT32 ID);
-extern unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap = false, float shadow = 1.0f);
+extern void sptFreeTreeByID(Tree *address);
+extern Tree *sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap = false, float shadow = 1.0f);
 extern void sptFreeClutter(TDTL_TREES* trees);
 extern void sptFreeTrees(TDTL_TREES* trees);
 extern bool sptCollide(const piVECTOR& pt1, const piVECTOR& pt2, piVECTOR& collidept, float& time, int& tri);
