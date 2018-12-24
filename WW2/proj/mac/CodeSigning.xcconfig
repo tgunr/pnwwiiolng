@@ -12,7 +12,7 @@
 // or including the archives in code signing.
 
 // Code sign identity - what kind of code signing?
-CODE_SIGN_IDENTITY_Development = Mac Developer
+CODE_SIGN_IDENTITY_Development =
 CODE_SIGN_IDENTITY_Release = Developer ID Application
 
 CODE_SIGN_IDENTITY_MC = $(CODE_SIGN_IDENTITY_Development)
