@@ -429,7 +429,6 @@ struct TEXTURE
 	LOGICAL					hasalpha;
 	LOGICAL					iswritable;
 	std::string				suffix;
-	std::string				ext;
 	
 	FLOAT32                 widthfactor[MAXMIPLEVELS];
 	FLOAT32                 heightfactor[MAXMIPLEVELS];
