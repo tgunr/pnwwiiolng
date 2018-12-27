@@ -1603,15 +1603,12 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	//anim->twist.UpdateYaw(Vehicle);
 
 	// update our position variables
-	if ( !(Vehicle->Flags & VEH_FLAGS_IS_CLONE) )
-	{
-		PosData->RenderAtt.Yaw	= anim->twist.vehicleYaw;
-		PosData->Att.Yaw		= anim->twist.vehicleYaw;
-		Vehicle->AnimationBits	= update.animationFlags;
-	}
-
+	PosData->RenderAtt.Yaw	= anim->twist.vehicleYaw;
+	PosData->Att.Yaw		= anim->twist.vehicleYaw;
 	PosData->Vel			= update.vel;
 	PosData->Vel.x			= -PosData->Vel.x; // usual bullshit
+
+	Vehicle->AnimationBits	= update.animationFlags;
 
 	fpProcessVehicleAnimationFlags(Vehicle);
 

@@ -7038,10 +7038,7 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			veh->Chat_Handle = chatGetHandle((const char*)veh->Handle);
 
 			// do something for vehicles
-			gr2AnimBitPacker bp = gr2AnimBitPacker(myVehicle->AnimationBits);
-			// override pose with info from model
-			bp.pose = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPose;
-			veh->AnimationBits = bp.pack();
+			veh->AnimationBits = myVehicle->AnimationBits;
 			veh->PosData = myVehicle->PosData;
 			veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
 			veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
@@ -7049,9 +7046,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
 			veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
 			veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
-
-			veh->PosData.Att = myVehicle->PosData.Att;  // myVehicle->ModelData->VehicleAtt;
-			veh->PosData.RenderAtt = myVehicle->PosData.RenderAtt;  // myVehicle->ModelData->VehicleAtt;
 
 			veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
 			veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
