@@ -657,7 +657,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	//       very very wrong and unusable) to enable usage of the newer
 	//       SetProcessDpiAwarenessContext() (Win 10 1607) or
 	//       SetProcessDpiAwareness() (Win 8.1) when available.
-	SetProcessDpiAware();
+	SetProcessDPIAware();
 
 	// We may need to restart if this is a Steam version that wasn't launched properly.
 	if ( !InitSteam() )
