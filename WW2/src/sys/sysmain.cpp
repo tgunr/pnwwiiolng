@@ -649,6 +649,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 0;
 	}
 
+	// Declare our "DPI awareness" (air quotes are very required here) as early
+	// as possible. The only reason this goes below mngoptParse() is so we can
+	// later add as -nodpiaware option for testing or whatever.
+	// TODO: Add a -dpiawareness option or something.
+	// TODO: Use an API availability check (Windows version checks above are
+	//       very very wrong and unusable) to enable usage of the newer
+	//       SetProcessDpiAwarenessContext() (Win 10 1607) or
+	//       SetProcessDpiAwareness() (Win 8.1) when available.
+	SetProcessDpiAware();
+
 	// We may need to restart if this is a Steam version that wasn't launched properly.
 	if ( !InitSteam() )
 		return 0;
