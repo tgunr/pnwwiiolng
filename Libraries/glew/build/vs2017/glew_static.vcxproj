@@ -66,7 +66,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <SmallerTypeCheck>false</SmallerTypeCheck>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <FloatingPointModel>Precise</FloatingPointModel>
       <FloatingPointExceptions>false</FloatingPointExceptions>
@@ -123,7 +123,7 @@
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <AssemblerOutput>NoListing</AssemblerOutput>
       <BrowseInformation>false</BrowseInformation>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
