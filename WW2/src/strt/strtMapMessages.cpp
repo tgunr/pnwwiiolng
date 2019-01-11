@@ -419,6 +419,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	spawnGrantRequest.weaponSerial = weaponSerial;
 	spawnGrantRequest.playerID = player.playerID();
 	spawnGrantRequest.missionID = 0;
+	spawnGrantRequest.usedMobileSpawn = player.m_wantMobileSpawn;
 
 	if ( player.validMissionPacket() )
 	{

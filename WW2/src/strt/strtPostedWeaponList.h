@@ -56,6 +56,7 @@ struct POSTED_WEAPON
 		, m_isNonSupplied(withIsNonSupplied)
 		, m_resupplyTicket(nullptr)
 		, m_posted(0)
+		, m_SpawnedFromMobileSpawn(false)
 	{
 		_register();
 	}
@@ -148,6 +149,7 @@ struct POSTED_WEAPON
 	ResupplyTicket*	m_resupplyTicket;		// Pointer to our resupply ticket if we
 											// are attached to one.
 	UINT32 			m_posted;				//Timestamp at which this was posted.  Posts
+	bool            m_SpawnedFromMobileSpawn;// True if spawned at a mobile spawn.
 
 private:
 	// Allocate me a serial number and post me to the postedWeaponList
