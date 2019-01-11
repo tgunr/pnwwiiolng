@@ -9,6 +9,8 @@ IF ( WIN32 )
     ADD_COMPILE_DEFINITIONS(  WIN32 UNICODE _UNICODE )
 
     ADD_COMPILE_OPTIONS(
+        # Non-DLL multithreaded CRT
+        $<IF:$<CONFIG:Debug>,/MTd,/MT>
     	# Debug info always, enforce for scope, C++ exceptions, precise FP
         /Zi /Zc:forScope /EHsc /fp:precise
         # No comdat, always bufsec, string dedup, frame pointers, intrinsics

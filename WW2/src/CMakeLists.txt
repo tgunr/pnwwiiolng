@@ -100,10 +100,7 @@ SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 ####################################
 ## General search paths
 
-# /usr/local is explicitly added because many systems don't search it by
-# default despite it being an obvious place to look.
 INCLUDE_DIRECTORIES(
-	${LIBRARIES_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
@@ -279,7 +276,7 @@ ADD_LIBRARY(teulserver STATIC
     mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
+TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 MySQL::MySQL ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -291,6 +288,7 @@ ADD_LIBRARY( instancing STATIC
     mm/mmEnums.h auth/authDispatch.h
     miss/missFlags.h wwii/wwiiBranchEnums.h
 )
+TARGET_LINK_LIBRARIES( instancing MySQL::MySQL )
 SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -341,9 +339,9 @@ ADD_LIBRARY( wwiilib STATIC
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 )
+TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )
 MACRO( USE_WWIILIB_ON Name )
-	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 ${MYSQL_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 MySQL::MySQL )
 ENDMACRO()
 
 ####################################
