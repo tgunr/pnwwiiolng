@@ -90,10 +90,7 @@ SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 ####################################
 ## General search paths
 
-# /usr/local is explicitly added because many systems don't search it by
-# default despite it being an obvious place to look.
 INCLUDE_DIRECTORIES(
-	${LIBRARIES_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
@@ -261,7 +258,7 @@ ADD_LIBRARY(teulserver STATIC
     mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
+TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 MySQL::MySQL ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -273,6 +270,7 @@ ADD_LIBRARY( instancing STATIC
     mm/mmEnums.h auth/authDispatch.h
     miss/missFlags.h wwii/wwiiBranchEnums.h
 )
+TARGET_LINK_LIBRARIES( instancing MySQL::MySQL )
 SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -323,17 +321,10 @@ ADD_LIBRARY( wwiilib STATIC
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
-IF (BUILDING_OWN_LIBXML2)
-	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-		ADD_DEPENDENCIES( ${Name} libxml2 )
-	ENDMACRO()
-ELSE()
-	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-	ENDMACRO()
-ENDIF()
+TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )
+MACRO( USE_WWIILIB_ON Name )
+	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 MySQL::MySQL )
+ENDMACRO()
 
 ####################################
 ## Various commandline utility executables
@@ -348,7 +339,7 @@ IF ( NOT MSVC )
 	USE_WWIILIB_ON( chatClient )
     TARGET_LINK_LIBRARIES( chatClient teulserver ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
-    
+
     INSTALL(
         TARGETS chatClient #luaClient
         ARCHIVE DESTINATION lib
@@ -435,7 +426,7 @@ SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 ## Macro for building hosts
 MACRO( ADD_HOST_TARGET Name )
     SET( HOST_TARGET_Usage "ADD_HOST_TARGET( <Name> [INSTANCING] [LUA] SOURCES ...)" )
-    
+
     CMAKE_PARSE_ARGUMENTS( HOST_TARGET_ARG "INSTANCING;LUA" "" "SOURCES;EXTRA_DEFINITIONS" ${ARGN} )
     IF ( NOT "${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" STREQUAL "" )
         MESSAGE( FATAL_ERROR "0 ${HOST_TARGET_Usage} ${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" )

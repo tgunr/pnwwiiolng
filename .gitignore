@@ -1251,8 +1251,6 @@ WW2/WW2OL.xcodeproj/ahwulf.pbxuser
 WW2/WW2OL.xcodeproj/ahwulf.perspectivev3
 WW2/WW2OL.xcodeproj/project.xcworkspace
 WW2/WW2OL.xcodeproj/xcuserdata
-WW2/lib/win/Debug
-WW2/lib/win/Release
 WW2/lib/win/SSE2SmartHeap
 WW2/lib/win/TestRelease
 WW2/lib/win/osg
