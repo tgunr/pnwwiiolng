@@ -6955,37 +6955,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 	vehVehicle* myVehicle = persGetPersonaVehiclePtr();
 	mlVehicleData* modelData = persGetPersonaModelDataPtr();
 
-	/*
-	if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
-	{
-		gr2AnimTrooper* anim = myVehicle->VehicleObjectData->PlaneObject->animModel;
-
-		if(anim)
-		{
-			gr2Model* model = anim->skeleton->attachments.at(0);
-			//gr2Model* model = anim->weapons[anim->currentWeapon].GetActive();
-			//const char* path = weapon->GetPath();
-			Matrixf transform;
-			transform.set(model->GetBoneTransform(0));
-			gr2RigidPhysicsModel* o = new gr2RigidPhysicsModel(model->GetPath(), myVehicle, transform, 0);
-			return 0;
-		}
-	}
-	*/
-
-	/*
-	if(vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-	{
-
-	}
-	else
-	{
-
-	}
-
-   char name[64];
-   */
-
 	FLOAT64VECTOR vehpos = {0,0,0};
 	if(modelData) vehpos = modelData->VehiclePos;
 
@@ -7014,7 +6983,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			// setup our name and decal for personalization reasons
 			char handle[11];
 			snprintf((char*)handle, 10, "C%d%d", (int)vehicle->uid(), GetRandom(1000, 1000000));
-			//veh->Chat_Handle = chatGetHandle((const char*)handle);
 
 			vehicle->setIcon(handle);
 #ifdef BETA_RELEASE
@@ -7031,18 +6999,27 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 
             veh->Flags |= VEH_FLAGS_IS_CLONE;
 
-			//veh->StateAnimation = myVehicle->StateAnimation;
-
 			// reset our name so we can easily id which vehicle index we're using
 			snprintf((char*)veh->Handle, 10, "C%d", (int)vehicle->uid());
 			veh->Chat_Handle = chatGetHandle((const char*)veh->Handle);
-
+			
 			// do something for vehicles
 			gr2AnimBitPacker bp = gr2AnimBitPacker(myVehicle->AnimationBits);
+			
+			// infantry stuff
 			// override pose with info from model
-			bp.pose = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPose;
+			if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
+			{
+				bp.pose = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPose;
+				bp.weapon = myVehicle->VehicleObjectData->PlaneObject->animModel->currentWeapon;
+				bp.movement = myVehicle->VehicleObjectData->PlaneObject->animModel->currentMove;
+				bp.point = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPoint;
+			}
+			
 			veh->AnimationBits = bp.pack();
 			veh->PosData = myVehicle->PosData;
+			veh->PosData.animationFlags = veh->AnimationBits;
+			veh->PosData.Pos = myVehicle->PosData.RenderPos;
 			veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
 			veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
 			veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
@@ -7050,8 +7027,8 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
 			veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
 
-			veh->PosData.Att = myVehicle->PosData.Att;  // myVehicle->ModelData->VehicleAtt;
-			veh->PosData.RenderAtt = myVehicle->PosData.RenderAtt;  // myVehicle->ModelData->VehicleAtt;
+			veh->PosData.Att = myVehicle->PosData.Att;
+			veh->PosData.RenderAtt = myVehicle->PosData.RenderAtt;
 
 			veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
 			veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
@@ -7076,31 +7053,10 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			COPY_VSMEMBER(DiveBrakeMoveTime);
 
 			COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
-			//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
 
 			COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
 			COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
 			COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
-
-			//COPY_VSMEMBER(GearPos);
-			//COPY_VSMEMBER(FlapPos);
-
-			//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
-			//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
-
-			//COPY_VSMEMBER(BombBayDoorPos);
-			//COPY_VSMEMBER(DiveBrakePos);
-
-			//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
-			//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
-
-			//COPY_VSMEMBER(GearDOFVar);
-			//COPY_VSMEMBER(FlapDOFVar);
-			//COPY_VSMEMBER(BombBayDoorDOFVar);
-			//COPY_VSMEMBER(DiveBrakeDOFVar);
-
-			//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
-			//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
 
 			COPY_VSMEMBER(UseCalculatedTrackAndWheel);
 			COPY_VSARRAY(TrackPos,2);
@@ -7152,6 +7108,8 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			veh->StickVehicleToGround = false;
 			veh->RideVehicleHostIndex = 0;
 
+			// one time interpolator update so it doesn't conflict with original info
+			veh->interpolator.NewMessageReceived(veh->LastUpdate, frametime);
             break;
         }
     }
@@ -7210,187 +7168,9 @@ static void _setVehicleState(vehVehicle* v, bool start)
 		v->StateAnimation.EjectRiders = 0;
 		v->StateAnimation.MainGunLastUpdateTime = 0;
 
-		//if(v->StateAnimation.enumDeployedState != IDE_DEPLOYED_NOT_USED)
-		//	v->StateAnimation.enumDeployedState = IDE_VEHICLE_UNDEPLOYED;
-
 		vehAnimUpdateVehicleStateAnimations(v);
 	}
 
-	/*
-	// only vehicles (not troopers) on the same sortie get vcached, so don't bother
-	// doing any of this since all of the states will remain for the current sortie
-	if(!isTrooper)
-		return;
-
-	// reset vehicle generic stuff
-	v->Flags = 0;
-	v->RideSeatNum = 0; // special values VEH_HOIST_RIDE_SEAT, VEH_TROOPER_ON_DECK_RIDE_SEAT, VEH_TOWED_VEHICLE
-	v->InfantryTarget = 0;
-	v->VehicleHasBeenHit = 0;
-	v->VehicleDeadTime = 0;
-	v->AnimationBits = 0;
-
-	if(start)
-	{
-		vehfxAttachVehicle(v, &v->iFXVehicleID);
-		v->interpolator = vehInterpolator(v);
-	}
-	else
-	{
-		vehfxDetachVehicle(v->iFXVehicleID);
-		v->iFXVehicleID = 0;
-
-		memset(&v->DamageQue, 0x0, sizeof(vehDamageQue));
-		memset(&v->MountIsFiring, 0x0, sizeof(v->MountIsFiring));
-		memset(&v->WeaponIsHidden, 0x0, sizeof(v->WeaponIsHidden));
-
-		// reset animation states
-		memset(&v->StateAnimation.FuelFireOn, 0, sizeof(v->StateAnimation.FuelFireOn));
-		memset(&v->StateAnimation.WingtipVortexSmokeOn, 0, sizeof(v->StateAnimation.WingtipVortexSmokeOn));
-		memset(&v->StateAnimation.GlycolLeakSmokeOn, 0, sizeof(v->StateAnimation.GlycolLeakSmokeOn));
-		memset(&v->StateAnimation.OilLeakSmokeOn, 0, sizeof(v->StateAnimation.OilLeakSmokeOn));
-		memset(&v->StateAnimation.ExhaustSmokeOn, 0, sizeof(v->StateAnimation.ExhaustSmokeOn));
-		memset(&v->StateAnimation.FuelLeakSmokeOn, 0, sizeof(v->StateAnimation.FuelLeakSmokeOn));
-		memset(&v->StateAnimation.EngineFireOn, 0, sizeof(v->StateAnimation.EngineFireOn));
-
-		int num = vehAnimFindVehicleStateNumber(v, "tankfire");
-		if(num >= 0) v->PosData.States[num] = 0;
-
-		memset(&v->StateAnimation.TreadDustOn, 0, sizeof(v->StateAnimation.TreadDustOn));
-		memset(&v->StateAnimation.DebrisOn, 0, sizeof(v->StateAnimation.DebrisOn));
-
-		// set all vis damage states
-		for (int i=0;i<VEH_MAX_STATE_BITS;i++)
-			vehAnimChangeVehicleStateByNumber(v, i, FALSE);
-
-		v->StateAnimation.FirstUpdateProcessed = true;
-		v->StateAnimation.bVehicleDestroyed = false;
-		v->StateAnimation.TankOnFire = FALSE;
-		v->StateAnimation.PlayCrash = 0;
-		v->StateAnimation.CrashHasPlayed = 0;
-		v->StateAnimation.EjectRiders = 0;
-		v->StateAnimation.MainGunLastUpdateTime = 0;
-
-		if(v->StateAnimation.enumDeployedState != IDE_DEPLOYED_NOT_USED)
-			v->StateAnimation.enumDeployedState = IDE_VEHICLE_UNDEPLOYED;
-
-		vehAnimUpdateVehicleStateAnimations(v);
-
-		if(v->VehicleType->Type != VEH_TYPE_PERSON)
-		{
-			// temp variable
-			OBJECT* Object = nullptr;
-
-			// remove any crap
-			if(v->ChunksOfCrap)
-				vehVisDamageRemoveAllCrap(v);
-
-			// clear all missing flags
-			obmainClearFlag2InThisTree(v->VehicleObjectData->PlaneObject, OBJECT_MISSING);
-
-			// cleaned up damaged objects
-			obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_VISIBLE);
-			obmainSetFlag2InThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_HIDDEN);
-
-			// fix up hitmap
-			obmainClearFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-			//obmainClearFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_HIDDEN);
-
-			// set dont update for inside and outside
-			//obmainSetFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_DONT_UPDATE);
-
-			Object = nullptr;
-			ogrpFindSubObjectByName(&Object,v->VehicleObjectData->PlaneObject,"hulk");
-			if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-
-			if(v->VehicleObjectData->VisDamageCrapGroup)
-				v->VehicleObjectData->VisDamageCrapGroup->flag2 |= OBJECT_DONT_UPDATE;
-
-			// if we're hulked, do a few more things, fix up colliders
-			if(v->isHulked())
-			{
-				if(v->VehicleObjectData->LoadoutLODObject)
-					ogrpHideObjectAndSubtree(v->VehicleObjectData->LoadoutLODObject);
-
-				// disable ode colliders
-				//physicsRecurseAndToggleObjectCollider(v->VehicleObjectData->VisDamageHulkLOD, false);
-
-				// update hulk flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageHulkLOD, OBJECT_DONT_UPDATE);
-				obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageHulkLOD, OBJECT_VISIBLE);
-
-				// update crap flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-				obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_VISIBLE);
-				//obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_HIDDEN);
-
-				// update stub flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_DONT_UPDATE);
-
-				if (v->VehicleObjectData->HitMap)
-				{
-					//physicsRecurseAndToggleObjectCollider(v->VehicleObjectData->HitMap, true);
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"inside");
-					v->VehicleObjectData->CollideInternObject = Object;
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"outside");
-					v->VehicleObjectData->CollideExternObject = Object;
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"walk");
-					v->VehicleObjectData->CollideWalkObject = Object;
-
-					v->VehicleObjectData->Radius = 0;
-
-					mlCalculateObjectTreeRadius(&(v->VehicleObjectData->Radius),v->VehicleObjectData->HitMap,0);
-					v->VehicleObjectData->Radius = (FLOAT32)(sqrt(v->VehicleObjectData->Radius) + 1.0); // margin of error
-				}
-				else
-				{
-					v->VehicleObjectData->CollideInternObject = nullptr;
-					v->VehicleObjectData->CollideExternObject = nullptr;
-					v->VehicleObjectData->Radius = 0.0;
-
-					if (v->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
-						v->VehicleObjectData->Radius = 3.0;
-				}
-			}
-
-			if(v->VehicleObjectData->HitMap)
-			{
-				Object = nullptr;
-				ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"inside");
-				if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-
-				Object = nullptr;
-				ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"outside");
-				if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-			}
-
-			// now fixup lods
-			for(int i = 0; i < ML_MAX_LODS; ++i)
-			{
-				if(v->VehicleObjectData->LODObjects[i])
-				{
-					OBJECT* lod = v->VehicleObjectData->LODObjects[i];
-
-					//if(i == 0)
-					//	obmainClearFlagsInThisTree(lod, OBJECT_SKIPDRAWING);
-
-					// start updating our objects again
-					obmainClearFlag2InThisTree(lod, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-					//obmainClearFlag2InThisTree(lod, OBJECT_HIDDEN);
-
-					// for anything that is an ob, set vis
-					obmainFindCallback(lod, _resetObject, nullptr);
-				}
-			}
-		}
-	}
-	*/
 }
 
 bool _findRTBFRU(ServerTrackedObject& sto, void* cookie)

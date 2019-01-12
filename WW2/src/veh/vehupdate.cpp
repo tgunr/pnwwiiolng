@@ -1607,9 +1607,9 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	{
 		PosData->RenderAtt.Yaw	= anim->twist.vehicleYaw;
 		PosData->Att.Yaw		= anim->twist.vehicleYaw;
-		Vehicle->AnimationBits	= update.animationFlags;
 	}
 
+	Vehicle->AnimationBits	= update.animationFlags;
 	PosData->Vel			= update.vel;
 	PosData->Vel.x			= -PosData->Vel.x; // usual bullshit
 
