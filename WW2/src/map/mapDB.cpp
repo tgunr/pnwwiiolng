@@ -389,10 +389,10 @@ bool mapFillPersonaData(Player* const player)
 
 		player->SetMeteredAccess(newMinuteBalance);
 
-		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
+		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
-						, player->minuteBalance()
+						, (uint64_t)player->minuteBalance()
 						);
 
 		return true;
