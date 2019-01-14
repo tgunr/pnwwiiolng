@@ -35,10 +35,10 @@ char*
 threadsPrintf(const char* fmt, ...)
 {
     assert(fmt);
-    
+
     char *p = nullptr;
     va_list args;
-    
+
     va_start(args, fmt);
     vasprintf(&p, fmt, args);
     va_end(args);
@@ -57,39 +57,32 @@ threadsFreeText(char* text)
 void
 ThreadTextQuery::addEntry(const char* const entry)
 {
-	assert( entry != nullptr );
+	assert(entry != nullptr);
 
 	// Are we about to fill the buffer?
 	size_t len = strlen(entry);
-	if ( noRoomFor(len + 1) ) // Account for separator
-	{
+	if (noRoomFor(len + 1)) { // Account for separator
 		// No space in the buffer for this many bytes,
 		// so commit immediately.
 		commit(0LL);
 	}
 
-	if ( m_length == 0 )
-	{
+	if (m_length == 0) {
 		// No current buffer, allocate one and copy the prefix into it.
 		m_length = strlcpy(m_statement, m_prefix, sizeof(m_statement));
 		m_commitFrom = teulClock64;
-	}
-	else
-	{
+	} else {
 		// We have a buffer, add a separator.
-		m_statement[m_length++] = separator();
+		m_length = strlcat(m_statement, ",", sizeof(m_statement));
 	}
 
-	if ( noRoomFor(len) ) {
-		dbugLog(_FLF, "Data too long for ThreadTextQuery - need %zu bytes to add entry %s, but buffer length %zu has only %zu available (current string is %s)", len, entry,
-sizeof(m_statement), roomLeft(), m_statement);
+	if (noRoomFor(len)) {
+		dbugLog(_FLF, "Data too long for ThreadTextQuery - need %zu bytes to add entry %s, but buffer length %zu has only %zu available (current string is %s)",
+		        len, entry, sizeof(m_statement), roomLeft(), m_statement);
 		throw std::domain_error("Data too long for ThreadTextQuery");
     }
 
-	// Copy the data over, no need to worry about buffer size because
-	// we've already validated that it fits.
-	strlcpy(m_statement + m_length, entry, sizeof(m_statement)); // And yet, we do the safe thing anyway, because, you know, safety?
-
-	m_length += len;
+    // Add the new entry.
+	m_length = strlcat(m_statement, entry, sizeof(m_statement));
 }
 

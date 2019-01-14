@@ -46,9 +46,6 @@ public:
 
 	size_t roomLeft() const { return TEXT_POOL_SIZE - 1 - m_sufLen - 1 - m_length; }
 
-	// Return the separator character - in case I decide to make it an option later.
-	char separator() const { return ','; }
-
 private:
 	DBThread::DBNo		m_db;
 	const char* const	m_prefix;
