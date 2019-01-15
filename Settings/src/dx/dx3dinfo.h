@@ -4,9 +4,9 @@
 #define dx3dinfo_HEADER
 
 #define DIRECT3D_VERSION 0x0900
-#include "d3d/d3d9types.h"
-#include "d3d/d3d9caps.h"
-#include "d3d/d3d9.h"
+#include <d3d9types.h>
+#include <d3d9caps.h>
+#include <d3d9.h>
 
 #include <string>
 
