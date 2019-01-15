@@ -1,12 +1,13 @@
 /*--------------------------------------------------------------------------------
 language.cpp
 ---------------------------------------------------------------------------------*/
+#include "stdafx.h"
+
 #include "language.h"
 #include "file.h"
 #include "libxml/parser.h"
 #include "libxml/tree.h"
 
-#include "stdafx.h"
 #include "settings.h"
 
 #include "ConvertUTF.h"
