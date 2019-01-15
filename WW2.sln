@@ -41,9 +41,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "Libraries\freetype\builds\windows\vc2015\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Playgate", "Playgate\Playgate.vcxproj", "{A755190B-E034-45F3-A255-75DCEE000361}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C5E233A4-EE47-427D-96E7-A3B784914109} = {C5E233A4-EE47-427D-96E7-A3B784914109}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtolua++", "Libraries\tolua++\win32\libtolua++.vcxproj", "{71891C1A-E328-4258-AC3F-6F9698C6D8B4}"
 	ProjectSection(ProjectDependencies) = postProject
