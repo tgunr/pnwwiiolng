@@ -134,7 +134,8 @@ public:
 			ISMOBILESPAWN_PROP, CANSTO_PROP, BRIGADENOTICES_PROP, ISHC_PROP, ISOIC_PROP,
 			OICOF_PROP, HAVEBRIGADENOTICES_PROP, RECRUITER_PROP, RECRUITERS_PROP,
 			HAVERECRUITERS_PROP, BRANCHID_PROP, MISSIONINVITE_PROP, NEXTSUPPLY_PROP,
-			INSTANCE_PROP, STATE_PROP, CAPTURESTATE_PROP, INSTANCES_PROP
+			INSTANCE_PROP, STATE_PROP, CAPTURESTATE_PROP, INSTANCES_PROP,
+			MSCHECKBOXINIT_PROP, MSCHECKBOXSTATE_PROP
 	};
 
 	virtual JSBool GetProperty(JSContext* ctx, int propid, jsval* val);
@@ -182,6 +183,9 @@ protected:
 	int brigadenoticecount;
 	UINT16 nextsupply;
 	FULL_OBJ_ID lastspawnlistsource;
+
+	bool js_mscheckboxinit = false;  //  UI Mobile Spawn Initialise logic. Added 24-12-2018
+	bool js_mscheckboxstate = true;  //  UI Mobile Spawn Current State. Added 24-12-2018
 
 	~jsClient();
 };

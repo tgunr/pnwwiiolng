@@ -183,6 +183,8 @@ JSPropertySpec jsClient::jsproperties[] =
 	{"state",				jsClient::STATE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"capturestate",		jsClient::CAPTURESTATE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"instances",			jsClient::INSTANCES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"mscheckboxinit",		jsClient::MSCHECKBOXINIT_PROP,		JSPROP_PERMANENT, nullptr, nullptr},  //  Added 24-12-2018
+	{"mscheckboxstate",		jsClient::MSCHECKBOXSTATE_PROP,		JSPROP_PERMANENT, nullptr, nullptr},  //  Added 24-12-2018
 	{0, 0, 0, nullptr, nullptr}
 };
 
@@ -2083,6 +2085,16 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case INSTANCES_PROP:
 			*val = instances->jsVal();
 		break;
+		case MSCHECKBOXINIT_PROP:  //  UI Mobile Spawn Initialise logic. Added 24-12-2018
+		{
+			*val = BOOLEAN_TO_JSVAL((bool)js_mscheckboxinit);
+		}
+		break;
+		case MSCHECKBOXSTATE_PROP:  //  UI Mobile Spawn Current State. Added 24-12-2018
+		{
+			*val = BOOLEAN_TO_JSVAL((bool)js_mscheckboxstate);
+		}
+		break;
 	}
 
 	return JS_TRUE;
@@ -2090,6 +2102,20 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 {
+	switch (propid)
+	{
+	case MSCHECKBOXINIT_PROP:  //  Added 24-12-2018
+	{
+		js_mscheckboxinit = (bool)JSVAL_TO_BOOLEAN(*val);
+	}
+	break;
+	case MSCHECKBOXSTATE_PROP:  //  Added 24-12-2018
+	{
+		js_mscheckboxstate = (bool)JSVAL_TO_BOOLEAN(*val);
+	}
+	break;
+	}
+
 	return JS_TRUE;
 }
 
