@@ -419,6 +419,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	spawnGrantRequest.weaponSerial = weaponSerial;
 	spawnGrantRequest.playerID = player.playerID();
 	spawnGrantRequest.missionID = 0;
+	spawnGrantRequest.usedMobileSpawn = player.m_wantMobileSpawn;
 
 	if ( player.validMissionPacket() )
 	{
@@ -506,7 +507,7 @@ strtSendMMPostCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial)
 }
 
 //This function sends a spawn cancel to the strat system
-SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial)
+SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial, const FULL_OBJ_ID originFacility)
 {
 	SINT32 retval;
 	MM_SPAWN_CANCEL spawnCancel;
@@ -514,6 +515,7 @@ SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OB
 	spawnCancel.customerID = customerID;
 	spawnCancel.weaponSerial = weaponSerial;
 	spawnCancel.facility = facility;
+	spawnCancel.originFacility = originFacility;
 
 	retval = teulSend(connection, _SEND_MM_SPAWN_CANCEL, &spawnCancel);
 
