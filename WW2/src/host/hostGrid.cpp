@@ -78,20 +78,17 @@ _dumpVisList(const char* const label, const _Container& list)
 
 //////////////////////////////////////////////////////////////////////
 // Remove an viewing on my current list to the end of the list
-// and queue it onto the remove list.
+// and queue it onto the remove list. Return an iterator to one after
+// the removed viewing to support continued iteration.
 
-void
+Viewings::iterator
 HostVehicle::removeFromVisList(Viewings::iterator& it)
 {
 	if ( it->m_lastSent > 0ULL )
 	{
 		m_worldUpdate->removeList[m_worldUpdate->numRemove++] = it->m_index;
 	}
-	if ( &(*it) != &(m_visList.back()) )
-	{
-		memcpy(&(*it), &(m_visList.back()), sizeof(Viewing));
-	}
-	m_visList.pop_back();
+    return m_visList.erase(it);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -195,7 +192,7 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 		if ( subject.index != it->m_index )
 		{
 			EXTREME(_FLD, " vv:%u looks like it went away", it->m_index);
-			myVehicle.removeFromVisList(it);
+			it = myVehicle.removeFromVisList(it);
 			continue;
 		}
 
@@ -209,7 +206,7 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 			if ( subject.isHiddenBuzzard() && ! myVehicle.canSeeHiddenBuzzards() )
 			{
 				EXTREME(_FLD, " vv:%u hidden", it->m_index);
-				myVehicle.removeFromVisList(it);
+				it = myVehicle.removeFromVisList(it);
 				continue;
 			}
 			it->m_priority = _getVehicleDistance_cm2(subject, myVehicle);
@@ -217,7 +214,7 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 			{
 				EXTREME(_FLD, " vv:%u out of range", it->m_index);
 				// Gone out of range
-				myVehicle.removeFromVisList(it);
+				it = myVehicle.removeFromVisList(it);
 				continue;
 			}
 		}
@@ -347,7 +344,7 @@ _cullAdditions(HostVehicle& myVehicle)
 			if ( newVehiclesRemaining == 0 )
 			{
 				EXTREME(_FLD, " vc:%u no room for new updates", it->m_index);
-				myVehicle.removeFromVisList(it);
+				it = myVehicle.removeFromVisList(it);
 				continue;
 			}
 			--newVehiclesRemaining;
@@ -363,10 +360,11 @@ _cullAdditions(HostVehicle& myVehicle)
 static void
 _limitVisListSize(HostVehicle& myVehicle, const UINT32 numVehicles)
 {
-	while ( myVehicle.m_visList.size() > numVehicles )
-	{
-		myVehicle.removeFromVisList(--(myVehicle.m_visList.end()));
-	}
+    if (myVehicle.m_visList.size() > numVehicles) {
+        for (auto it = myVehicle.m_visList.begin() + numVehicles; it != myVehicle.m_visList.end(); ) {
+            it = myVehicle.removeFromVisList(it);
+        }
+    }
 }
 
 #if defined(ENABLE_BIASING)

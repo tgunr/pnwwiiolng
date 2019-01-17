@@ -129,7 +129,7 @@ public:
 	bool updateGrid();
 	void removeFromGrid();
 
-	void removeFromVisList(Viewings::iterator& it);
+	Viewings::iterator removeFromVisList(Viewings::iterator& it);
 
 public:
 	// Interface functions
