@@ -757,7 +757,7 @@ mmProcessFEPostCancel(Player& player, const FE_POST_CANCEL& request)
 
 	BETAInfo(player.teulIndex());
 
-	strtSendMMSpawnCancel(stratIndex, player.playerID(), player.m_weapOrigin, player.weapon());
+	strtSendMMSpawnCancel(stratIndex, player.playerID(), player.m_weapOrigin, player.weapon(), player.missionPacket().sortie().originFac());
 	player.SetVehicleState(MM_VEH_NONE);
 	player.cancelWeapon(false);
 
