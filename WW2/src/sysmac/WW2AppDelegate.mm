@@ -3,6 +3,7 @@
 #include "syscfg.h"
 #include "build_info.hpp"
 #import "WW2AppDelegate.h"
+#include "teul/teulEndpoint.h"
 #include "sysmain.h"
 #include "sys/sysSteam.h"
 #include "vars.h"
@@ -28,7 +29,6 @@
 #include "sys/sysAntihack.h"
 #include <netdb.h>
 #include <arpa/inet.h>
-#import <HockeySDK/HockeySDK.h>
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -305,7 +305,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 @end
 // End cribbing
 
-@interface WW2AppDelegate () <NSURLConnectionDataDelegate, WebFrameLoadDelegate, WebPolicyDelegate, BITHockeyManagerDelegate>
+@interface WW2AppDelegate () <NSURLConnectionDataDelegate, WebFrameLoadDelegate, WebPolicyDelegate>
 @end
 
 @implementation WW2AppDelegate
@@ -513,11 +513,6 @@ extern NSString *WebActionOriginalURLKey;
     }
 }
 
-- (NSString *)userIDForHockeyManager:(BITHockeyManager *)hockeyManager componentManager:(BITHockeyBaseManager *)componentManager
-{
-    return [[NSUserDefaults standardUserDefaults] stringForKey:@"WW2.lastSuccessfulUsername"] ?: @"";
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
     if (!mngoptParse()) {
@@ -627,22 +622,6 @@ extern NSString *WebActionOriginalURLKey;
     
     
     [launcherWindow setIsVisible:true];
-    
-    // This sequence depends on certain implementation details of the
-    // BITCrashManager - in particular, that report metadata is processed
-    // synchronously during -startManager, that -userIDForHockeyManager is
-    // only called once per crash report, and only one crash report will be
-    // freshly processed at a time (versus needing to be sent). If these
-    // preconditions are violated (likely due to implementation changes in the
-    // SDK), the provided username of the player (if any) may be inaccurate.
-    // Not much of a big deal, is it?
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"97d81f56ff22d04ccdbc1a0d537e81c0" delegate:self];
-#ifdef DEBUG_WW2
-    [BITHockeyManager sharedHockeyManager].logLevel = BITLogLevelDebug;
-#endif
-    [BITHockeyManager sharedHockeyManager].disableFeedbackManager = YES;
-    [BITHockeyManager sharedHockeyManager].crashManager.autoSubmitCrashReport = YES;
-    [[BITHockeyManager sharedHockeyManager] startManager];
     
 #ifdef DEBUG_WW2
     dbugInit(LogMode::TO_FILE, nullptr);

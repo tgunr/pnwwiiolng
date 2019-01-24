@@ -144,7 +144,7 @@ from within one of YourSubClassedXMLLoader's functions
 /********* defines **********/
 
 #define XML_DEFAULT_FLAGS XML_PARSE_DTDLOAD | XML_PARSE_RECOVER
-#define XML_IS_NODETYPE(n, t) (!stricmp((const char*)(n)->name, t))
+#define XML_IS_NODETYPE(n, t) (!strcasecmp((const char*)(n)->name, t))
 #define XML_DEFAULT_HANDLER "_DEFAULT_"
 #define MAX_XML_TRIM_SIZE 1024
 #define XML_TAG_HANDLER(handler) bool handler(xmlNode* node, bool first = true, void* userData = nullptr)

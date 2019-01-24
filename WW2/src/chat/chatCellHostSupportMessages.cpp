@@ -28,7 +28,6 @@
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverServerInfo.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiCallbacks.h"
 

@@ -2715,7 +2715,7 @@ static void _cullTriangles(OBJECT* o)
         }
 #endif
 
-    std::vector<piVECTOR>* verts;
+    std::vector<piVECTOR>* verts = nullptr;
 
     for(i = 0, j = 0; i < octets; i++, pn++)
     {

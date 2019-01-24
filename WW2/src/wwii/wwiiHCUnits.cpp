@@ -12,7 +12,6 @@
 #include "include/mydbQuery.h"
 #include "chat/chatHandle.h"
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
 
 #if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"

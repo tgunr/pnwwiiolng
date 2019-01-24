@@ -740,46 +740,37 @@ static std::set<std::string> TerrainObjectSpecials;
 
 static int get_trnobj_texturedata(SDM_ObjInfo const* info, int* texid, int* x, int* y, int* width, int* height, float* uv)
 {
-	if(_trnobjtexturemap.size() == 0)
-	{
-//#if GREEN_INSTALL == 1
-    loadTextureMap("ui/textures/atlas/mapbld_small.xy");
-//#else
-//    loadTextureMap("ui/textures/atlas/mapbld.xy");
-//#endif
-    TerrainObjectSpecials.insert("infantrypit1"); // these overrides shold match GenerateIcons.cpp
-    TerrainObjectSpecials.insert("atgunpit1");
-    TerrainObjectSpecials.insert("farmruin");
-  }
+	if(_trnobjtexturemap.size() == 0) {
+		loadTextureMap("ui/textures/atlas/mapbld_small.xy");
+		TerrainObjectSpecials.insert("infantrypit1"); // these overrides shold match GenerateIcons.cpp
+		TerrainObjectSpecials.insert("atgunpit1");
+		TerrainObjectSpecials.insert("farmruin");
+	}
 
 	std::string objname = info->objname;
-  std::string directory;
+	std::string directory;
 
 	size_t n;
 	n = objname.find_last_of("/\\");
 
-	if(n != std::string::npos)
-  {
-    directory = objname.substr(0,n);
-    objname.erase(0, n+1);
+	if(n != std::string::npos) {
+		directory = objname.substr(0,n);
+		objname.erase(0, n+1);
 
-    if ( directory == "to" )
-    {
-      if ( TerrainObjectSpecials.find(objname) == TerrainObjectSpecials.end() )
-      {
-        *texid = -1;
-        return -1;
-      }
-    }
-  }
+		if ( directory == "to" ) {
+			if ( TerrainObjectSpecials.find(objname) == TerrainObjectSpecials.end() ) {
+				*texid = -1;
+				return -1;
+			}
+		}
+	}
 
 	objname += "_icon";
 
-  if ( _trnobjtexturemap.find(objname) == _trnobjtexturemap.end() )
-  {
-    *texid = -1;
-    return -1;
-  }
+	if ( _trnobjtexturemap.find(objname) == _trnobjtexturemap.end() ) {
+		*texid = -1;
+		return -1;
+	}
 
 	trnobjtextureinfo& objinfo = _trnobjtexturemap[objname];
 

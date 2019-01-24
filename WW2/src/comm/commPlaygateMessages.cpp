@@ -80,26 +80,6 @@ _teulKitError(
 }
 
 //////////////////////////////////////////////////////////////////////
-// Callback invoked when a callback encounters an error.
-
-static void
-_callbackError(
-	const SINT32 teulIndex
-	, const UCHAR* const /*data*/
-	, const SINT32 /*size*/
-	, const TEUL_CALLBACK* /*object*/
-	, const SINT32 error
-	)
-{
-	const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
-	playgate.AlertOK(GetLoc(ERROR_DEBUG
-								, teulIndex
-								, teulGetAddress(dest.first)
-								, dest.second
-								, error));
-}
-
-//////////////////////////////////////////////////////////////////////
 // Initialize Playgate's comm functions (network transport).
 
 bool
@@ -233,7 +213,6 @@ commInstallMessage(
 	ci.callY         = MessageNumber;
 	ci.sendAction    = SendFunc;
 	ci.recvAction    = ReceiveFunc;
-	ci.error         = _callbackError;
 
 	return teulAllocCallback(&ci);
 }

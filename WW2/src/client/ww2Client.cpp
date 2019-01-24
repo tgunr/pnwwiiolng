@@ -47,10 +47,10 @@
 #include "chat/chatMissionMember.h"
 #include "chat/chatMotds.h"
 #include "garrisons/garrisonCountryChangeRequest.h"
+#include "chat/omgChat.h"
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChat.hxx"
 #include "strt/strtCaptureState.h"
 #include "strt/strtClientMessages.h"
 #include "strt/strtDTL.h"
@@ -2764,12 +2764,17 @@ bool ww2::Client::InitTeul(void)
 
 	char dbugFileName[21];
 	strprintf(dbugFileName, "wwiiClient");
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
-	if (err > -1)
-	{
-		err = commInstallClientCallbacks() | chatInstallClientCallbacks() | strtInstallClientCallbacks()
-			  | mapInstallClientCallbacks() | missionInstallCallbacks() | mmClientInstallCallbacks() | wwiiClientInstallCallbacks()
-			  | Instance::InstallClientCallbacks();
+
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr);
+	if ( err > -1 ) {
+		err = commInstallClientCallbacks() 	|
+			chatInstallClientCallbacks()	|
+			strtInstallClientCallbacks() 	|
+			mapInstallClientCallbacks()		|
+			missionInstallCallbacks()		|
+			mmClientInstallCallbacks()		|
+			wwiiClientInstallCallbacks()	|
+			Instance::InstallClientCallbacks();
 	}
 
 	teulInitialized = err > -1;
@@ -3363,12 +3368,13 @@ void HostState::Update()
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connecting", DisplayName());
 				break;
 			case CONNECTED:
-				if (hostType == Teul::Connection::Cell)
-					uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(),
-										 connection->m_serverAddr.m_hostIP - (parent->connection->m_serverAddr.m_hostIP & 0xff));
-				else
-					uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected", DisplayName());
-				break;
+                if (hostType == Teul::Connection::Cell) {
+                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(),
+                        (connection->m_serverAddr.m_hostIP & 0xff) - (parent->connection->m_serverAddr.m_hostIP & 0xff));
+                } else {
+                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected", DisplayName());
+                }
+                break;
 			case FATAL:
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: fatal condition", DisplayName());
 				break;
@@ -3701,12 +3707,12 @@ static void _describeState(const wchar_t *const hostName, std::wstring &into, co
 	SINT32 reason = 0;
 	TeulDeltaMS lastRx_ms = 0;
 	const bool success = Teul::GetEndpointStatus(state->Index(), &reason, &lastRx_ms);
-	if (success == false)
-	{
+
+	if ( success == false ) {
 		if (reason < 0)
 			reason = -reason;
-		switch (reason)
-		{
+
+		switch ( reason ) {
 			case EINVAL:
 				into += LocOrStr(L"?network.state.error.einval?", L"INV!");
 				break;
@@ -3727,12 +3733,12 @@ static void _describeState(const wchar_t *const hostName, std::wstring &into, co
 		return;
 	}
 
-	if (lastRx_ms <= 5000)
+	if (lastRx_ms <= 5000) {
 		into += LocOrStr(L"?network.state.label.ok?", L"-OK-");
-	else
-	{
-		wchar_t lastRx[65];
-		swprintf(lastRx, sizeof(lastRx) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
+	} else {
+		wchar_t lastRx[65] = {0};
+
+		swprintf(lastRx, (sizeof(lastRx) / sizeof(lastRx[0])) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
 		into += lastRx;
 	}
 }
@@ -3753,7 +3759,7 @@ std::wstring clientGetNetworkState()
 	if (client->CellState()->Connected() && g_lastPing > 0)
 	{
 		wchar_t ping[65];
-		swprintf(ping, sizeof(ping) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
+		swprintf(ping, (sizeof(ping) / sizeof(ping[0])) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
 		states += ping;
 	}
 	else

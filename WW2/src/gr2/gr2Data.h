@@ -212,7 +212,7 @@ struct gr2ObjectConfig : public std::vector<gr2ObjectConfigParam>
 		gr2ObjectConfig::const_iterator cit = begin();
 		for(; cit != end(); cit++)
 		{
-			if(!stricmp(cit->first.c_str(), name.c_str()))
+			if(!strcasecmp(cit->first.c_str(), name.c_str()))
 				return cit->second;
 		}
 

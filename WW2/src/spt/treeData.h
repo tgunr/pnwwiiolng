@@ -126,4 +126,4 @@ CTree* treeDataGetBaseTree(int base);
 Tree* treeDataGetFreeTree();
 const std::vector<float>& treeDataGetBillboardTexCoords();
 oglVertexBuffer* treeDataGetVBO();
-bool treeDataIsValid(unsigned int address);
+bool treeDataIsValid(Tree *address);

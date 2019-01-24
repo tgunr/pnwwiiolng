@@ -750,7 +750,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	if (!currentWeapon->spawn())
 	{
 		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
-		response.code = SPAWN_ERROR;
+		response.code = SPAWN_WEAPON_NOT_AT_FACILITY;
 		return false;
 	}
 
@@ -1635,7 +1635,7 @@ _returnLog(const POSTED_WEAPON *weapon, const char *message)
 //////////////////////////////////////////////////////////////////////
 // Attempts to return posted weapon to the Garrison in the CP that we RTB to
 
-static bool 
+static bool
 _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 {
 	if (!weapon || !weapon->m_facility)
@@ -1685,7 +1685,7 @@ _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 //////////////////////////////////////////////////////////////////////
 // Attempt to return posted weapon to its brigade
 
-static bool 
+static bool
 _returnToBrigade(POSTED_WEAPON *weapon)
 {
 	if (!weapon || !weapon->m_facility)

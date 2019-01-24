@@ -6,11 +6,7 @@
 //  Copyright © 2016 Playnet, Inc.
 //
 
-// **************************************************
-// ${AUTOGENERATION_WARNING}
-// **************************************************
-
-/*
+/***************************************************
     Remember - this information is overwritten by each individual build command,
     on every platform. Even if you just hit Cmd-B in Xcode twice in a row (for
     example), this info is generated twice. The generator does not check whether
@@ -27,7 +23,7 @@
     Version:     ${PRODUCT_VERSION} (${PRODUCT_VERSION_VALUE})
     Code Commit: ${GIT_CODE_COMMITISH} (${GIT_CODE_COMMIT}) - ${GIT_CODE_STATE}
     Data Commit: ${GIT_DATA_COMMITISH} (${GIT_DATA_COMMIT}) - ${GIT_DATA_STATE}
-*/
+***************************************************/
 
 // Because otherwise MSVC cries like a whiny baby about PCH.
 // This does not need to be here for any actual reason whatsoever.

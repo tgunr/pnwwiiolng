@@ -34,7 +34,6 @@ extern const char* _missionTypes[MAX_MISSION_TYPES];
 // MISSION_CODES
 //
 // reasons why posting a mission might get rejected
-// should these be moved to dbugExtErrors.h?
 enum MISSION_CODE
 {
 	MC_DETAIL,						// Information only

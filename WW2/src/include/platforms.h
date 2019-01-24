@@ -28,10 +28,35 @@
 # error "No build defined by compiler"
 #endif
 
+// Helper macros for cleaning up all the client/server ifdefs.
+#if platBuild == BUILD_SERVER
+# define ON_SERVER(...) __VA_ARGS__
+# define ON_CLIENT(...)
+#elif platBuild == BUILD_CLIENT
+# define ON_SERVER(...)
+# define ON_CLIENT(...) __VA_ARGS__
+#endif
+
+// Helpers for conditionalizing on debug more cleanly as well.
+#if defined(DEBUG) && !defined(NDEBUG)
+# define DEBUG_ONLY(...) __VA_ARGS__
+# define RELEASE_ONLY(...)
+#elif !defined(DEBUG) && defined(NDEBUG)
+# define DEBUG_ONLY(...)
+# define RELEASE_ONLY(...) __VA_ARGS__
+#else
+# error "One and only one of DEBUG or NDEBUG must be defined by compiler"
+#endif
+
 //////////////////////////////////////////////////////////////////////////////
 // Check actual compiler - Clang 3.6, GCC 4.8, or VS2015
 #if !__check_Clang_version(3,6) && !__check_GCC_version(4,8) && !__check_MSVC_version(19)
 # error "Clang 3.6 or newer, GCC 4.8 or newer, or VS2015 or newer is required."
+#endif
+
+// Provide this for all compilers
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
 #endif
 
 #if __is_Clang()
@@ -53,6 +78,11 @@
 #define FALLTHROUGH [[fallthrough]]
 #else
 #define FALLTHROUGH [[clang::fallthrough]]
+#endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
 #endif
 
 #elif __is_GCC()
@@ -83,6 +113,11 @@
 #else
 #define FALLTHROUGH
 #endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
+#endif
 
 #else
 
@@ -100,6 +135,11 @@
 #define DISABLE_WARNING(warning)
 #define POP_WARNINGS()
 #define FALLTHROUGH __fallthrough
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL // __pragma(warning(suppress:4100)) - unsuitable because it applies globally, not to the single decl
+#endif
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
@@ -146,18 +186,19 @@
 #include <io.h>
 #include <time.h>
 #include <direct.h>
+#include <winsock2.h>
+#include <WinInet.h>
+#include <Winineti.h>
+#include <WinIoCtl.h>
+#include <Ws2tcpip.h>
+#include <iphlpapi.h>
 
-#ifndef stricmp
-# define stricmp(x,y) _stricmp(x,y)
-#endif
 #ifndef strlwr
 # define strlwr(x) _strlwr(x)
 #endif
 #ifndef strupr
 # define strupr(x) _strupr(x)
 #endif
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
 #define swprintf swprintf_s
 #define	vswprintf vswprintf_s
 
@@ -189,6 +230,22 @@ using fullpath_t = wchar_t;
 #define WRONG_PATHSEP_W L"/"
 #define WRONG_PATHSEP_WC L'/'
 
+using nfds_t = UINT32; // values of this type are not actually used on Windows but we don't want to ifdef the declarations
+using socklen_t = SINT32;
+
+// Unfortunately, RakNet thinks it's clever and owns the universe and can do
+// whatever it pleases. It's quite wrong about this. We thus use this horrible
+// workaround to change INVALID_SOCKET and SOCKET_ERROR from a macro to a
+// constant (as we've made it on macOS/Linux builds), so our other workaround
+// for RakNet's pointless horsing around will work properly.
+#undef INVALID_SOCKET
+#undef SOCKET_ERROR
+constexpr const SOCKET INVALID_SOCKET = static_cast<SOCKET>(~0);
+constexpr const int SOCKET_ERROR = -1;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
+
 static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
     return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
 }
@@ -210,6 +267,16 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 // Equivalents for macOS/Linux
 #elif platOS == OS_MACOS || platOS == OS_LINUX
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <sys/un.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <ifaddrs.h>
+
 using fullpath_t = char;
 #define PATHLit(s) s
 #define PRpathT "s"
@@ -223,6 +290,13 @@ using fullpath_t = char;
 #define WRONG_PATHSEP_C '\\'
 #define WRONG_PATHSEP_W L"\\"
 #define WRONG_PATHSEP_WC L'\\'
+
+using SOCKET = int;
+constexpr const SOCKET INVALID_SOCKET = -1;
+constexpr const int SOCKET_ERROR = -1;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
 
 static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
     *fdp = open(path, oflag, cmode);
@@ -254,11 +328,18 @@ static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { 
 #define PLAT_EAGAIN EAGAIN
 #define PLAT_EINPROGRESS WSAEINPROGRESS
 #define PLAT_ECONNREFUSED WSAECONNREFUSED
+#define PLAT_ECONNABORTED WSAECONNRESET
+#define PLAT_EPFNOSUPPORT WSAEPFNOSUPPORT
+#define PLAT_ESHUTDOWN WSAESHUTDOWN
+#define PLAT_EHOSTDOWN WSAEHOSTDOWN
 #else
 #define PLAT_EWOULDBLOCK EWOULDBLOCK
 #define PLAT_EINTR EINTR
 #define PLAT_EAGAIN EAGAIN
 #define PLAT_EINPROGRESS EINPROGRESS
 #define PLAT_ECONNREFUSED ECONNREFUSED
+#define PLAT_ECONNABORTED ECONNABORTED
+#define PLAT_EPFNOSUPPORT EPFNOSUPPORT
+#define PLAT_ESHUTDOWN ESHUTDOWN
+#define PLAT_EHOSTDOWN EHOSTDOWN
 #endif
-

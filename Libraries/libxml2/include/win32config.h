@@ -55,7 +55,7 @@
 	: ((_fpclass(d) == _FPCLASS_NINF) ? -1 : 0))
 #endif
 /* _isnan(x) returns nonzero if (x == NaN) and zero otherwise. */
-#ifndef isnan
+#if !defined(isnan) && !defined(__cplusplus)
 #define isnan(d) (_isnan(d))
 #endif
 #else /* _MSC_VER */

@@ -1,46 +1,46 @@
 #pragma once
 // Created: Fri Mar 31 16:24:00 2000
 //
-// The following file is a trimmed down version of snip_str.h from
-// http://chesworth.com/pv/resources/snippets.htm#section1group5
-//
-// All functions used were declared to be public domain and therefore free
-// for my bogarting
+// This file no longer bears any meaningful resemblance to the original Elmo
+// cribbed it from.
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#if platOS == OS_LINUX
-#define __USE_GNU 1
-#endif
+#if platOS == OS_WIN32
 
-#if platOS == OS_WIN32 && !defined(strcasecmp)
-# define strcasecmp _stricmp
-#endif
-#if platOS == OS_WIN32 && !defined(strncasecmp)
-# define strncasecmp _strnicmp
-#endif
-#if platOS == OS_WIN32 && !defined(wstrcasecmp)
-# define wstrcasecmp _wcsicmp
-# define wstrncasecmp _wcsnicmp
-#endif
+// Provide the POSIX names used by the rest of the code for various string functions
+static inline int strcasecmp(const char *a, const char *b) { return _stricmp(a, b); }
+static inline int strncasecmp(const char *a, const char *b, size_t n) { return _strnicmp(a, b, n); }
+static inline int wcsncasecmp(const wchar_t *a, const wchar_t *b, size_t n) { return _wcsnicmp(a, b, n); }
 
-#ifndef WIN32
-# define _strlwr(n) strlwr(n)
-# define _strupr(n) strupr(n)
-# define _stricmp(x,y) strcasecmp(x,y)
-# define _strnicmp(x,y,len) strncasecmp(x,y,len)
+#define strlwr(n) _strlwr(n)
+#define strupr(n) _strupr(n)
+#define vsnprintf _vsnprintf
+
+extern char* stptok(const char* s, char* tok, size_t toklen, char* brk);
+
+extern int vasprintf(char **result, const char *fmt, va_list args);
+
+static inline size_t strlcpy(char *dest, const char *src, size_t len) {
+    strcpy_s(dest, len, src);
+    return strlen(dest);
+}
+
+static inline size_t strlcat(char *dest, const char *src, size_t len) {
+    strcat_s(dest, len, src);
+    return strlen(dest);
+}
+
 #else
-# define strlwr(n) _strlwr(n)
-# define strupr(n) _strupr(n)
-# define stricmp(s1,s2) _stricmp(s1,s2)
-#endif
 
-#if !defined(WIN32) && !defined(WIN64)
 extern char* strlwr(char* string);
 extern char* strupr(char* string);
-#else
-extern char* stptok(const char* s, char* tok, size_t toklen, char* brk);
+
+# define _strlwr(n) strlwr(n)
+# define _strupr(n) strupr(n)
+
 #endif
+
 extern char* rmlead(char*);
 extern char* rmtrail(char* str);
 extern char* strescape(char* d, const char* s, char c);
@@ -48,8 +48,13 @@ extern char* strescape(char* d, const char* s, char c);
 template <size_t _DestSize>
 static inline void strsafecpy(char (&dest)[_DestSize], const char* src) noexcept
 {
-	strncpy(dest, src, _DestSize - 1);
-	dest[_DestSize - 1] = 0;
+    strlcpy(dest, src, _DestSize);
+}
+
+template <size_t _DestSize>
+static inline void strsafecat(char (&dest)[_DestSize], const char* src) noexcept
+{
+    strlcat(dest, src, _DestSize);
 }
 
 template <size_t _DestSize>
@@ -59,16 +64,33 @@ static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src) no
 	dest[_DestSize - 1] = 0;
 }
 
+template <size_t _DestSize>
+static inline void strsafecat(wchar_t (&dest)[_DestSize], const wchar_t* src) noexcept
+{
+    wcsncat(dest, src, _DestSize - 1);
+    dest[_DestSize - 1] = 0;
+}
+
 static inline void strsafecpy(char* dest, const char* src, size_t sizeWithNul) noexcept
 {
-	strncpy(dest, src, sizeWithNul - 1);
-	dest[sizeWithNul - 1] = 0;
+    strlcpy(dest, src, sizeWithNul);
+}
+
+static inline void strsafecat(char* dest, const char* src, size_t sizeWithNul) noexcept
+{
+    strlcat(dest, src, sizeWithNul);
 }
 
 static inline void strsafecpy(wchar_t* dest, const wchar_t* src, size_t sizeWithNul) noexcept
 {
 	wcsncpy(dest, src, sizeWithNul - 1);
 	dest[sizeWithNul - 1] = 0;
+}
+
+static inline void strsafecat(wchar_t* dest, const wchar_t* src, size_t sizeWithNul) noexcept
+{
+    wcsncat(dest, src, sizeWithNul - 1);
+    dest[sizeWithNul - 1] = 0;
 }
 
 // Now let's have some actual C++ string utility going on here.
@@ -79,7 +101,7 @@ std::string strtolower(const std::string &str);
 std::string strtoupper(const std::string &str);
 std::string strtrim(const std::string &str);
 
-#if platOS == OS_WIN32
-int vasprintf(char **result, const char *fmt, va_list args);
-#endif
-
+// The Windows implementation of these is in sysmain.cpp
+// The macOS implementation is in sysMacCompat.cpp
+extern std::string Base64Encode(void const *buffer, size_t bufferLength);
+extern bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength);

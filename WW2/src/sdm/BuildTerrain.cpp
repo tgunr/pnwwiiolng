@@ -538,10 +538,10 @@ static void LoadStratFile(const char* fileName)
 	static _CP*		pcplist;
 	FILE*			hfile = 0;
 	char*			ptr, buffer[256], dummy[32];
-	_CP*			pcp;
-	_FACILITY*		pfac;
-	_BUILDING*		pbld;
-	_DEPOTLINK*		plink;
+	_CP*			pcp = nullptr;
+	_FACILITY*		pfac = nullptr;
+	_BUILDING*		pbld = nullptr;
+	_DEPOTLINK*		plink = nullptr;
 	_WAYPOINT*		pwaypoint;
 	int				length;
 

@@ -109,20 +109,9 @@ namespace Teul
 // the information needed to create or decode a message.
 struct ACTION_OBJECT
 {
-#if __cplusplus <= 199711L
-	ACTION_OBJECT()
-		: teulIndex(-1)
-		, actionObj(nullptr), localRawData(nullptr), packed(nullptr), offset(0), m_size_bytes(0)
-		, fromAddress(0), fromPort(0)
-		, endpoint(nullptr), m_client(nullptr)
-	{}
-#else
-	// Required to turn ACTION_OBJECT back into POD now that
-	// a constructor exists.
 	ACTION_OBJECT() = default;
 	ACTION_OBJECT(const ACTION_OBJECT& rhs) = default;
 	ACTION_OBJECT& operator = (const ACTION_OBJECT& rhs) = default;
-#endif
 
 	ACTION_OBJECT(void* const packed_, const SINT32 offset_bits_, const SINT32 size_bytes_=0)
 		: teulIndex(-1), actionObj(nullptr), localRawData(nullptr), packed(static_cast<UCHAR*>(packed_))
@@ -142,9 +131,7 @@ struct ACTION_OBJECT
 	template<class Typename_>
 	bool canRead() const
 	{
-		if ( offset < 0 )
-			return false;
-		return (static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= static_cast<size_t>(sizeInBits());
+		return offset >= 0 && (static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= static_cast<size_t>(sizeInBits());
 	}
 
 	//! @brief Consume an object, in-place, from the packed data section.
@@ -178,14 +165,17 @@ struct ACTION_OBJECT
 		// Increment offset.
 		this->offset += Teul::BytesToBits(bytes);
 
-		if ( mode == TEUL_PACK )
+		if (mode == TEUL_PACK) {
 			memcpy(streamPtr, &instance_, bytes);
-		else
+		} else {
 			memcpy(&instance_, streamPtr, bytes);
+        }
 	}
 
 	void packSecondsDelta(PackMode mode, UINT32& time, SINT32 sizeBits=0);
-	void packChatHandle(PackMode mode, ChatHandle* const handle) { this->offset = teulPackUINT64(mode, this->packed, this->offset, static_cast<UINT64*>(handle), GAME_HANDLE_BITS); }
+	void packChatHandle(PackMode mode, ChatHandle* const handle) {
+        this->offset = teulPackUINT64(mode, this->packed, this->offset, static_cast<UINT64*>(handle), GAME_HANDLE_BITS);
+    }
 
 	// Size is in bytes which discards 3 significant bits of data and means that
 	// we can't accurately identify the case where there are less than 7 bits of

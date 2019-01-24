@@ -38,9 +38,9 @@ static int totaltrees = 0;
 
 static std::vector<float> billboardTexCoords;
 
-static ref_ptr<oglVertexBuffer> vbo;
+static oglVertexBuffer *vbo;
 
-using TreeSet = std::unordered_set<unsigned int>;
+using TreeSet = std::unordered_set<Tree *>;
 static TreeSet activetrees;
 
 #if USE_PREALLOCATED_TREES
@@ -59,7 +59,7 @@ static void addToFreeList(Tree* t);
 ------------------------------------------------------------------*/
 oglVertexBuffer* treeDataGetVBO()
 {
-    return vbo.get();
+    return vbo;
 }
 
 /*-----------------------------------------------------------------
@@ -471,7 +471,7 @@ Tree* treeDataGetFreeTree()
     t = new Tree;
 #endif
 
-    activetrees.insert((unsigned int)t);
+    activetrees.insert(t);
 
     totaltrees++;
 
@@ -490,17 +490,17 @@ void treeDataFreeTree(Tree* t)
     SDB_RemoveTree(t);
 #endif
 
-    TreeSet::iterator itr = activetrees.find((unsigned int)t);
+    TreeSet::iterator itr = activetrees.find(t);
 
     if(itr != activetrees.end())
     {
+        activetrees.erase(itr);
 #if USE_PREALLOCATED_TREES
         releaseActiveTree(t);
         addToFreeList(t);
 #else
         delete t;
 #endif
-        activetrees.erase(itr);
         totaltrees--;
     }
 }
@@ -509,7 +509,7 @@ void treeDataFreeTree(Tree* t)
 Module: treeDataIsValid
 Description:
 ------------------------------------------------------------------------*/
-bool treeDataIsValid(unsigned int address)
+bool treeDataIsValid(Tree *address)
 {
     TreeSet::iterator itr = activetrees.find(address);
     return itr != activetrees.end();

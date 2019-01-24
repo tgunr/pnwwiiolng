@@ -15,7 +15,6 @@
 #include "wwii/wwiiSerialNumber.h"
 
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"
@@ -418,7 +417,7 @@ strtdbPopulateVehTypesTable()
 		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now(),%u)"
 								, (needInsert ? ',' : ' ')
 								, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
-								, weap.name
+								, weap.fullName
 								, weap.access(), weap.access(), weap.access()
 								, weap.value
 								, weap.name

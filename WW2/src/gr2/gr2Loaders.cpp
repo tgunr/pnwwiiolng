@@ -239,7 +239,7 @@ bool gr2VehicleLoader::DoTurretRotation(xmlNode* node, bool first, void* userDat
 	{
 		gr2TurretSpec* turret = (gr2TurretSpec*)userData;
 
-		if(!stricmp((const char*)node->name, "traverse"))
+		if(!strcasecmp((const char*)node->name, "traverse"))
 		{
 			turret->traverse.type = gr2TurretRotationSpec::TURRET_TYPE_TRAVERSE;
 			turret->traverse.synced = true;
@@ -252,7 +252,7 @@ bool gr2VehicleLoader::DoTurretRotation(xmlNode* node, bool first, void* userDat
 			xmlGetNodeValue(node, XML_DATA_BOOL, &turret->traverse.invert, "invert");
 			xmlGetNodeValue(node, XML_DATA_BOOL, &turret->traverse.synced, "synced");
 		}
-		else if(!stricmp((const char*)node->name, "elevate"))
+		else if(!strcasecmp((const char*)node->name, "elevate"))
 		{
 			turret->elevate.type = gr2TurretRotationSpec::TURRET_TYPE_ELEVATE;
 			turret->elevate.synced = true;

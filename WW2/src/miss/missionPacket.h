@@ -12,7 +12,7 @@
 #include "wwii/wwiiRank.h"
 #include "weap/weapSerial.h"
 #include "chat/chatHandle.h"
-#include "omg/omgMissionSortieData.hxx"
+#include "chat/omgMissionSortieData.h"
 
 #include "miss/missFlags.h"
 

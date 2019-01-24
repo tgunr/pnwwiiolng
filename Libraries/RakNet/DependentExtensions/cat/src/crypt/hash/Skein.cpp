@@ -39,7 +39,7 @@ Skein::~Skein()
 
 void Skein::GenerateInitialState(int bits)
 {
-	u64 w[MAX_WORDS] = { getLE64(SCHEMA_VER), getLE64(bits), 0 };
+	u64 w[MAX_WORDS] = { getLE64(SCHEMA_VER), getLE64((u64)bits), 0 };
 
 	CAT_OBJCLR(State);
 

@@ -47,9 +47,11 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 // Project defines - DEBUG
 #ifdef _DEBUG
 #ifndef NO_LOGGING
+#ifndef EVENT_LOG
 #define EVENT_LOG
 #define EVENT_LOG_TIMES
 //		#define EVENT_LOG_EXTREME
+#endif
 #endif
 // #define MEMORY_DEBUG_EXTREME
 #elif defined(BETA_RELEASE)
@@ -66,10 +68,6 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #ifndef usleep
 # define usleep(n) Sleep((n))
-#endif
-
-#ifndef strcasecmp
-#define strcasecmp _stricmp
 #endif
 
 // we undefine these so we can redefine them below
@@ -107,7 +105,7 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "include/precompile_includes.h"
 #include <deque>
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 
 #include "math/mathvect.h"
 #include "math/math3d.h"

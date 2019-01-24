@@ -46,7 +46,7 @@ enum SPAWN_DENY_REASONCODE
 	SPAWN_DELAYED,							// Denied by launch timer
 	SPAWN_ACCOUNT_MINUTES,					// Not enough minutes on your account
 	SPAWN_ACCOUNT_MASK,						// Your account doesn't have access to this vehicle.
-	SPAWN_ERROR								// Unknown error.
+	SPAWN_ERROR,							// Unknown error.
 };
 
 // Object visibility flags

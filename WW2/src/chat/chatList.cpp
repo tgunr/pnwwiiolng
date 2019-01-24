@@ -24,7 +24,6 @@
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverTypes.h"
 #include "teul/teulBasic.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulPacket.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
