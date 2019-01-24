@@ -436,17 +436,20 @@ _getAccessValue(const char* key)
 }
 
 WEAPON::WEAPON(const WEAPON_SPEC withSpec
-				, const char* Name, const char* FullName, const char* withAccess
-				, UINT32 lod_cm, UINT32 AlertDist, UINT32 CVCValue
+				, const char* Name, const char* withAccess
+				, UINT16 unitCount
+				, UINT32 lod_cm, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
 				)
 	: m_spec(withSpec)
 	, m_access(_getAccessValue(withAccess))
 	, m_initialAccess(m_access)
 	, m_nextAccess(m_access)
+	, m_count(unitCount)
 	, m_friendlyBias(0)
 	, m_enemyBias(0)
 	, m_localIndex(0)
 	, LOD(lod_cm)
+	, speed(Speed)
 	, value(CVCValue)
 	, alertDist(AlertDist)
 	, maxLod_cm2((UINT64)lod_cm * (UINT64)lod_cm)
@@ -454,7 +457,7 @@ WEAPON::WEAPON(const WEAPON_SPEC withSpec
 	, m_modified(false)
 {
 	strsafecpy(name, Name);
-	strsafecpy(fullName, FullName);
+	strsafecpy(fullName, Name);
 	strlwr(name);
 
 	memset(bias, 0, sizeof(bias));

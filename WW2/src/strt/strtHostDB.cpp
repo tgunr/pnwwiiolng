@@ -417,7 +417,7 @@ strtdbPopulateVehTypesTable()
 		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now(),%u)"
 								, (needInsert ? ',' : ' ')
 								, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
-								, weap.fullName
+								, weap.name
 								, weap.access(), weap.access(), weap.access()
 								, weap.value
 								, weap.name
