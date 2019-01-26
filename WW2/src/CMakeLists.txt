@@ -647,7 +647,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapDB.cpp map/mapDB.h
     auth/authPlayerDetails.h
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
-    map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
     map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
