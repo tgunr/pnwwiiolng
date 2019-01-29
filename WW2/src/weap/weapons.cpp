@@ -348,7 +348,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
     piVECTOR		Dispersion = {0, 0, 0};
 	SINT32			AmmoGroup = 0;
 	UINT32			FiredWeapon = 0;
-    FLOAT64VECTOR	WorldOriginOffset = {0, 0, 0};
+    FLOAT64VECTOR	worldOriginOffset = {0, 0, 0};
     piVECTOR		V1 = {0, 0, 0};
     piVECTOR        V2 = {0, 0, 0};
     piVECTOR		origV1 = {0, 0, 0};
@@ -534,12 +534,12 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 			{
 				TempRecoilForce.x = TempRecoilForce.y = TempRecoilForce.z = 0.0;
 
-				trnGetWorldOriginOffset(&WorldOriginOffset);
-				WorldOriginOffset.z = -WorldOriginOffset.z;
+				trnGetWorldOriginOffset(&worldOriginOffset);
+				worldOriginOffset.z = -worldOriginOffset.z;
 
-				V1.x = (FLOAT32)(Pos->x - WorldOriginOffset.x);
-				V1.y = (FLOAT32)(Pos->y - WorldOriginOffset.y);
-				V1.z = -(FLOAT32)(Pos->z - WorldOriginOffset.z);
+				V1.x = (FLOAT32)(Pos->x - worldOriginOffset.x);
+				V1.y = (FLOAT32)(Pos->y - worldOriginOffset.y);
+				V1.z = -(FLOAT32)(Pos->z - worldOriginOffset.z);
 
 				V2.x = V2.z = 0.0f;
 
@@ -572,15 +572,15 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 #if(0)
                 FLOAT64VECTOR v1 =
                 {
-                    V1.x + WorldOriginOffset.x,
-                    V1.y + WorldOriginOffset.y,
+                    V1.x + worldOriginOffset.x,
+                    V1.y + worldOriginOffset.y,
                     V1.z
                 };
 
                 FLOAT64VECTOR v2 =
                 {
-                    V2.x + WorldOriginOffset.x,
-                    V2.y + WorldOriginOffset.y,
+                    V2.x + worldOriginOffset.x,
+                    V2.y + worldOriginOffset.y,
                     V2.z
                 };
 

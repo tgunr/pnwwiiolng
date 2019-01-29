@@ -5653,7 +5653,7 @@ SINT32 dot_move(const char* line)
 	if(VehicleData->VehicleMasterPtr->VehicleType->Type != VEH_TYPE_FLOATER)
 		SuperFloat = TRUE;
 
-
+	VehicleData->VehicleLastPos = FLOAT64VECTOR{ 0,0,0 };
 	VehicleData->RenderPos = VehicleData->VehiclePos = pos;
 
 	return DC_HANDLED;
@@ -5971,11 +5971,11 @@ static SINT32 dot_trntex(const char* line)
 
 	OBJECT* CollideObject = nullptr;
 	piVECTOR V1,V2;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	V1.x = (FLOAT32)(VehicleData->VehiclePos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	V1.x = (FLOAT32)(VehicleData->VehiclePos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - worldOriginOffset.y);
 	V2 = V1; V2.z = 10000; V1.z = -10000;
 
 	trncdCollideWithVehiclesAndTerrain(&V1,&V2,nullptr,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);

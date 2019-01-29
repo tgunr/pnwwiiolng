@@ -1766,7 +1766,7 @@ FLOAT64 TempNum;
 piVECTOR TempVec;
 piMATRIX InvMat;
 FLOAT64 OneOverGridSize;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	if (Object == nullptr)
 	{
@@ -1788,7 +1788,7 @@ FLOAT64VECTOR WorldOriginOffset;
 		math3dInvertMatrix(&InvMat,&Object->mat);
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	OneOverGridSize = 1.0/GridSize;
 
@@ -1804,21 +1804,21 @@ FLOAT64VECTOR WorldOriginOffset;
 
 		TempNum = TempVec.x;
 
-		TempNum += WorldOriginOffset.x;
+		TempNum += worldOriginOffset.x;
 		TempNum *= OneOverGridSize;
 		TempNum = floor(TempNum + 0.5);
 		TempNum *= GridSize;
-		TempNum -= WorldOriginOffset.x;
+		TempNum -= worldOriginOffset.x;
 
 		TempVec.x = (FLOAT32)TempNum;
 
 		TempNum = TempVec.y;
 
-		TempNum += WorldOriginOffset.y;
+		TempNum += worldOriginOffset.y;
 		TempNum *= OneOverGridSize;
 		TempNum = floor(TempNum + 0.5);
 		TempNum *= GridSize;
-		TempNum -= WorldOriginOffset.y;
+		TempNum -= worldOriginOffset.y;
 
 		TempVec.y = (FLOAT32)TempNum;
 

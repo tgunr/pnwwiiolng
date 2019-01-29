@@ -200,7 +200,7 @@ public:
 	{
 		// set up our initial velocities
 		FLOAT64VECTOR lvel		= (veh->ModelData) ? veh->ModelData->VehicleRealVel : veh->PosData.LastUpdateVel;
-		FLOAT64VECTOR avel	= {0};
+		FLOAT64VECTOR avel	= {0,0,0};
 		FLOAT64VECTOR pos	= EjectPosition();
 		double VehSpeed			= mathExactVectorLength(&lvel);
 
