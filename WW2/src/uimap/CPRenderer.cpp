@@ -343,7 +343,10 @@ void FacilityMapObject::DrawSelf(SuperCellMapView* mv)
 //	unsigned int cpflags	= _cp.StratFlags();
 	phui::BoxVerts box;
 
-	if(mv->Scale() > 8) iconscale = mv->Width()/8.0f;
+	if (mv->Scale() > 8) {
+		iconscale = mv->Width() / 8.0f;
+		iconsize = _renderer->iconsize / iconscale;
+	}
 
 	float r,g,b,a;
 	mv->GetBackgroundColor(&r, &g, &b, &a);
