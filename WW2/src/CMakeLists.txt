@@ -243,38 +243,63 @@ ENDIF()
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
-	include/platforms.h include/precompile_includes.h
-    server/server.cpp server/server.h
-    server/serverReleaseTypeEnum.h
-    server/serverMessages.cpp server/serverMessages.h
-    server/serverPeers.cpp server/serverPeers.h
-    server/serverTransfer.cpp server/serverTransfer.h
-    str/stringLib.cpp str/stringLib.h
-    teul/teulVersion.h
-    teul/teulBasic.h teul/teulConstants.h teul/teulFuncTypes.h teul/teulKit.h
+	auth/authGameMessages.cpp auth/authGameMessages.h
+	auth/authPack.cpp auth/authPack.h
+	auth/authServerTypes.h
+	auth/authTypes.h
+	include/platforms.h
+	include/pnThread.h
+	include/precompile_includes.h
+	mem/memPool.h
+	server/server.cpp server/server.h
+	server/serverMessages.cpp server/serverMessages.h
+	server/serverPeers.cpp server/serverPeers.h
+	server/serverReleaseTypeEnum.h
+	server/serverTransfer.cpp server/serverTransfer.h
+	str/stringLib.cpp str/stringLib.h
+	teul/raknetConn.cpp teul/raknetConn.h
+	teul/teulAuth.cpp teul/teulAuth.h
+	teul/teulAuthServer.h
+	teul/teulBasic.h
+	teul/teulBits.h
+	teul/teulBlipRepeater.h
+	teul/teulCallback.cpp teul/teulCallback.h
+	teul/teulCallback.h
+	teul/teulCallbackInit.h
+	teul/teulCallbackStruct.h
+	teul/teulConnection.h
+	teul/teulConnectionInstruction.h
+	teul/teulConstants.h
+	teul/teulEndpoint.cpp teul/teulEndpoint.h
+	teul/teulEndpointDefs.h
+	teul/teulEndpointImpl.h
 	teul/teulExtErrors.h
-    teul/teulBlipRepeater.h
-    teul/teulCallback.cpp teul/teulCallback.h
-    teul/teulConnection.h teul/teulConnectionInstruction.h
-    teul/teulEndpointDefs.h teul/teulEndpoint.cpp teul/teulEndpoint.h teul/teulEndpointImpl.h
-    teul/teulMicroWebServer.cpp teul/teulMicroWebServer.h include/pnThread.h
-    teul/teulModCalls.cpp teul/teulModCalls.h
-    teul/teulModRecv.cpp teul/teulModSend.cpp teul/teulModule.cpp teul/teulModule.h
-    teul/teulNetTimeMS.cpp teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h teul/teulNetTimeMS.h
-    teul/teulNetworkMsg.h teul/teulNetworkArray.h teul/teulNetworkObject.h
-    teul/teulPackers.h teul/teulBits.h teul/teulPack.cpp teul/teulPacket.cpp teul/teulPacket.h
-    teul/teulTickSample.h
-    teul/teulTransmission.cpp teul/teulTransmission.h
-    teul/teulTransport.cpp
-    teul/teulUtils.cpp teul/teulUtils.h teul/teulTime.h teul/teulTimeMS.h
-    wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h
-    teul/teulCallback.h teul/teulCallbackInit.h teul/teulCallbackStruct.h
-    auth/authPack.cpp auth/authPack.h
-    auth/authGameMessages.cpp auth/authGameMessages.h auth/authTypes.h auth/authServerTypes.h
-    teul/teulAuth.cpp teul/teulAuth.h teul/teulAuthServer.h updt/loginTypes.h
-    wwii/wwiiConfig.cpp wwii/wwiiConfig.h wwii/wwiiConfigMap.h
-    mem/memPool.h
-    teul/raknetConn.cpp teul/raknetConn.h
+	teul/teulFuncTypes.h
+	teul/teulKit.h
+	teul/teulMicroWebServer.cpp teul/teulMicroWebServer.h
+	teul/teulModCalls.cpp teul/teulModCalls.h
+	teul/teulModRecv.cpp
+	teul/teulModSend.cpp
+	teul/teulModule.cpp teul/teulModule.h
+	teul/teulNetTimeMS.cpp teul/teulNetTimeMS.h
+	teul/teulNetTimeMS.h
+	teul/teulNetTimeMSPacker.h
+	teul/teulNetworkArray.h
+	teul/teulNetworkMsg.h
+	teul/teulNetworkObject.h
+	teul/teulPack.cpp teul/teulPackers.h
+	teul/teulPacket.cpp teul/teulPacket.h
+	teul/teulTickSample.h
+	teul/teulTime.h
+	teul/teulTimeMS.h
+	teul/teulTransmission.cpp teul/teulTransmission.h
+	teul/teulTransport.cpp
+	teul/teulUtils.cpp teul/teulUtils.h
+	teul/teulVersion.h
+	updt/loginTypes.h
+	wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h
+	wwii/wwiiConfig.cpp wwii/wwiiConfig.h
+	wwii/wwiiConfigMap.h
 )
 TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 MySQL::MySQL ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
@@ -282,11 +307,16 @@ SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 ####################################
 ## instancing library for hosts that deal with instances (all but strat)
 ADD_LIBRARY( instancing STATIC
-    chat/chatLocalizedMessage.cpp chat/chatLocalizedMessage.h chat/chatDefines.h
-    inst/instHost.cpp inst/instHost.h inst/instDescriptor.h inst/instPackers.cpp
-    wwii/wwiiPlayer.cpp wwii/wwiiPlayer.h
-    mm/mmEnums.h auth/authDispatch.h
-    miss/missFlags.h wwii/wwiiBranchEnums.h
+	auth/authDispatch.h
+	chat/chatDefines.h
+	chat/chatLocalizedMessage.cpp chat/chatLocalizedMessage.h
+	inst/instDescriptor.h
+	inst/instHost.cpp inst/instHost.h
+	inst/instPackers.cpp
+	miss/missFlags.h
+	mm/mmEnums.h
+	wwii/wwiiBranchEnums.h
+	wwii/wwiiPlayer.cpp wwii/wwiiPlayer.h
 )
 TARGET_LINK_LIBRARIES( instancing MySQL::MySQL )
 SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
@@ -294,49 +324,77 @@ SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 ####################################
 ## wwii library common to everything, when it isn't broken by target definitions
 ADD_LIBRARY( wwiilib STATIC
-    ${BUILD_INFO_FILES}
-    chat/chatHandle.cpp chat/chatHandle.h chat/chatName.h
-    chat/chatPackers.cpp chat/chatTimeInterval.cpp chat/chatTimeInterval.h
-    dbug/dbug.cpp dbug/dbug.h
-    fio/fiod.cpp fio/fiod.h
-    inst/instCommon.cpp inst/instPackers.cpp
-    parse/countryCodes.cpp parse/countryCodes.h parse/parse.cpp parse/parse.h
-    parse/parseIO.cpp parse/parseIO.h parse/parse.h parse/countryCodes.h
-    weap/weapList.cpp weap/weapList.h weap/weapSerial.h
-    weap/weapLoadIndexes.cpp weap/weapLoadIndexes.h weap/weapParser.cpp weap/weapParser.h
-    weap/weapSpec.cpp weap/weapSpec.h
+	${BUILD_INFO_FILES}
+	chat/chatHandle.cpp chat/chatHandle.h
+	chat/chatName.h
+	chat/chatPackers.cpp
+	chat/chatTimeInterval.cpp chat/chatTimeInterval.h
+	dbug/dbug.cpp dbug/dbug.h
+	fio/fiod.cpp fio/fiod.h
+	host/hostCommand.h
+	include/configVars.h
+	include/dbseWrapper.h
+	include/io_mapped_file.h
+	include/mydbQuery.h
+	include/wthrTime.h
+	inst/instCommon.cpp
+	inst/instPackers.cpp
 	libircclient/src/libircclient.cpp
-    tut/tutGroupProgress.cpp tut/tutGroupProgress.h
-    wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
-    wwii/wwiiIRC.cpp wwii/wwiiIRC.h host/hostCommand.h
-    wwii/wwiiRank.cpp wwii/wwiiRank.h
-    wwii/wwiiThreads.cpp wwii/wwiiThreads.h wwii/wwiiThreadTypes.h
-    wwii/wwiiThreadText.cpp wwii/wwiiThreadText.h wwii/wwiiThreadTextQuery.h
-    wwii/wwiiUTF.cpp wwii/wwiiUTF.h
-    score/scoreActor.cpp score/scoreActor.h
-    src/io_mapped_file.cpp include/io_mapped_file.h
-    src/mydbQuery.cpp include/mydbQuery.h include/dbseWrapper.h src/myDbseWrapper.cpp
-    wwii/wwiiDBConfig.cpp wwii/wwiiDBConfig.h wwii/wwiiDBThreads.cpp wwii/wwiiDBThreads.h
-    wwii/wwiiSerialNumber.cpp wwii/wwiiSerialNumber.h
-    wwii/wwiiSortieManager.cpp wwii/wwiiSortieManager.h
-    wwii/wwiiSyncVar.cpp wwii/wwiiSyncVar.h
-    sdm/sdmHash.cpp sdm/sdmHash.h sdm/sdmParse.cpp sdm/sdmParse.h strt/strtDTL.h wwii/wwiiTypes.h
-    src/wthrTime.cpp include/wthrTime.h
-	strt/strtDataErrors.cpp strt/strtDataErrors.h strt/strtDataErrorInfo.h
-    strt/strtSupercell.cpp strt/strtSupercell.h strt/strtSupercells.h
-    wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
-    wwii/wwiiHCUnitsCommon.cpp
-    teul/teulConfigVar.h include/configVars.h src/configVars.cpp
-    str/strdupptr.h
-    wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
-    # These weren't previously in wwiilib but seem to be required in various places
-    auth/authDB.cpp auth/authDB.h src/infoHostMessages.cpp include/infoHostMessages.h
-    src/infoPack.cpp include/infoPack.h
-	xml/XMLLoader2.cpp xml/XMLLoader2.h
-	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
-	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
+	parse/countryCodes.cpp parse/countryCodes.h
+	parse/parse.cpp parse/parse.h
+	parse/parseIO.cpp parse/parseIO.h
+	score/scoreActor.cpp score/scoreActor.h
+	sdm/sdmHash.cpp sdm/sdmHash.h
+	sdm/sdmParse.cpp sdm/sdmParse.h
+	src/configVars.cpp
+	src/io_mapped_file.cpp
+	src/mydbQuery.cpp
+	src/myDbseWrapper.cpp
+	src/wthrTime.cpp
+	str/strdupptr.h
+	strt/strtDataErrorInfo.h
+	strt/strtDataErrors.cpp strt/strtDataErrors.h
+	strt/strtDTL.h
+	strt/strtSupercell.cpp strt/strtSupercell.h
+	strt/strtSupercells.h
+	teul/teulCallback.h
+	teul/teulCallbackInit.h
+	teul/teulConfigVar.h
+	tut/tutGroupProgress.cpp tut/tutGroupProgress.h
+	weap/weapList.cpp weap/weapList.h
+	weap/weapLoadIndexes.cpp weap/weapLoadIndexes.h
+	weap/weapParser.cpp weap/weapParser.h
+	weap/weapSerial.h
+	weap/weapSpec.cpp weap/weapSpec.h
+	wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h
+	wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
+	wwii/wwiiDBConfig.cpp wwii/wwiiDBConfig.h
+	wwii/wwiiDBThreads.cpp wwii/wwiiDBThreads.h
+	wwii/wwiiHCUnitsCommon.cpp
+	wwii/wwiiIRC.cpp wwii/wwiiIRC.h
+	wwii/wwiiNetPorts.h
+	wwii/wwiiRank.cpp wwii/wwiiRank.h
+	wwii/wwiiSerialNumber.cpp wwii/wwiiSerialNumber.h
+	wwii/wwiiSortieManager.cpp wwii/wwiiSortieManager.h
+	wwii/wwiiSyncVar.cpp wwii/wwiiSyncVar.h
+	wwii/wwiiThreads.cpp wwii/wwiiThreads.h
+	wwii/wwiiThreadText.cpp wwii/wwiiThreadText.h
+	wwii/wwiiThreadTextQuery.h
+	wwii/wwiiThreadTypes.h
+	wwii/wwiiTypes.h
+	wwii/wwiiUTF.cpp wwii/wwiiUTF.h
+
+	# These weren't previously in wwiilib but seem to be required in various places
+	auth/authDB.cpp auth/authDB.h
 	chat/omgChat.cpp chat/omgChat.h
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
+	include/infoHostMessages.h
+	include/infoPack.h
+	src/infoHostMessages.cpp
+	src/infoPack.cpp
+	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
+	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
+	xml/XMLLoader2.cpp xml/XMLLoader2.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )
@@ -350,9 +408,11 @@ IF ( NOT WIN32 )
 
     # Chat management client
     ADD_EXECUTABLE( chatClient
-        chat/chatLocFile.cpp chat/chatLocFile.h
-        chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
-        chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
+		chat/chatLocFile.cpp chat/chatLocFile.h
+		chat/chatManagementClientMessages.cpp chat/chatManagementClientMessages.h
+		chat/chatManagementPack.cpp
+		chat/chatRoster.cpp
+		chat/chatRosterClient.cpp
     )
 	USE_WWIILIB_ON( chatClient )
     TARGET_LINK_LIBRARIES( chatClient teulserver ${LIBZ_LIBRARIES} )
@@ -384,10 +444,8 @@ IF ( WIN32 )
 	# Not part of stratValidator because the original coders couldn't figure
 	# out why it leaked so much memory.
 	ADD_EXECUTABLE(sdmpp
-		sdm/sdmpp.cpp
-			sdm/sdmpp.h
-
 		include/configVars.h
+		sdm/sdmpp.cpp sdm/sdmpp.h
 	)
 	USE_WWIILIB_ON(sdmpp)
 	TARGET_LINK_LIBRARIES(sdmpp teulserver)
@@ -395,30 +453,24 @@ IF ( WIN32 )
 ENDIF()
 
 	ADD_EXECUTABLE(stratValidator
-		parse/parseWor.cpp
-			parse/parseWor.h
-				parse/parseIO.h
-				strt/strtWOR.h
-					parse/parse.h
-					strt/strtDTL.h
-		strt/strtCPStruct.cpp
-			strt/strtCPStruct.h
-				strt/strtProtos.h
-				wwii/wwiiHCUnits.h
-				strt/strtCPFlags.h
-				inst/instDescriptor.h
-					mm/mmEnums.h
-		strt/strtData.cpp
-			strt/strtData.h
-			include/configVars.h
-				teul/teulConfigVar.h
-		strt/strtFacilityStruct.cpp
-			strt/strtFacilityStruct.h
-		strt/strtObjectStruct.cpp
-			strt/strtObjectStruct.h
-		strt/strtIO.cpp
-			strt/strtIO.h
+		include/configVars.h
+		inst/instDescriptor.h
+		mm/mmEnums.h
+		parse/parse.h
+		parse/parseIO.h
+		parse/parseWor.cpp parse/parseWor.h
+		strt/strtCPFlags.h
+		strt/strtCPStruct.cpp strt/strtCPStruct.h
+		strt/strtData.cpp strt/strtData.h
+		strt/strtDTL.h
+		strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
+		strt/strtIO.cpp strt/strtIO.h
+		strt/strtObjectStruct.cpp strt/strtObjectStruct.h
+		strt/strtProtos.h
 		strt/strtValidator.cpp
+		strt/strtWOR.h
+		teul/teulConfigVar.h
+		wwii/wwiiHCUnits.h
 		${PCH_INCLUDE_HEADERS}
 	)
 	SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
@@ -430,10 +482,9 @@ ENDIF()
 # Which is a shame, because the hosts wind up reading the SDM files too
 # to get the missing data. *Sigh*
 ADD_EXECUTABLE(stratLoader
+	sdm/sdmLoad.cpp sdm/sdmLoad.h
+	sdm/sdmParse.h
 	src/loader.cpp
-	sdm/sdmLoad.cpp
-		sdm/sdmLoad.h
-		sdm/sdmParse.h
 )
 USE_WWIILIB_ON(stratLoader)
 TARGET_LINK_LIBRARIES(stratLoader teulserver ${LIBZ_LIBRARIES} )
@@ -475,10 +526,11 @@ IF ( NOT PN_DISABLE_AUTH )
 	ADD_HOST_TARGET( ${AUTH_HOST_EXE} SOURCES
 		auth/authClientData.cpp auth/authClientData.h
 		auth/authGame.h
-		auth/authHost.cpp auth/authHost.h auth/authHostMessages.cpp auth/authHostMessages.h
-		wwii/wwiiRunningAverage.h
+		auth/authHost.cpp auth/authHost.h
+		auth/authHostMessages.cpp auth/authHostMessages.h
 		auth/authOTP.cpp auth/authOTP.h
 		auth/authPack.cpp auth/authPack.h
+		wwii/wwiiRunningAverage.h
 		EXTRA_DEFINITIONS "IS_AUTH_HOST"
 	)
 	SET(AUTH_INSTALL ${AUTH_HOST_EXE})
@@ -487,7 +539,8 @@ ENDIF()
 ####################################
 ## Controller host
 ADD_HOST_TARGET( ${CONTROLLER_HOST_EXE} SOURCES
-    src/controller.cpp src/controllerGameProcess.cpp src/controllerGameProcess.h
+	src/controller.cpp
+	src/controllerGameProcess.cpp src/controllerGameProcess.h
     EXTRA_DEFINITIONS "IS_CONTROLLER_HOST"
 )
 TARGET_LINK_LIBRARIES( ${CONTROLLER_HOST_EXE} ${LIBEVENT_LIBRARIES} )
@@ -500,76 +553,110 @@ TARGET_LINK_LIBRARIES( ${CONTROLLER_HOST_EXE} ${LIBEVENT_LIBRARIES} )
 # because the original design disconnected players from
 # map/mission when they spawned.
 ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
-    chat/chatDefines.h chat/chatData.h
-    chat/chatBanPlayer.cpp chat/chatBanPlayer.h
-    chat/chatChannels.h
-    chat/chatChannelList.cpp chat/chatChannelList.h chat/chatChannelNumber.cpp chat/chatChannelNumber.h
-    chat/chatDB.cpp chat/chatDB.h
-    chat/chatClientMessage.h chat/chatGroupsType.h
-    chat/chatDotBetaCommands.cpp chat/chatDotCommand.cpp
-    chat/chatDotCommand.h chat/chatDotCommands.cpp chat/chatDotGMCommands.cpp
-    chat/chatDotHCCommands.cpp chat/chatDotPassthrus.cpp chat/chatDotSquadCommands.cpp
-    chat/chatEditString.cpp chat/chatEditString.h
-    chat/chatFriendList.cpp chat/chatFriendList.h chat/chatFriendLogin.cpp
-    chat/chatGenericString.cpp chat/chatGenericString.h
-    chat/chatGrid.cpp chat/chatGrid.h
-    chat/chatGroupPermissions.cpp chat/chatGroupPermissions.h
-    chat/chatHost.cpp chat/chatHost.h
-    chat/chatChannelTypes.h chat/chatPrototypes.h chat/chatChannelID.h
-    chat/chatDebugConditions.h
-    chat/chatBroadcast.h chat/chatBroadcastHCPacket.h chat/chatBroadcastObject.h
-    chat/chatHostMessages.cpp chat/chatHostMessages.h
-    chat/chatList.cpp chat/chatList.h
-    host/hostPlayers.h
-    chat/chatHostPlayerIndex.h
-    chat/chatLocFile.cpp chat/chatLocFile.h
-    chat/chatManagementHostMessages.cpp chat/chatManagementHostMessages.h
-    chat/chatManagementIDs.cpp chat/chatManagementIDs.h
-    chat/chatManagementPack.cpp chat/chatManagementPlayer.cpp chat/chatManagementPlayer.h
-    chat/chatIRCPlayer.h chat/chatPlayer.h wwii/wwiiPlayer.h
-    auth/authDispatch.h mm/mmEnums.h
-    chat/chatServerTypes.h chat/chatPlayerInfo.h
-    inst/instDescriptor.h miss/missFlags.h
-    chat/chatPlayer.cpp chat/chatPlayer.h
-    chat/chatServerTrackedObjects.cpp chat/chatServerTrackedObjects.h
-    chat/chatBailSTO.h chat/chatHulkSTO.h chat/chatOrdnanceSTO.h chat/chatPPOSTO.h chat/chatServerSTO.h
-    chat/chatSTODamage.h chat/chatSTOJoules.h chat/chatUMSSTO.h chat/chatVehicleSTO.h
-    chat/chatSpamCan.cpp chat/chatSpamCan.h
-    chat/chatStrings.cpp
-    chat/chatThreads.cpp chat/chatThreads.h
-    chat/chatTimeString.cpp chat/chatTimeString.h
-    chat/chatTrainers.cpp chat/chatTrainers.h
-    chat/chatUnitMotds.cpp chat/chatUnitMotds.h
-    chat/chatWaypoints.cpp chat/chatWaypoints.h
-    chat/chatWho.cpp chat/chatWho.h chat/chatWhos.cpp chat/chatWhos.h
-    wwii/wwiiServerTrackedObject.cpp wwii/wwiiServerTrackedObject.h
-    wwii/wwiiServerTrackedObjectPacker.cpp wwii/wwiiServerTrackedObjectPacker.h
-    chat/chatBrigadeControl.cpp chat/chatBrigadeControl.h
-    chat/chatBrigadeMove.cpp chat/chatBrigadeMove.h chat/chatBrigadeMoveResults.h
-    wwii/wwiiNetPorts.h
-    chat/chatDecisions.cpp chat/chatDecisions.h
-    chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h chat/chatBrigadeVote.h
-    chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
-    chat/chatMissionInvite.cpp chat/chatMissionInvite.h
-    chat/chatMissionMember.cpp chat/chatMissionMember.h
-    chat/chatMissions.cpp chat/chatMissions.h chat/chatMissionTypes.h
-    chat/chatConstants.h
-    chat/chatMultiCrew.cpp chat/chatMultiCrew.h
-    wwii/wwiiPack.h
-    chat/chatReports.cpp chat/chatReports.h
-    chat/chatSaveChannels.cpp chat/chatSaveChannels.h
-    chat/chatSay.cpp chat/chatSay.h
-    chat/chatSquadControl.cpp chat/chatSquadControl.h chat/chatSquadControlResults.h
-    chat/chatSquadControls.cpp chat/chatSquadCreate.cpp chat/chatSquadCreate.h
-    chat/chatSquadList.cpp chat/chatSquadList.h chat/chatSquadListPurge.cpp chat/chatSquadListPurge.h
-    chat/chatSquadVote.cpp chat/chatSquadVote.h wwii/wwiiSquads.cpp wwii/wwiiSquads.h
-    map/mapAWS.cpp map/mapAWS.h
-    map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
-    strt/strtChatTypes.cpp strt/strtChatTypes.h
-    strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
-    wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-    wwii/wwiiCallbacks.h
-    INSTANCING
+	auth/authDispatch.h
+	chat/chatBailSTO.h
+	chat/chatBanPlayer.cpp chat/chatBanPlayer.h
+	chat/chatBrigadeControl.cpp chat/chatBrigadeControl.h
+	chat/chatBrigadeMove.cpp chat/chatBrigadeMove.h
+	chat/chatBrigadeMoveResults.h
+	chat/chatBrigadeVote.h
+	chat/chatBroadcast.h
+	chat/chatBroadcastHCPacket.h
+	chat/chatBroadcastObject.h
+	chat/chatChannelID.h
+	chat/chatChannelList.cpp chat/chatChannelList.h
+	chat/chatChannelNumber.cpp chat/chatChannelNumber.h
+	chat/chatChannels.h
+	chat/chatChannelTypes.h
+	chat/chatClientMessage.h
+	chat/chatConstants.h
+	chat/chatData.h
+	chat/chatDB.cpp chat/chatDB.h
+	chat/chatDebugConditions.h
+	chat/chatDecisions.cpp chat/chatDecisions.h
+	chat/chatDefines.h
+	chat/chatDotBetaCommands.cpp
+	chat/chatDotCommand.cpp chat/chatDotCommand.h
+	chat/chatDotCommands.cpp
+	chat/chatDotGMCommands.cpp
+	chat/chatDotHCCommands.cpp
+	chat/chatDotPassthrus.cpp
+	chat/chatDotSquadCommands.cpp
+	chat/chatEditString.cpp chat/chatEditString.h
+	chat/chatFriendList.cpp chat/chatFriendList.h
+	chat/chatFriendLogin.cpp
+	chat/chatGenericString.cpp chat/chatGenericString.h
+	chat/chatGrid.cpp chat/chatGrid.h
+	chat/chatGroupPermissions.cpp chat/chatGroupPermissions.h
+	chat/chatGroupsType.h
+	chat/chatHost.cpp chat/chatHost.h
+	chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h
+	chat/chatHostMessages.cpp chat/chatHostMessages.h
+	chat/chatHostMotds.cpp chat/chatHostMotds.h
+	chat/chatHostPlayerIndex.h
+	chat/chatHulkSTO.h
+	chat/chatIRCPlayer.h
+	chat/chatList.cpp chat/chatList.h
+	chat/chatLocFile.cpp chat/chatLocFile.h
+	chat/chatManagementHostMessages.cpp chat/chatManagementHostMessages.h
+	chat/chatManagementIDs.cpp chat/chatManagementIDs.h
+	chat/chatManagementPack.cpp
+	chat/chatManagementPlayer.cpp chat/chatManagementPlayer.h
+	chat/chatMissionInvite.cpp chat/chatMissionInvite.h
+	chat/chatMissionMember.cpp chat/chatMissionMember.h
+	chat/chatMissions.cpp chat/chatMissions.h
+	chat/chatMissionTypes.h
+	chat/chatMotds.cpp chat/chatMotds.h
+	chat/chatMultiCrew.cpp chat/chatMultiCrew.h
+	chat/chatOrdnanceSTO.h
+	chat/chatPlayer.cpp chat/chatPlayer.h
+	chat/chatPlayerInfo.h
+	chat/chatPPOSTO.h
+	chat/chatPrototypes.h
+	chat/chatReports.cpp chat/chatReports.h
+	chat/chatSaveChannels.cpp chat/chatSaveChannels.h
+	chat/chatSay.cpp chat/chatSay.h
+	chat/chatServerSTO.h
+	chat/chatServerTrackedObjects.cpp chat/chatServerTrackedObjects.h
+	chat/chatServerTypes.h
+	chat/chatSpamCan.cpp chat/chatSpamCan.h
+	chat/chatSquadControl.cpp chat/chatSquadControl.h
+	chat/chatSquadControlResults.h
+	chat/chatSquadControls.cpp
+	chat/chatSquadCreate.cpp chat/chatSquadCreate.h
+	chat/chatSquadList.cpp chat/chatSquadList.h
+	chat/chatSquadListPurge.cpp chat/chatSquadListPurge.h
+	chat/chatSquadVote.cpp chat/chatSquadVote.h
+	chat/chatSTODamage.h
+	chat/chatSTOJoules.h
+	chat/chatStrings.cpp
+	chat/chatThreads.cpp chat/chatThreads.h
+	chat/chatTimeString.cpp chat/chatTimeString.h
+	chat/chatTrainers.cpp chat/chatTrainers.h
+	chat/chatUMSSTO.h
+	chat/chatUnitMotds.cpp chat/chatUnitMotds.h
+	chat/chatVehicleSTO.h
+	chat/chatWaypoints.cpp chat/chatWaypoints.h
+	chat/chatWho.cpp chat/chatWho.h
+	chat/chatWhos.cpp chat/chatWhos.h
+	host/hostPlayers.h
+	inst/instDescriptor.h
+	map/mapAWS.cpp map/mapAWS.h
+	map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
+	miss/missFlags.h
+	mm/mmEnums.h
+	strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
+	strt/strtChatTypes.cpp strt/strtChatTypes.h
+	wwii/wwiiCallbacks.h
+	wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
+	wwii/wwiiNetPorts.h
+	wwii/wwiiPack.h
+	wwii/wwiiPlayer.h
+	wwii/wwiiServerTrackedObject.cpp wwii/wwiiServerTrackedObject.h
+	wwii/wwiiServerTrackedObjectPacker.cpp wwii/wwiiServerTrackedObjectPacker.h
+	wwii/wwiiSquads.cpp wwii/wwiiSquads.h
+
+	INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
 TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} ${LIBZ_LIBRARIES})
@@ -588,44 +675,69 @@ TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} ${LIBZ_LIBRARIES})
 # with map/mission work for any spawned players.
 # Current implementation only works for a single cell host.
 ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
-    chat/chatCellHostSupportMessages.cpp chat/chatCellHostSupportMessages.h
-    chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
-    comm/commHostMessages.cpp comm/commHostMessages.h comm/commTypes.h
-    updt/updtEnums.h updt/updtInfDeath.h
-    wwii/wwiiExitCodes.h weap/weapSerial.h wwii/wwiiRank.h
-    comm/commPackers.cpp comm/commPackers.h
-    host/host.cpp host/host.h
-    miss/missionPacket.h mm/mmEnums.h
-    host/host.h host/hostPlayers.h
-    miss/missFlags.h wwii/wwiiSyncVar.h
-    weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
-    host/hostPlayer.h host/hostFraming.cpp host/hostFraming.h host/hostGrid.cpp
-    host/hostScoringActor.cpp
-    host/hostVehicle.cpp host/hostVehicle.h inst/instDescriptor.h
-    updt/updtTypes.h updt/updtTurrets.h
-    updt/updtFraming.h updt/updtVehiclePosition.h
-    strt/strtTypes.h include/xyz_tuple.h
-    src/installCallbacks.cpp miss/missionPack.cpp miss/missionPack.h
-    mm/mmCellHostSupportMessages.cpp mm/mmCellHostSupportMessages.h
-    mm/mmPack.cpp mm/mmPack.h updt/updtPackers.cpp updt/updtPackers.h
-    wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h
-    host/hostAutomation.cpp host/hostAutomation.h
-    host/hostCellNet.cpp host/hostCellNet.h host/hostGridCell.cpp host/hostGridCell.h
-    miss/missionPacket.cpp miss/missionPacket.h
-    parse/parseWor.cpp parse/parseWor.h parse/parseIO.h strt/strtWOR.h parse/parse.h strt/strtDTL.h
-    strt/strtCPColliders.cpp strt/strtCPColliders.h strt/strtCPStruct.cpp strt/strtCPStruct.h
-    strt/strtProtos.h wwii/wwiiHCUnits.h
-    strt/strtCPFlags.h strt/strtData.cpp strt/strtData.h
-    strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
-    strt/strtHack.cpp strt/strtHack.h strt/strtIO.cpp strt/strtIO.h
-    strt/strtObjectStruct.cpp strt/strtObjectStruct.h
-    strt/strtPack.cpp strt/strtPack.h
-    strt/strtSyncData.cpp strt/strtSyncData.h strt/strtConstants.h
-    strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
-    strt/strtUpdater.cpp strt/strtUpdater.h
-    strt/strtUpdaterHostMessages.cpp strt/strtUpdaterHostMessages.h
-    strt/strtUpdaterPack.cpp strt/strtUpdaterPack.h
-    strt/strtUpdaterSupportMessages.cpp strt/strtUpdaterSupportMessages.h
+	chat/chatCellHostSupportMessages.cpp chat/chatCellHostSupportMessages.h
+	chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
+	comm/commHostMessages.cpp comm/commHostMessages.h
+	comm/commPackers.cpp comm/commPackers.h
+	comm/commTypes.h
+	host/host.cpp host/host.h
+	host/hostAutomation.cpp host/hostAutomation.h
+	host/hostCellNet.cpp host/hostCellNet.h
+	host/hostFraming.cpp host/hostFraming.h
+	host/hostGrid.cpp
+	host/hostGridCell.cpp host/hostGridCell.h
+	host/hostPlayer.h
+	host/hostPlayers.h
+	host/hostScoringActor.cpp
+	host/hostVehicle.cpp host/hostVehicle.h
+	include/xyz_tuple.h
+	inst/instDescriptor.h
+	miss/missFlags.h
+	miss/missionPack.cpp miss/missionPack.h
+	miss/missionPacket.cpp miss/missionPacket.h
+	mm/mmCellHostSupportMessages.cpp mm/mmCellHostSupportMessages.h
+	mm/mmEnums.h
+	mm/mmPack.cpp mm/mmPack.h
+	parse/parse.h
+	parse/parseIO.h
+	parse/parseWor.cpp parse/parseWor.h
+	src/installCallbacks.cpp
+	strt/strtConstants.h
+	strt/strtCPColliders.cpp strt/strtCPColliders.h
+	strt/strtCPFlags.h
+	strt/strtCPStruct.cpp strt/strtCPStruct.h
+	strt/strtData.cpp strt/strtData.h
+	strt/strtDTL.h
+	strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
+	strt/strtHack.cpp strt/strtHack.h
+	strt/strtIO.cpp strt/strtIO.h
+	strt/strtObjectStruct.cpp strt/strtObjectStruct.h
+	strt/strtPack.cpp strt/strtPack.h
+	strt/strtProtos.h
+	strt/strtSyncData.cpp strt/strtSyncData.h
+	strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
+	strt/strtTypes.h
+	strt/strtUpdater.cpp strt/strtUpdater.h
+	strt/strtUpdaterHostMessages.cpp strt/strtUpdaterHostMessages.h
+	strt/strtUpdaterPack.cpp strt/strtUpdaterPack.h
+	strt/strtUpdaterSupportMessages.cpp strt/strtUpdaterSupportMessages.h
+	strt/strtWOR.h
+	updt/updtEnums.h
+	updt/updtFraming.h
+	updt/updtInfDeath.h
+	updt/updtPackers.cpp updt/updtPackers.h
+	updt/updtTurrets.h
+	updt/updtTypes.h
+	updt/updtVehiclePosition.h
+	weap/weapSerial.h
+	weap/weapSpecPacker.h
+	wwii/wwiiExitCodes.h
+	wwii/wwiiFullObjIDPacker.h
+	wwii/wwiiHCUnits.h
+	wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h
+	wwii/wwiiRank.h
+	wwii/wwiiSyncVar.h
+
     INSTANCING
     EXTRA_DEFINITIONS "IS_CELL_HOST"
 )
@@ -638,67 +750,103 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
 # See the description of the cell host above for details on host spawning
 # works and why the chat host has wound up doing so much of map host's job.
 ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
-    chat/chatGroupPermissions.cpp chat/chatGroupPermissions.h chat/chatGroupsType.h
-    chat/chatSupportMessages.cpp chat/chatSupportMessages.h
-    chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
-    inst/instHostMessages.cpp inst/instHostMessages.h
-    map/mapArenaDescription.cpp map/mapArenaDescription.h
-    map/mapChecksums.cpp map/mapChecksums.h
-    map/mapDB.cpp map/mapDB.h
-    auth/authPlayerDetails.h
-    map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
-    map/mapPack.cpp
-    map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
-    miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
-    wwii/wwiiPlayer.h mm/mmEnums.h wwii/wwiiRank.h weap/weapSerial.h
-    wwii/wwiiSyncVar.h
-    weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
-    inst/instDescriptor.h auth/authDispatch.h
-    map/mapThreads.cpp map/mapThreads.h
-    miss/missActiveMission.cpp miss/missActiveMission.h miss/mission.cpp miss/mission.h
-    miss/missionDetail.cpp miss/missionDetail.h map/mapMissionList.h miss/missActiveMission.h
-    wwii/wwiiNetPorts.h
-    miss/missionHostMessages.cpp miss/missionHostMessages.h
-    miss/missionPack.cpp miss/missionPack.h
-    miss/missMobileSpawn.cpp miss/missMobileSpawn.h include/mobileSpawnEnums.h
-    mm/mmHostInstanceImpl.cpp mm/mmHostInstanceImpl.h
-    inst/instHostInstanceImpl.h inst/instHostInstance.h inst/instBasicStatus.h
-    host/hostPlayers.h inst/instStateEnums.h
-    mm/mmHostMessages.cpp mm/mmHostMessages.h mm/mmSpawnTypes.h
-    mm/mmMain.cpp mm/mmMain.h mm/mmPack.cpp mm/mmPack.h
-    mm/mmPolls.cpp mm/mmPolls.h
-    mm/mmSpawn.cpp mm/mmSpawn.h
-    mm/mmSpawnGrantResponse.cpp mm/mmSpawnGrantResponse.h
-    mm/mmdbLazyFetchPersona.cpp mm/mmdbLazyFetchPersona.h
-    score/scoreCallbacks.cpp score/scoreDeath.cpp score/scoreDeath.h score/scoreEvent.h
-    score/scoreActor.h score/scoreSortie.cpp score/scoreSortie.h
-    wwii/wwiiRTBCodes.h wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h
-    wwii/wwiiOpinionPoll.cpp wwii/wwiiOpinionPoll.h
-    teul/teulNetworkObject.h
-    map/mapBrigades.cpp map/mapBrigades.h map/mapBrigadeSummary.h map/mapPersonaTypes.h
-    wwii/wwiiHCUnits.h
-    map/mapData.cpp map/mapData.h
-    map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
+	auth/authDispatch.h
+	auth/authPlayerDetails.h
+	chat/chatGroupPermissions.cpp chat/chatGroupPermissions.h
+	chat/chatGroupsType.h
+	chat/chatSupportMessages.cpp chat/chatSupportMessages.h
+	chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
+	host/hostPlayers.h
+	include/mobileSpawnEnums.h
+	inst/instBasicStatus.h
+	inst/instDescriptor.h
+	inst/instHostInstance.h
+	inst/instHostInstanceImpl.h
+	inst/instHostMessages.cpp inst/instHostMessages.h
+	inst/instStateEnums.h
+	map/mapArenaDescription.cpp map/mapArenaDescription.h
+	map/mapBrigades.cpp map/mapBrigades.h
+	map/mapBrigadeSummary.h
+	map/mapChecksums.cpp map/mapChecksums.h
+	map/mapData.cpp map/mapData.h
+	map/mapDB.cpp map/mapDB.h
+	map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
+	map/mapHost.cpp
+	map/mapHostMessages.cpp map/mapHostMessages.h
+	map/mapHostSupercellData.cpp
+	map/mapMissionList.h
+	map/mapPack.cpp
+	map/mapPersonaTypes.h
+	map/mapPlayer.cpp map/mapPlayer.h
+	map/mapPlayerTypes.h
+	map/mapThreads.cpp map/mapThreads.h
+	miss/missActiveMission.cpp miss/missActiveMission.h
+	miss/missFlags.h
+	miss/mission.cpp miss/mission.h
+	miss/missionDetail.cpp miss/missionDetail.h
+	miss/missionHostMessages.cpp miss/missionHostMessages.h
+	miss/missionPack.cpp miss/missionPack.h
+	miss/missionPacket.cpp miss/missionPacket.h
+	miss/missionScoring.cpp
+	miss/missionTypes.h
+	miss/missionUtils.cpp miss/missionUtils.h
+	miss/missMobileSpawn.cpp miss/missMobileSpawn.h
+	mm/mmdbLazyFetchPersona.cpp mm/mmdbLazyFetchPersona.h
+	mm/mmdbPersonaSelections.cpp mm/mmdbPersonaSelections.h
+	mm/mmEnums.h
+	mm/mmHostInstanceImpl.cpp mm/mmHostInstanceImpl.h
+	mm/mmHostMessages.cpp mm/mmHostMessages.h
+	mm/mmMain.cpp mm/mmMain.h
+	mm/mmPack.cpp mm/mmPack.h
+	mm/mmPolls.cpp mm/mmPolls.h
+	mm/mmSpawn.cpp mm/mmSpawn.h
+	mm/mmSpawnGrantResponse.cpp mm/mmSpawnGrantResponse.h
+	mm/mmSpawnTypes.h
+	parse/parse.h
+	parse/parseIO.h
+	parse/parseWor.cpp parse/parseWor.h
+	score/scoreActor.h
+	score/scoreCallbacks.cpp
+	score/scoreDeath.cpp score/scoreDeath.h
+	score/scoreEvent.h
+	score/scoreSortie.cpp score/scoreSortie.h
+	strt/strtConstants.h
+	strt/strtCPFlags.h
+	strt/strtCPStruct.cpp strt/strtCPStruct.h
+	strt/strtData.cpp strt/strtData.h
+	strt/strtDB.cpp strt/strtDB.h
+	strt/strtDTL.h
+	strt/strtEvents.cpp strt/strtEvents.h
+	strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
+	strt/strtIO.cpp strt/strtIO.h
+	strt/strtMapMessages.cpp strt/strtMapMessages.h
+	strt/strtObjectStruct.cpp strt/strtObjectStruct.h
+	strt/strtPack.cpp strt/strtPack.h
+	strt/strtProtos.h
+	strt/strtSyncData.cpp strt/strtSyncData.h
+	strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
+	strt/strtWOR.h
+	teul/teulNetworkObject.h
+	weap/weapSerial.h
+	weap/weapSpecPacker.h
+	wwii/wwiiFullObjIDPacker.h
+	wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
+	wwii/wwiiHostMessages.cpp wwii/wwiiHostMessages.h
+	wwii/wwiiNetPorts.h
+	wwii/wwiiOpinionPoll.cpp wwii/wwiiOpinionPoll.h
 	wwii/wwiiPack.h
-    map/mapHostSupercellData.cpp
-    miss/missionPacket.cpp miss/missionPacket.h
-    miss/missionScoring.cpp miss/missionUtils.cpp miss/missionUtils.h
-    mm/mmdbPersonaSelections.cpp mm/mmdbPersonaSelections.h
-    parse/parseWor.cpp parse/parseWor.h parse/parseIO.h strt/strtWOR.h parse/parse.h strt/strtDTL.h
-    strt/strtCPStruct.cpp strt/strtCPStruct.h strt/strtProtos.h strt/strtCPFlags.h
-    strt/strtData.cpp strt/strtData.h strt/strtDB.cpp strt/strtDB.h
-    strt/strtEvents.cpp strt/strtEvents.h
-    strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
-    strt/strtIO.cpp strt/strtIO.h
-    strt/strtMapMessages.cpp strt/strtMapMessages.h
-    strt/strtObjectStruct.cpp strt/strtObjectStruct.h
-    strt/strtPack.cpp strt/strtPack.h
-    strt/strtSyncData.cpp strt/strtSyncData.h
-    strt/strtConstants.h strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
-    wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
+	wwii/wwiiPlayer.h
+	wwii/wwiiRank.h
+	wwii/wwiiRTBCodes.h
+	wwii/wwiiSyncVar.h
+
+	# Additional Files
 	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
-    EXTRA_DEFINITIONS "IS_MAP_HOST"
+	strt/strtLinkStruct.h
+	map/mapPersonaSummary.h
+
     INSTANCING
+	EXTRA_DEFINITIONS "IS_MAP_HOST"
 )
 
 ####################################
@@ -715,10 +863,19 @@ ADD_CUSTOM_COMMAND(
     MAIN_DEPENDENCY hostproj/${STRAT_HOST_EXE}.pkg
     DEPENDS
         ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES}
-        hostproj/syscfg.h hostproj/${STRAT_HOST_EXE}.pkg include/luaPkg.h
-        include/platforms.h include/systypes.h include/luaGlue.h include/precompile_includes.h
-        wwii/wwiiThreads.h wwii/wwiiOwnershipEnums.h inst/instBasicStatus.h wwii/wwiiConfig.h
-        chat/chatHandle.h weap/weapSpec.h
+		chat/chatHandle.h
+		hostproj/${STRAT_HOST_EXE}.pkg
+		hostproj/syscfg.h
+		include/luaGlue.h
+		include/luaPkg.h
+		include/platforms.h
+		include/precompile_includes.h
+		include/systypes.h
+		inst/instBasicStatus.h
+		weap/weapSpec.h
+		wwii/wwiiConfig.h
+		wwii/wwiiOwnershipEnums.h
+		wwii/wwiiThreads.h
 )
 SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY DEPENDS ${TOLUAPP_EXECUTABLE} ${TOLUAPP_LIBRARIES} )
 
@@ -730,54 +887,78 @@ SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY DEPENDS ${TOLUAPP_EXECUTAB
 # a metric ton of network routines for communicating with it...
 # It also hosts a Lua scripting environment.
 ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
-    strt/strtChatTypes.h
-    chat/chatStratSupportMessages.cpp chat/chatStratSupportMessages.h
-    chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
-    cnvy/cnvyConvoyList.cpp cnvy/cnvyConvoyList.h
-    cnvy/cnvyMain.cpp cnvy/cnvyMain.h
-    strt/strtProtos.h strt/strtEventQueue.h strt/strtTypes.h strt/strtServerTypes.h
-    mem/memPool.h teul/teulCLList.h list/listCL.h include/intrusiveList.h
-    strt/strtDatabaseSchemas.h
-    src/luaGlue.cpp include/luaGlue.h
-    miss/missionPack.cpp miss/missionPack.h
-    mm/mmPack.cpp mm/mmPack.h
-    parse/parseWor.cpp parse/parseWor.h parse/parseIO.h parse/parse.h
-    strt/strtWOR.h strt/strtDTL.h
-    strt/strtChatTypes.cpp strt/strtChatTypes.h
-    strt/strtCPClass.cpp strt/strtCPClass.h
-    strt/strtCP.cpp strt/strtCP.h strt/strtCPStruct.cpp strt/strtCPStruct.h strt/strtCPFlags.h
-    wwii/wwiiHCUnits.h inst/instDescriptor.h mm/mmEnums.h
-    strt/strtData.cpp strt/strtData.h strt/strtDB.cpp strt/strtDB.h
-    strt/strtdbSaveWorld.cpp strt/strtdbSaveWorld.h
-    strt/strtCaptureAction.cpp strt/strtCaptureAction.h
-    strt/strtCaptureContribution.cpp strt/strtCaptureContribution.h strt/strtCaptureScore.h
-    strt/strtDotCommands.cpp strt/strtDotCommands.h
-    strt/strtEnemyReport.cpp strt/strtEnemyReport.h
-    strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h strt/strtFB.cpp strt/strtFB.h
-    strt/strtHack.cpp strt/strtHack.h
-    strt/strtHCUnits.cpp strt/strtHCUnits.h chat/chatBrigadeMoveResults.h
-    strt/strtTOETypes.h
-    strt/strtHost.cpp strt/strtHostDB.cpp strt/strtHostDB.h
-    strt/strtHostMessages.cpp strt/strtHostMessages.h
-    strt/strtMapTypes.h mm/mmSpawnTypes.h miss/missionTypes.h wwii/wwiiRTBCodes.h weap/weapSerial.h
-    strt/strtIO.cpp strt/strtIO.h
-    strt/strtJoinRequestList.cpp
-    strt/strtHostLua.cpp strt/strtHostLua.h
-    strt/strtMain.cpp strt/strtMain.h
-    strt/strtMission.cpp strt/strtMission.h
-    strt/strtObjectStruct.cpp strt/strtObjectStruct.h
-    strt/strtPack.cpp strt/strtPack.h
-    strt/strtPostedWeaponList.cpp strt/strtPostedWeaponList.h
-    strt/strtJoinList.h
-    strt/strtSpawn.cpp strt/strtSpawn.h strt/strtWeaponsReturn.h strt/strtSpawnWeaponList.cpp
-    strt/strtSupply.cpp strt/strtSupply.h
-    strt/strtSync.cpp strt/strtSync.h strt/strtSyncData.cpp strt/strtSyncData.h strt/strtConstants.h
-    strt/strtTOE.cpp strt/strtTOE.h
-    strt/strtWeaponEntry.cpp strt/strtWeaponEntry.h
-    strt/strtTypes.h strt/strtObjectStruct.h
-    wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-    list/listCL.cpp list/listCL.h list/list.h
+	chat/chatBrigadeMoveResults.h
+	chat/chatStratSupportMessages.cpp chat/chatStratSupportMessages.h
+	chat/chatSupportRPCMessages.cpp chat/chatSupportRPCMessages.h
+	cnvy/cnvyConvoyList.cpp cnvy/cnvyConvoyList.h
+	cnvy/cnvyMain.cpp cnvy/cnvyMain.h
 	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
+	include/intrusiveList.h
+	inst/instDescriptor.h
+	list/list.h
+	list/listCL.cpp list/listCL.h
+	mem/memPool.h
+	miss/missionPack.cpp miss/missionPack.h
+	miss/missionTypes.h
+	mm/mmEnums.h
+	mm/mmPack.cpp mm/mmPack.h
+	mm/mmSpawnTypes.h
+	parse/parse.h
+	parse/parseIO.h
+	parse/parseWor.cpp parse/parseWor.h
+	src/luaGlue.cpp include/luaGlue.h
+	strt/strtCaptureAction.cpp strt/strtCaptureAction.h
+	strt/strtCaptureContribution.cpp strt/strtCaptureContribution.h
+	strt/strtCaptureScore.h
+	strt/strtChatTypes.cpp strt/strtChatTypes.h
+	strt/strtConstants.h
+	strt/strtCP.cpp strt/strtCP.h
+	strt/strtCPClass.cpp strt/strtCPClass.h
+	strt/strtCPFlags.h
+	strt/strtCPStruct.cpp strt/strtCPStruct.h
+	strt/strtData.cpp strt/strtData.h
+	strt/strtDatabaseSchemas.h
+	strt/strtDB.cpp strt/strtDB.h
+	strt/strtdbSaveWorld.cpp strt/strtdbSaveWorld.h
+	strt/strtDotCommands.cpp strt/strtDotCommands.h
+	strt/strtDTL.h
+	strt/strtEnemyReport.cpp strt/strtEnemyReport.h
+	strt/strtEventQueue.h
+	strt/strtFacilityStruct.cpp strt/strtFacilityStruct.h
+	strt/strtFB.cpp strt/strtFB.h
+	strt/strtHack.cpp strt/strtHack.h
+	strt/strtHCUnits.cpp strt/strtHCUnits.h
+	strt/strtHost.cpp
+	strt/strtHostDB.cpp strt/strtHostDB.h
+	strt/strtHostLua.cpp strt/strtHostLua.h
+	strt/strtHostMessages.cpp strt/strtHostMessages.h
+	strt/strtIO.cpp strt/strtIO.h
+	strt/strtJoinList.h
+	strt/strtJoinRequestList.cpp
+	strt/strtMain.cpp strt/strtMain.h
+	strt/strtMapTypes.h
+	strt/strtMission.cpp strt/strtMission.h
+	strt/strtObjectStruct.cpp strt/strtObjectStruct.h
+	strt/strtPack.cpp strt/strtPack.h
+	strt/strtPostedWeaponList.cpp strt/strtPostedWeaponList.h
+	strt/strtProtos.h
+	strt/strtServerTypes.h
+	strt/strtSpawn.cpp strt/strtSpawn.h
+	strt/strtSpawnWeaponList.cpp
+	strt/strtSupply.cpp strt/strtSupply.h
+	strt/strtSync.cpp strt/strtSync.h
+	strt/strtSyncData.cpp strt/strtSyncData.h
+	strt/strtTOE.cpp strt/strtTOE.h
+	strt/strtTOETypes.h
+	strt/strtTypes.h
+	strt/strtWeaponEntry.cpp strt/strtWeaponEntry.h
+	strt/strtWeaponsReturn.h
+	strt/strtWOR.h
+	teul/teulCLList.h
+	weap/weapSerial.h
+	wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
+	wwii/wwiiRTBCodes.h
+
     ${STRAT_HOST_EXE}Lua.cc
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA
@@ -838,15 +1019,27 @@ ENDIF()
 # Builds a single executable that runs all of the unit tests;
 # The install process will not execute unless all tests complete.
 ADD_EXECUTABLE( testUnits
-    tests/testUnits.cpp tests/testUnits.h tests/testCovert.cpp tests/testLocalizedMessage.cpp
-    tests/testTeulBits.cpp auth/authClientData.cpp
-    tests/testChatHandle.cpp tests/testFullObjID.cpp tests/testCommandWithArgs.cpp
-    tests/testInplaceVector.cpp tests/testPackers.cpp comm/commPackers.cpp
-    tests/testChatMissionStatus.cpp tests/testHostGridCell.cpp host/hostGridCell.cpp
-    tests/testSupercellVislevelXfer.cpp tests/testPersonaXfer.cpp tests/testCryptographer.cpp
-    tests/testXYZTuple.cpp tests/testTeulPacket.cpp
-    wwii/wwiiServerTrackedObjectPacker.cpp
-    tests/testSuite.h tests/testUnits.h
+	auth/authClientData.cpp
+	comm/commPackers.cpp
+	host/hostGridCell.cpp
+	tests/testChatHandle.cpp
+	tests/testChatMissionStatus.cpp
+	tests/testCommandWithArgs.cpp
+	tests/testCovert.cpp
+	tests/testCryptographer.cpp
+	tests/testFullObjID.cpp
+	tests/testHostGridCell.cpp
+	tests/testInplaceVector.cpp
+	tests/testLocalizedMessage.cpp
+	tests/testPackers.cpp
+	tests/testPersonaXfer.cpp
+	tests/testSuite.h
+	tests/testSupercellVislevelXfer.cpp
+	tests/testTeulBits.cpp
+	tests/testTeulPacket.cpp
+	tests/testUnits.cpp tests/testUnits.h
+	tests/testXYZTuple.cpp
+	wwii/wwiiServerTrackedObjectPacker.cpp
 )
 SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
 USE_WWIILIB_ON( testUnits )
@@ -859,8 +1052,10 @@ ADD_TEST( testUnits testUnits )
 
 # teul tests
 ADD_EXECUTABLE(testTeul
-    tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
-    tests/testTeul.cpp
+	tests/testTeul.cpp
+	tests/testTeulClient.h
+	tests/testTeulServer.h
+	tests/testTeulTest.h
 )
 USE_WWIILIB_ON( testTeul )
 TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )

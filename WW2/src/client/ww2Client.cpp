@@ -182,7 +182,7 @@ struct ClientClassData
 		int instance;
 		int country;
 		int branch;
-		int brigade;
+		int brigade;  //  TODO: This should be at least an unsigned int as the usual Brigade/HCUnit ID's are UINT32
 		int mission;
 	};
 
@@ -688,7 +688,7 @@ int Client::RequestPersonaSummaries()
 }
 
 /************************************************************************************************
-	Client::RequestPersonaSummaries
+	Client::RequestPersonaSelection
 *************************************************************************************************/
 
 int Client::RequestPersonaSelection(PersonaSummary const &persona)
@@ -840,7 +840,7 @@ int Client::RequestMissionWeapCancel()
 }
 
 /************************************************************************************************
-	Client::RequestMissionWeapCancel
+	Client::ClearMissionWeap
 *************************************************************************************************/
 
 void Client::ClearMissionWeap() { memset(&_data->weapSerial, 0x0, sizeof(_data->weapSerial)); }
@@ -868,7 +868,7 @@ int Client::RequestGarrisonCountryChange(FULL_OBJ_ID cp, WWII_COUNTRY const &cou
 }
 
 /************************************************************************************************
-	Client::RequestMissionPostList
+	Client::RequestJoin
 *************************************************************************************************/
 
 int Client::RequestJoin(WEAPON_SERIAL const &serial, ChatHandle const &commander)
@@ -1251,7 +1251,7 @@ void Client::ProcessMissionMemberUpdate(MissionMember const &missionMember)
 }
 
 /************************************************************************************************
-	ProcessMissionMemberUpdate
+	ProcessBrigadeControl
 *************************************************************************************************/
 
 void Client::ProcessBrigadeControl(BrigadeControlList const &entry) { _classdata->oics[entry.m_brigade] = entry; }
@@ -2511,7 +2511,7 @@ bool Client::SelectPersona(const PersonaSummary &persona, bool save, bool force)
 
 		if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
 			current = GetPersona();
-
+	
 		ResetMissionData();
 	}
 
@@ -2549,7 +2549,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 			{
 				BrigadeControlRequest req;
 				req.requestList(PlayerClient()->ChatConnection(), current->m_countryID,
-								current->m_branchID); // lets get a new list of OIC's
+					current->m_branchID); // lets get a new list of OIC's
 			}
 
 			return true;
@@ -2611,6 +2611,39 @@ const PersonaSummary *Client::GetPersona(int country, int branch) const
 	}
 
 	return nullptr;
+}
+
+//  Checks each of the Players other personas (not the current one) brigade to ensure it is valid following a Garrison Change.
+//  Retrurns the number of Player personas changed. It "Should" only be 1 at most.
+int Client::ValidatePersonasBrigade(UINT32 unitID)
+{
+	int retValue = 0;
+
+	const PersonaSummary *selectedPersona = GetPersona();
+	UINT32 selectedPersonaID = selectedPersona->m_personaID;
+	HCUnit * trainingUnit = nullptr;
+
+	for (unsigned int i = 0; i < _classdata->personas.m_count; ++i)
+	{
+		const PersonaSummary &summary = _classdata->personas.m_summaries[i];
+
+		if (summary.m_brigadeID == unitID)
+		{
+			if (summary.m_personaID != selectedPersonaID)
+			{
+				retValue = retValue + 1;
+
+				//  Set the Personas BrigadeID to the Appropriate Training Unit.
+				trainingUnit = HCUnit::GetTrainingUnit(summary.m_countryID, summary.m_branchID);
+
+				_classdata->personas.m_summaries[i].m_brigadeID = trainingUnit->unitID();
+
+				trainingUnit = nullptr;
+			}
+		}
+	}
+
+	return retValue;
 }
 
 // defaults to getting the saved persona

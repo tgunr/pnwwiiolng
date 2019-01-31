@@ -368,7 +368,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 		return _sendResult(teulIndex, BRIG_ERROR);
 	}
 
-	if ( m_detail.brigadeID() == 0 && m_status != BRIG_SELECT )
+	if (m_detail.brigadeID() == 0 && m_status != BRIG_SELECT)
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_ID0);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with brigade id 0"
@@ -384,7 +384,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	}
 
 	Brigade* const brigade = mapFindBrigade(m_detail.brigadeID());
-	if ( brigade == nullptr && m_status != BRIG_SELECT)
+	if (brigade == nullptr && m_status != BRIG_SELECT)
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_NONE, LSTR_BDESEL_REFUSED_BDE);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request for non-existant brigade %d"
@@ -396,11 +396,11 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	{
 		case BRIG_DETAIL:
 			return _query(player, brigade);
-
+			break;
 
 		case BRIG_SELECT:
 			return _select(player, brigade);
-
+			break;
 
 		default:
 			dbugLog(_FLW, "t:%d p:%u c:%s invalid selection.m_status: %d"
@@ -642,5 +642,219 @@ ActiveMission::populate(const Mission* const mission)
 	m_countryID = mission->country();
 	m_branchID = mission->branch();
 	m_brigadeID = mission->brigade()->brigadeID();
+}
+
+//  #include <list>
+//  #include <vector>
+#include "strt/strtLinkStruct.h"
+#include "strt/strtData.h"
+
+//////////////////////////////////////////////////////////////////////
+//  Moved from strtCaptureAction.cpp and revised
+//  Return a list of Garrison Units in the Target CP (FULL_OBJ_ID).
+
+void BrigadeSelection::GetGarrisonUnits(std::list<HCUnit> &unitsList, FULL_OBJ_ID cpObjID)
+{
+	unitsList.clear();
+
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID() == cpObjID)
+			{
+				unitsList.push_back(*it->second);
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Get a Favoured Garrison Unit adjacent (linked) to the Target CP (FULL_OBJ_ID).
+
+HCUnit *BrigadeSelection::GetReplacementGarrison(UINT32 originalGarrisonID, WWII_COUNTRY originalCountry)
+{
+	//  Returns:  a pointer to the Selected Replacement HCUnit  OR  nullptr.
+	
+	HCUnit*	targrHCUnit = HCUnit::Lookup(originalGarrisonID);
+	if (targrHCUnit == nullptr) { return nullptr; }
+
+	return GetReplacementGarrison(targrHCUnit->homeCPID(), originalCountry);
+}
+
+HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry)
+{
+	//  Returns:  a pointer to the Selected Replacement HCUnit  OR  nullptr.
+	
+	std::list<HCUnit> sameCountry; //  Land Garrisons - Same Country
+	std::list<HCUnit> sameSide;	//  Land Garrisons - Same Side
+	std::list<HCUnit> otherUnits;  //  Other Garrison Units present
+
+	UINT32 selectedUnitID = 0;
+	bool unitSelected = false;
+
+	CPStruct *cp = strtGetCP(cpObjID);
+	if (cp == nullptr) { return nullptr; }
+
+	//  TODO: Add Checking of the Origin CP (cpObjID) for other (different Branch) suitable units.
+
+	sameCountry.clear();
+	sameSide.clear();
+	otherUnits.clear();
+
+	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //  Iterate though linked towns list
+	{
+		LinkStruct *outLink = *it;
+		if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+			continue;
+
+		const CPStruct *const otherCP = outLink->endDepot->cp;
+
+		//  Only look at Friendly Towns
+		if (otherCP->side == wwiiSide(originalCountry))
+		{
+			std::list<HCUnit> garrisonList;
+			garrisonList.clear();
+
+			//  Get the Garrison Units within the Linked Town
+			GetGarrisonUnits(garrisonList, otherCP->fullObjID);
+
+			for (auto it = garrisonList.begin(), end = garrisonList.end(); it != end; ++it)
+			{
+				//  Place each unit into the apprioriate list
+				if (it->branch() == BRANCH_LAND)
+				{
+					//  Land Branch
+					if (it->country() == originalCountry)
+					{
+						//  Land Garrisons - Same Country
+						sameCountry.push_back(*it);
+					}
+					else
+					{
+						//  Land Garrisons - Same Side
+						sameSide.push_back(*it);
+					}
+				}
+				else
+				{
+					//  Other Garrison Units present
+					otherUnits.push_back(*it);
+				}
+			}
+
+			garrisonList.clear();
+		}
+	}
+
+	//  Select the Garrison Unit
+	unitSelected = false;
+
+	if (!sameCountry.empty()) //  First Choice Units:  Land Garrisons - Same Country
+	{
+		int pickMe = 0;
+		int count = 1;
+
+		if (sameCountry.size() < (size_t)2)
+		{
+			pickMe = 1;
+		}
+		else
+		{
+			srand((unsigned int)time(NULL));
+			pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+		}
+
+		//  Pick One
+		for (std::list<HCUnit>::iterator it = sameCountry.begin(); it != sameCountry.end(); ++it)
+		{
+			if (count == pickMe)
+			{
+				selectedUnitID = it->unitID();
+				unitSelected = true;
+				break;
+			}
+
+			count++;
+		}
+	}
+
+	if (unitSelected == false)
+	{
+		if (!sameSide.empty()) //  Second Choice Units: Land Garrisons - Same Side
+		{
+			int pickMe = 0;
+			int count = 1;
+
+			if (sameCountry.size() < (size_t)2)
+			{
+				pickMe = 1;
+			}
+			else
+			{
+				srand((unsigned int)time(NULL));
+				pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+			}
+
+			//  Pick One
+			for (std::list<HCUnit>::iterator it = sameSide.begin(); it != sameSide.end(); ++it)
+			{
+				if (count == pickMe)
+				{
+					selectedUnitID = it->unitID();
+					unitSelected = true;
+					break;
+				}
+
+				count++;
+			}
+		}
+
+		if (!otherUnits.empty() && unitSelected == false) //  Third Choice Units: Other Garrison Units present
+		{
+			int pickMe = 0;
+			int count = 1;
+
+			if (sameCountry.size() < (size_t)2)
+			{
+				pickMe = 1;
+			}
+			else
+			{
+				srand((unsigned int)time(NULL));
+				pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+			}
+
+			//  Pick One
+			for (std::list<HCUnit>::iterator it = otherUnits.begin(); it != otherUnits.end(); ++it)
+			{
+				if (count == pickMe)
+				{
+					selectedUnitID = it->unitID();
+					unitSelected = true;
+					break;
+				}
+
+				count++;
+			}
+		}
+	}
+
+	sameCountry.clear();
+	sameSide.clear();
+	otherUnits.clear();
+
+	if (unitSelected == true)
+	{
+		for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+		{
+			if (it->second->unitID() == selectedUnitID)
+				return it->second;
+		}
+	}
+
+	//  No Unit Selected OR None Available
+
+	return nullptr;
 }
 

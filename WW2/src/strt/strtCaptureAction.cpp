@@ -568,21 +568,6 @@ CaptureAction::LeaveContention() const
 	m_cp.checkTownStatus(&m_cp, justCaptured, 0);
 }
 
-void HCUnit::GetGarrisonUnits(std::list<HCUnit>& unitsList, UINT16 cpID)
-{
-	//dbugLog(_FLN, "Performing HCUnit::GetGarrisonUnits");
-	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
-	{
-		if (it->second->isGarrison())
-		{
-			if (it->second->homeCPID().id == cpID)
-			{
-				unitsList.push_back(*it->second);
-			}
-		}
-	}
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // Finish the capture event.

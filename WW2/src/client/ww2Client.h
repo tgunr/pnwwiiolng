@@ -369,6 +369,10 @@ public:
 	const PersonaSummary* GetSavedPersona() const;
 	void SetSelectedPersonaCountry(WWII_COUNTRY newCountry);
 
+	//  Checks each of the Players other personas brigade to ensure it is valid following a Garrison Change.
+	//  Retrurns the number of Player personas changed. It "Should" only be 1 at most.
+	int ValidatePersonasBrigade(UINT32 unitID);
+
 	void SetSpawnOverride(double x, double y, double z);
 	void SetPosition(double x, double y, double z);
 	void SetVelocity(double vx, double vy, double vz);

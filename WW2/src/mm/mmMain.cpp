@@ -877,11 +877,13 @@ _checkAcceptingStatus()
 		updateCapacity = true;
 		wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
-		std::string acceptingMessage = "++ Accepting logins from Auth server: ";
+		std::string acceptingMessage = "\n\n==================================================================================\n";
+		acceptingMessage = acceptingMessage += "   ++ Now Accepting logins from Auth server: ";
 		acceptingMessage += g_arenaDescription["host_rev"];
-		acceptingMessage += " ++";
+		acceptingMessage += " ++\n==================================================================================";
 		wwiiIRCChannelMessage("-sys,#servers", acceptingMessage.c_str());
-		printf("%s\n", acceptingMessage.c_str());
+		printf("%s\n\n\n", acceptingMessage.c_str());
+
 	}
 
 	if ( updateCapacity )
