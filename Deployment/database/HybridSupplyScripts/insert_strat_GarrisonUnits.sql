@@ -234,9 +234,13 @@ BEGIN
         IF ABCount > 3 THEN SET ABCount = 3; END IF;
         IF DOCount > 2 THEN SET DOCount = 2; END IF;
         IF AFCount > 1 THEN SET AFCount = 1; END IF; -- Future proofing, just in case
-        
-        
-        SET baseUnitName = CONCAT('Gsn', SUBSTRING(cityName, 1, 3));
+		
+		IF cityName REGEXP '[.]' THEN
+			SET baseUnitName = REPLACE(CONCAT('Gsn', SUBSTRING(cityName, 1, 4)), '.', '');
+		ELSE
+			SET baseUnitName = CONCAT('Gsn', SUBSTRING(cityName, 1, 3));
+		END IF;
+		
         SET baseNick = CONCAT('Gsn', SUBSTRING(cityName, 1, 18));
         
         SELECT CONCAT('Processing ', cityname, '; ABCount: ', ABCount, '; DOCount: ', DOCount, '; AFCount: ', AFCount);
