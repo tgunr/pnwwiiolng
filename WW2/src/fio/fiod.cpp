@@ -596,7 +596,6 @@ int fiodOpenWrite(const char* filename, bool userdir) {
 	return fd;
 }
 
-#if platBuild == BUILD_SERVER
 size_t fiodGetString(int fd, char* string, size_t length)
 {
 	FILE_MAP::iterator it = s_fileMap.find(fd);
@@ -623,7 +622,6 @@ size_t fiodGetString(int fd, char* string, size_t length)
 
 	return (size_t)(writePtr - string);
 }
-#endif
 
 #if platOS == OS_WIN32
 
