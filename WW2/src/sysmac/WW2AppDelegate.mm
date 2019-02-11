@@ -857,10 +857,10 @@ extern NSString *WebActionOriginalURLKey;
 {
     @autoreleasepool {
         
-        [self setUserName:@""];
-        [userNameField setStringValue:@""];
-        [self setUserPassword:@""];
-        [passwordField setStringValue:@""];
+        [self setUserName:@"pgunr"];
+        [userNameField setStringValue:@"pgunr"];
+        [self setUserPassword:@"bat1d93k"];
+        [passwordField setStringValue:@"bat1d93k"];
         rememberUserPassword = NO;
         [rememberPasswordCheckbox setState:NSOffState];
         

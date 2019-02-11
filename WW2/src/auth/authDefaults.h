@@ -11,7 +11,8 @@
 #include "wwii/wwiiNetPorts.h"
 
 #ifndef NDEBUG
-#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
+#define DEFAULT_AUTH_SERVER "auth.playnet.com"
+//#define DEFAULT_AUTH_SERVER "authdev.playnet.com"
 #else
 #define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #endif
