@@ -252,7 +252,7 @@ extern LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
 extern LOGICAL			NoInfPreload;				// don't preload infantry
 extern LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 extern LOGICAL          g_buildTerrain;             // Build SDMs for archives.
-
+extern LOGICAL          g_logDebug;                 // Enable/Disable global logging
 extern LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 extern LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
 extern LOGICAL          g_log_weap;					// turn on logging for LOG_WEAP

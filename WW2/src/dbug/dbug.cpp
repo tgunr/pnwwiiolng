@@ -60,7 +60,7 @@ const char* errorTypes[] = {
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
 // message constructions.
-bool g_logDebug = true;
+//bool g_logDebug = true;
 
 static std::mutex s_dbugInitMutex;
 static bool s_dbugInitialized = false;
@@ -326,8 +326,8 @@ void dbugInit(LogMode logMode, const char* const filename)
 
 	setlocale(LC_CTYPE, "");
 
-	Debug::ERROR_TYPE level = Debug::ERR_DBUG;
-	g_logDebug = true;
+	Debug::ERROR_TYPE level = Debug::ERR_WARN;
+//    g_logDebug = true;
 
     int file = -1;
     if (logMode == LogMode::TO_FILE) {
@@ -365,7 +365,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 // dbugClose: closes the debug file and cleans up.
 void dbugClose()
 {
-	g_logDebug = false;
+//    g_logDebug = false;
 	if ( _logger.isInitialized() == false )
 		return;
 
@@ -434,10 +434,10 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 	SINT32 flags = level & DBUG_FLAG_MASK;
 	level = static_cast<Debug::ERROR_TYPE>(level & ~DBUG_FLAG_MASK);
 
-	if ( level == Debug::ERR_DBUG )
-		g_logDebug = true;
-	else
-		g_logDebug = false;
+//    if ( level == Debug::ERR_DBUG )
+//        g_logDebug = true;
+//    else
+//        g_logDebug = false;
 
 	_logger.m_logFlags = flags;
 
@@ -566,9 +566,11 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
     try {
         std::lock_guard<std::mutex> lock(s_dbugOutputMutex);
         // re-check: could have changed while we got the lock
-        if ( logToConsole || _logger.m_dbugfile >= 0 ) {
-            _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
-            _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
+        if (g_logDebug) {
+            if ( logToConsole || _logger.m_dbugfile >= 0 ) {
+                _dbugOut(logToConsole, _logger.m_logMode, prefix, pfxLen, false);
+                _dbugOut(logToConsole, _logger.m_logMode, _logger.text(), len, true);
+            }
         }
     } catch (std::system_error &e) {
         // This probably means we tried to grab the mutex during exit(),
@@ -601,14 +603,16 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 	}
 	else
 	{
-		if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.m_logLevel))
-		{
-			va_list args;
-			va_start(args, fmt);
-			result = _dbugLogPrivate(TRUE, filename, lineno, errType, fmt, args);
-			va_end(args);
-		}
-	}
+        if (g_logDebug) {
+            if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.m_logLevel))
+            {
+                va_list args;
+                va_start(args, fmt);
+                result = _dbugLogPrivate(TRUE, filename, lineno, errType, fmt, args);
+                va_end(args);
+            }
+        }
+    }
 
 	return result;
 }

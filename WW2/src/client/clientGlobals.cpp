@@ -251,6 +251,7 @@ LOGICAL			NoInfPreload;				// don't preload infantry
 LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 LOGICAL          g_buildTerrain;             // Build SDMs for archives.
 
+LOGICAL          g_logDebug;                // Global logging
 LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
 LOGICAL          g_log_weap;					// turn on logging for LOG_WEAP

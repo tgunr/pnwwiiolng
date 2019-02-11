@@ -515,6 +515,7 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    g_logDebug = true;
     if (!mngoptParse()) {
         [NSApp terminate:self];
         return;
@@ -623,7 +624,7 @@ extern NSString *WebActionOriginalURLKey;
     
     [launcherWindow setIsVisible:true];
     
-#ifdef DEBUG_WW2
+#ifdef DEBUG_WW2e
     dbugInit(LogMode::TO_FILE, nullptr);
 #else
     dbugInit(LogMode::OFF, nullptr);
