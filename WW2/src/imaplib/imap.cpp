@@ -1,3 +1,4 @@
+#include "syscfg.h"
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -599,29 +600,31 @@ static int imapProcessButtonInput(imap_compiled_keymap_entry* entry)
 
 static int imapProcessAxisInput(imap_compiled_keymap_entry* entry, imap_callback_ext_data* extdata)
 {
-	int param;
+	int param = 0;
 
-	if(!inputMap.axisInputEnabled || entry->keyState[0]->iacInfo.axisType  == 0 ||
-		entry->keyState[0]->iac == IMAP_IAC_NOKEY || !entry->keyState[0]->gotinput) return 0;
+	if (!inputMap.axisInputEnabled ||
+        entry->keyState[0]->iacInfo.axisType  == 0 ||
+		entry->keyState[0]->iac == IMAP_IAC_NOKEY ||
+        !entry->keyState[0]->gotinput)
+    {
+        return 0;
+    }
 				
-	if(entry->keyState[0]->iacInfo.axisType != IMAP_DELTA_AXIS)
-	{
-		switch(entry->keymap.axis.range)
-		{
+	if (entry->keyState[0]->iacInfo.axisType != IMAP_DELTA_AXIS) {
+		switch (entry->keymap.axis.range) {
 			case 0:
 				param = entry->keyState[0]->count;
-			break;
-			
+                break;
 			case 1:
 				param = entry->keyState[0]->count * 2 - entry->keymap.axis.range * IMAP_MAX_VALUE;
-			break;
-			
+                break;
 			case -1:
 				param =-entry->keyState[0]->count * 2 + entry->keymap.axis.range * IMAP_MAX_VALUE;
-			break;
+                break;
+            default:
+                ABORT_IF(true);
 		}
-	}else
-	{
+	} else {
 		param = entry->keyState[0]->count;
 	}
 								

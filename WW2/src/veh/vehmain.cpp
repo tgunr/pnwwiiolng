@@ -23,7 +23,7 @@
 #include "fx/TransformEffect.h"
 #include "gr2/gr2Anim.h"
 #include "gr2/gr2Physics.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"
 #include "include/vars.h"

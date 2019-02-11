@@ -16,11 +16,11 @@
 
 #include "uimap/uiMap.h"
 #include "ui/uiMain.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "sdm/sdm.h"
 #include "trn/trnmain.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "fio/fio.h"
 #include "strt/strtTypes.h"
 #include "pers/persmain.h"

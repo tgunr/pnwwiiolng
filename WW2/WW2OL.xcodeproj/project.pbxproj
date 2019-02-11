@@ -382,7 +382,6 @@
 		084DD9F91120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		084DD9FA1120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34E10619AC8005FDF19 /* libspeedtreemac.a */; };
-		087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087286DE10D1B23B00456009 /* libimapmac.a */; };
 		08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F50107BF96D009DB5AF /* liblua5.1.a */; };
 		08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F52107BF977009DB5AF /* libtolua++.a */; };
 		087FF4F4120D142F00F2BF14 /* busmessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 087FF4F3120D142F00F2BF14 /* busmessage.h */; };
@@ -484,6 +483,9 @@
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 		FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
+		FAF70D9A220FD5720061B74A /* imap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAF70D96220FD5720061B74A /* imap.cpp */; };
+		FAF70D9B220FD5720061B74A /* imapKeymap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAF70D98220FD5720061B74A /* imapKeymap.cpp */; };
+		FAF70D9C220FD5720061B74A /* cfml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAF70D99220FD5720061B74A /* cfml.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1496,6 +1498,13 @@
 		FA83A97C21696EF80013293C /* omgChat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = omgChat.h; sourceTree = "<group>"; };
 		FA83A97D21696EF90013293C /* omgMissionSortieData.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = omgMissionSortieData.cpp; sourceTree = "<group>"; };
 		FABC5C1920720BCA00AF2510 /* en */ = {isa = PBXFileReference; fileEncoding = 2483028224; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		FAF70D93220FD5710061B74A /* imap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imap.h; sourceTree = "<group>"; };
+		FAF70D94220FD5720061B74A /* imapInternals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imapInternals.h; sourceTree = "<group>"; };
+		FAF70D95220FD5720061B74A /* imapTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imapTypes.h; sourceTree = "<group>"; };
+		FAF70D96220FD5720061B74A /* imap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imap.cpp; sourceTree = "<group>"; };
+		FAF70D97220FD5720061B74A /* cfml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cfml.h; sourceTree = "<group>"; };
+		FAF70D98220FD5720061B74A /* imapKeymap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imapKeymap.cpp; sourceTree = "<group>"; };
+		FAF70D99220FD5720061B74A /* cfml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cfml.cpp; sourceTree = "<group>"; };
 		FAF9F2BF21412997000D78C7 /* precompile_includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = precompile_includes.h; sourceTree = "<group>"; };
 		FAFA9A042082890900CB7918 /* authClientMessages.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authClientMessages.h; sourceTree = "<group>"; };
 		FAFA9A052082890900CB7918 /* authConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = authConstants.h; sourceTree = "<group>"; };
@@ -1564,7 +1573,6 @@
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
-				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
 				FA13BB511C87CF8500095818 /* libglew.a in Frameworks */,
 				08492F5B131708E700C7F39E /* libftgl.a in Frameworks */,
@@ -2927,6 +2935,7 @@
 				08104963103DD1290065E0E2 /* gl */,
 				0810496D103DD1640065E0E2 /* gmlp */,
 				08104971103DD1A30065E0E2 /* gr2 */,
+				FAF70D92220FD5640061B74A /* imaplib */,
 				081049A1103DD1D50065E0E2 /* imap */,
 				081049C2103DD2310065E0E2 /* include */,
 				081049DF103DD2660065E0E2 /* inst */,
@@ -3113,6 +3122,20 @@
 				FA3D8BA81C8BF201002C5119 /* build_info.cpp */,
 			);
 			name = Config;
+			sourceTree = "<group>";
+		};
+		FAF70D92220FD5640061B74A /* imaplib */ = {
+			isa = PBXGroup;
+			children = (
+				FAF70D95220FD5720061B74A /* imapTypes.h */,
+				FAF70D94220FD5720061B74A /* imapInternals.h */,
+				FAF70D98220FD5720061B74A /* imapKeymap.cpp */,
+				FAF70D93220FD5710061B74A /* imap.h */,
+				FAF70D96220FD5720061B74A /* imap.cpp */,
+				FAF70D97220FD5720061B74A /* cfml.h */,
+				FAF70D99220FD5720061B74A /* cfml.cpp */,
+			);
+			path = imaplib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3481,6 +3504,7 @@
 				08104A17103DD2900065E0E2 /* jsPosition.cpp in Sources */,
 				08104A18103DD2900065E0E2 /* jsStratDB.cpp in Sources */,
 				08104A19103DD2900065E0E2 /* jsVehicle.cpp in Sources */,
+				FAF70D9B220FD5720061B74A /* imapKeymap.cpp in Sources */,
 				08104A2F103DD2C30065E0E2 /* ldbmp.cpp in Sources */,
 				08104A30103DD2C30065E0E2 /* lddds.cpp in Sources */,
 				08104A31103DD2C30065E0E2 /* ldflt.cpp in Sources */,
@@ -3606,6 +3630,7 @@
 				08104C6E103DF9F70065E0E2 /* glsl.cpp in Sources */,
 				08104C6F103DF9F70065E0E2 /* glslCloth.cpp in Sources */,
 				08104C70103DF9F70065E0E2 /* glslNormal.cpp in Sources */,
+				FAF70D9A220FD5720061B74A /* imap.cpp in Sources */,
 				08104C71103DF9F70065E0E2 /* glslProgram.cpp in Sources */,
 				08104C72103DF9F70065E0E2 /* glslShader.cpp in Sources */,
 				08104C73103DF9F70065E0E2 /* glslSpecular.cpp in Sources */,
@@ -3639,6 +3664,7 @@
 				08104E11103DFC920065E0E2 /* trndata.cpp in Sources */,
 				08104E12103DFC920065E0E2 /* trnfx.cpp in Sources */,
 				08104E13103DFC920065E0E2 /* trngrass.cpp in Sources */,
+				FAF70D9C220FD5720061B74A /* cfml.cpp in Sources */,
 				08104E14103DFC920065E0E2 /* trnldr.cpp in Sources */,
 				08104E15103DFC920065E0E2 /* trnLua.cpp in Sources */,
 				08104E16103DFC920065E0E2 /* trnmain.cpp in Sources */,

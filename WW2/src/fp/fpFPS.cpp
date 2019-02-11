@@ -34,7 +34,7 @@
 #include "fp/fpMain.h"
 #include "trn/trnmain.h"
 #include "ml/mlhead.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "wwii/wwiiCovert.h"
 #include "locl/loclLang.h"
 #include "ui/uiMain.h"

@@ -890,6 +890,10 @@
     <ClInclude Include="..\..\src\comm\commConstants.h" />
     <ClInclude Include="..\..\src\comm\commPackers.h" />
     <ClInclude Include="..\..\src\comm\commTypes.h" />
+    <ClInclude Include="..\..\src\imaplib\cfml.h" />
+    <ClInclude Include="..\..\src\imaplib\imap.h" />
+    <ClInclude Include="..\..\src\imaplib\imapInternals.h" />
+    <ClInclude Include="..\..\src\imaplib\imapTypes.h" />
     <ClInclude Include="..\..\src\teul\teulExtErrors.h" />
     <ClInclude Include="..\..\src\dd\ddp.h" />
     <ClInclude Include="..\..\src\dd\dx3dinfo.h" />
@@ -1461,6 +1465,9 @@
     <ClCompile Include="..\..\src\gr2\gr2layer.cpp" />
     <ClCompile Include="..\..\src\gr2\gr2layerTypes.cpp" />
     <ClCompile Include="..\..\src\gr2\gr2Physics.cpp" />
+    <ClCompile Include="..\..\src\imaplib\cfml.cpp" />
+    <ClCompile Include="..\..\src\imaplib\imap.cpp" />
+    <ClCompile Include="..\..\src\imaplib\imapKeymap.cpp" />
     <ClCompile Include="..\..\src\imap\iac.cpp" />
     <ClCompile Include="..\..\src\imap\imaphack.cpp" />
     <ClCompile Include="..\..\src\imap\imapLua.cpp" />
@@ -1877,9 +1884,6 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\glew\build\vs2017\glew_static.vcxproj">
       <Project>{c5e233a4-ee47-427d-96e7-a3b784914109}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
-      <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\libxml2\win32\VC14\libxml2.vcxproj">
       <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>

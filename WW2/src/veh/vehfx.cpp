@@ -13,7 +13,7 @@
 #include "fx/fxUtl.h"
 #include "fx/fxWeather.h"
 #include "fx/TransformEffect.h"
-#include "imap/imaptypes.h"
+#include "imaplib/imaptypes.h"
 #include "include/vars.h"
 #include "math/math3d.h"
 #include "math/mathnum.h"
