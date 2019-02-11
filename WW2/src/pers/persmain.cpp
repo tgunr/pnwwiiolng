@@ -5739,7 +5739,8 @@ void persGetCameraPosition(piVECTOR* pos)
 
 void persShakeCamera(FLOAT32 mag, SINT32 duration)
 {
-	if(vehmainHasBailedOut() || mag <= .0001f || duration <= 0) // resets shake
+    if (true)
+    //    if(vehmainHasBailedOut() || mag <= .0001f || duration <= 0) // resets shake
 	{
 		g_fShakeMagnitude = 0;
 		_shaketime = 0;
