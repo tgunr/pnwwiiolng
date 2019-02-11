@@ -1648,6 +1648,8 @@ UINT32 mlgearDetermineHeightVariance(FLOAT64* HeightVariance,
 
 	*HeightVariance = 0.0;
 
+    return 0;
+    
 	if (BumpDensity < 0.0001)
 	{
 		return 0;
