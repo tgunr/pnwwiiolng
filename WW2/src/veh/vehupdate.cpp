@@ -2641,8 +2641,8 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 
 	for (i = 0; i < damagePacket.numHits; i++)
 	{
-		damagePacket.list[i].object.cell.ox = Vehicle.DamageQue.SuperCellX[i] << 4;
-		damagePacket.list[i].object.cell.oy = Vehicle.DamageQue.SuperCellY[i] << 4;
+		damagePacket.list[i].object.cell.ox = static_cast<SINT16>(static_cast<UINT16>(Vehicle.DamageQue.SuperCellX[i]) << 4);
+		damagePacket.list[i].object.cell.oy = static_cast<SINT16>(static_cast<UINT16>(Vehicle.DamageQue.SuperCellY[i]) << 4);
 		damagePacket.list[i].object.id = Vehicle.DamageQue.Id[i];
 		damagePacket.list[i].object.objType = 0;
 

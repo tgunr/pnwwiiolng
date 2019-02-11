@@ -5724,8 +5724,8 @@ UINT32 trnUpdateObjectFlags(SINT32 x, SINT32 y, UINT32 id, SINT16 ownership, SIN
 {
 	sdm_full_obj_id fullid;
 	memset(&fullid, 0x0, sizeof(sdm_full_obj_id));
-	fullid.cell.ox = x << 4;
-	fullid.cell.oy = y << 4;
+	fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(x) << 4);
+	fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(y) << 4);
 	fullid.id = id;
 
 	StratDB::StratObject* stratobj = StratDB::FindStratObject(fullid);

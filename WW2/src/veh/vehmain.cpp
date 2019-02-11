@@ -4329,8 +4329,8 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 
 	if(ResupplyTO && *ExitStatus == PEXIT_RTB)
 	{
-		id->cell.ox	= ResupplyTO->StratSupercellX << 4;
-		id->cell.oy	= ResupplyTO->StratSupercellY << 4;
+		id->cell.ox	= static_cast<SINT16>(static_cast<UINT16>(ResupplyTO->StratSupercellX) << 4);
+		id->cell.oy	= static_cast<SINT16>(static_cast<UINT16>(ResupplyTO->StratSupercellY) << 4);
 		id->id 		= ResupplyTO->ObjId.id;
 		id->objClass= ResupplyTO->ObjId.objClass;
 		id->objType	= ResupplyTO->ObjId.objType;
