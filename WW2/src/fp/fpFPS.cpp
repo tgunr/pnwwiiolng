@@ -1537,6 +1537,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
     if((stateFlags & STATE_FIRE) && fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LMG && fpFPSIsMoving())
     {
         stateFlags &= ~STATE_FIRE;
+        persShakeHead("common.headshake.nofiremoving");
     }
     
 	// LMGs have some special allowances for "aim"
