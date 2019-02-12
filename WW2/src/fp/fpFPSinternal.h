@@ -4,7 +4,7 @@
 // externally useable stuff goes in fpFPS.h
 
 // Flags for data testing builds
-//#define NO_GUN_WOBBLE
+#define NO_GUN_WOBBLE
 //#define NARROW_AIM_FOV
 //#define NO_DISPERSION
 //#define NO_MUZZLE_RISE
