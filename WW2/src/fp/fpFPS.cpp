@@ -1532,10 +1532,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	{
 		stateFlags &= ~STATE_AIM;
 	}
-
-    // if you are moving with an LMG, no firing
-    if(HAS_ANY_BITS(stateFlags, STATE_MOVE_SLOW | STATE_MOVE_BACKWARD | STATE_STRAFE_LEFT | STATE_STRAFE_RIGHT) &&
-       fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LMG)
+    
+    // lmg's cannot fire while moving
+    if((stateFlags & STATE_FIRE) && fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_LMG && fpFPSIsMoving())
     {
         stateFlags &= ~STATE_FIRE;
     }
