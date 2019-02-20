@@ -589,7 +589,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
 		phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
 
-		if(_altuniticon)
+		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
+		if(_altuniticon && ((cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -618,7 +619,15 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		glTranslatef(ugx, ugy, 0.0f);
 
 		unsigned int count = _cp.GetUnitCount();
+		
+		// If the town is not fronline, backline or reserve don't show a Dot for the hidden Garrison that is there
+		if(!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+		{
+			count--;
+		}
+
 		unsigned int limit = std::min(5U, count);
+
 		for(unsigned int s = 0; s < limit; ++s)
 		{
 //			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
