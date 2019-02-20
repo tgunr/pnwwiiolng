@@ -619,7 +619,7 @@ CaptureAction::ApplyEffects(bool manualCapture) const
 	m_cp.checkHCUnits();
 
 	// Set the last capture time only when switching sides 
-	if (m_oldSide != m_newSide)
+	if (m_leftContention == true && m_oldSide != m_newSide)
 	{
 		m_cp.setLastCaptureTime(teulTime());
 	}
