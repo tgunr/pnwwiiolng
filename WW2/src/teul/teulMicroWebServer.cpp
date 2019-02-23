@@ -714,8 +714,6 @@ size_t HTTPRequestParser::getBytesUnused() const
         case State::Complete:
             return m_bytesSoFar - (m_headersParser->getBytesUsed() + m_bodyParser->getUsedBytes());
     }
-
-	return 0;  //annoying warning that needs to go away
 }
 
 void HTTPRequestParser::reset()
