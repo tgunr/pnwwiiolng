@@ -263,6 +263,12 @@ StratHCUnit::save() const
 	// Safely derefence the current and fallback CP destinations into OIDs.
 	UINT32 homeOID = (homeCP() ? homeCP()->uOID : 0);
 	UINT32 fallbackOID = (fallbackCP() ? fallbackCP()->uOID : 0);
+	char templateName[MAX_HANDLE_SIZE];
+	templateName[0] = '\0';
+	if (toeTemplateHeader() != nullptr && toeTemplateHeader()->handle() != 0)
+	{
+		chatGetCallsign(templateName, toeTemplateHeader()->handle());
+	}
 
 	DBThread::Do(DBThread::Default
 		, "UPDATE strat_hc_units"
@@ -273,13 +279,15 @@ StratHCUnit::save() const
 				", last_moved = %u"
 				", last_moved_by = '%s'"
 		        ", country_id = %u"
+		        ", toe_template = '%s'"
 			" WHERE unit_id = %u"
 				, homeOID
 				, fallbackOID
 				, nextMove()
 				, lastMoved()
 				, ((0LL != lastMovedBy()) ? Chat::Name(lastMovedBy()).c_str() : "SYSTEM")
-		        , country()
+				, country()
+				, templateName
 				, unitID()
 				);
 }
