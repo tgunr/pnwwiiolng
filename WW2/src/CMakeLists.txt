@@ -1,33 +1,52 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12.0)
+
+####################################
+## Simplify environment
+IF( WIN32 OR APPLE )
+	SET( LINUX OFF )
+ELSEIF( UNIX )
+	SET( LINUX ON )
+ELSE()
+	MESSAGE( FATAL_ERROR "Detected neither WIN32, APPLE, nor UNIX. What system is this?" )
+ENDIF()
 
 ####################################
 ## Initial CMake config
-ENABLE_TESTING()
-SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes;${CMAKE_MODULE_PATH}" )
-IF ( NOT UNIX AND NOT APPLE AND NOT WIN32 )
-    MESSAGE( FATAL_ERROR "Unknown build environment, not continuing" )
-ENDIF()
+LIST( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes" )
 
-IF ( NOT CMAKE_BUILD_TYPE )
-	MESSAGE( WARNING "No CMAKE_BUILD_TYPE specified. Assuming Debug." )
-	SET( CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE )
-ENDIF()
-SET(_BUILD_TYPES "Debug, Release, RelWithDebInfo, MinSizeRel")
-STRING(FIND ", ${_BUILD_TYPES}" "${CMAKE_BUILD_TYPE}" _BUILD_TYPE)
-IF ( NOT _BUILD_TYPE GREATER 1 )	# ',' and ' ' match against the start of the string
-	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE, expected one of ${_BUILD_TYPES}" )
+SET( CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo )
+IF ( NOT CMAKE_BUILD_TYPE AND CMAKE_GENERATOR MATCHES "Ninja|Makefile" )
+	MESSAGE( FATAL_ERROR "CMAKE_BUILD_TYPE is required with ${CMAKE_GENERATOR}. Specify one of: ${CMAKE_CONFIGURATION_TYPES}" )
+ELSEIF( CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST CMAKE_CONFIGURATION_TYPES )
+	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}. Expected one of: ${CMAKE_CONFIGURATION_TYPES}" )
 ENDIF()
 
 ####################################
 ## Declare the project (don't specify version here)
-PROJECT( WW2GameHosts LANGUAGES C CXX )
+PROJECT( WW2Hosts
+	DESCRIPTION "Hosts and utilities for World War II Online"
+	HOMEPAGE_URL "https://wwiionline.com"
+	LANGUAGES C CXX
+)
 
 ####################################
 ## Require C++14
 SET( CMAKE_CXX_STANDARD_REQUIRED ON )
 SET( CMAKE_CXX_STANDARD 14 )
+
+####################################
+# RakNet
+# Ridiculously, this has to be all the way up here, otherwise, RakNet will pick
+# up a bunch of build settings not intended for it, which screws up the stupid
+# thing a surprising amount. Oh wait. That's only on UNIX/macOS. On Windows this
+# actually makes RakNet unable to link, because Windows is an infantile OS in 2018.
+IF( NOT WIN32 )
+	ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
+	SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+	INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+ENDIF( NOT WIN32 )
 
 ####################################
 ## Determine bitness
@@ -39,27 +58,30 @@ ELSEIF ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 ELSE ()
 	MESSAGE( FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}" )
 ENDIF ()
-
 MARK_AS_ADVANCED( CMAKE_BITNESS )
-MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit" )
 
 OPTION( PN_BUILD_32BIT "Enable 32-bit build" OFF )
 IF ( WIN32 OR CMAKE_BITNESS EQUAL 32 )
 	MARK_AS_ADVANCED( PN_BUILD_32BIT )
 ENDIF()
 
-# You *HAVE* to supply this on the command line when you first
-# build the cache in order for this to work, otherwise CMake
-# will not re-check library paths and will use the wrong
-# libs.
 IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
-	SET(BUILD_BITNESS 64)
+	SET( BUILD_BITNESS 64 )
 ELSE ( )
-	SET(BUILD_BITNESS 32)
+	SET( BUILD_BITNESS 32 )
 ENDIF ( )
-
 MARK_AS_ADVANCED( BUILD_BITNESS )
-MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
+
+IF ( APPLE AND NOT BUILD_BITNESS EQUAL 64 )
+	MESSAGE( FATAL_ERROR "It is no longer possible to build 32-bit hosts on macOS" )
+ELSEIF ( LINUX AND NOT CMAKE_BITNESS EQUAL BUILD_BITNESS )
+	MESSAGE( WARNING "You are building ${BUILD_BITNESS}-bit on a ${CMAKE_BITNESS}-bit machine. This is probably a bad idea." )
+ELSEIF ( WIN32 AND NOT BUILD_BITNESS EQUAL 32 )
+	MESSAGE( FATAL_ERROR
+		"The 64-bit host build is temporarily unsupported on Win32 due to problems with libxml2 prebuilts." )
+ENDIF()
+
+MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit, build is ${BUILD_BITNESS}-bit" )
 
 ####################################
 ## Executable names
@@ -78,10 +100,7 @@ SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 ####################################
 ## General search paths
 
-# /usr/local is explicitly added because many systems don't search it by
-# default despite it being an obvious place to look.
 INCLUDE_DIRECTORIES(
-	${LIBRARIES_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
@@ -109,12 +128,20 @@ OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers."
 # Disable building and use of auth host (for cluster-on-a-box/controller testing)
 OPTION( PN_DISABLE_AUTH     "Build without use of/support for auth" OFF )
 
+# Disable the build info generator (speeds up building during development)
+# Only valid in debug builds
+IF ( CMAKE_BUILD_TYPE MATCHES Debug )
+	OPTION( PN_NO_BUILD_INFO    "Disable the build_info.cpp generator (Debug only)" OFF )
+ELSE()
+	SET( PN_NO_BUILD_INFO OFF CACHE BOOL "Disables generating build_info.cpp" FORCE )
+ENDIF()
+
 # If the user is building a Debug build, enable SANITIZE options.
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
 		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
 	ELSE()
-		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables Address Sanitizer, etc. on Unix builds" FORCE )
 		MARK_AS_ADVANCED( PN_SANITIZE )
 	ENDIF()
 ENDIF()
@@ -151,11 +178,8 @@ IF ( PN_BETA_RELEASE )
 ENDIF()
 
 ####################################
-## Status output
-MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
-
-####################################
 ## Generate config.h
+# TODO THIS NEEDS TO BE MOVED DOWN AND APPLY ITSELF TO THE MAIN HOSTS CONFIG TARGET
 INCLUDE( cmakeincludes/PlatformChecks.cmake )
 
 ####################################
@@ -167,66 +191,92 @@ INCLUDE( cmakeincludes/HostConfiguration.cmake )
 INCLUDE( cmakeincludes/Dependencies.cmake )
 
 ####################################
-## Set up the OMG parser commands
-INCLUDE( cmakeincludes/BuildOMGgen.cmake )
-
-# And the actual OMG files we generate
-ADD_OMG_TARGET( omg/omgMissionSortieData )
-ADD_OMG_TARGET( omg/omgChat )
+# RakNet
+# Ridiculously, this has to be all the way down here, otherwise, RakNet will miss
+# a bunch of build settings required for it to build correctly. Oh wait. That's
+# only on Windows. On UNIX/macOS this makes RakNet pick up a bunch of garbage
+# build setitings, because Windows is an infantile OS in 2018.
+IF( WIN32 )
+	ADD_SUBDIRECTORY(../../Libraries/RakNet ./RakNet)
+	SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
+	INCLUDE_DIRECTORIES( SYSTEM ${RAKNET_INCLUDE_DIRS} )
+ENDIF( WIN32 )
 
 ####################################
 ## Run build_info.py to get build_info.cpp
 # Use BYPRODUCTS for the real result and a symbolic (fake) OUTPUT so the script
 # runs always; easiest way to avoid the run-when-needed default behaviors.
-ADD_CUSTOM_COMMAND(
-    OUTPUT build_info.stamp
-    BYPRODUCTS build_info.cpp
-    MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
-    COMMAND
-        ${PYTHON_EXECUTABLE}
-        ${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
-        host
-        ${CMAKE_CURRENT_BINARY_DIR}
-    COMMENT "Generating build information"
-    VERBATIM
-)
-SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
+IF ( PN_NO_BUILD_INFO )
+	# If bypassing build info generation was requested, substitute hardcoded info instead
+	SET( BUILD_INFO_FILES ${CMAKE_CURRENT_SOURCE_DIR}/build_info.generic.cpp )
+ELSE()
+	ADD_CUSTOM_COMMAND(
+		OUTPUT build_info.stamp
+		BYPRODUCTS build_info.cpp
+		MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/build_info.cpp.in
+		COMMAND
+			${PYTHON_EXECUTABLE}
+			${CMAKE_CURRENT_SOURCE_DIR}/build_info.py
+			host
+			${CMAKE_CURRENT_BINARY_DIR}
+		COMMENT "Generating build information"
+		VERBATIM
+	)
+	SET_SOURCE_FILES_PROPERTIES( build_info.stamp PROPERTIES SYMBOLIC TRUE )
+	SET( BUILD_INFO_FILES
+		${CMAKE_CURRENT_BINARY_DIR}/build_info.stamp
+		${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp
+	)
+ENDIF()
 
-add_subdirectory(../../Libraries/RakNet ./RakNet)
-
-# RakNet
-SET(RAKNET_INCLUDE_DIRS "${RakNet_SOURCE_DIR}/Source;${RakNet_SOURCE_DIR}/DependentExtensions;${RakNet_SOURCE_DIR}/DependentExtensions/cat/include")
-INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} ${RAKNET_INCLUDE_DIRS} )
+####################################
+# maclib library, provides the Base64 implementation on macOS for the hosts
+# This is needed because the Base64 implementation uses Objective-C and that
+# needs a separate target
+IF ( APPLE )
+	FIND_LIBRARY( FOUNDATION Foundation )
+	ADD_LIBRARY(maclib STATIC sysmac/sysMacCompat.mm)
+	TARGET_LINK_LIBRARIES( maclib ${FOUNDATION} )
+	LINK_LIBRARIES( maclib ${FOUNDATION} )
+ENDIF()
 
 ####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
+	include/platforms.h include/precompile_includes.h
     server/server.cpp server/server.h
     server/serverReleaseTypeEnum.h
-    server/serverLuaInterface.cpp
     server/serverMessages.cpp server/serverMessages.h
     server/serverPeers.cpp server/serverPeers.h
     server/serverTransfer.cpp server/serverTransfer.h
     str/stringLib.cpp str/stringLib.h
+    teul/teulVersion.h
+    teul/teulBasic.h teul/teulConstants.h teul/teulFuncTypes.h teul/teulKit.h
+	teul/teulExtErrors.h
+    teul/teulBlipRepeater.h
     teul/teulCallback.cpp teul/teulCallback.h
-    teul/teulEndpoint.cpp teul/teulEndpoint.h teul/teulEndpointImpl.h
+    teul/teulConnection.h teul/teulConnectionInstruction.h
+    teul/teulEndpointDefs.h teul/teulEndpoint.cpp teul/teulEndpoint.h teul/teulEndpointImpl.h
     teul/teulMicroWebServer.cpp teul/teulMicroWebServer.h include/pnThread.h
     teul/teulModCalls.cpp teul/teulModCalls.h
     teul/teulModRecv.cpp teul/teulModSend.cpp teul/teulModule.cpp teul/teulModule.h
     teul/teulNetTimeMS.cpp teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h teul/teulNetTimeMS.h
-    teul/teulBits.h teul/teulPack.cpp teul/teulPacket.cpp teul/teulPacket.h
+    teul/teulNetworkMsg.h teul/teulNetworkArray.h teul/teulNetworkObject.h
+    teul/teulPackers.h teul/teulBits.h teul/teulPack.cpp teul/teulPacket.cpp teul/teulPacket.h
+    teul/teulTickSample.h
     teul/teulTransmission.cpp teul/teulTransmission.h
     teul/teulTransport.cpp
-    teul/teulUtils.cpp teul/teulUtils.h
-    wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
+    teul/teulUtils.cpp teul/teulUtils.h teul/teulTime.h teul/teulTimeMS.h
+    wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h
+    teul/teulCallback.h teul/teulCallbackInit.h teul/teulCallbackStruct.h
     auth/authPack.cpp auth/authPack.h
     auth/authGameMessages.cpp auth/authGameMessages.h auth/authTypes.h auth/authServerTypes.h
-    teul/teulAuth.cpp teul/teulAuth.h updt/loginTypes.h
+    teul/teulAuth.cpp teul/teulAuth.h teul/teulAuthServer.h updt/loginTypes.h
     wwii/wwiiConfig.cpp wwii/wwiiConfig.h wwii/wwiiConfigMap.h
-    dbug/dbugInternal.h mem/memPool.h
+    mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
+TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 MySQL::MySQL ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -238,12 +288,13 @@ ADD_LIBRARY( instancing STATIC
     mm/mmEnums.h auth/authDispatch.h
     miss/missFlags.h wwii/wwiiBranchEnums.h
 )
+TARGET_LINK_LIBRARIES( instancing MySQL::MySQL )
 SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 
 ####################################
 ## wwii library common to everything, when it isn't broken by target definitions
 ADD_LIBRARY( wwiilib STATIC
-    build_info.cpp build_info.stamp
+    ${BUILD_INFO_FILES}
     chat/chatHandle.cpp chat/chatHandle.h chat/chatName.h
     chat/chatPackers.cpp chat/chatTimeInterval.cpp chat/chatTimeInterval.h
     dbug/dbug.cpp dbug/dbug.h
@@ -254,21 +305,17 @@ ADD_LIBRARY( wwiilib STATIC
     weap/weapList.cpp weap/weapList.h weap/weapSerial.h
     weap/weapLoadIndexes.cpp weap/weapLoadIndexes.h weap/weapParser.cpp weap/weapParser.h
     weap/weapSpec.cpp weap/weapSpec.h
-    ${LIBRARIES_DIR}/tinyxml/tinystr.cpp ${LIBRARIES_DIR}/tinyxml/tinystr.h
-	${LIBRARIES_DIR}/tinyxml/tinyxml.cpp ${LIBRARIES_DIR}/tinyxml/tinyxml.h
-    ${LIBRARIES_DIR}/tinyxml/tinyxmlerror.cpp ${LIBRARIES_DIR}/tinyxml/tinyxmlparser.cpp
 	libircclient/src/libircclient.cpp
     tut/tutGroupProgress.cpp tut/tutGroupProgress.h
     wwii/wwiiCommandLineArgs.cpp wwii/wwiiCommandLineArgs.h
     wwii/wwiiIRC.cpp wwii/wwiiIRC.h host/hostCommand.h
     wwii/wwiiRank.cpp wwii/wwiiRank.h
-    wwii/wwiiString.cpp wwii/wwiiString.h
     wwii/wwiiThreads.cpp wwii/wwiiThreads.h wwii/wwiiThreadTypes.h
     wwii/wwiiThreadText.cpp wwii/wwiiThreadText.h wwii/wwiiThreadTextQuery.h
     wwii/wwiiUTF.cpp wwii/wwiiUTF.h
     score/scoreActor.cpp score/scoreActor.h
     src/io_mapped_file.cpp include/io_mapped_file.h
-    src/mydbQuery.cpp include/mydbQuery.h src/myDbseWrapper.cpp
+    src/mydbQuery.cpp include/mydbQuery.h include/dbseWrapper.h src/myDbseWrapper.cpp
     wwii/wwiiDBConfig.cpp wwii/wwiiDBConfig.h wwii/wwiiDBThreads.cpp wwii/wwiiDBThreads.h
     wwii/wwiiSerialNumber.cpp wwii/wwiiSerialNumber.h
     wwii/wwiiSortieManager.cpp wwii/wwiiSortieManager.h
@@ -279,7 +326,7 @@ ADD_LIBRARY( wwiilib STATIC
     strt/strtSupercell.cpp strt/strtSupercell.h strt/strtSupercells.h
     wwii/wwiiCallbacks.cpp wwii/wwiiCallbacks.h teul/teulCallback.h teul/teulCallbackInit.h
     wwii/wwiiHCUnitsCommon.cpp
-    include/configVars.h src/configVars.cpp
+    teul/teulConfigVar.h include/configVars.h src/configVars.cpp
     str/strdupptr.h
     wwii/wwiiNetPorts.h wwii/wwiiCallbacks.h
     # These weren't previously in wwiilib but seem to be required in various places
@@ -288,25 +335,18 @@ ADD_LIBRARY( wwiilib STATIC
 	xml/XMLLoader2.cpp xml/XMLLoader2.h
 	weap/weapSpawnXML.cpp weap/weapSpawnXML.h
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
-	omg/omgChat.cxx omg/omgChat.hxx
-	omg/omgMissionSortieData.cxx omg/omgMissionSortieData.hxx
+	chat/omgChat.cpp chat/omgChat.h
+	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
-IF (BUILDING_OWN_LIBXML2)
-	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-		ADD_DEPENDENCIES( ${Name} libxml2 )
-	ENDMACRO()
-ELSE()
-	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-	ENDMACRO()
-ENDIF()
+TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )
+MACRO( USE_WWIILIB_ON Name )
+	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 MySQL::MySQL )
+ENDMACRO()
 
 ####################################
 ## Various commandline utility executables
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 
     # Chat management client
     ADD_EXECUTABLE( chatClient
@@ -315,20 +355,8 @@ IF ( NOT MSVC )
         chat/chatManagementPack.cpp chat/chatRoster.cpp chat/chatRosterClient.cpp
     )
 	USE_WWIILIB_ON( chatClient )
-    TARGET_LINK_LIBRARIES( chatClient teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( chatClient teulserver ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
-    
-    #ADD_EXECUTABLE( luaClient src/luaClient.cpp )
-    #TARGET_INCLUDE_DIRECTORIES( luaClient
-    #    PRIVATE ${READLINE_INCLUDE_DIRS}
-    #    PRIVATE ${NCURSES_INCLUDE_DIRS}
-	#PRIVATE ${RAKNET_INCLUDE_DIRS}
-    #)
-	#USE_WWIILIB_ON( luaClient )
-    #TARGET_LINK_LIBRARIES( luaClient
-    #    teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
-    #)
-    #SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
     INSTALL(
         TARGETS chatClient #luaClient
@@ -340,7 +368,7 @@ IF ( NOT MSVC )
 
 ENDIF()
 
-IF ( MSVC )
+IF ( WIN32 )
 	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
 
 	# Not currently generated:
@@ -361,8 +389,8 @@ IF ( MSVC )
 
 		include/configVars.h
 	)
-	TARGET_LINK_LIBRARIES(sdmpp teulserver ${MYSQL_LIBRARIES})
 	USE_WWIILIB_ON(sdmpp)
+	TARGET_LINK_LIBRARIES(sdmpp teulserver)
 	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
 ENDIF()
 
@@ -395,7 +423,7 @@ ENDIF()
 	)
 	SET_PROPERTY(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
 	USE_WWIILIB_ON(stratValidator)
-	TARGET_LINK_LIBRARIES(stratValidator teulserver ${MYSQL_LIBRARIES})
+	TARGET_LINK_LIBRARIES(stratValidator teulserver)
 	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 
 # Reads SDM files and imports portions of them into the game database.
@@ -408,7 +436,7 @@ ADD_EXECUTABLE(stratLoader
 		sdm/sdmParse.h
 )
 USE_WWIILIB_ON(stratLoader)
-TARGET_LINK_LIBRARIES(stratLoader teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
+TARGET_LINK_LIBRARIES(stratLoader teulserver ${LIBZ_LIBRARIES} )
 SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
 
@@ -416,7 +444,7 @@ SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 ## Macro for building hosts
 MACRO( ADD_HOST_TARGET Name )
     SET( HOST_TARGET_Usage "ADD_HOST_TARGET( <Name> [INSTANCING] [LUA] SOURCES ...)" )
-    
+
     CMAKE_PARSE_ARGUMENTS( HOST_TARGET_ARG "INSTANCING;LUA" "" "SOURCES;EXTRA_DEFINITIONS" ${ARGN} )
     IF ( NOT "${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" STREQUAL "" )
         MESSAGE( FATAL_ERROR "0 ${HOST_TARGET_Usage} ${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" )
@@ -432,7 +460,7 @@ MACRO( ADD_HOST_TARGET Name )
         TARGET_LINK_LIBRARIES( "${Name}" ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
     ENDIF()
 	USE_WWIILIB_ON( "${Name}" )
-    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
+    TARGET_LINK_LIBRARIES( "${Name}" teulserver ${LIBZ_LIBRARIES} )
     IF ( NOT "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" STREQUAL "" )
         SET_PROPERTY( TARGET "${Name}" PROPERTY COMPILE_DEFINITIONS "${HOST_TARGET_ARG_EXTRA_DEFINITIONS}" )
     ENDIF()
@@ -518,15 +546,16 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     wwii/wwiiServerTrackedObjectPacker.cpp wwii/wwiiServerTrackedObjectPacker.h
     chat/chatBrigadeControl.cpp chat/chatBrigadeControl.h
     chat/chatBrigadeMove.cpp chat/chatBrigadeMove.h chat/chatBrigadeMoveResults.h
-    teul/teulNetworkMsg.h wwii/wwiiNetPorts.h
+    wwii/wwiiNetPorts.h
     chat/chatDecisions.cpp chat/chatDecisions.h
     chat/chatHostBrigadeControl.cpp chat/chatHostBrigadeControl.h chat/chatBrigadeVote.h
     chat/chatHostMotds.cpp chat/chatHostMotds.h chat/chatMotds.cpp chat/chatMotds.h
     chat/chatMissionInvite.cpp chat/chatMissionInvite.h
-    chat/chatMissionMember.cpp chat/chatMissionMember.h chat/chatMissions.cpp chat/chatMissions.h
+    chat/chatMissionMember.cpp chat/chatMissionMember.h
+    chat/chatMissions.cpp chat/chatMissions.h chat/chatMissionTypes.h
     chat/chatConstants.h
     chat/chatMultiCrew.cpp chat/chatMultiCrew.h
-    teul/teulNetworkArray.h teul/teulNetworkObject.h wwii/wwiiPack.h
+    wwii/wwiiPack.h
     chat/chatReports.cpp chat/chatReports.h
     chat/chatSaveChannels.cpp chat/chatSaveChannels.h
     chat/chatSay.cpp chat/chatSay.h
@@ -539,13 +568,11 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     strt/strtChatTypes.cpp strt/strtChatTypes.h
     strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-    dbse/dbseClient.cpp dbse/dbseClient.h dbse/dbseTypes.h dbse/dbseConstants.h
-    dbse/dbseClientMessages.cpp dbse/dbseClientMessages.h
-    teul/teulBasic.h wwii/wwiiCallbacks.h
+    wwii/wwiiCallbacks.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
-TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 ${LIBZ_LIBRARIES})
+TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} ${LIBZ_LIBRARIES})
 
 ####################################
 ## Cell host
@@ -571,7 +598,6 @@ ADD_HOST_TARGET( ${CELL_HOST_EXE} SOURCES
     miss/missionPacket.h mm/mmEnums.h
     host/host.h host/hostPlayers.h
     miss/missFlags.h wwii/wwiiSyncVar.h
-    teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
     host/hostPlayer.h host/hostFraming.cpp host/hostFraming.h host/hostGrid.cpp
     host/hostScoringActor.cpp
@@ -621,18 +647,17 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapDB.cpp map/mapDB.h
     auth/authPlayerDetails.h
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
-    map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
     map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
     wwii/wwiiPlayer.h mm/mmEnums.h wwii/wwiiRank.h weap/weapSerial.h
-    wwii/wwiiSyncVar.h teul/teulNetTimeMS.h teul/teulNetTimeMSPacker.h
+    wwii/wwiiSyncVar.h
     weap/weapSpecPacker.h wwii/wwiiFullObjIDPacker.h
     inst/instDescriptor.h auth/authDispatch.h
     map/mapThreads.cpp map/mapThreads.h
     miss/missActiveMission.cpp miss/missActiveMission.h miss/mission.cpp miss/mission.h
     miss/missionDetail.cpp miss/missionDetail.h map/mapMissionList.h miss/missActiveMission.h
-    teul/teulNetworkMsg.h wwii/wwiiNetPorts.h
+    wwii/wwiiNetPorts.h
     miss/missionHostMessages.cpp miss/missionHostMessages.h
     miss/missionPack.cpp miss/missionPack.h
     miss/missMobileSpawn.cpp miss/missMobileSpawn.h include/mobileSpawnEnums.h
@@ -654,7 +679,7 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     wwii/wwiiHCUnits.h
     map/mapData.cpp map/mapData.h
     map/mapHCUnitLocations.cpp map/mapHCUnitLocations.h
-    teul/teulNetworkArray.h wwii/wwiiPack.h
+	wwii/wwiiPack.h
     map/mapHostSupercellData.cpp
     miss/missionPacket.cpp miss/missionPacket.h
     miss/missionScoring.cpp miss/missionUtils.cpp miss/missionUtils.h
@@ -757,12 +782,12 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA
 )
-IF ( MSVC )
+IF ( WIN32 )
     SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "/W0" )
 ELSE()
 	SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
-                  "-Wno-unused-function" )
+                  "-Wno-unused-function -Wno-zero-as-null-pointer-constant" )
 ENDIF()
 TARGET_INCLUDE_DIRECTORIES( ${STRAT_HOST_EXE} PRIVATE ${TOLUAPP_INCLUDE_DIR})
 
@@ -806,7 +831,7 @@ ENDIF()
 IF ( NOT PN_DISABLE_AUTH )
 	ADD_EXECUTABLE( testAuthConnect tests/testAuthConnect.cpp )
 	USE_WWIILIB_ON( testAuthConnect )
-	TARGET_LINK_LIBRARIES( testAuthConnect teulserver ${MYSQL_LIBRARIES} )
+	TARGET_LINK_LIBRARIES( testAuthConnect teulserver )
 	SET_PROPERTY( TARGET testAuthConnect PROPERTY FOLDER "Test" )
 ENDIF()
 
@@ -827,21 +852,19 @@ SET_PROPERTY( TARGET testUnits PROPERTY COMPILE_DEFINITIONS "ENABLE_TESTS" )
 USE_WWIILIB_ON( testUnits )
 TARGET_COMPILE_OPTIONS( testUnits PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testUnits ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testUnits teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testUnits teulserver ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testUnits PROPERTY FOLDER "Test" )
 
 ADD_TEST( testUnits testUnits )
 
 # teul tests
 ADD_EXECUTABLE(testTeul
-    tests/testTeul.cpp teul/teulExceptions.h teul/teulKit.h teul/teulEndpoint.h
-    teul/teulEndpointImpl.h teul/teulPacket.h teul/teulPacketHeader.h
-    wwii/wwiiCallbacks.h tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
-    teul/teulVersion.h teul/teulConnectionInstruction.h
+    tests/testTeulTest.h tests/testTeulClient.h tests/testTeulServer.h
+    tests/testTeul.cpp
 )
 USE_WWIILIB_ON( testTeul )
 TARGET_COMPILE_OPTIONS( testTeul PRIVATE ${_EXTRA_HOST_COMPILE_OPTIONS} )
 TARGET_LINK_LIBRARIES( testTeul ${_EXTRA_HOST_LINK_OPTIONS} )
-TARGET_LINK_LIBRARIES( testTeul teulserver ${MYSQL_LIBRARIES} ${LIBZ_LIBRARIES} )
+TARGET_LINK_LIBRARIES( testTeul teulserver ${LIBZ_LIBRARIES} )
 SET_PROPERTY( TARGET testTeul PROPERTY FOLDER "Test" )
 

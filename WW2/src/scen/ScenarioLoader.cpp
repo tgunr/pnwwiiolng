@@ -52,9 +52,9 @@ bool ScenarioLoader::DoNode(xmlNode* node, bool first, void* userData)
 		{
 			if(*body)
 			{
-				if(!stricmp(name, "body"))
+				if(!strcasecmp(name, "body"))
 					data->body = (const char*)body;
-				else if(!stricmp(name, "include"))
+				else if(!strcasecmp(name, "include"))
 					data->AddInclude((const char*)body);
 				else
 					(*data)[name] = (const char*)body;

@@ -52,9 +52,6 @@ SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAY
 	if ( teulIndex < 0 )
 		return -EINVAL;
 
-	// Make sure nagle is disabled so that this actually gets sent.
-	endpoint->setNagleEnabled(false);
-
 	PLAYER_EXIT pe = { destination, exitCode, facility };
 	return teulSend(teulIndex, _PLAYER_EXIT, &pe);
 }

@@ -5082,7 +5082,7 @@ chatGetCallsign(char* const callsign, const ChatHandle srcHandle)
 		wchar_t wideCallsign[MAX_HANDLE_WSIZE];
 		if ( PN_UNLIKELY(!chatGetCallsign(wideCallsign, srcHandle)) )
 			return false;
-		WWII::ConvertChars(wideCallsign, callsign, sizeof(wideCallsign));
+		WWII::ConvertChars(wideCallsign, callsign, MAX_HANDLE_LEN);
 		return true;
 	}
 

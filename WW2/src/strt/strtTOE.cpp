@@ -19,6 +19,7 @@
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiConfig.h"
 #include "include/mydbQuery.h"
+#include "include/strprintf.h"
 
 // TOE templates.
 TOE_TEMPLATES toeTemplates;
@@ -339,6 +340,13 @@ strtSaveTOESupplies()
 
 void strtClearTOESaveList(StratHCUnit& unit)
 {
+	// Clear out the unit in the DB
+	char buffer[TEXT_POOL_SIZE+1];
+	const char* format = "DELETE FROM toe.supply where unit_id=%u";
+	strprintf(buffer, format, unit.unitID());
+	DBSimpleQuery(dbh, buffer);
+
+	// Now clear the list
 	for (auto it = toeSaveList.begin(); it != toeSaveList.end();)
 	{
 		TOE_::WeaponInstance& entry = *it->first;

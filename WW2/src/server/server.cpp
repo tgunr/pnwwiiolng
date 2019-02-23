@@ -42,7 +42,6 @@
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
 #include "teul/teulMicroWebServer.h"
@@ -249,7 +248,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 		SINT32 wasIndex = psn->teulIndex;
 		ServerManager::SetPlayerTeulIndex(psn, -1);
 		///TODO: What if its not open? Check for ENOTCONN?
-		teulClose(wasIndex, Teul::Closing::PlayerRelease);
+		teulClose(wasIndex);
 	}
 }
 
@@ -462,7 +461,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		dbugLog(_FLD, "t:%d attempt to release null player", teulIndex);
 
 		if ( teulIndex >= 0)
-			teulClose(teulIndex, Teul::Closing::NullPlayerRelease);
+			teulClose(teulIndex);
 
 		return -ENOENT;
 	}
@@ -492,7 +491,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		else	if ( teulIndex >= 0)
 		{
 			ServerManager::SetPlayerTeulIndex(psn, -1);
-			teulClose(teulIndex, Teul::Closing::ReleaseEconn);
+			teulClose(teulIndex);
 		}
 
 		break;
@@ -1612,7 +1611,7 @@ serverGetAuthIP()
 	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	UINT32 address = Teul::GetSingleIP(authName);
 
 	ABORT_IF_EX(address == 0, "Unable to resolve auth address '%s'", authName);
 	return address;
@@ -1653,7 +1652,7 @@ _broadcastRxConnect(ENDPOINT& endpoint)
 
 #include "src/controllerGameIntro.h"
 
-static void
+void
 _controllerConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
@@ -1669,12 +1668,13 @@ _controllerConnect(ENDPOINT& endpoint)
 	intro.m_processType = Server::serverType;
 	intro.m_token = s_controllerToken;
 
-	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
+	auto result = endpoint.writeData(reinterpret_cast<char *>(&intro), sizeof(intro), 0, 0);
 	if ( result < 0 ) {
-		if ( dbugGetErrno() == ECONNREFUSED )
-			LogAbort("Connection to controller refused.");
-		else
-			LogAbort("Unable to greet controller because %d", dbugGetErrno());
+		if (result == -ECONNREFUSED) {
+			LogAbort("Connection to controller refused (not running?).");
+		} else {
+			LogAbort("Unable to greet controller because %d", -result);
+        }
 	}
 	ABORT_IF_EX(result != sizeof(intro), "Failed to write intro to controller: %dv%" PRSizeT "", result, sizeof(intro));
 }
@@ -1702,7 +1702,6 @@ void _connectToController()
 	TeulTimeMS timeout = teulClock64 + controllerTimeout;
 	while ( !s_controllerConnected && teulClock64 < timeout ) {
 		teulUpdateTransport(1);
-		teulSyncClock();
 	}
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
@@ -1929,7 +1928,7 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 
 	memInit();
 
-	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
+	SINT32 retval = teulInitTransport(LogMode::TO_FILE, appName, errorFnPtr, killFnPtr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 #ifndef NDEBUG

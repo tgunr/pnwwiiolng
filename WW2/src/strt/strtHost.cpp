@@ -43,7 +43,6 @@
 #include "strt/strtTOE.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -401,6 +400,7 @@ _housekeeping()
 
 	static UINT32 nextFBRepairCycle = 0;
 	static TeulTimeMS nextSecond = teulClock64+1000;
+	static TeulTimeMS nextMinute = teulClock64 + 1000 * 60;
 	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
 	static UINT32 nextObjectiveUpdate = teulTime() + 5;
 	static UINT32 nextForcedSupplyRouteCheck = 0;
@@ -410,6 +410,7 @@ _housekeeping()
 	static bool bInitiateFBRepairCycle = false;
 	static bool bInitiateHalfSecProcessing = false;
 	static bool bInitiateSecProcessing = false;
+	static bool bInitiateMinProcessing = false;
 	static bool bInitiateObjectiveUpdateProcessing = false;
 	static bool bInitiateSupplyRouteCheckProcessing = false;
 	static bool bInitiateForcedSupplyRouteCheckProcessing = false;
@@ -432,13 +433,23 @@ _housekeeping()
 	}
 
 	if ( teulClock64 >= nextSecond ) {
-		dbugLog(_FLI, "strat _housekeeping Second procesing, scheduled");
+		dbugLog(_FLD, "strat _housekeeping Second procesing, scheduled");
 		nextSecond += 1000;
 		if (nextSecond < teulClock64) {
 			nextSecond = teulClock64;
 			dbugLog(_FLI, "Lost time, need to schedule next second processing immediately");
 		}
 		bInitiateSecProcessing = true;
+	}
+
+	if ( teulClock64 >= nextMinute ) {
+		dbugLog(_FLD, "strat _housekeeping Minute procesing, scheduled");
+		nextMinute += (1000 * 60);
+		if (nextMinute < teulClock64) {
+			nextMinute = teulClock64;
+			dbugLog(_FLD, "Lost time, need to schedule next minute processing immediately");
+		}
+		bInitiateMinProcessing = true;
 	}
 
 	if ( teulTime() >= nextObjectiveUpdate )
@@ -482,17 +493,25 @@ _housekeeping()
 		bInitiateHalfSecProcessing = false;
 
 		if (bInitiateSecProcessing) {
-			dbugLog(_FLI, "strat _housekeeping Half Second processing subverted");
+			dbugLog(_FLD, "strat _housekeeping Half Second processing subverted");
 		}
 		return nextHouseKeep;
 	}
 
 	if (bInitiateSecProcessing)
 	{
-		dbugLog(_FLI, "strat _housekeeping Second procesing, activated");
+		dbugLog(_FLD, "strat _housekeeping Second procesing, activated");
 		strtProcessResupply();
 		stratProcessLuaEventQueue();
 		bInitiateSecProcessing = false;
+		return nextHouseKeep;
+	}
+
+	if (bInitiateMinProcessing)
+	{
+		dbugLog(_FLI, "strat _housekeeping Minute processing, activated");
+		strtProcessGarrisons();
+		bInitiateMinProcessing = false;
 		return nextHouseKeep;
 	}
 
@@ -535,19 +554,17 @@ const char* g_serverName = "stratd";
 int
 main(int argc, const char* argv[])
 {
-	// static? because we're main and we don't need to waste stack space on these,
-	// but they also don't need to be visible outside of our scope.
-	static std::vector<std::string> s_luaCmds;
-	static bool s_initOnly = false;
-	static bool s_debug = false;
+	std::vector<std::string> luaCmds;
+	bool initOnly = false;
+	bool debug = false;
 
 	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
 		{ "--lua-cmd", "Execute lua code after initializing.", true,
-			[](const char* code) { s_luaCmds.emplace_back(code); }, nullptr },
-		{ "--init-only", "Terminate after loading strat data.", false, [](const char*) { s_initOnly = true; }, nullptr },
-		{ "--debug", "Enable verbose + console logging", false, [](const char*) { s_debug = true; }, nullptr, }
+			[&](const char* code) { luaCmds.emplace_back(code); }, nullptr },
+		{ "--init-only", "Terminate after loading strat data.", false, [&](const char*) { initOnly = true; }, nullptr },
+		{ "--debug", "Enable verbose + console logging", false, [&](const char*) { debug = true; }, nullptr, }
 	});
-	if ( !s_debug ) {
+	if ( !debug ) {
 		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	} else {
@@ -583,18 +600,16 @@ main(int argc, const char* argv[])
 
 	strtInitializeStratSystem();
 
-	if ( s_luaCmds.empty() == false ) {
-		for ( auto&& code : s_luaCmds ) {
-			dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
-			Lua::RunObject("--lua-cmd", code);
-			auto results = Lua::Results();
-			for ( auto&& line : results ) {
-				printf("lua: %s\n", line.c_str());
-			}
-		}
-	}
-
-	if ( s_initOnly ) {
+    for ( auto&& code : luaCmds ) {
+        dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+        Lua::RunObject("--lua-cmd", code);
+        auto results = Lua::Results();
+        for ( auto&& line : results ) {
+            printf("lua: %s\n", line.c_str());
+        }
+    }
+	
+	if ( initOnly ) {
 		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
 		return 0;
 	}
@@ -658,8 +673,6 @@ main(int argc, const char* argv[])
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	serverOpenLuaClientInterface();
-
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
 
 	TeulTimeMS tick100ms = 0;
@@ -696,7 +709,7 @@ main(int argc, const char* argv[])
 		}
 	}
 
-	teulClose(mapConnection, Teul::Closing::MapSrvClose);
+	teulClose(mapConnection);
 
 	wwiiIRCChannelMessage("-sys", "[[ Shutting down normally ]]");
 	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_EXITED);

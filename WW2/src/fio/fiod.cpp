@@ -107,7 +107,7 @@ namespace {
 	{ return swprintf(buf, bufsize, L"%s" OS_PATHSEP_W L"%s", lhs, rhs); }
 	template<size_t bufSize>
 	UINT32 pathprintf(wchar_t(&buf)[bufSize], const wchar_t* lhs, const wchar_t* rhs)
-	{ return wstrprintf<bufSize>(buf, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
+	{ return swprintf(buf, bufSize - 1, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
 }
 
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
@@ -326,7 +326,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, userdir, path) ) {
-		dbugLog(_FLW, "Could not open file %s @ " PRpathT, filename, path);
+		dbugLog(_FLW, "Could not open file %s @ %" PRpathT, filename, path);
 		return -1;
 	}
 

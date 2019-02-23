@@ -15,7 +15,6 @@
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
 
@@ -44,9 +43,6 @@ static SINT32 _sendPlayerLoginReply(ACTION_OBJECT* const a);
 static SINT32 _sendServerLoad(ACTION_OBJECT* const a);
 static SINT32 _sendGameCapacity(ACTION_OBJECT* const a);
 
-//error function declaration
-static void _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
-
 //This function installs our two callbacks
 SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 {
@@ -57,7 +53,6 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 	memset(&ci,0,sizeof(ci));
 
 	//Global values
-	ci.error		= _errorFn;
 	ci.callX		= Auth::CallbackX;
 
 	//The recv function setup
@@ -150,11 +145,6 @@ static SINT32 _sendServerLoad(ACTION_OBJECT* const a)
 	return authPackSERVER_LOAD(TEUL_PACK, a->packed, a->offset, (AUTH_SERVER_LOAD*) a->localRawData, sizeof(AUTH_SERVER_LOAD));
 }
 
-static void _errorFn(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
-{
-	dbugLog(_FLA, "t:%d auth connection error %d", teulIndex, error);
-}
-
 //Send function
 static SINT32 _sendPlayerLoginReply(ACTION_OBJECT* const a)
 {
@@ -220,13 +210,13 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 	catch (std::exception& e)
 	{
 		dbugLog(_FLA, "t:%d %s. off:%d, sr:%d, ar:%d", a->teulIndex, e.what(), a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginExcept);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 	catch ( ... )
 	{
 		dbugLog(_FLA, "t:%d !!!Unhandled exception!!! off:%d, sr:%d, ar:%d", a->teulIndex, a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginErr);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 }

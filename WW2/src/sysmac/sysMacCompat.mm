@@ -1,21 +1,23 @@
 /* $Id: sysMacCompat.mm 2136 2009-11-16 03:27:03Z ahwulf@CRS $ */
-//#include <Carbon/Carbon.h>
 
-#include <CoreFoundation/CoreFoundation.h>
+#import <Foundation/Foundation.h>
+#include "platforms.h" // must come before the platBuild check in order to work
 
+#if platBuild == BUILD_CLIENT
+
+// Warning: gltypes.h must be included AFTER glew.h.
+// AppKit pulls in gltypes.h
+// syscfg.h pulls in glew.h
+// Therefore syscfg.h must be included before AppKit.
+// This is an absurd bit of ordering that would break horribly if we ever managed to convert to modules.
 #include "sysmac/syscfg.h"
+#include <sys/time.h>
+#import <AppKit/AppKit.h>
 #include "vars.h"
 #include "ddp.h"
 #include "rnmain.h"
 #include "rnlogo.h"
 #include "sys/sysLaunchUrl.h"
-
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <Cocoa/Cocoa.h>
 
 UINT64 GetMicroSeconds(void)
 {
@@ -269,3 +271,22 @@ static void testHttpRequests()
 		dbugLog(_FLI, "UNIT_TEST: testHttpRequests: jsonplaceholder POST: FAILED");
 }
 #endif
+
+#endif // platBuild == BUILD_CLIENT
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+    return [[NSData dataWithBytesNoCopy:const_cast<void *>(buffer) length:bufferLength] base64EncodedStringWithOptions:0].UTF8String;
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+    NSData *decoded = [[NSData alloc] initWithBase64EncodedString:[NSString stringWithUTF8String:input.data()] options:0];
+    
+    if (decoded) {
+        [decoded getBytes:outputBuffer length:std::min(*ioBufferLength, static_cast<size_t>(decoded.length))];
+        *ioBufferLength = std::min(*ioBufferLength, static_cast<size_t>(decoded.length));
+        return true;
+    }
+    return false;
+}

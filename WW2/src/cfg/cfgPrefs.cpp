@@ -114,7 +114,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.radialdensity",       &g_fRadialDensity,          cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.radialradius",        &g_fRadialRadius,           cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		1,		0,	0, true	},
-	{"app.usenetcode",			&g_wantNetcode,				cfgPARAM_BOOLEAN,   1,      0,  1, true },
+//	{"app.usenetcode",			&g_wantNetcode,				cfgPARAM_BOOLEAN,   1,      0,  1, true },
 	{"app.fsaasamples",      	&g_iFSSASamples,			cfgPARAM_SINT,		1,		0,	0, false	},
 	{"app.fsaahighquality",		&g_bFSSAHighQuality,        cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.soundhighquality",    &g_bSoundHighQuality,       cfgPARAM_BOOLEAN,	1,		0,	1, false	},

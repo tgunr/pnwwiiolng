@@ -32,7 +32,6 @@
 #include "strt/strtChatTypes.h"
 #include "strt/strtCPFlags.h"
 #include "teul/teulPacket.h"
-#include "teul/teulClosingEnums.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 
@@ -651,7 +650,7 @@ BrigadeController::requestNominate(Player* sponsor, const ChatHandle officerHand
 		throw BCERR_CANT_NOMINATE_HC;
 	if ( nominee->permissions(CAN_OIC) == false )
 		throw BCERR_NOMINEE_CANT_OIC;
-	if ( !unit().isBrigade() )
+	if (!unit().isBrigade() && !unit().isGarrison())
 		throw BCERR_WRONG_BRIGADE;
 	_requirePlayerInBrigade(nominee, unit());
 	if ( nominee->leadingBrigade() )
@@ -1242,7 +1241,7 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d no persona, disconnecting", teulIndex);
-		teulClose(teulIndex, Teul::Closing::BCRNoPersona);
+		teulClose(teulIndex);
 		return;
 	}
 

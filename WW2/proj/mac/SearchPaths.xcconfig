@@ -11,14 +11,10 @@
 // Warnings.xcconfig for information on why it looks like this.
 
 // Header search paths matching both #include <> and #include ""
-HEADER_SERACH_PATHS_19      = $(HEADER_SEARCH_PATHS_20) "$(DERIVED_SOURCES_DIR)"
-HEADER_SEARCH_PATHS_18      = $(HEADER_SEARCH_PATHS_19) "$(SRCROOT)/../Libraries/RakNet/DependentExtensions/cat/include"
-HEADER_SEARCH_PATHS_17      = $(HEADER_SEARCH_PATHS_18) "$(SRCROOT)/../Libraries/RakNet/Source"
-HEADER_SEARCH_PATHS_16      = $(HEADER_SEARCH_PATHS_17) "$(SRCROOT)/../Libraries/imap/include"
-HEADER_SEARCH_PATHS_15      = $(HEADER_SEARCH_PATHS_16) "$(SRCROOT)/../Libraries/libb64/libb64-1.2/include"
-HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/libevent/OSX-Code"
-HEADER_SEARCH_PATHS_13      = $(HEADER_SEARCH_PATHS_14) "$(SRCROOT)/../Libraries/libevent/include"
-HEADER_SEARCH_PATHS_12      = $(HEADER_SEARCH_PATHS_13) "$(SRCROOT)/../Libraries/libevent"
+HEADER_SERACH_PATHS_15      = $(HEADER_SEARCH_PATHS_16) "$(DERIVED_SOURCES_DIR)"
+HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/RakNet/DependentExtensions/cat/include"
+HEADER_SEARCH_PATHS_13      = $(HEADER_SEARCH_PATHS_14) "$(SRCROOT)/../Libraries/RakNet/Source"
+HEADER_SEARCH_PATHS_12      = $(HEADER_SEARCH_PATHS_13) "$(SRCROOT)/../Libraries/imap/include"
 HEADER_SEARCH_PATHS_11      = $(HEADER_SEARCH_PATHS_12) "$(SRCROOT)/../Libraries/tolua++/include"
 HEADER_SEARCH_PATHS_10      = $(HEADER_SEARCH_PATHS_11) "$(SRCROOT)/../Libraries/ft2/include/freetype"
 HEADER_SEARCH_PATHS_09      = $(HEADER_SEARCH_PATHS_10) "$(SRCROOT)/../Libraries/ftgl/src"

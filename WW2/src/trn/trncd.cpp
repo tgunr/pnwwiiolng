@@ -4695,7 +4695,7 @@ SINT32 trncdCollideSpeedTree(OBJECT* o,
     }
     else
     {
-        if(!o->treeID)
+        if(!o->treePtr)
         {
             return -1;
         }
@@ -4704,7 +4704,7 @@ SINT32 trncdCollideSpeedTree(OBJECT* o,
         // any projectile with high velocity will fail the bounding box test, since the
         // start and end points may lie outside the box, even though it passes through it.
         // So just pass it to the cylinder collide for an accurate collision test.
-        if(sptCollideWithTree(o->treeID, p1, p2, &collidept, &time))
+        if(sptCollideWithTree(o->treePtr, p1, p2, &collidept, &time))
         {
             collided = true;
         }

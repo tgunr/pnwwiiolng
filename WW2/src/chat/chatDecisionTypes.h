@@ -14,7 +14,7 @@
 #include <vector>
 #include "strt/strtChatTypes.h"
 #include "chat/chatData.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "teul/teulTime.h"
 
 //// ---> Typedefs

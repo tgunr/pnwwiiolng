@@ -52,7 +52,6 @@
 
 #include "str/stringLib.h"
 #include "sdm/sdmLoad.h"
-#include "dbse/dbseHandle.h"
 #include "sdm/sdmParse.h"
 #include "include/mydbQuery.h"
 

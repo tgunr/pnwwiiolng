@@ -459,7 +459,7 @@ static bool ReadGroup()
 		if(s_conversionFile.length() <= 7)
 		{
 			bTopmostObject = false;
-			if (stricmp(group->id, s_conversionFile.c_str()))
+			if (strcasecmp(group->id, s_conversionFile.c_str()))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
 							group->id, s_conversionFile.c_str());
@@ -2050,7 +2050,7 @@ static bool ReadLongID()
 			// Make sure we are staring at the same address for topmost
 			if (lastobject == groups[0])
 			{
-				if (stricmp(lastobject->name, s_conversionFile.c_str()))
+				if (strcasecmp(lastobject->name, s_conversionFile.c_str()))
 				{
 					FLTItemFileError("ReadLongID", lastobject->name, s_conversionFile.c_str());
 					return false;

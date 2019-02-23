@@ -150,6 +150,7 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 	, m_fallbackCP(strtGetCPByOID(withFallbackCpOID))
 	, m_lastMoved(withLastMove)
 	, m_nextMove(withNextMove)
+	, m_lastCaptureTime(0)
 	, m_next(nullptr)
 	, m_lastMovedBy(withLastMovedBy)
 	, m_nextEvent(nullptr)
@@ -262,6 +263,12 @@ StratHCUnit::save() const
 	// Safely derefence the current and fallback CP destinations into OIDs.
 	UINT32 homeOID = (homeCP() ? homeCP()->uOID : 0);
 	UINT32 fallbackOID = (fallbackCP() ? fallbackCP()->uOID : 0);
+	char templateName[MAX_HANDLE_SIZE];
+	templateName[0] = '\0';
+	if (toeTemplateHeader() != nullptr && toeTemplateHeader()->handle() != 0)
+	{
+		chatGetCallsign(templateName, toeTemplateHeader()->handle());
+	}
 
 	DBThread::Do(DBThread::Default
 		, "UPDATE strat_hc_units"
@@ -272,13 +279,15 @@ StratHCUnit::save() const
 				", last_moved = %u"
 				", last_moved_by = '%s'"
 		        ", country_id = %u"
+		        ", toe_template = '%s'"
 			" WHERE unit_id = %u"
 				, homeOID
 				, fallbackOID
 				, nextMove()
 				, lastMoved()
 				, ((0LL != lastMovedBy()) ? Chat::Name(lastMovedBy()).c_str() : "SYSTEM")
-		        , country()
+				, country()
+				, templateName
 				, unitID()
 				);
 }
@@ -1338,19 +1347,30 @@ StratHCUnit::reset()
 ////////////////////////////////////////////////////////////////////////
 // Restarts a Garrisons supply and initiates the trickle timer.
 
-void
-StratHCUnit::restartGarrisonSupply(bool manualChange)
+void StratHCUnit::restartGarrisonSupply(bool manualChange)
 {
-	if(!manualChange){
+	if (!manualChange)
+	{
 		dbugLog(_FLN, "Garrison not changed manually");
 		restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);
 	}
 	else
 	{
-		dbugLog(_FLN, "Garrison changed manually");
-		restartSupply(host_config.supply.mGarrisonInactiveTime_m * 60, host_config.supply.mGarrisonTrickleTime_m * 60, true);
+		UINT32 currentTime_s = teulTime();
+		UINT32 startTime_s = homeCP()->getLastCaptureTime();
+		UINT32 expireTime_s = startTime_s + host_config.supply.noPenaltySwitchPeriod_m * 60;
+		if (startTime_s != 0 && (wwiiSideCount(wwiiSide(country())) > 1) && (currentTime_s <= expireTime_s))
+		{
+			dbugLog(_FLN, "Garrison changed manually within no-penalty period");
+			restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);
+		}
+		else
+		{
+			dbugLog(_FLN, "Garrison changed manually");
+			restartSupply(host_config.supply.mGarrisonInactiveTime_m * 60, host_config.supply.mGarrisonTrickleTime_m * 60, true);
+		}
 	}
-}
+}  
 
 //////////////////////////////////////////////////////////////////////
 // Force the HCUnit to process the next supply ticket

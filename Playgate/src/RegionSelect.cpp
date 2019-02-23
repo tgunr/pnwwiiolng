@@ -195,7 +195,10 @@ static bool _lookupAuthHost()
 	if ( auth_override )
 		dbugLog(_FLI, "'%s' was passed in as a command-line argument. Forcing its use as the authhost.", g_authHostName) ;
 
-	if ( auth_override || !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() ) {
+	UINT32 addr = 0;
+
+	g_authHosts.clear();
+	if ( auth_override || !(addr = Teul::GetSingleIP(g_region.authSuffix().c_str())) ) {
 		if (!auth_override) {
 #ifndef BETA_RELEASE
 			strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
@@ -203,11 +206,12 @@ static bool _lookupAuthHost()
 			strprintf(g_authHostName, "authdev%s", g_region.authSuffix().c_str());
 #endif
 		}
-		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() ) {
+		if ( !(addr = Teul::GetSingleIP(g_authHostName)) ) {
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
 		}
 	}
+	g_authHosts.push_back( addr );
 	// Copy the list to a permanent home
 	dbugLog(_FLI, "lookup(%s) gave", g_authHostName);
 	for ( auto ip : g_authHosts ) {

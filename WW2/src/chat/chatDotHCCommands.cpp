@@ -12,7 +12,6 @@
 
 #include "chat/chatBroadcast.h"
 #include "chat/chatData.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
 #include "chat/chatDotCommand.h"

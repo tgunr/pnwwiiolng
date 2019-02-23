@@ -4,9 +4,9 @@ project(RakNetLibStatic)
 FILE(GLOB ALL_HEADER_SRCS ${RakNet_SOURCE_DIR}/Source/*.h)
 FILE(GLOB ALL_CPP_SRCS ${RakNet_SOURCE_DIR}/Source/*.cpp)
 
-include_directories( ${RAKNET_INTERNAL_INCLUDE_DIRS} ) 
+include_directories( ${RAKNET_INTERNAL_INCLUDE_DIRS} )
 
-add_library(RakNetLibStatic STATIC ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS} readme.txt)
+add_library(RakNetLibStatic STATIC ${ALL_CPP_SRCS} ${ALL_HEADER_SRCS})
 
 #IF(WIN32 AND NOT UNIX)
 #	SET( CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W0 ")
@@ -26,7 +26,7 @@ IF(WIN32 AND NOT UNIX)
 		ELSE()
 			set_target_properties(RakNetLibStatic PROPERTIES STATIC_LIBRARY_FLAGS "/NODEFAULTLIB:&quot;LIBCD.lib LIBCMTD.lib MSVCRT.lib&quot;" )
 		ENDIF()
-				
+
 	ENDIF(NOT ${CMAKE_GENERATOR} STREQUAL "MSYS Makefiles")
 
 ELSE(WIN32 AND NOT UNIX)

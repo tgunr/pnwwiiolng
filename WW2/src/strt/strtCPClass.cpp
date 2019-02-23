@@ -685,7 +685,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 
 		}
 
-		cp->changeOwnershipNoCapture(cp->controllingCountry, true, true);
+		cp->changeOwnershipNoCapture(cp->controllingCountry, false, true);
 
 
 		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
@@ -709,11 +709,6 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 		_checkUnit(unit->parent(), cp);
 	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	
-	// Garrisons don't change deployment so we don't need to check them.
-	if (unit->isGarrison()) {
-		return;
-	}
-	
 	if ( unit->canDeployTo(cp) )
 		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
@@ -734,6 +729,11 @@ CPStruct::checkHCUnits()
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
 	dbugLog(_FLI, "End");
+}
+
+void CPStruct::setLastCaptureTime(UINT32 time) 
+{
+	m_lastCaptureTime = time;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1685,23 +1685,38 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualCha
 			if (unit->isGarrison())
 			{
 				std::string toeTemplateHeaderName = unit->getToeTemplateHeaderName();
-				unit->m_countryID = countryID;
+				BRANCH_ENUM unitBranch = unit->branch();
+
+				// HACK! I really don't like doing this so we need to (long term) include this as part of
+				// a country handling overall which generalizes operations based on rules.  For example
+				// in this case we'd want a general way of identifying fallback countries from a provided
+				// country in a way that can be configured.  We should also be generally checking for missing
+				// brigade definitions as opposed to simply assuming its AIR & SEA.  This is a very quick way
+				// of achieving the goal so it stands for 1.36
+				if (countryID == WWII_USA && (unitBranch == BRANCH_AIR || unitBranch == BRANCH_SEA))
+				{
+					unit->m_countryID = WWII_ENGLAND;
+				} 
+				else
+				{
+					unit->m_countryID = countryID;
+				}
 
 				std::string countryPrefix;
 
-				if (countryID == WWII_ENGLAND)
+				if (unit->m_countryID == WWII_ENGLAND)
 				{
 					countryPrefix = "uk";
 				}
-				else if (countryID == WWII_USA)
+				else if (unit->m_countryID == WWII_USA)
 				{
 					countryPrefix = "us";
 				}
-				else if (countryID == WWII_FRANCE)
+				else if (unit->m_countryID == WWII_FRANCE)
 				{
 					countryPrefix = "fr";
 				}
-				else if (countryID == WWII_GERMANY)
+				else if (unit->m_countryID == WWII_GERMANY)
 				{
 					countryPrefix = "de";
 				}

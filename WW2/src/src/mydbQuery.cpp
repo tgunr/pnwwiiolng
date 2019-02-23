@@ -18,7 +18,7 @@
 #include <mysql.h>
 
 #include "errmsg.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "weap/weapSpec.h"
 
 using namespace std;
@@ -96,18 +96,6 @@ DBQuery::_finish(bool thorough)
 		m_currentRow = m_nextRow = 0;
 	}
 }
-
-#ifdef DB_USE_SQLITE
-//////////////////////////////////////////////////////////////////////
-// Throw an error for an sqlite3 connection
-
-static void
-_throwSqlite3Error(DB::handle_t* handle)
-{
-	std::string error = sqlite3_errmsg(m_conn);
-	throw std::logic_error(error);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Check for a result set and make a smart decision as to whether

@@ -245,6 +245,7 @@ WWII_CONFIG_MAP configMap[] =
 ,   { "supply.garrisonInactiveTimeM",TYPE_INT,	&host_config.supply.garrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes)" }
 ,   { "supply.mGarrisonTrickleTimeM",TYPE_INT,	&host_config.supply.mGarrisonTrickleTime_m,		0,		"30",	"Time from start to completion of trickle for a Garrison (minutes) after the country was manually changed" }
 ,   { "supply.mGarrisonInactiveTimeM",TYPE_INT,	&host_config.supply.mGarrisonInactiveTime_m,		0,		"15",	"Time it takes before a Garrison becomes active (minutes) after the country was manually changed" }
+,   { "supply.noPenaltySwitchPeriodM",TYPE_INT,	&host_config.supply.noPenaltySwitchPeriod_m,		0,		"5",	"Time (minutes) that HC has to switch garrison ownership without a trickle penalty" }
 
 ,	{ "throttle.enabled",			TYPE_BOOL,	&host_config.throttle.enabled,			0,		"y",	"Enable depot throttling" }
 ,	{ "throttle.percentage",		TYPE_BYTE,	&host_config.throttle.percentage,		100,	"5",	"Percentage equipment to expose at throttles" }

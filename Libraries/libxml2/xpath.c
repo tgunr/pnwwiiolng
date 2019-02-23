@@ -17,6 +17,7 @@
 #define IN_LIBXML
 #include "libxml.h"
 
+#include <inttypes.h>
 #include <string.h>
 
 #ifdef HAVE_SYS_TYPES_H

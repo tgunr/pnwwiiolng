@@ -1,0 +1,12 @@
+Scripts should be run in this order:
+
+1: insert_strat_GarrisonType
+2: insert_toe_GarrisonHeaders (if Game Management agrees to automate this process)
+3: insert_toe_GarrisonVehicles (if Game Management agrees to automate this process)
+4: insert_toe_GarrisonRDP (if Game Management agrees to automate this process)
+5: insert_strat_GarrisonUnits (must have accompanying toe headers either made by scripts or by Game Management first)
+
+insert_strat_GarrisonUnits can be run to refresh all Garrisons. This will be useful as towns are added/changed/removed.
+
+All scripts have been written such that they can be run multiple times without duplicate inserts or other issues.
+

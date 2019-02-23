@@ -31,7 +31,6 @@
 #include "mm/mmSpawn.h"
 #include "mm/mmSpawnTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulServer.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"
 #include "wwii/wwiiCallbacks.h"

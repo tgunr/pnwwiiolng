@@ -532,55 +532,61 @@ MissionList::receive(SINT32 teulIndex) {
 		UINT32 highestCount = 0;
 
 		auto add_missions =
-		[&] (WWII_COUNTRY country, BRANCH_ENUM branch) {
-			for ( BRIGADES::const_iterator brig = g_brigades[country][branch].begin();
-			      brig != g_brigades[(size_t)country][(size_t)branch].end() ; ++brig ) {
-				for ( BrigadeMissions::const_iterator miss = (*brig)->m_missionList.begin();
-				      miss != (*brig)->m_missionList.end() ; ++miss ) {
-					const Mission* mission = *miss;
+		[&] (BRANCH_ENUM branch) {
 
-					// If we can't spawn, don't bother.
-					if ( ! mission->accessible(player) && mission->accessibility(player) != MC_BRIGADE )
+			// NEW: iterate through all countries since since garrisons can now change allegiences
+			for ( size_t countryCheck = 0 ; countryCheck < MAX_COUNTRIES ; ++countryCheck ) {
+				BRIGADES nextList = g_brigades[countryCheck][(size_t)branch];
+
+				for ( BRIGADES::const_iterator brig = nextList.begin(); brig != nextList.end() ; ++brig ) {
+
+					// NEW: make sure the brigade's country really is of the requesting side first
+					if ( wwiiSide((*brig)->country()) != player->side() )
 						continue;
-					if ( mission->missionType() == RECON || mission->missionType() == RESUPPLY )
-						continue;
 
-					float value = static_cast<float>(mission->numTakers()) ;
-					// TODO: Move to script to be configured by producers.
-					{
-						const CPStruct* target = mission->targetCP();
+					for ( BrigadeMissions::const_iterator miss = (*brig)->m_missionList.begin();
+					      miss != (*brig)->m_missionList.end() ; ++miss ) {
+						const Mission* mission = *miss;
 
-						// NOTE: May make FB attacks work wrong? They're probably poor
-						// choices for new players anyway...
-						if ( mission->side() != target->ControllingSide() ) {
-							// Attacking mission.
-							if ( mission->isMobileSpawnAvailable() )
-								value *= 2.0f;
-						} else {
-							value *= 1.25f; // Slight preference for defense.
+						// If we can't spawn, don't bother.
+						if ( ! mission->accessible(player) && mission->accessibility(player) != MC_BRIGADE )
+							continue;
+						if ( mission->missionType() == RECON || mission->missionType() == RESUPPLY )
+							continue;
 
-							if ( target->isContested() )
-								value *= 2.5f;
+						float value = static_cast<float>(mission->numTakers()) ;
+						// TODO: Move to script to be configured by producers.
+						{
+							const CPStruct* target = mission->targetCP();
+
+							// NOTE: May make FB attacks work wrong? They're probably poor
+							// choices for new players anyway...
+							if ( mission->side() != target->ControllingSide() ) {
+								// Attacking mission.
+								if ( mission->isMobileSpawnAvailable() )
+									value *= 2.0f;
+							} else {
+								value *= 1.25f; // Slight preference for defense.
+
+								if ( target->isContested() )
+									value *= 2.5f;
+							}
+
+							if ( ! target->hasHeavyInfantryEWS() )
+								value *= 0.25f;
+
+							// TODO: Big boost for missions with squadmates.
 						}
 
-						if ( ! target->hasHeavyInfantryEWS() )
-							value *= 0.25f;
-
-						// TODO: Big boost for missions with squadmates.
+						missions.insert(std::make_pair((int)value, mission)) ;
+						if ( mission->numTakers() > highestCount )
+							highestCount = mission->numTakers();
 					}
-
-					missions.insert(std::make_pair((int)value, mission)) ;
-					if ( mission->numTakers() > highestCount )
-						highestCount = mission->numTakers();
 				}
 			}
 		} ;
 
-		for ( int country = 0 ; country < MAX_COUNTRIES ; ++country ) {
-			if ( wwiiSide(country) != player->side() )
-				continue;
-			add_missions((WWII_COUNTRY)country, player->branch());
-		}
+		add_missions(player->branch());
 
 		//------
 

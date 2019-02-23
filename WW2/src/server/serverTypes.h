@@ -7,7 +7,6 @@
 //
 // Originating Programmer:  Marty "Vandal" Poulin
 
-#include "teul/teulServer.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
 #ifndef SERVER_HASH_SIZE

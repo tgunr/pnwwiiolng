@@ -29,5 +29,3 @@ size_t serverGetPlayerCount(const UINT32 serverType_);
 // Find out how many players the cluster can support, adjusted
 // by different host types and configuration parameters.
 size_t serverGetClusterCapacity();
-
-void serverOpenLuaClientInterface();	// for strat host

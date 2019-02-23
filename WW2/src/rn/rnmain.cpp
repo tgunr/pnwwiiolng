@@ -33,7 +33,6 @@
 #include "trn/trntod.h"
 #include "draw/draw2d.h"
 #include "sn/sndsSoundControl.h"
-#include "dbug/dbugExtErrors.h"
 #include "pers/pershud.h"
 #include "ml/mlCompon.h"
 #include "locl/loclLang.h"
@@ -352,9 +351,6 @@ void rnconnectToServer(void) {
 		teulGetHost(gClientV, &appversion);
 	else
 		teulGetHost(PN_product_version_string, &appversion);
-
-	if ( teulMaskNetworkAddress(0) == 0 )
-		teulSetNetworkMask(GameHost);
 
 	if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
 		throw ClientNetError("connect.fail");

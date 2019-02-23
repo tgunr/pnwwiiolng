@@ -15,22 +15,6 @@
 #include "trn/trnvars.h"
 #include "ob/obpool.h"
 #include "math/math3d.h"
-/*
-#include "math/mathvect.h"
-#include "math/math3d.h"
-#include "trn/trnmain.h"
-#include "trn/trnvars.h"
-#include "physics/physicsMain.h"
-#include "gr2/gr2Physics.h"
-#include "fp/fpTPSPhysics.h"
-#include "sdm/sdm.h"
-#include "physics/odeConvert.h"
-#include "ui/uiChat.h"
-#include "Random.h"
-
-#include "trn/trnwtr.h"
-#include "ml/mlutility.h"
-*/
 
 static dContact _contact; // utility contact for creating new contact joints
 static bool _doDebug = false;
@@ -41,89 +25,6 @@ static bool _doDebug = false;
 #ifdef DEBUG_ODE_VERTEX_SHEARING
 static unsigned int _totalVsize = 0;
 #endif //DEBUG_ODE_VERTEX_SHEARING
-
-/*
-static void _debugContact(Vec3d pos, Vec3d normal, UINT32 color = 0, const char* altName = nullptr)
-{
-	// physics object line
-	FLOAT64VECTOR v1, v2, temp;
-	Vec3d pv1, pv2;
-
-	normal.normalize(); // make sure
-	normal *= .3f;
-
-	pv1 = pos;
-	pv2 = pos + normal;
-
-	pv1 = physicsPhysicalToGame(pv1);
-	pv2 = physicsPhysicalToGame(pv2);
-
-	pv1.get(v1);
-	v1.z = -v1.z;
-
-	pv2.get(v2);
-	v2.z = -v2.z;
-
-	static int count = 0;
-
-	char name[32];
-
-	if(altName)
-	{
-		if(!color)
-			color = (normal.z() >= 0) ? colorGREENALPHA : colorREDALPHA;
-
-		draw3dSetWorldDebugLine(&v1, &v2, altName, color);
-	}
-	else
-	{
-		snprintf(name, 31, "contact%d", count++);
-		if(count > 500) count = 0;
-
-		if(!color)
-			color = (normal.z() >= 0) ? colorGREENALPHA : colorREDALPHA;
-
-		draw3dSetWorldDebugLine(&v1, &v2, name, color);
-
-		// now we draw the base
-		temp = v1;
-
-		v2 = v1;
-
-		v1.x -= .05f;
-		v2.x += .05f;
-
-		snprintf(name, 31, "contact%d", count++);
-		if(count > 500) count = 0;
-
-		draw3dSetWorldDebugLine(&v1, &v2, name, color);
-
-		v1 = temp;
-		v2 = v1;
-
-		v1.y -= .05f;
-		v2.y += .05f;
-
-		snprintf(name, 31, "contact%d", count++);
-		if(count > 500) count = 0;
-
-		draw3dSetWorldDebugLine(&v1, &v2, name, color);
-	}
-}
-
-static void _debugContact(const colliderQuery::Collision& contact, UINT32 color = 0)
-{
-	_debugContact(contact.pos, contact.normal, color);
-}
-
-static void _debugContact(dContact& contact, UINT32 color = 0)
-{
-	Vec3d pos		= Vec3Ode(contact.geom.pos);
-	Vec3d normal	= Vec3Ode(contact.geom.normal);
-
-	_debugContact(pos, normal, color);
-}
-*/
 
 static void _initContact(const colliderQuery::Collision& hit, double scfm = .0008f, double serp = .2f, double bounce = .2f, double bvel = .1f)
 {
@@ -140,25 +41,6 @@ static void _initContact(const colliderQuery::Collision& hit, double scfm = .000
 	_contact.surface.bounce = bounce;
 	_contact.surface.bounce_vel = bvel;
 }
-
-/*
-static void odeCollisionCallback (void* cookie, dGeomID o1, dGeomID o2)
-{
-	if(dGeomIsSpace(o1) || dGeomIsSpace(o2))
-	{
-		dSpaceCollide2 ((dGeomID)o1, (dGeomID)o2, cookie, odeCollisionCallback);
-		return;
-	}
-	dBodyID b1 = dGeomGetBody(o1);
-	dBodyID b2 = dGeomGetBody(o2);
-
-	if ((b1 && b2) || (!b1 && !b2)) return;
-
-	physicsBody* pbody = (physicsBody*)dBodyGetData(b1 ? b1 : b2);
-	if(pbody)
-		pbody->Collide(b1 ? o1 : o2, b1 ? o2 : o1);
-}
-*/
 
 void physicsModel::BeginStep()
 {
@@ -556,10 +438,6 @@ void physicsBody::Collide(dGeomID bodyGeom, dGeomID geom)
 			if(dDOT(vec, contact->geom.normal) > 0) continue;
 		}
 
-/*printf("(%lf %lf %lf) (%lf %lf %lf) %lf %x %x\n"
-	,contact->geom.normal[0],contact->geom.normal[1],contact->geom.normal[2]
-	,contact->geom.pos[0], contact->geom.pos[1],contact->geom.pos[2]
-	,contact->geom.depth, (int)contact->geom.g1, (int)contact->geom.g2);*/
 		if(handleContact(contact))
 			_contacts.push_back(*contact);
 	}
@@ -753,75 +631,6 @@ dGeomID physicsBody::rayCheck()
 	return nullptr;
 }
 
-/* old method
-void physicsBody::rayCheck2()
-{
-// do a ray collision to make sure we didn't go through
-// would be more efficient to do this in one go with all bodies, but we shouldn't have many at once
-	dVector3 curPos, dir;
-	dOPE(curPos,=,_body->getPosition());
-	dOP(dir,-,curPos,_prevPos);
-
-    // No direction results in an assert.
-    if(Vec3d(dir[0], dir[1], dir[2]).length2() <= 0.0f)
-    {
-        return;
-    }
-
-	dGeomID ray = dCreateRay(colliderDynamicSpace(),dLENGTH(dir));
-	dGeomRaySet (ray,_prevPos[0],_prevPos[1],_prevPos[2],dir[0],dir[1],dir[2]);
-	colliderSetBits(ray, 0, COLLIDER_MOVE_MASK);
-
-	const int MAX_CONTACTS = 16;
-	dContact contacts[MAX_CONTACTS];
-
-	dContact* hit=0;
-	double minlen2=100000;
-	int numc = dCollide (ray, (dGeomID)colliderTerrainSpace(), MAX_CONTACTS, &contacts[0].geom, sizeof(dContact));
-	numc += dCollide (ray, (dGeomID)colliderVehicleSpace(), MAX_CONTACTS-numc, &contacts[numc].geom, sizeof(dContact));
-
-	for (int i = 0; i < numc; i++)
-	{ // find the closest hit
-		dContact* contact = &contacts[i];
-		dVector3 delta;
-		dOP(delta,-,contact->geom.pos,_prevPos);
-		double len2 = dLENGTHSQUARED(delta);
-		if(len2 < minlen2)
-		{
-			if(dDOT(delta, contact->geom.normal) > 0)
-			{ // weird edge case flip the normal so it's in the "right" direction
-				contact->geom.normal[0] = -contact->geom.normal[0];
-				contact->geom.normal[1] = -contact->geom.normal[1];
-				contact->geom.normal[2] = -contact->geom.normal[2];
-			}
-
-			minlen2 = len2;
-			hit = contact;
-		}
-	}
-
-	if(hit && handleContact(hit))
-	{
-	// we have a ray collision which probably means we just went through something
-	// so we'll force it back and attach a joint
-		_body->setPosition(_prevPos[0],_prevPos[1],_prevPos[2]);
-
-		hit->surface.mode = dContactSoftERP | dContactSoftCFM | dContactBounce;// | dContactApprox1;
-		hit->surface.mu = dInfinity;
-		hit->surface.soft_cfm = .0008f;
-		hit->surface.soft_erp = .2f;
-		hit->surface.bounce = .25f; //getRestitution();
-		hit->surface.bounce_vel = 0.1;
-
-		dJointID c = dJointCreateContact (*_odeWorld, *_odeContactGroup, hit);
-		dJointAttach (c, _body->id(), 0);
-		_collided = true;
-	}
-
-	dGeomDestroy(ray);
-}
-*/
-
 void physicsBody::BeginStep()
 {
 	_contacts.clear();
@@ -861,9 +670,6 @@ void physicsBody::BeginStep()
 	// clear out old contact joints
 	if(collideJoints)
 		collideJoints->empty();
-
-	//if(_enhancedCollisionCheck)
-	//	preCheck();
 
 	// now find our collisions
 	if(collider && collider->findCollisions())
@@ -940,36 +746,6 @@ void physicsBody::EndStep()
 
 	_collided = 0;
 }
-
-/*
-void physicsBody::BeginStep()
-{
-	if(!IsEnabled())
-		return;
-
-	if(!_collided && _enhancedCollisionCheck)
-		rayCheck();
-
-	if(!_collided)
-	{ // make sure these braces stay here because of the macro
-	 	dOPE(_lastFreePos,=,_body->getPosition());
-	}
-
-	_collided = false;
-
-	applyForces();
-
-	dOPE(_prevPos,=,_body->getPosition());
-}
-
-void physicsBody::EndStep()
-{
-	if(!IsEnabled())
-		return;
-
-	damp();
-}
-*/
 
 int physicsBody::InitCollisions()
 {
@@ -1090,15 +866,6 @@ void physicsBody::makeMeshColliderFromObject(OBJECT* Object, FLOAT64VECTOR* offs
 
 	recurseAndMakeMeshCollider(Object);
 	_geom->attachToBody(_body);
-
-
-	// 180 around the z
-	//Matrixf zAxis = Matrixf::rotate(PI, 0, 0, 1);
-	//dMatrix3 rotate;
-
-	//MatrixTodMatrix(zAxis, rotate);
-	//dMatrix3 invert={1,0,0,0, 0,1,0,0, 0,0,-1,0};
-	//_geom->offsetRotation(invert);
 
 	if(offset)
 		_geom->offsetPosition(offset->x, offset->y, offset->z);
@@ -1780,156 +1547,3 @@ int physicsShearedCollider::create(OBJECT* o, piMATRIX* transform)
 
 	return -1;
 }
-
-/*
-int physicsCollider::createMeshFromObject(OBJECT* Object, bool addTransform)
-{
-	//if(Object->numtris < 4) return -1; // <-- this was causing some simple mesh colliders not to be created
-	if(!Object->numtris) return -1;
-
-// we use are own hacked up version of ode that uses short and left handed indices
-// so we don't have to do all this stuff
-	// negative z (sigh)
-*/
-/*
-	dTriMeshDataID mesh = dGeomTriMeshDataCreate();
-
-	float* verts = _vertices = new float[3*Object->numverts];
-	piVectorConstPtr pverts = Object->RenderPositions();
-
-	for(int i = 0; i < Object->numverts; i++, ++pverts)
-	{
-		*verts++ = pverts->x;
-		*verts++ = pverts->y;
-		*verts++ =-pverts->z;
-	}
-
-	// have to change to int indices (sigh)
-	int* indices = _indices = new int[3*Object->numtris];
-	piINDICES* ptris = Object->ptris;
-
-	for(int i = 0; i < Object->numtris; i++, ptris++)
-	{
-		*indices++ = ptris->v3;
-		*indices++ = ptris->v2;
-		*indices++ = ptris->v1;
-	}
-	dGeomTriMeshDataBuildSingle(mesh, _vertices, 3*sizeof(float), Object->numverts
-									, _indices,  3*Object->numtris, 3*sizeof(int));
-	dGeomTriMeshDataPreprocess(mesh);
-*/
-
-	/*
-	if(Object->treeID)
-	{
-		return -1;
-	}
-	*/
-
-	/*
-	static std::map<std::string, bool> badObjects;
-
-	piVectorPtr p = Object->StaticNormals();
-
-	for(int i = 0; i < Object->numverts; ++i)
-	{
-		float result = mathVectDotProduct(p, p);
-
-		if(result < .000001f)
-		{
-			std::string name = Object->modelInstance->GetModelName();
-
-			if(badObjects.find(name) == badObjects.end())
-			{
-				badObjects[name] = true;
-			}
-		}
-
-		++p;
-	}
-	*/
-/*
-	dTriMeshDataID mesh = dGeomTriMeshDataCreate();
-	bool isSheared = (Object->modelInstance && Object->modelInstance->IsShearPlacement());
-
-	if(isSheared)
-	{
-		piMATRIX mat = Object->mat;
-		float* verts = _vertices = new float[3*Object->numverts];
-		piVectorConstPtr pverts = Object->RenderPositions();
-
-		// helper vars
-		piVECTOR temp;
-
-		// reset position
-		mat._41 = mat._42 = mat._43 = 0;
-
-		for(int i = 0; i < Object->numverts; i++, ++pverts)
-		{
-			//temp.x = pverts->x;
-			//temp.y = pverts->y;
-			//temp.z = pverts->z;
-
-			math3dVectorMultiply(&temp, pverts.ptr, &mat);
-
-			*verts++ = temp.x;
-			*verts++ = temp.y;
-			*verts++ = temp.z;
-		}
-
-		dGeomTriMeshDataBuildSingle(mesh, _vertices, 3*sizeof(float), Object->numverts
-										, Object->ptris,  3*Object->numtris, 3*sizeof(short));
-
-		//dGeomTriMeshDataPreprocess(mesh);
-
-#ifdef DEBUG_ODE_VERTEX_SHEARING
-		vsize = (3 * Object->numverts * sizeof(float));
-
-		_totalVsize += vsize;
-#endif // DEBUG_ODE_VERTEX_SHEARING
-	}
-	else
-	{
-		dGeomTriMeshDataBuildSingle(mesh, Object->RenderPositions().ptr, sizeof(piUNIFIED_VERTEX), Object->numverts
-				, Object->ptris,  3*Object->numtris, 3*sizeof(short));
-
-	}
-
-	dGeomID meshGeom = dCreateTriMesh(addTransform ? 0 : _space, mesh,0,0,0);
-	dGeomID geom = meshGeom;
-
-	dGeomSetData(meshGeom, Object);
-
-	if(addTransform)
-	{
-		geom = dCreateGeomTransform(_space);
-
-		dGeomSetData(geom, Object);
-		dGeomTransformSetGeom(geom, meshGeom);
-		dGeomTransformSetCleanup(geom, 1);
-		dGeomTransformSetInfo(geom, 1); // collisions return the transform geom
-
-		_geom.push_back(geomMesh(geom, mesh));
-
-		if(isSheared)
-		{
-			piMATRIX mat = IdentityMatrix;
-			mat._41 = Object->mat._41;
-			mat._42 = Object->mat._42;
-			mat._43 = Object->mat._43;
-			updateTransform(mat);
-		}
-		else
-			updateTransform(Object->mat);
-	}
-	else
-	{
-		_geom.push_back(geomMesh(meshGeom,mesh));
-	}
-
-	// set up bits
-	colliderSetBits(geom, _categoryMask, _collideMask);
-
-	return _geom.size() - 1;
-}
-*/

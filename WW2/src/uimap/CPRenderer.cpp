@@ -589,7 +589,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
 		phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
 
-		if(_altuniticon)
+		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
+		if(_altuniticon && ((cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -618,7 +619,15 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		glTranslatef(ugx, ugy, 0.0f);
 
 		unsigned int count = _cp.GetUnitCount();
+		
+		// If the town is not fronline, backline or reserve don't show a Dot for the hidden Garrison that is there
+		if(!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+		{
+			count--;
+		}
+
 		unsigned int limit = std::min(5U, count);
+
 		for(unsigned int s = 0; s < limit; ++s)
 		{
 //			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
@@ -1109,7 +1118,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 			std::wstring tip;
 
 			int objective		= 0;
-			int cpflags			= _cp.StratFlags(true);
+			unsigned int cpflags	= _cp.StratFlags(true);
 			int side			= _renderer->client ? (_renderer->client->PersonaSelected().m_countryID == 4) ? 2:1 : 0;
 			UINT32 myBrigadeID	= _renderer->client ? _renderer->client->BrigadeSelected().m_detail.brigadeID() : 0;
 
@@ -1214,6 +1223,11 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 						HCUnit* division = (unit->isBrigade()) ? unit->parent(): unit;
 						display = false;
 						
+						if (unit->isGarrison() &&
+							(cpflags & CP_STAT_ENEMY_LINKED) &&
+							(unit->branch() == BRANCH_AIR))
+							continue;
+						
 						// Check whether this is a reserve town with no units in it or not.
 						if (unit->isBrigade() || unit->isDivision() ||
 							(unit->isGarrison() && (cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED |
@@ -1300,18 +1314,21 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				tip += _renderer->tooltip("widgets.map.tooltip.frontline");
 				tip += L"\n";
 			}
+			else
 			if (cpflags & CP_STAT_FRONTLINE_LINKED)
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.backline");
 				tip += L"\n";
 			}
+			else
 			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.inactive");
 				tip += L"\n";
 			}
+			else
 			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";
