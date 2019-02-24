@@ -100,7 +100,12 @@ function becd.start_file( name, title )
 	-- Move all HCUnits off-map.
 	for unit in allStratHCUnits()
 	do
-		deploy( unit, "offmap", 0, false )
+		local hcunit = getHcUnit(unit)
+		
+		if not hcunit:isGarrison() then
+			deploy( unit, "offmap", 0, false )
+		end
+		
 		resetUnitSupply( unit )
 	end
 
@@ -185,11 +190,7 @@ end
 function becd.start_hcunit_cps()
 	if becd.errors then return end
 
-    print( "becd: starting hcunit_cps" )
-
-    for unit in allStratHCUnits() do
-      undeploy(unit)
-    end
+    print( "BECD: Starting HC Unit CPs" )
 end
 
 ----------------------------------------------------------------------
