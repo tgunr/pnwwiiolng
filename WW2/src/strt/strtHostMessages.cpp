@@ -15,7 +15,6 @@
 #include "chat/chatConstants.h"
 #include "chat/chatName.h"
 #include "chat/chatStratSupportMessages.h"
-#include "chat/chatCPCountryChange.h"
 #include "garrisons/garrisonCountryChangeRequest.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
@@ -1067,7 +1066,7 @@ void GarrisonCountryChangeReq::strtProcessRequest()
                 if (cp->changeOwnership(m_country, true, true))
                 {
 					// Now that the town has changed owner we need to change the Garrison to match.
-					chatCPCountryChangeProposal(m_cp, m_country, cp.)
+					cp->changeAllGarrisonCountries(m_country, true);
                     m_result = GCR_APPROVED;
                     dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %d to change CP %u to country %u ", m_clientsTeulIndex, m_cp.id, m_country);
                 }
