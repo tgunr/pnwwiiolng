@@ -1879,54 +1879,19 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 
 			if (unitloc.m_action != CHANGE_NOTHING)
 			{
-				switch (unitloc.m_action)
-				{
-				case CHANGE_COUNTRY:
-					//  Garrison Changes Country = HC Changes the Garrison unit Country.
-					//  Persona = Change.
-					clientErrorLog("Garrison Changed: Country.");
-					break;
-
-				case CHANGE_SIDE:
-					//  Garrison Changes Side = CP captured by the Enemy.
-					//  Persona = Probably NO Change.
-					clientErrorLog("Garrison Changed: Side.");
-					break;
-
-				case CHANGE_BRANCH:
-					//  Garrison Changes Branch = The Replacement Unit has a different Branch.
-					//  Persona = Change.
-					clientErrorLog("Garrison Changed: Branch.");
-					break;
-
-				case CHANGE_COUNTRY_BRANCH:
-					//  Garrison Changes Country and Branch = The Replacement Unit has a different Country AND Branch.
-					//  Persona = Change.
-					clientErrorLog("Garrison Changed: Country and Branch.");
-					break;
-				
-				default:
-					//  Should NOT end up here.
-					clientErrorLog("Garrison Changed Action Event: %d.", unitloc.m_action);
-					break;
-				}
-
-				if (1 == 1)
-				{
-					originalPersona = GetPersona();  //  Gets the Curent Persona
+				originalPersona = GetPersona();  //  Gets the Curent Persona
 													 
-					//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
-					HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
+				//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
+				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
 
-					clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
-					SelectBrigade(trainingUnit->unitID(), true, true);
+				clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
+				SelectBrigade(trainingUnit->unitID(), true, true);
 
-					SavePersona(SAVE_PERSONA);
-					SavePersona(SAVE_BRIGADE);
+				SavePersona(SAVE_PERSONA);
+				SavePersona(SAVE_BRIGADE);
 
-					// update the jsclient
-					jsclient->UpdatePersonas();
-				}
+				// update the jsclient
+				jsclient->UpdatePersonas();
 
 				replacementPersona = GetPersona(replacementUnit->m_countryID, replacementUnit->m_branchID);
 

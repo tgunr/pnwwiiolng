@@ -2366,8 +2366,6 @@ _sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country, 
 void
 GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 {
-	dbugLog(_FLN, ">>>>>>  GarrisonCountryChange::process: START. - mapPlayer");
-	
 	HCUnit* hcUnit = HCUnit::Lookup(unitID);
 	if (hcUnit != nullptr)
 	{
@@ -2470,7 +2468,5 @@ GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 	{
 		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
 	}
-
-	dbugLog(_FLN, ">>>>>>  GarrisonCountryChange::process: END - mapPlayer");
 }
 

@@ -374,12 +374,9 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 template<>
 SINT32 HC_UNIT_COUNTRY_CHANGES::receive(SINT32 teulIndex, HC_UNIT_COUNTRY_CHANGES& incoming)
 {
-	clientErrorLog(">>>>>>  Garrison Country Change - START - client");
-
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if (!client)
 	{
-		clientErrorLog(">>>>>>  Garrison Country Change - END-1 - client");
 		return 0;
 	}
 
@@ -390,7 +387,6 @@ SINT32 HC_UNIT_COUNTRY_CHANGES::receive(SINT32 teulIndex, HC_UNIT_COUNTRY_CHANGE
 
 	incoming.clear();
 
-	clientErrorLog(">>>>>>  Garrison Country Change - END-2 - client");
 	return 0;
 }
 

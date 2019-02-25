@@ -226,7 +226,7 @@ public:
 	//////////////////////////////////////////////////////////////////////
 	//  Moved from strtCaptureAction.cpp and revised
 	//  Return a list of Garrison Units in the Target CP (FULL_OBJ_ID).
-	void GetGarrisonUnits(std::list<HCUnit> &unitsList, FULL_OBJ_ID cpObjID);
+	void GetGarrisonUnits(std::vector<HCUnit> &unitsList, FULL_OBJ_ID cpObjID);
 
 	//////////////////////////////////////////////////////////////////////
 	// Get a Favoured Garrison Unit adjacent (linked) to the Target CP (FULL_OBJ_ID).

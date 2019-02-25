@@ -653,7 +653,7 @@ ActiveMission::populate(const Mission* const mission)
 //  Moved from strtCaptureAction.cpp and revised
 //  Return a list of Garrison Units in the Target CP (FULL_OBJ_ID).
 
-void BrigadeSelection::GetGarrisonUnits(std::list<HCUnit> &unitsList, FULL_OBJ_ID cpObjID)
+void BrigadeSelection::GetGarrisonUnits(std::vector<HCUnit> &unitsList, FULL_OBJ_ID cpObjID)
 {
 	unitsList.clear();
 
@@ -685,10 +685,12 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(UINT32 originalGarrisonID, WWII
 HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry)
 {
 	//  Returns:  a pointer to the Selected Replacement HCUnit  OR  nullptr.
-	
-	std::list<HCUnit> sameCountry; //  Land Garrisons - Same Country
-	std::list<HCUnit> sameSide;	//  Land Garrisons - Same Side
-	std::list<HCUnit> otherUnits;  //  Other Garrison Units present
+
+	HCUnit* retHCUnit = nullptr;
+
+	std::vector<UINT32> sameCountry;	//  Land Garrisons - Same Country
+	std::vector<UINT32> sameSide;		//  Land Garrisons - Same Side
+	std::vector<UINT32> otherUnits;		//  Other Garrison Units present
 
 	UINT32 selectedUnitID = 0;
 	bool unitSelected = false;
@@ -697,10 +699,6 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 	if (cp == nullptr) { return nullptr; }
 
 	//  TODO: Add Checking of the Origin CP (cpObjID) for other (different Branch) suitable units.
-
-	sameCountry.clear();
-	sameSide.clear();
-	otherUnits.clear();
 
 	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //  Iterate though linked towns list
 	{
@@ -713,8 +711,7 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 		//  Only look at Friendly Towns
 		if (otherCP->side == wwiiSide(originalCountry))
 		{
-			std::list<HCUnit> garrisonList;
-			garrisonList.clear();
+			std::vector<HCUnit> garrisonList;
 
 			//  Get the Garrison Units within the Linked Town
 			GetGarrisonUnits(garrisonList, otherCP->fullObjID);
@@ -728,22 +725,20 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 					if (it->country() == originalCountry)
 					{
 						//  Land Garrisons - Same Country
-						sameCountry.push_back(*it);
+						sameCountry.push_back(it->unitID());
 					}
 					else
 					{
 						//  Land Garrisons - Same Side
-						sameSide.push_back(*it);
+						sameSide.push_back(it->unitID());
 					}
 				}
 				else
 				{
 					//  Other Garrison Units present
-					otherUnits.push_back(*it);
+					otherUnits.push_back(it->unitID());
 				}
 			}
-
-			garrisonList.clear();
 		}
 	}
 
@@ -753,30 +748,16 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 	if (!sameCountry.empty()) //  First Choice Units:  Land Garrisons - Same Country
 	{
 		int pickMe = 0;
-		int count = 1;
 
-		if (sameCountry.size() < (size_t)2)
-		{
-			pickMe = 1;
-		}
-		else
+		if (sameCountry.size() > (size_t)1)
 		{
 			srand((unsigned int)time(NULL));
-			pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+			pickMe = (rand() % (unsigned int)sameCountry.size());
 		}
 
 		//  Pick One
-		for (std::list<HCUnit>::iterator it = sameCountry.begin(); it != sameCountry.end(); ++it)
-		{
-			if (count == pickMe)
-			{
-				selectedUnitID = it->unitID();
-				unitSelected = true;
-				break;
-			}
-
-			count++;
-		}
+		selectedUnitID = sameCountry[pickMe];
+		unitSelected = true;
 	}
 
 	if (unitSelected == false)
@@ -784,59 +765,31 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 		if (!sameSide.empty()) //  Second Choice Units: Land Garrisons - Same Side
 		{
 			int pickMe = 0;
-			int count = 1;
 
-			if (sameCountry.size() < (size_t)2)
-			{
-				pickMe = 1;
-			}
-			else
+			if (sameSide.size() > (size_t)1)
 			{
 				srand((unsigned int)time(NULL));
-				pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+				pickMe = (rand() % (unsigned int)sameSide.size());
 			}
 
 			//  Pick One
-			for (std::list<HCUnit>::iterator it = sameSide.begin(); it != sameSide.end(); ++it)
-			{
-				if (count == pickMe)
-				{
-					selectedUnitID = it->unitID();
-					unitSelected = true;
-					break;
-				}
-
-				count++;
-			}
+			selectedUnitID = sameSide[pickMe];
+			unitSelected = true;
 		}
 
 		if (!otherUnits.empty() && unitSelected == false) //  Third Choice Units: Other Garrison Units present
 		{
 			int pickMe = 0;
-			int count = 1;
 
-			if (sameCountry.size() < (size_t)2)
-			{
-				pickMe = 1;
-			}
-			else
+			if (otherUnits.size() > (size_t)1)
 			{
 				srand((unsigned int)time(NULL));
-				pickMe = (rand() % (unsigned int)sameCountry.size()) + 1;
+				pickMe = (rand() % (unsigned int)otherUnits.size());
 			}
 
 			//  Pick One
-			for (std::list<HCUnit>::iterator it = otherUnits.begin(); it != otherUnits.end(); ++it)
-			{
-				if (count == pickMe)
-				{
-					selectedUnitID = it->unitID();
-					unitSelected = true;
-					break;
-				}
-
-				count++;
-			}
+			selectedUnitID = otherUnits[pickMe];
+			unitSelected = true;
 		}
 	}
 
@@ -846,15 +799,16 @@ HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNT
 
 	if (unitSelected == true)
 	{
-		for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
-		{
-			if (it->second->unitID() == selectedUnitID)
-				return it->second;
-		}
+		//  Unit Selected
+		HCUNIT_INDEX::iterator it = hcUnits.find(selectedUnitID);
+		retHCUnit = (it != hcUnits.end()) ? it->second : nullptr;
+	}
+	else
+	{
+		//  No Unit Selected OR None Available
+		retHCUnit = nullptr;
 	}
 
-	//  No Unit Selected OR None Available
-
-	return nullptr;
+	return retHCUnit;
 }
 
