@@ -125,7 +125,7 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 
 		char versionNo[4 * 6 + 1];
 		teulGetAddress(login.appVersion, versionNo, sizeof(versionNo) - 1);
-		dbugLog(_FLI, "t:%d otp:%u app:%s crs:%s", a->teulIndex, login.OTP, versionNo, login.CopyRightString);
+		dbugLog(_FLI, "t:%d LOGIN: att:%u app:%s otp:%u crs:%s", a->teulIndex, login.attemptID, versionNo, login.OTP, login.CopyRightString);
 
 		UINT32 destAddress = a->endpoint->destAddress();
 
