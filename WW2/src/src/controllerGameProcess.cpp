@@ -24,7 +24,7 @@ static TeulTimeMS s_lastLaunch = 0ULL;
 // Delay between process launches
 static const TeulTimeMS s_launchInterval_ms = 2000;
 
-static std::list<GameProcess> s_processes;
+static std::vector<GameProcess> s_processes;
 
 static const char** s_savedEnvp = nullptr;
 static bool s_singleStartMode = false;
@@ -502,7 +502,9 @@ namespace GameProcessManager
 	bool Heartbeat(bool allowStarts)
 	{
 		// Remove all processes we no-longer need.
-		s_processes.remove_if([](const GameProcess& proc_) { return (proc_.ReadyForRemoval()); });
+        s_processes.erase(
+            std::remove_if(s_processes.begin(), s_processes.end(), [](const GameProcess& proc_) { return (proc_.ReadyForRemoval()); }),
+            s_processes.end());
 
 		if ( s_processes.empty() )
 			return false;
