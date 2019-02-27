@@ -89,7 +89,6 @@ static Teul::PlayerIdent _defaultPlayerIdent;
 static void _yield()
 {
 	teulUpdateTransport(1);
-	Teul::Connection::expire();
 }
 
 /************************************************************************************************
@@ -548,32 +547,36 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 
 	Teul::ServerAddr server = {host, static_cast<UINT16>(port)};
 	Teul::PlayerIdent &ident = _classdata->playerIdent;
+    
+    try {
+        ClientHostConnection *conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30 * 1000);
+        if (!conn->start(this)) {
+            dbugLog(_FLI, "Failed to start host connection");
+            throw ClientNetError("connect.login.auth.failed");
+        }
 
-	ClientHostConnection *conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30 * 1000);
-	if (!conn->start(this))
-	{
-		dbugLog(_FLI, "Failed to start host connection");
-		throw ClientNetError("connect.login.auth.failed");
-	}
+        StatusMessage("loading.network.loggingin");
 
-	StatusMessage("loading.network.loggingin");
+        while (conn->complete() == false) {
+            _yield();
+        }
 
-	while (conn->complete() == false)
-	{
-		_yield();
-	}
-
-	if (conn->m_connected == false || conn->m_loggedIn == false)
-	{
-		if (conn->m_connected)
-		{
-			if (mapHostState->retryCount > 0)
-				throw ClientNetError("connect.login.auth.reconnectfailed");
-			throw ClientNetError("connect.login.auth.failed");
-		}
-		else
-			throw ClientNetError("connect.login.auth.timeout");
-	}
+        if (conn->m_connected == false || conn->m_loggedIn == false)
+        {
+            if (conn->m_connected) {
+                if (mapHostState->retryCount > 0) {
+                    throw ClientNetError("connect.login.auth.reconnectfailed");
+                } else {
+                    throw ClientNetError("connect.login.auth.failed");
+                }
+            } else {
+                throw ClientNetError("connect.login.auth.timeout");
+            }
+        }
+    } catch (...) {
+        Teul::Connection::expire(); // garbage-collect connections
+        throw;
+    }
 
 	if (wantChat && !ChatState()->connection && !ChatState()->IsReconnecting())
 	{
@@ -587,6 +590,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 			if (teulClock64 >= timeout)
 				throw ClientNetError("connect.login.chat.timeout");
 			_yield();
+            Teul::Connection::expire();
 		}
 
 		dbugLog(_FLI, "connecting to chat");
@@ -614,6 +618,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 int Client::Logout()
 {
 	_yield();
+    Teul::Connection::expire();
 
 	for (int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		_classdata->connections[i]->Reset();
@@ -2056,7 +2061,10 @@ bool Client::ConnectToChatHost(bool blocking)
 		_yield();
 	}
 
-	return conn->isInService();
+	bool did_connect = conn->isInService();
+ 
+    Teul::Connection::expire();
+    return did_connect;
 }
 
 /************************************************************************************************
@@ -3140,6 +3148,7 @@ bool HostState::Ready(TeulTimeMS timeout)
 		}
 
 		_yield();
+        Teul::Connection::expire();
 	}
 
 	return true; // we didn't time out
@@ -3566,8 +3575,10 @@ bool CellHostState::Reconnect()
 		if (conn->start(client))
 		{
 			// wait for the connection to finish one way or another
-			while (conn->complete() == false)
+			while (conn->complete() == false) {
 				_yield();
+            }
+            Teul::Connection::expire();
 
 			// good connection!
 			if (Connected())
