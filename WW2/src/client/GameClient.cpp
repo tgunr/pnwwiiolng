@@ -1853,6 +1853,7 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
 	HCUnit* replacementUnit = HCUnit::Lookup(unitloc.m_replacementUnitID);
 
+	const PersonaSummary *current = nullptr; 
 	const PersonaSummary *originalPersona = nullptr;
 	const PersonaSummary *replacementPersona = nullptr;
 
@@ -1884,7 +1885,7 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
 				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
 
-				clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
+				//  clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
 				SelectBrigade(trainingUnit->unitID(), true, true);
 
 				SavePersona(SAVE_PERSONA);
@@ -1898,62 +1899,55 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				PersonaSummary tempPersona = *replacementPersona;
 
 				// try to select it
-				bool force = true;
-				bool save = true;
+				RequestPersonaSelection(tempPersona);
 
-				const PersonaSummary *current = GetPersona();
-
-				if (force || !current || *current != tempPersona)
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
 				{
-					current = nullptr;
-
-					RequestPersonaSelection(tempPersona);
-
-					if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
-					{
-						current = GetPersona();
-					}
-
-					ResetMissionData();
+					current = GetPersona();
 				}
+
+				ResetMissionData();
 
 				if (current && *current == tempPersona)
 				{
-					if (save)
-					{
-						SavePersona(SAVE_PERSONA);
-						SavePersona(SAVE_BRIGADE);
-					}
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
 
 					clientErrorLog("Replacement BrigadeID set to: %s (%d)", replacementUnit->m_name, replacementUnit->m_unitID);
-					SelectBrigade(unitloc.m_replacementUnitID, save, force);
+					SelectBrigade(unitloc.m_replacementUnitID, true, true);
 				}
 
 				// update the jsclient
 				jsclient->UpdatePersonas();
 
+				std::wstring messageText = L"Server Selected Unit Replacement - Garrison Changed ";
+
 				switch (unitloc.m_action)
 				{
 				case CHANGE_COUNTRY:
-					uiChatPrintLineColor(colorORANGEALPHA, L"Server Selected Unit Replacement - Garrison Changed Country.");
+					messageText = messageText += L"Country.";
 					break;
 
 				case CHANGE_SIDE:
-					uiChatPrintLineColor(colorORANGEALPHA, L"Server Selected Unit Replacement - Garrison Changed Sides.");
+					messageText = messageText += L"Sides.";
 					break;
 
 				case CHANGE_BRANCH:
-					uiChatPrintLineColor(colorORANGEALPHA, L"Server Selected Unit Replacement - Garrison Changed Branch.");
+					messageText = messageText += L"Branch.";
 					break;
 
 				case CHANGE_COUNTRY_BRANCH:
-					uiChatPrintLineColor(colorORANGEALPHA, L"Server Selected Unit Replacement - Garrison Changed Country and Branch.");
+					messageText = messageText += L"Country and Branch.";
 					break;
 
 				default:
 					//  Should NOT end up here.
+					messageText = L"";
 					break;
 				}
+
+				if (messageText != L"") { uiChatPrintLineColor(colorORANGEALPHA, messageText.c_str()); }
+				
 			}
 			else
 			{
@@ -1961,7 +1955,7 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 
 				if (tempValue < 1)
 				{
-					clientErrorLog("No GARRISON_CHANGE_ACTION required.");
+					clientErrorLog("No Other Personas Updated.");
 				}
 				else
 				{

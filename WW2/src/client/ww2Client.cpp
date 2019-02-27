@@ -2614,14 +2614,19 @@ const PersonaSummary *Client::GetPersona(int country, int branch) const
 }
 
 //  Checks each of the Players other personas (not the current one) brigade to ensure it is valid following a Garrison Change.
-//  Retrurns the number of Player personas changed. It "Should" only be 1 at most.
+//  Retrurns the number of Players "Other" personas changed. It "Should" only be 1 at most.
 int Client::ValidatePersonasBrigade(UINT32 unitID)
 {
 	int retValue = 0;
 
 	const PersonaSummary *selectedPersona = GetPersona();
 	UINT32 selectedPersonaID = selectedPersona->m_personaID;
-	HCUnit * trainingUnit = nullptr;
+
+	const PersonaSummary *current = nullptr;
+	const PersonaSummary *originalPersona = GetPersona();
+	const PersonaSummary *replacementPersona = nullptr;
+
+	PersonaSummary origPersona = *originalPersona;
 
 	for (unsigned int i = 0; i < _classdata->personas.m_count; ++i)
 	{
@@ -2634,11 +2639,47 @@ int Client::ValidatePersonasBrigade(UINT32 unitID)
 				retValue = retValue + 1;
 
 				//  Set the Personas BrigadeID to the Appropriate Training Unit.
-				trainingUnit = HCUnit::GetTrainingUnit(summary.m_countryID, summary.m_branchID);
+				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(summary.m_countryID, summary.m_branchID);
 
-				_classdata->personas.m_summaries[i].m_brigadeID = trainingUnit->unitID();
+				replacementPersona = GetPersona(trainingUnit->m_countryID, trainingUnit->m_branchID);
+				PersonaSummary tempPersona = *replacementPersona;
 
-				trainingUnit = nullptr;
+				// try to select it
+				RequestPersonaSelection(tempPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				if (current && *current == tempPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					SelectBrigade(trainingUnit->unitID(), true, true);
+				}
+
+				// Restore the Original Persona and try to select it
+				PersonaSummary origPersona = *originalPersona;
+
+				RequestPersonaSelection(origPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				if (current && *current == origPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					SelectBrigade(current->m_brigadeID, true, true);
+				}
+
+				// update the jsclient
+				PlayerClient()->jsclient->UpdatePersonas();
 			}
 		}
 	}
