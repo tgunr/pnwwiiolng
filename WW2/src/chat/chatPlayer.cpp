@@ -222,7 +222,17 @@ Player::_setChannel(UCHAR index, CHANNEL_TYPE type, Chat::Channel* toChannel, bo
 // Constructor
 
 Player::Player(UINT32 withPlayerid, bool playerIsManager)
-	: wwiiPlayer()
+	: wwiiPlayer(), m_takenBy(0), m_grabbing(0), m_joinedMission(0), m_playerMask(0), m_lastSquadInfo_ms(0), m_lastAWSRequest(0),
+      m_lastX(0), m_lastY(0), m_lastZ(0), m_originCpID{{0,0},0,0,0}, m_objectiveCpID{{0,0},0,0,0}, m_uiTarget{{0,0},0,0,0},
+      m_chatPermissions(nullptr), m_loginTime(0), m_messagesSent(0), m_shortestMessage(0), m_longestMessage(0), m_bytesSent(0),
+      m_lastMessageID(0), m_prevSide(WWII_NO_SIDE), m_goneAFK(0),m_lastAfkNoticeFrom(0), m_lastGroupRead(0), m_joinedSquad(0),
+      m_cellHost(0), m_gridX(0), m_gridY(0), m_channels{}, m_friends(), m_ignores(), m_weapon(), m_impl(nullptr), m_squadInvite(nullptr),
+      m_lastCP(nullptr), m_insideFacility(nullptr), m_snoopBy(nullptr), m_snoopOn(nullptr), m_crsSnoopBy(nullptr), m_crsSnoopOn(nullptr),
+      func_hashes(), tampered_funcs(), m_tunes(nullptr), m_capping(nullptr), m_capProgress(0), m_state(nullptr), m_leadingBrigade(0),
+      m_initialized(false), m_hqOff(false), m_hcOff(false), m_trOff(false), m_gmHide(false), m_gmNote(false), m_active(false),
+      m_inFacility(false), m_feReady(false), m_rxAllHQ(false), m_grabbed(false), m_isSpawned(false), m_onCommandList(false),
+      m_noWho(false), m_noEnemyChat(false), m_invalidData(false), m_haveChannels(false), m_announcedToSquad(false),
+      m_isBuzzard(false), m_afkMessage{0}
 {
 	dbugLog(_FLI, "p:%u creating %s player %p", withPlayerid, (playerIsManager ? "management" : "standard"), this);
 	_construct(withPlayerid);
@@ -232,7 +242,17 @@ Player::Player(UINT32 withPlayerid, bool playerIsManager)
 // Construct from baseline data
 
 Player::Player(const PlayerStatusNode* psn, const Chat::PlayerInfo* playerInfo)
-	: wwiiPlayer()
+	: wwiiPlayer(), m_takenBy(0), m_grabbing(0), m_joinedMission(0), m_playerMask(0), m_lastSquadInfo_ms(0), m_lastAWSRequest(0),
+      m_lastX(0), m_lastY(0), m_lastZ(0), m_originCpID{{0,0},0,0,0}, m_objectiveCpID{{0,0},0,0,0}, m_uiTarget{{0,0},0,0,0},
+      m_chatPermissions(nullptr), m_loginTime(0), m_messagesSent(0), m_shortestMessage(0), m_longestMessage(0), m_bytesSent(0),
+      m_lastMessageID(0), m_prevSide(WWII_NO_SIDE), m_goneAFK(0),m_lastAfkNoticeFrom(0), m_lastGroupRead(0), m_joinedSquad(0),
+      m_cellHost(0), m_gridX(0), m_gridY(0), m_channels{}, m_friends(), m_ignores(), m_weapon(), m_impl(nullptr), m_squadInvite(nullptr),
+      m_lastCP(nullptr), m_insideFacility(nullptr), m_snoopBy(nullptr), m_snoopOn(nullptr), m_crsSnoopBy(nullptr), m_crsSnoopOn(nullptr),
+      func_hashes(), tampered_funcs(), m_tunes(nullptr), m_capping(nullptr), m_capProgress(0), m_state(nullptr), m_leadingBrigade(0),
+      m_initialized(false), m_hqOff(false), m_hcOff(false), m_trOff(false), m_gmHide(false), m_gmNote(false), m_active(false),
+      m_inFacility(false), m_feReady(false), m_rxAllHQ(false), m_grabbed(false), m_isSpawned(false), m_onCommandList(false),
+      m_noWho(false), m_noEnemyChat(false), m_invalidData(false), m_haveChannels(false), m_announcedToSquad(false),
+      m_isBuzzard(false), m_afkMessage{0}
 {
 	if ( psn == nullptr )
 		throw std::domain_error("Tried to create Client with NULL player");

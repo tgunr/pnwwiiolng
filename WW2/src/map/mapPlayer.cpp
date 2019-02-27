@@ -497,7 +497,16 @@ Player::Player()
 // Map Persona constructor
 
 Player::Player(SINT32 newTeulIndex, const Auth::Dispatch& newDispatch, const playerid_t newPlayerID)
-	: wwiiPlayer(), m_groups(), m_permissions(&nullChatPermissions)
+	: wwiiPlayer(), m_playerMask(), m_personaMask(0), m_nextSpam(0), m_lastHCUpdate(0), m_customSpawnLocation{0, 0, 0},
+      m_customerID(0), timeIn(0), m_rankPointsEarned(0), m_sideLockTime(0), m_portal(0), m_state(PERS_SELECTING_PERSONA),
+      m_vehicleState(MM_VEH_NONE), m_lastSide(WWII_NO_SIDE), m_sessionSide(WWII_NO_SIDE), m_brigade(nullptr),
+      m_mission(nullptr), m_roomFlags(0), m_loginState(0), m_loginSub(0), m_nextLaunch(0), m_lastPoll(0), m_useRank(nullptr),
+      m_actualRank(nullptr), m_hasValidMissionPacket(false), m_registered(false), m_launchPermitted(false), m_wantMobileSpawn(false),
+      m_requestedCapacity(false), m_receivedCapacity(false), m_needsChatSync(false), m_promoted(false), m_clientActivated(false),
+      m_xferedToChat(false), m_allowPollVote(false), m_hasBalanced(false), m_hasSelectedPersonaOnce(false), m_useCustomSpawnLocation(false),
+      m_isBuzzard(false), m_implementAntiAddiction(false), m_spawnedAsSide(0), m_lastSpawnedTo(0), m_mp(), m_weapOrigin{{0, 0}, 0, 0, 0},
+      m_weapon{{{0, 0}, 0, 0, 0}, 0, {}}, m_damageRecord(), m_repairRecord(), m_groups(), m_permissions(&nullChatPermissions),
+      m_accountGoodUntil(0), m_minuteBalance(0), m_nextCharge(0), m_sortie(nullptr), m_missionResults(nullptr)
 {
 	if ( newPlayerID <= DEFAULT_PLAYER_ID )
 	{
