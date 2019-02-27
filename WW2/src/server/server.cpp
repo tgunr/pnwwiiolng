@@ -141,7 +141,6 @@ static ENDPOINT* s_broadcastEndpoint = nullptr;
 
 // Connection to the controller process.
 
-static uint32_t s_controllerToken = 0;
 static bool s_controllerConnected = false;
 
 #if defined(SERVER_AS_ENTRY_POINT)
@@ -1666,7 +1665,6 @@ _controllerConnect(ENDPOINT& endpoint)
 	intro.m_processID = getpid();
 #endif
 	intro.m_processType = Server::serverType;
-	intro.m_token = s_controllerToken;
 
 	auto result = endpoint.writeData(reinterpret_cast<char *>(&intro), sizeof(intro), 0, 0);
 	if ( result < 0 ) {
@@ -1885,11 +1883,6 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 			[](const char*) {}, nullptr
 #endif
 		},
-		{
-			"--token", "Specify the controller connection token.", true,
-			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); },
-			nullptr
-		}
 	};
 	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
 	for (int argn = 1; argn < argc; ++argn)
