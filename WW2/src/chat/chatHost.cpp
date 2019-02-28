@@ -2750,8 +2750,6 @@ _lowFrequencyHouseKeeping()
 
 	// Less frequent activities
 	++tickCount;
-	if ( (tickCount % 10) == 0 )
-		wwiiPlayer::logStats();
 
 	bool reset = true;
 	if ( (tickCount & 3) == 0 )
