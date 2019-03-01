@@ -230,7 +230,7 @@ public:
 
 	//////////////////////////////////////////////////////////////////////
 	// Get a Favoured Garrison Unit adjacent (linked) to the Target CP (FULL_OBJ_ID).
-	HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry);
-	HCUnit *BrigadeSelection::GetReplacementGarrison(UINT32 originalGarrisonID, WWII_COUNTRY originalCountry);
+	HCUnit *GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry);
+	HCUnit *GetReplacementGarrison(UINT32 originalGarrisonID, WWII_COUNTRY originalCountry);
 };
 
