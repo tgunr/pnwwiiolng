@@ -25,7 +25,6 @@
 #include "strt/strtServerTypes.h"
 #include "strt/strtPostListReply.h"
 #include "map/mapHostMessages.h"
-#include "garrisons/garrisonCountryChangeRequest.h"
 #include "mm/mmMain.h"
 
 #ifndef STRAT_CLIENT
@@ -53,7 +52,6 @@ static TEUL_CALLBACK* _SEND_MM_SPAWN_CANCEL;
 
 static TEUL_CALLBACK* _XCHG_MM_JOIN_LIST;
 static TEUL_CALLBACK* _XCHG_MM_LEAVE_LIST;
-static TEUL_CALLBACK* _XCHG_MM_GARRISON_COUNTRY_CHANGE;
 
 //Sends the MM Post request to the strat system
 static SINT32 _sendMMPostReq(ACTION_OBJECT* const a)
@@ -597,21 +595,6 @@ static SINT32 _recvMMGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
 	return mmhostToClientGarrisonCountryChange(a);
 }
 
-// Send an GarrisonCountryChangeReq recieved from a client to the Strat host.
-SINT32 strtSendGarrisonCountryChangeRequest(GarrisonCountryChangeReq& garrisonCountryChangeReq)
-{
-	GarrisonCountryChangeReq gcc = garrisonCountryChangeReq;
-	dbugLog(_FLD, "GarrisonCountryChangeRequest is being sent to strat.");
-	return gcc.sendToStrat(mapGetStratIndex());
-    //return garrisonCountryChangeReq->sendToStrat(mapGetStratIndex());
-}
-
-// Request a GarrisonCountryChangeReq from Strat.
-SINT32 GarrisonCountryChangeReq::sendToStrat(SINT32 teulIndex) {
-	// 
-	return teulSend(teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, this);
-}
-
 //////////////////////////////////////////////////////////////////////
 //Install all the map callbacks
 SINT32
@@ -624,7 +607,6 @@ strtInstallMapCallbacks()
 		REGISTER_SENDRECV(STRT_MM_CAPACITY_Y, _sendMMFacilityCapacityRequest, _recvMMFacilityCapacityResponse, _XCHG_MM_FACILITY_CAPACITY);
 		REGISTER_SENDRECV(STRT_MM_JOIN_LIST_Y, _sendMMJoinListRequest, _recvMMJoinListResponse, _XCHG_MM_JOIN_LIST);
 		REGISTER_SENDRECV(STRT_MM_LEAVE_LIST_Y, _sendMMLeaveListRequest, _recvMMLeaveListResponse, _XCHG_MM_LEAVE_LIST);
-		REGISTER_SENDRECV(STRT_MM_GARRISON_COUNTRY_CHANGE_Y, _sendMMGarrisonCountryChangeRequest, _recvMMGarrisonCountryChangeResponse, _XCHG_MM_GARRISON_COUNTRY_CHANGE);
 
 		REGISTER_SENDER(STRT_MM_POST_REQ_Y, _sendMMPostReq, _SEND_MM_POST_REQ);
 		REGISTER_SENDER(STRT_MM_POST_CANCEL_Y, _sendMMPostCancel, _SEND_MM_POST_CANCEL);

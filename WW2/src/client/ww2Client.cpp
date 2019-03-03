@@ -46,7 +46,6 @@
 #include "chat/chatBrigadeControlList.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatMotds.h"
-#include "garrisons/garrisonCountryChangeRequest.h"
 #include "chat/omgChat.h"
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
@@ -856,16 +855,6 @@ int Client::RequestMissionCrew(unsigned int numcrew) { return mmSendRequestCrew(
 *************************************************************************************************/
 
 int Client::RequestMissionPostList(FULL_OBJ_ID const &fac) { return mmSendPostListRequest(MapConnection(), fac); }
-
-/************************************************************************************************
-	Client::RequestGarrisonCountryChange
-*************************************************************************************************/
-
-int Client::RequestGarrisonCountryChange(FULL_OBJ_ID cp, WWII_COUNTRY const &country)
-{
-	GarrisonCountryChangeReq gcc;
-	return gcc.send(MapConnection(), cp, country);
-}
 
 /************************************************************************************************
 	Client::RequestMissionPostList
@@ -1890,61 +1879,6 @@ void Client::ProcessMissionList(MissionList const &missionList)
 	}
 	_data->missionListUpdate = 0;
 	_data->canpost = missionList.m_canPost;
-}
-
-/************************************************************************************************
-ProcessGarrisonCountryChange
-*************************************************************************************************/
-
-void Client::ProcessGarrisonCountryChangeReq(GarrisonCountryChangeReq const &garrisonCountryChangeReq)
-{
-	// TODO: CHANGE THESE MESSAGES TO BE LANGUAGE SPECIFIC.
-	// uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.failed").c_str());
-
-	switch (garrisonCountryChangeReq.m_result)
-	{
-		case GCR_APPROVED:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country changed");
-		}
-		break;
-		case GCR_FAILED_OWNER_ALREADY:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country change denied, CP already belongs to that country.");
-		}
-		break;
-		case GCR_FAILED_TOO_MANY:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country change denied, too many of that country already on the map.");
-		}
-		break;
-		case GCR_FAILED_SUPPLY:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA,
-								 L"Garrison country change denied, supply must be either less than 5% or be at 100%");
-		}
-		break;
-		case GCR_FAILED_WRONG_OWNER:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA,
-								 L"Garrison country denied, you can't change a CP that doesn't belong to your side.");
-		}
-		break;
-		case GCR_FAILED_HAS_OBJECTIVE:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country change denied, you can't change a CP that is either "
-												   L"attacking or defending or linked to an attack.");
-		}
-		break;
-		case GCR_FAILED:
-		{
-			uiChatPrintLineColor(colorORANGEALPHA, L"Garrison country change failed.");
-		}
-		break;
-		default:
-			//
-			break;
-	}
 }
 
 /************************************************************************************************

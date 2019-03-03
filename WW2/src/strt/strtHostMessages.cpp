@@ -65,6 +65,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiServerTypeEnums.h"
+#include "chat/chatHostBrigadeControl.h"
 
 #undef DEBUG_SYNC
 
@@ -79,7 +80,7 @@ static TEUL_CALLBACK *_SEND_MM_JOIN_ACCEPT;
 static TEUL_CALLBACK *_SEND_MM_JOIN_DENY;
 static TEUL_CALLBACK *_XCHG_MM_SPAWN_GRANT;
 static TEUL_CALLBACK *_XCHG_MM_CAPACITY;
-static TEUL_CALLBACK *_XCHG_MM_GARRISON_COUNTRY_CHANGE;
+static TEUL_CALLBACK *_SEND_MM_GARRISON_COUNTRY_CHANGE;
 
 static TEUL_CALLBACK *_SEND_SYNC_CPS;
 static TEUL_CALLBACK *_SEND_SYNC_FACILITIES;
@@ -1019,72 +1020,9 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-//////////////////////////////////////////////////////////////////////
-// Receive a GarrisonCountryChangeReq from the map host
-
-static SINT32 _recvMMGarrisonCountryChangeRequest(ACTION_OBJECT *const a)
-{
-	GarrisonCountryChangeReq request(a);
-    request.strtProcessRequest();
-    //dbugLog(_FLD, "GarrisonCountryChangeReq received on strat host from %d to change CP %u to country %u ", request.m_clientsTeulIndex, request.m_cp.id, request.m_country);
-    return teulSend(a->teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, &request);
-}
-
-//////////////////////////////////////////////////////////////////////
-// Process a GarrisonCountryChangeReq
-
-void GarrisonCountryChangeReq::strtProcessRequest()
-{
-	if (m_result == GCR_REQUESTING)
-	{
-		CPStruct *cp = strtGetCP(m_cp);
-		if (cp == nullptr)
-		{
-			dbugLog(_FLI, "GarrisonCountryChangeReq(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(m_cp));
-		}
-		else
-		{
-			if (cp->isObjective() || cp->islinkedToAnAO())
-			{
-				m_result = GCR_FAILED_HAS_OBJECTIVE;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP has an Objective or is linked to one.");
-			}
-			else if (wwiiSide(m_country) != wwiiSide(cp->country))
-			{
-				m_result = GCR_FAILED_WRONG_OWNER;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the other side.");
-			}
-            else if (m_country == cp->country)
-            {
-                m_result = GCR_FAILED_OWNER_ALREADY;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the requested country already.");
-            }
-            // TODO Add some checks here for percentages of UK, French and US towns already on the front line.
-
-            if (m_result == GCR_REQUESTING)
-            {
-                if (cp->changeOwnership(m_country, true, true))
-                {
-					// Now that the town has changed owner we need to change the Garrison to match.
-					cp->changeAllGarrisonCountries(m_country, true);
-                    m_result = GCR_APPROVED;
-                    dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %d to change CP %u to country %u ", m_clientsTeulIndex, m_cp.id, m_country);
-                }
-                else
-                {
-                    dbugLog(_FLI, "GarrisonCountryChangeReq cp->changeOwnership failed for %s whilst changing from country %u to %u",
-                            cp->name, cp->country, m_country);
-                    m_result = GCR_FAILED;
-                }
-            }
-		}
-	}
-}
-
-
 SINT32 GarrisonCountryChangeReq::sendToMap(SINT32 teulIndex)
 {
-    return teulSend(teulIndex, _XCHG_MM_GARRISON_COUNTRY_CHANGE, this);
+    return teulSend(teulIndex, _SEND_MM_GARRISON_COUNTRY_CHANGE, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1110,7 +1048,6 @@ strtHostInstallCallbacks()
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_RECEIVER(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest);
 		REGISTER_RECVSEND(STRT_MM_CAPACITY_Y, _recvMMCapacityRequest, _sendMMCapacityResponse, _XCHG_MM_CAPACITY);
-		REGISTER_RECVSEND(STRT_MM_GARRISON_COUNTRY_CHANGE_Y, _recvMMGarrisonCountryChangeRequest, _sendMMGarrisonCountryChangeResponse, _XCHG_MM_GARRISON_COUNTRY_CHANGE);
 
 		REGISTER_RECEIVER(STRT_SYNC_DAMAGE_LIST_Y, _recvSyncDamageList);
 		REGISTER_RECEIVER(STRT_MM_POST_REQ_Y, _recvMMPostRequest);
@@ -1121,6 +1058,7 @@ strtHostInstallCallbacks()
 		REGISTER_RECEIVER(STRT_MM_SPAWN_CANCEL_Y, _recvMMSpawnCancel);
 		REGISTER_RECEIVER(STRT_ENEMY_REPORT_Y, _recvEnemyReport);
 
+		REGISTER_SENDER(STRT_MM_GARRISON_COUNTRY_CHANGE_Y, _sendMMGarrisonCountryChangeResponse, _SEND_MM_GARRISON_COUNTRY_CHANGE);
 		REGISTER_SENDER(STRT_MM_POST_ACCEPT_Y, _sendMMPostAccept, _SEND_MM_POST_ACCEPT);
 		REGISTER_SENDER(STRT_MM_POST_DENY_Y, _sendMMPostDeny, _SEND_MM_POST_DENY);
 		REGISTER_SENDER(STRT_MM_JOIN_ACCEPT_Y, _sendMMJoinAccept, _SEND_MM_JOIN_ACCEPT);

@@ -1650,9 +1650,6 @@
     <ClInclude Include="..\..\src\miss\missionJoinRequest.h">
       <Filter>miss</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\garrisons\garrisonCountryChangeRequest.h">
-      <Filter>garrisons</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2704,9 +2701,6 @@
     </ClCompile>
     <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
       <Filter>sys</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\garrisons\garrisonCountryChangeRequest.cpp">
-      <Filter>garrisons</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

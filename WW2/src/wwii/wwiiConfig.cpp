@@ -150,6 +150,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "objective.warningPeriodM",		TYPE_SINT,	&host_config.objective.warningPeriod_m,1440,"10",	"Duration of AO budet warnings (minutes)" }
 ,	{ "oic.attackVoteTimeS",		TYPE_SINT,	&host_config.oic.attackVoteTime_s,		3600,	"60",	"Duration of attack requests (seconds)" }
 ,	{ "oic.moveVoteTimeS",			TYPE_SINT,	&host_config.oic.moveVoteTime_s,		3600,	"60",	"Duration of move request proposals (seconds)" }
+,	{ "oic.countryChangeVoteTimeS",	TYPE_SINT,	&host_config.oic.changeCountryVoteTime_s,		3600,	"60",	"Duration of change country request proposals (seconds)" }
 ,	{ "oic.nominationVoteTimeS",	TYPE_SINT,	&host_config.oic.nominationVoteTime_s,	3600,	"60",	"Duration of nomination proposals (seconds)" }
 ,	{ "oic.offerTimeS",				TYPE_SINT,	&host_config.oic.offerTime_s,			3600,	"90",	"Duration of OIC offers (seconds)" }
 ,	{ "oic.removalVoteTimeS",		TYPE_SINT,	&host_config.oic.removalVoteTime_s,		3600,	"60",	"Duration of OIC removal proposals (seconds)" }

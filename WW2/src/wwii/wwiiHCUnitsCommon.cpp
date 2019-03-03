@@ -321,3 +321,36 @@ HCUnit::GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 
 	return nullptr;
 }
+
+void HCUnit::GetGarrisonUnits(std::list<HCUnit *>& unitsList, UINT16 cpID)
+{
+	//dbugLog(_FLN, "Performing HCUnit::GetGarrisonUnits");
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID().id == cpID)
+			{
+				unitsList.push_back(it->second);
+			}
+		}
+	}
+}
+
+UINT32 HCUnit::GetArmyGarrison(UINT16 cpID)
+{
+	// Need to look up primary brigade for the target CP
+	UINT32 brigadeID = 0;
+	std::list<HCUnit *> garrisons;
+	HCUnit::GetGarrisonUnits(garrisons, cpID);
+	for (HCUnit *unit : garrisons)
+	{
+		if (!unit->isMarineUnit() && !unit->isParatroopUnit())
+		{
+			brigadeID = unit->m_unitID;
+			break;
+		}
+	}
+
+	return brigadeID;
+}

@@ -42,6 +42,3 @@ extern SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 mi
 extern SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool multicrew);
 
 extern SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join);
-
-// This function sends a Garrison country change request to the strat system.
-SINT32 strtSendGarrisonCountryChangeRequest(GarrisonCountryChangeReq& garrisonCountryChangeReq);

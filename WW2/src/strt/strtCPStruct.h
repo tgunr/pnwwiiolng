@@ -227,6 +227,7 @@ public:
 	WWII_SIDE attacker() const { return m_attacker; }
 	HCUnit* attackingUnit() const { return m_attackingUnit; }
 
+	bool canChangeOwnership(WWII_COUNTRY toCountry, bool force);
 	bool changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly);
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
 	void changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly);

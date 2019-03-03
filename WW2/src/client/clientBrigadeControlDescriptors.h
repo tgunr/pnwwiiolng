@@ -131,6 +131,33 @@ struct BCD_BrigadeOriginTarget : public BrigadeControlDescriptor
 	}
 };
 
+struct BCD_SponsorGarrisonCountryChange : public BrigadeControlDescriptor
+{
+	BCD_SponsorGarrisonCountryChange(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	{
+		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
+
+		arg1 = chatGetWideCallsign(bcn->m_sponsor);
+
+		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
+		if(origin) arg3		= origin->DisplayName();
+		arg4 = wwiiCountryCode((WWII_COUNTRY)bcn->m_country);
+	}
+};
+
+struct BCD_GarrisonCountryChange : public BrigadeControlDescriptor
+{
+	BCD_GarrisonCountryChange(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	{
+		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
+		StratDB::StratObject* target = StratDB::FindStratObject(bcn->m_target);
+
+		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
+		if(origin) arg3		= origin->DisplayName();
+		arg4 = wwiiCountryCode((WWII_COUNTRY)bcn->m_country);
+	}
+};
+
 struct BCD_Objective : public BrigadeControlDescriptor
 {
 	BCD_Objective(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)

@@ -569,6 +569,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     wwii/wwiiCallbacks.h
+ 	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
@@ -696,7 +697,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     strt/strtSyncData.cpp strt/strtSyncData.h
     strt/strtConstants.h strt/strtSyncSupportMessages.cpp strt/strtSyncSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
-	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     EXTRA_DEFINITIONS "IS_MAP_HOST"
     INSTANCING
 )

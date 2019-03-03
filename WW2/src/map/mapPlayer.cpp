@@ -2358,26 +2358,3 @@ _sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country)
 		_packet.clear();
 		return true;
 }
-
-// Map host calls this.
-void
-GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
-{
-	HCUnit* hcUnit = HCUnit::Lookup(unitID);
-	if (hcUnit != nullptr)
-	{
-		// Alter our copy of the change.
-		hcUnit->setCountry(country);
-
-		// Send the change to all connected players.
-		for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
-		{
-			Player* const player = (Player*)(*it);
-			_sendHCUnitCountryChange(player, &unitID, &country);
-		}
-	}
-	else
-	{
-		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
-	}
-}

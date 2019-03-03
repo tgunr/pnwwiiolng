@@ -226,17 +226,66 @@ BrigadeMove::process(const ChatHandle byHandle) const
 }
 
 // Chat host uses this to change the country of an HCUnit.
-void
-GarrisonCountryChange::process(const UINT32 unitID, const WWII_COUNTRY country)
+void GarrisonCountryChange::process(const ChatHandle byHandle) const
 {
+	Player* player = PlayerInterface::Lookup(byHandle);
 
-		HCUnit* hcUnit = HCUnit::Lookup(unitID);
-		if (hcUnit != nullptr)
+	LSTRING_ID response = LSTR_NONE;
+	const char* text = nullptr;
+	char temp[16];
+
+	HCUnit* hcUnit = HCUnit::Lookup(m_brigadeID);
+	switch (m_action)
+	{
+	case GCR_APPROVED:
+		if (m_actionable)
 		{
-			hcUnit->setCountry(country);
+			if (hcUnit != nullptr)
+			{
+				chatAnnounceCountryChange(*hcUnit, hcUnit->homeCPID(), hcUnit->homeCPID(), byHandle);
+				hcUnit->setCountry(m_newCountryId);
+			}
+			else
+			{
+				dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+			}
 		}
 		else
-		{
-			dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+		{			
+			chatCPCountryChangeProposal(hcUnit->m_homeCPID, m_newCountryId, byHandle);
 		}
+	break;
+	case GCR_FAILED:
+		response = LSTR_CHANGE_COUNTRY_FAILED;
+	break;
+
+	case GCR_FAILED_OWNER_ALREADY:
+		response = LSTR_FAILED_OWNER_ALREADY;
+	break;
+	case GCR_FAILED_TOO_MANY:
+		response = LSTR_FAILED_TOO_MANY;
+	break;
+	case GCR_FAILED_SUPPLY:
+		response = LSTR_FAILED_SUPPLY;
+	break;
+	case GCR_FAILED_WRONG_OWNER:
+		response = LSTR_FAILED_WRONG_OWNER;
+	break;
+	case GCR_FAILED_HAS_OBJECTIVE:
+		response = LSTR_FAILED_HAS_OBJECTIVE;
+	break;
+#ifdef PUBLIC_RELEASE
+	default:
+		response = LSTR_INTERNAL_ERROR;
+#endif
+	}
+
+	if ( player )
+	{
+		if ( response != LSTR_NONE )
+			player->message(LSTR_CAUTION, response, text);
+		else if ( text )
+			player->message(LSTR_CAUTION, LSTR_GENERIC, text);
+	}
+
 }

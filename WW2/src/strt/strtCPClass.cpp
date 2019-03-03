@@ -551,7 +551,7 @@ bool CPStruct::changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool
 }
 
 bool
-CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+CPStruct::canChangeOwnership(WWII_COUNTRY toCountry, bool force)
 {
 	if (toCountry >= MAX_COUNTRIES)
 	{
@@ -566,26 +566,38 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 		return false;
 	}
 
-	dbugLog(_FLI, "%s %s %s change of ownership to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
-			name, _countryName[toCountry]);
+	return true;
+}
 
-	// Firstly change standard facilities
-	FacilityStruct *facility;
-	for (facility = facilityList; facility != nullptr; facility = facility->next)
+bool
+CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+{
+	bool retVal = false;
+
+	if (canChangeOwnership(toCountry, force))
 	{
-		if (facility->type == FACILITY_FIREBASE)
-			continue;
-		if ( force || facility->country != toCountry )
-			strtConvertFacility(*facility, toCountry, force, quietly);
+		dbugLog(_FLI, "%s %s %s change of ownership to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
+				name, _countryName[toCountry]);
+
+		// Firstly change standard facilities
+		FacilityStruct *facility;
+		for (facility = facilityList; facility != nullptr; facility = facility->next)
+		{
+			if (facility->type == FACILITY_FIREBASE)
+				continue;
+			if ( force || facility->country != toCountry )
+				strtConvertFacility(*facility, toCountry, force, quietly);
+		}
+
+		bool justCaptured = true; // This is needed to trigger town status check because town status may not have changed as a result of capture
+		checkTownStatus(this, justCaptured, 0);
+
+		// Clear out the routeing
+		resetRouteing();
+		retVal = true;
 	}
 
-	bool justCaptured = true; // This is needed to trigger town status check because town status may not have changed as a result of capture
-	checkTownStatus(this, justCaptured, 0);
-
-	// Clear out the routeing
-	resetRouteing();
-
-	return true;
+	return retVal;
 }
 
 void CPStruct::changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly)

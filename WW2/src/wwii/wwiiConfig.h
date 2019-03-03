@@ -101,6 +101,7 @@ struct cfOIC
 	UINT16		removalVoteTime_s;
 	UINT16		replaceDelay_s;
 	UINT16		moveVoteTime_s;
+	UINT16		changeCountryVoteTime_s;
 	UINT16		attackVoteTime_s;
 	UINT16		withdrawVoteTime_s;
 };

@@ -91,6 +91,7 @@ public:
 	void requestReplace(Player* player, const ChatHandle officer);
 	void requestRemove(Player* player, const ChatHandle officerHandle);
 	void requestMove(Player* player, const FULL_OBJ_ID destination, const FULL_OBJ_ID from);
+	void requestCountryChange(Player *player, const FULL_OBJ_ID cp, const WWII_COUNTRY to);
 	void requestAttack(Player* player, FULL_OBJ_ID& target);
 	void requestDefend(Player* player, FULL_OBJ_ID& target);
 	void requestClear(Player* player, FULL_OBJ_ID& target);
@@ -103,6 +104,7 @@ public:
 #endif
 	void processReplacingExpired();
 	void processToMoveExpired();
+	void processChangeCountryExpired();
 	void processToAttackExpired();
 	void processToDefendExpired();
 	void processToClearExpired();
@@ -406,6 +408,7 @@ BrigadeController::votePermitRequirement() const
 	case Vote::TOREMOVE:
 		return VP_COMMANDER;
 
+	case Vote::CHANGECOUNTRY:
 	case Vote::TOMOVE:
 	case Vote::TOATTACK:
 	case Vote::TODEFEND:
@@ -839,6 +842,21 @@ BrigadeController::requestMove(Player* player, const FULL_OBJ_ID destination, co
 		throw BCERR_ALREADY_VOTING;
 
 	chatSendBrigadeMove(player->chatHandle(), false, unit().unitID(), destination, false);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Process a CP change country request
+
+void
+BrigadeController::requestCountryChange(Player* player, const FULL_OBJ_ID cp, const WWII_COUNTRY to)
+{
+	if (unit().country() == to)
+		throw BCERR_COUNTRY_ALREADY_CHANGED;
+
+	if ( vote() )
+		throw BCERR_ALREADY_VOTING;
+
+	chatSendGarrisonChangeCountry(player->chatHandle(), false, unit().unitID(), cp, to, false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1480,6 +1498,28 @@ BrigadeController::processToMoveExpired()
 }
 
 //////////////////////////////////////////////////////////////////////
+// Process a change country request expiring
+
+void
+BrigadeController::processChangeCountryExpired()
+{
+
+	if ( unit().country() != vote()->m_country )
+	{
+		dbugLog(_FLW, "hcu:%u(%s) move has wrong origin [brigade moved?]", unit().unitID(), unit().callsign());
+		_noticeToOfficers(BrigadeControl::_ERROR, BrigadeControl::REQ_COUNTRY_CHANGE, BCERR_COUNTRY_ALREADY_CHANGED, VP_NONE
+							, unit(), vote()->m_nominee, vote()->m_sponsor
+							, 0, nullObjID, PlayerInterface::Lookup(vote()->m_sponsor));
+		return;
+	}
+
+	FULL_OBJ_ID destination;
+	destination.FromKey(vote()->m_nominee);
+	chatSendGarrisonChangeCountry(vote()->m_sponsor, false, unit().unitID(), destination, unit().country(), true);
+
+}
+
+//////////////////////////////////////////////////////////////////////
 // Process an attack request
 
 void
@@ -1579,6 +1619,9 @@ BrigadeController::processVoteExpired()
 	case Vote::TOMOVE:
 		processToMoveExpired();
 	break;
+	case Vote::CHANGECOUNTRY:
+		processChangeCountryExpired();
+	break;
 	case Vote::MAX_VOTE_MODES:
 	break;
 	case Vote::TOATTACK:
@@ -1673,6 +1716,9 @@ public:
 				case Vote::TOMOVE:
 					entry += "moving";
 				break;
+				case Vote::CHANGECOUNTRY:
+					entry += "country change";
+				break;
 				case Vote::TOATTACK:
 					entry += "attack";
 				break;
@@ -1745,6 +1791,49 @@ chatBrigadeMoveProposal(UINT32 brigadeID, const FULL_OBJ_ID destination, ChatHan
 		if ( player != nullptr && player->teulIndex() >= 0 )
 		{
 			BrigadeControlNotice outgoing(BrigadeControl::_ERROR, error, BrigadeControl::REQ_MOVE, VP_NONE, bc.unit(), destination.Key(), byHandle, 0);
+			outgoing.m_origin = origin;
+			outgoing.send(player->teulIndex());
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Place a country change proposal for a CP, inform HC officers and giving them
+// opportunity to block the change.
+
+void
+chatCPCountryChangeProposal(const struct FULL_OBJ_ID origin, WWII_COUNTRY country, ChatHandle byHandle)
+{
+	// Need to look up primary brigade for the target CP
+	UINT32 brigadeID = HCUnit::GetArmyGarrison(origin.id);
+	assert( brigadeID != 0 );
+	if ( byHandle == 0LL )
+		byHandle = systemHandleID;
+
+	// Lookup the brigade controller for this brigade, creating it if neccessary
+	BrigadeController& bc = BrigadeController::Get(brigadeID);
+	try
+	{
+		if ( bc.vote() )
+			throw BCERR_ALREADY_VOTING;
+
+		if ( byHandle != systemHandleID && bc.oic() && !bc.oic()->hasHandle(byHandle) )
+			throw BCERR_BRIGADE_HAS_OIC;
+
+		UINT32 delay = host_config.oic.changeCountryVoteTime_s;
+		// Are you the brigade oic?
+		if ( !(bc.oic() && bc.oic()->hasHandle(byHandle)) )
+			delay += delay / 2;
+
+		bc.voteFor(Vote::CHANGECOUNTRY, BrigadeControl::REQ_COUNTRY_CHANGE, origin.Key(), byHandle, delay, origin);
+		bc.vote()->m_country = country;
+	}
+	catch (BRIGADE_CONTROL_ERROR error)
+	{
+		Player* player = PlayerInterface::Lookup(byHandle);
+		if ( player != nullptr && player->teulIndex() >= 0 )
+		{
+			BrigadeControlNotice outgoing(BrigadeControl::_ERROR, error, BrigadeControl::REQ_COUNTRY_CHANGE, VP_NONE, bc.unit(), origin.Key(), byHandle, 0);
 			outgoing.m_origin = origin;
 			outgoing.send(player->teulIndex());
 		}
@@ -1908,7 +1997,8 @@ chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle)
 	// Is this player actually the OIC of the brigade?
 	if ( bc->oic() && bc->oic()->hasHandle(handle) )
 	{
-		if ( bc->vote() && bc->vote()->m_voteMode == Vote::TOMOVE )
+		if ( bc->vote() && (bc->vote()->m_voteMode == Vote::TOMOVE 
+			|| bc->vote()->m_voteMode == Vote::CHANGECOUNTRY))
 			bc->cancelVote();
 		bc->removeOIC(BrigadeControl::REQ_REMOVE, bc->oicHandle(), true, true);
 	}
@@ -1946,3 +2036,21 @@ chatAnnounceBrigadeMove(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL
 	if ( bc.vote() && bc.vote()->isTargettedAction() )
 		bc.cancelVote();
 }
+
+//////////////////////////////////////////////////////////////////////
+// Announce Country Change
+
+void
+chatAnnounceCountryChange(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL_OBJ_ID destination, ChatHandle byHandle)
+{
+	if ( byHandle == systemHandleID )
+		byHandle = 0LL;
+
+	_noticeToSide(BrigadeControl::_COUNTRY_CHANGED, BrigadeControl::REQ_COUNTRY_CHANGE, unit, destination, byHandle, unit.side(), origin);
+
+	// Well, maybe now we need to drop the vote.
+	BrigadeController& bc = BrigadeController::Get(unit.unitID());
+	if ( bc.vote() && bc.vote()->isTargettedAction() )
+		bc.cancelVote();
+}
+

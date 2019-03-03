@@ -189,13 +189,17 @@ template<>
 SINT32
 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
 {
-	if (incoming.action() != EXCHANGE) // We should only get exchanges
+	const GarrisonCountryChange& data = incoming.data();
+	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
+	CPStruct* cp = strtGetCP(unit->m_homeCPID);
+	std::list<HCUnit *> garrisons;
+	HCUnit::GetGarrisonUnits(garrisons, unit->m_homeCPID.id);
+	for (HCUnit *nextUnit : garrisons)
 	{
-		dbugLog(_FLA, "Invalid Garrison country change msg");
-		return -EINVAL;
+		nextUnit->setCountry(data.m_newCountryId);
 	}
-
-	incoming.data().process(incoming.data().m_brigadeID, incoming.data().m_newCountryId);
+	unit->setCountry(data.m_newCountryId);
+	cp->controllingCountry = data.m_newCountryId;
 
 	return 0;
 }

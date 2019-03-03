@@ -8,7 +8,7 @@
 #include "client/GameClient.h"
 #include "strt/strtCPFlags.h"
 #include "weap/weapList.h"
-#include "garrisons/garrisonCountryChangeRequest.h"
+#include "wwii/wwiiHCUnits.h"
 
 /************************************************************************************************
 	jsStratObject
@@ -259,8 +259,19 @@ JS_FUNCTION_DEF(jsStratObject, changegarrisoncountry)
 
 	if (argc > 0) JS_ValueToInt32(ctx, argv[0], &country);
 
-	GarrisonCountryChangeReq gcc;
-	gcc.requestChangeCountry(PlayerClient()->MapConnection(), *origin->stratobj->FullObjID(), static_cast<WWII_COUNTRY>(country));
+	FULL_OBJ_ID cp = *origin->stratobj->FullObjID();
+	UINT32 brigadeID = HCUnit::GetArmyGarrison(cp.id); // TODO lookup brigade/garrison based on CP
+	if (brigadeID == 0)
+	{
+		return JS_FALSE;
+	}
+
+	BrigadeControlRequest req;
+	req.requestBrigadeCountryChange(
+				PlayerClient()->ChatConnection(),
+				brigadeID,
+				cp,		// CP to change
+				(WWII_COUNTRY)country);				// target country
 
 	return JS_TRUE;
 }
