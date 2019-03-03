@@ -8,6 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+
 #include "chat/chatConstants.h"
 #include "chat/chatDefines.h"
 #include "chat/chatGCITypes.h"
@@ -584,8 +585,8 @@ CaptureAction::ApplyEffects(bool manualCapture) const
 		LeaveContention();
 
 	// Assign control to the new controller, if neccessary
-//	if (m_setControl == true)
-	if (m_leftContention == true)
+	if (m_setControl == true)
+//	if (m_leftContention == true)
 		{
 			SetControl();
 		}
