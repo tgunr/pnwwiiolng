@@ -973,13 +973,15 @@ UCHAR _BombsightTypeNames[3][32] =
 
 		if (strcmp((char*)VarName,"elevationrate") == 0)
 		{
-			CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
+//            CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
+            CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)4.0;
 		}
 
 		if (strcmp((char*)VarName,"traverserate") == 0)
 		{
-			CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
-		}
+//            CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
+            CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)4.0;
+        }
 
         if(strcmp((char*)VarName, "turretelevate") == 0)
         {
