@@ -497,7 +497,16 @@ Player::Player()
 // Map Persona constructor
 
 Player::Player(SINT32 newTeulIndex, const Auth::Dispatch& newDispatch, const playerid_t newPlayerID)
-	: wwiiPlayer(), m_groups(), m_permissions(&nullChatPermissions)
+	: wwiiPlayer(), m_playerMask(), m_personaMask(0), m_nextSpam(0), m_lastHCUpdate(0), m_customSpawnLocation{0, 0, 0},
+      m_customerID(0), timeIn(0), m_rankPointsEarned(0), m_sideLockTime(0), m_portal(0), m_state(PERS_SELECTING_PERSONA),
+      m_vehicleState(MM_VEH_NONE), m_lastSide(WWII_NO_SIDE), m_sessionSide(WWII_NO_SIDE), m_brigade(nullptr),
+      m_mission(nullptr), m_roomFlags(0), m_loginState(0), m_loginSub(0), m_nextLaunch(0), m_lastPoll(0), m_useRank(nullptr),
+      m_actualRank(nullptr), m_hasValidMissionPacket(false), m_registered(false), m_launchPermitted(false), m_wantMobileSpawn(false),
+      m_requestedCapacity(false), m_receivedCapacity(false), m_needsChatSync(false), m_promoted(false), m_clientActivated(false),
+      m_xferedToChat(false), m_allowPollVote(false), m_hasBalanced(false), m_hasSelectedPersonaOnce(false), m_useCustomSpawnLocation(false),
+      m_isBuzzard(false), m_implementAntiAddiction(false), m_spawnedAsSide(0), m_lastSpawnedTo(0), m_mp(), m_weapOrigin{{0, 0}, 0, 0, 0},
+      m_weapon{{{0, 0}, 0, 0, 0}, 0, {}}, m_damageRecord(), m_repairRecord(), m_groups(), m_permissions(&nullChatPermissions),
+      m_accountGoodUntil(0), m_minuteBalance(0), m_nextCharge(0), m_sortie(nullptr), m_missionResults(nullptr)
 {
 	if ( newPlayerID <= DEFAULT_PLAYER_ID )
 	{
@@ -2336,25 +2345,140 @@ mapPlayerInit()
 //////////////////////////////////////////////////////////////////////
 // Send a Unit country change to this player.
 bool
-_sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country)
+_sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country, UINT32* replacementUnitID, GARRISON_CHANGE_ACTION* desiredClientAction)
 {
 	HCUnitCountryChange entry;
 
-		entry.m_unitID = *unitID;
-		entry.m_country = *country;
-	
-		static HC_UNIT_COUNTRY_CHANGES _packet;
-		_packet.add(entry);
+	entry.m_unitID = *unitID;
+	entry.m_country = *country;
+	entry.m_replacementUnitID = *replacementUnitID;
+	entry.m_action = *desiredClientAction;
 
-		if (_packet.size() > 0)
-		{
-			dbugLog(_FLD, "t:%d p:%u c:%s sending a unit country change."
-				, player->teulIndex()
-				, player->playerID()
-				, player->callsign()
-			);
-			_packet.send(player->teulIndex());
-		}
-		_packet.clear();
-		return true;
+	static HC_UNIT_COUNTRY_CHANGES _packet;
+	_packet.add(entry);
+
+	if (_packet.size() > 0)
+	{
+		dbugLog(_FLD, "t:%d p:%u c:%s sending a unit country change."
+			, player->teulIndex()
+			, player->playerID()
+			, player->callsign()
+		);
+		_packet.send(player->teulIndex());
+	}
+	_packet.clear();
+
+	return true;
 }
+
+/*  TODO: Need to figure out if I'm missing anything here
+
+// Map host calls this.
+void
+GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
+{
+	HCUnit* hcUnit = HCUnit::Lookup(unitID);
+	if (hcUnit != nullptr)
+	{
+		BrigadeSelection tempSelection;
+		HCUnit* replacementHCUnit = nullptr;
+		UINT32 replacementHCUnitID = 0;
+		GARRISON_CHANGE_ACTION clientAction = CHANGE_NOTHING;
+		WWII_COUNTRY originalUnitCountry = hcUnit->country();
+		BRANCH_ENUM originalUnitBranch = hcUnit->branch();
+		
+		//  Set the Unit (unitID) to the NEW Country.
+		hcUnit->setCountry(country);
+
+		//  Send the change to all connected players.
+		for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
+		{
+			Player* const player = (Player*)(*it);
+
+			if (player->brigadeID() == unitID)
+			{
+				if (wwiiSide(originalUnitCountry) == wwiiSide(country))
+				{
+					//  Garrison Changes Country = HC Changes the Garrison unit Country. Persona = Change.
+					dbugLog(_FLN, "Garrison Changed: Country.");
+
+					//  Using the Same Unit.
+					replacementHCUnit = hcUnit;
+					clientAction = CHANGE_COUNTRY;
+				}
+				else
+				{
+					//  Garrison Replacement Unit Required.
+					replacementHCUnit = tempSelection.GetReplacementGarrison(unitID, originalUnitCountry);
+
+					if (replacementHCUnit == nullptr)
+					{
+						//  No replacement unit selected, provide an appropriate Training Unit.
+						replacementHCUnit = HCUnit::GetTrainingUnit(originalUnitCountry, originalUnitBranch);
+					}
+
+					if (replacementHCUnit != nullptr)
+					{
+						if (originalUnitBranch == replacementHCUnit->branch())
+						{
+							//  Garrison Changes Side = CP captured by the Enemy. Persona = Probably NO Change.
+							dbugLog(_FLN, "Garrison Changed: Side.");
+
+							clientAction = CHANGE_SIDE;
+						}
+						else
+						{
+							if (originalUnitCountry == replacementHCUnit->m_countryID)
+							{
+								//  Garrison Changes Branch = The Replacement Unit has a different Branch. Persona = Change.
+								dbugLog(_FLN, "Garrison Changed: Branch.");
+
+								clientAction = CHANGE_BRANCH;
+							}
+							else
+							{
+								//  Garrison Changes Country and Branch = The Replacement Unit has a different Country AND Branch. Persona = Change.
+								dbugLog(_FLN, "Garrison Changed Country and Branch.");
+
+								clientAction = CHANGE_COUNTRY_BRANCH;
+							}
+						}
+					}
+				}
+
+				if (replacementHCUnit != nullptr)
+				{
+					replacementHCUnitID = replacementHCUnit->unitID();
+					dbugLog(_FLN, "Replacement Unit: %s (%d) for Player: %d", replacementHCUnit->name(), replacementHCUnit->unitID(), player->playerID());
+				}
+				else
+				{
+					//  NO Changes - This might be indicating an Error Condition because the replacementHCUnit SHOULD NEVER end up as nullptr.
+					dbugLog(_FLN, "No Garrison Changes for Player: %d.  (###)", player->playerID());
+
+					replacementHCUnitID = 0;
+					clientAction = CHANGE_NOTHING;
+				}
+			}
+			else
+			{
+				//  NO Changes
+				dbugLog(_FLN, "No Garrison Changes for Player: %d.", player->playerID());
+
+				replacementHCUnitID = 0;
+				clientAction = CHANGE_NOTHING;
+			}
+
+			_sendHCUnitCountryChange(player, &unitID, &country, &replacementHCUnitID, &clientAction);
+
+			replacementHCUnit = nullptr;
+			replacementHCUnitID = 0;
+		}
+	}
+	else
+	{
+		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+	}
+}
+
+*/

@@ -14,9 +14,10 @@ require 'locstr'
 StringPool.Add({
 
 	-- Training Facility Names (or numbers)
-	['ukTraining'] = { ['en'] = 'British Training', ['zh'] = 'B军训练' }
-,	['frTraining'] = { ['en'] = 'French Training', ['zh'] = 'A军训练' }
-,	['deTraining'] = { ['en'] = 'German Training', ['zh'] = 'C军训练' }
+	['ukTraining'] = { ['en'] = 'Fort Montgomery - British Training Ground', ['zh'] = 'B军训练' }
+,	['frTraining'] = { ['en'] = 'Fort De Gaulle - French Training Ground', ['zh'] = 'A军训练' }
+,	['deTraining'] = { ['en'] = 'Fort Rommel - German Training Ground', ['zh'] = 'C军训练' }
+,       ['usTraining'] = { ['en'] = 'Fort Patton - U.S. Training Ground', ['zh'] = '美国训练场' }
 
 	-- The forts at Area 51
 ,	['ukFort'] = { ['en'] = 'Fort Montgomery', ['zh'] = '孟德利堡垒' }

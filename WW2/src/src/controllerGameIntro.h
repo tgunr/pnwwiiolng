@@ -8,6 +8,5 @@ struct ProcessIntroduction
 {
 	UINT64	m_processID;
 	UINT32	m_processType;
-	UINT32	m_token;
 };
 #pragma pack(pop)

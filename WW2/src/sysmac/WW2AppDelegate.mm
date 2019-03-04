@@ -799,6 +799,10 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)removeAllKeychainEntries
 {
+    if (MacNoKeychainUsage) {
+        return;
+    }
+    
     NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
 
     for (NSArray *account in [self allKeychainAccountNames]) {
@@ -821,6 +825,10 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)saveUserNamePassword
 {
+    if (MacNoKeychainUsage) {
+        return;
+    }
+    
     // The entered credentials are valid!
     if (_passwordEntryIsInitial) {
         // We used already-saved credentials successfully. Don't bother.
@@ -863,6 +871,10 @@ extern NSString *WebActionOriginalURLKey;
         [passwordField setStringValue:@""];
         rememberUserPassword = NO;
         [rememberPasswordCheckbox setState:NSOffState];
+        
+        if (MacNoKeychainUsage) {
+            return;
+        }
         
         NSArray *accounts = [self allKeychainAccountNames];
         

@@ -348,7 +348,6 @@ namespace {
 	void ConnectionError(SINT32, const UCHAR*, SINT32, const TEUL_CALLBACK*, SINT32 error);
 
 	TEUL_CALLBACK* _LoginXchg = nullptr;
-	TEUL_CALLBACK* _LoginSteamXchg = nullptr;
 	TEUL_CALLBACK* _GetArenaList = nullptr;
 	TEUL_CALLBACK* _ArenaReq = nullptr;
 	TEUL_CALLBACK* _ArenaReq2 = nullptr;

@@ -88,7 +88,6 @@ static Teul::PlayerIdent _defaultPlayerIdent;
 static void _yield()
 {
 	teulUpdateTransport(1);
-	Teul::Connection::expire();
 }
 
 /************************************************************************************************
@@ -181,7 +180,7 @@ struct ClientClassData
 		int instance;
 		int country;
 		int branch;
-		int brigade;
+		int brigade;  //  TODO: This should be at least an unsigned int as the usual Brigade/HCUnit ID's are UINT32
 		int mission;
 	};
 
@@ -547,32 +546,36 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 
 	Teul::ServerAddr server = {host, static_cast<UINT16>(port)};
 	Teul::PlayerIdent &ident = _classdata->playerIdent;
+    
+    try {
+        ClientHostConnection *conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30 * 1000);
+        if (!conn->start(this)) {
+            dbugLog(_FLI, "Failed to start host connection");
+            throw ClientNetError("connect.login.auth.failed");
+        }
 
-	ClientHostConnection *conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30 * 1000);
-	if (!conn->start(this))
-	{
-		dbugLog(_FLI, "Failed to start host connection");
-		throw ClientNetError("connect.login.auth.failed");
-	}
+        StatusMessage("loading.network.loggingin");
 
-	StatusMessage("loading.network.loggingin");
+        while (conn->complete() == false) {
+            _yield();
+        }
 
-	while (conn->complete() == false)
-	{
-		_yield();
-	}
-
-	if (conn->m_connected == false || conn->m_loggedIn == false)
-	{
-		if (conn->m_connected)
-		{
-			if (mapHostState->retryCount > 0)
-				throw ClientNetError("connect.login.auth.reconnectfailed");
-			throw ClientNetError("connect.login.auth.failed");
-		}
-		else
-			throw ClientNetError("connect.login.auth.timeout");
-	}
+        if (conn->m_connected == false || conn->m_loggedIn == false)
+        {
+            if (conn->m_connected) {
+                if (mapHostState->retryCount > 0) {
+                    throw ClientNetError("connect.login.auth.reconnectfailed");
+                } else {
+                    throw ClientNetError("connect.login.auth.failed");
+                }
+            } else {
+                throw ClientNetError("connect.login.auth.timeout");
+            }
+        }
+    } catch (...) {
+        Teul::Connection::expire(); // garbage-collect connections
+        throw;
+    }
 
 	if (wantChat && !ChatState()->connection && !ChatState()->IsReconnecting())
 	{
@@ -586,6 +589,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 			if (teulClock64 >= timeout)
 				throw ClientNetError("connect.login.chat.timeout");
 			_yield();
+            Teul::Connection::expire();
 		}
 
 		dbugLog(_FLI, "connecting to chat");
@@ -613,6 +617,7 @@ int Client::Login(unsigned int host, UINT16 port, bool wantChat)
 int Client::Logout()
 {
 	_yield();
+    Teul::Connection::expire();
 
 	for (int i = 0; i < Teul::Connection::NumHostTypes; i++)
 		_classdata->connections[i]->Reset();
@@ -687,7 +692,7 @@ int Client::RequestPersonaSummaries()
 }
 
 /************************************************************************************************
-	Client::RequestPersonaSummaries
+	Client::RequestPersonaSelection
 *************************************************************************************************/
 
 int Client::RequestPersonaSelection(PersonaSummary const &persona)
@@ -839,7 +844,7 @@ int Client::RequestMissionWeapCancel()
 }
 
 /************************************************************************************************
-	Client::RequestMissionWeapCancel
+	Client::ClearMissionWeap
 *************************************************************************************************/
 
 void Client::ClearMissionWeap() { memset(&_data->weapSerial, 0x0, sizeof(_data->weapSerial)); }
@@ -857,7 +862,7 @@ int Client::RequestMissionCrew(unsigned int numcrew) { return mmSendRequestCrew(
 int Client::RequestMissionPostList(FULL_OBJ_ID const &fac) { return mmSendPostListRequest(MapConnection(), fac); }
 
 /************************************************************************************************
-	Client::RequestMissionPostList
+	Client::RequestJoin
 *************************************************************************************************/
 
 int Client::RequestJoin(WEAPON_SERIAL const &serial, ChatHandle const &commander)
@@ -1240,7 +1245,7 @@ void Client::ProcessMissionMemberUpdate(MissionMember const &missionMember)
 }
 
 /************************************************************************************************
-	ProcessMissionMemberUpdate
+	ProcessBrigadeControl
 *************************************************************************************************/
 
 void Client::ProcessBrigadeControl(BrigadeControlList const &entry) { _classdata->oics[entry.m_brigade] = entry; }
@@ -1990,7 +1995,10 @@ bool Client::ConnectToChatHost(bool blocking)
 		_yield();
 	}
 
-	return conn->isInService();
+	bool did_connect = conn->isInService();
+ 
+    Teul::Connection::expire();
+    return did_connect;
 }
 
 /************************************************************************************************
@@ -2445,7 +2453,7 @@ bool Client::SelectPersona(const PersonaSummary &persona, bool save, bool force)
 
 		if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
 			current = GetPersona();
-
+	
 		ResetMissionData();
 	}
 
@@ -2483,7 +2491,7 @@ bool Client::SelectBrigade(UINT32 brigadeID, bool save, bool force)
 			{
 				BrigadeControlRequest req;
 				req.requestList(PlayerClient()->ChatConnection(), current->m_countryID,
-								current->m_branchID); // lets get a new list of OIC's
+					current->m_branchID); // lets get a new list of OIC's
 			}
 
 			return true;
@@ -2545,6 +2553,80 @@ const PersonaSummary *Client::GetPersona(int country, int branch) const
 	}
 
 	return nullptr;
+}
+
+//  Checks each of the Players other personas (not the current one) brigade to ensure it is valid following a Garrison Change.
+//  Retrurns the number of Players "Other" personas changed. It "Should" only be 1 at most.
+int Client::ValidatePersonasBrigade(UINT32 unitID)
+{
+	int retValue = 0;
+
+	const PersonaSummary *selectedPersona = GetPersona();
+	UINT32 selectedPersonaID = selectedPersona->m_personaID;
+
+	const PersonaSummary *current = nullptr;
+	const PersonaSummary *originalPersona = GetPersona();
+	const PersonaSummary *replacementPersona = nullptr;
+
+	PersonaSummary origPersona = *originalPersona;
+
+	for (unsigned int i = 0; i < _classdata->personas.m_count; ++i)
+	{
+		const PersonaSummary &summary = _classdata->personas.m_summaries[i];
+
+		if (summary.m_brigadeID == unitID)
+		{
+			if (summary.m_personaID != selectedPersonaID)
+			{
+				retValue = retValue + 1;
+
+				//  Set the Personas BrigadeID to the Appropriate Training Unit.
+				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(summary.m_countryID, summary.m_branchID);
+
+				replacementPersona = GetPersona(trainingUnit->m_countryID, trainingUnit->m_branchID);
+				PersonaSummary tempPersona = *replacementPersona;
+
+				// try to select it
+				RequestPersonaSelection(tempPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				if (current && *current == tempPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					SelectBrigade(trainingUnit->unitID(), true, true);
+				}
+
+				// Restore the Original Persona and try to select it
+				PersonaSummary origPersona = *originalPersona;
+
+				RequestPersonaSelection(origPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				if (current && *current == origPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					SelectBrigade(current->m_brigadeID, true, true);
+				}
+
+				// update the jsclient
+				PlayerClient()->jsclient->UpdatePersonas();
+			}
+		}
+	}
+
+	return retValue;
 }
 
 // defaults to getting the saved persona
@@ -3074,6 +3156,7 @@ bool HostState::Ready(TeulTimeMS timeout)
 		}
 
 		_yield();
+        Teul::Connection::expire();
 	}
 
 	return true; // we didn't time out
@@ -3500,8 +3583,10 @@ bool CellHostState::Reconnect()
 		if (conn->start(client))
 		{
 			// wait for the connection to finish one way or another
-			while (conn->complete() == false)
+			while (conn->complete() == false) {
 				_yield();
+            }
+            Teul::Connection::expire();
 
 			// good connection!
 			if (Connected())

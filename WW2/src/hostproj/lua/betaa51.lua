@@ -1,10 +1,11 @@
 local area51 = {
-  { "Fort Rommel", GERMANY }
-, { "Fort Montgomery", ENGLAND }
-, { "Fort De Gaulle", FRANCE }
+  { "Fort Rommel - German Training Ground", GERMANY }
+, { "Fort Montgomery - British Training Ground", ENGLAND }
+, { "Fort De Gaulle - French Training Ground", FRANCE }
 , { "Camp Victoria", ENGLAND }
 , { "Camp Gretchen", GERMANY }
 , { "Camp Yvette", FRANCE }
+, { "Fort Patton - U.S. Training Ground", USA }
 } ;
 
 

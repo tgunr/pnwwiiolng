@@ -713,6 +713,13 @@ size_t HTTPRequestParser::getBytesUnused() const
             return m_bytesSoFar - (m_headersParser->getBytesUsed() + m_bodyParser->getUsedBytes());
         case State::Complete:
             return m_bytesSoFar - (m_headersParser->getBytesUsed() + m_bodyParser->getUsedBytes());
+        default:
+            // Apparently, MSVC is unable to correctly determine that a switch is exhaustive over a
+            // scoped enumeration, even though Clang doesn't bat an eyelash. There was some reason
+            // somewhere in the past not to do the LogAbort() here despite having done it 20 lines
+            // earlier, but whatever it was, it's gone now. Since LogAbort() is [[noreturn]], this
+            // should fully satisfy even the most whiny example of Microsoft's laziness.
+            LogAbort("Invalid request parser state %u", static_cast<uint8_t>(m_state));
     }
 }
 

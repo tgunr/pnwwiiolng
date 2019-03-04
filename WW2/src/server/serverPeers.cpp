@@ -244,10 +244,9 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 	teulGetAddress(forIP_, dest, sizeof(dest));
 	dbugLog(_FLI, "requested %s connection: type:%u ip:%s", g_serverTypes[type_], type_, dest);
 	const SINT32 net = forIP_ >> 24;
-	if ( (net == 127) | (net == 0) )
+	if ( type_ == EXIT_SERVER || (type_ == Server::myServerInfo.stats.type && (net == 127 || net == 0)) )
 	{
-		// Ignore localhost and exit host.
-		dbugLog(_FLI, " - ignoring local/exit host.");
+		dbugLog(_FLI, " - ignoring self/exit host.");
 		return;
 	}
 	// Ignore requests to connect to ourselves or to peers with lower IPs,
@@ -257,7 +256,6 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 	if ( (forIP_ < Server::myServerInfo.stats.address)
 		|| (forIP_ == Server::myServerInfo.stats.address && type_ <= Server::myServerInfo.stats.type)
 		|| ((ip & 0xff) <= (Server::myServerInfo.stats.address & 0xff) && type_ <= Server::myServerInfo.stats.type)
-		|| ((forIP_ >> 24) == 127)
 		)
 	{
 		dbugLog(_FLI, " - leaving this [%u] one to connect to me [%u]", (ip & 0xff), (Server::myServerInfo.stats.address & 0xff));

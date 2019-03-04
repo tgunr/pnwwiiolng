@@ -359,16 +359,18 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Receive a map HCUnit Locations message
+// Receive a map HCUnit Country Change message
 
 template<>
 SINT32 HC_UNIT_COUNTRY_CHANGES::receive(SINT32 teulIndex, HC_UNIT_COUNTRY_CHANGES& incoming)
 {
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if (!client)
+	{
 		return 0;
+	}
 
-	Write_Debug("Receiving %u incoming unit country change", incoming.size());
+	clientErrorLog("Receiving %u incoming unit country change", incoming.size());
 
 	for (UINT32 i = 0; i < incoming.size(); ++i)
 		client->ProcessHCUnitCountryChange(incoming.data(i));
