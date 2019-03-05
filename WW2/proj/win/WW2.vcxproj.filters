@@ -385,9 +385,6 @@
     <ClInclude Include="..\..\src\draw\drawIcon.h">
       <Filter>draw</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\draw\sneaky.h">
-      <Filter>draw</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\draw\TextureFont.h">
       <Filter>draw</Filter>
     </ClInclude>
@@ -1755,9 +1752,6 @@
       <Filter>draw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\draw\FTFontReplacement.cpp">
-      <Filter>draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\draw\sneaky.cpp">
       <Filter>draw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\draw\TextureFont.cpp">

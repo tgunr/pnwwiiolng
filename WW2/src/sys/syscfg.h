@@ -54,9 +54,11 @@ using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 // Project defines - DEBUG
 #ifdef _DEBUG
 #ifndef NO_LOGGING
+#ifndef EVENT_LOG
 #define EVENT_LOG
 #define EVENT_LOG_TIMES
 //		#define EVENT_LOG_EXTREME
+#endif
 #endif
 // #define MEMORY_DEBUG_EXTREME
 #elif defined(BETA_RELEASE)

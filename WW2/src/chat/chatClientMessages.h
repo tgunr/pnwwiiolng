@@ -2,8 +2,6 @@
 
 #define BUFFERSIZE 16
 
-#include <b64/encode.h>
-#include <b64/decode.h>
 #include "build_info.hpp"
 
 // Created: Wed Jul 26 11:00:52 2000
@@ -94,32 +92,15 @@ struct ChatClientInfo
     char m_clientInfo[INFO_MAX_RAW_SIZE];
     char m_output[INFO_MAX_ENCODE_SIZE+1];
 
-    base64::base64_encodestate state_encode;
-    base64::base64_decodestate state_decode;
-
     void decode(char *decodeStr) {
-
-        base64_init_decodestate(&state_decode);
-        base64::base64_decode_block(decodeStr, static_cast<int>(strlen(decodeStr)), m_clientInfo, &state_decode);
+        size_t decodeLen = sizeof(m_clientInfo);
+        Base64Decode(decodeStr, &m_clientInfo[0], &decodeLen);
     }
 
     // Member functions
     char *encode() {
-        base64_init_encodestate(&state_encode);
-
-        int cnt = 0;
-        char* c = m_output;
-
-        /* gather data from the input and send it to the output */
-        cnt = base64::base64_encode_block(m_clientInfo, static_cast<int>(sizeof(m_clientInfo)), m_output, &state_encode);
-        c += cnt;
-
-        /* since we have encoded the entire input string, we know that
-         there is no more input data; finalise the encoding */
-        cnt = base64::base64_encode_blockend(c, &state_encode);
-        c += cnt;
-        *c = 0;
-
+        std::string output = Base64Encode(&m_clientInfo[0], sizeof(m_clientInfo));
+        strlcpy(&m_output[0], output.data(), sizeof(m_output));
         return m_output;
     }
 };

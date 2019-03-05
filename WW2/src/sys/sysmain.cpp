@@ -252,10 +252,13 @@ BOOL				bOsVersionInfo;
 	memset(&osvi, 0, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
+    __pragma(warning(push));
+	__pragma(warning(disable : 4996));
 	if (!(bOsVersionInfo = GetVersionEx((OSVERSIONINFO*)&osvi)))
 	{
 		return FALSE;
 	}
+	__pragma(warning(pop));
 
 	switch (osvi.dwPlatformId)
 	{
@@ -616,6 +619,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!mngoptParse()) {
 		return 0;
 	}
+
+	// Declare our "DPI awareness" (air quotes are very required here) as early
+	// as possible. The only reason this goes below mngoptParse() is so we can
+	// later add as -nodpiaware option for testing or whatever.
+	// TODO: Add a -dpiawareness option or something.
+	// TODO: Use an API availability check (Windows version checks above are
+	//       very very wrong and unusable) to enable usage of the newer
+	//       SetProcessDpiAwarenessContext() (Win 10 1607) or
+	//       SetProcessDpiAwareness() (Win 8.1) when available.
+	SetProcessDPIAware();
 
 	// We may need to restart if this is a Steam version that wasn't launched properly.
 	if ( !InitSteam() )

@@ -9,7 +9,7 @@
 #pragma pack(push)
 #pragma pack(1)
 
-#define MINPOOLOBJS 110000
+#define MINPOOLOBJS 150000
 
 #define QUEUE_TEXTURE_LOADING
 #undef QUEUE_TEXTURE_LOADING	// Disable to avoid heap fragmentation

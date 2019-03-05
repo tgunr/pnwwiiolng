@@ -1,28 +1,35 @@
 ####################################
 ## Declare CMake version requirement
-CMAKE_MINIMUM_REQUIRED(VERSION 3.8.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.12.0)
+
+####################################
+## Simplify environment
+IF( WIN32 OR APPLE )
+	SET( LINUX OFF )
+ELSEIF( UNIX )
+	SET( LINUX ON )
+ELSE()
+	MESSAGE( FATAL_ERROR "Detected neither WIN32, APPLE, nor UNIX. What system is this?" )
+ENDIF()
 
 ####################################
 ## Initial CMake config
-ENABLE_TESTING()
-SET( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes;${CMAKE_MODULE_PATH}" )
-IF ( NOT UNIX AND NOT APPLE AND NOT WIN32 )
-    MESSAGE( FATAL_ERROR "Unknown build environment, not continuing" )
-ENDIF()
+LIST( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes" )
 
-IF ( NOT CMAKE_BUILD_TYPE )
-	MESSAGE( WARNING "No CMAKE_BUILD_TYPE specified. Assuming Debug." )
-	SET( CMAKE_BUILD_TYPE Debug CACHE STRING "Build type" FORCE )
-ENDIF()
-SET(_BUILD_TYPES "Debug, Release, RelWithDebInfo, MinSizeRel")
-STRING(FIND ", ${_BUILD_TYPES}" "${CMAKE_BUILD_TYPE}" _BUILD_TYPE)
-IF ( NOT _BUILD_TYPE GREATER 1 )	# ',' and ' ' match against the start of the string
-	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE, expected one of ${_BUILD_TYPES}" )
+SET( CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo )
+IF ( NOT CMAKE_BUILD_TYPE AND CMAKE_GENERATOR MATCHES "Ninja|Makefile" )
+	MESSAGE( FATAL_ERROR "CMAKE_BUILD_TYPE is required with ${CMAKE_GENERATOR}. Specify one of: ${CMAKE_CONFIGURATION_TYPES}" )
+ELSEIF( CMAKE_BUILD_TYPE AND NOT CMAKE_BUILD_TYPE IN_LIST CMAKE_CONFIGURATION_TYPES )
+	MESSAGE( FATAL_ERROR "Unrecognized CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE}. Expected one of: ${CMAKE_CONFIGURATION_TYPES}" )
 ENDIF()
 
 ####################################
 ## Declare the project (don't specify version here)
-PROJECT( WW2GameHosts LANGUAGES C CXX )
+PROJECT( WW2Hosts
+	DESCRIPTION "Hosts and utilities for World War II Online"
+	HOMEPAGE_URL "https://wwiionline.com"
+	LANGUAGES C CXX
+)
 
 ####################################
 ## Require C++14
@@ -51,27 +58,30 @@ ELSEIF ( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 ELSE ()
 	MESSAGE( FATAL_ERROR "Unknown CMAKE_SIZEOF_VOID_P value ${CMAKE_SIZEOF_VOID_P}" )
 ENDIF ()
-
 MARK_AS_ADVANCED( CMAKE_BITNESS )
-MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit" )
 
 OPTION( PN_BUILD_32BIT "Enable 32-bit build" OFF )
 IF ( WIN32 OR CMAKE_BITNESS EQUAL 32 )
 	MARK_AS_ADVANCED( PN_BUILD_32BIT )
 ENDIF()
 
-# You *HAVE* to supply this on the command line when you first
-# build the cache in order for this to work, otherwise CMake
-# will not re-check library paths and will use the wrong
-# libs.
 IF ( CMAKE_BITNESS EQUAL 64 AND NOT PN_BUILD_32BIT )
-	SET(BUILD_BITNESS 64)
+	SET( BUILD_BITNESS 64 )
 ELSE ( )
-	SET(BUILD_BITNESS 32)
+	SET( BUILD_BITNESS 32 )
 ENDIF ( )
-
 MARK_AS_ADVANCED( BUILD_BITNESS )
-MESSAGE( STATUS "Build is ${BUILD_BITNESS}-bit" )
+
+IF ( APPLE AND NOT BUILD_BITNESS EQUAL 64 )
+	MESSAGE( FATAL_ERROR "It is no longer possible to build 32-bit hosts on macOS" )
+ELSEIF ( LINUX AND NOT CMAKE_BITNESS EQUAL BUILD_BITNESS )
+	MESSAGE( WARNING "You are building ${BUILD_BITNESS}-bit on a ${CMAKE_BITNESS}-bit machine. This is probably a bad idea." )
+ELSEIF ( WIN32 AND NOT BUILD_BITNESS EQUAL 32 )
+	MESSAGE( FATAL_ERROR
+		"The 64-bit host build is temporarily unsupported on Win32 due to problems with libxml2 prebuilts." )
+ENDIF()
+
+MESSAGE( STATUS "CMake is ${CMAKE_BITNESS}-bit, build is ${BUILD_BITNESS}-bit" )
 
 ####################################
 ## Executable names
@@ -90,10 +100,7 @@ SET( LIBRARIES_DIR "${PROJECT_DIR}/Libraries" )
 ####################################
 ## General search paths
 
-# /usr/local is explicitly added because many systems don't search it by
-# default despite it being an obvious place to look.
 INCLUDE_DIRECTORIES(
-	${LIBRARIES_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
@@ -130,11 +137,11 @@ ELSE()
 ENDIF()
 
 # If the user is building a Debug build, enable SANITIZE options.
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 	IF ( CMAKE_BUILD_TYPE MATCHES Debug )
 		OPTION( PN_SANITIZE "Enable -fsanitize=address, -fsanitize=undefined and -fstack-protector-all" OFF )
 	ELSE()
-		SET( PN_SANITIZE OFF CACHE BOOL "Enables address sanitizer etc on non-msvc builds" FORCE )
+		SET( PN_SANITIZE OFF CACHE BOOL "Enables Address Sanitizer, etc. on Unix builds" FORCE )
 		MARK_AS_ADVANCED( PN_SANITIZE )
 	ENDIF()
 ENDIF()
@@ -171,11 +178,8 @@ IF ( PN_BETA_RELEASE )
 ENDIF()
 
 ####################################
-## Status output
-MESSAGE( STATUS "${CMAKE_BUILD_TYPE} build, ${BUILD_BITNESS}-bit." )
-
-####################################
 ## Generate config.h
+# TODO THIS NEEDS TO BE MOVED DOWN AND APPLY ITSELF TO THE MAIN HOSTS CONFIG TARGET
 INCLUDE( cmakeincludes/PlatformChecks.cmake )
 
 ####################################
@@ -226,6 +230,17 @@ ELSE()
 ENDIF()
 
 ####################################
+# maclib library, provides the Base64 implementation on macOS for the hosts
+# This is needed because the Base64 implementation uses Objective-C and that
+# needs a separate target
+IF ( APPLE )
+	FIND_LIBRARY( FOUNDATION Foundation )
+	ADD_LIBRARY(maclib STATIC sysmac/sysMacCompat.mm)
+	TARGET_LINK_LIBRARIES( maclib ${FOUNDATION} )
+	LINK_LIBRARIES( maclib ${FOUNDATION} )
+ENDIF()
+
+####################################
 # teulserver library, provides teul and the "server" API, for what they're worth
 ADD_LIBRARY(teulserver STATIC
 	include/platforms.h include/precompile_includes.h
@@ -261,7 +276,7 @@ ADD_LIBRARY(teulserver STATIC
     mem/memPool.h
     teul/raknetConn.cpp teul/raknetConn.h
 )
-TARGET_LINK_LIBRARIES( teulserver ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
+TARGET_LINK_LIBRARIES( teulserver LibXml2::LibXml2 MySQL::MySQL ${LIBEVENT_LIBRARIES} ${RAKNET_LIBRARY_LIBS} RakNetLibStatic libcattunnel libcatcrypt libcatmath libcatcommon )
 SET_PROPERTY( TARGET teulserver PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -273,6 +288,7 @@ ADD_LIBRARY( instancing STATIC
     mm/mmEnums.h auth/authDispatch.h
     miss/missFlags.h wwii/wwiiBranchEnums.h
 )
+TARGET_LINK_LIBRARIES( instancing MySQL::MySQL )
 SET_PROPERTY( TARGET instancing PROPERTY FOLDER "Libs" )
 
 ####################################
@@ -323,21 +339,14 @@ ADD_LIBRARY( wwiilib STATIC
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
-SET(WWIILIB_LIBRARIES wwiilib ${LIBXML2_LIBRARIES})
-IF (BUILDING_OWN_LIBXML2)
-	MACRO( USE_WWIILIB_ON Name )
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-		ADD_DEPENDENCIES( ${Name} libxml2 )
-	ENDMACRO()
-ELSE()
-	MACRO( USE_WWIILIB_ON Name)
-		TARGET_LINK_LIBRARIES( ${Name} ${WWIILIB_LIBRARIES} ${MYSQL_LIBRARIES} )
-	ENDMACRO()
-ENDIF()
+TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )
+MACRO( USE_WWIILIB_ON Name )
+	TARGET_LINK_LIBRARIES( ${Name} wwiilib LibXml2::LibXml2 MySQL::MySQL )
+ENDMACRO()
 
 ####################################
 ## Various commandline utility executables
-IF ( NOT MSVC )
+IF ( NOT WIN32 )
 
     # Chat management client
     ADD_EXECUTABLE( chatClient
@@ -348,18 +357,6 @@ IF ( NOT MSVC )
 	USE_WWIILIB_ON( chatClient )
     TARGET_LINK_LIBRARIES( chatClient teulserver ${LIBZ_LIBRARIES} )
     SET_PROPERTY( TARGET chatClient PROPERTY FOLDER "Tools" )
-    
-    #ADD_EXECUTABLE( luaClient src/luaClient.cpp )
-    #TARGET_INCLUDE_DIRECTORIES( luaClient
-    #    PRIVATE ${READLINE_INCLUDE_DIRS}
-    #    PRIVATE ${NCURSES_INCLUDE_DIRS}
-	#PRIVATE ${RAKNET_INCLUDE_DIRS}
-    #)
-	#USE_WWIILIB_ON( luaClient )
-    #TARGET_LINK_LIBRARIES( luaClient
-    #    teulserver ${READLINE_LIBRARIES} ${NCURSES_LIBRARIES} ${MYSQL_LIBRARIES}
-    #)
-    #SET_PROPERTY( TARGET luaClient PROPERTY FOLDER "Tools" )
 
     INSTALL(
         TARGETS chatClient #luaClient
@@ -371,7 +368,7 @@ IF ( NOT MSVC )
 
 ENDIF()
 
-IF ( MSVC )
+IF ( WIN32 )
 	# kfsone: I'm currently using these because they're helpful for cluster-in-a-box,
 
 	# Not currently generated:
@@ -447,7 +444,7 @@ SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 ## Macro for building hosts
 MACRO( ADD_HOST_TARGET Name )
     SET( HOST_TARGET_Usage "ADD_HOST_TARGET( <Name> [INSTANCING] [LUA] SOURCES ...)" )
-    
+
     CMAKE_PARSE_ARGUMENTS( HOST_TARGET_ARG "INSTANCING;LUA" "" "SOURCES;EXTRA_DEFINITIONS" ${ARGN} )
     IF ( NOT "${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" STREQUAL "" )
         MESSAGE( FATAL_ERROR "0 ${HOST_TARGET_Usage} ${HOST_TARGET_ARG_UNPARSED_ARGUMENTS}" )
@@ -575,7 +572,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
-TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} libb64 ${LIBZ_LIBRARIES})
+TARGET_LINK_LIBRARIES( ${CHAT_HOST_EXE} ${LIBZ_LIBRARIES})
 
 ####################################
 ## Cell host
@@ -650,7 +647,6 @@ ADD_HOST_TARGET( ${MAP_HOST_EXE} SOURCES
     map/mapDB.cpp map/mapDB.h
     auth/authPlayerDetails.h
     map/mapHost.cpp map/mapHostMessages.cpp map/mapHostMessages.h
-    map/mapMinuteBalance.cpp map/mapMinuteBalance.h
     map/mapPack.cpp
     map/mapPlayer.cpp map/mapPlayer.h map/mapPlayerTypes.h
     miss/missionTypes.h miss/missionPacket.h miss/missFlags.h
@@ -784,7 +780,7 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA
 )
-IF ( MSVC )
+IF ( WIN32 )
     SET_PROPERTY( SOURCE ${STRAT_HOST_EXE}Lua.cc PROPERTY COMPILE_FLAGS
                   "/W0" )
 ELSE()

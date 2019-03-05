@@ -13,7 +13,7 @@
 #define CD_POLY_FENCE
 //#undef CD_POLY_FENCE
 
-
+/*
 #ifndef _DEBUG
 
 #define OutlineTriangle(a, b, c)
@@ -34,7 +34,7 @@ static void HighliteView(piVECTOR* pv, DWORD color)
 }
 
 #endif
-
+*/
 
 LOGICAL obcdCheckObjectCollision(OBJECT* lpobj, COLLISION* collision)
 {

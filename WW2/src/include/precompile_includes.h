@@ -1,6 +1,6 @@
 #pragma once
 
-#if defined(HAVE_CONFIG_H)
+#if __has_include("config.h")
 #include "config.h"
 #endif
 
@@ -33,7 +33,13 @@
 #include <numeric>
 #include <thread>
 #include <mutex>
+#include <locale>
+#include <fstream>
 #include <signal.h>
+
+#if __has_include(<codecvt>)
+#include <codecvt>
+#endif
 
 #if __has_include(<unistd.h>)
 #include <unistd.h>

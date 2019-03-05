@@ -3956,10 +3956,12 @@ static void _describeState(const wchar_t* const hostName, std::wstring& into, co
 	SINT32 reason = 0;
 	TeulDeltaMS lastRx_ms = 0;
 	const bool success = Teul::GetEndpointStatus(state->Index(), &reason, &lastRx_ms);
+
 	if ( success == false )
 	{
 		if ( reason < 0 )
 			reason = -reason;
+
 		switch ( reason )
 		{
 		case EINVAL:
@@ -3982,12 +3984,12 @@ static void _describeState(const wchar_t* const hostName, std::wstring& into, co
 		return;
 	}
 
-	if ( lastRx_ms <= 5000 )
+	if ( lastRx_ms <= 5000 ) {
 		into += LocOrStr(L"?network.state.label.ok?", L"-OK-");
-	else
-	{
-		wchar_t lastRx[65];
-		swprintf(lastRx, sizeof(lastRx) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
+	} else {
+		wchar_t lastRx[65] = {0};
+
+		swprintf(lastRx, (sizeof(lastRx) / sizeof(lastRx[0])) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
 		into += lastRx;
 	}
 }
@@ -4008,7 +4010,7 @@ std::wstring clientGetNetworkState()
 	if ( client->CellState()->Connected() && g_lastPing > 0 )
 	{
 		wchar_t ping[65];
-		swprintf(ping, sizeof(ping) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
+		swprintf(ping, (sizeof(ping) / sizeof(ping[0])) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
 		states += ping;
 	}
 	else

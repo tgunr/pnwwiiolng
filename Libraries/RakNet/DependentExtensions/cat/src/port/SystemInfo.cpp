@@ -233,11 +233,7 @@ static u32 GetMaxSectorSize()
 		there is an emulation layer for new disks that will fake 512B sector sizes.
 	*/
 
-	// If OS version is Vista+,
-	OSVERSIONINFOA info;
-	info.dwOSVersionInfoSize = sizeof(info);
-	GetVersionExA(&info);
-	bool use_physical_sector_size = info.dwMajorVersion >= 6;
+	bool use_physical_sector_size = true;
 
 	// Set up device names
 	const int MAX_DRIVES = 16;

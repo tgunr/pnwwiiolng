@@ -9,7 +9,6 @@ Description:
 #include "ogl/oglGlobalStates.h"
 #include "shader/glsl.h"
 #include "ogl/States.h"
-#include "draw/sneaky.h"
 
 // Use for shared uniforms blocks (Add if necessary)
 enum
@@ -190,7 +189,7 @@ void glslProgram::LinkProgram()
 
     if(!_programhandle)
     {
-        _programhandle = gl_CreateProgram();
+        _programhandle = glCreateProgram();
     }
 
     _needsLink = false;

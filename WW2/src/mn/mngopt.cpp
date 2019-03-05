@@ -106,6 +106,9 @@ static GVAR vars[] = {
 #endif
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
+    LOGICAL_KEY_DEF("nomouseclip", gDisableMouseClipping),
+    LOGICAL_KEY_DEF("nohidemouse", gDisableMouseHiding),
+    LOGICAL_KEY_DEF("notopmost", gDisableGameTopmost),
 #endif
     { nullptr, ENULL, { nullptr }, 0 },
 };

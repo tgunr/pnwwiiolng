@@ -22,9 +22,9 @@
 #define new DEBUG_NEW
 #endif
 
-#include "glew/glew.h"
+#include "GL/glew.h"
 #include <GL/gl.h>
-#include "glew/wglew.h"
+#include "GL/wglew.h"
 
 #include <algorithm>
 

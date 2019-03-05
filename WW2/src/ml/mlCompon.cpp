@@ -195,7 +195,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 	UINT32 VarNum;
 	UCHAR * VarName;
 	UCHAR * VarContents;
-	mlComponent * CurrentComponent;
+	mlComponent * CurrentComponent = nullptr;
 
 	while (fioGetLine(ComponentListFile, (char*)Buffer, 255) != 0)
 	{
@@ -669,6 +669,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 	mlComponent * CurrentComponent;
 
 	*ComponentList = nullptr;
+	CurrentComponent = nullptr;
 	if(ComponentListFilename == nullptr || *ComponentListFilename == '\0')
 		return 1;
 
@@ -739,7 +740,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == nullptr || VarContents == nullptr)
+			if (VarName == nullptr || VarContents == nullptr || CurrentComponent == nullptr)
 				continue;
 
 			mlUtilityFindVarname(&VarNum, VarName,

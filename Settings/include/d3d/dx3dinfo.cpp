@@ -1,12 +1,18 @@
 // dx3dinfo.c
-
+#include "stdafx.h"
 #include <windows.h>
+#include <mmsystem.h>
 
 #include "d3d\mmeapi.h"
 #include "dsound.h"
 #include <vector>
 
 #include "d3d\dx3dinfo.h"
+
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "d3d9.lib")
+#pragma comment(lib, "dxguid.lib")
+#pragma comment(lib, "dsound.lib")
 
 DWORD					numadapters;
 

@@ -17,7 +17,6 @@
 #include "mem/mem.h"
 #include "ogl/oglGlobalStates.h"
 #include "ogl/States.h"
-#include "draw/sneaky.h"
 
 #if USE_STATESET
 #include "fx/postRender.h"
@@ -110,7 +109,7 @@ static bool _createTexture(SINT32 width, SINT32 height, GLenum target, GLuint& t
 {
     glEnable(target);
 
-    gl_GenTextures(1, &texid);
+    glGenTextures(1, &texid);
 
     // Initialize color texture
     TextureState::Bind(0, texid, target);
