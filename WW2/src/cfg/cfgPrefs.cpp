@@ -114,7 +114,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.radialdensity",       &g_fRadialDensity,          cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.radialradius",        &g_fRadialRadius,           cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		1,		0,	0, true	},
-	{"app.usenetcode",			nullptr,					cfgPARAM_BOOLEAN,   1,      0,  1, true },
+	{"app.usenetcode",			&g_wantNetcode,				cfgPARAM_BOOLEAN,   1,      0,  1, true },
 	{"app.fsaasamples",      	&g_iFSSASamples,			cfgPARAM_SINT,		1,		0,	0, false	},
 	{"app.fsaahighquality",		&g_bFSSAHighQuality,        cfgPARAM_BOOLEAN,	1,		0,	1, false	},
 	{"app.soundhighquality",    &g_bSoundHighQuality,       cfgPARAM_BOOLEAN,	1,		0,	1, false	},
@@ -131,7 +131,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.usenetworkroute",     &g_useNetworkRoute,         cfgPARAM_SINT,		0,		0,	0, true	},
 	{"app.wantsse2",            &g_wantSSE2,				cfgPARAM_BOOLEAN,	0,		0,	1, false	},
 	{"app.fontsize",			nullptr,						cfgPARAM_UINT,		1,		9,	12, true	},
-	{"app.squadinvites",        &SquadInvites,				cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.squadinvites",        &SquadInvites,				    cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.tooltips",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.showreadout",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.iconmode",			nullptr,						cfgPARAM_SINT,		1,		0,	2, true	},
@@ -143,12 +143,12 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.awsalpha",			nullptr,						cfgPARAM_FLOAT,		1,		0,	1, true	},
 	{"app.ragdolls",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.setdecal",			nullptr,						cfgPARAM_UINT,		1,		0,	0, true	},
-	{"app.waterrefractions",    &wantWaterRefractions,      cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.wantbloodeffects",    &WantBloodEffects,          cfgPARAM_BOOLEAN,   1,      0,  1 , true  },
-	{"app.shadowreceivers",		&ShadowMapFlags,			cfgPARAM_UINT,		1,      0,  1 , true  },
+	{"app.waterrefractions",    &wantWaterRefractions,          cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.wantbloodeffects",    &WantBloodEffects,              cfgPARAM_BOOLEAN,   1,      0,  1 , true  },
+	{"app.shadowreceivers",		&ShadowMapFlags,			    cfgPARAM_UINT,		1,      0,  1 , true  },
 	{"app.corpses",				nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.ragdollweapons",		nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.combatsmoke",			&WantCombatSmoke,			cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.combatsmoke",			&WantCombatSmoke,			    cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.radialclutterwhenflying",		&g_bRadialWhenFlying,	cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.lowmemory",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.corpsetime",			nullptr,						cfgPARAM_FLOAT,		1,		0,	1, true	},
@@ -157,10 +157,11 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.ppook",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.pponok",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.macsound",			nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
-	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
-	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
-	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true },
-    {"app.aimFOVAdjust",        &aimFOVAdjust,                  cfgPARAM_UINT,  1,      1,  10,  true }
+	{"app.inflodmod",			&gTrooperMOD,				    cfgPARAM_FLOAT,		1,		0,	4, true	},
+	{"app.conv",				&Convergence,				    cfgPARAM_UINT,		1,		0,  800,    true },
+	{"app.aimScalar",			&aimMouse,					    cfgPARAM_FLOAT,		1,		0,  8,      true },
+    {"app.gVaue",               &gValue,                        cfgPARAM_FLOAT,     1,      1,  100,    true },
+    {"app.turRate",             &gTurRate,                      cfgPARAM_FLOAT,     1,      1,  20,     true }
 	// add more vars here
 };
 
@@ -1047,6 +1048,10 @@ void cfgPrefsSetDefaults()
 
 	gTrooperLOD = 1.0f;
 	gTrooperMOD = 1.0f;
+    gTurRate = 1.0f;
+    gValue = 1.0f;
+    gToggle1 = 1;
+    
 	gRagdolls = TRUE;
 	gVCache = 0; // disabled by default
 
@@ -1060,7 +1065,8 @@ void cfgPrefsSetDefaults()
 	gr2DrawFlags = 1;
 #endif
 
-	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "800x600x32");
+    
+	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "0x0x0");
 
 	// special processing gets handled by a call to cfgPrefsSyncGlobals() next
 }
@@ -1081,14 +1087,16 @@ void cfgPrefsSetResolution()
 	strncpy(str, WantedVideoResolution, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedWidth = atoi(str);
+	if ( WantedWidth == 0 )
+		WantedWidth = atoi(str);
 
 	// Height
 	Length = strcspn(WantedVideoResolution + Position, "x");
 	strncpy(str, WantedVideoResolution + Position, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedHeight = atoi(str);
+	if ( WantedHeight == 0 )
+		WantedHeight = atoi(str);
 
 	// Depth
 	Length = strcspn(WantedVideoResolution + Position, "x");

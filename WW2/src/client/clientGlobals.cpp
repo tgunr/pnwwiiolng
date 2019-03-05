@@ -87,21 +87,21 @@ UINT32			WindowRefreshRate;	// desired refresh rate
 UINT32			DefTextureFormat;
 UINT32			DefTextureAlphaFormat;
 
-SINT32          WantedX;			// desired/actual x
-SINT32          WantedY;			// desired/actual y
-SINT32          WantedWidth;		// desired/actual width
-SINT32          WantedHeight;		// desired/actual height
-SINT32          WantedBpp;			// desired/actual bpp
-SINT32          WantedRefreshRate;
-SINT32          WantedAlpha;		// desired/actual alpha
-LOGICAL         WantedHdw;			// desired/actual hardware
-SINT32          WantedStencil;		// desired/actual hardware
-LOGICAL         WantedFullscreen;   // desired/actual window
-LOGICAL         WantedBorderless;   // desired/actual window
-LOGICAL         WantedWindow;		// desired/actual window
+SINT32           WantedX;			// desired/actual x
+SINT32           WantedY;			// desired/actual y
+SINT32           WantedWidth;		// desired width
+SINT32           WantedHeight;		// desired height
+SINT32           WantedBpp;			// desired bpp
+SINT32          	WantedRefreshRate;
+SINT32           WantedAlpha;		// desired/actual alpha
+LOGICAL          WantedHdw;			// desired/actual hardware
+SINT32           WantedStencil;		// desired/actual hardware
+LOGICAL          WantedFullscreen;	// desired/actual fullscreen
+LOGICAL          WantedBorderless;	// desired/actual borderless window
+LOGICAL          WantedWindow;		// desired/actual window
 SINT32			WantedMode;			// desired/actual mode
-SINT32          WantedSide;         // User selected side from webpage.
-SINT32          UseStaccato;		// are we using the staccato sound system?
+SINT32           WantedSide;         // User selected side from webpage.
+SINT32			UseStaccato;		// are we using the staccato sound system?
 SINT8			TicketFile[_MAX_PATH];
 SINT8			GameServerIP[64];	// IP of server to connect to
 SINT8			GameServerPort[64];	// Port of server to connect to
@@ -110,7 +110,6 @@ SINT8			HackID[128];		// used for hacker detection (comes from playgate only)
 LOGICAL			AltFont;            // testing if true use alternate UI font
 SINT8			ServerApID[64];		// program apId
 SINT8			ServerData[64];		// data passed from auth server
-SINT8			ServerProtocol[64]; // connection protocol
 SINT8			BypassString[64];
 LOGICAL         UseSteamLogin = FALSE; // We should use Steam to authenticate our login
 LOGICAL         LaunchSettingsOnly = FALSE; //do not launch settings
@@ -188,7 +187,6 @@ LOGICAL			g_enableVSync;	    // Lock the frame rate to refresh rate
 SINT32			ShadowSizeSelect;	// A number representing shadow texture size											// (1-8) means "2^n"
 											// (1-8) means "2^n"
 											// 0 means "No Shadows"
-SINT8			Playarc[_MAX_PATH]; // path the archiver, usually just "playarc"
 /**/
 
 SINT32           nErrorCode;         // Set to any user specified error code
@@ -245,7 +243,7 @@ piMATRIX			IdentityMatrix;
 
 LOGICAL			VehicleObjectAnalysis;		// "Gizmos and Whizbangs"
 LOGICAL			WantDataDir = FALSE;		// Want to run out of data directory
-LOGICAL			HasKeyFile = TRUE;					// Have key file to enable special features
+LOGICAL			HasKeyFile;					// Have key file to enable special features
 LOGICAL			SuperTroop;					// SuperTroop!
 LOGICAL			SuperFloat;					// SuperFloat!
 LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
@@ -253,9 +251,10 @@ LOGICAL			NoInfPreload;				// don't preload infantry
 LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 LOGICAL          g_buildTerrain;             // Build SDMs for archives.
 
+LOGICAL          g_logDebug;                // Global logging
 LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
-LOGICAL          g_log_weap;					// turn on logging for LOG_WEAPON
+LOGICAL          g_log_weap;					// turn on logging for LOG_WEAP
 
 FLOAT32			gFPS;
 FLOAT32			gLastFrameFPS;
@@ -265,7 +264,11 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
+#if defined(DEBUG) || defined(ALPHA_RELEASE)
+LOGICAL			OpenConsole = TRUE;
+#else
 LOGICAL			OpenConsole = FALSE;
+#endif
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
@@ -284,39 +287,16 @@ UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
 FLOAT32         gTurRate; // Rate multiplier
-FLOAT32         aimFOVAdjust = 1.0; // Aiming FOV
-
-SINT8            gAuthServer[128]; // Authentication server to be used
-SINT8            gAuthServerPort[64];
-char             gAuthRelayURL[128]; // Auth relay URL override
-SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
-SINT8            gClientV[32]; // Version to submit
-
-SINT8            gLogMask[_MAX_PATH];
-
-#ifdef DEBUG_WW2
-SINT32           gLogLevel = LOG_DEBUG;
-#else
-SINT32           gLogLevel = LOG_RECOVER;
-#endif
+SINT8           gAuthServer[128]; // Authentication server to be used
+SINT8           gAuthServerPort[64];
+char            gAuthRelayURL[128]; // Auth relay URL override
+SINT8           gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
+SINT8           gClientV[32]; // Version to submit
 FLOAT32         gValue; // Global debug value
-FLOAT32         gDValue; // Global debug value
-FLOAT32         gEValue; // Global debug value
-FLOAT32         gHValue; // Global debug value
-FLOAT32         gXValue; // Global debug value
-FLOAT32         gYValue; // Global debug value
-FLOAT32         gZValue; // Global debug value
 UINT32          gToggle1;
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;
-LOGICAL          gDisableMouseClipping = false;
-LOGICAL          gDisableMouseHiding = false;
-LOGICAL          gDisableGameTopmost = true;
-#endif
-
-#if platOS == OS_MACOS
-LOGICAL          MacNoKeychainUsage = false;
 #endif
 
 #ifdef BETA_RELEASE
@@ -325,3 +305,5 @@ LOGICAL          MacNoKeychainUsage = false;
 	UINT32			gUnitDecalOverride;
 	UINT32			gr2DrawFlags;
 #endif	// #ifdef BETA_RELEASE
+
+
