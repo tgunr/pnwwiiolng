@@ -337,7 +337,7 @@ static NSString *placeholderHTML = @""
 @"</head>"
 @"<body>"
 @"<div class=\"hi\">"
-@"<a href=\"http://www.battlegroundeurope.net/\">"
+@"<a href=\"https://www.wwiionline.com/\">"
 @"<img style=\"height: 90px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
@@ -351,7 +351,7 @@ static NSString *placeholderHTML = @""
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.battlegroundeurope.com/pgservers.html"]);
+            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.wwiionline.com/pgservers.html"]);
             NSURLRequest *playnetHome = [NSURLRequest requestWithURL:playgateURL];
             
             [frame loadRequest:playnetHome];
