@@ -189,18 +189,32 @@ template<>
 SINT32
 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
 {
-	const GarrisonCountryChange& data = incoming.data();
-	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
-	CPStruct* cp = strtGetCP(unit->m_homeCPID);
-	std::list<HCUnit *> garrisons;
-	HCUnit::GetGarrisonUnits(garrisons, unit->m_homeCPID.id);
-	for (HCUnit *nextUnit : garrisons)
-	{
-		nextUnit->setCountry(data.m_newCountryId);
-	}
-	unit->setCountry(data.m_newCountryId);
-	cp->controllingCountry = data.m_newCountryId;
+	GarrisonCountryChange& data = incoming.data();
 
+	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG for unit %d, new country %d",
+		data.m_brigadeID, data.m_newCountryId);
+
+	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
+	if (unit != nullptr)
+	{
+		dbugLog(_FLD, "Garrison is name is %s", unit->name());
+
+		CPStruct* cp = strtGetCP(unit->m_homeCPID);
+		if (cp != nullptr)
+		{
+			dbugLog(_FLD, "Old country is %d, new is %d", cp->controllingCountry, data.m_newCountryId);
+
+			std::list<HCUnit *> garrisons;
+			HCUnit::GetGarrisonUnits(garrisons, unit->m_homeCPID);
+			for (HCUnit *nextUnit : garrisons)
+			{
+				dbugLog(_FLD, "Changing garrison's %s country to %d", nextUnit->name(), data.m_newCountryId);
+				data.process(nextUnit->m_unitID, data.m_newCountryId);
+			}
+			cp->controllingCountry = data.m_newCountryId;
+			
+		}
+	}
 	return 0;
 }
 

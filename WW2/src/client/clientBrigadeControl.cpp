@@ -226,6 +226,7 @@ bool BrigadeControlRequest::requestBrigadeCountryChange(SINT32 teulIndex, UINT32
 	m_brigadeID = brigade;
 	m_officer = destination.Key();
 	m_target = destination;
+	m_origin = destination;
 	m_country = country;
 
 	return send(teulIndex);
@@ -247,6 +248,7 @@ bool BrigadeControlRequest::vetoBrigadeCountryChange(SINT32 teulIndex, UINT32 br
 	m_brigadeID = brigade;
 	m_officer = destination.Key();
 	m_target = destination;
+	m_origin = destination;
 	m_country = country;
 
 	return send(teulIndex);

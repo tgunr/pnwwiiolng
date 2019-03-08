@@ -4382,6 +4382,13 @@ JS_FUNCTION_DEF(jsBrigadeControlNotice, veto)
 							jsnotice->notice.m_target,
 							jsnotice->notice.m_origin);
 				break;
+			case BrigadeControlNotice::REQ_COUNTRY_CHANGE:
+
+				req.vetoBrigadeCountryChange(PlayerClient()->ChatConnection(),
+					        jsnotice->notice.m_brigadeID,
+							jsnotice->notice.m_origin,
+							(WWII_COUNTRY)jsnotice->notice.m_country);
+				break;
 		}
 
 		*rval = BOOLEAN_TO_JSVAL(JS_TRUE);

@@ -70,6 +70,8 @@ StratHCUnit::announceHome() const
 void
 StratHCUnit::announceGarrisonCountryChange() const
 {
+	dbugLog(_FLD, "Country change notification for unit %s (%d) to country %d", name(), unitID(), country());
+
 	if (isTrainingUnit())
 		return;
 	ChatHandle movedBy = lastMovedBy();
@@ -79,6 +81,8 @@ StratHCUnit::announceGarrisonCountryChange() const
 	GarrisonCountryChange& message = outgoing.data();
 	message.m_brigadeID = unitID();
 	message.m_newCountryId = country();
+	message.m_action = GCR_APPROVED;
+	message.m_actionable = true;
 
 	stratSendGarrisonCountryChange(outgoing);
 }

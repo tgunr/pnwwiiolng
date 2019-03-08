@@ -234,6 +234,9 @@ void GarrisonCountryChange::process(const ChatHandle byHandle) const
 	const char* text = nullptr;
 	char temp[16];
 
+	dbugLog(_FLD, "Chat server received GarrisonCountryChange related to brigade %d with action %d and actionable is %d", 
+		m_brigadeID, m_action, m_actionable);
+
 	HCUnit* hcUnit = HCUnit::Lookup(m_brigadeID);
 	switch (m_action)
 	{
@@ -242,8 +245,10 @@ void GarrisonCountryChange::process(const ChatHandle byHandle) const
 		{
 			if (hcUnit != nullptr)
 			{
-				chatAnnounceCountryChange(*hcUnit, hcUnit->homeCPID(), hcUnit->homeCPID(), byHandle);
+				dbugLog(_FLD, "Announcing Country change to %d", m_newCountryId);
+
 				hcUnit->setCountry(m_newCountryId);
+				chatAnnounceCountryChange(*hcUnit, hcUnit->homeCPID(), hcUnit->homeCPID(), byHandle);
 			}
 			else
 			{
@@ -282,10 +287,19 @@ void GarrisonCountryChange::process(const ChatHandle byHandle) const
 
 	if ( player )
 	{
+		dbugLog(_FLD, "Response sent to player %d", response);
 		if ( response != LSTR_NONE )
 			player->message(LSTR_CAUTION, response, text);
 		else if ( text )
 			player->message(LSTR_CAUTION, LSTR_GENERIC, text);
+		else
+		{
+			dbugLog(_FLW, "Nothing sent to player, no error text provided");
+		}
+	}
+	else
+	{
+		dbugLog(_FLW, "Player could not be found from handle");
 	}
 
 }

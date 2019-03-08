@@ -260,7 +260,7 @@ JS_FUNCTION_DEF(jsStratObject, changegarrisoncountry)
 	if (argc > 0) JS_ValueToInt32(ctx, argv[0], &country);
 
 	FULL_OBJ_ID cp = *origin->stratobj->FullObjID();
-	UINT32 brigadeID = HCUnit::GetArmyGarrison(cp.id); // TODO lookup brigade/garrison based on CP
+	UINT32 brigadeID = HCUnit::GetArmyGarrison(cp); // TODO lookup brigade/garrison based on CP
 	if (brigadeID == 0)
 	{
 		return JS_FALSE;

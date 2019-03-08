@@ -817,10 +817,17 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			if (unit == nullptr || (unit->side() != wwiiSide(ps.m_countryID)))
 			{
 				Brigade * brigade = (Brigade *)HCUnit::GetTrainingUnit(ps.m_countryID, ps.m_branchID);
-				ps.m_brigadeID = brigade->brigadeID();
-				savePersona = true;
-				dbugLog(_FLD, "New unit id %d being returned for player %d, persona %d", ps.m_brigadeID, player->playerID(),
-						ps.m_personaID);
+				if (brigade != nullptr)
+				{
+					ps.m_brigadeID = brigade->brigadeID();
+					savePersona = true;
+					dbugLog(_FLD, "New unit id %d being returned for player %d, persona %d", ps.m_brigadeID, player->playerID(),
+							ps.m_personaID);
+				}
+				else
+				{
+					dbugLog(_FLW, "Could not find training unit for country %d, branch %d", ps.m_countryID, ps.m_branchID);
+				}
 			}
 		}
 

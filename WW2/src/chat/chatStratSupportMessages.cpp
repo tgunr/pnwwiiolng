@@ -294,6 +294,8 @@ template<>
 SINT32
 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
 {
+	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG");
+
 	GarrisonCountryChange& request = incoming.data();
 	if ( incoming.action() != GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE || request.m_action != GCR_APPROVED )
 	{
@@ -318,7 +320,12 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 
 	if ( !request.m_actionable || request.m_action != GCR_APPROVED )
 	{
+		dbugLog(_FLD, "Calling stratSendGarrisonCountryChange");
 		stratSendGarrisonCountryChange(incoming);
+	}
+	else
+	{
+		dbugLog(_FLD, "Not actionable or not approved", request.m_actionable, request.m_action);
 	}
 	return 1;
 
@@ -328,63 +335,63 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 GARRISON_COUNTRY_CHANGE_RESULT
 GarrisonCountryChange::process(const ChatHandle mover, const char* callsign, UINT32 unitID, WWII_COUNTRY country)
 {
+	dbugLog(_FLD, "GarrisonCountryChange::process() was called from %s for unit %d and country %d where action=%d",
+		callsign, unitID, country, m_action);
+
 	GARRISON_COUNTRY_CHANGE_RESULT result = GCR_FAILED;
 
 	// TODO: here we are to actually perform the strat hosts function of verifying and then
 	//       changing the country when "actionable"
-	if (m_action == GCR_REQUESTING)
+	StratHCUnit *unit = StratHCUnit::Lookup(unitID);
+	CPStruct *cp = strtGetCP(unit->m_homeCPID);
+	if (cp == nullptr)
 	{
-		StratHCUnit *unit = StratHCUnit::Lookup(unitID);
-		CPStruct *cp = strtGetCP(unit->m_homeCPID);
-		if (cp == nullptr)
+		dbugLog(_FLI, "GarrisonCountryChangeReq(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(unit->m_homeCPID));
+	}
+	else
+	{
+		if (cp->isObjective() || cp->islinkedToAnAO())
 		{
-			dbugLog(_FLI, "GarrisonCountryChangeReq(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(unit->m_homeCPID));
+			result = GCR_FAILED_HAS_OBJECTIVE;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP has an Objective or is linked to one.");
 		}
-		else
+		else if (wwiiSide(country) != wwiiSide(cp->country))
 		{
-			if (cp->isObjective() || cp->islinkedToAnAO())
-			{
-				result = GCR_FAILED_HAS_OBJECTIVE;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP has an Objective or is linked to one.");
-			}
-			else if (wwiiSide(country) != wwiiSide(cp->country))
-			{
-				result = GCR_FAILED_WRONG_OWNER;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the other side.");
-			}
-            else if (country == cp->country)
+			result = GCR_FAILED_WRONG_OWNER;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the other side.");
+		}
+        else if (country == cp->country)
+        {
+            result = GCR_FAILED_OWNER_ALREADY;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the requested country already.");
+        }
+        else
+        {
+	        // TODO Add some checks here for percentages of UK, French and US towns already on the front line.
+
+            if (cp->canChangeOwnership(country, true))
             {
-                result = GCR_FAILED_OWNER_ALREADY;
-                dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the requested country already.");
+				if (m_actionable)
+				{
+					dbugLog(_FLI, "CP Change country request (vote) from %s to change CP %u to country %u ", callsign,
+							unit->m_homeCPID.id, country);
+
+					cp->changeOwnership(country, true, true);
+
+					// Now that the town has changed owner we need to change the Garrison to match.
+					cp->changeAllGarrisonCountries(country, true);
+				}
+
+                result = GCR_APPROVED;
+                dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %s to change CP %u to country %u ", callsign, unit->m_homeCPID.id, country);
             }
             else
             {
-	            // TODO Add some checks here for percentages of UK, French and US towns already on the front line.
-
-                if (cp->canChangeOwnership(country, true))
-                {
-					if (m_actionable)
-					{
-						dbugLog(_FLI, "CP Change country request (vote) from %s to change CP %u to country %u ", callsign,
-								unit->m_homeCPID.id, country);
-
-						cp->changeOwnership(country, true, true);
-
-						// Now that the town has changed owner we need to change the Garrison to match.
-						cp->changeAllGarrisonCountries(country, true);
-					}
-
-                    result = GCR_APPROVED;
-                    dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %s to change CP %u to country %u ", callsign, unit->m_homeCPID.id, country);
-                }
-                else
-                {
-                    dbugLog(_FLI, "GarrisonCountryChangeReq cp->changeOwnership failed for %s whilst changing from country %u to %u",
-                            cp->name, cp->country, country);
-                    result = GCR_FAILED;
-                }
+                dbugLog(_FLI, "GarrisonCountryChangeReq cp->changeOwnership failed for %s whilst changing from country %u to %u",
+                        cp->name, cp->country, country);
+                result = GCR_FAILED;
             }
-		}
+        }
 	}
 
 	return result;

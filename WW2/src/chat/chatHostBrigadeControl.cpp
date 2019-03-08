@@ -75,7 +75,7 @@ public:
 	bool canVote(const Player* player) const;
 	bool isOfferedTo(const Player* player) const;
 
-	void voteFor(Vote::Mode mode, BrigadeControl::BRIGADE_ACTION_REQ action, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, const FULL_OBJ_ID origin=nullObjID);
+	void voteFor(Vote::Mode mode, BrigadeControl::BRIGADE_ACTION_REQ action, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, WWII_COUNTRY country=WWII_NO_COUNTRY, const FULL_OBJ_ID origin=nullObjID);
 	void voteVeto(Vote::Mode mode, const ChatHandle nominee, const ChatHandle sponsor);
 	void cancelVote();
 
@@ -309,7 +309,7 @@ _noticeToBrigade(UINT32 notice, UINT32 action, UINT32 error, VOTE_PERMIT votePer
 
 static void
 _noticeToOfficers(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, UINT32 error, VOTE_PERMIT votePermit
-				, const HCUnit& unit, const ChatHandle nominee, const ChatHandle sponsor, UINT32 delay=0, const FULL_OBJ_ID origin=nullObjID
+				, const HCUnit& unit, const ChatHandle nominee, const ChatHandle sponsor, UINT32 delay=0, const WWII_COUNTRY country = WWII_NO_COUNTRY, const FULL_OBJ_ID origin=nullObjID
 				, Player* alsoPlayer=nullptr)
 {
 	BrigadeControlNotice outgoing(notice, error, action, votePermit, unit, nominee, sponsor, delay);
@@ -318,6 +318,7 @@ _noticeToOfficers(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, UINT
 	else
 		outgoing.m_target = nullObjID;
 	outgoing.m_origin = origin;
+	outgoing.m_country = country;
 
 	HCUnitBroadcast::sendToOfficers(&unit, &outgoing, outgoing.s_callback);
 	if ( alsoPlayer && !alsoPlayer->isActiveCommander() && alsoPlayer->teulIndex() >= 0 )
@@ -325,11 +326,12 @@ _noticeToOfficers(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, UINT
 }
 
 static void
-_noticeToSide(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, const HCUnit& unit, const FULL_OBJ_ID target, const ChatHandle sponsor, UCHAR side, const FULL_OBJ_ID origin=nullObjID)
+_noticeToSide(UINT32 notice, BrigadeControl::BRIGADE_ACTION_REQ action, const HCUnit& unit, const FULL_OBJ_ID target, const ChatHandle sponsor, UCHAR side, WWII_COUNTRY country=WWII_NO_COUNTRY, const FULL_OBJ_ID origin=nullObjID)
 {
 	BrigadeControlNotice outgoing(notice, 0, action, VP_NONE, unit, 0LL, sponsor, 0);
 	outgoing.m_target = target;
 	outgoing.m_origin = origin;
+	outgoing.m_country = country;
 
 	chatBroadcastObject(sidePlayers[side].begin(), sidePlayers[side].end(), outgoing.s_callback, outgoing);
 }
@@ -448,20 +450,22 @@ BrigadeController::canVote(const Player* player) const
 // Initiate an election or vote "for" the current vote on a nominee
 
 void
-BrigadeController::voteFor(Vote::Mode mode, BrigadeControl::BRIGADE_ACTION_REQ action, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, const FULL_OBJ_ID origin)
+BrigadeController::voteFor(Vote::Mode mode, BrigadeControl::BRIGADE_ACTION_REQ action, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, WWII_COUNTRY country, const FULL_OBJ_ID origin)
 {
 	if ( m_vote )
 		throw BCERR_ALREADY_VOTING;
 
 	_voting(sponsor, action, "nominating", duration, nominee, unit().callsign(), mode);
-	m_vote = new Vote(mode, action, nominee, sponsor, duration, origin);
+	m_vote = new Vote(mode, action, nominee, sponsor, duration, country, origin);
 	if ( m_vote == nullptr )
 		throw BCERR_NO_VOTE_TO_VETO;
+
+	dbugLog(_FLD, "Vote created related to country %d, requested %d", m_vote->m_country, country);
 
 	elections.insert(unit().unitID());
 
 	// Send notification to HC officers
-	_noticeToOfficers(BrigadeControl::_PROPOSAL, m_vote->m_forAction, 0, votePermitRequirement(), unit(), nominee, sponsor, duration, origin);
+	_noticeToOfficers(BrigadeControl::_PROPOSAL, m_vote->m_forAction, 0, votePermitRequirement(), unit(), nominee, sponsor, duration, country, origin);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -497,7 +501,7 @@ BrigadeController::voteVeto(Vote::Mode mode, const ChatHandle nominee, const Cha
 	_voting(sponsor, vote()->m_forAction, "vetoing", 0, vote()->m_nominee, unit().callsign(), mode);
 
 	// Send notification to officers
-	_noticeToOfficers(BrigadeControl::_VETOED, vote()->m_forAction, 0, VP_NONE, unit(), vote()->m_nominee, sponsor, 0, vote()->m_origin);
+	_noticeToOfficers(BrigadeControl::_VETOED, vote()->m_forAction, 0, VP_NONE, unit(), vote()->m_nominee, sponsor, 0, WWII_NO_COUNTRY, vote()->m_origin);
 
 	cancelVote();
 }
@@ -1241,12 +1245,16 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 			throw BCERR_INVALID_REQ;
 		}
 
-		if ( isObjective() )
+		if ( m_action != REQ_COUNTRY_CHANGE && isObjective() )
 		{
 			if ( player->leadingBrigade() )
 				m_brigadeID = player->leadingBrigade();
 			else
 				m_brigadeID = player->brigadeID();
+		}
+		else
+		{
+			dbugLog(_FLD, "Requested Country Change brigade is %d", m_brigadeID);
 		}
 
 		if ( m_brigadeID == 0 )
@@ -1265,21 +1273,25 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 
 		if ( bc.unit().side() != player->side() )
 		{
-			player->log(_FLA, "Requesting enemy brigade");
+			player->log(_FLA, "Requesting enemy brigade (requested %d) for unit %s (%d), unit's side %d, player's (%d) side %d",
+				m_brigadeID, bc.unit().name(), bc.unit().m_unitID, bc.unit().side(), player->playerID(), player->side());
 			throw BCERR_INVALID_REQ;
 		}
 
-		// Validation
-		///TODO: Check if we should disable this.
-		if ( m_country && bc.unit().country() != m_country )
+		if (m_action != REQ_COUNTRY_CHANGE)
 		{
-			player->log(_FLA, "Requesting brigade in different country");
-			throw BCERR_INVALID_REQ;
-		}
-		if ( m_branch && bc.unit().branch() != m_branch )
-		{
-			player->log(_FLA, "Requesting brigade in different branch");
-			throw BCERR_INVALID_REQ;
+			// Validation
+			///TODO: Check if we should disable this.
+			if ( m_country && bc.unit().country() != m_country )
+			{
+				player->log(_FLA, "Requesting brigade in different country");
+				throw BCERR_INVALID_REQ;
+			}
+			if ( m_branch && bc.unit().branch() != m_branch )
+			{
+				player->log(_FLA, "Requesting brigade in different branch");
+				throw BCERR_INVALID_REQ;
+			}
 		}
 
 		// Ensure that the handle is lowercase
@@ -1323,6 +1335,11 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 		case REQ_MOVE:
 			// Wants to move the brigade
 			bc.requestMove(player, m_target, m_origin);
+		break;
+
+		case REQ_COUNTRY_CHANGE:
+			// Wants to change the country of CP associated with brigade
+			bc.requestCountryChange(player, m_origin, (WWII_COUNTRY)m_country);
 		break;
 
 		case REQ_ATTACK:
@@ -1402,7 +1419,7 @@ BrigadeController::processElectionExpired()
 	// Notify the nominee that they have the opportunity
 	_noticeToOfficers(BrigadeControl::_OFFERING
 						, vote()->m_forAction, 0, VP_NONE, unit(), nominee->chatHandle(), vote()->m_sponsor
-						, host_config.oic.offerTime_s, nullObjID, nominee);
+						, host_config.oic.offerTime_s, WWII_NO_COUNTRY, nullObjID, nominee);
 
 	// Don't delete me
 	return false;
@@ -1424,7 +1441,7 @@ BrigadeController::processOfferExpired()
 	}
 
 	_noticeToOfficers(BrigadeControl::_OFFER_LAPSED
-						, vote()->m_forAction, 0, VP_NONE, unit(), nominee->chatHandle(), vote()->m_sponsor, 0, nullObjID, nominee);
+						, vote()->m_forAction, 0, VP_NONE, unit(), nominee->chatHandle(), vote()->m_sponsor, 0, WWII_NO_COUNTRY, nullObjID, nominee);
 
 	return true;
 }
@@ -1488,7 +1505,7 @@ BrigadeController::processToMoveExpired()
 		dbugLog(_FLW, "hcu:%u(%s) move has wrong origin [brigade moved?]", unit().unitID(), unit().callsign());
 		_noticeToOfficers(BrigadeControl::_ERROR, BrigadeControl::REQ_MOVE, BCERR_ALREADY_MOVED, VP_NONE
 							, unit(), vote()->m_nominee, vote()->m_sponsor
-							, 0, nullObjID, PlayerInterface::Lookup(vote()->m_sponsor));
+							, 0, WWII_NO_COUNTRY, nullObjID, PlayerInterface::Lookup(vote()->m_sponsor));
 		return;
 	}
 
@@ -1504,18 +1521,22 @@ void
 BrigadeController::processChangeCountryExpired()
 {
 
-	if ( unit().country() != vote()->m_country )
+	if ( unit().country() == vote()->m_country )
 	{
-		dbugLog(_FLW, "hcu:%u(%s) move has wrong origin [brigade moved?]", unit().unitID(), unit().callsign());
+		dbugLog(_FLW, "hcu:%u(%s) country change already took place to country %d, vote country %d", 
+			unit().unitID(), 
+			unit().callsign(),
+			unit().country(),
+			vote()->m_country);
 		_noticeToOfficers(BrigadeControl::_ERROR, BrigadeControl::REQ_COUNTRY_CHANGE, BCERR_COUNTRY_ALREADY_CHANGED, VP_NONE
 							, unit(), vote()->m_nominee, vote()->m_sponsor
-							, 0, nullObjID, PlayerInterface::Lookup(vote()->m_sponsor));
+							, 0, vote()->m_country, nullObjID, PlayerInterface::Lookup(vote()->m_sponsor));
 		return;
 	}
 
 	FULL_OBJ_ID destination;
 	destination.FromKey(vote()->m_nominee);
-	chatSendGarrisonChangeCountry(vote()->m_sponsor, false, unit().unitID(), destination, unit().country(), true);
+	chatSendGarrisonChangeCountry(vote()->m_sponsor, false, unit().unitID(), destination, vote()->m_country, true);
 
 }
 
@@ -1783,7 +1804,7 @@ chatBrigadeMoveProposal(UINT32 brigadeID, const FULL_OBJ_ID destination, ChatHan
 		if ( !(bc.oic() && bc.oic()->hasHandle(byHandle)) )
 			delay += delay / 2;
 
-		bc.voteFor(Vote::TOMOVE, BrigadeControl::REQ_MOVE, destination.Key(), byHandle, delay, origin);
+		bc.voteFor(Vote::TOMOVE, BrigadeControl::REQ_MOVE, destination.Key(), byHandle, delay, WWII_NO_COUNTRY, origin);
 	}
 	catch (BRIGADE_CONTROL_ERROR error)
 	{
@@ -1805,7 +1826,7 @@ void
 chatCPCountryChangeProposal(const struct FULL_OBJ_ID origin, WWII_COUNTRY country, ChatHandle byHandle)
 {
 	// Need to look up primary brigade for the target CP
-	UINT32 brigadeID = HCUnit::GetArmyGarrison(origin.id);
+	UINT32 brigadeID = HCUnit::GetArmyGarrison(origin);
 	assert( brigadeID != 0 );
 	if ( byHandle == 0LL )
 		byHandle = systemHandleID;
@@ -1825,8 +1846,9 @@ chatCPCountryChangeProposal(const struct FULL_OBJ_ID origin, WWII_COUNTRY countr
 		if ( !(bc.oic() && bc.oic()->hasHandle(byHandle)) )
 			delay += delay / 2;
 
-		bc.voteFor(Vote::CHANGECOUNTRY, BrigadeControl::REQ_COUNTRY_CHANGE, origin.Key(), byHandle, delay, origin);
-		bc.vote()->m_country = country;
+		dbugLog(_FLD, "Voting for country change to %d", country);
+
+		bc.voteFor(Vote::CHANGECOUNTRY, BrigadeControl::REQ_COUNTRY_CHANGE, origin.Key(), byHandle, delay, country, origin);
 	}
 	catch (BRIGADE_CONTROL_ERROR error)
 	{
@@ -2029,7 +2051,7 @@ chatAnnounceBrigadeMove(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL
 	if ( byHandle == systemHandleID )
 		byHandle = 0LL;
 
-	_noticeToSide(BrigadeControl::_UNIT_MOVED, BrigadeControl::REQ_MOVE, unit, destination, byHandle, unit.side(), origin);
+	_noticeToSide(BrigadeControl::_UNIT_MOVED, BrigadeControl::REQ_MOVE, unit, destination, byHandle, unit.side(), WWII_NO_COUNTRY, origin);
 
 	// Well, maybe now we need to drop the vote.
 	BrigadeController& bc = BrigadeController::Get(unit.unitID());
@@ -2043,13 +2065,20 @@ chatAnnounceBrigadeMove(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL
 void
 chatAnnounceCountryChange(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL_OBJ_ID destination, ChatHandle byHandle)
 {
+	BrigadeController& bc = BrigadeController::Get(unit.unitID());
+
 	if ( byHandle == systemHandleID )
 		byHandle = 0LL;
 
-	_noticeToSide(BrigadeControl::_COUNTRY_CHANGED, BrigadeControl::REQ_COUNTRY_CHANGE, unit, destination, byHandle, unit.side(), origin);
+	WWII_COUNTRY country = unit.country();
+	if (bc.vote())
+		country = bc.vote()->m_country;
+
+	dbugLog(_FLD, "Sending notice to side to change to country %d", country);
+
+	_noticeToSide(BrigadeControl::_COUNTRY_CHANGED, BrigadeControl::REQ_COUNTRY_CHANGE, unit, destination, byHandle, unit.side(), country, origin);
 
 	// Well, maybe now we need to drop the vote.
-	BrigadeController& bc = BrigadeController::Get(unit.unitID());
 	if ( bc.vote() && bc.vote()->isTargettedAction() )
 		bc.cancelVote();
 }

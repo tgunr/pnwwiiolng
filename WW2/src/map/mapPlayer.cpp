@@ -2345,14 +2345,14 @@ mapPlayerInit()
 //////////////////////////////////////////////////////////////////////
 // Send a Unit country change to this player.
 bool
-_sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country, UINT32* replacementUnitID, GARRISON_CHANGE_ACTION* desiredClientAction)
+_sendHCUnitCountryChange(Player* player, UINT32 unitID, WWII_COUNTRY country, UINT32 replacementUnitID, GARRISON_CHANGE_ACTION desiredClientAction)
 {
 	HCUnitCountryChange entry;
 
-	entry.m_unitID = *unitID;
-	entry.m_country = *country;
-	entry.m_replacementUnitID = *replacementUnitID;
-	entry.m_action = *desiredClientAction;
+	entry.m_unitID = unitID;
+	entry.m_country = country;
+	entry.m_replacementUnitID = replacementUnitID;
+	entry.m_action = desiredClientAction;
 
 	static HC_UNIT_COUNTRY_CHANGES _packet;
 	_packet.add(entry);
@@ -2371,8 +2371,6 @@ _sendHCUnitCountryChange(Player* player, UINT32* unitID, WWII_COUNTRY* country, 
 	return true;
 }
 
-/*  TODO: Need to figure out if I'm missing anything here
-
 // Map host calls this.
 void
 GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
@@ -2387,8 +2385,11 @@ GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 		WWII_COUNTRY originalUnitCountry = hcUnit->country();
 		BRANCH_ENUM originalUnitBranch = hcUnit->branch();
 		
+		g_brigades[originalUnitCountry][originalUnitBranch].erase((Brigade*)hcUnit);
+		
 		//  Set the Unit (unitID) to the NEW Country.
 		hcUnit->setCountry(country);
+		g_brigades[country][hcUnit->branch()].insert((Brigade*)hcUnit);
 
 		//  Send the change to all connected players.
 		for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
@@ -2469,7 +2470,7 @@ GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 				clientAction = CHANGE_NOTHING;
 			}
 
-			_sendHCUnitCountryChange(player, &unitID, &country, &replacementHCUnitID, &clientAction);
+			_sendHCUnitCountryChange(player, unitID, country, replacementHCUnitID, clientAction);
 
 			replacementHCUnit = nullptr;
 			replacementHCUnitID = 0;
@@ -2480,5 +2481,3 @@ GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 		dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
 	}
 }
-
-*/

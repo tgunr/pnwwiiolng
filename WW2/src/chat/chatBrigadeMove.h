@@ -44,8 +44,15 @@ class GarrisonCountryChange
 public:
 	GarrisonCountryChange() : m_action(GCR_FAILED), m_brigadeID(0), m_newCountryId(WWII_NO_COUNTRY), m_actionable(false) {}
 	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
+	
+	// for strat host
 	GARRISON_COUNTRY_CHANGE_RESULT process(const ChatHandle mover, const char* callsign, const UINT32 unitID, const WWII_COUNTRY country = WWII_NO_COUNTRY);
+	
+	// for chat host
 	void process(const ChatHandle playerHandle) const;
+	
+	// for map host
+	void process(UINT32 unitID, WWII_COUNTRY country);
 
 public:
 	GARRISON_COUNTRY_CHANGE_RESULT	m_action;		// What we're doing

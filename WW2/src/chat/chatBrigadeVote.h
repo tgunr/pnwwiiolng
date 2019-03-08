@@ -33,12 +33,12 @@ public:
 		CHANGECOUNTRY, 
 		MAX_VOTE_MODES };
 
-	Vote(Mode voteMode, BrigadeControl::BRIGADE_ACTION_REQ forAction, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, const FULL_OBJ_ID origin=nullObjID)
+	Vote(Mode voteMode, BrigadeControl::BRIGADE_ACTION_REQ forAction, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, WWII_COUNTRY country=WWII_NO_COUNTRY, const FULL_OBJ_ID origin=nullObjID)
 		: m_voteMode(voteMode), m_forAction(forAction)
 		, m_nominee(nominee), m_sponsor(sponsor)
 		, m_startedAt(teulTime()), m_closeAt(teulTime() + duration)
 		, m_origin(origin)
-		, m_country(WWII_NO_COUNTRY)
+		, m_country(country)
 	{
 	}
 
