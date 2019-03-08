@@ -794,10 +794,10 @@ static UINT32 _UpdateVehicleLODs()
 {
 	if (ft500mscount == 0) return 0;
 
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	worldOriginOffset.z = -worldOriginOffset.z;
 
 	vehVehicle*CurrentVehicle = persGetPersonaVehiclePtr();
 
@@ -864,9 +864,9 @@ static UINT32 _UpdateVehicleLODs()
 		// now add object to sort list if applicable;
 		Position = MAX_POSSIBLE_VIS_VEHICLES;
 		LODVehicles[Position] = CurrentVehicle;
-		VehPos.x = (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-		VehPos.y = (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-		VehPos.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+		VehPos.x = (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - worldOriginOffset.x);
+		VehPos.y = (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - worldOriginOffset.y);
+		VehPos.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - worldOriginOffset.z);
 
 #ifdef BETA_RELEASE
 		// make sure it doesn't interfere with other object analysis stuff
@@ -1575,7 +1575,7 @@ UINT32 vehUpdate()
 
 static UINT32 _CheckAndUpdateHitmap(vehVehicle* CurrentVehicle)
 {
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 piVECTOR TempVec;
 UINT32 i;
 FLOAT32 MaxDist;
@@ -1606,19 +1606,19 @@ FLOAT32 Dist;
 		return 0;
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	if (CurrentVehicle->ModelData != nullptr)
 	{
-		TempVec.x = (FLOAT32)(CurrentVehicle->ModelData->VehiclePos.x - WorldOriginOffset.x);
-		TempVec.y = (FLOAT32)(CurrentVehicle->ModelData->VehiclePos.y - WorldOriginOffset.y);
-		TempVec.z = (FLOAT32)(-CurrentVehicle->ModelData->VehiclePos.z - WorldOriginOffset.z);
+		TempVec.x = (FLOAT32)(CurrentVehicle->ModelData->VehiclePos.x - worldOriginOffset.x);
+		TempVec.y = (FLOAT32)(CurrentVehicle->ModelData->VehiclePos.y - worldOriginOffset.y);
+		TempVec.z = (FLOAT32)(-CurrentVehicle->ModelData->VehiclePos.z - worldOriginOffset.z);
 	}
 	else
 	{
-		TempVec.x = (FLOAT32)(CurrentVehicle->PosData.Pos.x - WorldOriginOffset.x);
-		TempVec.y = (FLOAT32)(CurrentVehicle->PosData.Pos.y - WorldOriginOffset.y);
-		TempVec.z = (FLOAT32)(-CurrentVehicle->PosData.Pos.z - WorldOriginOffset.z);
+		TempVec.x = (FLOAT32)(CurrentVehicle->PosData.Pos.x - worldOriginOffset.x);
+		TempVec.y = (FLOAT32)(CurrentVehicle->PosData.Pos.y - worldOriginOffset.y);
+		TempVec.z = (FLOAT32)(-CurrentVehicle->PosData.Pos.z - worldOriginOffset.z);
 	}
 
 	mathAddVectors(&TempVec,&TempVec,&playpos);
@@ -3513,14 +3513,14 @@ LOGICAL _CanPlayerExit()
 		return TRUE;
 	}
 
-	FLOAT64VECTOR WorldOriginOffset;
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	FLOAT64VECTOR worldOriginOffset;
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	piVECTOR V1, V2;
 	SINT32 DummyNum;
 
-	V1.x = (FLOAT32)(Vehicle->ModelData->RenderPos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(Vehicle->ModelData->RenderPos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(Vehicle->ModelData->RenderPos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(Vehicle->ModelData->RenderPos.y - worldOriginOffset.y);
 	V1.z = -(FLOAT32)(Vehicle->ModelData->RenderPos.z);
 
 	if (trnopCollideDown(&V2,&DummyNum,&V1))
@@ -4128,12 +4128,12 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 
 	trnCDTerrainObject* TO, *ClosestTO, *ResupplyTO;
 	StratDB::StratObject* ClosestStrat;
-	FLOAT64VECTOR Pos, TOPos, Dist, WorldOriginOffset;
+	FLOAT64VECTOR Pos, TOPos, Dist, worldOriginOffset;
 	FLOAT64 Len, BaseLen, HomeBaseLen;
 	UINT32 FriendlyTerritory, NearBase, OnGroundStopped;
 	piVECTOR V1,V2;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 	Pos = Vehicle->ModelData->RenderPos;
 	trncdGetTOHead(&TO);
 	ClosestTO = nullptr;
@@ -4157,9 +4157,9 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 
 			V1 = TO->Center;
 
-			TOPos.x = V1.x + WorldOriginOffset.x;
-			TOPos.y = V1.y + WorldOriginOffset.y;
-			TOPos.z = -(V1.z + WorldOriginOffset.z);
+			TOPos.x = V1.x + worldOriginOffset.x;
+			TOPos.y = V1.y + worldOriginOffset.y;
+			TOPos.z = -(V1.z + worldOriginOffset.z);
 
 			mathSubVectors(&Dist,&TOPos,&Pos);
 
@@ -4264,8 +4264,8 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 	{ // Need to check if landed.
 		SINT32 poly;
 
-		V1.x = 	(FLOAT32)(Vehicle->ModelData->RenderPos.x - WorldOriginOffset.x);
-		V1.y =  (FLOAT32)(Vehicle->ModelData->RenderPos.y - WorldOriginOffset.y);
+		V1.x = 	(FLOAT32)(Vehicle->ModelData->RenderPos.x - worldOriginOffset.x);
+		V1.y =  (FLOAT32)(Vehicle->ModelData->RenderPos.y - worldOriginOffset.y);
 		V1.z = -(FLOAT32)(Vehicle->ModelData->RenderPos.z);
 
 		if (trnopCollideDown(&V2,&poly,&V1))
@@ -4591,7 +4591,7 @@ static void _FindNearbyFacilities2(vehVehicle* Vehicle)
 	lasttime = frametime;
 
 	trnCDTerrainObject* TO, *capTO = nullptr;
-	FLOAT64VECTOR Pos, TOPos, Dist, WorldOriginOffset;
+	FLOAT64VECTOR Pos, TOPos, Dist, worldOriginOffset;
 	FLOAT64 Len2 = 0, MinLen2 = 1000000000000000.0;
 	piVECTOR V1;
 	TERRAIN_DETAIL* td;
@@ -4619,7 +4619,7 @@ static void _FindNearbyFacilities2(vehVehicle* Vehicle)
 	if(!weapon || !weapon->alertDist) skipEWScheck = TRUE;
 	if(Vehicle->VehicleType->Type == VEH_TYPE_FLOATER) skipEWScheck = TRUE; // make sure skull and buzz don't send EWS
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 	trncdGetTOHead(&TO);
 	Pos = Vehicle->ModelData->RenderPos;
 
@@ -4653,9 +4653,9 @@ static void _FindNearbyFacilities2(vehVehicle* Vehicle)
 
 		V1 = TO->Center;
 
-		TOPos.x = V1.x + WorldOriginOffset.x;
-		TOPos.y = V1.y + WorldOriginOffset.y;
-		TOPos.z = -(V1.z + WorldOriginOffset.z);
+		TOPos.x = V1.x + worldOriginOffset.x;
+		TOPos.y = V1.y + worldOriginOffset.y;
+		TOPos.z = -(V1.z + worldOriginOffset.z);
 
 		mathSubVectors(&Dist,&TOPos,&Pos);
 		Len2 = (Dist.x * Dist.x + Dist.y * Dist.y); // ignore z
@@ -4958,7 +4958,7 @@ SINT32 vehAttachToRidePoint(vehVehicle* RiderVehicle)
 	mlObjectData* RideeObjectData = nullptr;
 	piVECTOR pos, att;
 	piVECTOR relpos = {0,0,0};
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	FLOAT64VECTOR RidePos;
 
     if(RiderVehicle == nullptr) return -1;
@@ -5023,8 +5023,8 @@ SINT32 vehAttachToRidePoint(vehVehicle* RiderVehicle)
 		RiderVehicle->PosData.Vel.z = -3000;
 		return -3;
 	}
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	mathAddVectors(&RidePos, &pos, &WorldOriginOffset); RidePos.z = -RidePos.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	mathAddVectors(&RidePos, &pos, &worldOriginOffset); RidePos.z = -RidePos.z;
 
 	if(RiderModelData) // 1st person
 	{

@@ -344,6 +344,7 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		_LastUpdateTime = frametime;
 	}
 
+	// Are we past the next update time
 	if (frametime - TempNum > 0 || ForceSend != 0)
 	{
 
@@ -446,6 +447,7 @@ UINT32 vehUpdatePositionInfo(vehVehicle* Vehicle)
 	return 0;
 }
 
+
 static UINT32 _ResolveAverages(vehVehicle* Vehicle)
 {
 	vehVehiclePositionData* PosData;
@@ -455,6 +457,9 @@ static UINT32 _ResolveAverages(vehVehicle* Vehicle)
 
 	PosData = &Vehicle->PosData;
 
+	// PosData->NumSamples is incremented each time a vehicle is updated.
+	// and is reset when a network update message is sent.
+	// This averages the velocity and acceleration since the last update message.
 	if (PosData->NumSamples == 0) return 0;
 
 	PosData->Vel.x = PosData->VelSum.x / PosData->NumSamples;
@@ -1626,7 +1631,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	FLOAT64VECTOR			TempVec;
 	FLOAT64VECTOR			PrevVel,PrevVel1;
 	FLOAT64ATT				VAtt1,VAtt2;
-	FLOAT64VECTOR			WorldOriginOffset;
+	FLOAT64VECTOR			worldOriginOffset;
 	OBJECT*					pObject;
 
 	if (Vehicle == nullptr) return 0;
@@ -1775,11 +1780,11 @@ else
 	piVECTOR V1,V2;
 	SINT32 DummyNum;
 
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		V1.x = (FLOAT32)(PosData->Pos.x - WorldOriginOffset.x);
-		V1.y = (FLOAT32)(PosData->Pos.y - WorldOriginOffset.y);
-		V1.z = -(FLOAT32)(PosData->Pos.z - -WorldOriginOffset.z) - 0.3f;
+		V1.x = (FLOAT32)(PosData->Pos.x - worldOriginOffset.x);
+		V1.y = (FLOAT32)(PosData->Pos.y - worldOriginOffset.y);
+		V1.z = -(FLOAT32)(PosData->Pos.z - -worldOriginOffset.z) - 0.3f;
 
 		V2 = V1;
 		V2.z += 10000.0;
@@ -1787,7 +1792,7 @@ else
 		if (trncdCollideDownMediumList(&V1,&V2) == TRUE)
 		{
 
-			V2.z += (FLOAT32)WorldOriginOffset.z;
+			V2.z += (FLOAT32)worldOriginOffset.z;
 			V2.z = -V2.z;
 
 			PosData->LastUpdatePos.z = PosData->Pos.z = V2.z - (Vehicle->VehicleObjectData->LowestPoint);
@@ -1796,7 +1801,7 @@ else
 		{
 			if (trnopCollideDown(&V2, &DummyNum, &V1) == TRUE)
 			{
-				V2.z += (FLOAT32)WorldOriginOffset.z;
+				V2.z += (FLOAT32)worldOriginOffset.z;
 				V2.z = -V2.z;
 
 				PosData->LastUpdatePos.z = PosData->Pos.z = V2.z - (Vehicle->VehicleObjectData->LowestPoint);
@@ -2079,25 +2084,13 @@ FLOAT64 FireDelta;
 FLOAT64 CurrentTime;
 UINT32 AmmoFlags;
 FLOAT64VECTOR RelativePos;
-FLOAT64VECTOR WorldOriginOffset;
 LOGICAL WeaponFired;
 SINT32 SoundNum;
 OBJECT * TempObj;
 
 // Weapon Firing Stuff
-FLOAT64VECTOR	vecVehicleVel; // For recoil, etc.
-piMATRIX		FirePointMatrix, TempMatrix;
-FLOAT64VECTOR	FirePositionVector;
-FLOAT64VECTOR	FlashPositionVector;
 FLOAT64			LastFireTime = 0.0f;
 SINT32			RecoilNum = 0;
-
-    memset(&vecVehicleVel, 0, sizeof(FLOAT64VECTOR));
-    memset(&FirePositionVector, 0, sizeof(FLOAT64VECTOR));
-    memset(&FlashPositionVector, 0, sizeof(FLOAT64VECTOR));
-
-    FirePointMatrix = IdentityMatrix;
-    TempMatrix = IdentityMatrix;
 
 	if (Vehicle == nullptr)
 	{
@@ -2108,9 +2101,6 @@ SINT32			RecoilNum = 0;
 	{
 		return 0;
 	}
-
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
 
 	if (Vehicle->VehicleType == nullptr)
 	{

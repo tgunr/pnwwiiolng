@@ -82,7 +82,7 @@ LOGICAL trnopCollideDownWithDTL(piVECTOR* retpos,
 LOGICAL		retval=FALSE;
 piVECTOR	oldpos, newpos;
 COLLISION	collision;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	oldpos = newpos = *pos;
 	oldpos.z -= 20000.0f * ScaleFactor;
@@ -101,11 +101,11 @@ FLOAT64VECTOR WorldOriginOffset;
 
 	if (retval)
 	{
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		retpos->x = (FLOAT32)(collision.colpos.x - WorldOriginOffset.x);
-		retpos->y = (FLOAT32)(collision.colpos.y - WorldOriginOffset.y);
-		retpos->z = (FLOAT32)(collision.colpos.z - WorldOriginOffset.z);
+		retpos->x = (FLOAT32)(collision.colpos.x - worldOriginOffset.x);
+		retpos->y = (FLOAT32)(collision.colpos.y - worldOriginOffset.y);
+		retpos->z = (FLOAT32)(collision.colpos.z - worldOriginOffset.z);
 
         if(poly)
         {
@@ -128,7 +128,7 @@ LOGICAL trnopCollideDown(piVECTOR* retpos, SINT32* poly, piVECTOR* pos)
 LOGICAL		retval=FALSE;
 piVECTOR	oldpos, newpos;
 COLLISION	collision;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	oldpos = newpos = *pos;
 	oldpos.z -= 20000.0f * ScaleFactor;
@@ -145,11 +145,11 @@ FLOAT64VECTOR WorldOriginOffset;
 	retval = trncdCheckTerrainDown(&collision);
 	if (retval)
 	{
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		retpos->x = (FLOAT32)(collision.colpos.x - WorldOriginOffset.x);
-		retpos->y = (FLOAT32)(collision.colpos.y - WorldOriginOffset.y);
-		retpos->z = (FLOAT32)(collision.colpos.z - WorldOriginOffset.z);
+		retpos->x = (FLOAT32)(collision.colpos.x - worldOriginOffset.x);
+		retpos->y = (FLOAT32)(collision.colpos.y - worldOriginOffset.y);
+		retpos->z = (FLOAT32)(collision.colpos.z - worldOriginOffset.z);
 		*poly = collision.colpoly;
 	}
 	else
@@ -1762,7 +1762,7 @@ SINT8*			ptr;
 SINT32			place;
 piMATRIX		mat;
 OBJECT*		lpsub;
-FLOAT64VECTOR	WorldOriginOffset;
+FLOAT64VECTOR	worldOriginOffset;
 UINT32			i;
 UINT32			toplevel;
 LOGICAL			DoGroupNormals;
@@ -1775,7 +1775,7 @@ OBJECT*			TempObj;
 
 	mat = IdentityMatrix;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
     if(lpobj->flag2 & OBJECT_IS_ROTATED)
     {
@@ -1784,9 +1784,9 @@ OBJECT*			TempObj;
     }
 
 	piVECTOR	translation;
-	translation.x = (FLOAT32)((FLOAT64)pos->x - WorldOriginOffset.x);
-	translation.y = (FLOAT32)((FLOAT64)pos->y - WorldOriginOffset.y);
-	translation.z = (FLOAT32)((FLOAT64)pos->z - WorldOriginOffset.z);
+	translation.x = (FLOAT32)((FLOAT64)pos->x - worldOriginOffset.x);
+	translation.y = (FLOAT32)((FLOAT64)pos->y - worldOriginOffset.y);
+	translation.z = (FLOAT32)((FLOAT64)pos->z - worldOriginOffset.z);
 
 	obplyrRotateAndTranslateObjectTree(lpobj, mat, translation);
 

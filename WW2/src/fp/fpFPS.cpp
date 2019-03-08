@@ -8480,13 +8480,13 @@ UINT32 fpFPSGetResupplyTarget ()
 void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, piMATRIX* pFireAtt)
 {
 	FLOAT64VECTOR	startPos, endPos;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
 	vehVehicle*		collideVehicle;
 	vehVehicle*		playerVehicle = persGetPersonaVehiclePtr();
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	projVel.x = projVel.z = 0.0; projVel.y = 1.0;
 	mathVectorRotate64(&projVel, &projVel, pFireAtt);
@@ -8506,12 +8506,12 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 
 	//draw3dSetWorldDebugLine (&startPos, &endPos, "ResupplyTest", colorYELLOWALPHA);
 
-	V1.x = (FLOAT32)(startPos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(startPos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(startPos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(startPos.y - worldOriginOffset.y);
 	V1.z = (FLOAT32)(startPos.z);
 
-	V2.x = (FLOAT32)(endPos.x - WorldOriginOffset.x);
-	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
+	V2.x = (FLOAT32)(endPos.x - worldOriginOffset.x);
+	V2.y = (FLOAT32)(endPos.y - worldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
 	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, &collideVehicle, nullptr, FALSE, FALSE, TRUE) == TRUE)
@@ -8570,12 +8570,12 @@ static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, piMATRIX* pFireAtt)
 {
 	FLOAT64VECTOR	startPos, endPos;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
 	trnCDTerrainObject* TO = nullptr;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	projVel.x = projVel.z = 0.0; projVel.y = 1.0;
 	mathVectorRotate64(&projVel, &projVel, pFireAtt);
@@ -8595,12 +8595,12 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 
 	//draw3dSetWorldDebugLine (&startPos, &endPos, "BridgeRepair", colorMAGENTAALPHA);
 
-	V1.x = (FLOAT32)(startPos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(startPos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(startPos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(startPos.y - worldOriginOffset.y);
 	V1.z = (FLOAT32)(startPos.z);
 
-	V2.x = (FLOAT32)(endPos.x - WorldOriginOffset.x);
-	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
+	V2.x = (FLOAT32)(endPos.x - worldOriginOffset.x);
+	V2.y = (FLOAT32)(endPos.y - worldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
 	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, nullptr, &TO, FALSE, FALSE, TRUE) == TRUE)
@@ -10673,9 +10673,9 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			OBJECT* RideObject = currentVehicle->VehicleObjectData->FPSSeats[i];
 			if(RideObject == nullptr) break;
 			FLOAT64VECTOR TrooperPos = {0,0,0}, RidePos, DeltaVec;
-			FLOAT64VECTOR WorldOriginOffset;
+			FLOAT64VECTOR worldOriginOffset;
 
-			trnGetWorldOriginOffset(&WorldOriginOffset);
+			trnGetWorldOriginOffset(&worldOriginOffset);
 			mathVectorMultiply64(&TrooperPos, &TrooperPos, &vehicleData->VehicleAttMat);
 			mathAddVectors(&TrooperPos, &TrooperPos, &vehicleData->AdjustedForCGPos);
 
@@ -10685,9 +10685,9 @@ LOGICAL fpFPSRideUnrideVehicle ()
 
 			mathVectorMultiply64(&RidePos, &RidePos, &RideObject->mat);
 
-			RidePos.x += WorldOriginOffset.x;
-			RidePos.y += WorldOriginOffset.y;
-			RidePos.z = -(RidePos.z + WorldOriginOffset.z);
+			RidePos.x += worldOriginOffset.x;
+			RidePos.y += worldOriginOffset.y;
+			RidePos.z = -(RidePos.z + worldOriginOffset.z);
 			mathSubVectors(&DeltaVec, &RidePos, &TrooperPos);
 
 			if(mathExactVectorLength2(&DeltaVec) < MIN_RIDE_DISTANCE2)

@@ -1813,6 +1813,19 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	if(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)
 	{
 		Ammo->Flags |= WEAP_AMMOFLAG_DONTCOLLIDEWITHFIRER;
+		if (EmitterObject != nullptr)
+		{
+			// For the 3rd person view of the round we need to take into account
+			// where the barrel of the gun is pointing and make sure that the round starts there.
+			FLOAT64VECTOR position = *RelativePnt;
+			position.z = -position.z;
+			mathVectorMultiply64(&position, &position, &EmitterObject->mat);
+			position.x += WorldOriginOffset.x;
+			position.y += WorldOriginOffset.y;
+			position.z += WorldOriginOffset.z;
+			position.z = -position.z;
+			Ammo->Position = Ammo->LastCollidePos = position;
+		}
 	}
 	else
 	{
