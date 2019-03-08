@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "imap/iac.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "str/striws.h"
 #include "ui/uiUTF.h"
 

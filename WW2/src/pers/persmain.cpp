@@ -17,7 +17,7 @@
 #include "fx/postRender.h"
 #include "gr2/gr2Anim.h"
 #include "gr2/gr2Main.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "include/vars.h"
 #include "locl/loclMain.h"

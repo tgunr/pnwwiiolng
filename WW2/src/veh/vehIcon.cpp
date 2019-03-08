@@ -12,7 +12,7 @@
 #include "ld/ldpix.h"
 #include "rn/rnvis.h"
 #include "rn/rntext.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMain.h"

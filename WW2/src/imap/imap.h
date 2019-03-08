@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 
 /************************************************************************************************
 	imap

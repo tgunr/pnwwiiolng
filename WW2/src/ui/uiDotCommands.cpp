@@ -5540,7 +5540,7 @@ static void _HitmapName(OBJECT* obj, void* p)
 }
 
 #include "phui/Periodical.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 
 static SINT32 TurretTest;
 static SINT32 TurretTestStartTime;
