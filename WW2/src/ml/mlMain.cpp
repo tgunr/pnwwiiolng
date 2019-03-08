@@ -182,7 +182,7 @@
 #define _NUM_CP_LOOPS 100
 
 #define MIN_VEHICLE_TOW_DISTANCE 3.0 // added to vehicle radius
-#define MIN_TOW_DISTANCE 2.0
+#define MIN_TOW_DISTANCE 3.0
 #define MIN_HOIST_XY_DISTANCE2 	9.0
 #define MIN_HOIST_Z_DISTANCE2  	1.0
 #define MIN_RIDE_XY_DISTANCE2 	9.0
