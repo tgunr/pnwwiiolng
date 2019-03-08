@@ -237,8 +237,8 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 {
 	FULL_OBJ_ID fid;
 
-	fid.cell.ox		= scx << 4;
-	fid.cell.oy		= scy << 4;
+	fid.cell.ox		= static_cast<SINT16>(static_cast<UINT16>(scx) << 4);
+	fid.cell.oy		= static_cast<SINT16>(static_cast<UINT16>(scy) << 4);
 	fid.id			= id;
 	fid.objClass	= 0;
 	fid.objType		= 0;

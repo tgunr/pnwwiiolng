@@ -1262,8 +1262,8 @@ void CPRenderer::MessageReceived(phui::Message* msg, phui::MessageHandler* reply
 			msg->FindLong(CPUPDATE_SX, &sx,i);
 			msg->FindLong(CPUPDATE_SY, &sy,i);
 
-			fullid.cell.ox = (SINT16)(sx << 4);
-			fullid.cell.oy = (SINT16)(sy << 4);
+			fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(sx) << 4);
+			fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(sy) << 4);
 			fullid.id = (UINT16)id;
 
 			stratobj = StratDB::FindStratObject(fullid);

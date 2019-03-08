@@ -1690,30 +1690,7 @@ static int fioOpenCallback(const char* name)
 	if(fd < 0)
 		fd = fioOpen(path.c_str());
 
-	if(fd > -1 && (ext == ".xml" || ext == ".uixml"))
-		skipWordPadGarbage(fd);
-
 	return fd;
-}
-
-// stupid motherfucking Notepad adds garbage to the beginning of a UTF-8
-// so we skip past to the first <. stupid motherfucking windoze, fucking suck it.
-static int skipWordPadGarbage(int fd)
-{
-	int i = 0;
-	for(;;i++)
-	{
-		char c;
-		if(fioRead(fd, &c, 1) != 1) break;
-		if(c == '<')
-		{
-			fioSeek(fd, -1,  SEEK_CUR);
-			return i;
-			break;
-		}
-	}
-
-	return 0;
 }
 
 // Don't have to change Util.h in phui with this function
