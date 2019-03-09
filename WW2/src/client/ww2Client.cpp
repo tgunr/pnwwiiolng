@@ -2561,14 +2561,16 @@ int Client::ValidatePersonasBrigade(UINT32 unitID)
 {
 	int retValue = 0;
 
+	UINT32 selectedPersonaID = 0;
 	const PersonaSummary *selectedPersona = GetPersona();
-	UINT32 selectedPersonaID = selectedPersona->m_personaID;
-
+	if (selectedPersona != nullptr)
+	{
+		selectedPersonaID = selectedPersona->m_personaID;
+	}
+	
 	const PersonaSummary *current = nullptr;
 	const PersonaSummary *originalPersona = GetPersona();
 	const PersonaSummary *replacementPersona = nullptr;
-
-	PersonaSummary origPersona = *originalPersona;
 
 	for (unsigned int i = 0; i < _classdata->personas.m_count; ++i)
 	{
