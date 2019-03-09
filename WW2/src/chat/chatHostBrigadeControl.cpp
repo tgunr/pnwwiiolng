@@ -501,7 +501,7 @@ BrigadeController::voteVeto(Vote::Mode mode, const ChatHandle nominee, const Cha
 	_voting(sponsor, vote()->m_forAction, "vetoing", 0, vote()->m_nominee, unit().callsign(), mode);
 
 	// Send notification to officers
-	_noticeToOfficers(BrigadeControl::_VETOED, vote()->m_forAction, 0, VP_NONE, unit(), vote()->m_nominee, sponsor, 0, WWII_NO_COUNTRY, vote()->m_origin);
+	_noticeToOfficers(BrigadeControl::_VETOED, vote()->m_forAction, 0, VP_NONE, unit(), vote()->m_nominee, sponsor, 0, vote()->m_country, vote()->m_origin);
 
 	cancelVote();
 }
@@ -1280,17 +1280,20 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 
 		if (m_action != REQ_COUNTRY_CHANGE)
 		{
-			// Validation
-			///TODO: Check if we should disable this.
-			if ( m_country && bc.unit().country() != m_country )
+			if (!bc.vote() || bc.vote()->m_voteMode != Vote::CHANGECOUNTRY)
 			{
-				player->log(_FLA, "Requesting brigade in different country");
-				throw BCERR_INVALID_REQ;
-			}
-			if ( m_branch && bc.unit().branch() != m_branch )
-			{
-				player->log(_FLA, "Requesting brigade in different branch");
-				throw BCERR_INVALID_REQ;
+				// Validation
+				///TODO: Check if we should disable this.
+				if ( m_country && bc.unit().country() != m_country )
+				{
+					player->log(_FLA, "Requesting brigade in different country");
+					throw BCERR_INVALID_REQ;
+				}
+				if ( m_branch && bc.unit().branch() != m_branch )
+				{
+					player->log(_FLA, "Requesting brigade in different branch");
+					throw BCERR_INVALID_REQ;
+				}
 			}
 		}
 

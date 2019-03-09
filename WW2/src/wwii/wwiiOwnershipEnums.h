@@ -55,7 +55,7 @@ static inline const wchar_t *wwiiCountryCode(WWII_COUNTRY co)
 	switch(co)
 	{
 		case WWII_NO_COUNTRY:
-			return nullptr;
+			return L"NO_COUNTRY";
 		case WWII_ENGLAND:
 			return L"UK";
 		case WWII_USA:
@@ -71,7 +71,7 @@ static inline const wchar_t *wwiiCountryCode(WWII_COUNTRY co)
 		case WWII_RUSSIA:
 			return L"RU";
 		default:
-			return nullptr;
+			return L"UNKNOWN";
 	}
 }
 
