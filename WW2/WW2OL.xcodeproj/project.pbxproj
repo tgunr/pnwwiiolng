@@ -537,7 +537,7 @@
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.h",
 				"$(DERIVED_FILE_DIR)/$(INPUT_FILE_BASE).tab.cpp",
 			);
-			script = "${SRCROOT}/src/omggen/mac_bison ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
+			script = "/usr/bin/bison ${YACCFLAGS} --defines=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.h\" --file-prefix=\"${DERIVED_FILE_DIR}/omggen\" --output=\"${DERIVED_FILE_DIR}/${INPUT_FILE_BASE}.tab.cpp\" \"${INPUT_FILE_PATH}\"";
 		};
 		FA448CF61D0D02EB00C4936D /* PBXBuildRule */ = {
 			isa = PBXBuildRule;
@@ -3557,8 +3557,8 @@
 						DevelopmentTeam = J63A54QWD2;
 					};
 					8D0C4E890486CD37000505A6 = {
-						DevelopmentTeam = J63A54QWD2;
-						ProvisioningStyle = Manual;
+						DevelopmentTeam = NL3267E99V;
+						ProvisioningStyle = Automatic;
 					};
 					E97C76341C8513EB00875F44 = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -3566,7 +3566,8 @@
 					};
 					FA448CE11D0CB25500C4936D = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = J63A54QWD2;
+						DevelopmentTeam = NL3267E99V;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -4155,12 +4156,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -4197,12 +4202,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -4238,6 +4247,9 @@
 		E964E05D1E914A0E00D4BC5F /* BetaRelease */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4246,6 +4258,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = BetaRelease;
@@ -4254,12 +4267,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = BetaRelease;
@@ -4322,6 +4339,9 @@
 		E9C3FB651EE1A4EF00872413 /* MC */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4330,6 +4350,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = MC;
@@ -4338,12 +4359,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = MC;
@@ -4389,12 +4414,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Development;
@@ -4431,6 +4460,9 @@
 		FA448CE71D0CB25500C4936D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4439,6 +4471,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = Debug;
@@ -4446,6 +4479,9 @@
 		FA448CE81D0CB25500C4936D /* Development */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4454,6 +4490,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = Development;
@@ -4461,6 +4498,9 @@
 		FA448CE91D0CB25500C4936D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4469,6 +4509,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = Release;
@@ -4476,6 +4517,9 @@
 		FA448CEA1D0CB25500C4936D /* GM */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				LEX = "$(SRCROOT)/proj/mac/flex";
 				LEXFLAGS = "--nounistd --batch --header-file=$(DERIVED_SOURCES_DIR)/omggen.yy.h";
 				LEX_SUPPRESS_DEFAULT_RULE = YES;
@@ -4484,6 +4528,7 @@
 					"$(PROJECT_DIR)/lib/mac",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				YACC = "$(SRCROOT)/proj/mac/bison";
 			};
 			name = GM;
@@ -4500,12 +4545,16 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = NL3267E99V;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = GM;

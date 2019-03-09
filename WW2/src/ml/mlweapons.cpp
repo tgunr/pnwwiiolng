@@ -281,7 +281,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 		case ML_WEAPON_AMMOCOUNT4:
 			if(MountData->NumberOfWeaponsInMount > 0)
 			{
-				int ammoAmount = 3 * atoi(VarContents);
+				int ammoAmount = atoi(VarContents);
 				MountData->Weapons[MountData->NumberOfWeaponsInMount-1].NumTotalRounds[VarNum-ML_WEAPON_AMMOCOUNT1]		= (ammoAmount >= 0) ? ammoAmount: 0;
 				MountData->Weapons[MountData->NumberOfWeaponsInMount-1].NumRoundsAmmoLeft[VarNum-ML_WEAPON_AMMOCOUNT1]	= ammoAmount;
 			}

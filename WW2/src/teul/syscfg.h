@@ -7,6 +7,11 @@
 // header file.
 // Originating Programmer : Stephen W. Evans
 
+#ifdef _DEBUG
+	#define NO_DEBUG_WRITE
+	#define NO_DEBUG_LOG
+#endif
+
 #include "include/platforms.h"
 
 #include "teul/teulBasic.h"
@@ -16,5 +21,7 @@
 #include "teul/teulPackers.h"
 #include "teul/teulPacket.h"
 #include "weap/weapSpec.h"
+
+#define WriteDebug(...)
 
 #endif
