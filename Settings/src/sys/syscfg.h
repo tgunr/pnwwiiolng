@@ -170,6 +170,6 @@ extern wwiiolpath_string WW2_userDocumentsPath;	//	??_userDocumentsPath - Window
 												//	??_userDocumentsPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
 extern wwiiolpath_string WW2_userWorkingPath;	//	??_userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
 
-#endif
+#endif  //  platOS == OS_WIN32
 
 #endif // __SETTINGS_SYSCFG_H__

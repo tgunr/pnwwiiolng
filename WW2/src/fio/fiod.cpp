@@ -599,6 +599,15 @@ bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
 #else
 void fiodSetUserpath(bool) {}
 
+bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
+	{
+		returnPrePath = fiodGetPrepath();
+
+		if (returnPrePath != L"") { return true; }
+
+		return false;
+	}
+
 const fullpath_t* fiodGetPrepath() {
 #if platOS != OS_WIN32
 	return cv_dataDir.GetString();

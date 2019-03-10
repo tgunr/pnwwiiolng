@@ -43,9 +43,6 @@
     <ClCompile Include="..\WW2\src\wwii\wwiiUTF.cpp">
       <Filter>WW2 - src\wwii</Filter>
     </ClCompile>
-    <ClCompile Include="..\WW2\src\fio\fiostructure.cpp">
-      <Filter>WW2 - src\fio</Filter>
-    </ClCompile>
     <ClCompile Include="..\WW2\src\src\infoMessages.cpp">
       <Filter>WW2 - src\src</Filter>
     </ClCompile>
@@ -118,6 +115,9 @@
     <ClCompile Include="src\versionWin.cpp">
       <Filter>Playgate Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\WW2\src\fio\fiostructure.cpp">
+      <Filter>WW2 - src\fio</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WW2\src\comm\commPlaygateMessages.h">
@@ -143,9 +143,6 @@
     </ClInclude>
     <ClInclude Include="..\WW2\src\wwii\wwiiUTF.h">
       <Filter>WW2 - src\wwii</Filter>
-    </ClInclude>
-    <ClInclude Include="..\WW2\src\fio\fiostructure.h">
-      <Filter>WW2 - src\fio</Filter>
     </ClInclude>
     <ClInclude Include="src\Antihack.h">
       <Filter>Playgate Files</Filter>
@@ -210,9 +207,6 @@
     <ClInclude Include="src\registry.h">
       <Filter>Playgate Files</Filter>
     </ClInclude>
-    <ClInclude Include="res\resource.h">
-      <Filter>Playgate Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Resource.h">
       <Filter>Playgate Files</Filter>
     </ClInclude>
@@ -237,13 +231,13 @@
     <ClInclude Include="src\versionWin.h">
       <Filter>Playgate Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\WW2\src\include\compiler_check.h">
-      <Filter>WW2 - src\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\WW2\src\include\platforms.h">
-      <Filter>WW2 - src\include</Filter>
-    </ClInclude>
     <ClInclude Include="..\WW2\src\include\precompile_includes.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WW2\src\fio\fiostructure.h">
+      <Filter>WW2 - src\fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\WW2\src\include\cpuFeatures.h">
       <Filter>WW2 - src\include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -258,14 +252,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\ww2assets\DATA\playgate\bg.bmp">
-      <Filter>Resource Files\Backgrounds</Filter>
-    </Image>
-    <Image Include="..\ww2assets\DATA\playgate\bg-tos.bmp">
-      <Filter>Resource Files\Backgrounds</Filter>
-    </Image>
     <Image Include="..\ww2assets\oswin\WWIIOnLine.ico">
       <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\ww2assets\oswin\dependencies\playgate\bg.bmp">
+      <Filter>Resource Files\Backgrounds</Filter>
+    </Image>
+    <Image Include="..\ww2assets\oswin\dependencies\playgate\bg-tos.bmp">
+      <Filter>Resource Files\Backgrounds</Filter>
     </Image>
   </ItemGroup>
 </Project>

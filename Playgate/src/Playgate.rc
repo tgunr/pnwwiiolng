@@ -164,7 +164,7 @@ BEGIN
             VALUE "FileDescription", "World War II Online - Launcher"
             VALUE "FileVersion", "0.1.1.9"
             VALUE "InternalName", "Playgate"
-            VALUE "LegalCopyright", "© 1999-2018, Playnet Inc."
+            VALUE "LegalCopyright", "© 1999-2019, Playnet Inc / CRS."
             VALUE "OriginalFilename", "Playgate.exe"
             VALUE "ProductName", "Playgate: World War II Online - Launcher"
             VALUE "ProductVersion", "0.1.1.9"

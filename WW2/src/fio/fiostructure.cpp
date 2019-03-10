@@ -50,7 +50,6 @@ wwiiolpath_string	WW2_userScreenShotsPath;	//	Windows - USER Config ROOT folder:
 wwiiolpath_string	WW2_userWorkingPath;		//	Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.
 												//	macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
 
-
 /************************************************************************************************
 fioStructureInit - sets up the data directory structure on clients
 *************************************************************************************************/
@@ -460,7 +459,7 @@ LOGICAL fioStructureInit()
             //  This should NOT happen.
             //  Unable to locate the \Program * Files -> CRS -> WWIIOnLine -> data directory.
 #if EXE_BUILD != BUILD_EXE_SETTINGS
-            dbugLog(_FLI, "&HFFF7 - Unable to locate the \Program * Files -> CRS -> WWIIOnLine -> data directory.  Aborting.  This should NOT Happen.");
+            dbugLog(_FLI, "&HFFF7 - Unable to locate the \\Program * Files -> CRS -> WWIIOnLine -> data directory.  Aborting.  This should NOT Happen.");
 #endif
             exeDataPath = L"";
 			exeDataPathSet = FALSE;

@@ -890,6 +890,7 @@
     <ClInclude Include="..\..\src\comm\commConstants.h" />
     <ClInclude Include="..\..\src\comm\commPackers.h" />
     <ClInclude Include="..\..\src\comm\commTypes.h" />
+    <ClInclude Include="..\..\src\fio\fiostructure.h" />
     <ClInclude Include="..\..\src\teul\teulExtErrors.h" />
     <ClInclude Include="..\..\src\dd\ddp.h" />
     <ClInclude Include="..\..\src\dd\dx3dinfo.h" />
@@ -1428,6 +1429,7 @@
     <ClCompile Include="..\..\src\fio\fio.cpp" />
     <ClCompile Include="..\..\src\fio\fioa.cpp" />
     <ClCompile Include="..\..\src\fio\fiod.cpp" />
+    <ClCompile Include="..\..\src\fio\fiostructure.cpp" />
     <ClCompile Include="..\..\src\fp\fpFPS.cpp" />
     <ClCompile Include="..\..\src\fp\fpFPSdata.cpp" />
     <ClCompile Include="..\..\src\fp\fpFPSfx.cpp" />
@@ -1913,6 +1915,9 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
 </Project>

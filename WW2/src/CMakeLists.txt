@@ -337,6 +337,9 @@ ADD_LIBRARY( wwiilib STATIC
 	wwii/wwiiPPOLoader.cpp wwii/wwiiPPOLoader.h
 	chat/omgChat.cpp chat/omgChat.h
 	chat/omgMissionSortieData.cpp chat/omgMissionSortieData.h
+
+	# Additional FILES
+	fio/fiostructure.cpp fio/fiostructure.h
 )
 SET_PROPERTY( TARGET wwiilib PROPERTY FOLDER "Libs" )
 TARGET_LINK_LIBRARIES( wwiilib LibXml2::LibXml2 MySQL::MySQL )

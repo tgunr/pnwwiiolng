@@ -320,6 +320,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\WW2\src\fio\fiostructure.cpp" />
     <ClCompile Include="src\Antihack.cpp" />
     <ClCompile Include="src\BDialog.cpp" />
     <ClCompile Include="src\explorer2.cpp" />
@@ -360,6 +361,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\WW2\src\fio\fiostructure.h" />
     <ClInclude Include="..\WW2\src\include\precompile_includes.h" />
     <ClInclude Include="src\Antihack.h" />
     <ClInclude Include="src\BDialog.h" />
@@ -401,7 +403,6 @@
     <ClInclude Include="src\versionWin.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\Playgate.ico" />
     <None Include="res\Playgate.rc2" />
   </ItemGroup>
   <ItemGroup>
@@ -417,6 +418,11 @@
     <ProjectReference Include="..\WW2\proj\win\teulKit\teulKit.vcxproj">
       <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\ww2assets\oswin\dependencies\playgate\bg-tos.bmp" />
+    <Image Include="..\ww2assets\oswin\dependencies\playgate\bg.bmp" />
+    <Image Include="..\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

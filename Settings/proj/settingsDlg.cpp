@@ -16,8 +16,6 @@
 #include "cpuid.h"
 #include "file.h"
 
-#include "settingsDlg.h"
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -32,8 +30,11 @@
 static HGLRC _hrc;
 
 static int _curLanguage = 0;
+
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
 bool _runAsAdmin = false;  //  true = Settings.exe is to run with Administrator Privileges. Set from Regestry settings.
 bool _checkedHiDPI = false;
+*/
 
 CsettingsDlg::CsettingsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CsettingsDlg::IDD, pParent)
@@ -59,7 +60,7 @@ void CsettingsDlg::DoDataExchange(CDataExchange* pDX)
 //    DDX_Control(pDX, IDC_CHECK_RUN_SSE2, _runsse2);
     DDX_Control(pDX, IDC_COMBO_NETWORK, _network);
     DDX_Control(pDX, IDC_COMBO_SOUND_CARD, _soundcard);
-	DDX_Control(pDX, IDC_CHECK_HIDPI, _hidpi);
+//	DDX_Control(pDX, IDC_CHECK_HIDPI, _hidpi);  HDPI CheckBox - Disabled; MJH 2019-03-07
 }
 
 BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
@@ -74,7 +75,7 @@ BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
 	//ON_BN_CLICKED(IDC_CHECK_RUN_SSE2, OnBnClickedCheckRunSse2)
 	ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
 	ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
-	ON_BN_CLICKED(IDC_CHECK_HIDPI, OnBnClickedCheckHiDPI)
+//	ON_BN_CLICKED(IDC_CHECK_HIDPI, OnBnClickedCheckHiDPI)  HDPI CheckBox - Disabled; MJH 2019-03-07
 END_MESSAGE_MAP()
 
 
@@ -219,8 +220,8 @@ BOOL CsettingsDlg::OnInitDialog()
     GetDlgItem(IDC_STATIC_RESOLUTION)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND_CARD)->SetFont(&font);
-	GetDlgItem(IDC_STATIC_OPTIONS)->SetFont(&font);
-	GetDlgItem(IDC_CHECK_HIDPI)->SetFont(&font);
+//	GetDlgItem(IDC_STATIC_OPTIONS)->SetFont(&font);  HDPI CheckBox - Disabled; MJH 2019-03-07
+//	GetDlgItem(IDC_CHECK_HIDPI)->SetFont(&font);  HDPI CheckBox - Disabled; MJH 2019-03-07
 //    GetDlgItem(IDC_CHECK_RUN_SSE2)->SetFont(&font);
 
 	fileInit();
@@ -434,6 +435,7 @@ void CsettingsDlg::_setSoundCard()
     _soundcard.SetCurSel(cursor);
 }
 
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
 void CsettingsDlg::_getHiDPI()
 {
 	std::wstring Key = L"";
@@ -444,7 +446,7 @@ void CsettingsDlg::_getHiDPI()
 	std::wstring test2 = L"";
 	std::wstring test3 = L"";
 
-/*  Disabled  --  MJH - Feburary 27, 2018.
+====  Disabled  --  MJH - Feburary 27, 2018.  ====
 	//  Is Settings.exe running with Administrator Privileges?
 	Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
 	ValueName = WW2_exePath + L"\\Settings.exe";
@@ -480,7 +482,7 @@ void CsettingsDlg::_getHiDPI()
 		_runAsAdmin = false;
 		GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(false);
 	}
-*/
+====  Disabled  --  MJH - Feburary 27, 2018.  ====
 
 	_runAsAdmin = true;
 	GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(true);
@@ -552,6 +554,7 @@ void CsettingsDlg::_setHiDPI()
 
 	return;
 }
+*/
 
 void CsettingsDlg::_setDialog()
 {
@@ -569,13 +572,13 @@ void CsettingsDlg::_setDialog()
 		displayList.push_back(tmpDisplay);
     }
 
-	_runAsAdmin = false; 
+//	_runAsAdmin = false;  HDPI CheckBox - Disabled; MJH 2019-03-07
 	_setLanguage();
     _setVideoCard();
     _setResolution();
     _setSoundCard();
     _setNetwork();
-	_getHiDPI();
+//	_getHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 
     _p_info info;
 
@@ -628,11 +631,13 @@ void CsettingsDlg::_setDialog()
     wnd = GetDlgItem(IDC_STATIC_SOUND_CARD);
     wnd->SetWindowText(getLoc(_curLanguage, "settings.soundcard"));
 
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
 	wnd = GetDlgItem(IDC_STATIC_OPTIONS);
 	wnd->SetWindowText(getLoc(_curLanguage, "settings.options"));
 
 	wnd = GetDlgItem(IDC_CHECK_HIDPI);
 	wnd->SetWindowText(getLoc(_curLanguage, "settings.options.dpi"));
+*/
 	
 //    wnd = GetDlgItem(IDC_CHECK_RUN_SSE2);
 //    wnd->SetWindowText(getLoc(_curLanguage, "settings.wantsse2"));
@@ -702,7 +707,7 @@ void CsettingsDlg::_saveDialogValues()
 //    OnBnClickedCheckRunSse2();
     OnCbnSelchangeComboNetwork();
     OnCbnSelchangeComboSoundCard();
-	_setHiDPI();
+//	_setHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 }
 
 void CsettingsDlg::OnBnClickedOk()
@@ -762,10 +767,12 @@ void CsettingsDlg::OnBnClickedCheckRunSse2()
 }
 */
 
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
 void CsettingsDlg::OnBnClickedCheckHiDPI()
 {
 	_checkedHiDPI = _hidpi.GetCheck() ? true : false;
 }
+*/
 
 void CsettingsDlg::OnCbnSelchangeComboNetwork()
 {  

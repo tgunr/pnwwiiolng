@@ -87,11 +87,11 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Settings Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\include\d3d\dx3dinfo.cpp">
-      <Filter>Settings Files\d3d</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp">
       <Filter>ww2 - src\fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\d3d\dx3dinfo.cpp">
+      <Filter>Settings Files\d3d</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,51 +131,51 @@
     <ClInclude Include="stdafx.h">
       <Filter>Settings Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\d3d\dx3dinfo.h">
-      <Filter>Settings Files\d3d</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\WW2\src\fio\fiostructure.h">
       <Filter>ww2 - src\fio</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\sys\syscfg.h">
-      <Filter>Settings Files\sys</Filter>
+    <ClInclude Include="..\..\WW2\src\include\systypes.h">
+      <Filter>ww2 - src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\d3d\dx3dinfo.h">
+      <Filter>Settings Files\d3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\settings.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\chinese\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\chinese\settings.dtd">
       <Filter>Resource Files\Location Files\chinese</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\english\mainmenu-english.strings">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings">
       <Filter>Resource Files\Location Files\english</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\english\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\settings.dtd">
       <Filter>Resource Files\Location Files\english</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\french\mainmenu-french.strings">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings">
       <Filter>Resource Files\Location Files\french</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\french\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\settings.dtd">
       <Filter>Resource Files\Location Files\french</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\german\mainmenu-german.strings">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings">
       <Filter>Resource Files\Location Files\german</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\german\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\settings.dtd">
       <Filter>Resource Files\Location Files\german</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\italian\mainmenu-italian.strings">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings">
       <Filter>Resource Files\Location Files\italian</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\italian\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\settings.dtd">
       <Filter>Resource Files\Location Files\italian</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\spanish\mainmenu-spanish.strings">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings">
       <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
-    <None Include="..\..\ww2assets\DATA\loc\spanish\settings.dtd">
+    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\settings.dtd">
       <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
   </ItemGroup>
@@ -188,6 +188,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico" />
+    <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

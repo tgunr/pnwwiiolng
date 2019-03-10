@@ -40,9 +40,11 @@ protected:
     void _initGlew();
     void _setVideoCard();
     void _setResolution();
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
 	void _getHiDPI();
 	void _setHiDPI();
-    void _kill();
+*/
+	void _kill();
     void _adjustOK();
     void _adjustCancel();
     void _setNetwork();
@@ -60,7 +62,7 @@ public:
     //afx_msg void OnBnClickedCheckRunSse2();
     afx_msg void OnCbnSelchangeComboNetwork();
     afx_msg void OnCbnSelchangeComboSoundCard();
-	afx_msg void OnBnClickedCheckHiDPI();
+//	afx_msg void OnBnClickedCheckHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 
 private:
     CComboBox _language;
@@ -68,7 +70,7 @@ private:
     CComboBox _resolution;
     CComboBox _network;
     CComboBox _soundcard;
-	CButton _hidpi;
+//	CButton _hidpi;  HDPI CheckBox - Disabled; MJH 2019-03-07
 
     //CButton _runsse2;
 
