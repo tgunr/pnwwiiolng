@@ -620,8 +620,9 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 		unsigned int count = _cp.GetUnitCount();
 		
-		// If the town is not fronline, backline or reserve don't show a Dot for the hidden Garrison that is there
-		if(!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+		// If the town is not fronline, backline, reserve or a frontline airfield don't show a Dot for the hidden Garrison that is there
+		if((!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) 
+			|| ((cpflags & CP_STAT_ENEMY_LINKED) && (cpflags & CP_STAT_HAS_AIRBASE)))
 		{
 			count--;
 		}
