@@ -189,14 +189,32 @@ template<>
 SINT32
 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
 {
-	if (incoming.action() != EXCHANGE) // We should only get exchanges
+	GarrisonCountryChange& data = incoming.data();
+
+	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG for unit %d, new country %d",
+		data.m_brigadeID, data.m_newCountryId);
+
+	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
+	if (unit != nullptr)
 	{
-		dbugLog(_FLA, "Invalid Garrison country change msg");
-		return -EINVAL;
+		dbugLog(_FLD, "Garrison is name is %s", unit->name());
+
+		CPStruct* cp = strtGetCP(unit->m_homeCPID);
+		if (cp != nullptr)
+		{
+			dbugLog(_FLD, "Old country is %d, new is %d", cp->controllingCountry, data.m_newCountryId);
+
+			std::list<HCUnit *> garrisons;
+			HCUnit::GetGarrisonUnits(garrisons, unit->m_homeCPID);
+			for (HCUnit *nextUnit : garrisons)
+			{
+				dbugLog(_FLD, "Changing garrison's %s country to %d", nextUnit->name(), data.m_newCountryId);
+				data.process(nextUnit->m_unitID, data.m_newCountryId);
+			}
+			cp->controllingCountry = data.m_newCountryId;
+			
+		}
 	}
-
-	incoming.data().process(incoming.data().m_brigadeID, incoming.data().m_newCountryId);
-
 	return 0;
 }
 

@@ -40,6 +40,5 @@ namespace Map
 
 	,	SWING_METER_Y
 	,   HC_UNIT_COUNTRY_CHANGE_Y
-	,   _XCHG_GARRISON_COUNTRY_CHANGE_Y
 	};
 }

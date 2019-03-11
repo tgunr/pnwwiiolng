@@ -11,7 +11,6 @@
 enum GARRISON_COUNTRY_CHANGE_RESULT
 {
 	GCR_APPROVED				// 0
-	, GCR_REQUESTING
 	, GCR_FAILED_OWNER_ALREADY
 	, GCR_FAILED_TOO_MANY
 	, GCR_FAILED_SUPPLY
@@ -31,7 +30,6 @@ public:
 	SINT32 send(SINT32 teulIndex, FULL_OBJ_ID cp, WWII_COUNTRY const& country);
 	SINT32 sendToClient(SINT32 teulIndex);
 	SINT32 sendToMap(SINT32 teulIndex);
-	SINT32 sendToStrat(SINT32 teulIndex);
 	SINT32 receive(SINT32 teulIndex);
 
 #if platBuild == BUILD_CLIENT
@@ -39,7 +37,6 @@ public:
 #endif // platBuild == BUILD_CLIENT
 
 SINT32 packer(PackMode mode, ACTION_OBJECT* a);
-	void strtProcessRequest();
 
 public:
 	GARRISON_COUNTRY_CHANGE_RESULT m_result;

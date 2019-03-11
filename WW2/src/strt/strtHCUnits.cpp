@@ -70,6 +70,8 @@ StratHCUnit::announceHome() const
 void
 StratHCUnit::announceGarrisonCountryChange() const
 {
+	dbugLog(_FLD, "Country change notification for unit %s (%d) to country %d", name(), unitID(), country());
+
 	if (isTrainingUnit())
 		return;
 	ChatHandle movedBy = lastMovedBy();
@@ -79,6 +81,8 @@ StratHCUnit::announceGarrisonCountryChange() const
 	GarrisonCountryChange& message = outgoing.data();
 	message.m_brigadeID = unitID();
 	message.m_newCountryId = country();
+	message.m_action = GCR_APPROVED;
+	message.m_actionable = true;
 
 	stratSendGarrisonCountryChange(outgoing);
 }
@@ -726,6 +730,7 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 		m_fallbackCP = m_homeCP;
 	setHomeCP(cp, redeployDelay, forceDelay);
 
+	// Tell the database and other servers where this HCUnit is
 	announceHome();
 
 	UINT32 startTimeS = host_config.supply.trickleStart_m * 60;
@@ -734,7 +739,7 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 	if ( offMap() )
 	{
 		dbugLog(_FLD, "hcu:%u(%s) moved off map, purging resupply", unitID(), callsign());
-		// Going off map nukes resupply tickest and resets
+		// Going off map nukes resupply tickets and resets
 		// stock levels to capacity.
 		purgeResupply(true);
 	}

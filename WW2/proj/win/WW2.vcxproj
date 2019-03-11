@@ -938,7 +938,6 @@
     <ClInclude Include="..\..\src\fx\postRender.h" />
     <ClInclude Include="..\..\src\fx\stoeffects.h" />
     <ClInclude Include="..\..\src\fx\TransformEffect.h" />
-    <ClInclude Include="..\..\src\garrisons\garrisonCountryChangeRequest.h" />
     <ClInclude Include="..\..\src\gl\gl.h" />
     <ClInclude Include="..\..\src\gl\gl3.h" />
     <ClInclude Include="..\..\src\gmlp\gmlpmain.h" />
@@ -1457,7 +1456,6 @@
     <ClCompile Include="..\..\src\fx\postRender.cpp" />
     <ClCompile Include="..\..\src\fx\stoeffects.cpp" />
     <ClCompile Include="..\..\src\fx\TransformEffect.cpp" />
-    <ClCompile Include="..\..\src\garrisons\garrisonCountryChangeRequest.cpp" />
     <ClCompile Include="..\..\src\gmlp\gmlpmain.cpp" />
     <ClCompile Include="..\..\src\gr2\gr2Anim.cpp" />
     <ClCompile Include="..\..\src\gr2\gr2layer.cpp" />

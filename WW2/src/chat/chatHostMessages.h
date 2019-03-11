@@ -34,6 +34,8 @@ SINT32 chatSendSmiteUser(UINT32 customerID, const char* handle);
 bool chatSendStratCommand(SINT32 playerID, int cmd, const struct FULL_OBJ_ID cp, WWII_SIDE side);
 
 void chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable);
+void chatSendGarrisonChangeCountry(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, const WWII_COUNTRY country, bool isActionable);
+
 void chatSendHCUnitUpdate(const Player*, UINT32 unitID);
 
 SINT32 chatSendPopulation();

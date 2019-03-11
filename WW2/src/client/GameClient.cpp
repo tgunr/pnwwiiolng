@@ -1885,15 +1885,17 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
 				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
 
-				//  clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
-				SelectBrigade(trainingUnit->unitID(), true, true);
+				if (trainingUnit != nullptr)
+				{
+					//  clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
+					SelectBrigade(trainingUnit->unitID(), true, true);
 
-				SavePersona(SAVE_PERSONA);
-				SavePersona(SAVE_BRIGADE);
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
 
-				// update the jsclient
-				jsclient->UpdatePersonas();
-
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
 				replacementPersona = GetPersona(replacementUnit->m_countryID, replacementUnit->m_branchID);
 
 				PersonaSummary tempPersona = *replacementPersona;

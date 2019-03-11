@@ -28,7 +28,6 @@
 #include "map/mapSwingMeter.h"
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
-#include "garrisons/garrisonCountryChangeRequest.h"
 
 namespace Chat
 {
@@ -316,15 +315,6 @@ SINT32 MissionList::receive(SINT32 teulIndex)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 		client->ProcessMissionList(*this);
-
-	return 0;
-}
-
-SINT32 GarrisonCountryChangeReq::receive(SINT32 teulIndex)
-{
-	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
-	if (client)
-		client->ProcessGarrisonCountryChangeReq(*this);
 
 	return 0;
 }

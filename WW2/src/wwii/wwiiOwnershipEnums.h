@@ -50,6 +50,31 @@ enum WWII_SIDE				//] Definitive list of in-game sides.
 	MAX_SIDES				//] Guaranteed to be greater than the highest side no.
 };
 
+static inline const wchar_t *wwiiCountryCode(WWII_COUNTRY co)
+{
+	switch(co)
+	{
+		case WWII_NO_COUNTRY:
+			return L"NO_COUNTRY";
+		case WWII_ENGLAND:
+			return L"UK";
+		case WWII_USA:
+			return L"US";
+		case WWII_FRANCE:
+			return L"FR";
+		case WWII_GERMANY:
+			return L"DE";
+		case WWII_ITALY:
+			return L"IT";
+		case WWII_CHINA:
+			return L"CN";
+		case WWII_RUSSIA:
+			return L"RU";
+		default:
+			return L"UNKNOWN";
+	}
+}
+
 // This function can be called for any mechanism that needs to know if there are multiple "functional" countries
 // on a "side".  As of 2018 only ALLIED had more than one side and AXIS had only one.  Using this function to represent the
 // ability to present country options for any particular side is prefered over hardcoding things

@@ -152,6 +152,11 @@ public:
 	// Get the training unit for a particular country/branch
 	static HCUnit* GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch);
 
+	// Get a list of all the Garrisons for a particular Country/CP
+	static void GetGarrisonUnits(std::list<HCUnit *> &unitsList, FULL_OBJ_ID cpID);
+
+	// Get the controlling army garrison for the specified CP
+	static UINT32 GetArmyGarrison(FULL_OBJ_ID cpID);
 
 	//// ---- Member Functions ---- ////
 

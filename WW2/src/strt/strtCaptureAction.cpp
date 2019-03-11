@@ -569,7 +569,6 @@ CaptureAction::LeaveContention() const
 	m_cp.checkTownStatus(&m_cp, justCaptured, 0);
 }
 
-
 //////////////////////////////////////////////////////////////////////
 // Finish the capture event.
 
