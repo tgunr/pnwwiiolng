@@ -2931,8 +2931,8 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 		{
 			currWeapControl = gr2PlayAnimation (weapModel, weapAnims[weapon][RELOAD2]);
 		}
-		else if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG || FPS_WEAPONTYPE_AUTO_RIFLE))
-		{
+		else if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG) || (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_SMG))
+		){
 			currWeapControl = gr2PlayAnimation (weapModel, weapAnims[weapon][DEPLOYING]);
 		}
 		else
@@ -2975,8 +2975,8 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 		// lmgs play the deploy animation for both deploy and undeploy
 		// but for undeploy, they play it backwards
-        if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG || FPS_WEAPONTYPE_AUTO_RIFLE))
-		{
+        if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG) || (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_SMG))
+		){
 			if(state == UNDEPLOYING)
 			{
 				gr2ControlSetLastFrame(currWeapControl);
@@ -3011,8 +3011,8 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 	if (arms_anim_files[weapon][state][0])
 	{
-		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG || FPS_WEAPONTYPE_AUTO_RIFLE))
-		{
+		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG) || (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_SMG))
+		){
 			currSkelControl = gr2PlayAnimation (skeletonModel, armsAnims[weapon][DEPLOYING]);
 		}
 		else
@@ -3037,8 +3037,8 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 		gr2ControlSetEaseOutDuration (currSkelControl, outDuration);
 
-		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG || FPS_WEAPONTYPE_AUTO_RIFLE))
-		{
+		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG) || (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_SMG))
+		){
 			if(state == UNDEPLOYING)
 			{
 				gr2ControlSetLastFrame(currSkelControl);
