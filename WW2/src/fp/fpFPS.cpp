@@ -1533,7 +1533,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		stateFlags &= ~STATE_AIM;
 	}
     
-    // lmg's cannot fire while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
+    // LMGs cannot fire while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
     if ((stateFlags & STATE_FIRE) && (currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29) && fpFPSIsMoving())
     {
         stateFlags &= ~STATE_FIRE;
@@ -9456,7 +9456,7 @@ void fpFPSForcedReload ()
 		return;
 	}
     
-    // no lmg reloading while moving for the MG34 (German LMG), BREN (British LMG)
+    // LMGs cannot reload while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
     if ((currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29) && fpFPSIsMoving(.01f))
     {
         persShakeHead("common.headshake.reloadstill");
