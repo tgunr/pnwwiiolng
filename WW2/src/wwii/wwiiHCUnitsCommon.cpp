@@ -327,7 +327,7 @@ HCUnit::GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 		}
 	}
 
-	return nullptr;
+	return retVal;
 }
 
 void HCUnit::GetGarrisonUnits(std::list<HCUnit *>& unitsList, FULL_OBJ_ID cpID)
