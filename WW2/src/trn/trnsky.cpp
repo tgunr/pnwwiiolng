@@ -1914,11 +1914,11 @@ static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 	FLOAT32 TempNum;
 	FLOAT32 Red,Green,Blue,Alpha = 0.0f;
 	UINT32 Color;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	FLOAT32 PlayerSunDotProduct;
 
 	trnTODGetTimeOfDay(&TimeOfDay);
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	sunelevation = (FLOAT32)(fmod(2*PI*TimeOfDay/86400,2*PI));
 

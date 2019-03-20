@@ -34,7 +34,7 @@
 #include "fp/fpMain.h"
 #include "trn/trnmain.h"
 #include "ml/mlhead.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "wwii/wwiiCovert.h"
 #include "locl/loclLang.h"
 #include "ui/uiMain.h"
@@ -1532,7 +1532,14 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	{
 		stateFlags &= ~STATE_AIM;
 	}
-
+    
+    // LMGs cannot fire while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
+    if ((stateFlags & STATE_FIRE) && (currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29) && fpFPSIsMoving())
+    {
+        stateFlags &= ~STATE_FIRE;
+        persShakeHead("common.headshake.nofiremoving");
+    }
+    
 	// LMGs have some special allowances for "aim"
 	if (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LMG)
 	{
@@ -2924,8 +2931,8 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 		{
 			currWeapControl = gr2PlayAnimation (weapModel, weapAnims[weapon][RELOAD2]);
 		}
-		else if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG))
-		{
+		else if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG)))
+        {
 			currWeapControl = gr2PlayAnimation (weapModel, weapAnims[weapon][DEPLOYING]);
 		}
 		else
@@ -2968,7 +2975,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 		// lmgs play the deploy animation for both deploy and undeploy
 		// but for undeploy, they play it backwards
-		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG))
+        if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG)))
 		{
 			if(state == UNDEPLOYING)
 			{
@@ -3004,7 +3011,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 	if (arms_anim_files[weapon][state][0])
 	{
-		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG))
+		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG)))
 		{
 			currSkelControl = gr2PlayAnimation (skeletonModel, armsAnims[weapon][DEPLOYING]);
 		}
@@ -3030,7 +3037,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 		gr2ControlSetEaseOutDuration (currSkelControl, outDuration);
 
-		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG))
+		if(((state == DEPLOYING)||(state == UNDEPLOYING)) && ((fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_LMG) || (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_SMG)))
 		{
 			if(state == UNDEPLOYING)
 			{
@@ -8480,13 +8487,13 @@ UINT32 fpFPSGetResupplyTarget ()
 void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, piMATRIX* pFireAtt)
 {
 	FLOAT64VECTOR	startPos, endPos;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
 	vehVehicle*		collideVehicle;
 	vehVehicle*		playerVehicle = persGetPersonaVehiclePtr();
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	projVel.x = projVel.z = 0.0; projVel.y = 1.0;
 	mathVectorRotate64(&projVel, &projVel, pFireAtt);
@@ -8506,12 +8513,12 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 
 	//draw3dSetWorldDebugLine (&startPos, &endPos, "ResupplyTest", colorYELLOWALPHA);
 
-	V1.x = (FLOAT32)(startPos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(startPos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(startPos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(startPos.y - worldOriginOffset.y);
 	V1.z = (FLOAT32)(startPos.z);
 
-	V2.x = (FLOAT32)(endPos.x - WorldOriginOffset.x);
-	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
+	V2.x = (FLOAT32)(endPos.x - worldOriginOffset.x);
+	V2.y = (FLOAT32)(endPos.y - worldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
 	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, &collideVehicle, nullptr, FALSE, FALSE, TRUE) == TRUE)
@@ -8570,12 +8577,12 @@ static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, piMATRIX* pFireAtt)
 {
 	FLOAT64VECTOR	startPos, endPos;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
 	trnCDTerrainObject* TO = nullptr;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	projVel.x = projVel.z = 0.0; projVel.y = 1.0;
 	mathVectorRotate64(&projVel, &projVel, pFireAtt);
@@ -8595,12 +8602,12 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 
 	//draw3dSetWorldDebugLine (&startPos, &endPos, "BridgeRepair", colorMAGENTAALPHA);
 
-	V1.x = (FLOAT32)(startPos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(startPos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(startPos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(startPos.y - worldOriginOffset.y);
 	V1.z = (FLOAT32)(startPos.z);
 
-	V2.x = (FLOAT32)(endPos.x - WorldOriginOffset.x);
-	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
+	V2.x = (FLOAT32)(endPos.x - worldOriginOffset.x);
+	V2.y = (FLOAT32)(endPos.y - worldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
 	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, nullptr, &TO, FALSE, FALSE, TRUE) == TRUE)
@@ -9448,6 +9455,13 @@ void fpFPSForcedReload ()
 		persShakeHead("common.headshake.reloadstill");
 		return;
 	}
+    
+    // LMGs cannot reload while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
+    if ((currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29) && fpFPSIsMoving(.01f))
+    {
+        persShakeHead("common.headshake.reloadstill");
+        return;
+    }
 
 	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP]))
 	{
@@ -10673,9 +10687,9 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			OBJECT* RideObject = currentVehicle->VehicleObjectData->FPSSeats[i];
 			if(RideObject == nullptr) break;
 			FLOAT64VECTOR TrooperPos = {0,0,0}, RidePos, DeltaVec;
-			FLOAT64VECTOR WorldOriginOffset;
+			FLOAT64VECTOR worldOriginOffset;
 
-			trnGetWorldOriginOffset(&WorldOriginOffset);
+			trnGetWorldOriginOffset(&worldOriginOffset);
 			mathVectorMultiply64(&TrooperPos, &TrooperPos, &vehicleData->VehicleAttMat);
 			mathAddVectors(&TrooperPos, &TrooperPos, &vehicleData->AdjustedForCGPos);
 
@@ -10685,9 +10699,9 @@ LOGICAL fpFPSRideUnrideVehicle ()
 
 			mathVectorMultiply64(&RidePos, &RidePos, &RideObject->mat);
 
-			RidePos.x += WorldOriginOffset.x;
-			RidePos.y += WorldOriginOffset.y;
-			RidePos.z = -(RidePos.z + WorldOriginOffset.z);
+			RidePos.x += worldOriginOffset.x;
+			RidePos.y += worldOriginOffset.y;
+			RidePos.z = -(RidePos.z + worldOriginOffset.z);
 			mathSubVectors(&DeltaVec, &RidePos, &TrooperPos);
 
 			if(mathExactVectorLength2(&DeltaVec) < MIN_RIDE_DISTANCE2)

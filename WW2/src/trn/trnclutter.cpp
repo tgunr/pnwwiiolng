@@ -426,8 +426,8 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 
 	mlVehicleData*	VehicleData = persGetPersonaModelDataPtr();
 
-	FLOAT64VECTOR WorldOriginOffset;
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	FLOAT64VECTOR worldOriginOffset;
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	Clutter->Pos.x = PosX;
 	Clutter->Pos.y = PosY;
@@ -451,8 +451,8 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 
 	Variance = (_GetRandomNumberFromSeed(&TempS32) / 32767.0f) * 0.2f + 0.8f;
 
-	P1.x = (FLOAT32)(Clutter->Pos.x - WorldOriginOffset.x);
-	P1.y = (FLOAT32)(Clutter->Pos.y - WorldOriginOffset.y);
+	P1.x = (FLOAT32)(Clutter->Pos.x - worldOriginOffset.x);
+	P1.y = (FLOAT32)(Clutter->Pos.y - worldOriginOffset.y);
 	P1.z = -10000.0;
 	P2 = P1;
 	P2.z = 10000.0;

@@ -27,7 +27,7 @@
 int profile;
 #endif
 
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 
 static UINT32 _TimeOfDay;

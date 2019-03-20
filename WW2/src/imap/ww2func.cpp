@@ -3,7 +3,7 @@
 
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "str/striws.h"
 #include "veh/vehType.h"
 

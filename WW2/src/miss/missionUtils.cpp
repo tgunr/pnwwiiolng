@@ -23,8 +23,8 @@ FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, REL_OBJ_
 		return nullptr;
 	}
 
-	foid->cell.ox = sx << 4;
-	foid->cell.oy = sy << 4;
+	foid->cell.ox = static_cast<SINT16>(static_cast<UINT16>(sx) << 4);
+	foid->cell.oy = static_cast<SINT16>(static_cast<UINT16>(sy) << 4);
 	foid->id = roid.id;
 	foid->objClass = roid.objClass;
 	foid->objType = roid.objType;

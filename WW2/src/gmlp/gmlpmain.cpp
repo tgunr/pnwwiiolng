@@ -54,7 +54,7 @@
 #include "trn/trnclutter.h"
 #include "trn/trncloud.h"
 #include "gmlp/gmlpmain.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2imap.h"
 #include "fp/fpFPS.h"
 #include "fp/fpFPSdata.h"

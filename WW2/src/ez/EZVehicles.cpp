@@ -1,7 +1,7 @@
 #include "syscfg.h" // Path is project specific.
 
 #include "ez/EZVehicles.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "pers/persmain.h"
 #include "math/math3d.h"

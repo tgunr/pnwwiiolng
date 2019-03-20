@@ -1887,7 +1887,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
     FLOAT64 TempNum = 0;
     FLOAT64 Angle = 0;
     FLOAT64VECTOR TempVec = {0, 0, 0};
-    FLOAT64VECTOR WorldOriginOffset = {0, 0, 0};
+    FLOAT64VECTOR worldOriginOffset = {0, 0, 0};
     UINT32 NumCornersToCheck = 0;
     piVECTOR BBox1 = {0, 0, 0};
     piVECTOR BBox2 = {0, 0, 0};
@@ -1903,7 +1903,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 		return FALSE;
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	{
@@ -2089,13 +2089,13 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 		if(Vehicle->VehicleType->Type != VEH_TYPE_AIR)
 		{
 			// ok we're in view field, lets see if LOS is blocked
-			V1.x = (FLOAT32)(AG->Pos.x + AG->EyePos.x - WorldOriginOffset.x);
-			V1.y = (FLOAT32)(AG->Pos.y + AG->EyePos.y - WorldOriginOffset.y);
-			V1.z = -(FLOAT32)(AG->Pos.z + AG->EyePos.z + WorldOriginOffset.z);
+			V1.x = (FLOAT32)(AG->Pos.x + AG->EyePos.x - worldOriginOffset.x);
+			V1.y = (FLOAT32)(AG->Pos.y + AG->EyePos.y - worldOriginOffset.y);
+			V1.z = -(FLOAT32)(AG->Pos.z + AG->EyePos.z + worldOriginOffset.z);
 
-			V2.x = (FLOAT32)(Corners[i].x - WorldOriginOffset.x);
-			V2.y = (FLOAT32)(Corners[i].y - WorldOriginOffset.y);
-			V2.z = -(FLOAT32)(Corners[i].z + WorldOriginOffset.z);
+			V2.x = (FLOAT32)(Corners[i].x - worldOriginOffset.x);
+			V2.y = (FLOAT32)(Corners[i].y - worldOriginOffset.y);
+			V2.z = -(FLOAT32)(Corners[i].z + worldOriginOffset.z);
 
 #ifdef BETA_RELEASE
 draw3dLineDebug(&V1,&V2,colorBLUEALPHA);
