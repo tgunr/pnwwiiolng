@@ -1404,19 +1404,19 @@ static LOGICAL _IsMountBlocked(mlWeaponMount* Mount, int i, vehVehicle* Vehicle)
 	FLOAT64VECTOR CollideRay = {0,1000,0};
 	FASTCOLLIDE CollideList[32], *CollideListPtr;
 	UINT32 NumCollisions;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	piVECTOR start, end;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	_GetFireAttPosVel(Mount, i, Vehicle->ModelData, &FireAtt, &RelPnt, &FirePnt, &FireVel);
 
 	// Fire out a ray and see if it collides with our own vehicle
 	mathVectorMultiply64(&CollideRay, &CollideRay, &FireAtt);
 
-	start.x = (FLOAT32)(FirePnt.x - WorldOriginOffset.x);
-	start.y = (FLOAT32)(FirePnt.y - WorldOriginOffset.y);
-	start.z = (FLOAT32)(FirePnt.z - WorldOriginOffset.z);
+	start.x = (FLOAT32)(FirePnt.x - worldOriginOffset.x);
+	start.y = (FLOAT32)(FirePnt.y - worldOriginOffset.y);
+	start.z = (FLOAT32)(FirePnt.z - worldOriginOffset.z);
 	end.x = start.x + (FLOAT32)CollideRay.x;
 	end.y = start.y + (FLOAT32)CollideRay.y;
 	end.z = start.z + (FLOAT32)CollideRay.z;
@@ -1430,7 +1430,7 @@ static LOGICAL _IsMountBlocked(mlWeaponMount* Mount, int i, vehVehicle* Vehicle)
 
 	weapCollideRoundWithVehicles(&CollideListPtr, &NumCollisions,
 									&start, &end, frametime/1000.0, frametime/1000.0,
-									TRUE, TRUE, &WorldOriginOffset, FALSE, 0);
+									TRUE, TRUE, &worldOriginOffset, FALSE, 0);
 	NumCollisions = 32 - NumCollisions;
 
 	return NumCollisions;

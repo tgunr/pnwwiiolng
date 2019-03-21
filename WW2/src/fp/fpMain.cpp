@@ -1449,13 +1449,13 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 	piVECTOR		SphereCenter;
 	UINT32			Collision;
 //	SINT32			collisionOccurred = 0;
-	FLOAT64VECTOR 	WorldOriginOffset;
+	FLOAT64VECTOR 	worldOriginOffset;
 	OBJECT*			colObject;
 
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	vehGetVehicleHead(&CurrentVehicle);
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	worldOriginOffset.z = -worldOriginOffset.z;
 
 	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
 	{
@@ -1490,9 +1490,9 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 
 		//CurrentVehicle->VehicleObjectData->CollideExternObject
 		//CurrentVehicle->VehicleObjectData->HitBox
-		SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-		SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-		SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+		SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - worldOriginOffset.x);
+		SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - worldOriginOffset.y);
+		SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - worldOriginOffset.z);
 
 		mlUtilityCheckLineSphereCollide(&Collision, &SphereCenter, OldPos,
 										NewPos, CurrentVehicle->VehicleObjectData->Radius);
@@ -1579,7 +1579,7 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 {
 	FLOAT64			CosValue, SinValue;
 	SINT32			i;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	OBJECT*			keeperColObj = nullptr;
 	piVECTOR		keeperPos;
 	piVECTOR		rayStart, rayEnd;
@@ -1597,14 +1597,14 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 
 	CosValue = cos((pVehicleData->VehicleAtt.Yaw));
 	SinValue = sin((pVehicleData->VehicleAtt.Yaw));
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 	memset(CollisionList, 0x0, sizeof(CollisionList));
 
 	for (i=0; i < numLines; i++)
 	{
-		rayStart.x = (FLOAT32)(pVehicleData->VehiclePos.x - WorldOriginOffset.x);
-		rayStart.y = (FLOAT32)(pVehicleData->VehiclePos.y - WorldOriginOffset.y);
-		rayStart.z = -(FLOAT32)(pVehicleData->VehiclePos.z + WorldOriginOffset.z);
+		rayStart.x = (FLOAT32)(pVehicleData->VehiclePos.x - worldOriginOffset.x);
+		rayStart.y = (FLOAT32)(pVehicleData->VehiclePos.y - worldOriginOffset.y);
+		rayStart.z = -(FLOAT32)(pVehicleData->VehiclePos.z + worldOriginOffset.z);
 
 		rayEnd = rayStart;
 

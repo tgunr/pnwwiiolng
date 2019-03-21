@@ -66,6 +66,12 @@ struct sdm_full_obj_id
 	SINT8		objType;			// type
 
 #ifdef __cplusplus
+    static sdm_full_obj_id from_foi(const FULL_OBJ_ID &foi) {
+        sdm_full_obj_id sfoi;
+        sfoi.cell.ox = foi.cell.ox; sfoi.cell.oy = foi.cell.oy; sfoi.id = foi.id;
+        sfoi.objClass = foi.objClass; sfoi.objType = foi.objType;
+        return sfoi;
+    }
 	sdm_full_obj_id& init() { cell.ox = cell.oy = 0; this->id = 0; objClass = objType = 0; return *this; }
 	bool valid() const { return (objClass > 0 && objType > 0); }
 	int sx() const { return cell.ox >> 4; }

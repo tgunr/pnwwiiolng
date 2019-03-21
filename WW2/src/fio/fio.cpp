@@ -443,35 +443,48 @@ size_t fioWrite(int fd, const void* dptr, size_t length)
 
 size_t fioGetLine(int fd, char* string, size_t length)
 {
-	size_t   i;
+    SINT32 fdtype = fioDescriptorType(fd);
 
-	if(fd < 0) return -1;
-
-  for (i=0; i < length - 1; i++)
-  {
-    if (fioRead(fd, &string[i], 1) != 1)
-	{
-		break;
-	}
-
-    if (string[i] == '\n')
+    switch(fdtype)
     {
-      if (i > 0 && string[i-1] == '\r')
-      {
-        i -= 1;
-      }
-
-      string[i] = 0;
-      return(i+1);
+        case -1:
+            return -1;
+        break;
+        case ISUSERDIRECTORY:
+        case ISDIRECTORY:
+        default:
+            //return fiodGetString(fd, string, length); // Doesn't currently work
+        break;
+        case ISARCHIVE:
+        break;
     }
-  }
-
-  if (i < length)
-  {
-	string[i] = 0;
-  }
-
-  return(i);
+    
+    char *p = string;
+    for (; p < string + length; ++p) {
+        if (fioRead(fd, p, 1) != 1) {
+            break;
+        }
+        if (*p == '\r') {
+            char c = 0;
+            
+            if (fioRead(fd, &c, 1) != 1) { // no way to distinguish between EOF and error...!
+                break;
+            }
+            if (c == '\n') {
+                *p = '\n'; // so the addOne logic works
+                break;
+            } else {
+                // Rather than repeat the end-check here, just loop around
+                fioSeek(fd, static_cast<size_t>(-1), SEEK_CUR);
+                continue;
+            }
+        } else if (*p == '\n') {
+            break;
+        }
+    }
+    bool addOne = (p < string + length && *p == '\n');
+    *p = 0;
+    return p - string + (addOne ? 1 : 0);
 }
 
 /************************************************************************************************

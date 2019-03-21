@@ -4,7 +4,7 @@
 #include <sys/stat.h>
 
 #include "mem/mem.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/iac.h"
 #include "imap/ww2imap.h"
 #include "imap/ww2func.h"

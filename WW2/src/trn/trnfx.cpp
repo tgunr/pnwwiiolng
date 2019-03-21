@@ -109,8 +109,8 @@ void trnFxPlayAirWarnSiren(trnCDTerrainObject* to, SINT32 lod)
     // Check if HEAVY AIR warning
 	sdm_full_obj_id fullid;
 
-    fullid.cell.ox = to->StratSupercellX << 4;
-    fullid.cell.oy = to->StratSupercellY << 4;
+    fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(to->StratSupercellX) << 4);
+    fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(to->StratSupercellY) << 4);
     fullid.id = to->ObjId.id;
 	fullid.objClass = to->ObjId.objClass;
     fullid.objType = to->ObjId.objType;

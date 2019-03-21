@@ -115,7 +115,7 @@ function stratSetup ()
   routDestination[WWII_ENGLAND] = getCP(locstr('ukTraining'))
   routDestination[WWII_FRANCE] = getCP(locstr('frTraining'))
   routDestination[WWII_GERMANY] = getCP(locstr('deTraining'))
-  routDestination[WWII_USA] = getCP(locstr('ukTraining'))
+  routDestination[WWII_USA] = getCP(locstr('usTraining'))
 
   if routDestination[WWII_ENGLAND] == nil or
      routDestination[WWII_FRANCE] == nil or
@@ -294,8 +294,8 @@ if getHCUnit("trngukarmy") then
  deploy("trngdearmy", locstr('deFort'), trainingDeploymentDelay)
  deploy("trngdeair", locstr('deFort'), trainingDeploymentDelay)
  deploy("trngdenavy", locstr('deFort'), trainingDeploymentDelay)
- deploy("trngusarmy", locstr('ukFort'), trainingDeploymentDelay)
- deploy("trngusair", locstr('ukFort'), trainingDeploymentDelay)
- deploy("trngusnavy", locstr('ukFort'), trainingDeploymentDelay)
+ deploy("trngusarmy", locstr('usFort'), trainingDeploymentDelay)
+ deploy("trngusair", locstr('usFort'), trainingDeploymentDelay)
+ deploy("trngusnavy", locstr('usFort'), trainingDeploymentDelay)
 end
 
