@@ -126,6 +126,7 @@ const SCHAR* hud_icons[NUM_ICONS] =
 	"hudltmortar1.bmp"
 };
 
+// HUD Icons
 const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 {
 	"none",
@@ -148,9 +149,9 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"bren",
 	"mg34",
 	"fm39",
-	"smoke",
-	"smoke",
-	"smoke",
+	"stigr",	// German Smoke Grenade
+	"smoke",	// British Smoke Grenade
+	"smoke",	// French Smoke Grenade
 	"ammocan",
 	"mas36",
 	"mas40",
@@ -180,7 +181,7 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"bazooka",
 	"pzschreck",
 	"m1903a3",
-	"smoke",
+	"smoke",	// American Smoke Grenade
 	"piat",
 	"Sten",
 	"GreaseGun",
