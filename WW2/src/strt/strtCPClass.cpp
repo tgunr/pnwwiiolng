@@ -1701,12 +1701,14 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualCha
 				// HACK! I really don't like doing this so we need to (long term) include this as part of
 				// a country handling overall which generalizes operations based on rules.  For example
 				// in this case we'd want a general way of identifying fallback countries from a provided
-				// country in a way that can be configured.  We should also be generally checking for missing
-				// brigade definitions as opposed to simply assuming its AIR & SEA.  This is a very quick way
-				// of achieving the goal so it stands for 1.36
+				// country in a way that can be configured. We should also be generally checking for missing
+				// brigade definitions as opposed to simply assuming it's AIR & SEA. This is a very quick way
+				// of achieving the goal so it stands for 1.36.
+				//
+				// Since the US country doesn't have their own Aiforce or Navy, replace the default Garrisons with French ones.
 				if (countryID == WWII_USA && (unitBranch == BRANCH_AIR || unitBranch == BRANCH_SEA))
 				{
-					unit->m_countryID = WWII_ENGLAND;
+					unit->m_countryID = WWII_FRANCE;
 				} 
 				else
 				{
