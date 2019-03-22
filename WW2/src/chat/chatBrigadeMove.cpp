@@ -245,9 +245,10 @@ void GarrisonCountryChange::process(const ChatHandle byHandle) const
 		{
 			if (hcUnit != nullptr)
 			{
-				dbugLog(_FLD, "Announcing Country change to %d", m_newCountryId);
-
-				hcUnit->setCountry(m_newCountryId);
+				dbugLog(_FLI, "Country changing for garrison %s currently %d", hcUnit->name(), hcUnit->country());
+				WWII_COUNTRY country = GarrisonCountryChangeReq::getReplacementCountry(m_newCountryId, hcUnit);
+				hcUnit->setCountry(country);
+				dbugLog(_FLI, "To %d when requsted was %d", country, m_newCountryId);
 				chatAnnounceCountryChange(*hcUnit, hcUnit->homeCPID(), hcUnit->homeCPID(), byHandle);
 			}
 			else

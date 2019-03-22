@@ -7,6 +7,7 @@
 #include "teul/teulPackers.h"
 #include "teul/teulBasic.h"
 #include "systypes.h"
+#include "wwii/wwiiHCUnits.h"
 
 enum GARRISON_COUNTRY_CHANGE_RESULT
 {
@@ -43,4 +44,28 @@ public:
 	FULL_OBJ_ID	                   m_cp;
 	WWII_COUNTRY                   m_country;
 	SINT32                         m_clientsTeulIndex;
+
+public:
+	/*
+		A garrison should not always change to the requested country value, in some cases
+		we'll substitute another based on unit availability.
+	*/
+	static WWII_COUNTRY getReplacementCountry(WWII_COUNTRY requested, HCUnit * unit)
+	{
+		WWII_COUNTRY retVal = requested;
+		BRANCH_ENUM unitBranch = unit->branch();
+
+		// HACK! I really don't like doing this so we need to (long term) include this as part of
+		// a country handling overall which generalizes operations based on rules.  For example
+		// in this case we'd want a general way of identifying fallback countries from a provided
+		// country in a way that can be configured.  We should also be generally checking for missing
+		// brigade definitions as opposed to simply assuming its AIR & SEA.  This is a very quick way
+		// of achieving the goal so it stands for 1.36
+		if (requested == WWII_USA && (unitBranch == BRANCH_AIR || unitBranch == BRANCH_SEA))
+		{
+			retVal = WWII_ENGLAND;
+		} 
+
+		return retVal;
+	}
 };
