@@ -63,7 +63,7 @@ public:
 		// of achieving the goal so it stands for 1.36
 		if (requested == WWII_USA && (unitBranch == BRANCH_AIR || unitBranch == BRANCH_SEA))
 		{
-			retVal = WWII_ENGLAND;
+			retVal = WWII_FRANCE;
 		} 
 
 		return retVal;
