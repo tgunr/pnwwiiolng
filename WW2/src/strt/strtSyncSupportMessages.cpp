@@ -187,6 +187,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	cp->m_contention = (flags & CP_STAT_CONTENTION) == CP_STAT_CONTENTION;
 	cp->m_enemyLinked = (flags & CP_STAT_ENEMY_LINKED) == CP_STAT_ENEMY_LINKED;
 	cp->m_frontlineLinked = (flags & CP_STAT_FRONTLINE_LINKED) == CP_STAT_FRONTLINE_LINKED;
+	cp->m_frontline = (flags & CP_STAT_FRONTLINE) == CP_STAT_FRONTLINE;
 
 #if defined(IS_MAP_HOST)
 	if ( hasChanged )

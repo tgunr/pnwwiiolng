@@ -2511,6 +2511,7 @@ JSPropertySpec jsBrigade::jsproperties[] =
 	{"isbrigade",		jsBrigade::ISBRIGADE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isgarrison",		jsBrigade::ISGARRISON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isfrontlinelinked", jsBrigade::ISFLLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isfrontline",		jsBrigade::ISFL_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isenemylinked",	jsBrigade::ISENEMYLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"hasaf",			jsBrigade::HASAF_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
 	{"hasnavy",			jsBrigade::HASNAVY_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
@@ -2904,6 +2905,13 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
 				bool fllinked = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE_LINKED));
 				*val = BOOLEAN_TO_JSVAL(fllinked);
+			}
+			break;
+		case ISFL_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool fl = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE));
+				*val = BOOLEAN_TO_JSVAL(fl);
 			}
 			break;
 		case ISENEMYLINKED_PROP:

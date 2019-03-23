@@ -593,7 +593,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
 
 		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
-		if(_altuniticon && ((cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
+		if(_altuniticon && ((cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -624,8 +624,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		unsigned int count = _cp.GetUnitCount();
 		
 		// If the town is not fronline, backline, reserve or a frontline airfield don't show a Dot for the hidden Garrison that is there
-		if((!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) 
-			|| ((cpflags & CP_STAT_ENEMY_LINKED) && (cpflags & CP_STAT_HAS_AIRBASE)))
+		if((!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) 
+			|| ((cpflags & CP_STAT_FRONTLINE) && (cpflags & CP_STAT_HAS_AIRBASE)))
 		{
 			count--;
 		}
@@ -758,7 +758,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					{
 						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
 						// Take into account the player's map preference settings aswell
-						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
+						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
 							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
 							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
 							(_renderer->showbrigades && !garrisonOnly))
@@ -773,7 +773,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					case WWII_GERMANY:
 						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
 						// Take into account the player's map preference settings aswell
-						if((_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) || 
+						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
 							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
 							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
 							(_renderer->showbrigades && !garrisonOnly))
@@ -1014,10 +1014,10 @@ bool CPMapObject::ObjectVisible() const
 	unsigned int cpflags = _cp.StratFlags(true);
 	return _mouseover || _selected || _childselected || _renderer->showcps ||
 		(_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
-		(_renderer->showfrontline && cpflags & CP_STAT_ENEMY_LINKED) ||
+		(_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) ||
 		(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) ||
-		(_renderer->showreserve && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
-		(_renderer->showrear && !(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED))) ||
+		(_renderer->showreserve && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
+		(_renderer->showrear && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED))) ||
 		(_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
 		(_renderer->showbrigades && _bestunit) ||
 		(_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
@@ -1228,13 +1228,13 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 						display = false;
 						
 						if (unit->isGarrison() &&
-							(cpflags & CP_STAT_ENEMY_LINKED) &&
+							(cpflags & CP_STAT_FRONTLINE) &&
 							(unit->branch() == BRANCH_AIR))
 							continue;
 						
 						// Check whether this is a reserve town with no units in it or not.
 						if (unit->isBrigade() || unit->isDivision() ||
-							(unit->isGarrison() && (cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED |
+							(unit->isGarrison() && (cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED |
 								CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 						{
 							display = true;
@@ -1312,7 +1312,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				}
 			}
 
-			if (cpflags & CP_STAT_ENEMY_LINKED)
+			if (cpflags & CP_STAT_FRONTLINE)
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.frontline");
@@ -1326,14 +1326,14 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				tip += L"\n";
 			}
 			else
-			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			if (!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.inactive");
 				tip += L"\n";
 			}
 			else
-			if (!(cpflags & (CP_STAT_ENEMY_LINKED | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			if (!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 			{
 				tip += L"\n";
 				tip += _renderer->tooltip("widgets.map.tooltip.reserve");

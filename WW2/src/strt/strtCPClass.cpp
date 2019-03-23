@@ -629,7 +629,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 		CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
 		dbugLog(_FLN, "2: Level %d %s is outgoing linked to %s", recurseLevel, cp->name, otherCP->name);
 
-		if ((otherCP->ControllingSide() != cp->ControllingSide()) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+		if ((otherCP->side != cp->side) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
 		{
 			//Linked town is enemy
 			newStatus = FRONT_LINE;
@@ -664,19 +664,19 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 	switch (cp->m_townstatus)
 	{
 	case FRONT_LINE:
-		strtEnemyLink(*cp, true);
+		strtFrontline(*cp, true);
 		strtFrontlineLink(*cp, false);
 		break;
 	case BACK_LINE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, true);
 		break;
 	case RESERVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	case INACTIVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	}

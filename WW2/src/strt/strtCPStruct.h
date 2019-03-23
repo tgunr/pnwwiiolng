@@ -106,6 +106,7 @@ struct CSAFE_CPStruct
 
 	bool 				m_contention;
 	bool 				m_enemyLinked;
+	bool 				m_frontline;
 	bool 				m_frontlineLinked;
 	bool				isUnderAttack;
 	bool				m_friendlyLinked;
@@ -264,6 +265,7 @@ public:
 	bool isContested() const { return m_contention; }
 	bool isEnemyLinked() const { return m_enemyLinked; }
 	bool isFrontlineLinked() const { return m_frontlineLinked; }
+	bool isFrontline() const { return m_frontline; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
     bool islinkedToAnAO();
