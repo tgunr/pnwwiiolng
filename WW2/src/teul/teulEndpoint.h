@@ -81,7 +81,6 @@ public:
 	bool				m_reliable;
 	bool				m_doTimeoutCheck;
 	bool				m_closed;
-	bool				m_writesPending;
 	bool				m_haveTicks;		// False until we've started recording ticks.
 	bool				m_peer;			// Peering connection.
 	bool				m_rakNetEnabled;	
@@ -143,9 +142,6 @@ public:
 
 	//! Flag the endpoint as having become connected.
 	void setConnected();
-
-	//! Flag whether the endpoint needs to monitor for writes or not.
-	void setWritesPending(const bool pending_);
 
 	//! Encrypt an outgoing stream.
 	void encrypt(UCHAR* const stream_, const size_t bytes_);

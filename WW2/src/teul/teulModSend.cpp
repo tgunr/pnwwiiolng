@@ -176,7 +176,6 @@ SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference
         Teul::Packet* const copy = s_delayedPackets.New(packet);
         copy->addBytesSent(packet.sentBytes());
         m_impl->m_sendQueue.push_back(copy);
-        setWritesPending(true);
     }
 	return static_cast<SINT32>(packetBytes); // always returns entire size even if send was partial?
 }
@@ -219,7 +218,6 @@ SINT32 ENDPOINT::pushSendQueue()
 	}
 
     // If we get down here, we successfully drained the entire queue.
-    setWritesPending(false);
 	return 0;
 }
 

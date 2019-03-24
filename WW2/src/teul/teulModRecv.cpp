@@ -1027,11 +1027,4 @@ SINT32 teulModIdle(const TeulTimeMS duration_)
 void ENDPOINT::setConnected()
 {
 	m_connected = true;
-	updateSocketEvents();
-}
-
-void ENDPOINT::setWritesPending(const bool pending_)
-{
-	m_writesPending = pending_;
-	updateSocketEvents();
 }
