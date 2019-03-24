@@ -3196,18 +3196,6 @@ void fpFPSAdjustEyeToPose (FLOAT32 deltaTime)
 		}
 		*/
 	}
-	else if(prevPose != targetPose)
-	{
-		prevPose = targetPose;
-		stat2Flags &= ~STAT2_POSE_CHANGE;
-		TUT_MGR->DoEvent(TUT_EVENT_FPS_POSE, &targetPose);
-		_updateFPSColliders();
-
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(!ppo || !ppo->buildAt)
-			_ppoLastStance = fpFPSGetPlayerPose();
-	}
 
 	currentEyeHeight = -TROOPER_STAND_EYE_HEIGHT + eyeHeight;
 }
