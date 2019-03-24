@@ -153,6 +153,18 @@ strtFrontlineLink(CPStruct& cp, bool state)
 	}
 }
 
+void
+strtFrontline(CPStruct& cp, bool state)
+{
+	cp.m_frontline = state;
+	if (state)
+		cp.flags |= CP_STAT_FRONTLINE;
+	else
+	{
+		cp.flags &= ~CP_STAT_FRONTLINE;
+	}
+}
+
 static inline void
 _checkSupplyLinksIn(const Supercell& sc)
 {
@@ -900,7 +912,7 @@ _setTownStatus()
 			const CPStruct* const otherCP = outLink->endDepot->cp;
 
 			// Find towns that are not of the same side but linked, thus making them Frontline
-			if ((otherCP->ControllingSide() != cp->ControllingSide()) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+			if ((otherCP->side != cp->side) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
 			{
 				//Linked town is enemy
 				cp->m_townstatus = FRONT_LINE;
@@ -990,19 +1002,19 @@ _setTownStatusFlags(CPStruct* cp)
 	switch (cp->m_townstatus)
 	{
 	case FRONT_LINE:
-		strtEnemyLink(*cp, true);
+		strtFrontline(*cp, true);
 		strtFrontlineLink(*cp, false);
 		break;
 	case BACK_LINE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, true);
 		break;
 	case RESERVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	case INACTIVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	}

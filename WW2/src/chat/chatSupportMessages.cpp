@@ -200,20 +200,16 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 		if (unit != nullptr)
 		{
 			dbugLog(_FLD, "Garrison is name is %s", unit->name());
-
+			data.process(unit->m_unitID, data.m_newCountryId);
 			CPStruct* cp = strtGetCP(unit->m_homeCPID);
 			if (cp != nullptr)
 			{
-				dbugLog(_FLD, "Old country is %d, new is %d", cp->controllingCountry, data.m_newCountryId);
-
-				std::list<HCUnit *> garrisons;
-				HCUnit::GetGarrisonUnits(garrisons, unit->m_homeCPID);
-				for (HCUnit *nextUnit : garrisons)
+				UINT32 armyGarrison = HCUnit::GetArmyGarrison(unit->m_homeCPID);
+				if (data.m_brigadeID == armyGarrison)
 				{
-					dbugLog(_FLD, "Changing garrison's %s country to %d", nextUnit->name(), data.m_newCountryId);
-					data.process(nextUnit->m_unitID, data.m_newCountryId);
+					dbugLog(_FLD, "Old country is %d, new is %d", cp->controllingCountry, data.m_newCountryId);
+					cp->controllingCountry = data.m_newCountryId;
 				}
-				cp->controllingCountry = data.m_newCountryId;
 			
 			}
 		}

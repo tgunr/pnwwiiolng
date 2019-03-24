@@ -139,8 +139,19 @@ struct BCD_SponsorGarrisonCountryChange : public BrigadeControlDescriptor
 
 		arg1 = chatGetWideCallsign(bcn->m_sponsor);
 
-		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
-		if(origin) arg3		= origin->DisplayName();
+		const HCUnit* brigade = HCUnit::Lookup(bcn->m_brigadeID);
+		if (brigade->branch() == BRANCH_LAND &&
+			brigade->movementType() == BRANCH_LAND)
+		{
+			// only report CP if garrsion is army one, otherwise identify the garrison
+			getBrigadeDescriptor(bcn->m_brigadeID, arg2);
+			if(origin) arg3		= origin->DisplayName();
+		}
+		else
+		{
+			getBrigadeDescriptor(bcn->m_brigadeID, arg3);
+			if(origin) arg2		= origin->DisplayName();
+		}
 		arg4 = wwiiCountryCode((WWII_COUNTRY)bcn->m_country);
 	}
 };
@@ -152,8 +163,19 @@ struct BCD_GarrisonCountryChange : public BrigadeControlDescriptor
 		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
 		StratDB::StratObject* target = StratDB::FindStratObject(bcn->m_target);
 
-		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
-		if(origin) arg3		= origin->DisplayName();
+		const HCUnit* brigade = HCUnit::Lookup(bcn->m_brigadeID);
+		if (brigade->branch() == BRANCH_LAND &&
+			brigade->movementType() == BRANCH_LAND)
+		{
+			// only report CP if garrsion is army one, otherwise identify the garrison
+			getBrigadeDescriptor(bcn->m_brigadeID, arg2);
+			if(origin) arg3		= origin->DisplayName();
+		}
+		else
+		{
+			getBrigadeDescriptor(bcn->m_brigadeID, arg3);
+			if(origin) arg2		= origin->DisplayName();
+		}
 		arg4 = wwiiCountryCode((WWII_COUNTRY)bcn->m_country);
 	}
 };

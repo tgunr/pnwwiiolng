@@ -65,6 +65,7 @@ strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs)
 		cp.m_contention = (sync->flags & CP_STAT_CONTENTION) ? TRUE : FALSE;
 		cp.m_enemyLinked = (sync->flags & CP_STAT_ENEMY_LINKED) ? TRUE : FALSE;
 		cp.m_frontlineLinked = (sync->flags & CP_STAT_FRONTLINE_LINKED) ? TRUE : FALSE;
+		cp.m_frontline = (sync->flags & CP_STAT_FRONTLINE) ? TRUE : FALSE;
 	}
 }
 

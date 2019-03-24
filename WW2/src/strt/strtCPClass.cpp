@@ -38,6 +38,7 @@
 #include "strt/strtTOE.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 static CPSET g_objectives[MAX_SIDES];
 ObjectiveStats g_objectiveStats;
@@ -628,7 +629,7 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 		CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
 		dbugLog(_FLN, "2: Level %d %s is outgoing linked to %s", recurseLevel, cp->name, otherCP->name);
 
-		if ((otherCP->ControllingSide() != cp->ControllingSide()) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+		if ((otherCP->side != cp->side) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
 		{
 			//Linked town is enemy
 			newStatus = FRONT_LINE;
@@ -663,19 +664,19 @@ CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
 	switch (cp->m_townstatus)
 	{
 	case FRONT_LINE:
-		strtEnemyLink(*cp, true);
+		strtFrontline(*cp, true);
 		strtFrontlineLink(*cp, false);
 		break;
 	case BACK_LINE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, true);
 		break;
 	case RESERVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	case INACTIVE:
-		strtEnemyLink(*cp, false);
+		strtFrontline(*cp, false);
 		strtFrontlineLink(*cp, false);
 		break;
 	}
@@ -1696,24 +1697,7 @@ void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualCha
 			if (unit->isGarrison())
 			{
 				std::string toeTemplateHeaderName = unit->getToeTemplateHeaderName();
-				BRANCH_ENUM unitBranch = unit->branch();
-
-				// HACK! I really don't like doing this so we need to (long term) include this as part of
-				// a country handling overall which generalizes operations based on rules.  For example
-				// in this case we'd want a general way of identifying fallback countries from a provided
-				// country in a way that can be configured. We should also be generally checking for missing
-				// brigade definitions as opposed to simply assuming it's AIR & SEA. This is a very quick way
-				// of achieving the goal so it stands for 1.36.
-				//
-				// Since the US country doesn't have their own Aiforce or Navy, replace the default Garrisons with French ones.
-				if (countryID == WWII_USA && (unitBranch == BRANCH_AIR || unitBranch == BRANCH_SEA))
-				{
-					unit->m_countryID = WWII_FRANCE;
-				} 
-				else
-				{
-					unit->m_countryID = countryID;
-				}
+				unit->m_countryID = GarrisonCountryChangeReq::getReplacementCountry(countryID, unit);
 
 				std::string countryPrefix;
 

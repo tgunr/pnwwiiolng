@@ -401,6 +401,21 @@ mapFindBrigade(UINT32 brigadeID)
 	return ( unit != nullptr && (unit->type() == HCU_BRIGADE || unit->type() == HCU_GARRISON) ) ? (Brigade*)unit : nullptr;
 }
 
+void mapClearBrigadeMissions(UINT32 brigadeID)
+{
+	Brigade* brigade = (Brigade*)HCUnit::Lookup(brigadeID);
+	if (brigade->missions() > 0)
+	{
+		while (brigade->m_missionList.size() > 0)
+		{
+			Mission *mission = *brigade->m_missionList.begin();
+			delete mission;
+		}
+
+		mapNotifyPlayersInGarrison(brigadeID, brigade, brigade->country());
+	}
+}
+
 //////////////////////////////////////////////////////////////////////
 // Update the status of all brigades with missions at a particular CP
 
