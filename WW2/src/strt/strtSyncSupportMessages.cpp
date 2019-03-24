@@ -33,9 +33,7 @@
 #if defined(IS_MAP_HOST)
 #define _USE_STRAT_EVENTS
 #include "strt/strtEvents.h"
-#endif
-
-#if defined(IS_MAP_HOST)
+#include "map/mapBrigades.h"
 #include "miss/mission.h"
 #include "map/mapData.h"
 #endif
@@ -187,7 +185,25 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	cp->m_contention = (flags & CP_STAT_CONTENTION) == CP_STAT_CONTENTION;
 	cp->m_enemyLinked = (flags & CP_STAT_ENEMY_LINKED) == CP_STAT_ENEMY_LINKED;
 	cp->m_frontlineLinked = (flags & CP_STAT_FRONTLINE_LINKED) == CP_STAT_FRONTLINE_LINKED;
+	bool origFrontLine = cp->m_frontline;
 	cp->m_frontline = (flags & CP_STAT_FRONTLINE) == CP_STAT_FRONTLINE;
+
+#if defined(IS_MAP_HOST)
+	if (cp->m_frontline && !origFrontLine && cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+	{
+		std::list<HCUnit *> garrisons;
+		HCUnit::GetGarrisonUnits(garrisons, cp->fullObjID);
+		for (HCUnit *garrison : garrisons)
+		{
+			if (garrison->branch() == WWII_AIRFORCE &&
+				garrison->movementType() == WWII_AIRFORCE)
+			{
+				dbugLog(_FLN, "Becoming frontline, clearing airfield Garrison %d missions", garrison->unitID());
+				mapClearBrigadeMissions(garrison->unitID());
+			}
+		}
+	}
+#endif
 
 #if defined(IS_MAP_HOST)
 	if ( hasChanged )

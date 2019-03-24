@@ -76,5 +76,6 @@ using BRIGADES = std::set<Brigade*>;
 extern BRIGADES g_brigades[MAX_COUNTRIES][MAX_BRANCHES];
 
 extern Brigade* mapFindBrigade(UINT32 brigadeID);
+extern void mapClearBrigadeMissions(UINT32 brigadeID);
 extern void mapUpdateBrigadesWithMissionsAt(const CPStruct* cp);
 
