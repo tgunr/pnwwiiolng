@@ -1244,7 +1244,8 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 						// If the town is not empty then we display the units that are in it on mouse over.
 						if (display)
 						{
-							if (division && division->unitID() != current)
+							// Garrisons don't have a Division so let's just show the Garrion
+							if (division && division->unitID() != current && !division->isGarrison())
 							{
 								current = division->unitID();
 								tip += uiUTF8toUTF16(division->m_name);
