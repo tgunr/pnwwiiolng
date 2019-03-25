@@ -369,7 +369,8 @@ public:
 extern void mapSendChatUpdates();
 extern void mapSendHCUpdates();
 extern void mapProcessLogins();
-extern void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY newCountry);
+extern void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry,
+									   BRANCH_ENUM originalUnitBranch, WWII_COUNTRY newCountry);
 
 extern void mapCheckSideCounts();
 

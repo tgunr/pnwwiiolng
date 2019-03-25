@@ -176,6 +176,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 #endif
 
 	//actually set the ownership
+	WWII_SIDE origSide = cp->side;
 	cp->country = country;
 	cp->side = wwiiSide(country);
 	cp->controllingCountry = controllingCountry;
@@ -189,7 +190,14 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	cp->m_frontline = (flags & CP_STAT_FRONTLINE) == CP_STAT_FRONTLINE;
 
 #if defined(IS_MAP_HOST)
-	if (cp->m_frontline && !origFrontLine && cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+	/*
+		So long as this isn't a side switch AND
+		CP became front-line AND
+		there is an airbase involved
+	*/
+	if ((origSide == wwiiSide(country)) && 
+		cp->m_frontline && !origFrontLine && 
+		cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
 	{
 		std::list<HCUnit *> garrisons;
 		HCUnit::GetGarrisonUnits(garrisons, cp->fullObjID);

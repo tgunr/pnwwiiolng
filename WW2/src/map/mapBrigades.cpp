@@ -412,7 +412,7 @@ void mapClearBrigadeMissions(UINT32 brigadeID)
 			delete mission;
 		}
 
-		mapNotifyPlayersInGarrison(brigadeID, brigade, brigade->country());
+		mapNotifyPlayersInGarrison(brigadeID, brigade, brigade->country(), brigade->branch(), brigade->country());
 	}
 }
 
