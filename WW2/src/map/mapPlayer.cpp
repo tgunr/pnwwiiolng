@@ -2419,6 +2419,7 @@ void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY orig
 									unitID,
 									player->playerID(),
 									replacementHCUnit->unitID());
+									clientAction = CHANGE_BRANCH;
 							}
 							else
 							{
