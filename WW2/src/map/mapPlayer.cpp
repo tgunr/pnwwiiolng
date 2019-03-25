@@ -2371,14 +2371,12 @@ _sendHCUnitCountryChange(Player* player, UINT32 unitID, WWII_COUNTRY country, UI
 	return true;
 }
 
-void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY newCountry)
+void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry, BRANCH_ENUM originalUnitBranch, WWII_COUNTRY newCountry)
 {
 	GARRISON_CHANGE_ACTION clientAction = CHANGE_NOTHING;
 	HCUnit* replacementHCUnit = nullptr;
 	UINT32 replacementHCUnitID = 0;
 	BrigadeSelection tempSelection;
-	WWII_COUNTRY originalUnitCountry = hcUnit->country();
-	BRANCH_ENUM originalUnitBranch = hcUnit->branch();
 
 	//  Send the change to all connected players.
 	for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
@@ -2413,13 +2411,25 @@ void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY newC
 						if (IS_CPFLAG(cp->flags, CP_STAT_FRONTLINE))
 						{
 							// Player can't remain in this garrison
-							replacementHCUnit = HCUnit::Lookup(HCUnit::GetArmyGarrison(hcUnit->homeCPID()));
+							if (hcUnit->country() == player->country())
+							{
+								replacementHCUnit = HCUnit::Lookup(HCUnit::GetArmyGarrison(hcUnit->homeCPID()));
 
-							dbugLog(_FLD, "Airforce garrison %d no longer valid choosing army garrison for player %d new garrison is %d", 
-								unitID,
-								player->playerID(),
-								replacementHCUnit->unitID());
-
+								dbugLog(_FLD, "Airforce garrison %d no longer valid choosing army garrison for player %d new garrison is %d", 
+									unitID,
+									player->playerID(),
+									replacementHCUnit->unitID());
+									clientAction = CHANGE_BRANCH;
+							}
+							else
+							{
+								// don't send anything to the player, country change logic will handle this case
+								dbugLog(_FLD, "Player won't be sent anything - not same country as garrison anymore");
+								replacementHCUnit = nullptr;
+								replacementHCUnitID = 0;
+								clientAction = CHANGE_NOTHING;
+								continue;
+							}
 						}
 						else
 						{
@@ -2499,6 +2509,27 @@ void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY newC
 			clientAction = CHANGE_NOTHING;
 		}
 
+		if (replacementHCUnit != nullptr && replacementHCUnit->side() != player->side())
+		{
+			UINT32 oldUnit = replacementHCUnitID;
+			replacementHCUnit = HCUnit::GetTrainingUnit(player->country(), player->branch());
+			replacementHCUnitID = replacementHCUnit->unitID();
+			dbugLog(_FLD, "Side does not match player %d replacement unit %d, replacing it with %d",
+				player->playerID(), oldUnit, replacementHCUnitID);
+		}
+		else if (replacementHCUnitID == 0)
+		{
+			HCUnit *unit = HCUnit::Lookup(player->brigadeID());
+			if (unit != nullptr && unit->side() != player->side())
+			{
+				UINT32 oldUnit = replacementHCUnitID;
+				replacementHCUnit = HCUnit::GetTrainingUnit(player->country(), player->branch());
+				replacementHCUnitID = replacementHCUnit->unitID();
+				dbugLog(_FLD, "Side does not match player %d current unit %d, replacing it with %d",
+					player->playerID(), oldUnit, replacementHCUnitID);
+			}
+		}
+
 		_sendHCUnitCountryChange(player, unitID, newCountry, replacementHCUnitID, clientAction);
 
 		replacementHCUnit = nullptr;
@@ -2525,7 +2556,7 @@ GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
 			hcUnit->setCountry(newCountry);
 			g_brigades[newCountry][hcUnit->branch()].insert((Brigade*)hcUnit);
 
-			mapNotifyPlayersInGarrison(unitID, hcUnit, newCountry);
+			mapNotifyPlayersInGarrison(unitID, hcUnit, originalUnitCountry, originalUnitBranch, newCountry);
 		}
 		else
 		{
