@@ -1954,7 +1954,11 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 					break;
 				}
 
-				if (messageText != L"") { uiChatPrintLineColor(colorORANGEALPHA, messageText.c_str()); }
+				if (messageText != L"")
+				{
+					int icons[CHATICON_MAX] = {-1,-1,IDE_ICON_NOTE};
+					uiChatPrintUILocLine(icons, colorYELLOWALPHA, "persona.serverselected", messageText.c_str());
+				}
 				
 			}
 			else
