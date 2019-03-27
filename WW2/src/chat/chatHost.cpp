@@ -948,7 +948,7 @@ _distributeSquelched(Player& player, Chat::HostMessage* hostMessage)
 	// Log all grab conversations
 	dbugLog(_FLI, "!GM:%s:GRAB:%s:%s"
 					, player.callsign(), recipient->callsign(), hostMessage->msg);
-	chatdbRecordEvent("GM", "GRAB", player.callsign(), recipient->callsign(), hostMessage->msg);
+	chatdbRecordEvent("GM", player.callsign(), "GRAB", recipient->callsign(), hostMessage->msg);
 
 	hostMessage->icon = _getChanIconFromType(PRIVATE_CHANNEL);
 
