@@ -170,85 +170,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0*4
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'degrdg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'degrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'degrdg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'degrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'degrdg3sp'
-,vehtype_oid
-,capacity*3
-,cycle0*3
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'degrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*3
-	,cycle0 = v.cycle0*3
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'degrdg4sp'
-,vehtype_oid
-,capacity*4
-,cycle0*4
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'degrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*4
-	,cycle0 = v.cycle0*4
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Air ----------------
 
@@ -330,47 +251,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'deairg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'deairspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'deparg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'deparspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Navy ----------------
 
@@ -451,48 +331,6 @@ ON DUPLICATE KEY UPDATE
 	capacity = v.capacity*2
 	,cycle0 = v.cycle0*2
 	,modified = UTC_TIMESTAMP();
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'denavg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'deseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'denavg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'deseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
-
 
 
 
@@ -653,85 +491,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0*4
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frgrdg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frgrdg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frgrdg3sp'
-,vehtype_oid
-,capacity*3
-,cycle0*3
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*3
-	,cycle0 = v.cycle0*3
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frgrdg4sp'
-,vehtype_oid
-,capacity*4
-,cycle0*4
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*4
-	,cycle0 = v.cycle0*4
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Air ----------------
 
@@ -813,47 +572,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frairg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frairspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frparg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frparaspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Navy ----------------
 
@@ -934,47 +652,6 @@ ON DUPLICATE KEY UPDATE
 	capacity = v.capacity*2
 	,cycle0 = v.cycle0*2
 	,modified = UTC_TIMESTAMP();
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frnavg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'frnavg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'frseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
 
 
 
@@ -1135,85 +812,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0*4
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukgrdg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukgrdg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukgrdg3sp'
-,vehtype_oid
-,capacity*3
-,cycle0*3
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*3
-	,cycle0 = v.cycle0*3
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukgrdg4sp'
-,vehtype_oid
-,capacity*4
-,cycle0*4
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*4
-	,cycle0 = v.cycle0*4
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Air ----------------
 
@@ -1295,47 +893,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukairg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukairspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'ukparg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukparspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Navy ----------------
 
@@ -1416,47 +973,6 @@ ON DUPLICATE KEY UPDATE
 	capacity = v.capacity*2
 	,cycle0 = v.cycle0*2
 	,modified = UTC_TIMESTAMP();
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'uknavg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'uknavg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'ukseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
 
 
 
@@ -1617,85 +1133,6 @@ ON DUPLICATE KEY UPDATE
 	,cycle0 = v.cycle0*4
 	,modified = UTC_TIMESTAMP();
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usgrdg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usgrdg2sp'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usgrdg3sp'
-,vehtype_oid
-,capacity*3
-,cycle0*3
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*3
-	,cycle0 = v.cycle0*3
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usgrdg4sp'
-,vehtype_oid
-,capacity*4
-,cycle0*4
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usgrdint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*4
-	,cycle0 = v.cycle0*4
-	,modified = UTC_TIMESTAMP();
-
-
 
 -- Air ----------------
 
@@ -1738,28 +1175,6 @@ ON DUPLICATE KEY UPDATE
 	capacity = v.capacity
 	,cycle0 = v.cycle0
 	,modified = UTC_TIMESTAMP();
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usairg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usairspec'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
 
 
 -- Navy ----------------
@@ -1828,46 +1243,6 @@ INTO
 toe.vehicles
 SELECT
 'usnavg2int'
-,vehtype_oid
-,capacity*2
-,cycle0*2
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity*2
-	,cycle0 = v.cycle0*2
-	,modified = UTC_TIMESTAMP();
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usnavg1sp'
-,vehtype_oid
-,capacity
-,cycle0
-,UTC_TIMESTAMP()
-,resupply_time_m
-FROM
-toe.vehicles v
-WHERE
-v.id = 'usseaint'
-ON DUPLICATE KEY UPDATE
-	capacity = v.capacity
-	,cycle0 = v.cycle0
-	,modified = UTC_TIMESTAMP();
-
-INSERT
-INTO
-toe.vehicles
-SELECT
-'usnavg2sp'
 ,vehtype_oid
 ,capacity*2
 ,cycle0*2
