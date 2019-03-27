@@ -1922,11 +1922,12 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				// update the jsclient
 				jsclient->UpdatePersonas();
 
-				//  ui.dtd = Enteries.
-				//  <!ENTITY persona.serverselected.country "Server Selected Unit Replacement - Garrison Changed Country.">
-				//  <!ENTITY persona.serverselected.sides "Server Selected Unit Replacement - Garrison Changed Sides.">
-				//  <!ENTITY persona.serverselected.branch "Server Selected Unit Replacement - Garrison Changed Branch.">
-				//  <!ENTITY persona.serverselected.countrybranch "Server Selected Unit Replacement - Garrison Changed Country and Branch.">
+				//  ui.dtd Entries:
+				//  <!ENTITY persona.serverselected "SYSTEM Selected Unit Replacement - The Garrison Changed {1}.">
+				//  <!ENTITY persona.serverselected.branch "Branch">
+				//  <!ENTITY persona.serverselected.country "Country">
+				//  <!ENTITY persona.serverselected.countrybranch "Country and Branch">
+				//  <!ENTITY persona.serverselected.sides "Sides">
 
 				std::wstring messageText = L"";
 
