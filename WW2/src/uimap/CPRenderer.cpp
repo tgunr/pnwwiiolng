@@ -1280,6 +1280,30 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 							{
 								tip += L"     ";
 								tip += uiUTF8toUTF16(unit->m_name);
+								
+								// If a Unit is a different country than the Town owner and it's a Garrison, 
+								// show the country abbreviation after the unit name.
+								if(unit->country() != _cp.Country() && unit->isGarrison())
+								{
+									switch (unit->country())
+									{
+									case WWII_ENGLAND:
+										tip += L" - UK";
+										break;
+									case WWII_USA:
+										tip += L" - US";
+										break;
+									case WWII_FRANCE:
+										tip += L" - FR";
+										break;
+									case WWII_GERMANY:
+										tip += L" - DE";
+										break;
+									default:
+										// Currently unrecognized country
+										break;
+									}
+								}
 							}
 							else if (unit->isDivision())
 							{
