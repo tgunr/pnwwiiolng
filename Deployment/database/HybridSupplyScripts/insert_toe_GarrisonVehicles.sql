@@ -27,10 +27,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg1for') = 0
-AND toe.vehicles.id = 'degrdfor';
+v.id = 'degrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -43,10 +46,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg2for') = 0
-AND toe.vehicles.id = 'degrdfor';
+v.id = 'degrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -59,10 +65,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg3for') = 0
-AND toe.vehicles.id = 'degrdfor';
+v.id = 'degrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -75,10 +84,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg4for') = 0
-AND toe.vehicles.id = 'degrdfor';
+v.id = 'degrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -93,10 +105,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg1int') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -109,10 +124,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg2int') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -125,10 +143,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg3int') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -141,10 +162,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg4int') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -159,10 +183,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg1sp') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -175,10 +202,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg2sp') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -191,10 +221,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg3sp') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -207,10 +240,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'degrdg4sp') = 0
-AND toe.vehicles.id = 'degrdint';
+v.id = 'degrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -227,10 +263,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deairg1for') = 0
-AND toe.vehicles.id = 'deairfor';
+v.id = 'deairfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -243,10 +282,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deparg1for') = 0
-AND toe.vehicles.id = 'deparfor';
+v.id = 'deparfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -261,10 +303,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deairg1int') = 0
-AND toe.vehicles.id = 'deairint';
+v.id = 'deairint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -277,10 +322,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deparg1int') = 0
-AND toe.vehicles.id = 'deparint';
+v.id = 'deparint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -295,10 +343,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deairg1sp') = 0
-AND toe.vehicles.id = 'deairspec';
+v.id = 'deairspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -311,10 +362,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'deparg1sp') = 0
-AND toe.vehicles.id = 'deparspec';
+v.id = 'deparspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -331,10 +385,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg1for') = 0
-AND toe.vehicles.id = 'deseafor';
+v.id = 'deseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -347,10 +404,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg2for') = 0
-AND toe.vehicles.id = 'deseafor';
+v.id = 'deseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -365,10 +425,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg1int') = 0
-AND toe.vehicles.id = 'deseaint';
+v.id = 'deseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -381,10 +444,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg2int') = 0
-AND toe.vehicles.id = 'deseaint';
+v.id = 'deseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -399,10 +465,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg1sp') = 0
-AND toe.vehicles.id = 'deseaint';
+v.id = 'deseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -415,10 +484,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'denavg2sp') = 0
-AND toe.vehicles.id = 'deseaint';
+v.id = 'deseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -438,10 +510,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg1for') = 0
-AND toe.vehicles.id = 'frgrdfor';
+v.id = 'frgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -454,10 +529,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg2for') = 0
-AND toe.vehicles.id = 'frgrdfor';
+v.id = 'frgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -470,10 +548,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg3for') = 0
-AND toe.vehicles.id = 'frgrdfor';
+v.id = 'frgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -486,10 +567,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg4for') = 0
-AND toe.vehicles.id = 'frgrdfor';
+v.id = 'frgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -504,10 +588,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg1int') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -520,10 +607,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg2int') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -536,10 +626,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg3int') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -552,10 +645,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg4int') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -570,10 +666,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg1sp') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -586,10 +685,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg2sp') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -602,10 +704,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg3sp') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -618,10 +723,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frgrdg4sp') = 0
-AND toe.vehicles.id = 'frgrdint';
+v.id = 'frgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -638,10 +746,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frairg1for') = 0
-AND toe.vehicles.id = 'frairfor';
+v.id = 'frairfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -654,10 +765,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frparg1for') = 0
-AND toe.vehicles.id = 'frparfor';
+v.id = 'frparfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -672,10 +786,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frairg1int') = 0
-AND toe.vehicles.id = 'frairint';
+v.id = 'frairint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -688,10 +805,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frparg1int') = 0
-AND toe.vehicles.id = 'frparint';
+v.id = 'frparint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -706,10 +826,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frairg1sp') = 0
-AND toe.vehicles.id = 'frairspec';
+v.id = 'frairspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -722,10 +845,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frparg1sp') = 0
-AND toe.vehicles.id = 'frparaspec';
+v.id = 'frparaspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -742,10 +868,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg1for') = 0
-AND toe.vehicles.id = 'frseafor';
+v.id = 'frseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -758,10 +887,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg2for') = 0
-AND toe.vehicles.id = 'frseafor';
+v.id = 'frseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -776,10 +908,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg1int') = 0
-AND toe.vehicles.id = 'frseaint';
+v.id = 'frseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -792,10 +927,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg2int') = 0
-AND toe.vehicles.id = 'frseaint';
+v.id = 'frseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -810,10 +948,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg1sp') = 0
-AND toe.vehicles.id = 'frseaint';
+v.id = 'frseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -826,10 +967,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'frnavg2sp') = 0
-AND toe.vehicles.id = 'frseaint';
+v.id = 'frseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -848,10 +992,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg1for') = 0
-AND toe.vehicles.id = 'ukgrdfor';
+v.id = 'ukgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -864,10 +1011,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg2for') = 0
-AND toe.vehicles.id = 'ukgrdfor';
+v.id = 'ukgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -880,10 +1030,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg3for') = 0
-AND toe.vehicles.id = 'ukgrdfor';
+v.id = 'ukgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -896,10 +1049,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg4for') = 0
-AND toe.vehicles.id = 'ukgrdfor';
+v.id = 'ukgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -914,10 +1070,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg1int') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -930,10 +1089,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg2int') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -946,10 +1108,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg3int') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -962,10 +1127,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg4int') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -980,10 +1148,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg1sp') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -996,10 +1167,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg2sp') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1012,10 +1186,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg3sp') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1028,10 +1205,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukgrdg4sp') = 0
-AND toe.vehicles.id = 'ukgrdint';
+v.id = 'ukgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -1048,10 +1228,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukairg1for') = 0
-AND toe.vehicles.id = 'ukairfor';
+v.id = 'ukairfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1064,10 +1247,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukparg1for') = 0
-AND toe.vehicles.id = 'ukparfor';
+v.id = 'ukparfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -1082,10 +1268,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukairg1int') = 0
-AND toe.vehicles.id = 'ukairint';
+v.id = 'ukairint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1098,10 +1287,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukparg1int') = 0
-AND toe.vehicles.id = 'ukparint';
+v.id = 'ukparint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -1116,10 +1308,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukairg1sp') = 0
-AND toe.vehicles.id = 'ukairspec';
+v.id = 'ukairspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1132,10 +1327,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'ukparg1sp') = 0
-AND toe.vehicles.id = 'ukparspec';
+v.id = 'ukparspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -1152,10 +1350,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg1for') = 0
-AND toe.vehicles.id = 'ukseafor';
+v.id = 'ukseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1168,10 +1369,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg2for') = 0
-AND toe.vehicles.id = 'ukseafor';
+v.id = 'ukseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -1186,10 +1390,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg1int') = 0
-AND toe.vehicles.id = 'ukseaint';
+v.id = 'ukseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1202,10 +1409,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg2int') = 0
-AND toe.vehicles.id = 'ukseaint';
+v.id = 'ukseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -1220,10 +1430,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg1sp') = 0
-AND toe.vehicles.id = 'ukseaint';
+v.id = 'ukseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1236,10 +1449,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'uknavg2sp') = 0
-AND toe.vehicles.id = 'ukseaint';
+v.id = 'ukseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -1258,10 +1474,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg1for') = 0
-AND toe.vehicles.id = 'usgrdfor';
+v.id = 'usgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1274,10 +1493,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg2for') = 0
-AND toe.vehicles.id = 'usgrdfor';
+v.id = 'usgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1290,10 +1512,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg3for') = 0
-AND toe.vehicles.id = 'usgrdfor';
+v.id = 'usgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1306,10 +1531,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg4for') = 0
-AND toe.vehicles.id = 'usgrdfor';
+v.id = 'usgrdfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -1324,10 +1552,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg1int') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1340,10 +1571,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg2int') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1356,10 +1590,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg3int') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1372,10 +1609,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg4int') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -1390,10 +1630,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg1sp') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1406,10 +1649,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg2sp') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1422,10 +1668,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg3sp') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*3
+	,cycle0 = v.cycle0*3
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1438,10 +1687,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usgrdg4sp') = 0
-AND toe.vehicles.id = 'usgrdint';
+v.id = 'usgrdint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*4
+	,cycle0 = v.cycle0*4
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -1458,10 +1710,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usairg1for') = 0
-AND toe.vehicles.id = 'usairfor';
+v.id = 'usairfor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -1476,10 +1731,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usairg1int') = 0
-AND toe.vehicles.id = 'usairint';
+v.id = 'usairint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -1494,10 +1752,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usairg1sp') = 0
-AND toe.vehicles.id = 'usairspec';
+v.id = 'usairspec'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 
 
@@ -1514,10 +1775,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg1for') = 0
-AND toe.vehicles.id = 'usseafor';
+v.id = 'usseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1530,10 +1794,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg2for') = 0
-AND toe.vehicles.id = 'usseafor';
+v.id = 'usseafor'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Intermission Headers --
 
@@ -1548,10 +1815,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg1int') = 0
-AND toe.vehicles.id = 'usseaint';
+v.id = 'usseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1564,10 +1834,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg2int') = 0
-AND toe.vehicles.id = 'usseaint';
+v.id = 'usseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
 
 -- Special Event Headers --
 
@@ -1582,10 +1855,13 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg1sp') = 0
-AND toe.vehicles.id = 'usseaint';
+v.id = 'usseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity
+	,cycle0 = v.cycle0
+	,modified = UTC_TIMESTAMP();
 
 INSERT
 INTO
@@ -1598,7 +1874,10 @@ SELECT
 ,UTC_TIMESTAMP()
 ,resupply_time_m
 FROM
-toe.vehicles
+toe.vehicles v
 WHERE
-(SELECT COUNT(*) FROM toe.vehicles WHERE id = 'usnavg2sp') = 0
-AND toe.vehicles.id = 'usseaint';
+v.id = 'usseaint'
+ON DUPLICATE KEY UPDATE
+	capacity = v.capacity*2
+	,cycle0 = v.cycle0*2
+	,modified = UTC_TIMESTAMP();
