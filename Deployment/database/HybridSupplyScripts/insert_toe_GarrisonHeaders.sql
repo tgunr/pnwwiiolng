@@ -138,69 +138,6 @@ SELECT
 ,9
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg4int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'degrdg1sp'
-,'German Ground Garrison Forces (1AB)(sp)'
-,4
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'degrdg2sp'
-,'German Ground Garrison Forces (2AB)(sp)'
-,4
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg2sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'degrdg3sp'
-,'German Ground Garrison Forces (3AB)(sp)'
-,4
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg3sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'degrdg4sp'
-,'German Ground Garrison Forces (4AB)(sp)'
-,4
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg4sp') = 0;
-
-
 -- Air ----------------
 INSERT
 INTO
@@ -264,39 +201,6 @@ SELECT
 ,14
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deparg1int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'deairg1sp'
-,'German Air Garrison Forces(sp)'
-,4
-,2
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,2
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deairg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'deparg1sp'
-,'German Airborne Garrison Forces(sp)'
-,4
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,14
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deparg1sp') = 0;
-
-
 -- Navy ----------------
 INSERT
 INTO
@@ -359,39 +263,6 @@ SELECT
 ,0
 ,13
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg2int') = 0;
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'denavg1sp'
-,'German Naval Garrison Forces (1D)(sp)'
-,4
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'denavg2sp'
-,'German Naval Garrison Forces (2D)(sp)'
-,4
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg2sp') = 0;
-
 
 
 -- France -------------------------------------------------
@@ -519,69 +390,6 @@ SELECT
 ,9
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg4int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frgrdg1sp'
-,'French Ground Garrison Forces (1AB)(sp)'
-,3
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frgrdg2sp'
-,'French Ground Garrison Forces (2AB)(sp)'
-,3
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg2sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frgrdg3sp'
-,'French Ground Garrison Forces (3AB)(sp)'
-,3
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg3sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frgrdg4sp'
-,'French Ground Garrison Forces (4AB)(sp)'
-,3
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg4sp') = 0;
-
-
 -- Air ----------------
 INSERT
 INTO
@@ -645,39 +453,6 @@ SELECT
 ,14
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frparg1int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frairg1sp'
-,'French Air Garrison Forces(sp)'
-,3
-,2
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,2
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frairg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frparg1sp'
-,'French Airborne Garrison Forces(sp)'
-,3
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,14
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frparg1sp') = 0;
-
-
 -- Navy ----------------
 INSERT
 INTO
@@ -740,41 +515,6 @@ SELECT
 ,0
 ,13
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg2int') = 0;
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frnavg1sp'
-,'French Naval Garrison Forces (1D)(sp)'
-,3
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'frnavg2sp'
-,'French Naval Garrison Forces (2D)(sp)'
-,3
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg2sp') = 0;
-
-
-
 
 
 -- United Kingdom -------------------------------------------------
@@ -902,69 +642,6 @@ SELECT
 ,9
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg4int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukgrdg1sp'
-,'UK Ground Garrison Forces (1AB)(sp)'
-,1
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukgrdg2sp'
-,'UK Ground Garrison Forces (2AB)(sp)'
-,1
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg2sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukgrdg3sp'
-,'UK Ground Garrison Forces (3AB)(sp)'
-,1
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg3sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukgrdg4sp'
-,'UK Ground Garrison Forces (4AB)(sp)'
-,1
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg4sp') = 0;
-
-
 -- Air ----------------
 INSERT
 INTO
@@ -1028,39 +705,6 @@ SELECT
 ,14
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukparg1int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukairg1sp'
-,'UK Air Garrison Forces(sp)'
-,1
-,2
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,2
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukairg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'ukparg1sp'
-,'UK Airborne Garrison Forces(sp)'
-,1
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,14
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukparg1sp') = 0;
-
-
 -- Navy ----------------
 INSERT
 INTO
@@ -1123,40 +767,6 @@ SELECT
 ,0
 ,13
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg2int') = 0;
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'uknavg1sp'
-,'UK Naval Garrison Forces (1D)(sp)'
-,1
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'uknavg2sp'
-,'UK Naval Garrison Forces (2D)(sp)'
-,1
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg2sp') = 0;
-
-
 
 
 -- United States -------------------------------------------------
@@ -1284,69 +894,6 @@ SELECT
 ,9
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg4int') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usgrdg1sp'
-,'US Ground Garrison Forces (1AB)(sp)'
-,2
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usgrdg2sp'
-,'US Ground Garrison Forces (2AB)(sp)'
-,2
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg2sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usgrdg3sp'
-,'US Ground Garrison Forces (3AB)(sp)'
-,2
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg3sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usgrdg4sp'
-,'US Ground Garrison Forces (4AB)(sp)'
-,2
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,9
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg4sp') = 0;
-
-
 -- Air ----------------
 INSERT
 INTO
@@ -1410,39 +957,6 @@ SELECT
 ,14
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usparg1nt') = 0;
 
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usairg1sp'
-,'US Air Garrison Forces(sp)'
-,2
-,2
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,2
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usairg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usparg1sp'
-,'US Airborne Garrison Forces(sp)'
-,2
-,1
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,14
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usparg1sp') = 0;
-
-
 -- Navy ----------------
 INSERT
 INTO
@@ -1505,36 +1019,3 @@ SELECT
 ,0
 ,13
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg2int') = 0;
-
--- Special Event Headers --
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usnavg1sp'
-,'US Naval Garrison Forces (1D)(sp)'
-,2
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg1sp') = 0;
-
-INSERT
-INTO
-toe.headers
-SELECT
-'usnavg2sp'
-,'US Naval Garrison Forces (2D)(sp)'
-,2
-,3
-,UTC_TIMESTAMP()
-,0
-,0
-,0
-,13
-WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg2sp') = 0;
-
