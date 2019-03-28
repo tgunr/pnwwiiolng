@@ -6731,14 +6731,16 @@ UINT32 _ReadBumpAndFrictionTable()
 		{
 			continue;
 		}
-		_BAFData[Position].BumpDensity = (FLOAT32)atof((char*)BufferPtr);
+        _BAFData[Position].BumpDensity = (FLOAT32)atof((char*)BufferPtr);
+        _BAFData[Position].BumpDensity = 0.01;
 
 		BufferPtr = (UCHAR*)strtok(nullptr,",");
 		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
-		_BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+        _BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
+        _BAFData[Position].BumpHeight = 0.0;
 
 		BufferPtr = (UCHAR*)strtok(nullptr,",");
 		if (BufferPtr == nullptr)
