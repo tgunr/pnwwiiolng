@@ -688,6 +688,7 @@ extern NSString *WebActionOriginalURLKey;
     // server, which is apparently pretending to be arena 1 (e.g. "live").
     [arenaMenu.menu addItemWithTitle:@"Campaign" action:nullptr keyEquivalent:@""].tag = 1;
     [arenaMenu.menu addItemWithTitle:@"Training / Events" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"Closed Beta" action:nullptr keyEquivalent:@""].tag = 222;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = YES;
 #endif
