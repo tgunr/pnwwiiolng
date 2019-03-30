@@ -16,7 +16,7 @@ Chaoswzkd		2098				04/21/2018	Initial Version
 -- Germany -------------------------------------------------
 
 -- Ground ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -29,9 +29,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -44,9 +45,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg2for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -59,9 +61,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg3for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -74,11 +77,12 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg4for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -91,9 +95,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -106,9 +111,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg2int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -121,9 +127,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg3int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -136,10 +143,11 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'degrdg4int') = 0;
 
 -- Air ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -152,9 +160,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deairg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -167,11 +176,12 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deparg1for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -184,9 +194,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deairg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -199,10 +210,11 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'deparg1int') = 0;
 
 -- Navy ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -215,9 +227,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -230,11 +243,12 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg2for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -247,9 +261,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -262,13 +277,14 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'denavg2int') = 0;
 
 
 -- France -------------------------------------------------
 
 -- Ground ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -281,9 +297,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -296,9 +313,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg2for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -311,9 +329,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg3for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -326,11 +345,12 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg4for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -343,9 +363,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -358,9 +379,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg2int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -373,9 +395,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg3int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -388,10 +411,11 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frgrdg4int') = 0;
 
 -- Air ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -404,9 +428,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frairg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -419,11 +444,12 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frparg1for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -436,9 +462,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frairg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -451,10 +478,11 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frparg1int') = 0;
 
 -- Navy ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -467,9 +495,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -482,11 +511,12 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg2for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -499,9 +529,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -514,13 +545,14 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'frnavg2int') = 0;
 
 
 -- United Kingdom -------------------------------------------------
 
 -- Ground ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -533,9 +565,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -548,9 +581,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg2for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -563,9 +597,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg3for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -578,11 +613,12 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg4for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -595,9 +631,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -610,9 +647,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg2int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -625,9 +663,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg3int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -640,10 +679,11 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukgrdg4int') = 0;
 
 -- Air ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -656,9 +696,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukairg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -671,11 +712,12 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukparg1for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -688,9 +730,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukairg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -703,10 +746,11 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'ukparg1int') = 0;
 
 -- Navy ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -719,9 +763,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -734,11 +779,12 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg2for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -751,9 +797,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -766,13 +813,14 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'uknavg2int') = 0;
 
 
 -- United States -------------------------------------------------
 
 -- Ground ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -785,9 +833,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -800,9 +849,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg2for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -815,9 +865,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg3for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -830,11 +881,12 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg4for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -847,9 +899,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -862,9 +915,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg2int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -877,9 +931,10 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg3int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -892,10 +947,11 @@ SELECT
 ,0
 ,0
 ,9
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usgrdg4int') = 0;
 
 -- Air ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -908,9 +964,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usairg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -923,11 +980,12 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usparg1for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -940,9 +998,10 @@ SELECT
 ,0
 ,0
 ,2
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usairg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -955,10 +1014,11 @@ SELECT
 ,0
 ,0
 ,14
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usparg1nt') = 0;
 
 -- Navy ----------------
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -971,9 +1031,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg1for') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -986,11 +1047,12 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg2for') = 0;
 
 -- Intermission Headers --
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -1003,9 +1065,10 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg1int') = 0;
 
-INSERT
+INSERT IGNORE
 INTO
 toe.headers
 SELECT
@@ -1018,4 +1081,5 @@ SELECT
 ,0
 ,0
 ,13
+FROM toe.headers
 WHERE(SELECT COUNT(*) FROM toe.headers WHERE id = 'usnavg2int') = 0;
