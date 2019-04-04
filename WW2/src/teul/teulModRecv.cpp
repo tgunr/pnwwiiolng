@@ -497,14 +497,8 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
     // of the generation counter effectively acts as a cancellation point within Teul's core
     // processing loop. Since we use relaxed ordering for all operations on the atomic, we don't
     // take any memory barrier overhead on x86.
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-    // GCC on Linux, because Debian 8, doesn't support atomics. We don't technically need it here so bypass it
-    static uint64_t pollGeneration = 0;
-    uint64_t currentPollGeneration = pollGeneration++;
-#else
     static std::atomic_uint64_t pollGeneration(0);
     uint64_t currentPollGeneration = pollGeneration.fetch_add(1, std::memory_order_relaxed);
-#endif
     
     // Use RAII semantics to force regenerate of the pollset even if we hit a cancellation point.
     // This is not hugely efficient, but it has the virtue that we'll never leave the pollset in a weird state.
@@ -585,22 +579,14 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
             teulClose(endpoint);
         }
         
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-		if (currentPollGeneration != pollGeneration - 1) {
-#else
         if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
-#endif
             return;
         }
 
         // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many cases.
         _routeCallbacks(endpoint);
 
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-		if (currentPollGeneration != pollGeneration - 1) {
-#else
         if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
-#endif
             return;
         }
     }
