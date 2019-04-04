@@ -23,9 +23,6 @@
 #include "wwii/wwiiConfig.h"
 #include "mem/memPool.h"
 
-// Maximum send buffer of 4096Kb.
-static Mem::Pool<Teul::Packet, 256 * 4096 / sizeof(Teul::Packet)> s_delayedPackets;
-
 //////////////////////////////////////////////////////////////////////
 // Pack the "outdata" for a callback and send it to the specified
 // endpoint destination.
@@ -173,9 +170,13 @@ SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference
     packet.addBytesSent(result);
     if (packet.sentBytes() < packetBytes) {
         // Entire packet not yet sent, queue it.
-        Teul::Packet* const copy = s_delayedPackets.New(packet);
+        Teul::Packet* const copy = new Teul::Packet(packet);
         copy->addBytesSent(packet.sentBytes());
         m_impl->m_sendQueue.push_back(copy);
+        // Attempt to push the send queue immediately.
+        if ((result = pushSendQueue()) < 0) {
+            return result;
+        }
     }
 	return static_cast<SINT32>(packetBytes); // always returns entire size even if send was partial?
 }
@@ -187,7 +188,7 @@ void EndpointImpl::freeFirstPacketInSendQueue()
 {
 	Teul::Packet* packet = m_sendQueue.front();
 	m_sendQueue.pop_front();
-	s_delayedPackets.Delete(packet);
+    delete packet;
 }
 
 //////////////////////////////////////////////////////////////////////
