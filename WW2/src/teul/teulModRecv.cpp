@@ -823,15 +823,7 @@ static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const U
     }
     ABORT_UNLESS(dgram->contents->packetToken() == Teul::PacketToken::Encrypted);
 
-#ifdef FIX_CRYPTO_MISALIGNMENT
-    std::unique_ptr<char[]> tempData = std::make_unique<char[]>((payloadSize + 3) & ~3);
-    
-    memcpy(tempData.get(), decrypted, payloadSize);
-    endpoint.decrypt(reinterpret_cast<unsigned char * const>(tempData.get()), payloadSize);
-    memcpy(decrypted, tempData.get(), payloadSize);
-#else
     endpoint.decrypt(reinterpret_cast<unsigned char * const>(decrypted), payloadSize);
-#endif
 }
 
 static bool _isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)

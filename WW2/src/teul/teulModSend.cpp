@@ -144,15 +144,7 @@ SINT32 ENDPOINT::sendPacket(Teul::Packet& packet, const UCHAR protocolPreference
 
 	// Encrypt the data.
 	if (packet.header().packetToken() != Teul::PacketToken::Unencrypted) {
-#ifdef FIX_CRYPTO_MISALIGNMENT
-        std::unique_ptr<char[]> tempData = std::make_unique<char[]>((packet.header().packetSizeBytes() + 3) & ~3);
-    
-        memcpy(tempData.get(), packet.encryptable(), packet.header().packetSizeBytes());
-        encrypt(reinterpret_cast<unsigned char * const>(tempData.get()), packet.header().packetSizeBytes());
-        memcpy(packet.encryptable(), tempData.get(), packet.header().packetSizeBytes());
-#else
         encrypt(packet.encryptable(), packet.header().packetSizeBytes());
-#endif
 	}
 
     ssize_t result = 0;
