@@ -106,6 +106,8 @@ struct CSAFE_CPStruct
 
 	bool 				m_contention;
 	bool 				m_enemyLinked;
+	bool 				m_frontline;
+	bool 				m_frontlineLinked;
 	bool				isUnderAttack;
 	bool				m_friendlyLinked;
 	bool				m_isSupplyCenter;
@@ -119,6 +121,16 @@ struct CSAFE_CPStruct
 	UINT64				m_lastUpdateNo;
 	TeulTimeMS			m_routeingRun;
 //tolua_begin
+};
+
+enum TOWN_STATUS
+{
+	INACTIVE = 0,
+	RESERVE,
+	BACK_LINE,
+	FRONT_LINE,
+	// Add new statuses here
+	MAX_TOWN_STATUS
 };
 
 class CPStruct : public CSAFE_CPStruct
@@ -137,6 +149,8 @@ public:
 		, m_units()
 		, m_value(0)
 		, m_brigades()
+		, m_townstatus(INACTIVE)
+		, m_lastCaptureTime(0)
 	{}
 
 	~CPStruct()
@@ -214,8 +228,13 @@ public:
 	WWII_SIDE attacker() const { return m_attacker; }
 	HCUnit* attackingUnit() const { return m_attackingUnit; }
 
+	bool canChangeOwnership(WWII_COUNTRY toCountry, bool force);
+	bool changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly);
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
+	void changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly);
 
+	void checkTownStatus(CPStruct *, bool, int);
+	
 	void checkHCUnits();
 
 	bool enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility);
@@ -245,7 +264,11 @@ public:
 
 	bool isContested() const { return m_contention; }
 	bool isEnemyLinked() const { return m_enemyLinked; }
+	bool isFrontlineLinked() const { return m_frontlineLinked; }
+	bool isFrontline() const { return m_frontline; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
+
+    bool islinkedToAnAO();
 
 	LinkStruct* link(UINT32 i) const;
 	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
@@ -277,6 +300,17 @@ public:
 	void setSupplyCenter();
 
 	void setRouteing(bool isConnected);
+
+	// Purges the supply and unsubscribes the Toe Template header of all Garrisons in this cp.
+	void removeAllGarrisonsSupply();
+
+	// Changes the country and the toe Template header for all Garrisons in this cp.
+	void changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange);
+
+	StratHCUnit* getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM movementType);
+
+	void disableAllGarrisons();
+	void enableAllGarrisons();
 
 	void setTableStates(bool isNewObjective = false);
 
@@ -313,8 +347,13 @@ public:
 	// How much our current brigade occupants make us worth
 	UINT32				m_value;
 
-//tolua_end
+	TOWN_STATUS				m_townstatus;
+
+	//tolua_end
 	ACTIVE_BRIGADES		m_brigades;
+
+	void setLastCaptureTime(UINT32 time);
+	UINT32 getLastCaptureTime() { return m_lastCaptureTime; }
 
 private:
 	//// Helper functions
@@ -327,6 +366,8 @@ private:
 
 	// Internal part of clearObjective
 	void _removeObjective(WWII_SIDE forSide);
+
+	UINT32	m_lastCaptureTime;
 
 public:
 //tolua_begin

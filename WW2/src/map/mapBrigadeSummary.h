@@ -51,7 +51,7 @@ static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
 static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
 // Take approx 1078 / sizeof a packed brigade summaries
-static const UINT32 MAX_LISTED_BRIGADES = 88;
+static const UINT32 MAX_LISTED_BRIGADES = 500;
 
 // The highest population rank a brigade can have - semi arbitrary number,
 // but be mindful the number fits inside the number of bits we pack
@@ -63,11 +63,11 @@ class BrigadeSummary : public HCUnit
 public:
 	//// ---- Class Operators ---- ////
 	// Create from scratch
-	BrigadeSummary(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeSummary(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, FULL_OBJ_ID withHome=nullObjID, const ChatHandle withOwner=0LL, RANK_NO withOwnerRank=0)
-		: HCUnit(withBrigadeID, HCU_BRIGADE, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
+		: HCUnit(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 				, withHandle, withName, withNick, withRank, withHome, withOwner, withOwnerRank)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
@@ -124,7 +124,7 @@ private:
 class BrigadeSummaries
 {
 public:
-	BrigadeSummaries() : m_error(false), m_count(0) { }
+	BrigadeSummaries() : m_error(false), m_lastGroup(false), m_group(0), m_count(0)  { }
 	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
     SINT32 packer(PackMode mode, ACTION_OBJECT* a);
@@ -135,11 +135,13 @@ public:
 	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
 	// Host function to populate the summaries
-	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player);
+	int populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player, int groupOffset);
 
 public:
 	bool			m_error;							// True error occured
-	UINT32			m_count;							// Number of summaries described
+	bool			m_lastGroup;							// True if this is the last group in the list
+	UINT32			m_group;							// group id for this summary group
+	UINT32			m_count;							// Number of summaries described in group
 	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES];	// Array of summaries
 };
 
@@ -148,11 +150,11 @@ public:
 class BrigadeDetail : public BrigadeSummary
 {
 public:
-	BrigadeDetail(UINT32 withBrigadeID, UINT32 withParentID
+	BrigadeDetail(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 					, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
 					, const ChatHandle withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, const FULL_OBJ_ID withHomeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
-		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
+		: BrigadeSummary(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 	virtual ~BrigadeDetail() {}
@@ -217,4 +219,18 @@ private:
 	SINT32 _query(Player* player, const Brigade* brigade);
 	SINT32 _select(Player* player, Brigade* brigade);
 	SINT32 _sendResult(SINT32 teulIndex, BRIGADE_SELECT_STATUS result) { m_status = result; return send(teulIndex); }
+
+public:
+    bool _autoSelectCheck(Player* player, Brigade* brigade);
+
+	//////////////////////////////////////////////////////////////////////
+	//  Moved from strtCaptureAction.cpp and revised
+	//  Return a list of Garrison Units in the Target CP (FULL_OBJ_ID).
+	void GetGarrisonUnits(std::vector<HCUnit> &unitsList, FULL_OBJ_ID cpObjID);
+
+	//////////////////////////////////////////////////////////////////////
+	// Get a Favoured Garrison Unit adjacent (linked) to the Target CP (FULL_OBJ_ID).
+	HCUnit *GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry);
+	HCUnit *GetReplacementGarrison(UINT32 originalGarrisonID, WWII_COUNTRY originalCountry);
 };
+

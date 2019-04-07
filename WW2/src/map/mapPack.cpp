@@ -111,6 +111,8 @@ BrigadeSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 	a->offset = wwiiPackBool(mode, a->packed, a->offset, m_error);
 	if ( !m_error )
 	{
+		a->offset = wwiiPackBool(mode, a->packed, a->offset, m_lastGroup);
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_group, 7);
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_count, 7);
 		for ( UINT32 i = 0; i < m_count && i < MAX_LISTED_BRIGADES; ++i )
 		{
@@ -119,6 +121,8 @@ BrigadeSummaries::packer(PackMode mode, ACTION_OBJECT* a)
 	}
 	else if ( mode == TEUL_UNPACK )
 	{
+		m_lastGroup = true;
+		m_group = 0;
 		m_count = 0;
 	}
 

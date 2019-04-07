@@ -463,7 +463,7 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 		return;
 	}
 	BETAMSG(
-		"%s(%d%s%s%s%s%s%s%s%s): "
+		"%s(%d%s%s%s%s%s%s%s): "
 			"%s owns, "
 			"%s controls, "
 			"%s orig. "
@@ -471,11 +471,11 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 			"FBs: %d. "
 			"ABs: %d (Ax:%d/Al: %d). "
 			"Links: %d/%d. "
-			"Supplied: %s."
+			"Supplied: %s. "
+			"Status: %s%s%s%s"
 				,	cp->name
 				,	cp->uOID
 				,	(cp->isContested()) ? "/Con" : ""
-				,	(cp->isEnemyLinked()) ? "/Front" : ""
 				,	(cp->isUnderAttack) ? "/EWS" : ""
 				,	(cp->modified) ? "/DB":""
 				,	(cp->flags & CP_STAT_ALLIED_ATTACK_OBJ) ? "/AlAtt":""
@@ -492,6 +492,10 @@ _printCPInfo(OOBMessage& message, CPStruct* const cp)
 				,	cp->numOpenLinks
 				,	cp->numLinks
 				,	((cp->isSupplied()) ? "Yes" : "No")
+				,	(cp->isFrontline()) ? "Frontline" : ""
+				,	((!cp->isFrontline()) & cp->isFrontlineLinked()) ? "Backline" : ""
+				,	(!(cp->flags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) &&(cp->flags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ? "Reserve" : ""
+				,	(!(cp->flags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ? "Inactive" : ""
 	);
 	if ( cp->isUnderAttack )
 	{
@@ -1002,6 +1006,8 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 {
 	char* cpName = nullptr;
 	WWII_COUNTRY newOwner;
+	WWII_COUNTRY oldOwner;
+	WWII_SIDE oldSide;
 	CPStruct* cp;
 	bool quietly = false;
 	bool force = true;
@@ -1033,12 +1039,24 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	cp = _getCPByArguments(cpName, message, false);
 	if ( cp == nullptr )
 		return false;
+	cp->m_enemyLinked;
+	cp->m_townstatus;
+
+	oldOwner = cp->country;
+	oldSide = cp->side;
 
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
 		quietly = true;
 
 	if ( cp->changeOwnership(newOwner, force, quietly) )
 	{
+		// If we've changed the country but not the side then we need to change the Garrison country to match.
+		// if the side had changed too then the Garrison country is changed via a CaptureAction.
+		if (cp->side == oldSide && newOwner != oldOwner)
+		{
+			cp->changeAllGarrisonCountries(newOwner, false);
+		}
+
 		if ( quietly )
 			LOCMESSAGE(LSTR_NOTE, (force ? LSTR_FORCED_OWNERSHIP : LSTR_CHANGED_OWNERSHIP), cp->name, _countryCode[newOwner]);
 		else
@@ -2378,7 +2396,7 @@ static const char*
 _describeSHCU(StratHCUnit* unit)
 {
 	static std::string text;
-	text = (unit->isBrigade()) ? "Brig" : "Div";
+	text = (unit->isBrigade()) ? "Brig" : (unit->isGarrison()) ? "Gar" : "Div";
 	text += "#";
 	char buf[16];
 	snprintf(buf, 15, "%u", unit->unitID());

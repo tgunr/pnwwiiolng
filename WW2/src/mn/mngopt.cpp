@@ -108,6 +108,9 @@ static GVAR vars[] = {
     LOGICAL_KEY_DEF("nohidemouse", gDisableMouseHiding),
     LOGICAL_KEY_DEF("notopmost", gDisableGameTopmost),
 #endif
+#if platOS == OS_MACOS
+    NULL_KEY_DEF("nokeychain", MacNoKeychainUsage),
+#endif
     { nullptr, ENULL, { nullptr }, 0 },
 };
 

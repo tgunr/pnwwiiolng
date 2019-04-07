@@ -59,6 +59,7 @@ enum {
 	STRT_CP_FACILITIES_Y,
 	STRT_POPULATION_NOTICE_Y,			// For chat to send pop notices.
 	STRT_ATTACK_ORDER_Y,				// Chat->Strat attack orders.
+	STRT_MM_GARRISON_COUNTRY_CHANGE_Y,
 
 	//Add stuff here
 	MAX_STRAT_Y

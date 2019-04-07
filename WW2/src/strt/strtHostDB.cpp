@@ -1009,7 +1009,7 @@ strtdbRestoreTOESupplies()
 	HCUNIT_INDEX::iterator it;
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
-		if ( it->second->isDivision() == false && it->second->isBrigade() == false )
+		if ( it->second->isDivision() == false && it->second->isBrigade() == false && it->second->isGarrison() == false)
 			continue;
 
 		StratHCUnit* unit = (StratHCUnit*)it->second;

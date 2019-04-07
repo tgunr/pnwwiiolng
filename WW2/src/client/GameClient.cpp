@@ -1848,3 +1848,141 @@ void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 	}
 }
 
+void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
+{
+	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
+	HCUnit* replacementUnit = HCUnit::Lookup(unitloc.m_replacementUnitID);
+
+	const PersonaSummary *current = nullptr; 
+	const PersonaSummary *originalPersona = nullptr;
+	const PersonaSummary *replacementPersona = nullptr;
+
+	if (unit != nullptr)
+	{
+		if (unit->isGarrison() && unitloc.m_country != WWII_NO_COUNTRY)
+		{		
+			//  Change the Country of the Garrison Unit
+			unit->setCountry(unitloc.m_country);
+				
+			if (Client::BrigadeSelected().m_detail.brigadeID() == unitloc.m_unitID)
+			{
+				//  Cancel Spawn Reservation
+				if (WeaponSerial().serial != 0)
+					RequestMissionWeapCancel();
+
+				//  Exit Mission
+				if (SelectedMission().m_brigadeID == unitloc.m_unitID)
+					ExitMission();
+
+				//  Clear Current Mission Data
+				ResetMissionData();
+			}
+
+			if (unitloc.m_action != CHANGE_NOTHING)
+			{
+				originalPersona = GetPersona();  //  Gets the Curent Persona
+													 
+				//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
+				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
+
+				if (trainingUnit != nullptr)
+				{
+					//  clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
+					SelectBrigade(trainingUnit->unitID(), true, true);
+
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
+				replacementPersona = GetPersona(replacementUnit->m_countryID, replacementUnit->m_branchID);
+
+				PersonaSummary tempPersona = *replacementPersona;
+
+				// try to select it
+				RequestPersonaSelection(tempPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				ResetMissionData();
+
+				if (current && *current == tempPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					clientErrorLog("Replacement BrigadeID set to: %s (%d)", replacementUnit->m_name, replacementUnit->m_unitID);
+					SelectBrigade(unitloc.m_replacementUnitID, true, true);
+				}
+
+				// update the jsclient
+				jsclient->UpdatePersonas();
+
+				//  ui.dtd Entries:
+				//  <!ENTITY persona.serverselected "SYSTEM Selected Unit Replacement - The Garrison Changed {1}.">
+				//  <!ENTITY persona.serverselected.branch "Branch">
+				//  <!ENTITY persona.serverselected.country "Country">
+				//  <!ENTITY persona.serverselected.countrybranch "Country and Branch">
+				//  <!ENTITY persona.serverselected.sides "Sides">
+
+				std::wstring messageText = L"";
+
+				switch (unitloc.m_action)
+				{
+				case CHANGE_COUNTRY:
+					messageText = uiLocString("persona.serverselected.country");
+					break;
+
+				case CHANGE_SIDE:
+					messageText = uiLocString("persona.serverselected.sides");
+					break;
+
+				case CHANGE_BRANCH:
+					messageText = uiLocString("persona.serverselected.branch");
+					break;
+
+				case CHANGE_COUNTRY_BRANCH:
+					messageText = uiLocString("persona.serverselected.countrybranch");
+					break;
+
+				default:
+					//  Should NOT end up here.
+					messageText = L"";
+					break;
+				}
+
+				if (messageText != L"")
+				{
+					int icons[CHATICON_MAX] = {-1,-1,IDE_ICON_NOTE};
+					uiChatPrintUILocLine(icons, colorYELLOWALPHA, "persona.serverselected", messageText.c_str());
+				}
+				
+			}
+			else
+			{
+				int tempValue = Client::ValidatePersonasBrigade(unitloc.m_unitID);
+
+				if (tempValue < 1)
+				{
+					clientErrorLog("No Other Personas Updated.");
+				}
+				else
+				{
+					clientErrorLog("%d Other Personas Updated.", tempValue);
+
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
+			}
+		}
+	}
+	else
+	{
+		clientErrorLog("Unit Invalid in country change.");
+	}
+}
+

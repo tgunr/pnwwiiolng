@@ -1454,6 +1454,8 @@
 		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClientHelp.h; sourceTree = "<group>"; };
 		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClient.h; sourceTree = "<group>"; };
 		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiClient.cpp; sourceTree = "<group>"; };
+		E9F03784219110CA00F77749 /* garrisonCountryChangeRequest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = garrisonCountryChangeRequest.cpp; path = garrisons/garrisonCountryChangeRequest.cpp; sourceTree = "<group>"; };
+		E9F03785219110CA00F77749 /* garrisonCountryChangeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = garrisonCountryChangeRequest.h; path = garrisons/garrisonCountryChangeRequest.h; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authSteam.cpp; sourceTree = "<group>"; };
 		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = authSteam.h; sourceTree = "<group>"; };
@@ -1482,7 +1484,7 @@
 		FA13BB4E1C87650800095818 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
 		FA37D7501C937F7100013187 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = proj/mac/Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FA3CF9891F01C1F600C54395 /* gr2Object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gr2Object.cpp; sourceTree = "<group>"; };
 		FA3CF98B1F01C67D00C54395 /* gr2Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gr2Object.h; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
@@ -2917,6 +2919,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E9F03783219110AB00F77749 /* garrisons */,
 				E9C3FB6A1EE1A7F400872413 /* mc */,
 				FA06C3B11ECF27FB00A9977E /* auth */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3073,6 +3076,15 @@
 				E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */,
 			);
 			path = mc;
+			sourceTree = "<group>";
+		};
+		E9F03783219110AB00F77749 /* garrisons */ = {
+			isa = PBXGroup;
+			children = (
+				E9F03784219110CA00F77749 /* garrisonCountryChangeRequest.cpp */,
+				E9F03785219110CA00F77749 /* garrisonCountryChangeRequest.h */,
+			);
+			name = garrisons;
 			sourceTree = "<group>";
 		};
 		FA06C3B11ECF27FB00A9977E /* auth */ = {

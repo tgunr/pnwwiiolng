@@ -77,6 +77,7 @@ enum BRIGADE_CONTROL_ERROR
 ,	BCERR_CANT_CANX_DEFEND			// Can't cancel defend, tit
 ,	BCERR_NOT_FRONTLINE				// Can't attack non-frontline towns
 ,	BCERR_NOMINEE_CANT_OIC			// The player you tried to nominate doesn't have OIC permission
+,   BCERR_COUNTRY_ALREADY_CHANGED   // The country is already as specified
 ,	MAX_BC_ERRORS
 };
 
@@ -126,6 +127,7 @@ public:
 	,	_REPLACE_PENDING		// OIC is replacing you
 	,	_OFFER_LAPSED			// Offer to a player timed out
 	,	_OBJECTIVE				// Attack/Clear/Defend see action code
+	,   _COUNTRY_CHANGED		// Notice that a unit(s) country has changed (garrisons only)
 	};
 
 public:
@@ -147,12 +149,13 @@ public:
 	,	REQ_ATTACK				// Attack a target
 	,	REQ_CLEAR				// Clear an attack or defend objective
 	,	REQ_DEFEND				// Defend a target
+	,   REQ_COUNTRY_CHANGE		// Request a change in country (Garrison Cities only)
 
 	,	MAX_BC_REQ_CODES		// Maximum brigade control request codes
 	};
     static inline std::string to_string(BRIGADE_ACTION_REQ req) {
         static const std::vector<std::string> reqs{
-            "INVALID", "LIST", "NOMINATE", "VETO", "VOLUNTEER", "RESIGN", "REPLACE", "REMOVE", "MOVE", "ATTACK", "CLEAR", "DEFEND" };
+            "INVALID", "LIST", "NOMINATE", "VETO", "VOLUNTEER", "RESIGN", "REPLACE", "REMOVE", "MOVE", "ATTACK", "CLEAR", "DEFEND", "COUNTRY" };
         auto rawReq = static_cast<std::underlying_type<BRIGADE_ACTION_REQ>::type>(req);
         return rawReq > 0 && (size_t)rawReq < reqs.size() ? reqs[rawReq] : std::to_string(rawReq);
     }
@@ -169,7 +172,7 @@ public:
 
     BrigadeControl(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
-	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
+	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND || m_action == REQ_CLEAR); }
 	bool isObjective() const { return (m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
 
 public:
@@ -238,6 +241,10 @@ public:
 	bool vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
 	// H/C: Veto an objective order
 	bool vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target);
+	// H/C: Propose a CP/garrison country change.
+	bool requestBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country);
+	// H/C: Veto a CP/garrison country change
+	bool vetoBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country);
 };
 
 //////////////////////////////////////////////////////////////////////

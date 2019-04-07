@@ -19,6 +19,7 @@
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiConfig.h"
 #include "include/mydbQuery.h"
+#include "include/strprintf.h"
 
 // TOE templates.
 TOE_TEMPLATES toeTemplates;
@@ -170,6 +171,8 @@ TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 	assert( m_subscribers.find(unit) != m_subscribers.end() );
 
 	m_subscribers.erase(unit);
+
+	unit->clearTOEInstance();
 
 	toe.clear();
 }
@@ -332,5 +335,30 @@ strtSaveTOESupplies()
 		DBSimpleQuery(dbh, buffer);
 
 	toeSaveList.clear();
+}
+
+
+void strtClearTOESaveList(StratHCUnit& unit)
+{
+	// Clear out the unit in the DB
+	char buffer[TEXT_POOL_SIZE+1];
+	const char* format = "DELETE FROM toe.supply where unit_id=%u";
+	strprintf(buffer, format, unit.unitID());
+	DBSimpleQuery(dbh, buffer);
+
+	// Now clear the list
+	for (auto it = toeSaveList.begin(); it != toeSaveList.end();)
+	{
+		TOE_::WeaponInstance& entry = *it->first;
+
+		if (entry.unit().unitID() == unit.unitID())
+		{
+			it = toeSaveList.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 

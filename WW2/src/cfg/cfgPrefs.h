@@ -20,7 +20,7 @@
 #define CFG_MAP_FILTER_ARMY 		"map.army"
 #define CFG_MAP_FILTER_AIRFORCE 	"map.airforce"
 #define CFG_MAP_FILTER_NAVY			"map.navy"
-#define CFG_MAP_FILTER_DEPOTS		"map.deopots"
+#define CFG_MAP_FILTER_DEPOTS		"map.depots"
 #define CFG_MAP_FILTER_NAMES		"map.names"
 #define CFG_MISC_AUTORELOAD			"misc.autoreload"
 #define CFG_APP_LOADTIME			"app.loadtime" // long

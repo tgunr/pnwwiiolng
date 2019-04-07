@@ -24,6 +24,7 @@ enum HCUNIT_TYPE
 	HCU_GENERIC = 0				// Just part o'the structure
 ,	HCU_BRIGADE = 1				// A brigade
 ,	HCU_DIVISION = 2			// A division
+,	HCU_GARRISON = 3
 ,	MAX_HCUNIT_TYPES
 };
 
@@ -77,7 +78,7 @@ public:
 	UINT32 parentID() const { return m_parentID; }
 	HCUnit* parent() const { return m_parent; }
 	WWII_COUNTRY country() const { return m_countryID; }
-	WWII_SIDE side() const { return ( m_countryID == 4 ) ? AXIS : ALLIED; }
+	WWII_SIDE side() const { return wwiiSide(m_countryID); }
 	BRANCH_ENUM branch() const { return m_branchID; }
 	FULL_OBJ_ID homeCPID() const { return m_homeCPID; }
 	BRANCH_ENUM movementType() const { return m_movementType; }
@@ -119,6 +120,8 @@ public:
 
 	bool isBrigade() const { return m_type == HCU_BRIGADE; }
 	bool isDivision() const { return m_type == HCU_DIVISION; }
+	bool isGarrison() const { return m_type == HCU_GARRISON;  }
+	bool isDisabled() const { return m_disabled; }
 
 	bool isMarineUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_SEA; }
 
@@ -127,6 +130,10 @@ public:
 	bool isParatroopUnit() const { return m_branchID == BRANCH_LAND && m_movementType == BRANCH_AIR; }
 
 	bool isTrainingUnit() const { return m_training; }
+
+	void setCountry(WWII_COUNTRY newCountry) { m_countryID = newCountry;}
+
+	void setDisabled(bool disabled) { m_disabled = disabled; }
 
 	////
 	// Static functions
@@ -142,6 +149,14 @@ public:
 	// Get the command unit for a particular country/branch
 	static HCUnit* GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch);
 
+	// Get the training unit for a particular country/branch
+	static HCUnit* GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch);
+
+	// Get a list of all the Garrisons for a particular Country/CP
+	static void GetGarrisonUnits(std::list<HCUnit *> &unitsList, FULL_OBJ_ID cpID);
+
+	// Get the controlling army garrison for the specified CP
+	static UINT32 GetArmyGarrison(FULL_OBJ_ID cpID);
 
 	//// ---- Member Functions ---- ////
 
@@ -169,6 +184,7 @@ protected:
 	HCUnit*			m_parent;			// So we can climb the tree
 	bool			m_registered;		// Whether we are the registered instance
 	bool			m_training;
+	bool            m_disabled;
 
 private:
 	void lookupParent();

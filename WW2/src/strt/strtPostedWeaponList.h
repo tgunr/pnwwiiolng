@@ -56,6 +56,7 @@ struct POSTED_WEAPON
 		, m_isNonSupplied(withIsNonSupplied)
 		, m_resupplyTicket(nullptr)
 		, m_posted(0)
+		, m_SpawnedFromMobileSpawn(false)
 	{
 		_register();
 	}
@@ -99,8 +100,8 @@ struct POSTED_WEAPON
 
 	// Attempt to under a weapon reservation and return the
 	// vehicle to its spawn lists. Returns true if the weapon
-	// was delivered division -> brigade
-	bool returnWeapon(bool allowOverstock, bool hasBeenHit);
+	// was delivered division -> brigade or to a different Garrison.
+	bool returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID originFacilityID = nullObjID);
 
 	// If we don't already have one, schedule a replacement for me
 	void scheduleReinforcement();
@@ -148,6 +149,7 @@ struct POSTED_WEAPON
 	ResupplyTicket*	m_resupplyTicket;		// Pointer to our resupply ticket if we
 											// are attached to one.
 	UINT32 			m_posted;				//Timestamp at which this was posted.  Posts
+	bool            m_SpawnedFromMobileSpawn;// True if spawned at a mobile spawn.
 
 private:
 	// Allocate me a serial number and post me to the postedWeaponList

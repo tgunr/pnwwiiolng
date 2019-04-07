@@ -17,3 +17,5 @@ extern void strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC spec, UI
 // loading sequence from saving everything.
 extern void strtSaveTOESupplies();  //tolua_export
 
+extern void strtClearTOESaveList(StratHCUnit& unit);
+
