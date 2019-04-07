@@ -126,7 +126,7 @@ strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID)
 		return 0;
 
 	const StratHCUnit* brigade = StratHCUnit::Lookup(brigadeID);
-	if ( brigade == nullptr || !brigade->isBrigade() )
+	if ( brigade == nullptr || (!brigade->isBrigade() && !brigade->isGarrison()) )
 	{
 		dbugLog(_FLA, "hcu:%u is not a brigade", brigadeID);
 		return 0;
@@ -725,7 +725,7 @@ _checkResupplyStatus(bool fullCheck)
 {
 	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
-		if ( it->second->isBrigade() == false && it->second->isDivision() == false )
+		if ( it->second->isBrigade() == false && it->second->isDivision() == false && it->second->isGarrison() == false )
 			continue;
 		if ( it->second->isTrainingUnit() )
 			continue;

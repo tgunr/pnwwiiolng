@@ -101,6 +101,7 @@ struct cfOIC
 	UINT16		removalVoteTime_s;
 	UINT16		replaceDelay_s;
 	UINT16		moveVoteTime_s;
+	UINT16		changeCountryVoteTime_s;
 	UINT16		attackVoteTime_s;
 	UINT16		withdrawVoteTime_s;
 };
@@ -166,6 +167,11 @@ struct cfSUPPLY
 	UINT32	trickleTime_m;		//!< Minutes that complete trickle should take
 	UINT32	populationAdjust;	//!< Divisor for population-based rate adjustment
 	UCHAR	nomanDepots;		//!< Enable spawning at depots in adjacent friendly towns with a DO
+	UINT32	garrisonTrickleTime_m;	//!< Minutes that complete trickle should take
+	UINT32	garrisonInactiveTime_m;	//!< Minutes until a Garrison becomes active 
+	UINT32	mGarrisonTrickleTime_m;	//!< Minutes that complete trickle should take after the garrison country is manually changed
+	UINT32	mGarrisonInactiveTime_m; //!< Minutes until a Garrison becomes active after the garrison country is manually changed
+	UINT32  noPenaltySwitchPeriod_m; //!< Minutes that HC has to switch garrison ownership without a trickle penalty
 };
 
 struct cfTHROTTLE

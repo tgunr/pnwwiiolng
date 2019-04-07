@@ -135,6 +135,30 @@ CPStruct::flagsFor(WWII_SIDE forSide, const Instance::Descriptor& instance) cons
 	}
 }
 
+bool CPStruct::islinkedToAnAO()
+{
+    if (!isEnemyLinked())
+        return false;
+
+
+    CPStruct::LINKS::iterator it;
+    LinkStruct* link;
+
+    for (it = m_links.begin(); it != m_links.end(); ++it)
+    {
+        link = *it;
+        CPStruct* cp = link->endDepot->cp;
+        if (ControllingSide() != cp->ControllingSide())
+        {
+            if (cp->isDefendObjective(cp->ControllingSide()))
+            {
+                return true;
+            }
+        }  
+    }
+    return false;
+}
+
 //////////////////////////////////////////////////////////////////////
 // Get a particular link
 

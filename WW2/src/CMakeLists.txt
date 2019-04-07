@@ -569,6 +569,7 @@ ADD_HOST_TARGET( ${CHAT_HOST_EXE} SOURCES
     strt/strtChatSupportMessages.cpp strt/strtChatSupportMessages.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     wwii/wwiiCallbacks.h
+ 	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     INSTANCING
     EXTRA_DEFINITIONS "IS_CHAT_HOST"
 )
@@ -776,6 +777,7 @@ ADD_HOST_TARGET( ${STRAT_HOST_EXE} SOURCES
     strt/strtTypes.h strt/strtObjectStruct.h
     wwii/wwiiHCUnits.cpp wwii/wwiiHCUnits.h
     list/listCL.cpp list/listCL.h list/list.h
+	garrisons/garrisonCountryChangeRequest.cpp garrisons/garrisonCountryChangeRequest.h
     ${STRAT_HOST_EXE}Lua.cc
     EXTRA_DEFINITIONS "IS_STRAT_HOST" "LUA_MODULE_OPEN=tolua_stratd_open" "CHECK_SUPPLY=1"
     INSTANCING LUA

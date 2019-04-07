@@ -565,6 +565,43 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Asks the host to validate a brigade move; if you want it to execute
+// the move too, set actionable to true.
+
+void
+chatSendGarrisonChangeCountry(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, const WWII_COUNTRY country, bool isActionable)
+{
+	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
+	if (PN_LIKELY(stratEndpoint != nullptr)) {
+		GARRISON_COUNTRY_CHANGE_MSG outgoing(byPlayer, isGM, GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE);
+
+		outgoing.data().m_action = GCR_APPROVED;
+		outgoing.data().m_brigadeID = brigadeID;
+		outgoing.data().m_newCountryId = country;
+		outgoing.data().m_actionable = isActionable;
+
+		outgoing.send(*stratEndpoint, GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE);
+	}
+}
+
+template<>
+SINT32
+GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+{
+	if (incoming.action() != EXCHANGE) // We should only get exchanges
+	{
+		dbugLog(_FLA, "Invalid Unit country change msg");
+		return -EINVAL;
+	}
+
+	incoming.data().process(incoming.key());
+
+	return 0;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////
 // Request from the player for a squad info update
 
 template<>
@@ -1667,6 +1704,7 @@ _registerMMCallbacks()
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
 	{
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
+		REGISTER_MSG_SENDER(Map::HC_UNIT_COUNTRY_CHANGE_Y, HC_UNIT_COUNTRY_CHANGES);
 		REGISTER_RECEIVER(Map::TUT_PROGRESS_Y, _recvTutProgress);
 	}
 	END_CALLBACK_REGISTRATION(Map::CallbackX)
@@ -1756,6 +1794,7 @@ chatInstallHostCallbacks()
 		REGISTER_RECEIVER(Chat::ATTACK_ORDER_Y, _recvAttackOrder);
 		REGISTER_RECEIVER(Chat::HOST_LOCALITY_UPDATES_Y, _recvLocalityUpdates);
 		REGISTER_OMG_RECEIVER(Chat::CellHostUpdate, _recvCellHostUpdate);
+		REGISTER_MSG(Chat::GARRISON_COUNTRY_Y, GARRISON_COUNTRY_CHANGE_MSG);
 	}
 	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

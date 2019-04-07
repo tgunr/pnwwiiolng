@@ -8,6 +8,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "wwii/wwiiRTBCodes.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 extern SINT32 strtInstallMapCallbacks();
 
@@ -33,7 +34,7 @@ extern SINT32 strtSendMMPostCancel(SINT32 connection, const WEAPON_SERIAL& weapo
 
 //This function sends a spawn cancel to the strat system
 //extern SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, WEAPON_SERIAL weaponSerial);
-extern SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial);
+extern SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial, const FULL_OBJ_ID originFacility = nullObjID);
 
 //This function sends a capacity request to the strat system
 extern SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID, UINT32 playerID, const FULL_OBJ_ID facility, CODE_RTB rtb);
@@ -41,4 +42,3 @@ extern SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 mi
 extern SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool multicrew);
 
 extern SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join);
-

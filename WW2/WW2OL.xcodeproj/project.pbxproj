@@ -1454,6 +1454,8 @@
 		E9C3FB6B1EE1A81C00872413 /* multiClientHelp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClientHelp.h; sourceTree = "<group>"; };
 		E9C3FB6C1EE1A81C00872413 /* multiClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = multiClient.h; sourceTree = "<group>"; };
 		E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = multiClient.cpp; sourceTree = "<group>"; };
+		E9F03784219110CA00F77749 /* garrisonCountryChangeRequest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = garrisonCountryChangeRequest.cpp; path = garrisons/garrisonCountryChangeRequest.cpp; sourceTree = "<group>"; };
+		E9F03785219110CA00F77749 /* garrisonCountryChangeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = garrisonCountryChangeRequest.h; path = garrisons/garrisonCountryChangeRequest.h; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA06C3B21ECF289F00A9977E /* authSteam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authSteam.cpp; sourceTree = "<group>"; };
 		FA06C3B31ECF289F00A9977E /* authSteam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = authSteam.h; sourceTree = "<group>"; };
@@ -2917,6 +2919,7 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				E9F03783219110AB00F77749 /* garrisons */,
 				E9C3FB6A1EE1A7F400872413 /* mc */,
 				FA06C3B11ECF27FB00A9977E /* auth */,
 				08E5E55513E855A100A5034D /* ez */,
@@ -3073,6 +3076,15 @@
 				E9C3FB6D1EE1A81C00872413 /* multiClient.cpp */,
 			);
 			path = mc;
+			sourceTree = "<group>";
+		};
+		E9F03783219110AB00F77749 /* garrisons */ = {
+			isa = PBXGroup;
+			children = (
+				E9F03784219110CA00F77749 /* garrisonCountryChangeRequest.cpp */,
+				E9F03785219110CA00F77749 /* garrisonCountryChangeRequest.h */,
+			);
+			name = garrisons;
 			sourceTree = "<group>";
 		};
 		FA06C3B11ECF27FB00A9977E /* auth */ = {

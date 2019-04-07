@@ -24,7 +24,7 @@ static TeulTimeMS s_lastLaunch = 0ULL;
 // Delay between process launches
 static const TeulTimeMS s_launchInterval_ms = 2000;
 
-static std::list<GameProcess> s_processes;
+static std::vector<GameProcess> s_processes;
 
 static const char** s_savedEnvp = nullptr;
 static bool s_singleStartMode = false;
@@ -41,9 +41,44 @@ bool GameProcess::IsRunning() const
 	auto result = WaitForSingleObject(m_processHandle, 0);
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
+    ABORT_IF_EX(m_processID > static_cast<decltype(m_processID)>(std::numeric_limits<pid_t>::max()),
+        "Child process ID %" PR64BitUT " must fit in the current architecture's pid_t type - it doesn't.", m_processID);
+
 	int status = 0;
-	auto result = waitpid(m_processID, &status, WNOHANG);
-	return ( result == 0 );
+	auto result = waitpid(static_cast<pid_t>(m_processID), &status, WNOHANG);
+
+    if (result == 0) {
+        dbugLog(_FLD, "waitpid() says process %" PR64BitUT " is fine.", m_processID);
+        return true; // nothing to report
+    }
+
+    if (result == -1 && errno == ECHILD) {
+        return false; // no such child or no children at all
+    }
+
+    ABORT_IF_EX(result == -1, "waitpid() returned not-ECHILD error %d", errno);
+
+    ABORT_IF_EX(result != static_cast<pid_t>(m_processID),
+        "waitpid() returned pid %d which isn't %" PR64BitUT ", kernel's broken", result, m_processID);
+
+    if (WIFSTOPPED(status)) {
+        // Stopped by a signal (most likely SIGSTOP) probably means a debugger attached to it
+        dbugLog(_FLI, "Child %" PR64BitUT " stopped by signal %d, treating that as running.", m_processID, WSTOPSIG(status));
+        return true;
+    } else if (WIFCONTINUED(status)) {
+        // Continued by SIGCONT is harmless
+        return true;
+    } else if (WIFSIGNALED(status)) {
+        // Killed by a signal
+        dbugLog(_FLI, "Child %" PR64BitUT " killed by signal %d.", m_processID, WTERMSIG(status));
+        return false;
+    } else if (WIFEXITED(status)) {
+        // Exited normally
+        dbugLog(_FLI, "Child %" PR64BitUT " exited with status %d.", m_processID, WEXITSTATUS(status));
+        return false;
+    }
+
+    ABORT_IF_EX(true, "waitpid() returned status %d which isn't stopped, signaled, or exited.", status);
 #endif
 }
 
@@ -75,7 +110,7 @@ void GameProcess::RequestStart()
 		return;
 	m_wantRunning = true;
 	m_stopped = 0ULL;
-	Log("requestStart");
+	Log(_FL, "requestStart");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -100,7 +135,7 @@ void GameProcess::OnStarting(processhandle_t processHandle_, UINT64 processID_)
 	s_processStarting = this;
 	++m_launchAttempts;
 
-	Log("launched");
+	Log(_FL, "launched");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -112,7 +147,7 @@ bool GameProcess::OnStarted()
 		return false;
 
 	teulSyncClock();
-	Log(Debug::ERR_NOTE, "started (attempt %u, took %" PR64BitUT "ms)", m_launchAttempts, (teulClock64 - m_startSent));
+	Log(_FLN, "started (attempt %u, took %" PR64BitUT "ms)", m_launchAttempts, (teulClock64 - m_startSent));
 
 	m_started = teulClock64;
 	m_stopped = 0ULL;
@@ -130,7 +165,7 @@ void GameProcess::RequestStop()
 	if ( m_wantRunning == false )
 		return;
 	m_wantRunning = false;
-	Log("requestStop");
+	Log(_FL, "requestStop");
 
 	// TODO: Close cleanly.
 	Kill();
@@ -145,7 +180,7 @@ void GameProcess::RequestDiscontinue()
 	if ( m_desired == false )
 		return;
 	m_desired = false;
-	Log("requestDisc");
+	Log(_FL, "requestDisc");
 	RequestStop();
 }
 
@@ -161,9 +196,9 @@ void GameProcess::OnStopped()
 	}
 	ABORT_IF( !Running() && !StartSent() );
 	if ( Running() )
-		Log(Debug::ERR_NOTE, "stopped after %" PR64BitUT "s", TimeRunning() / 1000);
+		Log(_FLN, "stopped after %" PR64BitUT "s", TimeRunning() / 1000);
 	else
-		Log(Debug::ERR_NOTE, "stopped during startup after %" PR64BitUT "ms", TimeSinceStartSent());
+		Log(_FLN, "stopped during startup after %" PR64BitUT "ms", TimeSinceStartSent());
 
 	teulSyncClock();
 
@@ -189,7 +224,7 @@ void GameProcess::Kill()
 {
 	if ( !StartSent() )
 		return;
-	Log(Debug::ERR_NOTE, "kill");
+	Log(_FLN, "kill");
 #if platOS == OS_WIN32
 	if (m_processHandle) {
 		TerminateProcess(m_processHandle, 1);
@@ -210,7 +245,7 @@ bool GameProcess::CheckStatus()
 {
 	if ( g_shuttingDown && Desired() )
 	{
-		Log(Debug::ERR_MINOR, "terminating for shutdown.");
+		Log(_FLM, "terminating for shutdown.");
 		RequestDiscontinue();
 	}
 
@@ -219,18 +254,18 @@ bool GameProcess::CheckStatus()
 	{
 		if ( TimeSinceStopSent() > s_processShutdownTimeout )
 		{
-			Log(Debug::ERR_WARN, "process took to long to stop, killing.");
+			Log(_FLW, "process took to long to stop, killing.");
 			Kill();
 			return false;
 		}
-		Log("waiting on shutdown.");
+		Log(_FL, "waiting on shutdown.");
 	}
 
 	if ( StartSent() )
 	{
 		if ( ! IsRunning() )
 		{
-			Log("process stopped");
+			Log(_FL, "process stopped");
 			OnStopped();
 			return false;
 		}
@@ -245,7 +280,7 @@ bool GameProcess::CheckStatus()
 		{
 			ABORT_IF( StopSent() );
 
-			Log("want stopped.");
+			Log(_FL, "want stopped.");
 			RequestStop();
 			return false;
 		}
@@ -262,7 +297,7 @@ bool GameProcess::CheckStatus()
 		if ( WantRunning() == false )
 		{
 			// Flag that we should start it, and let it get picked up this heartbeat cycle.
-			Log("want running.");
+			Log(_FL, "want running.");
 			RequestStart();
 			return true;
 		}
@@ -272,15 +307,16 @@ bool GameProcess::CheckStatus()
 			ABORT_IF(s_processStarting != this);
 			if ( TimeSinceStartSent() >= s_processLaunchTimeout )
 			{
-				Log(Debug::ERR_WARN, "startup timed out after %" PR64BitUT "ms. Killing.", TimeSinceStartSent());
+				Log(_FLW, "startup timed out after %" PR64BitUT "ms. Killing.", TimeSinceStartSent());
 				Kill();
 				return false;
 			}
-			Log("waiting for startup.");
+			Log(_FL, "waiting for startup.");
 			return false;
 		}
-		ABORT_IF(s_processStarting == this);
-		Log("waiting on startup opportunity.");
+
+		ABORT_IF_EX(s_processStarting == this, "if we're not the starting process, we'd better not be marked as such");
+		Log(_FL, "waiting on startup opportunity.");
 		return true;
 	}
 	else if ( StartSent() )
@@ -292,7 +328,7 @@ bool GameProcess::CheckStatus()
 	}
 	else
 	{
-		Log("awaiting removal (!desired)");
+		Log(_FL, "awaiting removal (!desired)");
 		return false;
 	}
 }
@@ -399,7 +435,8 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	}
 	int s = posix_spawn(&childPid, execArgs[0],
 				&file_actions, nullptr,
-				(char**)execArgs.data(), (char**)s_savedEnvp);
+				const_cast<char * const *>(execArgs.data()),
+                const_cast<char * const *>(s_savedEnvp));
 	if (s != 0) {
 		errno_ = errno;
 		char error[512]{};
@@ -465,7 +502,9 @@ namespace GameProcessManager
 	bool Heartbeat(bool allowStarts)
 	{
 		// Remove all processes we no-longer need.
-		s_processes.remove_if([](const GameProcess& proc_) { return (proc_.ReadyForRemoval()); });
+        s_processes.erase(
+            std::remove_if(s_processes.begin(), s_processes.end(), [](const GameProcess& proc_) { return (proc_.ReadyForRemoval()); }),
+            s_processes.end());
 
 		if ( s_processes.empty() )
 			return false;
@@ -547,7 +586,7 @@ namespace GameProcessManager
 			for ( auto it = s_processes.begin(); it != s_processes.end(); )
 			{
 				auto& proc = *(it++);
-				proc.Log(Debug::ERR_ABORT, "still running at shutdown, terminating.");
+				proc.Log(_FLA, "still running at shutdown, terminating.");
 				proc.Kill();
 			}
 		}

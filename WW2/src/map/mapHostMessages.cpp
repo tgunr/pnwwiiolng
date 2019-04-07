@@ -36,6 +36,7 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiOpinionPoll.h"
+#include "strt/strtMapMessages.h"
 
 #define SPAWN_AT_DEPOTS
 
@@ -50,6 +51,8 @@ static	TEUL_CALLBACK*	_XCHG_MISSION_LIST;
 static	TEUL_CALLBACK*	_SEND_HCUNIT_LIST;
 static	TEUL_CALLBACK*	_SEND_ARENA_DESCRIPTION;
 static	TEUL_CALLBACK*	_SEND_TUT_PROGRESS;
+static	TEUL_CALLBACK*	_SEND_TOWN_STATUS;
+static	TEUL_CALLBACK*	_XCHG_GARRISON_COUNTRY_CHANGE;
 
 SINT32
 HCUnitList::send(SINT32 teulIndex)
@@ -168,7 +171,7 @@ _sendBrigadeSelectResponse(ACTION_OBJECT* const a)
 SINT32
 BrigadeSelection::send(SINT32 teulIndex)
 {
-	dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
+	//dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
 	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this);
 }
 
@@ -294,6 +297,7 @@ HostInstallCallbacks()
 		REGISTER_RECVSEND(Map::XCHG_MISSION_LIST_Y, _recvMissionListRequest, _sendMissionListResponse, _XCHG_MISSION_LIST);
 
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
+		REGISTER_MSG_SENDER(Map::HC_UNIT_COUNTRY_CHANGE_Y, HC_UNIT_COUNTRY_CHANGES);
 
 		REGISTER_MSG_SENDER(Map::SWING_METER_Y, SWING_METER_MSG);
 
