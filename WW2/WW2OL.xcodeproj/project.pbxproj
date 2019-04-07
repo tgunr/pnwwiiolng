@@ -1482,7 +1482,7 @@
 		FA13BB4E1C87650800095818 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
 		FA37D7501C937F7100013187 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = proj/mac/Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
-		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		FA3CF9891F01C1F600C54395 /* gr2Object.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = gr2Object.cpp; sourceTree = "<group>"; };
 		FA3CF98B1F01C67D00C54395 /* gr2Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gr2Object.h; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
