@@ -121,7 +121,7 @@ using UnitList = std::vector<UINT32>;
 	bool IsUnitHere(unsigned int id) const;
 	const UnitList& GetUnits() const { return _units; }
 	unsigned int GetUnitCount() const { return (unsigned int)_units.size(); }
-	unsigned int FindBestUnit(int s, int c, int b) const;
+	unsigned int FindBestUnit(int s, int c, int b, bool ignoreGarrisons = false) const;
 	unsigned int FindBestAlliedUnit(int c, int b) const;
 
 	bool IsSpawnable() const;

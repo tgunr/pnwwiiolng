@@ -1002,16 +1002,6 @@ public:
 	}
 };
 
-static void
-_logWWIIPlayerStats()
-{
-	static TeulTimeMS nextBlip = 0ULL;
-	if ( teulClock64 < nextBlip )
-		return;
-	wwiiPlayer::logStats();
-	nextBlip = teulClock64 + 60 * 1000;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Periodic "housekeeping" routines that are run every few seconds.
 
@@ -1033,7 +1023,6 @@ _housekeeping()
 	,	_pollChecksums
 #endif
 	,	Instance::RecordPopulations
-	,	_logWWIIPlayerStats
 	,	[](){ chatHousekeepGroupPermissions(); }
 	,	mapExpireSorties
 	,	mapRequestBrigadeDetailsUpdate

@@ -141,7 +141,6 @@ static ENDPOINT* s_broadcastEndpoint = nullptr;
 
 // Connection to the controller process.
 
-static uint32_t s_controllerToken = 0;
 static bool s_controllerConnected = false;
 
 #if defined(SERVER_AS_ENTRY_POINT)
@@ -1666,7 +1665,6 @@ _controllerConnect(ENDPOINT& endpoint)
 	intro.m_processID = getpid();
 #endif
 	intro.m_processType = Server::serverType;
-	intro.m_token = s_controllerToken;
 
 	auto result = endpoint.writeData(reinterpret_cast<char *>(&intro), sizeof(intro), 0, 0);
 	if ( result < 0 ) {
@@ -1860,6 +1858,7 @@ static std::thread s_parentCheckThread;
 void
 Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTION errorFnPtr, KILL_FUNCTION killFnPtr, int argc, const char* argv[], const CommandLineOptions& cliOptions)
 {
+    bool skipControllerConnect = false;
 	Server::serverType = myType;
 	Teul::SetAppName(appName);
 
@@ -1885,11 +1884,12 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 			[](const char*) {}, nullptr
 #endif
 		},
-		{
-			"--token", "Specify the controller connection token.", true,
-			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); },
-			nullptr
-		}
+        {
+            "--barge-in-on-controller",
+            "Don't require controller to have started process in order to work in CiaB mode.",
+            false,
+            [&skipControllerConnect] (const char *) { skipControllerConnect = true; }, nullptr
+        },
 	};
 	allOptions.insert(allOptions.end(), cliOptions.begin(), cliOptions.end());
 	for (int argn = 1; argn < argc; ++argn)
@@ -1940,7 +1940,7 @@ Server::InitializeProcess(const char* appName, SERVER_TYPE myType, ERROR_FUNCTIO
 
 	_initAddresses();
 
-	if ( _serverUsesBroadcast(myType) && Server::IsBroadcastViaController() )
+	if ( _serverUsesBroadcast(myType) && Server::IsBroadcastViaController() && !skipControllerConnect )
 		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);

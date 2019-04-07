@@ -52,11 +52,11 @@
 #define SPAWN_TIMEOUT (9 * 60 * 60)
 
 #ifdef SPAWN_RESTRICT
-SPAWN_RESTRICTION spawnRestriction = { 0, "\0", 0, 0, 0 };
+SPAWN_RESTRICTION spawnRestriction = {0, "\0", 0, 0, 0};
 #endif // SPAWN_RESTRICT
 
-///REVIEW:TOES
-//Weapons that have been spawned, no longer attached to facilities
+/// REVIEW:TOES
+// Weapons that have been spawned, no longer attached to facilities
 static POSTED_WEAPON_LIST _spawnedWeapons;
 
 static bool _canSpawn(const TOE_::WeaponInstance*
@@ -67,11 +67,11 @@ static bool _canSpawn(const TOE_::WeaponInstance*
 						, bool includeZeros
 						, bool isReserve
 						);
-static void _validateCrew(POSTED_WEAPON& currentWeapon);
+static void _validateCrew(POSTED_WEAPON &currentWeapon);
 
-static void _setupSpawnObject(ObjectStruct& object);
+static void _setupSpawnObject(ObjectStruct &object);
 
-extern const std::string& sdmTranslateName(const std::string& from);
+extern const std::string &sdmTranslateName(const std::string &from);
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -79,10 +79,10 @@ extern const std::string& sdmTranslateName(const std::string& from);
 static bool
 _spawnDisabledByGM(const PermissionMask& permMask)
 {
-	if ( !host_config.isArenaLocked(AL_SPAWN) )
+	if (!host_config.isArenaLocked(AL_SPAWN))
 		return false;
 
-	if ( (permMask & (IS_PLAYNET|ALL_SPAWN|GAME_MANAGER)) != 0 )
+	if ((permMask & (IS_PLAYNET | ALL_SPAWN | GAME_MANAGER)) != 0)
 		return false;
 
 	// Otherwise, we aren't letting you
@@ -95,12 +95,12 @@ _spawnDisabledByGM(const PermissionMask& permMask)
 static UINT16
 _constructWeaponSerial(WEAPON_SERIAL* serial, WeaponEntry* spawnEntry)
 {
-	assert( serial != nullptr );
-	assert( spawnEntry != nullptr );
+	assert(serial != nullptr);
+	assert(spawnEntry != nullptr);
 
 	// Cycle the spawner slots
 	UINT32 portal = rand() % spawnEntry->portals().size();
-	const ObjectStruct& spawner = spawnEntry->portals(portal);
+	const ObjectStruct &spawner = spawnEntry->portals(portal);
 
 	serial->source = spawner.fullObjID;
 	serial->serial = 0;
@@ -114,12 +114,12 @@ _constructWeaponSerial(WEAPON_SERIAL* serial, WeaponEntry* spawnEntry)
 
 struct PostRequestFail
 {
-	PostRequestFail(const char* withWhat, SPAWN_DENY_REASONCODE withCode)
+	PostRequestFail(const char *withWhat, SPAWN_DENY_REASONCODE withCode)
 		: m_what(withWhat), m_code(withCode)
 		{}
-	const char* what() const { return m_what; }
+	const char *what() const { return m_what; }
 	SPAWN_DENY_REASONCODE code() const { return m_code; }
-	const char* const m_what;
+	const char *const m_what;
 	SPAWN_DENY_REASONCODE m_code;
 };
 
@@ -130,14 +130,14 @@ struct PostRequestFail
 static void
 _addWeaponListToFacility(FacilityStruct* facility, WEAPON_LIST* weaponList, ObjectStruct& object, UINT8 category)
 {
-	assert( facility != nullptr );
-	assert( weaponList != nullptr );
+	assert(facility != nullptr);
+	assert(weaponList != nullptr);
 
-	///TODO:+TOE:Minor A copy of this for every facility is handy, but surely very wasteful?
+	/// TODO:+TOE:Minor A copy of this for every facility is handy, but surely very wasteful?
 	WEAPON_LIST::iterator it;
-	for ( it = weaponList->begin(); it != weaponList->end(); ++it )
+	for (it = weaponList->begin(); it != weaponList->end(); ++it)
 	{
-		if ( category == 0 || it->first.wCategory == category )
+		if (category == 0 || it->first.wCategory == category)
 			facility->addWeaponSpawner(*it->second, object);
 	}
 }
@@ -147,95 +147,98 @@ _addWeaponListToFacility(FacilityStruct* facility, WEAPON_LIST* weaponList, Obje
 
 static POSTED_WEAPON*
 _postWeapon(WeapJoinRequestNode* joinNode
-			, FacilityStruct& facility
-			, bool isReserve
-			, WEAPON_SPEC weapon
-			, SINT32 missionID
-			, UINT32 brigadeID
-			, UINT32 supplyUnitID
-			, const PermissionMask& permMask
-			, UINT32 commander
-			, const ChatHandle handle
-			, bool isImmediateSpawn
-			, bool isMulticrew
-			)
+            , FacilityStruct& facility
+            , bool isReserve
+            , WEAPON_SPEC weapon
+            , SINT32 missionID
+            , UINT32 brigadeID
+            , UINT32 supplyUnitID
+            , const PermissionMask& permMask
+            , UINT32 commander
+            , const ChatHandle handle
+            , bool isImmediateSpawn
+            , bool isMulticrew
+            )
 {
-	if ( joinNode == nullptr )
+	if (joinNode == nullptr)
 	{
 		dbugLog(_FLA, "postWeapon called with NULL join node");
 		return nullptr;
 	}
 
-	StratHCUnit* unit = StratHCUnit::Lookup(brigadeID);
-	if ( unit == nullptr )
+	StratHCUnit *unit = StratHCUnit::Lookup(brigadeID);
+	if (unit == nullptr)
 	{
-		dbugLog(_FLA, "p:%u c:%s hc:%u invalid brigadeID"
-						, commander, Chat::Name(handle).c_str(), brigadeID);
+        dbugLog(_FLA, "p:%u c:%s hc:%u invalid brigadeID"
+                        , commander, Chat::Name(handle).c_str(), brigadeID);
 		return nullptr;
 	}
 
-	StratHCUnit* supplyUnit;
-	if ( supplyUnitID == brigadeID )
+	StratHCUnit *supplyUnit;
+	if (supplyUnitID == brigadeID)
 		supplyUnit = unit;
 	else
 	{
 		supplyUnit = StratHCUnit::Lookup(supplyUnitID);
-		if ( supplyUnit == nullptr )
+		if (supplyUnit == nullptr)
 		{
-			dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u invalid supplyUnitID"
-						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
+            dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u invalid supplyUnitID"
+                        , commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
 			return nullptr;
 		}
 	}
 
-	WeaponEntry* spawnEntry = facility.weaponEntry(weapon);
-	if ( spawnEntry == nullptr )
+	WeaponEntry *spawnEntry = facility.weaponEntry(weapon);
+	if (spawnEntry == nullptr)
 		return nullptr;
 
-	TOE_::WeaponInstance* toeEntry = supplyUnit->toeWeaponInstance(weapon);
-	if ( toeEntry == nullptr && spawnEntry->weapon().isSystemWeapon() == false && !(permMask & ALL_SPAWN) )
+	TOE_::WeaponInstance *toeEntry = supplyUnit->toeWeaponInstance(weapon);
+	if (toeEntry == nullptr && spawnEntry->weapon().isSystemWeapon() == false && !(permMask & ALL_SPAWN))
 	{
-		dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u requested non-toe weapon: %s"
-						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID
-						, weapPrintName(weapon));
+        dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u requested non-toe weapon: %s"
+                        , commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID
+                        , weapPrintName(weapon));
 		return nullptr;
 	}
 
-	if ( facility.supplyingFacility(*supplyUnit, false) == nullptr )
+	if (!unit->isGarrison())
 	{
-		if ( facility.supplyingFacility(*unit, false) == nullptr )
+		if (facility.supplyingFacility(*supplyUnit, false) == nullptr)
 		{
-			dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u no supply link"
-							, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
-			return nullptr;
+			if (facility.supplyingFacility(*unit, false) == nullptr)
+			{
+				dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u no supply link"
+                           , commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
+				return nullptr;
+			}
+			dbugLog(_FLN, "p:%u c:%s hc:%u sup:%u switching supply to brigade", commander, Chat::Name(handle).c_str(), brigadeID,
+					supplyUnitID);
+			supplyUnitID = brigadeID;
+			supplyUnit = unit;
 		}
-		dbugLog(_FLN, "p:%u c:%s hc:%u sup:%u switching supply to brigade"
-							, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
-		supplyUnitID = brigadeID;
-		supplyUnit = unit;
 	}
 
-	//We found it!!!
-	if ( _canSpawn(toeEntry, *supplyUnit, facility, *spawnEntry, permMask, false, isReserve) == false )
+	// We found it!!!
+	if (_canSpawn(toeEntry, *supplyUnit, facility, *spawnEntry, permMask, false, isReserve) == false)
 		return nullptr;
 
 	// If we are spawning a weapon with the ALL_SPAWN permission,
 	// or if we are spawning a weapon for which none are in stock, then
 	// don't try to reinforce me.
 	bool isNonSupplied = false;
-	if ( toeEntry == nullptr || toeEntry->weapon().isSupplied(permMask) == false )
+	if (toeEntry == nullptr || toeEntry->weapon().isSupplied(permMask) == false)
 	{
 		isNonSupplied = true;
 #ifdef BETA_RELEASE
-		if ( toeEntry == nullptr || (permMask & ALL_SPAWN) )
+		if (toeEntry == nullptr || (permMask & ALL_SPAWN))
 			TELL_TESTER(commander, "you have all spawn");
-		else if ( toeEntry->access() == 0 )
+		else if (toeEntry->access() == 0)
 			TELL_TESTER(commander, "free weapon");
-		else if ( toeEntry->weapon().isSystemWeapon() )
+		else if (toeEntry->weapon().isSystemWeapon())
 			TELL_TESTER(commander, "system weapon");
 #endif
 	}
-	else if ( isReserve == false && toeEntry->present() == 0 )
+	else if (isReserve == false && toeEntry->present() == 0)
 	{
 		isNonSupplied = true;
 		TELL_TESTER(commander, "Non-supplied mission vehicle");
@@ -244,29 +247,29 @@ _postWeapon(WeapJoinRequestNode* joinNode
 	WEAPON_SERIAL serial;
 	UINT16 portal = _constructWeaponSerial(&serial, spawnEntry);
 
-	POSTED_WEAPON* pw;
+	POSTED_WEAPON *pw;
 	pw =  new POSTED_WEAPON(serial, portal, missionID
 							, commander, handle, 0
 							, unit, supplyUnit, &facility
 							, isMulticrew, isImmediateSpawn, isNonSupplied);
-	if ( pw == nullptr )
+	if (pw == nullptr)
 		LogAbort("Failed to create POSTED_WEAPON entry");
 
-	POSTED_WEAPON& postedWeapon = *pw;
+	POSTED_WEAPON &postedWeapon = *pw;
 
-	//Populate its fields with good values
+	// Populate its fields with good values
 	joinNode->AddToList(&postedWeapon.m_crewList);
 
-	//insert it into the postedWeapon List for this facility
+	// insert it into the postedWeapon List for this facility
 	postedWeapon.post(spawnEntry, false);
 
-	///TODO:+TOE: This code needs to be moved to the StratHCUnit or TOE, it shouldn't be done this directly here.
-	if ( postedWeapon.isNonSupplied() == false )
+	/// TODO:+TOE: This code needs to be moved to the StratHCUnit or TOE, it shouldn't be done this directly here.
+	if (postedWeapon.isNonSupplied() == false)
 	{
-		//If they are on a mission, take one of the mission weapons
-		//Don't schedule reinforcement -- if the server craps out,
-		//we want these vehicles returned more quickly
-		if ( toeEntry && toeEntry->present() > 0 )
+		// If they are on a mission, take one of the mission weapons
+		// Don't schedule reinforcement -- if the server craps out,
+		// we want these vehicles returned more quickly
+		if (toeEntry && toeEntry->present() > 0)
 			toeEntry->setPresent(toeEntry->present() - 1);
 
 		dbugLog(_FLD,"facility %s %s %s mission %s for %s - %u/%u"
@@ -290,8 +293,8 @@ _postWeapon(WeapJoinRequestNode* joinNode
 static WeapJoinRequestNode*
 _getNewJoinNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 {
-	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(playerID);
-	if ( joinNode )
+	WeapJoinRequestNode *joinNode = WeapJoinRequestNode::Lookup(playerID);
+	if (joinNode)
 		delete joinNode;
 	return new WeapJoinRequestNode(playerID, handle, missionID);
 }
@@ -302,25 +305,25 @@ _getNewJoinNode(UINT32 playerID, const ChatHandle handle, UINT32 missionID)
 bool
 strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST_ACCEPT& accept, MM_POST_DENY& deny)
 {
-	//these parts of the deny don't change
+	// these parts of the deny don't change
 	deny.customerID = request.customerID;
 	deny.weapon = request.weapon;
 
 	// Test for GM spawn limits
-	if ( _spawnDisabledByGM(request.permMask) )
+	if (_spawnDisabledByGM(request.permMask))
 	{
 		deny.reasonCode = SPAWN_DISABLED_BY_GM;
 		return false;
 	}
 
-	//Get the facility first
-	FacilityStruct* facility = strtGetFacility(request.facility);
+	// Get the facility first
+	FacilityStruct *facility = strtGetFacility(request.facility);
 	if (facility == nullptr)
 	{
 		dbugLog(_FLW, "p:%u c:%s couldn't find facility " PRF_FULL_OBJ_ID " denying post"
-				, request.customerID, Chat::Name(request.handle).c_str()
-				, PRA_FULL_OBJ_ID(request.facility)
-				);
+              , request.customerID, Chat::Name(request.handle).c_str()
+              , PRA_FULL_OBJ_ID(request.facility)
+              );
 
 		deny.reasonCode = SPAWN_FACILITY_NOT_FOUND;
 
@@ -329,52 +332,56 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 
 	try
 	{
-		if ( facility->isOpen() == false )
+		if (facility->isOpen() == false)
 			throw PostRequestFail("facility closed", SPAWN_FACILITY_CLOSED);
 
-        dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
-                    , request.customerID
-                    , Chat::Name(request.handle).c_str()
-                    , request.brigadeID
-                    , request.missionID
-                    , weapPrintName(request.weapon)
-                    , facility->name
-                    );
+		dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
+                   , request.customerID
+                   , Chat::Name(request.handle).c_str()
+                   , request.brigadeID
+                   , request.missionID
+                   , weapPrintName(request.weapon)
+                   , facility->name
+                   );
 
 		UINT32 supplyUnitID = strtGetSupplyingUnit(*facility, request.brigadeID);
-		if ( supplyUnitID == 0 )
+		if (supplyUnitID == 0)
 			supplyUnitID = request.brigadeID;
 
 		// Make sure it contains our brigade
-		StratHCUnit* unit = StratHCUnit::Lookup(supplyUnitID);
-		if ( unit == nullptr || (!unit->isBrigade() && !unit->isDivision()) )
+		StratHCUnit *unit = StratHCUnit::Lookup(supplyUnitID);
+		if (unit == nullptr || (!unit->isBrigade() && !unit->isDivision() && !unit->isGarrison()))
 			throw PostRequestFail("not a recognized brigade/division", SPAWN_NO_BRIGADE_SUPPLY);
 
-		FacilityStruct* supplyFacility = facility->supplyingFacility(*unit, false);
-		if ( supplyFacility == nullptr )
-			throw PostRequestFail("no supplying facility", SPAWN_NO_BRIGADE_SUPPLY);
+		// garrisons don't have a concept of a supplying facility
+		if (!unit->isGarrison())
+		{
+			FacilityStruct *supplyFacility = facility->supplyingFacility(*unit, false);
+			if (supplyFacility == nullptr)
+				throw PostRequestFail("no supplying facility", SPAWN_NO_BRIGADE_SUPPLY);
+		}
 
-		WeapJoinRequestNode* joinNode = _getNewJoinNode(request.customerID, request.handle, request.missionID);
-		if ( joinNode == nullptr )
+		WeapJoinRequestNode *joinNode = _getNewJoinNode(request.customerID, request.handle, request.missionID);
+		if (joinNode == nullptr)
 			throw PostRequestFail("getNewJoinNode returned NULL", SPAWN_FACILITY_NOT_FOUND);
 
-		//Now we setup the entry in the posted weapon list
-		POSTED_WEAPON* postedWeapon;
+		// Now we setup the entry in the posted weapon list
+		POSTED_WEAPON *postedWeapon;
 		postedWeapon = _postWeapon(joinNode
-								, *facility
-								, false
-								, request.weapon
-								, request.missionID
-								, request.brigadeID
-								, supplyUnitID
-								, request.permMask
-								, request.customerID
-								, request.handle
-								, request.immediateSpawn != FALSE
-								, request.multicrew != FALSE
-								);
+                               , *facility
+                               , false
+                               , request.weapon
+                               , request.missionID
+                               , request.brigadeID
+                               , supplyUnitID
+                               , request.permMask
+                               , request.customerID
+                               , request.handle
+                               , request.immediateSpawn != FALSE
+                               , request.multicrew != FALSE
+                               );
 
-		if ( !postedWeapon )
+		if (!postedWeapon)
 		{
 			TELL_TESTER(request.customerID, "request for %s at %s denied", weapPrintFullName(request.weapon), facility->name);
 			delete joinNode;
@@ -382,13 +389,13 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 		}
 
 		TELL_TESTER(request.customerID, "posted #%u %s at %s"
-					, postedWeapon->serial()
-					, weapPrintFullName(request.weapon)
-					, facility->name
-					);
+                   , postedWeapon->serial()
+                   , weapPrintFullName(request.weapon)
+                   , facility->name
+                   );
 
 		// When we are successful, the join request node will linger
-		//Likewise this part of the post accept
+		// Likewise this part of the post accept
 		accept.customerID = request.customerID;
 		accept.immediateSpawn = request.immediateSpawn;
 		accept.multicrew = request.multicrew;
@@ -398,7 +405,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 
 		return true;
 	}
-	catch ( PostRequestFail& e )
+	catch (PostRequestFail &e)
 	{
 		dbugLog(_FLN, "p:%u c:%s br:%u m:%u %s@%s postReqFail %u: %s"
 						, request.customerID
@@ -436,17 +443,17 @@ POSTED_WEAPON::detachCrewAndJoiners(bool includeCommander)
 {
     dbugLog(_FLD, "p:%u v:%u deleting %s crew (crew:%p, join:%p)", m_commander, serial(), (includeCommander ? "all" : "joined"), &m_crewList, &m_joinList);
 
-	if ( includeCommander )
+	if (includeCommander)
 	{
 		m_crewList.clear(0, false);
-		assert( m_crewList.empty() == true );
+		assert(m_crewList.empty() == true);
 	}
 	else
 	{
 		m_crewList.clear(m_commander, false);
 	}
 
-	if ( m_status != POSTED_WEAPON::_POSTED && m_status != POSTED_WEAPON::_RESERVED )
+	if (m_status != POSTED_WEAPON::_POSTED && m_status != POSTED_WEAPON::_RESERVED)
 	{
 		detachJoiners(false);
 		return;
@@ -454,7 +461,7 @@ POSTED_WEAPON::detachCrewAndJoiners(bool includeCommander)
 
 	detachJoiners(true);
 
-	if ( m_crew != 0 )
+	if (m_crew != 0)
 	{
 		strtSendMMJoinDeny(m_crew, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
 		m_crew = 0;
@@ -471,16 +478,16 @@ POSTED_WEAPON::detachJoiners(bool announceFails)
 }
 
 static void
-_cleanUpJoinNode(WeapJoinRequestNode* joinNode)
+_cleanUpJoinNode(WeapJoinRequestNode* joinNode, FULL_OBJ_ID originFacilityID)
 {
-	switch(joinNode->m_joinList->m_type)
+	switch (joinNode->m_joinList->m_type)
 	{
 		case JOIN_LIST::_FREE:
-			dbugLog(_FLA,"illegal node state JOIN_LIST_FREE on spawnCancel of id %d",joinNode->m_playerID);
+			dbugLog(_FLA, "illegal node state JOIN_LIST_FREE on spawnCancel of id %d", joinNode->m_playerID);
 			break;
 		case JOIN_LIST::_FACILITY:
 		{
-            const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
+			const FULL_OBJ_ID fid = joinNode->m_joinList->m_facility->fullObjID;
             dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
                     , joinNode, joinNode->m_playerID
                     , PRA_FULL_OBJ_ID(fid)
@@ -490,23 +497,23 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 		case JOIN_LIST::_POST_JOIN_REQ:
 		case JOIN_LIST::_POST_CREW:
 		{
-			if ( joinNode->m_joinList->m_weapon == nullptr )
+			if (joinNode->m_joinList->m_weapon == nullptr)
 				break;
-			POSTED_WEAPON& postedWeapon = *joinNode->m_joinList->m_weapon;
+			POSTED_WEAPON &postedWeapon = *joinNode->m_joinList->m_weapon;
 
 			if (joinNode->m_playerID == postedWeapon.m_commander)
 			{
 				_validateCrew(postedWeapon);
 
 				// We have to be able to push the vehicle count up by 1.
-				postedWeapon.returnWeapon(true, false);
+				postedWeapon.returnWeapon(true, false, originFacilityID);
 				return;
 			}
 			else
 			{
 				if (joinNode->m_playerID == postedWeapon.m_crew)
 				{
-					//Found it.  Take the crewmember off
+					// Found it.  Take the crewmember off
 					postedWeapon.m_crew = 0;
 					postedWeapon.setMulticrew(false);
 				}
@@ -519,14 +526,14 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 	delete joinNode;
 }
 
-//Processes a post list request.
+// Processes a post list request.
 SINT32
-strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request)
+strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST &request)
 {
-	FacilityStruct* facility;
-	WeapJoinRequestNode* joinNode;
+	FacilityStruct *facility;
+	WeapJoinRequestNode *joinNode;
 
-	//Get the facility first
+	// Get the facility first
 	facility = strtGetFacility(request.facility);
 	if (facility == nullptr)
 	{
@@ -534,21 +541,21 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 		return -EINVAL;
 	}
 
-	StratHCUnit* unit = StratHCUnit::Lookup(request.brigadeID);
-	if ( unit == nullptr )
+	StratHCUnit *unit = StratHCUnit::Lookup(request.brigadeID);
+	if (unit == nullptr)
 	{
 		dbugLog(_FLI, "hcu:%u unrecognized brigade", request.brigadeID);
 		return -EINVAL;
 	}
 
 	joinNode = _getNewJoinNode(request.crewID, request.crewHandle, request.missionID);
-	if ( !joinNode )
+	if (!joinNode)
 	{
 		dbugLog(_FLW, "NULL join node for post list request");
 		return -EINVAL;
 	}
 
-	assert( facility->m_joinList != nullptr );
+	assert(facility->m_joinList != nullptr);
 
 	joinNode->AddToList(facility->m_joinList);
 
@@ -560,12 +567,12 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 
 	UINT32 weapons = 0;
 	POSTED_WEAPON_LIST::const_iterator it;
-	for ( it = unit->postedWeaponList().begin(); it != unit->postedWeaponList().end();++it )
+	for (it = unit->postedWeaponList().begin(); it != unit->postedWeaponList().end(); ++it)
 	{
-		const POSTED_WEAPON& weapon = *(*it);
-		if ( weapon.m_missionID != request.missionID
+		const POSTED_WEAPON &weapon = *(*it);
+		if (weapon.m_missionID != request.missionID
 			|| (weapon.m_status != POSTED_WEAPON::_POSTED && weapon.m_status != POSTED_WEAPON::_RESERVED)
-			|| weapon.m_multicrew == false )
+			|| weapon.m_multicrew == false)
 			continue;
 
 		MM_POSTED_WEAPON weaponMM(weapon.m_weaponSerial, weapon.m_portal, weapon.m_commander, weapon.m_missionID, weapon.m_crew);
@@ -582,23 +589,23 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 bool
 strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, MM_JOIN_DENY& deny)
 {
-	ObjectStruct* object;
-	POSTED_WEAPON* currentWeapon;
+	ObjectStruct *object;
+	POSTED_WEAPON *currentWeapon;
 	UINT32 serial = request.weaponSerial.serial;
 
-	//Setup reasonable values for the return
+	// Setup reasonable values for the return
 	accept.customerID = request.customerID;
 	deny.customerID = request.customerID;
 
 #ifdef NEVER
-	if ( _spawnDisabledByGM(0) )
+	if (_spawnDisabledByGM(0))
 	{
 		deny.reasonCode = SPAWN_DISABLED_BY_GM;
 		return false;
 	}
 #endif
 
-	//Get the facility first
+	// Get the facility first
 	object = strtGetObject(request.weaponSerial.source);
 	if (object == nullptr)
 	{
@@ -606,29 +613,29 @@ strtProcessJoinRequest(const MM_JOIN_REQUEST& request, MM_JOIN_ACCEPT& accept, M
 		return false;
 	}
 
-	FacilityStruct& facility = object->Facility();
-	if ( facility.side != request.weaponSerial.spec.side() )
+	FacilityStruct &facility = object->Facility();
+	if (facility.side != request.weaponSerial.spec.side())
 	{
 		deny.reasonCode = SPAWN_FACILITY_CLOSED;
 		return false;
 	}
 
 	currentWeapon = strtFindPostedWeapon(serial);
-	if ( currentWeapon == nullptr )
+	if (currentWeapon == nullptr)
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
 		dbugLog(_FLW, "p:%u couldn't find v:%u", request.customerID, serial);
 		return false;
 	}
-	if ( currentWeapon->m_crew != 0 )
+	if (currentWeapon->m_crew != 0)
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
 		dbugLog(_FLN, "p:%u v:%u join request denied: already has crew", request.customerID, serial);
 		return false;
 	}
 
-	//If we found it, *AND* nobody else has jumped in it
-	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(request.customerID);
+	// If we found it, *AND* nobody else has jumped in it
+	WeapJoinRequestNode *joinNode = WeapJoinRequestNode::Lookup(request.customerID);
 	if (joinNode == nullptr)
 	{
 		deny.reasonCode = SPAWN_WEAPON_NOT_AT_FACILITY;
@@ -654,10 +661,10 @@ static void
 _validateCrew(POSTED_WEAPON& post)
 {
 	WeapJoinRequestList::const_iterator it;
-	for ( it = post.m_crewList.begin(); it != post.m_crewList.end(); ++it )
+	for (it = post.m_crewList.begin(); it != post.m_crewList.end(); ++it)
 	{
-		WeapJoinRequestNode* joinNode = *it;
-		if ( joinNode->m_playerID == 0 || WeapJoinRequestNode::Lookup(joinNode->m_playerID) != joinNode )
+		WeapJoinRequestNode *joinNode = *it;
+		if (joinNode->m_playerID == 0 || WeapJoinRequestNode::Lookup(joinNode->m_playerID) != joinNode)
 		{
 			LogAbort("p:%u v:%u invalid crew %p (%u)!!", post.m_commander, post.m_weaponSerial.serial, joinNode, joinNode->m_playerID);
 		}
@@ -666,20 +673,20 @@ _validateCrew(POSTED_WEAPON& post)
 	dbugLog(_FLD, "p:%u c:%s v:%u crew valid for vehicle %p", post.m_commander, Chat::Name(post.m_handle).c_str(), post.m_weaponSerial.serial, &post);
 }
 
-//This function processes a spawn grant request
+// This function processes a spawn grant request
 bool
 strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRANT_RESPONSE& response)
 {
 	UINT32 serial = request.weaponSerial.serial;
 
-	//Populate the response;
+	// Populate the response;
 	response.weaponSerial = request.weaponSerial;
 	response.serverIP = 0;
 	response.commander = request.playerID;
 	response.crew = 0;
 
-	//If found, send the commander and crew back to the mmhost
-	POSTED_WEAPON* currentWeapon = strtFindPostedWeapon(serial);
+	// If found, send the commander and crew back to the mmhost
+	POSTED_WEAPON *currentWeapon = strtFindPostedWeapon(serial);
 	if (currentWeapon == nullptr)
 	{
 		dbugLog(_FLA, "v:%u spawnGrant: couldn't find weapon", serial);
@@ -687,21 +694,21 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		return false;
 	}
 
-	if ( currentWeapon->m_facility == nullptr )
+	if (currentWeapon->m_facility == nullptr)
 	{
 		dbugLog(_FLI, "v:%u null facility", serial);
 		response.code = SPAWN_FACILITY_NOT_FOUND;
 		return false;
 	}
-	if ( currentWeapon->m_facility->isOpen() == false )
+	if (currentWeapon->m_facility->isOpen() == false)
 	{
 		dbugLog(_FLI, "v:%u no spawning: facility %s is closed", serial, currentWeapon->m_facility->name);
 		response.code = SPAWN_FACILITY_CLOSED;
 		return false;
 	}
 
-	//Pick the server that I'm going to send commander and crew to
-	Server::ServerInfo* server = Server::ServerInfo::GetBest(CELL_HOST);
+	// Pick the server that I'm going to send commander and crew to
+	Server::ServerInfo *server = Server::ServerInfo::GetBest(CELL_HOST);
 	if (server == nullptr)
 	{
 		dbugLog(_FLA, "v:%u spawnGrant: couldn't find cell server to send players to", serial);
@@ -710,42 +717,45 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	}
 
 	// Incase they've changed mission
-	if ( currentWeapon->m_status == POSTED_WEAPON::_RESERVED )
+	if (currentWeapon->m_status == POSTED_WEAPON::_RESERVED)
 		currentWeapon->m_missionID = request.missionID;
 
-	switch ( currentWeapon->m_status )
+	switch (currentWeapon->m_status)
 	{
 		case POSTED_WEAPON::_RESERVED:
 			dbugLog(_FLD, "v:%u received spawnRequest for reserved %s"
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
-		break;
+			break;
 		case POSTED_WEAPON::_POSTED:
 			dbugLog(_FLD, "v:%u received spawnRequest for new %s"
 						, serial
 						, weapPrintName(currentWeapon->spec())
 						);
-		break;
+			break;
 		case POSTED_WEAPON::_SPAWNED:
-			dbugLog(_FLA,"v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
-			response.code = SPAWN_RESERVATION_CANCELLED;
+			dbugLog(_FLA, "v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
+			response.code = SPAWN_ERROR;
 			return false;
 		case POSTED_WEAPON::_FREE:
 		case POSTED_WEAPON::_CANCELLED:
 		default:
 			LogAbort("v:%u invalid status %d weapon %p!", serial, currentWeapon->m_status, currentWeapon);
-			//response.code = SPAWN_ERROR;
-			//return false;
+			// response.code = SPAWN_ERROR;
+			// return false;
 	}
 
 	// Place a spawned weapon entry and schedule a new reinforcement
-	if ( !currentWeapon->spawn() )
+	if (!currentWeapon->spawn())
 	{
 		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
 		response.code = SPAWN_WEAPON_NOT_AT_FACILITY;
 		return false;
 	}
+
+	currentWeapon->m_SpawnedFromMobileSpawn = request.usedMobileSpawn;
+
 
 	TELL_TESTER(currentWeapon->m_commander
 				, "v#%u spawning %s at %s"
@@ -763,15 +773,15 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	return true;
 }
 
-//This function processes a post info request
+// This function processes a post info request
 bool
 strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request)
 {
-	ObjectStruct* object;
-	FacilityStruct* facility;
-	POSTED_WEAPON* currentWeapon;
+	ObjectStruct *object;
+	FacilityStruct *facility;
+	POSTED_WEAPON *currentWeapon;
 
-	//Find the posted Vehicle
+	// Find the posted Vehicle
 	object = strtGetObject(request.weaponSerial.source);
 	if (object == nullptr)
 		return false;
@@ -780,7 +790,7 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 	if (facility == nullptr)
 		return false;
 
-	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(request.customerID);
+	WeapJoinRequestNode *joinNode = WeapJoinRequestNode::Lookup(request.customerID);
 	if (joinNode == nullptr)
 	{
 		// Why not create one, eh?
@@ -789,7 +799,7 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 
 	// Find the posted weapon
 	currentWeapon = strtFindPostedWeapon(request.weaponSerial.serial);
-	if ( currentWeapon == nullptr || currentWeapon->multicrew() == false )
+	if (currentWeapon == nullptr || currentWeapon->multicrew() == false)
 		return false;
 
 	// Remove the crew from the facility list of joiners and move them onto
@@ -804,20 +814,20 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 void
 POSTED_WEAPON::setMulticrew(bool isMulticrew)
 {
-	assert( m_facility->m_joinList != nullptr );
+	assert(m_facility->m_joinList != nullptr);
 
-	if ( m_multicrew == isMulticrew )
+	if (m_multicrew == isMulticrew)
 		return;
 
 	m_multicrew = isMulticrew;
 
-	COMMANDED_WEAPON_ACTION action = ( isMulticrew ) ? COMMANDED_WEAPON_ADD : COMMANDED_WEAPON_DELETE;
+	COMMANDED_WEAPON_ACTION action = (isMulticrew) ? COMMANDED_WEAPON_ADD : COMMANDED_WEAPON_DELETE;
 
 	WeapJoinRequestList::const_iterator it;
-	for ( it = m_facility->m_joinList->begin(); it != m_facility->m_joinList->end(); ++it )
+	for (it = m_facility->m_joinList->begin(); it != m_facility->m_joinList->end(); ++it)
 	{
-		const WeapJoinRequestNode* node = *it;
-		if ( node->m_missionID != m_missionID )
+		const WeapJoinRequestNode *node = *it;
+		if (node->m_missionID != m_missionID)
 			continue;
 
 		MM_POSTED_WEAPON weaponMM(this->m_weaponSerial, this->m_portal, this->m_commander, this->m_missionID, this->m_crew);
@@ -831,7 +841,7 @@ POSTED_WEAPON::setMulticrew(bool isMulticrew)
 }
 
 //////////////////////////////////////////////////////////////////////
-//This function processes a post info update
+// This function processes a post info update
 
 bool
 strtProcessPostInfoUpdate(MM_POST_INFO_UPDATE* infoUpdate)
@@ -840,7 +850,7 @@ strtProcessPostInfoUpdate(MM_POST_INFO_UPDATE* infoUpdate)
 		return false;
 
 	// Lookup the weapon
-	POSTED_WEAPON* currentWeapon = strtFindPostedWeapon(infoUpdate->weaponSerial.serial);
+	POSTED_WEAPON *currentWeapon = strtFindPostedWeapon(infoUpdate->weaponSerial.serial);
 	if (currentWeapon == nullptr)
 		return false;
 
@@ -856,11 +866,11 @@ strtProcessPostInfoUpdate(MM_POST_INFO_UPDATE* infoUpdate)
 bool
 strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel)
 {
-	WeapJoinRequestNode* joinNode = WeapJoinRequestNode::Lookup(spawnCancel.customerID);
-	if (! joinNode)
+	WeapJoinRequestNode *joinNode = WeapJoinRequestNode::Lookup(spawnCancel.customerID);
+	if (!joinNode)
 		return false;
 
-	_cleanUpJoinNode(joinNode);
+	_cleanUpJoinNode(joinNode, spawnCancel.originFacility);
 
 	return true;
 }
@@ -877,15 +887,15 @@ _verifyRTBFacility(const WEAPON_SPEC spec, const FULL_OBJ_ID rtbFacility, const 
 	Chat::Name callsign((handle == 0ULL) ? systemHandle : handle);
 
 	// Nothing to do if we have a null object ID.
-	if ( rtbFacility.id == 0 )
+	if (rtbFacility.id == 0)
 	{
 		// No facility means the client doesn't think you're rtbing any place
 		dbugLog(_FLI, "vrtb: %s facilityID", callsign.c_str());
 		return nullptr;
 	}
 
-	FacilityStruct*	facility = strtGetFacility(rtbFacility);
-	if ( facility == nullptr )
+	FacilityStruct *facility = strtGetFacility(rtbFacility);
+	if (facility == nullptr)
 	{
 		dbugLog(_FLW, "vrtb: no facility matches " PRF_FULL_OBJ_ID " for %s"
 						, PRA_FULL_OBJ_ID(rtbFacility)
@@ -894,14 +904,14 @@ _verifyRTBFacility(const WEAPON_SPEC spec, const FULL_OBJ_ID rtbFacility, const 
 	}
 
 	// It must be a spawn-type facility or else
-	if ( !facility->m_spawnable )
+	if (!facility->m_spawnable)
 	{
 		dbugLog(_FLW, "vrtb: %s had non-spawnable facility", callsign.c_str());
 		return nullptr;
 	}
 
 	// Host of reasons we might exclude this facility
-	if ( facility->isOpen() == false )
+	if (facility->isOpen() == false)
 	{
 #ifdef DEBUG
 		dbugLog(_FLD, "vrtb: %s@%s: facility is closed", callsign.c_str(), facility->name);
@@ -910,7 +920,7 @@ _verifyRTBFacility(const WEAPON_SPEC spec, const FULL_OBJ_ID rtbFacility, const 
 	}
 
 	// Non-matching ownerships
-	if ( facility->side != spec.side() )
+	if (facility->side != spec.side())
 	{
 		dbugLog(_FLD, "vrtb: %s@%s wrong side", callsign.c_str(), facility->name);
 		return nullptr;
@@ -931,24 +941,24 @@ POSTED_WEAPON::reReserve()
 
 	try
 	{
-		if ( m_commander == 0 || m_handle == 0LL )
+		if (m_commander == 0 || m_handle == 0LL)
 			throw "Vehicle has no commander";
 
-		if ( m_facility == nullptr )
+		if (m_facility == nullptr)
 			throw "No facility";
 
-		if ( m_facility->open == false )
+		if (m_facility->open == false)
 			throw "Facility closed";
 
-		TOE_::WeaponInstance* toeEntry = m_supplyingBrigade->toeWeaponInstance(spec());
-		if ( toeEntry == nullptr )
+		TOE_::WeaponInstance *toeEntry = m_supplyingBrigade->toeWeaponInstance(spec());
+		if (toeEntry == nullptr)
 			throw "Weapon not on supplying unit's TOE";
 
-		WeaponEntry* spawnEntry = m_facility->weaponEntry(spec());
-		if ( spawnEntry == nullptr )
+		WeaponEntry *spawnEntry = m_facility->weaponEntry(spec());
+		if (spawnEntry == nullptr)
 			throw "No spawn entry at this facility";
 
-		if ( _canSpawn(toeEntry, *m_supplyingBrigade, *m_facility, *spawnEntry, 0LL, true, true) == false )
+		if (_canSpawn(toeEntry, *m_supplyingBrigade, *m_facility, *spawnEntry, 0LL, true, true) == false)
 			throw "Spawn denied";
 
 		// Relinquish my old serial number.
@@ -973,7 +983,7 @@ POSTED_WEAPON::reReserve()
 
 		return true;
 	}
-	catch ( const char* reason )
+	catch (const char *reason)
 	{
 		TELL_TESTER(m_commander, "re-reserve failed: %s", reason);
 		dbugLog(_FLW, "p:%u c:%s v:%u reReserve failed: %s"
@@ -995,11 +1005,11 @@ POSTED_WEAPON::reReserve()
 void
 _reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, bool rtbPromoted)
 {
-	if ( currentWeapon->m_status == POSTED_WEAPON::_SPAWNED )
+	if (currentWeapon->m_status == POSTED_WEAPON::_SPAWNED)
 	{
-		const char* deadOrAlive = (currentWeapon->isDead()) ? "Dead" : "Alive";
-		const char* RTBstate;
-		switch ( currentWeapon->m_playerExitCode )
+		const char *deadOrAlive = (currentWeapon->isDead()) ? "Dead" : "Alive";
+		const char *RTBstate;
+		switch (currentWeapon->m_playerExitCode)
 		{
 			case PEXIT_UNINITIALIZED: RTBstate = "INVALID"; break;
 			case PEXIT_RTB: RTBstate = "RTB"; break;
@@ -1008,7 +1018,7 @@ _reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, 
 			case PEXIT_OVER_FRIENDLY_TERRITORY: RTBstate = "Rescued"; break;
 			default:
 				RTBstate = "-unknown-?";
-			break;
+				break;
 		}
 		TELL_TESTER(currentWeapon->m_commander, "You returned %s%s and your %s was %s"
 						, RTBstate
@@ -1026,8 +1036,8 @@ _reportWeaponStatus(const POSTED_WEAPON* currentWeapon, const WEAPON_SPEC spec, 
 void
 WeaponsReturn::process() const
 {
-	POSTED_WEAPON* const currentWeapon = strtFindPostedWeapon(m_sortieID);
-	if ( currentWeapon == nullptr )
+	POSTED_WEAPON *const currentWeapon = strtFindPostedWeapon(m_sortieID);
+	if (currentWeapon == nullptr)
 	{
 		dbugLog(_FLW, "v:%u no match for returning weapon", m_sortieID);
 		return;
@@ -1050,27 +1060,27 @@ WeaponsReturn::process() const
 			, (m_resupplyMission ? "resupply" : "stdsupply")
 			);
 
-	FacilityStruct*	destFacility = currentWeapon->m_facility;
+	FacilityStruct *destFacility = currentWeapon->m_facility;
 
 #ifdef BETA_RELEASE
 	_reportWeaponStatus(currentWeapon, currentWeapon->spec(), m_rtbPromoted);
 #endif
 
-	FacilityStruct*		rtbFacility = nullptr;
-	SINT32				capacityTeulIndex = -1;
+	FacilityStruct *rtbFacility = nullptr;
+	SINT32 capacityTeulIndex = -1;
 	MM_CAPACITY_REQUEST capacityRequest;
-	SINT32				crewIndex = -1;
-	MM_CAPACITY_REQUEST	crewRequest;
-	bool				overSupply = false;
+	SINT32 crewIndex = -1;
+	MM_CAPACITY_REQUEST crewRequest;
+	bool overSupply = false;
 
-	if ( currentWeapon->m_status == POSTED_WEAPON::_SPAWNED && m_exitCode == PEXIT_RTB )
+	if (currentWeapon->m_status == POSTED_WEAPON::_SPAWNED && m_exitCode == PEXIT_RTB)
 	{
-		WeapJoinRequestNode* joinNode = nullptr;
+		WeapJoinRequestNode *joinNode = nullptr;
 		// Has a commander, so it will need a capacity request
-		if ( currentWeapon->m_commander > 0 )
+		if (currentWeapon->m_commander > 0)
 		{
 			joinNode = WeapJoinRequestNode::Lookup(currentWeapon->m_commander);
-			if ( joinNode != nullptr && joinNode->m_capacityTeulIndex >= 0 )
+			if (joinNode != nullptr && joinNode->m_capacityTeulIndex >= 0)
 			{
 				dbugLog(_FLD, "%s requires a capacity response", info);
 				capacityTeulIndex = joinNode->m_capacityTeulIndex;
@@ -1081,10 +1091,10 @@ WeaponsReturn::process() const
 			}
 		}
 
-		if ( currentWeapon->m_crew > 0 )
+		if (currentWeapon->m_crew > 0)
 		{
 			joinNode = WeapJoinRequestNode::Lookup(currentWeapon->m_crew);
-			if ( joinNode != nullptr && joinNode->m_capacityTeulIndex >= 0 )
+			if (joinNode != nullptr && joinNode->m_capacityTeulIndex >= 0)
 			{
 				crewIndex = joinNode->m_capacityTeulIndex;
 				crewRequest = joinNode->m_capacityRequest;
@@ -1093,17 +1103,17 @@ WeaponsReturn::process() const
 		}
 
 		// Determine the RTB facility
-		if ( m_isVehicleDead == false )
+		if (m_isVehicleDead == false)
 		{
 			rtbFacility = _verifyRTBFacility(currentWeapon->spec(), m_rtbFacility, currentWeapon->m_handle);
 
-			if ( rtbFacility != nullptr )
+			if (rtbFacility != nullptr)
 			{
 				dbugLog(_FLD, "%s rtbFacility is %s", info, rtbFacility->name);
 
-				if ( rtbFacility->weaponEntry(currentWeapon->spec()) != nullptr )
+				if (rtbFacility->weaponEntry(currentWeapon->spec()) != nullptr)
 				{
-					if ( rtbFacility != destFacility )
+					if (rtbFacility != destFacility)
 					{
 						dbugLog(_FLD, "%s found new destination: %s", info, rtbFacility->name);
 						destFacility = rtbFacility;
@@ -1118,7 +1128,7 @@ WeaponsReturn::process() const
 		}
 	}
 
-	if ( currentWeapon->m_status == POSTED_WEAPON::_SPAWNED && m_exitCode == PEXIT_RTB )
+	if (currentWeapon->m_status == POSTED_WEAPON::_SPAWNED && m_exitCode == PEXIT_RTB)
 
 	dbugLog(_FLD,"%s status: %d. exitCode:%d. isDead:%d. %s returning from %s to %s [%s]. cti:%d"
 			, info
@@ -1155,30 +1165,30 @@ WeaponsReturn::process() const
 	currentWeapon->m_facility = destFacility;
 
 	bool needsReturn = true;
-	if ( reserveAgain == true )
+	if (reserveAgain == true)
 	{
 		// Try and pre-reserve the weapon instead
-		if ( currentWeapon->reReserve() == true )
+		if (currentWeapon->reReserve() == true)
 			needsReturn = false;
 	}
 
 	bool vehicleDelivered = false;
-	if ( needsReturn )
+	if (needsReturn)
 	{
 		vehicleDelivered = currentWeapon->returnWeapon(overSupply, m_hasBeenHit);
 	}
 
 	// Live clients need a capacity response to finish their debrief
-	if ( capacityTeulIndex >= 0 )
+	if (capacityTeulIndex >= 0)
 	{
 		// Are we relocating?
 		FULL_OBJ_ID destObjID = nullObjID;
-		if ( vehicleDelivery == true && vehicleDelivered == true )
+		if (vehicleDelivery == true && vehicleDelivered == true)
 			destObjID = rtbFacility->fullObjID;
-		else if ( destFacility->side == currentWeapon->spec().side() )
+		else if (destFacility->side == currentWeapon->spec().side())
 			destObjID = destFacility->fullObjID;
 		strtReplyToCapacityRequest(capacityTeulIndex, capacityRequest, destObjID, vehicleDelivered);
-		if ( crewIndex >= 0 )
+		if (crewIndex >= 0)
 			strtReplyToCapacityRequest(crewIndex, crewRequest, destObjID, vehicleDelivered);
 	}
 
@@ -1188,7 +1198,7 @@ WeaponsReturn::process() const
 void
 strtExpireWeapon(POSTED_WEAPON& weapon)
 {
-	assert( weapon.m_facility != nullptr );
+	assert(weapon.m_facility != nullptr);
 
 	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(weapon.spec()));
 
@@ -1228,24 +1238,24 @@ strtInitSpawn()
 static void
 _setupClassSpawn(ObjectStruct& object, WEAPON_SPEC classSpec)
 {
-	WEAPON_LIST* weaponList = weapFindSpawnList(classSpec);
-//	if ( weaponList == NULL )
-//	{
-//		dbugLog(_FLW, "%s: empty list for %s in spawn.xml", object.name, object.filename);
-//		return;
-//	}
+	WEAPON_LIST *weaponList = weapFindSpawnList(classSpec);
+	//	if ( weaponList == NULL )
+	//	{
+	//		dbugLog(_FLW, "%s: empty list for %s in spawn.xml", object.name, object.filename);
+	//		return;
+	//	}
 
 	// Well then, this is our spawn ability, isn't it?
-//	object.spawnAbility.weap = classSpec;
+	//	object.spawnAbility.weap = classSpec;
 
 	_addWeaponListToFacility(object.facility, weaponList, object, 0);
 }
 
-//Spawn is setup on a facility level
+// Spawn is setup on a facility level
 SINT32
-strtSetupSpawn(FacilityStruct* facility)
+strtSetupSpawn(FacilityStruct *facility)
 {
-	ObjectStruct* object;
+	ObjectStruct *object;
 
 	if (facility == nullptr)
 		return -1;
@@ -1258,17 +1268,17 @@ strtSetupSpawn(FacilityStruct* facility)
 
 	facility->m_joinList = new JOIN_LIST(JOIN_LIST::_FACILITY, facility, nullptr);
 
-	for ( object = facility->objectList; object != nullptr; object = object->next )
+	for (object = facility->objectList; object != nullptr; object = object->next)
 	{
-		if ( object->type != BUILDING_SPAWN )
+		if (object->type != BUILDING_SPAWN)
 			continue;
 
-//		WEAPON_SPEC classSpec = weapFindClass(object->filename);
-//		if ( classSpec.wClass != 0 )
-		if ( object->spawnAbility.weap.wCategory == 0 && object->spawnAbility.weap.wClass > 0 )
+		//		WEAPON_SPEC classSpec = weapFindClass(object->filename);
+		//		if ( classSpec.wClass != 0 )
+		if (object->spawnAbility.weap.wCategory == 0 && object->spawnAbility.weap.wClass > 0)
 		{
 			dbugLog(_FLI, "setting up class spawn for %s/%s", facility->name, object->name);
-//			_setupClassSpawn(*object, classSpec);
+			//			_setupClassSpawn(*object, classSpec);
 			_setupClassSpawn(*object, object->spawnAbility.weap);
 			continue;
 		}
@@ -1293,12 +1303,12 @@ strtExpireSpawnedWeapons()
 
 	UINT32 timeout = teulTime() - SPAWN_TIMEOUT;
 
-	dbugLog(_FLD,"checking spwaned list for timeouts");
+	dbugLog(_FLD, "checking spwaned list for timeouts");
 
-	//While the smallest timestamp is over 4 hours old
-	while ( !_spawnedWeapons.empty() && _spawnedWeapons.front()->m_posted <= timeout )
+	// While the smallest timestamp is over 4 hours old
+	while (!_spawnedWeapons.empty() && _spawnedWeapons.front()->m_posted <= timeout)
 	{
-		POSTED_WEAPON* weapon = _spawnedWeapons.front();
+		POSTED_WEAPON *weapon = _spawnedWeapons.front();
 		dbugLog(_FLD, "v:%u has been spawned for %u seconds, returning to spawn list"
                        	, weapon->m_weaponSerial.serial
                        	, teulTime() - weapon->m_posted);
@@ -1306,14 +1316,14 @@ strtExpireSpawnedWeapons()
 		// If it has resupply pending, tough.
 		weapon->detachReinforcement();
 
-		//Return it to the facility, dont allow oversupply
+		// Return it to the facility, dont allow oversupply
 		weapon->returnWeapon(false, false);
 
-		assert( _spawnedWeapons.front() != weapon );
+		assert(_spawnedWeapons.front() != weapon);
 	}
 
 #ifdef BETA_RELEASE
-	if ( debugSupplyEnabledMemory )
+	if (debugSupplyEnabledMemory)
 		strtEnableDebugSupply();
 #endif
 }
@@ -1326,20 +1336,20 @@ strtExpireSpawnedWeapons()
 static void
 _setupSpawnObject(ObjectStruct& object)
 {
-	if ( object.facility == nullptr )
+	if (object.facility == nullptr)
 		LogAbort("obj:%s not attached to any facility", object.name);
 
-	FacilityStruct& facility = *object.facility;
+	FacilityStruct &facility = *object.facility;
 
 	// Get the list of vehicles that can be spawned at this category
 	// of facility
 	WEAPON_SPEC spawnAbility = object.spawnAbility.weap;
 
-	WEAPON_LIST* weaponList = weapFindSpawnList(spawnAbility);
-	if ( weaponList == nullptr || weaponList->empty() )
+	WEAPON_LIST *weaponList = weapFindSpawnList(spawnAbility);
+	if (weaponList == nullptr || weaponList->empty())
 	{
 		static const std::string s_DealDock = sdmTranslateName("Deal Dock");
-		if ( strcmp(facility.name, s_DealDock.c_str()) == 0 )
+		if (strcmp(facility.name, s_DealDock.c_str()) == 0)
 		{
 			// I think this is intended to only print the error once
 			dbugLog(_FLA,"Could not setup spawn for object %s " PRF_FULL_OBJ_ID ", no class for " PRF_WEAPON_SPEC ""
@@ -1364,40 +1374,40 @@ _diagnoseSupply(const StratHCUnit& unit, const FacilityStruct& facility, const F
 {
 	supplyFacility = nullptr;
 
-	if ( facility.isOpen() == false )
+	if (facility.isOpen() == false)
 		return FacilityWeaponList::_CLOSED;
 
-	if ( facility.side != unit.side() )
+	if (facility.side != unit.side())
 		return FacilityWeaponList::_ENEMY_OWNS;
 
-	FacilityStruct* mate;
-	FacilityStruct* mateAB;
+	FacilityStruct *mate;
+	FacilityStruct *mateAB;
 
-//	if ( facility.country != country )
-//		return FacilityWeaponList::_WRONG_OWNER;
+	//	if ( facility.country != country )
+	//		return FacilityWeaponList::_WRONG_OWNER;
 
-	switch ( facility.type )
+	switch (facility.type)
 	{
 		case FACILITY_FIREBASE:
-			if ( facility.armyBase->isOpen() == false || facility.armyBase->side != unit.side() )
+			if (facility.armyBase->isOpen() == false || facility.armyBase->side != unit.side())
 				return FacilityWeaponList::_SUPPLY_CLOSED;
 			supplyFacility = facility.findLocalAB(unit.side());
-			if ( supplyFacility == nullptr || supplyFacility->canABSupply(unit.side()) == false )
+			if (supplyFacility == nullptr || supplyFacility->canABSupply(unit.side()) == false)
 				return FacilityWeaponList::_NOT_LINKED;
-		break;
+			break;
 
 		case FACILITY_DEPOT:
 			supplyFacility = facility.findLocalAB(unit.side());
-			if ( supplyFacility != nullptr )
+			if (supplyFacility != nullptr)
 			{
-				if ( supplyFacility->side != unit.side() )
+				if (supplyFacility->side != unit.side())
 					return FacilityWeaponList::_NOT_LINKED;
-				if ( supplyFacility->uOID != facility.uOID )
+				if (supplyFacility->uOID != facility.uOID)
 				{
-					if ( supplyFacility->cp == unit.homeCP() )
+					if (supplyFacility->cp == unit.homeCP())
 						return FacilityWeaponList::_NORMAL;
 					// Are we allowed to link back to our brigade?
-					if ( unit.isBrigade() == false || facility.canFollowSupplyLink() == false )
+					if ((unit.isBrigade() == false && unit.isGarrison() == false) || facility.canFollowSupplyLink() == false)
 						return FacilityWeaponList::_NOT_LINKED;
 				}
 			}
@@ -1406,58 +1416,58 @@ _diagnoseSupply(const StratHCUnit& unit, const FacilityStruct& facility, const F
 			// Start by assuming we're in self-supply mode.
 			supplyFacility = &facility;
 
-			if ( facility.m_incomingLink == nullptr || facility.m_outgoingLink == nullptr )
+			if (facility.m_incomingLink == nullptr || facility.m_outgoingLink == nullptr)
 				return FacilityWeaponList::_CUT_BY_NO_LINKS;
 
 			// Is our mate friendly?
 			mate = facility.m_incomingLink->startDepot;
-			if ( mate == nullptr )
+			if (mate == nullptr)
 				return FacilityWeaponList::_CUT_BY_NO_LINKS;
 
 			// Make sure its a reciprocal link
-			if ( mate != facility.m_incomingLink->endDepot )
+			if (mate != facility.m_incomingLink->endDepot)
 				return FacilityWeaponList::_CUT_BY_NO_LINKS;
 
-			if ( facility.m_outgoingLink->hasEnemyFirebase(unit.side()) )
+			if (facility.m_outgoingLink->hasEnemyFirebase(unit.side()))
 				return FacilityWeaponList::_CUT_BY_FB;
 
 			// Don't own both ends of the link
-			if ( mate->side != unit.side() )
+			if (mate->side != unit.side())
 				return FacilityWeaponList::_CUT_BY_MATE;
 
-			if ( mate->cp != unit.homeCP() )
+			if (mate->cp != unit.homeCP())
 				return FacilityWeaponList::_NOT_LINKED;
 
 			mateAB = mate->findLocalAB(unit.side());
-			if ( mateAB == nullptr || mateAB == mate )
+			if (mateAB == nullptr || mateAB == mate)
 				return FacilityWeaponList::_CUT_OFF;
 
-			if ( mateAB->cp->side != unit.side() )
+			if (mateAB->cp->side != unit.side())
 				return FacilityWeaponList::_CUT_OFF;
 
 			supplyFacility = mateAB;
 
-		return FacilityWeaponList::_NORMAL;
+			return FacilityWeaponList::_NORMAL;
 
 		default:
 			supplyFacility = facility.supplyingFacility(unit, false);
-			if ( supplyFacility == nullptr )
+			if (supplyFacility == nullptr)
 				return FacilityWeaponList::_NOT_LINKED;
-		break;
+			break;
 	}
 
 	// Depots have been dealt with, now we know we're a military fac.
 
-	if ( supplyFacility->side != unit.side() )
+	if (supplyFacility->side != unit.side())
 		return FacilityWeaponList::_WRONG_OWNER;
 
-	if ( facility.cp->side != unit.side() )
+	if (facility.cp->side != unit.side())
 		return FacilityWeaponList::_ENEMY_OWNS_CP;
 
-	if ( facility.cp->controllingSide != unit.side() )
+	if (facility.cp->controllingSide != unit.side())
 		return FacilityWeaponList::_ENEMY_CONTROLS_CP;
 
-	if ( supplyFacility->isOpen() == false )
+	if (supplyFacility->isOpen() == false)
 		return FacilityWeaponList::_SUPPLY_CLOSED;
 
 	return FacilityWeaponList::_NORMAL;
@@ -1480,14 +1490,14 @@ strtInitializeVehicleAccessLevels()
 	// For each access level, find the lowest rank
 	// that can access the weapon
 	bool disableRankLimits = (host_config.arena.vehicleRestrictions == false);
-	for ( UINT32 a = 0; a < _NUM_ACCESS_LEVELS; ++a )
+	for (UINT32 a = 0; a < _NUM_ACCESS_LEVELS; ++a)
 	{
 		fakeWeapon.m_access = a;
-		const Rank* rank;
-		for ( UINT32 r = 0; r <= Rank::max(); ++r )
+		const Rank *rank;
+		for (UINT32 r = 0; r <= Rank::max(); ++r)
 		{
 			rank = Rank::lookup(r);
-			if ( rank && fakeWeapon.isPermitted(rank->permissions(), disableRankLimits) )
+			if (rank && fakeWeapon.isPermitted(rank->permissions(), disableRankLimits))
 			{
 				dbugLog(_FLI, "Access level %u requires rank %u", a, r);
 				_accessLevels[a] = r;
@@ -1511,33 +1521,33 @@ FacilityWeaponList::populate(const StratHCUnit& unit, const FacilityStruct& faci
 	m_refreshSeconds = host_config.supply.listRefresh_s;
 	m_numWeapons = 0;
 
-	if ( !unit.isSpawnable() )
+	if (!unit.isSpawnable())
 	{
 		m_status = FacilityWeaponList::_BDE_DISABLED;
 		return TRUE;
 	}
 
 	// Is this facility open ?
-	const FacilityStruct* supplyFacility = nullptr;
+	const FacilityStruct *supplyFacility = nullptr;
 	m_status = _diagnoseSupply(unit, facility, supplyFacility);
 
-	if ( m_status > FacilityWeaponList::_NORMAL )
+	if (m_status > FacilityWeaponList::_NORMAL)
 		return TRUE;
 
-	if ( (m_status > FacilityWeaponList::_INVALID && m_status < FacilityWeaponList::_NORMAL) || supplyFacility == nullptr )
+	if ((m_status > FacilityWeaponList::_INVALID && m_status < FacilityWeaponList::_NORMAL) || supplyFacility == nullptr)
 		supplyFacility = &facility;
 
-	if ( facility.type == FACILITY_DEPOT && supplyFacility == &facility )
+	if (facility.type == FACILITY_DEPOT && supplyFacility == &facility)
 		m_status = FacilityWeaponList::_CUT_OFF;
 
-	const FacilityStruct::WEAPON_ENTRIES& weapons = facility.weaponEntries();
-	if ( weapons.empty() )
+	const FacilityStruct::WEAPON_ENTRIES &weapons = facility.weaponEntries();
+	if (weapons.empty())
 	{
 		m_status = FacilityWeaponList::_NON_SPAWNABLE;
 		return TRUE;
 	}
 
-	if ( m_status == FacilityWeaponList::_NORMAL && unit.isSupplyInTransit() )
+	if (m_status == FacilityWeaponList::_NORMAL && unit.isSupplyInTransit())
 		m_status = FacilityWeaponList::_SUPPLY_IN_TRANSIT;
 
 	m_nextSupplyM = (unit.getSecondsToNextSupply() + 59) / 60;
@@ -1548,38 +1558,38 @@ FacilityWeaponList::populate(const StratHCUnit& unit, const FacilityStruct& faci
 
 	FacilityStruct::WEAPON_ENTRIES::const_iterator it;
 	UINT32 numWeapons = 0;
-	for ( it = weapons.begin(); it != weapons.end(); ++it )
+	for (it = weapons.begin(); it != weapons.end(); ++it)
 	{
-		const WeaponEntry& spawnEntry = *it->second;
+		const WeaponEntry &spawnEntry = *it->second;
 
 		// Make sure that the brigade allows spawning of these.
-		const TOE_::WeaponInstance* toeEntry = unit.toeWeaponInstance(spawnEntry.spec());
-		if ( toeEntry == nullptr && spawnEntry.spec().wCountry != unit.country() )
+		const TOE_::WeaponInstance *toeEntry = unit.toeWeaponInstance(spawnEntry.spec());
+		if (toeEntry == nullptr && spawnEntry.spec().wCountry != unit.country())
 			continue;
 		SINT16 access = (toeEntry ? toeEntry->access() : spawnEntry.access());
 
 		m_weapons[numWeapons] = spawnEntry.spec();
-		WeaponCounter& counter = m_counters[numWeapons];
+		WeaponCounter &counter = m_counters[numWeapons];
 		m_levels[numWeapons] = _accessLevels[access];
 
-		if ( _canSpawn(toeEntry, unit, facility, spawnEntry, permMask, true, false) == true )
+		if (_canSpawn(toeEntry, unit, facility, spawnEntry, permMask, true, false) == true)
 		{
 			spawnEntry.getCounter(&counter, toeEntry);
-			if ( counter.capacity > 0 || allWeapons || counter.current > 0 || spawnEntry.weapon().isSupplied(permMask) == false )
+			if (counter.capacity > 0 || allWeapons || counter.current > 0 || spawnEntry.weapon().isSupplied(permMask) == false)
 			{
-				if ( counter.current == 0 && (allWeapons == false && spawnEntry.weapon().isSystemWeapon() == false) )
+				if (counter.current == 0 && (allWeapons == false && spawnEntry.weapon().isSystemWeapon() == false))
 					counter.spawnable = (counter.capacity > 0) ? WeaponCounter::NOT_PRESENT : WeaponCounter::NOT_DEPLOYED;
 				else
 					counter.spawnable = WeaponCounter::SPAWNABLE;
 				++numWeapons;
 			}
 		}
-		else if ( toeEntry && spawnEntry.weapon().isPlayerWeapon() && toeEntry->capacity() > 0 )
+		else if (toeEntry && spawnEntry.weapon().isPlayerWeapon() && toeEntry->capacity() > 0)
 		{
 			// Anyone can spawn these and they are deployed here (> 0 capacity)
 			// but you don't have permission to spawn them
 			spawnEntry.getCounter(&counter, toeEntry);
-//			counter.setCurrent(0);
+			//			counter.setCurrent(0);
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 			++numWeapons;
 		}
@@ -1587,19 +1597,19 @@ FacilityWeaponList::populate(const StratHCUnit& unit, const FacilityStruct& faci
 
 	m_numWeapons = numWeapons;
 
-	if ( m_numWeapons == 0 )
+	if (m_numWeapons == 0)
 	{
-		if ( m_status < FacilityWeaponList::_CUT_OFF || m_status >= FacilityWeaponList::_NORMAL )
+		if (m_status < FacilityWeaponList::_CUT_OFF || m_status >= FacilityWeaponList::_NORMAL)
 			m_status = FacilityWeaponList::_EMPTY;
 	}
 	else
 	{
 		// Test whether you need any kind of warning
-		if ( facility.side == facility.cp->side )
+		if (facility.side == facility.cp->side)
 		{
-			if ( facility.type == FACILITY_ARMYBASE && facility.cp->isOverrun() )
+			if (facility.type == FACILITY_ARMYBASE && facility.cp->isOverrun())
 				chatSendLocalizedMessage(playerID, LSTR_WARNING, LSTR_BASE_OVERRUN, facility.cp->name);
-			else if ( facility.cp->isFallingBack() )
+			else if (facility.cp->isFallingBack())
 				chatSendLocalizedMessage(playerID, LSTR_WARNING, LSTR_FALLBACK_ISSUED, facility.cp->name);
 		}
 	}
@@ -1611,34 +1621,84 @@ FacilityWeaponList::populate(const StratHCUnit& unit, const FacilityStruct& faci
 // Print a message about a return attempt
 
 static void
-_returnLog(const POSTED_WEAPON* weapon, const char* message)
+_returnLog(const POSTED_WEAPON *weapon, const char *message)
 {
-	dbugLog(_FLD, "v:%u hcu:%u sup:%u rtb:%s %s"
-				, weapon->m_weaponSerial.serial
-				, weapon->m_brigade->unitID()
-				, weapon->m_supplyingBrigade->unitID()
-				, weapon->m_facility->name
-				, message
-				);
+   dbugLog(_FLD, "v:%u hcu:%u sup:%u rtb:%s %s"
+               , weapon->m_weaponSerial.serial
+               , weapon->m_brigade->unitID()
+               , weapon->m_supplyingBrigade->unitID()
+               , weapon->m_facility->name
+               , message
+               );
+}
+
+//////////////////////////////////////////////////////////////////////
+// Attempts to return posted weapon to the Garrison in the CP that we RTB to
+
+static bool
+_returnWeaponToGarrison(POSTED_WEAPON *weapon)
+{
+	if (!weapon || !weapon->m_facility)
+	{
+		dbugLog(_FLW, "No weapon or no facility for returning weapon");
+		return false;
+	}
+
+	if (weapon->m_brigade == nullptr)
+	{
+		dbugLog(_FLW, "No garrsion reference for returning weapon");
+		return false;
+	}
+
+	if (weapon->m_facility->CP().country == weapon->m_brigade->country())
+	{
+		// If there is a Garrison of the same branch and movement type in the CP that we are trying to RTB to
+		// then try to deposit the weapon there.
+		StratHCUnit *newUnit
+			= weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
+		if (newUnit)
+		{
+			if (newUnit->depositWeapons(weapon->spec(), 1, true, nullptr) == false)
+			{
+				dbugLog(_FLW, "Failed to deposit returining weapon");
+				return false;
+			}
+			_returnLog(weapon, "manually-supplied to Garrison");
+			weapon->detachReinforcement();
+			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->shortName());
+		}
+		else
+		{
+			dbugLog(_FLW, "No garrison found to return unit to");
+			return false;
+		}
+	}
+	else
+	{
+		dbugLog(_FLD, "Garrison no longer owned by originating country, unable to return weapon");
+		return false;
+	}
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Attempt to return posted weapon to its brigade
 
 static bool
-_returnToBrigade(POSTED_WEAPON* weapon)
+_returnToBrigade(POSTED_WEAPON *weapon)
 {
-	if ( !weapon || !weapon->m_facility )
+	if (!weapon || !weapon->m_facility)
 		return false;
-	FacilityStruct* supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_brigade, false);
-	if ( supplyFacility == nullptr )
+	FacilityStruct *supplyFacility = weapon->m_facility->supplyingFacility(*weapon->m_brigade, false);
+	if (supplyFacility == nullptr)
 		return false;
-	if ( weapon->m_brigade == nullptr )
+	if (weapon->m_brigade == nullptr)
 		return false;
 
-	if ( weapon->m_brigade != weapon->m_supplyingBrigade )
+	if (weapon->m_brigade != weapon->m_supplyingBrigade)
 	{
-		if ( weapon->m_brigade->depositWeapons(weapon->spec(), 1, true, nullptr) == false )
+		if (weapon->m_brigade->depositWeapons(weapon->spec(), 1, true, nullptr) == false)
 			return false;
 		_returnLog(weapon, "manually-supplied to brigade");
 		weapon->detachReinforcement();
@@ -1646,10 +1706,10 @@ _returnToBrigade(POSTED_WEAPON* weapon)
 	}
 	else
 	{
-		if ( weapon->m_brigade->depositWeapons(weapon->spec(), 1, true, weapon->m_resupplyTicket) == false )
+		if (weapon->m_brigade->depositWeapons(weapon->spec(), 1, true, weapon->m_resupplyTicket) == false)
 			return false;
 		_returnLog(weapon, "returned to original brigade");
-		assert( weapon->m_resupplyTicket == nullptr );
+		assert(weapon->m_resupplyTicket == nullptr);
 	}
 
 	return true;
@@ -1663,12 +1723,12 @@ _returnToBrigade(POSTED_WEAPON* weapon)
 static bool
 _returnToOrigin(POSTED_WEAPON& weapon)
 {
-	if ( !weapon.m_facility )
+	if (!weapon.m_facility)
 		return false;
-	FacilityStruct* supplyFacility = weapon.m_facility->supplyingFacility(*weapon.m_supplyingBrigade, false);
-	if ( !supplyFacility || !weapon.m_supplyingBrigade )
+	FacilityStruct *supplyFacility = weapon.m_facility->supplyingFacility(*weapon.m_supplyingBrigade, false);
+	if (!supplyFacility || !weapon.m_supplyingBrigade)
 		return false;
-	if ( weapon.m_supplyingBrigade->depositWeapons(weapon.spec(), 1, true, weapon.m_resupplyTicket) == false )
+	if (weapon.m_supplyingBrigade->depositWeapons(weapon.spec(), 1, true, weapon.m_resupplyTicket) == false)
 		return false;
 
 	_returnLog(&weapon, "returned to origin");
@@ -1682,16 +1742,16 @@ _returnToOrigin(POSTED_WEAPON& weapon)
 static void
 _rescue(POSTED_WEAPON* weapon)
 {
-	if ( weapon->isNonSupplied() )
+	if (weapon->isNonSupplied())
 		return;
 
 	// Queue a "rescue" vehicle (15 minute delay)
-	TOE_::WeaponInstance* toeEntry = weapon->m_supplyingBrigade->toeWeaponInstance(weapon->spec());
-	if ( toeEntry != nullptr )
+	TOE_::WeaponInstance *toeEntry = weapon->m_supplyingBrigade->toeWeaponInstance(weapon->spec());
+	if (toeEntry != nullptr)
 	{
 		weapon->cancelReinforcement();
 		UINT32 rescueTime = host_config.supply.rescueTime_m;
-		if ( weapon->m_supplyingBrigade->createResupplyTicket(*toeEntry, false, rescueTime * 60, 1, nullptr) )
+		if (weapon->m_supplyingBrigade->createResupplyTicket(*toeEntry, false, rescueTime * 60, 1, nullptr))
 		{
 			TELL_TESTER(weapon->m_commander, "#%u rescue scheduled for %um", weapon->m_weaponSerial.serial, rescueTime);
 			_returnLog(weapon, "scheduled rescue");
@@ -1712,35 +1772,35 @@ _rescue(POSTED_WEAPON* weapon)
 
 //////////////////////////////////////////////////////////////////////
 // Process the return of a POSTED_WEAPON. Returns true if the weapon
-// was delivered to its brigade from its division.
+// was delivered to its brigade from its division or to a different Garrison.
 
 bool
-POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
+POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID originFacilityID)
 {
 	bool returnable = (isNonSupplied() == false);
 	bool rtbed = false;
 	bool rescue = false;
 	bool rescuable = false;
 	bool vehicleDelivered = false;
-	if ( m_playerExitCode == PEXIT_OVER_FRIENDLY_TERRITORY && isDead() == false )
+	if (m_playerExitCode == PEXIT_OVER_FRIENDLY_TERRITORY && isDead() == false)
 		rescuable = true;
-	else if ( m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false )
+	else if (m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false)
 		rescuable = true;
 	else if (isDead() && !hasBeenHit)
 		rescuable = true;
-	switch ( m_status )
+	switch (m_status)
 	{
 		case _RESERVED:
 		case _POSTED:
 			/* Do nothing */
 			rtbed = true;
-		break;
+			break;
 
 		case _SPAWNED:
 			_spawnedWeapons.remove(this);
 			rtbed = (returnable && m_playerExitCode == PEXIT_RTB && isDead() == false);
 			rescue = (returnable && rescuable);
-		break;
+			break;
 
 		case _FREE:
 		case _CANCELLED:
@@ -1748,7 +1808,7 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 			LogAbort("v:%u invalid status %d weapon %p!", m_weaponSerial.serial, m_status, this);
 	}
 
-	if ( returnable && rtbed == false )
+	if (returnable && rtbed == false)
 		returnable = false;
 
 	TELL_TESTER(m_commander, "processing #%u return => %s [%s, %s, %s, %s]"
@@ -1760,41 +1820,83 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 					, (returnable ? "returnable" : "non-returnable")
 				);
 
-	if ( returnable == false )
+	if (returnable == false)
 	{
 		TELL_TESTER(m_commander, "non-returnable");
 		_returnLog(this, "non-returnable");
 	}
-	else if ( rtbed == true )
+	else if (rtbed == true)
 	{
-		// First attempt to deliver the equipment back to the unit it
-		// came from: if you spawn divisional equipment, it should try
-		// to return to the division before falling thru to a brigade
-		// that may be at the same town.
-		// After that, try to deliver it to your brigade at this
-		// location. If that fails, finally, "rescue" the equipment.
+		if (m_supplyingBrigade->isGarrison())
+		{
+			// Get the Facility that this weapon originated from.
+			FacilityStruct* parentFacility = strtGetFacility(originFacilityID);
+			
+			// If we spawned in at this town or we spawned via an MS then we do NOT want to overstock the Garrision that's here
+			// so the weapon is returned to it's own Garrison.
+			if (parentFacility != nullptr && parentFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
+			{
+				if (_returnToOrigin(*this) == true)
+						{
+							TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+							rescue = false;
+						}
+						else
+						{
+							TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+							_returnLog(this, "failed to deliver");
+							rescue = true;
+						}
+			}
+			else
+			{
+				// Try to over-stock the Garrison at the town where we rtb-ed
+				if (_returnWeaponToGarrison(this) == true)
+				{
+					TELL_TESTER(m_commander, "returned #%u to different Garrison", m_weaponSerial.serial);
+					rescue = false;
+					if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
+						vehicleDelivered = true;
+				}
+				else
+				{
+					TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+					_returnLog(this, "failed to deliver");
+					rescue = true;
+				}
+			}
+		}
+		else {
+			// This for units that aren't Garrisons.
+			// First attempt to deliver the equipment back to the unit it
+			// came from: if you spawn divisional equipment, it should try
+			// to return to the division before falling thru to a brigade
+			// that may be at the same town.
+			// After that, try to deliver it to your brigade at this
+			// location. If that fails, finally, "rescue" the equipment.
 
-		if ( _returnToOrigin(*this) == true )
-		{
-			TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
-			rescue = false;
-		}
-		else if ( _returnToBrigade(this) == true )
-		{
-			TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
-			rescue = false;
-			if ( m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade )
-				vehicleDelivered = true;
-		}
-		else
-		{
-			TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
-			_returnLog(this, "failed to deliver");
-			rescue = true;
+			if (_returnToOrigin(*this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+				rescue = false;
+			}
+			else if (_returnToBrigade(this) == true)
+			{
+				TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
+				rescue = false;
+				if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
+					vehicleDelivered = true;
+			}
+			else
+			{
+				TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+				_returnLog(this, "failed to deliver");
+				rescue = true;
+			}
 		}
 	}
 
-	if ( rescue == true )
+	if (rescue == true)
 	{
 		_rescue(this);
 	}
@@ -1816,14 +1918,14 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 
 //////////////////////////////////////////////////////////////////////
 // Bump a posted weapon to spawned state
-///ASSUMPTION: The weapon is /supposed/ to have been posted or
-///ASSUMPTION: reserved before being passed to spawn().
+/// ASSUMPTION: The weapon is /supposed/ to have been posted or
+/// ASSUMPTION: reserved before being passed to spawn().
 
 bool
 POSTED_WEAPON::spawn()
 {
-	WeaponEntry* spawnEntry = m_facility->weaponEntry(spec());
-	if ( spawnEntry == nullptr )
+	WeaponEntry *spawnEntry = m_facility->weaponEntry(spec());
+	if (spawnEntry == nullptr)
 	{
 		dbugLog(_FLW, "v:%u can't grant request for %s at %s - no spawn entry"
 						, m_weaponSerial.serial
@@ -1834,12 +1936,12 @@ POSTED_WEAPON::spawn()
 	}
 
 	// Remove the "Reservation has timed out" expiry ticket
-	if ( m_expiryUpdate != nullptr )
+	if (m_expiryUpdate != nullptr)
 		cnvyRemoveWeaponFromExpireList(*this);
 
 	// If we are spawning someplace other than where we were reserved,
 	// we may need to relocate our throttle.
-	if ( m_postingEntry != spawnEntry && m_supplyingBrigade != nullptr )
+	if (m_postingEntry != spawnEntry && m_supplyingBrigade != nullptr)
 	{
 		m_supplyingBrigade->decrementThrottle(this);
 		m_postingEntry = spawnEntry;
@@ -1847,7 +1949,7 @@ POSTED_WEAPON::spawn()
 		m_postingEntry = nullptr;
 	}
 
-	if ( m_postingEntry != nullptr )
+	if (m_postingEntry != nullptr)
 		m_postingEntry = nullptr;
 
 	// If the reservation has been for 5 minutes, don't fidget the reinforcement
@@ -1856,17 +1958,17 @@ POSTED_WEAPON::spawn()
 	// cancel the reinforcement and post a new one.
 	bool reinforcementExpired = (m_resupplyTicket == nullptr || teulTime() - m_posted > MIN_REINFORCEMENT_SHUFFLE_TIME_S);
 
-	if ( m_posted != 0 && reinforcementExpired )
+	if (m_posted != 0 && reinforcementExpired)
 		cancelReinforcement();
 
-	//Set the posted timestamp to be the spawn time
+	// Set the posted timestamp to be the spawn time
 	_spawnedWeapons.push_back(this);
 
 	m_posted = teulTime();
 	m_status = _SPAWNED;
 
 	// If we didn't or don't have a reinforcement, schedule a new one.
-	if ( reinforcementExpired )
+	if (reinforcementExpired)
 		scheduleReinforcement();
 
 	dbugLog(_FLI, "v:%u spawn()d %s at %s - %s"
@@ -1879,7 +1981,7 @@ POSTED_WEAPON::spawn()
 	return true;
 }
 
-//Returns true or false depending on whether the facility can currently
+// Returns true or false depending on whether the facility can currently
 //	spawn the weaponSpec provided
 static bool
 _canSpawn(
@@ -1892,36 +1994,36 @@ _canSpawn(
 		, bool isReserve
 		)
 {
-	if ( unit.side() != facility.side )
+	if (unit.side() != facility.side)
 		return false;
 
-	if ( spawnEntry.isAccessible(facility) == false )
+	if (spawnEntry.isAccessible(facility) == false)
 		return false;
 
 	bool disableRankLimits = host_config.arena.vehicleRestrictions == false;
-	if ( isReserve == false && spawnEntry.weapon().isPermitted(permMask, disableRankLimits) == false )
+	if (isReserve == false && spawnEntry.weapon().isPermitted(permMask, disableRankLimits) == false)
 		return false;
 
-	if ( facility.side != facility.cp->side && facility.isMilitaryFacility() )
+	if (facility.side != facility.cp->side && facility.isMilitaryFacility())
 		return false;
 
-	if ( spawnEntry.weapon().isSupplied(permMask) == false || (permMask & ALL_SPAWN) )
+	if (spawnEntry.weapon().isSupplied(permMask) == false || (permMask & ALL_SPAWN))
 		return true;
 
-	if ( toeEntry == nullptr )
+	if (toeEntry == nullptr)
 		return false;
 
-	if ( host_config.supply.enabled == false )
+	if (host_config.supply.enabled == false)
 		return true;
 
-	if ( includeZeros == true || isReserve == true )
+	if (includeZeros == true || isReserve == true)
 		return true;
 
 	// Check for present + capacity.
-	if ( toeEntry->present() <= 0 && (includeZeros == false || toeEntry->capacity() == 0) )
+	if (toeEntry->present() <= 0 && (includeZeros == false || toeEntry->capacity() == 0))
 		return false;
 
-	//check to see if the weapon is available
+	// check to see if the weapon is available
 	//	it might not be available due to
 	//		*1. spawn limits (regular)
 	//		*2. spawn limits (mission)
@@ -1929,13 +2031,13 @@ _canSpawn(
 	//		*4. rank
 
 	// Check for throttling
-	if ( spawnEntry.isThrottled() )
+	if (spawnEntry.isThrottled())
 	{
 		UINT32 used = unit.checkThrottleWindow(&facility, toeEntry->spec());
-		if ( used > 0 && used >= toeEntry->throttleCapacity() )
+		if (used > 0 && used >= toeEntry->throttleCapacity())
 			return false;
 	}
 
-	//Otherwise, I guess you can spawn
+	// Otherwise, I guess you can spawn
 	return true;
 }

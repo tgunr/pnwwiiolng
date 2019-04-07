@@ -104,6 +104,7 @@ namespace Chat
 
 		MAP_REFRESH_PLAYER_Y,	// Chat needs a refresh of a player.
 		NETCODE_NOTICE_Y,		// Netcode enabled value changed
+		GARRISON_COUNTRY_Y,     // Change a Garrisons country
 		MAX_MESSAGE_Y
 	};
 }

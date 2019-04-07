@@ -92,16 +92,16 @@ public:
 		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), text);
 	}
 	template<typename... Args>
-	void Log(int level, const char* fmt, Args&&... args)
+	void Log(const char* const filename, const SINT32 lineno, Debug::ERROR_TYPE level, const char* fmt, Args&&... args)
 	{
 		char myfmt[1024];
 		strprintf(myfmt, "s:%%u(%%s) pid:%%" PR64BitUT " %s", fmt);
-		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, myfmt, ServerType(), ServerTypeName(), ProcessID(), std::forward<Args>(args)...);
+		dbugLog(filename, lineno, level, myfmt, ServerType(), ServerTypeName(), ProcessID(), std::forward<Args>(args)...);
 	}
 
-	void Log(const char* msg)
+	void Log(const char* const filename, const SINT32 lineno, const char* msg)
 	{
-		dbugLog("GameProcess", 0, Debug::ERR_DBUG | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), msg);
+		dbugLog(filename, lineno, Debug::ERR_DBUG, "s:%u(%s) pid:%" PR64BitUT " %s", ServerType(), ServerTypeName(), ProcessID(), msg);
 	}
 };
 

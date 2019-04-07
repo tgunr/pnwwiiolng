@@ -297,10 +297,68 @@ HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 			continue;
 		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
 			continue;
-		if ( it->second->isBrigade() || it->second->isDivision() )
+		if ( it->second->isBrigade() || it->second->isDivision() || it->second->isGarrison() )
 			continue;
 		return it->second;
 	}
 
 	return nullptr;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Return the training unit for a particular country/branch
+
+HCUnit*
+HCUnit::GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
+{
+	//  Returns:  a pointer to the Selected Training HCUnit  OR  nullptr.
+	
+	HCUnit* retVal = nullptr;
+
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
+	{
+		if (it->second->isTrainingUnit() == true)
+		{
+			if (it->second->country() == forCountry && it->second->branch() == forBranch)
+			{
+				retVal = it->second;
+				break;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+void HCUnit::GetGarrisonUnits(std::list<HCUnit *>& unitsList, FULL_OBJ_ID cpID)
+{
+	//dbugLog(_FLN, "Performing HCUnit::GetGarrisonUnits");
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID() == cpID)
+			{
+				unitsList.push_back(it->second);
+			}
+		}
+	}
+}
+
+UINT32 HCUnit::GetArmyGarrison(FULL_OBJ_ID cpID)
+{
+	// Need to look up primary brigade for the target CP
+	UINT32 brigadeID = 0;
+	std::list<HCUnit *> garrisons;
+	HCUnit::GetGarrisonUnits(garrisons, cpID);
+	for (HCUnit *unit : garrisons)
+	{
+		if (!unit->isMarineUnit() && !unit->isParatroopUnit())
+		{
+			brigadeID = unit->m_unitID;
+			break;
+		}
+	}
+
+	return brigadeID;
 }

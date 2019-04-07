@@ -4,7 +4,7 @@ function changeCP (cp)
  if cp:isObjective(AXIS) then cp:clearObjective(AXIS) end
  if cp:isObjective(ALLIED) then cp:clearObjective(ALLIED) end
  if cp.country == cp.originalCountry and cp:isContested() == false then return 0 end
- cp:changeOwnership(cp.originalCountry, true, true)
+ cp:changeOwnershipFromScript(cp.originalCountry, true, true)
  return 1
 end
 

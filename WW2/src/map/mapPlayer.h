@@ -16,6 +16,7 @@
 #include "map/mapPlayerTypes.h"
 #include "wwii/wwiiPermissions.h"
 #include "wwii/wwiiPlayer.h"
+#include "wwii/wwiiHCUnits.h"
 
 #define MAX_SHORT_TITLE 16
 #define MAX_LONG_TITLE 64
@@ -368,6 +369,8 @@ public:
 extern void mapSendChatUpdates();
 extern void mapSendHCUpdates();
 extern void mapProcessLogins();
+extern void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry,
+									   BRANCH_ENUM originalUnitBranch, WWII_COUNTRY newCountry);
 
 extern void mapCheckSideCounts();
 

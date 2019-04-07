@@ -64,6 +64,8 @@ class CaptureState;
 struct ClientData;
 struct ClientClassData;
 struct ChatServerInfo;
+class HCUnitCountryChange;
+class CPCountryChangeNotice;
 
 namespace Chat
 {
@@ -273,6 +275,7 @@ public:
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice);
 	virtual void ProcessMissionInvite(const MissionInvite& invite);
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc){}
+	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc){}
 	virtual void ProcessInstanceResult(const Instance::Result& result);
 	virtual void ProcessInstanceList(const Instance::ClientListing* list);
 	virtual void ProcessTutorialFlags(ChatHandle group, UINT64 flags);
@@ -362,6 +365,11 @@ public:
 	void SavePersona(int type = -1); // -1 == save all attributes
 	const PersonaSummary* GetPersona(int country = -1, int branch = -1) const;
 	const PersonaSummary* GetSavedPersona() const;
+	void SetSelectedPersonaCountry(WWII_COUNTRY newCountry);
+
+	//  Checks each of the Players other personas brigade to ensure it is valid following a Garrison Change.
+	//  Retrurns the number of Player personas changed. It "Should" only be 1 at most.
+	int ValidatePersonasBrigade(UINT32 unitID);
 
 	void SetSpawnOverride(double x, double y, double z);
 	void SetPosition(double x, double y, double z);

@@ -74,7 +74,7 @@ void DBThread::Thread::run()
 {
     threadIgnoreSIGPIPE();
 
-	m_conn = threadsOpenDBConnection(true);
+	m_conn = threadsOpenDBConnection();
 	if ( m_conn == nullptr )
 	{
 		dbugLog(_FLA, "unable to connect to mysql database");
@@ -172,27 +172,27 @@ threadsDBReconnect(DB::handle_t ** conn, UINT32 threadRef, PNThread *pThread)
 	*conn = nullptr;
 
 	while ((!pThread || !pThread->isCancelled()) && *conn == nullptr) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		dbugLog(_FLW, "dbc:%u reconnecting to database", threadRef);
-		*conn = threadsOpenDBConnection(true);
+		*conn = threadsOpenDBConnection();
 		if (*conn == nullptr) {
 			dbugLog(_FLA, "dbc:%u unable to reconnect to database, will retry", threadRef);
 		}
 	}
-	dbugLog(_FLW, "dbc:%u reconnected to database", threadRef);
+    if (*conn != nullptr) {
+	    dbugLog(_FLW, "dbc:%u reconnected to database", threadRef);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
 // Thread-safe db connection opener
 
-DB::handle_t*
-threadsOpenDBConnection(bool enableAutoCommit)
+DB::handle_t* threadsOpenDBConnection()
 {
 	DB::handle_t* newConn = dbseGetConnection();
 
-	if ( newConn != nullptr )
-	{
-		mysql_autocommit(newConn, (enableAutoCommit) ? 1 : 0);
+	if (newConn) {
+		mysql_autocommit(newConn, 1);
 	}
 
 	return newConn;
