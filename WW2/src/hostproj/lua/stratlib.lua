@@ -180,14 +180,14 @@ end
 function maxCaptureObjectives()
    local population = getLowerPopulation()
 
-   if population >= 385 then return 8 + math.floor((population - 330) / 55) end
-   if population >= 330 then return 7 end
-   if population >= 275 then return 6 end
-   if population >= 220 then return 5 end
-   if population >= 165 then return 4 end
-   if population >= 110 then return 3 end
-   if population >=  55 then return 2 end
-   return 1
+   if population >= 385 then return 9 + math.floor((population - 330) / 55) end
+   if population >= 330 then return 8 end
+   if population >= 275 then return 7 end
+   if population >= 220 then return 6 end
+   if population >= 165 then return 5 end
+   if population >= 110 then return 4 end
+   if population >=  55 then return 3 end
+   return 2
 end
 
 function countsAsEngagement(target)
