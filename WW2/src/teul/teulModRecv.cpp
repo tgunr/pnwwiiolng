@@ -800,6 +800,8 @@ void ENDPOINT::updateSocketEvents()
         pollData.fd[slot].events |= POLLOUT;
     }
 	pollData.fd[slot].revents = 0;
+ 
+    dbugLog(_FLD, "POLLSET: t:%d sock:" PRF_SOCKET " slot:%u events:0x%hx", teulIndex(), PRA_SOCKET(socket), slot, pollData.fd[slot].events);
 }
 
 static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
