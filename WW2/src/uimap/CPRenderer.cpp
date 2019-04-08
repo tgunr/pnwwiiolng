@@ -524,9 +524,13 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	phui::box_verts_with_pos(box, bgx - 5, bgy, bgw + 34, bgh);
 
 	if(_contended)
+	{
 		ctx->SetColor(.5f,.5f,0.0f,.7f);
+	}
 	else
+	{
 		ctx->SetColor(.3f,.3f,.3f,(_bestunit) ? 1.0f: .6f);
+	}
 
 	ctx->DrawQuad(box.verts);
 
@@ -609,7 +613,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		}
 
 		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
-		if(_altuniticon && ((cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
+		if(_altuniticon && (cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -782,7 +786,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						{
 							_bestuniticon = _renderer->animFlagIcons[unit->country()];
 							
-							if(alliedUnit)
+							if(alliedUnit && alliedUnit->isBrigade())
 								_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
 						}
 					}
