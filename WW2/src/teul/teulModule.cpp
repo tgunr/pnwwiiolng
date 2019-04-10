@@ -500,7 +500,6 @@ SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 	    inEndpoint.m_state = IS_OPEN;
     }
 	inEndpoint.setConnected();
-    inEndpoint.updateSocketEvents();
 	return 0;
 }
 
