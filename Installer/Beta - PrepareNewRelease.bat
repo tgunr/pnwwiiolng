@@ -1,35 +1,51 @@
 @echo off
 @echo.
-@echo ====  Launching:  PrepareNewRelease.bat  (release-beta).
+
+rem @echo ====  Launching:  _PrepareNewRelease.bat  (Release Candidate).
+
+rem @echo ====  Launching:  _PrepareNewRelease.bat  (Alpha Release).
+
+@echo ====  Launching:  _PrepareNewRelease.bat  (Beta Release).
+
 @echo.
 @echo.
 
+rem SET launchingdir=%CD% - Has < Run as Admin > issues.
 SET LaunchingDir=%~dp0
 
 IF NOT DEFINED LaunchingDir (
 	@echo.
 	@echo.
-	@echo PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
+	@echo _PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
+	
 	EXIT 1
 )
 
 CD /D "%LaunchingDir%"
 
-@echo ====  Current Working Directory: %CD%
+@echo Bat File Launching Directory  :  %CD%
+@echo.
 
-rem If PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
-IF /I NOT EXIST "PrepareNewRelease.bat" (
+rem If _PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
+IF /I NOT EXIST "_PrepareNewRelease.bat" (
 	@echo.
-	@echo PrepareNewRelease.bat: file NOT found - ABORTING.
+	@echo _PrepareNewRelease.bat: file NOT found - ABORTING.
+
 	EXIT 2
 ) else (
-	@echo Located PrepareNewRelease.bat file.
+	@echo Located _PrepareNewRelease.bat file.
 )
 
 @echo.
 @echo.
+
+rem CALL _PrepareNewRelease.bat /rc
+
+rem CALL _PrepareNewRelease.bat /alpha
+
+CALL _PrepareNewRelease.bat /beta
+
+@echo.
 @echo.
 
-CALL PrepareNewRelease.bat /beta
-
-@echo.
+rem @pause

@@ -1676,7 +1676,7 @@ static void glScreenCapture(void) {
 	#define topathstr std::to_wstring
 	//  wwiiolpath_string base_fileName = WW2_userDocumentsPath + OS_PATHSEP_WC + L"ScreenShots" + OS_PATHSEP_WC;
 	wwiiolpath_string base_fileName = WW2_userScreenShotsPath + OS_PATHSEP_WC;
-	wwiiolpath_string fileTimeStamp = SQL_DateTimeStamp();
+	wwiiolpath_string fileTimeStamp = SQL_DateTimeStamp(true);
 	wwiiolpath_string fileName = L"";
 	int shotCount = 0;
 
@@ -1688,13 +1688,13 @@ static void glScreenCapture(void) {
 	base_fileName += L"SShot_";
 	fileName = base_fileName + fileTimeStamp + L".bmp";
 
+	//  Chech to ensure the filename is unique.
 	if ( checkFile(fileName) == 0 )  //  Exists.
 	{
 		shotCount = 1;
 		do {
-			if (shotCount > 100)
-				return;
 			fileName = base_fileName + fileTimeStamp + L"_" + topathstr(shotCount++) + L".bmp";
+
 		} while (checkFile(fileName) == 0);
 	}
 	

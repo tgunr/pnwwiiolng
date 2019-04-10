@@ -20,7 +20,9 @@
 #include "syscfg.h" // Path is project specific.
 
 #include <string>
+#include <chrono>
 #include "fiostructure.h"
+#include "platforms.h"
 
 #if platOS == OS_WIN32
 	#include <shellapi.h>
@@ -1198,21 +1200,69 @@ extern LOGICAL WW2_userWorkingPathSet;
 }
 
 
-wwiiolpath_string SQL_DateTimeStamp() {
+// Retrieve the current time to millisecond resolution in portable fashion.
+// The extra math is needed thanks to design flaws in C++'s chrono library.
+// From dbug.cpp line : 496.
+static void _getCurrentTime(struct tm &tm, uint32_t &millis)
+{
+	auto now = std::chrono::system_clock::now();
+	time_t nowTime = std::chrono::system_clock::to_time_t(now);
+	auto nowRounded = std::chrono::system_clock::from_time_t(nowTime);
+
+	// If the time value was rounded upward instead of truncated or rounded down,
+	// adjust for the rounding.
+	if (nowRounded > now) {
+		--nowTime;
+		nowRounded -= std::chrono::seconds(1);
+	}
+
+	localtime_r(&nowTime, &tm);
+	millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - nowRounded).count();
+}
+
+
+//  Returns an SQL Formatted Date/Time Stamp string. YYYY-MM-DD HH:MM:SS.MS
+wwiiolpath_string SQL_DateTimeStamp(bool compact)
+{
 
 	//  Create a SQL formatted date/time stamp.
 	wwiiolpath_string returnValue = L"";
 	int n = 0;
-	time_t rawtime;
-	struct tm * timeinfo;
+	struct tm timeinfo;
+	uint32_t milisec;
 	wchar_t timeStamp[256] = L"";
+	std::wstring formatString = L"";
 
-	time(&rawtime);
-	timeinfo = localtime(&rawtime);
-	n = swprintf(timeStamp, 256, L"%.4d%.2d%.2d-%.2d%.2d%.2d", timeinfo->tm_year + 1900, timeinfo->tm_mon + 1, timeinfo->tm_mday, timeinfo->tm_hour, timeinfo->tm_min, timeinfo->tm_sec);
+	if (compact == true)
+	{
+		formatString = L"%.4d%.2d%.2d-%.2d%.2d%.2d%.3d";
+	}
+	else
+	{
+		formatString = L"%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.3d";
+	}
+
+//  time_t rawtime;
+//	time(&rawtime);
+//	timeinfo = localtime(&rawtime);
+	//  n = swprintf(timeStamp, 256, L"%.4d%.2d%.2d-%.2d%.2d%.2d"
+
+	_getCurrentTime(timeinfo, milisec);
+
+	//  n = swprintf(timeStamp, 256, L"%.4d-%.2d-%.2d %.2d:%.2d:%.2d.%.3d"
+	n = swprintf(timeStamp, 256, formatString.c_str()
+		, timeinfo.tm_year + 1900
+		, timeinfo.tm_mon + 1
+		, timeinfo.tm_mday
+		, timeinfo.tm_hour
+		, timeinfo.tm_min
+		, timeinfo.tm_sec
+		, milisec);
 
 	returnValue = timeStamp;
+
 	timeStamp[0] = 0;
+	formatString = L"";
 
 	return returnValue;
 }
@@ -1246,7 +1296,7 @@ bool CopyOldSetupFiles_WIN()
 
 
 	//  Create a folder copy date/time stamp.  =================================================
-	folderRename = L"_Copied_" + SQL_DateTimeStamp();
+	folderRename = L"_Copied_" + SQL_DateTimeStamp(true);
 
 
 	//  Ask Windows where the users documents folder is?  ======================================
@@ -1318,7 +1368,7 @@ bool CopyOldSetupFiles_WIN()
 			//  Re-Name:  ======================================================================
 			//   \User -> My Documents -> "Battleground Europe"
 			//   TO
-			//   \User -> My Documents -> "Battleground Europe_Copied_XXXXXXXXXX-XXXXXX".
+			//   \User -> My Documents -> "Battleground Europe_Copied_YYYY-MM-DD HH:MM:SS.MS".
 
 			reNamePath = bgePath + folderRename;
 			message2 = L"The Directory : \n" + bgePath + L"\n\nhas been re-named to : \n" + reNamePath;
@@ -1345,7 +1395,7 @@ bool CopyOldSetupFiles_WIN()
 				Wstring2Char(bgePath, source, MAX_PATH);
 				Wstring2Char(reNamePath, destination, MAX_PATH);
 
-				dbugLog(_FLW, "Old Settings - Could not rename:-\n\nfrom path : \n%s,\n\nto path : \n%s.", &source, &destination);
+				dbugLog(_FLW, "Old Settings - Could not rename:-\n\nfrom path : \n<< %s >>\n\nto path : \n<< %s >>", &source, &destination);
 #endif
 				copyFiles = false;
 			}
@@ -1374,7 +1424,7 @@ bool CopyOldSetupFiles_WIN()
 }
 
 
-bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function = 2U)
+bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function)
 {
 	bool retValue = false;
 

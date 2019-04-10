@@ -1,13 +1,12 @@
 ﻿; BOF ========================================================================
 ; File: WWIIOL_Installer_Template.iss
-; Software: Inno Setup Compiler 5.5.9 (u)
-; Date: April 8, 2018
+; Software: Inno Setup Compiler 5.6.1 (u)
+; Date: April 8, 2018, April 3, 2019
 ; Revision by: Mathew "james10" Hogan - MJH
 
 ; Addresses:
 ; DEV-1383: The Windows Installer is still referencing Battleground Europe
 ; and not World War II Online.
-; DEV-1630: DPI Scaling Needs to be disabled by Default.
 
 ; Also provides the installer functionality to copy the Settings folder to
 ; another directory as part of the setup process. Part of DEV-1383.
@@ -20,10 +19,10 @@
 
 ; ===  Editable Script Options.  =============================================
 
-; ===  Notes: Un-comment only One. There MUST be at least One or the script WILL FAIL.
-; ===  If you Un-comment more than one in any group,
-; ===  ONLY the LAST ONE in the list will be used.
-; ===  Is no option for a option group is selected, the Default will be used.
+; ===  Notes:
+; ===  * Un-comment only One Option.
+; ===  * If you Un-comment more than one in any group, ONLY the LAST ONE in the list will be used.
+; ===  * Is no option for a option group is selected, the Default will be used.
 
 
 ; ===  Release Type. (Un-comment only One)  ==================================
@@ -48,14 +47,14 @@
 ; #define EnablePatching "no"
 
 
+; ===  Script Debug. (Un-comment only One)  ==================================
+#define ScriptDebug "yes"
+; #define ScriptDebug "no"    ;Default
+
+
 ; ===  Should not edit below this line.   ====================================
 ; ============================================================================
 ; ============================================================================
-
-
-; ===  Script Debug.  ========================================================
-; #define ScriptDebug "yes"
-#define ScriptDebug "no"    ;Default
 
 
 ; ===  Game Install Root Names.  =============================================
@@ -69,9 +68,9 @@
 #define WWIIOnlineProperties "Settings.exe"
 #define WWIIOnlinePatchingTool "xdelta3.exe"
 #define WWIIOnlinePropertiesFile "wwiiol.xml"
-#define MSDirectXSetup "DATA\DirectXRedist\DXSetup.exe"
-#define MSRuntimeLibraryX64 "DATA\RuntimeLibraries\vc_redist.x64.exe"
-#define MSRuntimeLibraryX86 "DATA\RuntimeLibraries\vc_redist.x86.exe"
+#define MSDirectXSetup "data\DirectXRedist\DXSetup.exe"
+#define MSRuntimeLibraryX64 "data\RuntimeLibraries\vc_redist.x64.exe"
+#define MSRuntimeLibraryX86 "data\RuntimeLibraries\vc_redist.x86.exe"
 #define PlaygateValuePrams "-serverip $QUAD -serverport $PORT -serverotp $OTP -side $SESSIONID"
 #define PlaygateValueRegion "us"
 
@@ -88,8 +87,8 @@
 ; ===  Installer Variables.   ================================================
 #define InstallerExcludePatterns "*.gitignore, *.placeholder, *.DS_Store"
 #define InstallerSoftwareVersion "1.0.0.0"
-#define InstallerPublisher "Playnet Inc."
-#define InstallerCopyright "© 1999-2018, Playnet Inc."
+#define InstallerPublisher "Playnet Inc / CRS."
+#define InstallerCopyright "© 1999-2019, Playnet Inc / CRS."
 #define InstallerGroupName "Cornered Rat Software"
 #define InstallerRootPathName "CRS"
 #define InstallerBaseFileName "wwiiol_"
@@ -200,12 +199,10 @@
 
 
 ; ===  Installer Assets Directories.  ========================================
-; #define WWIIOnlineAssetsDir "assets"
 #define WWIIOnlineAssetsDir "..\.\ww2assets"
 
 
-; ===  Set - Installer Script Format. Options: "original", "originalpluss", "revised", "final".
-; final.
+; ===  Set - Installer Script Format.
 #define WWIIOnlineAppName "World War II Online"
 #define WWIIOnlineDirName "WWIIOnLine"
 #define WWIIOnlineGroupName "World War II Online"
@@ -228,8 +225,6 @@
   #define WWIIOnlineInstallVersion GetFileVersion( CurrentFilesRoot + "\" + WWIIOnlineExe )
   #define WWIIOnlineRollbackVersion "None"
   #define WWIIOnlinePreviousVersion "None"
-
-  ;#define TestVersionNumber={code:getVersionNumber( GetFileVersion( CurrentFilesRoot + "\" + WWIIOnlineExe ))}
 
 #endif
 
@@ -370,10 +365,9 @@ SetupWindowTitle={#WWIIOnlineAppName} - Setup
 [CustomMessages]
 AdditionalSettings=Additional Options:
 ExtInstallers=External Installers:
-HiDPISettings=Disable display scaling on high DPI settings for {#WWIIOnlineAppName}
-SettingsADMIN=Run Settings.exe as Administrator
 InstallDX=Install DirectX Redistributable Files
-InstallRunTime=Install Visual C++ Redistributable Files
+RunTimeX64=Install Visual C++ Runtime files for x64 Windows
+RunTimeX86=Install Visual C++ Runtime files for x86 Windows
 
 ; Startmenu shortcuts.
 WWIIolLauncher={#WWIIOnlineAppName} - Launcher
@@ -404,15 +398,16 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
-Name: "hiDPIMonitor"; Description: "{cm:HiDPISettings}"; GroupDescription: "{cm:AdditionalSettings}"
-; Name: "settingsAsAdmin"; Description: "{cm:SettingsADMIN}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
 Name: "DirectXRedist"; Description: "{cm:InstallDx}"; GroupDescription: "{cm:ExtInstallers}"
+; Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"; Check: IsWin64
+Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"
+Name: "VCRedistX86"; Description: "{cm:RunTimeX86}"; GroupDescription: "{cm:ExtInstallers}"
 
 
 [Files]
 #if InstallerBuildType == "installPatcher"
   ; PlayArc Files.
-  Source: "{#WWIIOnlineAssetsDir}\{#WWIIOnlinePatchingTool}"; DestDir: "{app}"; Flags: ignoreversion deleteafterinstall
+  Source: "{#WWIIOnlineAssetsDir}\oswin\{#WWIIOnlinePatchingTool}"; DestDir: "{app}"; Flags: ignoreversion deleteafterinstall
   Source: "{#PatchFilesRoot}\playarc01.ww2.patch"; DestDir: "{app}\playarc"; BeforeInstall: BackupPatchTgt('playarc\playarc01.ww2'); Flags: ignoreversion deleteafterinstall
   Source: "{#PatchFilesRoot}\playarc02.ww2.patch"; DestDir: "{app}\playarc"; BeforeInstall: BackupPatchTgt('playarc\playarc02.ww2'); Flags: ignoreversion deleteafterinstall
   Source: "{#PatchFilesRoot}\playarc03.ww2.patch"; DestDir: "{app}\playarc"; BeforeInstall: BackupPatchTgt('playarc\playarc03.ww2'); Flags: ignoreversion deleteafterinstall
@@ -436,41 +431,35 @@ Name: "DirectXRedist"; Description: "{cm:InstallDx}"; GroupDescription: "{cm:Ext
   ; Other Files.
   Source: "{#PatchFilesRoot}\license.rtf.patch";   DestDir: "{app}\docs"; BeforeInstall: BackupPatchTgt('docs\license.rtf');   Flags: ignoreversion deleteafterinstall
   Source: "{#PatchFilesRoot}\readme.rtf.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('readme.rtf');    Flags: ignoreversion deleteafterinstall
-  Source: "{#PatchFilesRoot}\bg-tos.bmp.patch";    DestDir: "{app}\DATA\playgate"; BeforeInstall: BackupPatchTgt('DATA\playgate\bg-tos.bmp');    Flags: ignoreversion deleteafterinstall
+  Source: "{#PatchFilesRoot}\readme.txt.patch";    DestDir: "{app}"; BeforeInstall: BackupPatchTgt('readme.txt');    Flags: ignoreversion deleteafterinstall
 
 #else
   ; InstallerBuildType == "installFull"
   ; InstallerBuildType == "installRollback"
-;  Source: "{#CurrentFilesRoot}\bin\*"; DestDir: "{app}\bin";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
-  Source: "{#CurrentFilesRoot}\DATA\*"; DestDir: "{app}\DATA";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
+  Source: "{#CurrentFilesRoot}\data\*"; DestDir: "{app}\data";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
   Source: "{#CurrentFilesRoot}\docs\*"; DestDir: "{app}\docs";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
   Source: "{#CurrentFilesRoot}\playarc\*"; DestDir: "{app}\playarc";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion recursesubdirs
   Source: "{#CurrentFilesRoot}\*"; DestDir: "{app}";Excludes: {#InstallerExcludePatterns}; Flags: ignoreversion
-
-
+ 
 #endif
        
 
 [Registry]
 ; DirectX Setup: RUNASADMIN
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSDirectXSetup}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
-; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSDirectXSetup}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
-; Settings.exe: RUNASADMIN
-; Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineProperties}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: settingsAsAdmin
-; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineProperties}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: settingsAsAdmin
+; VC Runtimes x64 Setup: RUNASADMIN
+; Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Check: IsWin64; Flags: createvalueifdoesntexist uninsdeletevalue
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
+
+; VC Runtimes x86 Setup: RUNASADMIN
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX86}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
 #if InstallerBuildType == "installPatcher"
-; Patching Tool (xdelta3.exe) = RUNASADMIN
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers\"; ValueType: String; ValueName: "{app}\{#WWIIOnlinePatchingTool}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
-; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers\"; ValueType: String; ValueName: "{app}\{#WWIIOnlinePatchingTool}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
+  ; Patching Tool (xdelta3.exe) = RUNASADMIN
+  Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers\"; ValueType: String; ValueName: "{app}\{#WWIIOnlinePatchingTool}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
 #endif
-
-; Registry: Hi DPI display setup.
-; The HKLM settings fails. Seems to be blocked, probably by Windows UAC despite having Admin privileges - MJH.
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineExe}"; ValueData: "HIGHDPIAWARE"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: hiDPIMonitor
-; Root: "HKLM"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#WWIIOnlineExe}"; ValueData: "~HIGHDPIAWARE"; Flags: createvalueifdoesntexist uninsdeletevalue; Tasks: hiDPIMonitor
 
 #if UsePlaygate == "yes"
 ; Default
@@ -485,6 +474,7 @@ Root: "HKLM"; Subkey: "SOFTWARE\Wow6432Node\Playnet\apps\appid{#WWIIOnlineID}\in
 Root: "HKLM"; Subkey: "SOFTWARE\Wow6432Node\Playnet\apps\appid{#WWIIOnlineID}\instance1"; ValueType: string; ValueName: "Path"; ValueData: "{app}"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue
 Root: "HKLM"; Subkey: "SOFTWARE\Wow6432Node\Playnet\apps\appid{#WWIIOnlineID}\instance1"; ValueType: string; ValueName: "Region"; ValueData: "{#PlaygateValueRegion}"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue
 Root: "HKLM"; Subkey: "SOFTWARE\Wow6432Node\Playnet\apps\appid{#WWIIOnlineID}\instance1"; ValueType: string; ValueName: "Version"; ValueData: "{#WWIIOnlineDirName}"; Flags: createvalueifdoesntexist uninsdeletekeyifempty uninsdeletevalue
+
 #endif
 
 [Icons]
@@ -495,7 +485,7 @@ Name: "{group}\Online Game Manual"; Filename: "{#InstallerManualURL}"; IconFilen
 
 #if UsePlaygate == "no"
   Name: "{group}\Play Online"; Filename: "{app}\{#WWIIOnlineExe}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolLauncher}"
-  Name: "{commondesktop}\{#WWIIOnlineAppName}"; Filename: "{app}\{#WWIIOnlineExe}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolLauncher}"; Tasks: desktopicon
+  Name: "{commondesktop}\{#WWIIOnlineAppName}{#WWIIOnlineAppVerName}"; Filename: "{app}\{#WWIIOnlineExe}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolLauncher}"; Tasks: desktopicon
 
 #else
 ; Default
@@ -508,8 +498,9 @@ Name: "{group}\Practice Offline"; Filename: "{app}\{#WWIIOnlineExe}"; IconFilena
 Name: "{group}\Settings"; Filename: "{app}\{#WWIIOnlineProperties}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolSettings}"
 Name: "{group}\Training"; Filename: "{#InstallerTrainingURL}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolTraining}"
 Name: "{group}\Support Files\DirectX Redistributable Installer"; Filename: "{app}\{#MSDirectXSetup}"; Comment: "{cm:InstallDX}"
-Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:InstallRunTime}"; Check: IsRunningWindows('x64')
-Name: "{group}\Support Files\(x86) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX86}"; Comment: "{cm:InstallRunTime}"
+; Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"; Check: IsWin64
+Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"
+Name: "{group}\Support Files\(x86) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX86}"; Comment: "{cm:RunTimeX86}"
 Name: "{group}\Support Files\Uninstall World War II Online"; Filename: "{uninstallexe}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolUninstall}"
 
 
@@ -539,15 +530,33 @@ Name: "{group}\Support Files\Uninstall World War II Online"; Filename: "{uninsta
   ; Other Files.
   Filename: "{app}\{#WWIIOnlinePatchingTool}"; Parameters: "-d -f -q -9 -s ""{app}\docs\license.rtf.backup""   ""{app}\docs\license.rtf.patch""   ""{app}\docs\license.rtf""";   Flags: skipifsilent runhidden; AfterInstall: CleanUp('docs\license.rtf') 
   Filename: "{app}\{#WWIIOnlinePatchingTool}"; Parameters: "-d -f -q -9 -s ""{app}\readme.rtf.backup""    ""{app}\readme.rtf.patch""    ""{app}\readme.rtf""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('readme.rtf')
-  Filename: "{app}\{#WWIIOnlinePatchingTool}"; Parameters: "-d -f -q -9 -s ""{app}\DATA\playgate\bg-tos.bmp.backup""    ""{app}\DATA\playgate\bg-tos.bmp.patch""    ""{app}\DATA\playgate\bg-tos.bmp""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('DATA\playgate\bg-tos.bmp')
+  Filename: "{app}\{#WWIIOnlinePatchingTool}"; Parameters: "-d -f -q -9 -s ""{app}\readme.txt.backup""    ""{app}\readme.txt.patch""    ""{app}\readme.rtf""";    Flags: skipifsilent runhidden; AfterInstall: CleanUp('readme.txt')
 
-#else
+  ; Re-launch WWIIOnline after Patching.
+  #if UsePlaygate == "yes"
+    ; Default
+    Filename: "{app}\{#WWIIOnlineLauncher}"; Description: "{cm:LaunchProgram,{#StringChange(WWIIOnlineAppName, '&', '&&')}} when finished everything."; Flags: nowait postinstall skipifsilent runascurrentuser
+
+   #else
+    Filename: "{app}\{#WWIIOnlineExe}"; Description: "{cm:LaunchProgram,{#StringChange(WWIIOnlineAppName, '&', '&&')}} when finished everything."; Flags: nowait postinstall skipifsilent runascurrentuser
+
+  #endif
+  
+ #else
   ; InstallerBuildType == "installFull"
   ; InstallerBuildType == "installRollback"
-  Filename: "{app}\{#MSDirectXSetup}"; StatusMsg: "Running DirectX Installer"; Tasks: DirectXRedist; Flags: skipifsilent runascurrentuser 
+  Filename: "{app}\{#MSDirectXSetup}"; StatusMsg: "Running DirectX Installer"; Tasks: DirectXRedist; Flags: skipifsilent runascurrentuser
+  ; Filename: "{app}\{#MSRuntimeLibraryX64}"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Check: IsWin64; Flags: skipifsilent runascurrentuser
+  Filename: "{app}\{#MSRuntimeLibraryX64}"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Flags: skipifsilent runascurrentuser
+  Filename: "{app}\{#MSRuntimeLibraryX86}"; StatusMsg: "Running VC++ Redistributable Installer x86"; Tasks: VCRedistX86; Flags: skipifsilent runascurrentuser 
   Filename: "{app}\{#WWIIOnlineProperties}"; Description: "Launch Settings Program after install completes."; Flags: postinstall skipifsilent runascurrentuser
-  Filename: "{app}\{#WWIIOnlineLauncher}"; Description: "{cm:LaunchProgram,{#StringChange(WWIIOnlineAppName, '&', '&&')}} when finished everything."; Flags: nowait postinstall skipifsilent runascurrentuser
 
+  #if UsePlaygate == "yes"
+    ; Default
+    Filename: "{app}\{#WWIIOnlineLauncher}"; Description: "{cm:LaunchProgram,{#StringChange(WWIIOnlineAppName, '&', '&&')}} when finished everything."; Flags: nowait postinstall skipifsilent runascurrentuser
+  #else
+    Filename: "{app}\{#WWIIOnlineExe}"; Description: "{cm:LaunchProgram,{#StringChange(WWIIOnlineAppName, '&', '&&')}} when finished everything."; Flags: nowait postinstall skipifsilent runascurrentuser
+  #endif
 #endif
 
 
@@ -556,16 +565,14 @@ Name: "{pf}\{#InstallerRootPathName}"; Flags: uninsalwaysuninstall
 
 #if ReleaseType == "Alpha" | ReleaseType == "Beta"
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}"; Flags: uninsalwaysuninstall
-;  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\bin"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\DATA"; Flags: uninsalwaysuninstall
+  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\data"; Flags: uninsalwaysuninstall
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\docs"; Flags: uninsalwaysuninstall
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\playarc"; Flags: uninsalwaysuninstall
 
 #else
   ; ReleaseType == "ReleaseCandidate" - Default
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}"; Flags: uninsalwaysuninstall
-;  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\bin"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\DATA"; Flags: uninsalwaysuninstall
+  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\data"; Flags: uninsalwaysuninstall
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\docs"; Flags: uninsalwaysuninstall
   Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\playarc"; Flags: uninsalwaysuninstall
 
@@ -613,25 +620,6 @@ var
 
   
 { Utility Functions - START.    =================}
-function IsRunningWindows( WindowsArchitecture: string ): boolean;
-var
-  output: boolean;
-
-begin
-  { IsWin64: Returns True if the system is running a 64-bit version of Windows. }
-
-  if AnsiLowercase( Trim( WindowsArchitecture )) = 'x64' then begin
-    output := IsWin64;
-
-  end else begin
-    output := not( IsWin64 );
-
-  end;  
-
-  Result := output;
-end;
-
-
 function StrSplit(Text: String; Separator: String): TArrayOfString;
 { Source:https://stackoverflow.com/questions/23836703/how-to-split-a-string-in-inno-setup }
 
@@ -674,12 +662,18 @@ begin
 
   end else begin
     versionARAY := StrSplit( Trim( versionText ), '.' );
+
     arrayLength := GetArrayLength( versionARAY );
+
+    Log(Format( 'versionText: %s', [ versionText ]));
+    Log(Format( 'arrayLength: %d', [ arrayLength ]));
 
     zz := 0;
     versionNumber := 0;
 
     repeat
+      Log(Format( 'versionARAY[XX]: %s', [ versionARAY[zz] ]));
+      
       if ( zz = 0 ) then begin
         versionNumber := versionNumber + StrToIntDef( versionARAY[ zz ], 0 ) * 1000000000;
 
@@ -695,7 +689,7 @@ begin
       end;
 
       zz := zz + 1;
-    until zz > arrayLength;
+    until zz >= arrayLength;
 
   end;
 
@@ -817,6 +811,9 @@ begin
   Log(Format( 'Current File Name: %s', [ CurrentFileName ]));
 
   versionARAY := StrSplit( CurrentFileName, '-' );
+
+  Log(Format( 'versionARAY[0]: %s', [ versionARAY[0] ]));
+  Log(Format( 'versionARAY[1]: %s', [ versionARAY[1] ]));
 
   PatchFromVersionNumber := StrToIntDef( getVersionNumber( versionARAY[0]), 0 );
   InstallVersionNumber := StrToIntDef( getVersionNumber( versionARAY[1]), 0 );
@@ -1006,7 +1003,7 @@ begin
 
   if ( FileCopySucess = true ) then begin
     if SetCurrentDir( Trim( ExpandConstant( '{userdocs}' ))) then begin
-      TimeStamp := GetDateTimeString('yyymmdd_hhnnss', ' ', ' ');
+      TimeStamp := GetDateTimeString('yyyymmdd-hhnnss', ' ', ' ');
       if  RenameFile( RootFolderName, RootFolderName + '_Copied_' + TimeStamp ) then begin
         MsgText := FmtMessage( CustomMessage('RenamedDIR'), [ RootFolderName, RootFolderName, TimeStamp ]);
         MsgYN := MsgBox( MsgText, mbInformation, mb_ok );

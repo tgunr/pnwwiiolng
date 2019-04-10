@@ -215,7 +215,7 @@
       <Optimization>Full</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>.\;src;$(SolutionDir)\WW2\src;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)Libraries\SteamSDK\public\steam;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;src;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\include;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)Libraries\SteamSDK\public\steam;$(SolutionDir)\Libraries\RakNet\Source;$(SolutionDir)\Libraries\RakNet\DependentExtensions\cat\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>BETA_RELEASE;WIN32;_WINDOWS;NDEBUG;FRONT_END;platOS=OS_WIN32;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;ANTIHACK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -362,6 +362,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="..\WW2\src\include\platforms.h" />
     <ClInclude Include="..\WW2\src\include\precompile_includes.h" />
     <ClInclude Include="src\Antihack.h" />
     <ClInclude Include="src\BDialog.h" />

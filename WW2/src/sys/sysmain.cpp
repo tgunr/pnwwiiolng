@@ -428,7 +428,8 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs%hs\n"), filename, pFFI, PN_code_git_commitish_string, PN_data_git_commitish_string);
+		//  usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs%hs\n"), filename, pFFI, PN_code_git_commitish_string, PN_data_git_commitish_string);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs (%hs)\r\nCommit: %hs%hs\n"), filename, PN_product_version_string, PN_build_platform_string, PN_code_git_commitish_string, PN_data_git_commitish_string);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);

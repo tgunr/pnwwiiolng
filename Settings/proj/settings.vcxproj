@@ -74,6 +74,7 @@
     <OutDir>$(BinOutDir)</OutDir>
     <IntDir>$(IntOutDir)</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\GitRepos\GitWWIIOnline\wwiiolng\WW2\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -171,8 +172,8 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EXE_BUILD=BUILD_EXE_SETTINGS;WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>EXE_BUILD=BUILD_EXE_SETTINGS;WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;GLEW_STATIC;platOS=OS_WIN32;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -226,6 +227,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="..\..\WW2\src\include\platforms.h" />
     <ClInclude Include="..\..\WW2\src\include\systypes.h" />
     <ClInclude Include="..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\src\cfg\cfgData.h" />
@@ -260,9 +262,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vs2017\glew_static.vcxproj">

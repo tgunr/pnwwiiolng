@@ -43,9 +43,19 @@ void GetWC(const char *sourceString, wwiiolpath_string &destinationString);
 wwiiolpath_string fioGetCurrentWorkingPath();
 LOGICAL fioSetCurrentWorkingPath(wwiiolpath_string targetPath);
 void fioStructureForwadDeclare();  //  Dosnt "DO" anything.
-wwiiolpath_string SQL_DateTimeStamp();  //  Returns an SQL Formatted Date/Time Stamp string. YYYYMMDD-HHMMSS
+
+//  Retrieve the current time to millisecond resolution in portable fashion. From dbug.cpp line: 496.
+//  static void _getCurrentTime(struct tm &tm, uint32_t &millis);
+
+//  Returns an SQL Formatted Date/Time Stamp string.
+//  compact = false -- YYYY-MM-DD HH:MM:SS.MS
+//  compact = true -- YYYYMMDD-HHMMSSMS
+wwiiolpath_string SQL_DateTimeStamp(bool compact = false);
+
 bool CopyOldSetupFiles_WIN();
-bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function);  //  Used within CopyOldSetupFiles_WIN().
+
+//  Used within CopyOldSetupFiles_WIN().
+bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinationPath, unsigned int FO_Function = 2U);
 
 
 #endif  //  __FileIOStructure__

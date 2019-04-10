@@ -25,12 +25,6 @@
     <Filter Include="Settings Files\d3d">
       <UniqueIdentifier>{29a14d49-0a4a-41f0-9e50-35d114f8df36}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ww2 - src">
-      <UniqueIdentifier>{838c7c68-a1df-4b67-8490-f094090e0285}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ww2 - src\fio">
-      <UniqueIdentifier>{80b2670b-6d57-4955-895f-30c9d61c809a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{ac85e990-9984-4c4d-b5da-1bd70b32ee90}</UniqueIdentifier>
     </Filter>
@@ -54,6 +48,15 @@
     </Filter>
     <Filter Include="Resource Files\Location Files\spanish">
       <UniqueIdentifier>{9dd4db96-c983-42fe-aa40-5a9b159538b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src">
+      <UniqueIdentifier>{838c7c68-a1df-4b67-8490-f094090e0285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\fio">
+      <UniqueIdentifier>{80b2670b-6d57-4955-895f-30c9d61c809a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\include">
+      <UniqueIdentifier>{47f6d4af-fbae-4ab8-929b-e2380fd59acc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +91,7 @@
       <Filter>Settings Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp">
-      <Filter>ww2 - src\fio</Filter>
+      <Filter>WW2 - src\fio</Filter>
     </ClCompile>
     <ClCompile Include="..\src\d3d\dx3dinfo.cpp">
       <Filter>Settings Files\d3d</Filter>
@@ -132,13 +135,16 @@
       <Filter>Settings Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\WW2\src\fio\fiostructure.h">
-      <Filter>ww2 - src\fio</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\WW2\src\include\systypes.h">
-      <Filter>ww2 - src</Filter>
+      <Filter>WW2 - src\fio</Filter>
     </ClInclude>
     <ClInclude Include="..\src\d3d\dx3dinfo.h">
       <Filter>Settings Files\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\include\platforms.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\include\systypes.h">
+      <Filter>WW2 - src\include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,9 +184,6 @@
     <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\settings.dtd">
       <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="settings.rc">
