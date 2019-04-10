@@ -1280,7 +1280,7 @@ _processDollars(const Player* player, const char* base, char* start)
 		{
 			if ( player->originCpID().id != 0 )
 			{
-				buffer.replace(pos, _TAG_LEN, player->objectiveCP());
+				buffer.replace(pos, _TAG_LEN, player->originCP());
 				translations = true;
 			}
 		}
