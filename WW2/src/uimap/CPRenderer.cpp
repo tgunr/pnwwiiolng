@@ -464,7 +464,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 {
 	// Set the needed variables to find out if the town has only a Garrison unit
 	_mycountry	= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
-	_myside		= _mycountry ? (_mycountry == 4) ? 2: 1: 0;
+	_myside		= wwiiSide(_mycountry);
 	bool garrisonOnly = false;
 	
 	// If no best unit was found, we know that it's only a Garrison in this town.
@@ -712,8 +712,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 	// init cache variables
 	_mycountry		= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
-	_myside			= _mycountry ? (_mycountry == 4) ? 2: 1: 0;
-	_cpside			= (_cp.Country() == 4) ? 2: 1;
+	_myside			= wwiiSide(_mycountry);
+	_cpside			= wwiiSide(_cp.Country());
 	_namecolor		= (_cpside == 1) ? _renderer->alliedcolor: _renderer->axiscolor;
 	_cutoff			= 0;
 	_objective		= 0;
