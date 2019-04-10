@@ -1166,10 +1166,10 @@ _injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UI
 		{
 			if ( unit->parent() )
 			{
-				unitName += unit->parent()->shortName();
+				unitName += unit->parent()->name();
 				unitName += "/";
 			}
-			unitName += unit->shortName();
+			unitName += unit->name();
 		}
 	}
 
