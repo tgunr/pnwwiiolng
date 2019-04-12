@@ -606,7 +606,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(1,1,1,1);
 
 		// Only towns that don't have Garrison units can show the Unit Flag designation
-		if(!garrisonOnly){
+		if(!garrisonOnly || (garrisonOnly && _bestuniticon == _renderer->animFlagIcons[WWII_NO_COUNTRY])){
 			ctx->SetTexture(_bestuniticon);
 			phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
 			phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
@@ -792,6 +792,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					}
 					break;
 					case WWII_GERMANY:
+					{
 						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
 						// Take into account the player's map preference settings aswell
 						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
@@ -801,6 +802,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						{
 							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
 						}
+					}
 					break;
                     default:
                         // No other valid countries right now
@@ -911,10 +913,14 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 		if((cpflags & CP_STAT_SURRENDER_CANDIDATE) && _renderer->animFlagIcons[WWII_NO_COUNTRY] >= 0)
 		{
-			if(_bestuniticon >= 0)
+			if(_bestuniticon >= 0 && !garrisonOnly)
+			{
 				_altuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 			else
+			{
 				_bestuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 		}
 	}
 	else
