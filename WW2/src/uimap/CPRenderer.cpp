@@ -606,7 +606,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(1,1,1,1);
 
 		// Only towns that don't have Garrison units can show the Unit Flag designation
-		if(!garrisonOnly){
+		if(!garrisonOnly || (garrisonOnly && _bestuniticon == _renderer->animFlagIcons[WWII_NO_COUNTRY])){
 			ctx->SetTexture(_bestuniticon);
 			phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
 			phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
@@ -633,9 +633,12 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(_namecolor[0],_namecolor[1],_namecolor[2],1.0f);
 		ctx->DisableTexture();
 
+		if(iconbuffer > 0.01)
+			iconbuffer = 0.01;
+
 		ugx = -iconbuffer * 4.0f;
 		// Towns with Garrion units don't have a flag, let's adjust the Dots down a bit
-		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 12.0f : 2.0f);
+		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 11.0f : 2.0f);
 
 		translatedx += ugx;
 		translatedy += ugy;
@@ -656,6 +659,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		for(unsigned int s = 0; s < limit; ++s)
 		{
 //			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
+
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
@@ -792,6 +796,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					}
 					break;
 					case WWII_GERMANY:
+					{
 						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
 						// Take into account the player's map preference settings aswell
 						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
@@ -801,6 +806,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						{
 							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
 						}
+					}
 					break;
                     default:
                         // No other valid countries right now
@@ -911,10 +917,14 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 		if((cpflags & CP_STAT_SURRENDER_CANDIDATE) && _renderer->animFlagIcons[WWII_NO_COUNTRY] >= 0)
 		{
-			if(_bestuniticon >= 0)
+			if(_bestuniticon >= 0 && !garrisonOnly)
+			{
 				_altuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 			else
+			{
 				_bestuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 		}
 	}
 	else
