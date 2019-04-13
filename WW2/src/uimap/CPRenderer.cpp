@@ -633,9 +633,12 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(_namecolor[0],_namecolor[1],_namecolor[2],1.0f);
 		ctx->DisableTexture();
 
+		if(iconbuffer > 0.01)
+			iconbuffer = 0.01;
+
 		ugx = -iconbuffer * 4.0f;
 		// Towns with Garrion units don't have a flag, let's adjust the Dots down a bit
-		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 12.0f : 2.0f);
+		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 11.0f : 2.0f);
 
 		translatedx += ugx;
 		translatedy += ugy;
@@ -656,6 +659,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		for(unsigned int s = 0; s < limit; ++s)
 		{
 //			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
+
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
