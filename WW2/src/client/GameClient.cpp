@@ -1962,24 +1962,6 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				}
 				
 			}
-			/*
-			else
-			{
-				int tempValue = Client::ValidatePersonasBrigade(unitloc.m_unitID);
-
-				if (tempValue < 1)
-				{
-					clientErrorLog("No Other Personas Updated.");
-				}
-				else
-				{
-					clientErrorLog("%d Other Personas Updated.", tempValue);
-
-					// update the jsclient
-					jsclient->UpdatePersonas();
-				}
-			}
-			*/
 		}
 	}
 	else
