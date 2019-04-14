@@ -1962,6 +1962,7 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 				}
 				
 			}
+			/*
 			else
 			{
 				int tempValue = Client::ValidatePersonasBrigade(unitloc.m_unitID);
@@ -1978,6 +1979,7 @@ void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
 					jsclient->UpdatePersonas();
 				}
 			}
+			*/
 		}
 	}
 	else
