@@ -462,6 +462,15 @@ void CPMapObject::DrawCPMarker(SuperCellMapView* mv)
 // this code is ugly and needs cleaning up - ramp
 void CPMapObject::DrawCP(SuperCellMapView* mv)
 {
+	// Set the needed variables to find out if the town has only a Garrison unit
+	_mycountry	= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
+	_myside		= wwiiSide(_mycountry);
+	bool garrisonOnly = false;
+	
+	// If no best unit was found, we know that it's only a Garrison in this town.
+	if (_cp.FindBestUnit(_myside, _mycountry, 0, true) == 0)
+		garrisonOnly = true;
+
 //	Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Entering renderer for town %s", _cp.Name());
 	phui::GraphicsContext *ctx = mv->GetGraphicsContext();
 
@@ -469,6 +478,10 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	ctx->DisableTexture();
 
 	unsigned int cpflags	= _cp.StratFlags(true);
+
+	// If the town has a Garrison unit and also has an inactive status, show it as inactive.
+	if(garrisonOnly && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+		_bestunit = 0;
 
 	int font			= mv->GetFont();
 	float fontheight	= ctx->FontHeight(font);
@@ -511,9 +524,13 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	phui::box_verts_with_pos(box, bgx - 5, bgy, bgw + 34, bgh);
 
 	if(_contended)
+	{
 		ctx->SetColor(.5f,.5f,0.0f,.7f);
+	}
 	else
+	{
 		ctx->SetColor(.3f,.3f,.3f,(_bestunit) ? 1.0f: .6f);
+	}
 
 	ctx->DrawQuad(box.verts);
 
@@ -588,12 +605,15 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 		ctx->SetColor(1,1,1,1);
 
-		ctx->SetTexture(_bestuniticon);
-		phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
-		phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
+		// Only towns that don't have Garrison units can show the Unit Flag designation
+		if(!garrisonOnly || (garrisonOnly && _bestuniticon == _renderer->animFlagIcons[WWII_NO_COUNTRY])){
+			ctx->SetTexture(_bestuniticon);
+			phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
+			phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
+		}
 
 		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
-		if(_altuniticon && ((cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) || (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
+		if(_altuniticon && (cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -613,8 +633,12 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(_namecolor[0],_namecolor[1],_namecolor[2],1.0f);
 		ctx->DisableTexture();
 
+		if(iconbuffer > 0.01)
+			iconbuffer = 0.01;
+
 		ugx = -iconbuffer * 4.0f;
-		ugy = bigiconsize - iconbuffer * 2.0f;
+		// Towns with Garrion units don't have a flag, let's adjust the Dots down a bit
+		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 11.0f : 2.0f);
 
 		translatedx += ugx;
 		translatedy += ugy;
@@ -635,6 +659,7 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		for(unsigned int s = 0; s < limit; ++s)
 		{
 //			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
+
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
@@ -691,8 +716,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 	// init cache variables
 	_mycountry		= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
-	_myside			= _mycountry ? (_mycountry == 4) ? 2: 1: 0;
-	_cpside			= (_cp.Country() == 4) ? 2: 1;
+	_myside			= wwiiSide(_mycountry);
+	_cpside			= wwiiSide(_cp.Country());
 	_namecolor		= (_cpside == 1) ? _renderer->alliedcolor: _renderer->axiscolor;
 	_cutoff			= 0;
 	_objective		= 0;
@@ -765,12 +790,13 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						{
 							_bestuniticon = _renderer->animFlagIcons[unit->country()];
 							
-							if(alliedUnit)
+							if(alliedUnit && alliedUnit->isBrigade())
 								_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
 						}
 					}
 					break;
 					case WWII_GERMANY:
+					{
 						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
 						// Take into account the player's map preference settings aswell
 						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
@@ -780,6 +806,7 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 						{
 							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
 						}
+					}
 					break;
                     default:
                         // No other valid countries right now
@@ -890,10 +917,14 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 		if((cpflags & CP_STAT_SURRENDER_CANDIDATE) && _renderer->animFlagIcons[WWII_NO_COUNTRY] >= 0)
 		{
-			if(_bestuniticon >= 0)
+			if(_bestuniticon >= 0 && !garrisonOnly)
+			{
 				_altuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 			else
+			{
 				_bestuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 		}
 	}
 	else

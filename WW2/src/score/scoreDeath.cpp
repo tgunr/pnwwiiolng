@@ -81,7 +81,7 @@ _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 static void
 _playerKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer, const bool friendlyFire)
 {
-	if ( host_config.kills.notifyKiller != 2 )
+	if ( !host_config.kills.notifyKiller )
 		return;
 
 	char vehicleName[MAX_HANDLE_SIZE];
@@ -109,7 +109,7 @@ _playerKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer, 
 static void
 _doKillARat(const Scoring::Sortie& victim, const Scoring::Sortie& killer, bool friendlyFire)
 {
-	if ( friendlyFire || ! host_config.kills.reportRats )
+	if ( friendlyFire || !host_config.kills.reportRats )
 		return;
 
 	const bool ratKiller = killer.isPlaynet();

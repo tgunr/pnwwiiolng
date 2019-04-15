@@ -6274,6 +6274,9 @@ static SINT32 dot_reloadvehicles(const char*)
 	vehtypeInit();
 	fpFPSDataReadFPSFile();
 	_ReadAmmoTypes();
+	
+	uiChatPrintLine("All vehicles reloaded.");
+	
 	return DC_HANDLED;
 }
 
