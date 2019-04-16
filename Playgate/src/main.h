@@ -2,7 +2,7 @@
 
 #define PG_VER_STRING		"1.1.9"
 #define PLAY_GATE_VERSION	"0." PG_VER_STRING
-#define	PG_COPYRIGHT		PG_VER_STRING " Copyright(C) Playnet Inc, 2001-2018"
+#define	PG_COPYRIGHT		PG_VER_STRING " Copyright(C) Playnet Inc, 2001-2019"
 
 #include "include/systypes.h"
 #include <string>

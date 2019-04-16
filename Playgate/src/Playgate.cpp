@@ -374,7 +374,7 @@ BOOL CPlaygateApp::InitInstance()
 
 	commInit();
 
-	dbugLog(_FLM, "Playgate launching information:\n\nPlaygate version %s.\nCommand Line: %s.\nExePath: %ls.\nDataPath: %ls.\n\n", PG_COPYRIGHT, m_lpCmdLine, WW2_exePath.c_str(), WW2_exePlayarcPath.c_str());
+	dbugLog(_FLM, "Playgate launching information:\n\nPlaygate version %s.\nCommand Line: %s\nExePath: %ls\nDataPath: %ls\n\n", PG_COPYRIGHT, GetCommandLineA(), WW2_exePath.c_str(), WW2_exePlayarcPath.c_str());
 
 	pgState = PgTOS;
 
