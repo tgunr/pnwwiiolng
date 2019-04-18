@@ -41,11 +41,13 @@ extern const char *macPreferencesPath();
 
 extern bool CopyOldSetupFiles_MAC();
 extern int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int AlertNumber);
+
 extern const char *macAppPath();
 extern const char *macDataPath();
 extern const char *macDocsPath();
 extern const char *macPlayarcPath();
 extern const char *macWorkingPathAPP();
+extern const char *macCrashLogsPath();
 extern const char *macCrashLogsPath();
 extern const char *macUserDocumentsPath();
 extern const char *macUserScreenShotsPath();

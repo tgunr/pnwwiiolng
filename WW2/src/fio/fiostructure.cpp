@@ -859,6 +859,7 @@ LOGICAL fioStructureInit()
     returnValue = macDocsPath();
     if (returnValue != NULL)
     {
+        //  /Applications -> World War II Online.app -> Contents -> Resources -> docs
         wwiiolpath_string docsPath(&returnValue[0], &returnValue[strlen(returnValue)]);
         exeDocsPath = docsPath;
         exeDocsPathSet = TRUE;

@@ -340,7 +340,7 @@ static NSString *placeholderHTML = @""
 @"</head>"
 @"<body>"
 @"<div class=\"hi\">"
-@"<a href=\"http://www.battlegroundeurope.net/\">"
+@"<a href=\"https://www.wwiionline.com/\">"
 @"<img style=\"height: 140px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
@@ -563,7 +563,8 @@ extern NSString *WebActionOriginalURLKey;
     LogEnabled = FALSE;
     UserLogEnabled = FALSE;
 #endif
-
+    
+    //  ISDIRECTORY
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {
@@ -1272,7 +1273,6 @@ static const char patchHandleKey = 0, patchSizeKey = 0, patchWrittenKey = 0;
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
     NSURLRequest *request = [NSURLRequest requestWithURL:patchURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60.0];
     NSURLConnection *uconnection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-//    NSURL *patchDir = [NSURL fileURLWithPath:@(macDocumentsPath())];
     NSURL *patchDir = [NSURL fileURLWithPath:@(macWorkingPathAPP())];
     NSURL *patchFileURL = [patchDir URLByAppendingPathComponent:patchURL.lastPathComponent];
     NSError *error = nil;
