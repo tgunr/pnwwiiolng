@@ -860,6 +860,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	facilityOID
 							,	player->chatHandle()
 							,	player->playerID()
+							,	player->country()
 							,	index
 							,	player->missionID()
 							,	player->brigadeID()

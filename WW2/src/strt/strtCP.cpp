@@ -1881,7 +1881,7 @@ static bool _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 // Capture a facility and log the change and effect.
 
 void
-strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
+strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
 {
 	//dbugLog(_FLN, "Performing strtCaptureAndLog");
 	if (unit == nullptr)
@@ -1891,10 +1891,10 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 cust
 	}
 
 	// Is this a save?
-	if ( facility->side == unit->side() )
+	if ( facility->side == wwiiSide(country) )
 	{
 		dbugLog(_FLD, "f:%s:cap saved by %s", facility->name, Chat::Name(handle).c_str());
-		strtCaptureLog(facility, CAP_SAVED, facility->country, handle, customerID, missionID, unit, teulTime(), seconds, false, false, false);
+		strtCaptureLog(facility, CAP_SAVED, facility->country, handle, customerID, country, missionID, unit, teulTime(), seconds, false, false, false);
 
 		if ( facility->cp->isObjective() )
 			facility->setCapturePending();
@@ -1910,13 +1910,13 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 cust
 	WWII_COUNTRY oldCountry = facility->country;
 
 	// They appear to be good for capture
-	strtCaptureFacility(*facility, unit->country(), oldCountry, true, false);
+	strtCaptureFacility(*facility, (WWII_COUNTRY)country, oldCountry, true, false);
 
 	// Determine if they changed things
-	bool hasTakenControl = (oldControl != unit->side() && facility->cp->controllingSide == unit->side());
-	bool hasTakenOwnership = (oldOwner != unit->side() && facility->cp->side == unit->side());
+	bool hasTakenControl = (oldControl != wwiiSide(country) && facility->cp->controllingSide == wwiiSide(country));
+	bool hasTakenOwnership = (oldOwner != wwiiSide(country) && facility->cp->side == wwiiSide(country));
 
-	strtCaptureLog(facility, CAP_CAPTURED, oldCountry, handle, customerID, missionID
+	strtCaptureLog(facility, CAP_CAPTURED, oldCountry, handle, customerID, country, missionID
 					, unit, teulTime(), seconds, wasContested, hasTakenControl, hasTakenOwnership);
 }
 
@@ -2153,7 +2153,7 @@ strtFallback(CPStruct* cp, WWII_SIDE forSide, FALLBACK_MODE mode, UINT32 playerI
 		if ( facility->side == forSide && facility->isMilitaryFacility() )
 		{
 			static const ChatHandle systemHandleID = chatGetHandle("SYSTEM");
-			strtCaptureAndLog(facility, systemHandleID, 0, 0, cp->attackingUnit(), 0);
+			strtCaptureAndLog(facility, systemHandleID, 0, cp->attackingUnit()->country(), 0, cp->attackingUnit(), 0);
 			facility->setCaptureEnabled();
 		}
 	}

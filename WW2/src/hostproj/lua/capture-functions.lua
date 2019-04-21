@@ -165,7 +165,8 @@ function P.contribute(contrib)
 	-- the player is capturing, otherwise the player is defending.
 
 	local contribType
-	if contrib:unit():side() ~= contrib:facility().side then
+	local contribSide = wwiiSide(contrib:playerCountry())
+	if contribSide ~= contrib:facility().side then
 		contribType = "cap"
 	else
 		contribType = "def"
@@ -393,7 +394,7 @@ function P.processFacility(facility, facilityData)
 
 		if capper.contrib ~= nil then
 			-- Increment progress.
-			local side = capper.contrib:unit():side();
+			local side = wwiiSide(capper.contrib:playerCountry());
 			newProgress = progress + P.ProgressRateForPlayers(cappers, side)
 
 			-- Get printable name of the capper
@@ -443,7 +444,7 @@ function P.processFacility(facility, facilityData)
 								Strat.CaptureContributionEvent.Active
 								, facility
 								, getHandle("SYSTEM")
-								, 0, 0, 0
+								, 0, facility.side, 0, 0
 								, HCUnit:GetCommandUnit(facility.country, BRANCH_LAND))
 
 			-- Reduce the progress.
