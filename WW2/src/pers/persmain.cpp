@@ -1400,6 +1400,9 @@ OBJECT * TempObj;
 			if (_Persona.PersonaEyeDOF != nullptr)
 			{
 				math3dMatrixMultiply(Mat,&(_Persona.PersonaEyeDOF->dof->dofmatrix2),Mat);
+                Mat->_41 *= gXValue;
+                Mat->_42 *= gYValue;
+                Mat->_43 *= gZValue;
 			}
 		}
 
@@ -2065,12 +2068,12 @@ Displacement.x = Displacement.y = Displacement.z = 0.0;
 		HeadAtt.Pitch = HeadAtt.Roll = HeadAtt.Yaw = 0.0f;
 		EyeAtt.Pitch = EyeAtt.Roll = EyeAtt.Yaw = 0.0f;
 	}
-	HeadAtt.Pitch = (_Persona.LastHeadAtt.Pitch * 0.05 + HeadAtt.Pitch * DeltaTime) /
-					(0.05+DeltaTime);
-	HeadAtt.Roll = (_Persona.LastHeadAtt.Roll * 0.05 + HeadAtt.Roll * DeltaTime) /
-					(0.05+DeltaTime);
-	HeadAtt.Yaw = (_Persona.LastHeadAtt.Yaw * 0.05 + HeadAtt.Yaw * DeltaTime) /
-					(0.05+DeltaTime);
+//    HeadAtt.Pitch = (_Persona.LastHeadAtt.Pitch * 0.05 + HeadAtt.Pitch * DeltaTime) /
+//                    (0.05+DeltaTime);
+//    HeadAtt.Roll = (_Persona.LastHeadAtt.Roll * 0.05 + HeadAtt.Roll * DeltaTime) /
+//                    (0.05+DeltaTime);
+//    HeadAtt.Yaw = (_Persona.LastHeadAtt.Yaw * 0.05 + HeadAtt.Yaw * DeltaTime) /
+//                    (0.05+DeltaTime);
 	_Persona.LastHeadAtt = HeadAtt;
 	Att1.x = -(float)HeadAtt.Pitch;
 	Att1.y = -(float)HeadAtt.Roll;
@@ -2083,18 +2086,19 @@ Displacement.x = Displacement.y = Displacement.z = 0.0;
 	_Persona.PersonaHeadDOF->dof->dofposmatrix = Matrix;
 	_Persona.PersonaHeadDOF->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
 
-	EyeAtt.Pitch = (_Persona.LastEyeAtt.Pitch * 0.03 + EyeAtt.Pitch * DeltaTime) /
-					(0.03+DeltaTime);
-	EyeAtt.Roll = (_Persona.LastEyeAtt.Roll * 0.03 + EyeAtt.Roll * DeltaTime) /
-					(0.03+DeltaTime);
-	EyeAtt.Yaw = (_Persona.LastEyeAtt.Yaw * 0.03 + EyeAtt.Yaw * DeltaTime) /
-					(0.03+DeltaTime);
+//    EyeAtt.Pitch = (_Persona.LastEyeAtt.Pitch * 0.03 + EyeAtt.Pitch * DeltaTime) /
+//                    (0.03+DeltaTime);
+//    EyeAtt.Roll = (_Persona.LastEyeAtt.Roll * 0.03 + EyeAtt.Roll * DeltaTime) /
+//                    (0.03+DeltaTime);
+//    EyeAtt.Yaw = (_Persona.LastEyeAtt.Yaw * 0.03 + EyeAtt.Yaw * DeltaTime) /
+//                    (0.03+DeltaTime);
 	_Persona.LastEyeAtt = EyeAtt;
 	Att1.x = -(float)EyeAtt.Pitch;
 	Att1.y = -(float)EyeAtt.Roll;
 	Att1.z = -(float)EyeAtt.Yaw;
 	mathEul_ToMatrix(&Matrix,EulOrdXYZs,&Att1);
-	if (_UseGyroStabilizedEyes)
+//    if (_UseGyroStabilizedEyes)
+    if (true)
 	{
 		math3dInvertMatrix(&Matrix2,&Matrix2);
 		math3dMatrixMultiply(&Matrix,&Matrix,&Matrix2);
