@@ -611,7 +611,7 @@ CaptureAction::ApplyEffects(bool manualCapture) const
 
 	// When we take ownership of a new town, destroy any outgoing
 	// firebases this would give us to enemy towns.
-	if ( m_leftContention == true && m_setOwner == true )
+	if ( m_leftContention == true && m_setOwner == true && !m_reclamation)
 	{
 		CPStruct::LINKS::iterator it;
 		for ( it = m_cp.m_links.begin(); it != m_cp.m_links.end(); ++it )
