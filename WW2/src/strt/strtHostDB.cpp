@@ -702,7 +702,7 @@ ObjectiveStats::save()
 
 void
 strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
-				, const ChatHandle handle, UINT32 customerID, UINT32 missionID
+				, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID
 				, const HCUnit* unit, UINT32 started, UINT32 seconds
 				, bool wasContested, bool tookControl, bool tookOwnership)
 {
@@ -733,7 +733,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 						" , %u"
 						" , '%s', %u, %u"
 						" )"
-						, state, customerID, unit->country(), unit->unitID()
+						, state, customerID, country, unit->unitID()
 						, fromCountry, started, seconds, missionID
 						, facility->uOID
 						, contentionState, tookControl, tookOwnership
@@ -746,7 +746,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: START %s#%d(%s)@%s(%s %s) requires %ds cs:%s"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -758,7 +758,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLW, "cap: ILLEGAL %s#%d(%s)@%s(%s %s) started %d took %d seconds"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -770,7 +770,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: CAPTURED %s#%d(%s)@%s(%s %s) started %u took %u seconds cs:%s ctrl:%s own:%s"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -785,7 +785,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: SAVED %s#%d(%s)@%s(%s %s) started %d took %d seconds"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]

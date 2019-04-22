@@ -533,7 +533,7 @@ Mission::changeLeadership(Player* player)
 		player = PlayerInterface::Lookup(m_backupLeader);
 		if ( player == nullptr || player->missionID() != missionID() || player->playerID() == playerID() )
 		{
-			dbugLog(_FLD, "m:%u no new leadership, deactivating", missionID());
+			dbugLog(_FLN, "m:%u no new leadership, deactivating", missionID());
 			deactivate();
 		}
 		return;
