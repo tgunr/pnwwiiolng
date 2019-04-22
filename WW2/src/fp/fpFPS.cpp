@@ -1533,9 +1533,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		stateFlags &= ~STATE_AIM;
 	}
 
-	// LMG's or RPATS cannot move while reloading
-	// LMG:  MG34 = German, Bren = British, FM29 = French, M1919A4 = US, British and French
-	// RPAT:  Panzershrek = German, PIAT = British, Bazooka = US and French
+	// LMGs and RPATS cannot move while reloading
+	// LMG: MG34 = German, Bren = British, FM29 = French, M1919A4 = US, British and French
+	// RPAT: Panzershrek = German, PIAT = British, Bazooka = US and French
 	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET
 		|| currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29)
 		&& (stateFlags & STATE_RELOADING)
@@ -1549,7 +1549,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		persShakeHead("common.headshake.reloadstill");
 	}
 
-// LMGs cannot fire while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
+	// LMGs cannot fire while moving (MG34 = German LMG) (Bren = British LMG) (FM29 = French LMG)
     if ((stateFlags & STATE_FIRE) && (currentWeaponModel == MG34 || currentWeaponModel == BREN || currentWeaponModel == FM29) && fpFPSIsMoving())
     {
         stateFlags &= ~STATE_FIRE;
