@@ -360,6 +360,17 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 			if (supplyFacility == nullptr)
 				throw PostRequestFail("no supplying facility", SPAWN_NO_BRIGADE_SUPPLY);
 		}
+		else
+		{
+			// if either link is open but owned by a different country then abort
+			if ((facility->m_incomingLink != nullptr && facility->m_incomingLink->firebase != nullptr &&
+				facility->m_incomingLink->firebase->isOpen() && facility->m_incomingLink->firebase->country != facility->country) ||
+				(facility->m_outgoingLink != nullptr && facility->m_outgoingLink->firebase != nullptr &&
+				facility->m_outgoingLink->firebase->isOpen() && facility->m_outgoingLink->firebase->country != facility->country))
+			{
+				throw PostRequestFail("no friendly fb for garrison supply", SPAWN_NO_BRIGADE_SUPPLY);
+			}
+		}
 
 		WeapJoinRequestNode *joinNode = _getNewJoinNode(request.customerID, request.handle, request.missionID);
 		if (joinNode == nullptr)
