@@ -767,6 +767,8 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 
 	currentWeapon->m_SpawnedFromMobileSpawn = request.usedMobileSpawn;
 
+	// Get the Facility that this weapon originated from.
+	currentWeapon->m_SpawnedFromFacility = currentWeapon->m_facility;
 
 	TELL_TESTER(currentWeapon->m_commander
 				, "v#%u spawning %s at %s"
@@ -1839,12 +1841,9 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID or
 	{
 		if (m_supplyingBrigade->isGarrison())
 		{
-			// Get the Facility that this weapon originated from.
-			FacilityStruct* parentFacility = strtGetFacility(originFacilityID);
-			
 			// If we spawned in at this town or we spawned via an MS then we do NOT want to overstock the Garrision that's here
 			// so the weapon is returned to it's own Garrison.
-			if (parentFacility != nullptr && parentFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
+			if (m_SpawnedFromFacility != nullptr && m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
 			{
 				if (_returnToOrigin(*this) == true)
 				{
