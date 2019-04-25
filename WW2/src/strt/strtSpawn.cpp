@@ -1665,8 +1665,7 @@ _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 	{
 		// If there is a Garrison of the same branch and movement type in the CP that we are trying to RTB to
 		// then try to deposit the weapon there.
-		StratHCUnit *newUnit
-			= weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
+		StratHCUnit *newUnit = weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
 		if (newUnit)
 		{
 			if (newUnit->depositWeapons(weapon->spec(), 1, true, nullptr) == false)
@@ -1676,7 +1675,7 @@ _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 			}
 			_returnLog(weapon, "manually-supplied to Garrison");
 			weapon->detachReinforcement();
-			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->shortName());
+			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->name());
 		}
 		else
 		{
@@ -1848,20 +1847,20 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID or
 			if (parentFacility != nullptr && parentFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
 			{
 				if (_returnToOrigin(*this) == true)
-						{
-							TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
-							rescue = false;
-						}
-						else
-						{
-							TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
-							_returnLog(this, "failed to deliver");
-							rescue = true;
-						}
+				{
+					TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+					rescue = false;
+				}
+				else
+				{
+					TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+					_returnLog(this, "failed to deliver");
+					rescue = true;
+				}
 			}
 			else
 			{
-				// Try to over-stock the Garrison at the town where we rtb-ed
+				// Try to over-stock the Garrison at the town where we RTBed
 				if (_returnWeaponToGarrison(this) == true)
 				{
 					TELL_TESTER(m_commander, "returned #%u to different Garrison", m_weaponSerial.serial);
