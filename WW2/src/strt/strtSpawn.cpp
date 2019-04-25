@@ -489,7 +489,7 @@ POSTED_WEAPON::detachJoiners(bool announceFails)
 }
 
 static void
-_cleanUpJoinNode(WeapJoinRequestNode* joinNode, FULL_OBJ_ID originFacilityID)
+_cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 {
 	switch (joinNode->m_joinList->m_type)
 	{
@@ -517,7 +517,7 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode, FULL_OBJ_ID originFacilityID)
 				_validateCrew(postedWeapon);
 
 				// We have to be able to push the vehicle count up by 1.
-				postedWeapon.returnWeapon(true, false, originFacilityID);
+				postedWeapon.returnWeapon(true, false);
 				return;
 			}
 			else
@@ -883,7 +883,7 @@ strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel)
 	if (!joinNode)
 		return false;
 
-	_cleanUpJoinNode(joinNode, spawnCancel.originFacility);
+	_cleanUpJoinNode(joinNode);
 
 	return true;
 }
@@ -1787,7 +1787,7 @@ _rescue(POSTED_WEAPON* weapon)
 // was delivered to its brigade from its division or to a different Garrison.
 
 bool
-POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID originFacilityID)
+POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 {
 	bool returnable = (isNonSupplied() == false);
 	bool rtbed = false;

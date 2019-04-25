@@ -173,7 +173,6 @@ struct MM_SPAWN_CANCEL
 	UINT32	      customerID;
 	FULL_OBJ_ID	  facility; //The facility the mmhost wants information on
 	WEAPON_SERIAL weaponSerial;
-	FULL_OBJ_ID	  originFacility; //The Facility that we spawned at.
 };
 
 //Message telling the map server to tell the commander front end that their
