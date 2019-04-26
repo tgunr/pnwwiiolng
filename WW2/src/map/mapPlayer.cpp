@@ -2549,8 +2549,13 @@ void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY orig
 	{
 		Player *const player = (Player *)(*it);
 
-		if (player->isSpawned())
+		// if the player is in this brigade and is spawned in, defer the alternate selection logic
+		if ((player->brigadeID() == unitID) && player->isSpawned())
 		{
+			// make sure the player at least is told about the brigade change, later they'll get a notice again
+			// that will handle their own brigade selection
+			_sendHCUnitCountryChange(player, unitID, newCountry, 0, CHANGE_NOTHING);
+
 			dbugLog(_FLN, "Player %d is spawned in, attempting to deferr garrison change", player->playerID());
 			if (player->m_deferredGarrisonChangeNotice == nullptr)
 			{
