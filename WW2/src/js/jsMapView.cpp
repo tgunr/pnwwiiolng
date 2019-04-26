@@ -48,15 +48,15 @@ JSFunctionSpec jsWaypointObject::jsfunctions[] =
 };
 JSPropertySpec jsWaypointObject::jsproperties[] =
 {
-	{"objecttype",		jsWaypointObject::OBJECTTYPE_PROP,	JSPROP_PERMANENT | JSPROP_READONLY},
-	{"local",				jsWaypointObject::LOCAL_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
+	{"objecttype",		jsWaypointObject::OBJECTTYPE_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
+	{"local",			jsWaypointObject::LOCAL_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{"shared",			jsWaypointObject::SHARED_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"name",				jsWaypointObject::NAME_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
+	{"name",			jsWaypointObject::NAME_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{"notes",			jsWaypointObject::NOTES_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"position",			jsWaypointObject::POSITION_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
+	{"position",		jsWaypointObject::POSITION_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
 	{"active",			jsWaypointObject::ACTIVE_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"type",				jsWaypointObject::TYPE_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
-	{"displayname",	jsWaypointObject::DISPLAYNAME_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
+	{"type",			jsWaypointObject::TYPE_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
+	{"displayname",		jsWaypointObject::DISPLAYNAME_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
 	{"creator",			jsWaypointObject::CREATOR_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{0}
 };
