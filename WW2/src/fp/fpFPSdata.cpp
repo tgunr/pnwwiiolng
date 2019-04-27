@@ -149,7 +149,7 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"bren",
 	"mg34",
 	"fm39",
-	"stigr",	// German Smoke Grenade
+	"stigr_smk",	// German Smoke Grenade
 	"smoke",	// British Smoke Grenade
 	"smoke",	// French Smoke Grenade
 	"ammocan",
