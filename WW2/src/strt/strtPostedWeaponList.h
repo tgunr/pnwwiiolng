@@ -151,7 +151,8 @@ struct POSTED_WEAPON
 	UINT32 			m_posted;				//Timestamp at which this was posted.  Posts
 
 	bool            m_SpawnedFromMobileSpawn;	// True if spawned at a mobile spawn.
-	FacilityStruct* m_SpawnedFromFacility;		// The actual facility where a player spawns from
+	FacilityStruct* m_SpawnedFromFacility = nullptr;	// The actual facility where a player spawns from, null for when 
+														// a player reserves a weapon and releases it without spawning
 
 private:
 	// Allocate me a serial number and post me to the postedWeaponList

@@ -1841,9 +1841,9 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	{
 		if (m_supplyingBrigade->isGarrison())
 		{
-			// If we spawned in at this town or we spawned via an MS then we do NOT want to overstock the Garrision that's here
-			// so the weapon is returned to it's own Garrison.
-			if (m_SpawnedFromFacility && m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
+			// If we haven't spawned in yet or we spawned at this town or we spawned via an MS then we do NOT want to overstock
+			// the Garrision that's here so the weapon is returned to it's own Garrison.
+			if (m_SpawnedFromFacility == nullptr || m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
 			{
 				if (_returnToOrigin(*this) == true)
 				{
