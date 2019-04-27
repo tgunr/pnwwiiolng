@@ -1843,18 +1843,18 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	{
 		if (m_supplyingBrigade->isGarrison())
 		{
-			// If we spawned in at this town or we spawned via an MS then we do NOT want to overstock the Garrision that's here
-			// so the weapon is returned to it's own Garrison.
-			if (m_SpawnedFromFacility && m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
+			// If we haven't spawned in yet or we spawned at this town or we spawned via an MS then we do NOT want to overstock
+			// the Garrision that's here so the weapon is returned to it's own Garrison.
+			if (m_SpawnedFromFacility == nullptr || m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
 			{
 				if (_returnToOrigin(*this) == true)
 				{
-					TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Returned #%u to origin", m_weaponSerial.serial);
 					rescue = false;
 				}
 				else
 				{
-					TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Could not return #%u to origin", m_weaponSerial.serial);
 					_returnLog(this, "failed to deliver");
 					rescue = true;
 				}
@@ -1864,14 +1864,14 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 				// Try to over-stock the Garrison at the town where we RTBed
 				if (_returnWeaponToGarrison(this) == true)
 				{
-					TELL_TESTER(m_commander, "returned #%u to different Garrison", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Returned #%u to different Garrison", m_weaponSerial.serial);
 					rescue = false;
 					if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
 						vehicleDelivered = true;
 				}
 				else
 				{
-					TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Could not return #%u to a different Garrison", m_weaponSerial.serial);
 					_returnLog(this, "failed to deliver");
 					rescue = true;
 				}
@@ -1888,19 +1888,19 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 
 			if (_returnToOrigin(*this) == true)
 			{
-				TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Returned #%u to origin", m_weaponSerial.serial);
 				rescue = false;
 			}
 			else if (_returnToBrigade(this) == true)
 			{
-				TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Returned #%u to brigade", m_weaponSerial.serial);
 				rescue = false;
 				if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
 					vehicleDelivered = true;
 			}
 			else
 			{
-				TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Could not return #%u", m_weaponSerial.serial);
 				_returnLog(this, "failed to deliver");
 				rescue = true;
 			}
