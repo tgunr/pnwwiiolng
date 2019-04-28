@@ -27,8 +27,8 @@
 
 :: Disable / Enable = DebugBat.
 :: One option MUST be SET.
-rem SET DebugBat="false"
-SET DebugBat="true"
+SET DebugBat="false"
+rem SET DebugBat="true"
 
 :: =====================================================================================================
 

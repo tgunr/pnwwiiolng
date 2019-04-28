@@ -359,7 +359,12 @@ VersionInfoProductTextVersion={#WWIIOnlineInstallVersion}{#WWIIOnlineInstallVers
 ExitSetupTitle={#WWIIOnlineAppName} - Exit Setup
 SelectLanguageTitle={#WWIIOnlineAppName} - Setup Language
 SetupAppTitle={#WWIIOnlineAppName} - Setup. {#WWIIOnlineInstallVersion}{#WWIIOnlineInstallVersionType}
-SetupWindowTitle={#WWIIOnlineAppName} - Setup
+
+#if InstallerBuildType == "installPatcher"
+  SetupWindowTitle={#WWIIOnlineAppName} - Patch
+#else
+  SetupWindowTitle={#WWIIOnlineAppName} - Setup
+#endif
 
 
 [CustomMessages]
