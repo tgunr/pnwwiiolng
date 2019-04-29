@@ -24,6 +24,8 @@
 
 #include "strt/strtServerTypes.h"
 #include "strt/strtPostListReply.h"
+#include "map/mapHostMessages.h"
+#include "mm/mmMain.h"
 
 #ifndef STRAT_CLIENT
 #include "strt/strtFacilityWeaponList.h"
@@ -415,6 +417,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	spawnGrantRequest.weaponSerial = weaponSerial;
 	spawnGrantRequest.playerID = player.playerID();
 	spawnGrantRequest.missionID = 0;
+	spawnGrantRequest.usedMobileSpawn = player.m_wantMobileSpawn;
 
 	if ( player.validMissionPacket() )
 	{
@@ -575,6 +578,20 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 	player->addStratHit(incoming);
 
 	return 0;
+}
+
+// Send a Garrison country change request to Strat.
+static SINT32 _sendMMGarrisonCountryChangeRequest(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq* request = (GarrisonCountryChangeReq*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
+}
+
+// Garrison country change response from Strat.
+static SINT32 _recvMMGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
+{
+	dbugLog(_FLD, "GarrisonCountryChangeReq received on map host from strat.");
+	return mmhostToClientGarrisonCountryChange(a);
 }
 
 //////////////////////////////////////////////////////////////////////

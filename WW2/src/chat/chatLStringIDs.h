@@ -752,7 +752,17 @@ enum LSTRING_ID
 , LSTR_JOINMISSION_PLAYERNOTFOUND
 , LSTR_JOINMISSION_ALREADYONMISSION
 
+// 680
 , LSTR_FACTORIES_USAGE, LSTR_FACTORIES_DETAIL
+, LSTR_CP_COUNTRY_CHANGE_WARNING
+
+// 683
+, 	LSTR_CHANGE_COUNTRY_FAILED		// Couldn't change CP's country
+,	LSTR_FAILED_OWNER_ALREADY		// Already owned by requested country.
+,	LSTR_FAILED_TOO_MANY			// too many of that country already on the map.
+,	LSTR_FAILED_SUPPLY				// supply not within limits
+,	LSTR_FAILED_WRONG_OWNER			// CP must belong to your side.
+,	LSTR_FAILED_HAS_OBJECTIVE		// Cannot have an objective
 
 ,	MAX_LSTRING_IDS
 };

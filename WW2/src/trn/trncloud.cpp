@@ -129,7 +129,7 @@ static UINT32 AddCloudWisps()
     piVECTOR Velocity;
     piVECTOR TempVel;
     piVECTOR RotationRate;
-    FLOAT64VECTOR WorldOriginOffset;
+    FLOAT64VECTOR worldOriginOffset;
     mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
 	if (VehicleData != nullptr)
@@ -166,10 +166,10 @@ static UINT32 AddCloudWisps()
 
 	if (Intensity > 0.001f)
 	{
-		trnGetWorldOriginOffset(&WorldOriginOffset);
-		Pos.x += WorldOriginOffset.x;
-		Pos.y += WorldOriginOffset.y;
-		Pos.z += WorldOriginOffset.z;
+		trnGetWorldOriginOffset(&worldOriginOffset);
+		Pos.x += worldOriginOffset.x;
+		Pos.y += worldOriginOffset.y;
+		Pos.z += worldOriginOffset.z;
 		Pos.z = -Pos.z;
 
 		PPos = Pos;

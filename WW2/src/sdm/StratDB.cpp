@@ -423,8 +423,8 @@ void StratObject::Set(sdm_cp const& cp)
 	_name = (const char*)cp.name;
 	_filename = (const char*)cp.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = cp.oid.id;
 	_fullid.objClass = cp.oid.objClass;
 	_fullid.objType = cp.oid.objType;
@@ -455,8 +455,8 @@ void StratObject::Set(sdm_facility const& fac)
 	_name = (const char*)fac.name;
 	_filename = (const char*)fac.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = fac.oid.id;
 	_fullid.objClass = fac.oid.objClass;
 	_fullid.objType = fac.oid.objType;
@@ -492,8 +492,8 @@ void StratObject::Set(sdm_building const& bld)
 	_name = (const char*)bld.name;
 	_filename = (const char*)bld.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = bld.oid.id;
 	_fullid.objClass = bld.oid.objClass;
 	_fullid.objType = bld.oid.objType;
@@ -576,7 +576,7 @@ StratObject::ChildList StratObject::ChildStratObjects() const
 	FindBestUnit
 *************************************************************************************************/
 
-unsigned int StratObject::FindBestUnit(int s, int c, int b) const
+unsigned int StratObject::FindBestUnit(int s, int c, int b, bool ignoreGarrisons) const
 {
 	HCUnit* best = nullptr;
 	HCUnit* unit = nullptr;
@@ -585,7 +585,7 @@ unsigned int StratObject::FindBestUnit(int s, int c, int b) const
 	{
 		unit = HCUnit::Lookup(_units[i]);
 
-		if(unit && !unit->isTrainingUnit())
+		if(unit && !unit->isTrainingUnit() && !(unit->isGarrison() && ignoreGarrisons))
 		{
 			if(!best)
 				best = unit;
@@ -934,7 +934,7 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 
 StratObject* StratDB::FindStratObject(const FULL_OBJ_ID fullobjid)
 {
-	return FindStratObject(*(sdm_full_obj_id*)&fullobjid);
+	return FindStratObject(sdm_full_obj_id::from_foi(fullobjid));
 }
 
 StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
@@ -1022,7 +1022,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 {
 	_loaded = true;
 
-	sdm_lookup_id id = { (SINT16)(_sx << 4), (SINT16)(_sy << 4), 0 };
+	sdm_lookup_id id = { static_cast<SINT16>(static_cast<UINT16>(_sx) << 4), static_cast<SINT16>(static_cast<UINT16>(_sy) << 4), 0 };
 	StratObject* stratobj;
 
 	for(int i = 0; i < strat->numcps; i++)

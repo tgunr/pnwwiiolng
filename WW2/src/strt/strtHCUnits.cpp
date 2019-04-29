@@ -65,11 +65,39 @@ StratHCUnit::announceHome() const
 	chatSendBrigadeMoveResult(outgoing);
 }
 
+// This is used by strat to broadcast a Unit country change to both the map and chat hosts.
+// Chat sends the message on to all players.
+void
+StratHCUnit::announceGarrisonCountryChange() const
+{
+	dbugLog(_FLD, "Country change notification for unit %s (%d) to country %d", name(), unitID(), country());
+
+	if (isTrainingUnit())
+		return;
+	ChatHandle movedBy = lastMovedBy();
+	if (movedBy == 0LL)
+		movedBy = chatGetHandle("SYSTEM");
+	GARRISON_COUNTRY_CHANGE_MSG outgoing(movedBy, 0, GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE);
+	GarrisonCountryChange& message = outgoing.data();
+	message.m_brigadeID = unitID();
+	message.m_newCountryId = country();
+	message.m_action = GCR_APPROVED;
+	message.m_actionable = true;
+
+	stratSendGarrisonCountryChange(outgoing);
+}
+
 void
 StratHCUnit::addTOEInstance(const TOE_::WeaponTemplate& weaponTemplate)
 {
 	if ( !isTrainingUnit() )
 		m_toe.insert(std::make_pair(weaponTemplate.spec(), TOE_::WeaponInstance(weaponTemplate, *this, weaponTemplate.capacity())));
+}
+
+void StratHCUnit::clearTOEInstance()
+{
+	if (!isTrainingUnit())
+		m_toe.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -126,11 +154,13 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 	, m_fallbackCP(strtGetCPByOID(withFallbackCpOID))
 	, m_lastMoved(withLastMove)
 	, m_nextMove(withNextMove)
+	, m_lastCaptureTime(0)
 	, m_next(nullptr)
 	, m_lastMovedBy(withLastMovedBy)
 	, m_nextEvent(nullptr)
 	, m_postedWeaponList()
 	, m_toeTemplateHeader(TOE_::TemplateHeader::Lookup(withToeTemplate))
+	, m_toeTemplateHeaderName(withToeTemplate)
 	, m_toe()
 	, m_impl(*(new StratHCUnitImpl(*this)))
 {
@@ -166,7 +196,7 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 		m_toeTemplateHeader->subscribe(this, m_toe);
 	}
 
-	if (isDivision() || isBrigade())
+	if (isDivision() || isBrigade() || isGarrison())
 		s_units.push_back(this);
 }
 
@@ -237,6 +267,12 @@ StratHCUnit::save() const
 	// Safely derefence the current and fallback CP destinations into OIDs.
 	UINT32 homeOID = (homeCP() ? homeCP()->uOID : 0);
 	UINT32 fallbackOID = (fallbackCP() ? fallbackCP()->uOID : 0);
+	char templateName[MAX_HANDLE_SIZE];
+	templateName[0] = '\0';
+	if (toeTemplateHeader() != nullptr && toeTemplateHeader()->handle() != 0)
+	{
+		chatGetCallsign(templateName, toeTemplateHeader()->handle());
+	}
 
 	DBThread::Do(DBThread::Default
 		, "UPDATE strat_hc_units"
@@ -246,12 +282,16 @@ StratHCUnit::save() const
 				", modified = now()"
 				", last_moved = %u"
 				", last_moved_by = '%s'"
+		        ", country_id = %u"
+		        ", toe_template = '%s'"
 			" WHERE unit_id = %u"
 				, homeOID
 				, fallbackOID
 				, nextMove()
 				, lastMoved()
 				, ((0LL != lastMovedBy()) ? Chat::Name(lastMovedBy()).c_str() : "SYSTEM")
+				, country()
+				, templateName
 				, unitID()
 				);
 }
@@ -345,7 +385,7 @@ strtInitializeHCUnits()
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
 		HCUnit* hcUnit = it->second;
-		if ( !hcUnit->isDivision() && !hcUnit->isBrigade() )
+		if ( !hcUnit->isDivision() && !hcUnit->isBrigade() && !hcUnit->isGarrison() )
 			continue;
 		static_cast<StratHCUnit*>(hcUnit)->initialize();
 	}
@@ -356,7 +396,7 @@ strtInitializeHCUnits()
 	StratHCUnit* unit;
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
-		if ( it->second->isDivision() == false && it->second->isBrigade() == false )
+		if ( it->second->isDivision() == false && it->second->isBrigade() == false && it->second->isGarrison() == false )
 			continue;
 		unit = (StratHCUnit*)it->second;
 		if ( unit->homeCP() && unit->homeCP()->isSupplied() == false )
@@ -374,7 +414,7 @@ StratHCUnit::Lookup(UINT32 unitID)
 	HCUnit* unit = HCUnit::Lookup(unitID);
 	if ( unit == nullptr )
 		return nullptr;
-	if ( unit->isBrigade() || unit->isDivision() )
+	if ( unit->isBrigade() || unit->isDivision() || unit->isGarrison() )
 		return (StratHCUnit*) unit;
 	return nullptr;
 }
@@ -385,7 +425,7 @@ StratHCUnit::Lookup(const char* name)
 	HCUnit* unit = HCUnit::Lookup(name);
 	if ( unit == nullptr )
 		return nullptr;
-	if ( unit->isBrigade() || unit->isDivision() )
+	if ( unit->isBrigade() || unit->isDivision() || unit->isGarrison() )
 		return (StratHCUnit*) unit;
 	return nullptr;
 }
@@ -690,6 +730,7 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 		m_fallbackCP = m_homeCP;
 	setHomeCP(cp, redeployDelay, forceDelay);
 
+	// Tell the database and other servers where this HCUnit is
 	announceHome();
 
 	UINT32 startTimeS = host_config.supply.trickleStart_m * 60;
@@ -698,7 +739,7 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 	if ( offMap() )
 	{
 		dbugLog(_FLD, "hcu:%u(%s) moved off map, purging resupply", unitID(), callsign());
-		// Going off map nukes resupply tickest and resets
+		// Going off map nukes resupply tickets and resets
 		// stock levels to capacity.
 		purgeResupply(true);
 	}
@@ -863,6 +904,8 @@ StratHCUnit::fallback()
 	m_fallbackCP = const_cast<CPStruct*>(findFallback());
 	if ( !fallbackCP() )
 		return false;
+	if (type() == HCU_GARRISON)
+		return false;
 
 	dbugLog(_FLI, "hcu:%u name:%s falling back from %s -> %s"
 					, unitID(), callsign()
@@ -887,6 +930,9 @@ StratHCUnit::rout()
 
 	if ( fallback() )
 		return true;
+
+	if (type() == HCU_GARRISON)
+		return false;
 
 	dbugLog(_FLI, "hcu:%u(%s) routing ", unitID(), callsign());
 
@@ -964,6 +1010,11 @@ StratHCUnit::move(const char* byCallsign, CPStruct* cp)
 	if ( result != BMR_APPROVED )
 		return result;
 
+	if ( type() == HCU_GARRISON)
+	{
+		return BMR_FAILED_PERMISSION;
+	}
+
 	const bool fromOffMap = offMap();
 	const bool frontMovement = cp->isEnemyLinked() || homeCP()->isEnemyLinked();
 
@@ -1010,6 +1061,12 @@ strtDeployDivision(HCUnit* unit, CPStruct* cp, bool transferSupply)
 		return false;
 	}
 
+	if ( unit->type() == HCU_GARRISON ) 
+	{
+		dbugLog(_FLW, "Tried to rout Garrison#%u %s", unit->unitID(), unit->name());
+		return false;
+	}
+
 	StratHCUnit* const division = (StratHCUnit*)unit;
 
 	if ( division->homeCP() == cp )
@@ -1040,6 +1097,8 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 	StratHCUnit* const brigade = StratHCUnit::Lookup(brigadeID);
 	ABORT_IF(brigade == nullptr);
 	if ( brigade->isTrainingUnit() )
+		return false;
+	if ( brigade->type() == HCU_GARRISON )
 		return false;
 
 	if ( !brigade->isBrigade() )
@@ -1288,6 +1347,34 @@ StratHCUnit::reset()
 	else
 		m_fallbackCP = nullptr;
 }
+
+////////////////////////////////////////////////////////////////////////
+// Restarts a Garrisons supply and initiates the trickle timer.
+
+void StratHCUnit::restartGarrisonSupply(bool manualChange)
+{
+	if (!manualChange)
+	{
+		dbugLog(_FLN, "Garrison not changed manually");
+		restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);
+	}
+	else
+	{
+		UINT32 currentTime_s = teulTime();
+		UINT32 startTime_s = homeCP()->getLastCaptureTime();
+		UINT32 expireTime_s = startTime_s + host_config.supply.noPenaltySwitchPeriod_m * 60;
+		if (startTime_s != 0 && (wwiiSideCount(wwiiSide(country())) > 1) && (currentTime_s <= expireTime_s))
+		{
+			dbugLog(_FLN, "Garrison changed manually within no-penalty period");
+			restartSupply(host_config.supply.garrisonInactiveTime_m * 60, host_config.supply.garrisonTrickleTime_m * 60, true);
+		}
+		else
+		{
+			dbugLog(_FLN, "Garrison changed manually");
+			restartSupply(host_config.supply.mGarrisonInactiveTime_m * 60, host_config.supply.mGarrisonTrickleTime_m * 60, true);
+		}
+	}
+}  
 
 //////////////////////////////////////////////////////////////////////
 // Force the HCUnit to process the next supply ticket

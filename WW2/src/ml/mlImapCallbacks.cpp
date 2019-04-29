@@ -11,7 +11,7 @@
 #include "math/math3d.h"
 #include "math/mathvect.h"
 #include "include/vars.h"
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include "ml/mlHead.h"
 #include "imap/ww2imap.h"
 #include "trn/trncd.h"

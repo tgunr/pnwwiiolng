@@ -310,25 +310,38 @@ namespace Fiod
 			return readLen;
 		}
 
-		size_t Seek(size_t offset, int from)
+		off_t Seek(off_t offset, int from)
 		{
-			char* newPtr = nullptr;
-			switch ( from )
-			{
-			case SEEK_SET:
-				newPtr = basePtr + offset;
-			break;
-			case SEEK_CUR:
-				newPtr = curPtr + offset;
-			break;
-			case SEEK_END:
-				newPtr = endPtr + offset;
-			break;
+            // The extra gymnastics using offsets instead of just checking the
+            // pointers directly are here because it's undefined behavior to
+            // form a pointer outside of its allocated range, even if that
+            // pointer is never dereferenced.
+            off_t totalLen = (endPtr - basePtr), curOffset = (curPtr - basePtr);
+
+			switch (from) {
+                case SEEK_SET:
+                    if (offset < 0 || offset > totalLen) {
+                        return -1;
+                    }
+                    curPtr = basePtr + offset;
+                    break;
+                case SEEK_CUR:
+                    if (curOffset + offset < 0 || curOffset + offset > totalLen) {
+                        return -1;
+                    }
+                    curPtr += offset;
+                    break;
+                case SEEK_END:
+                    if (offset > 0 || -offset > totalLen) {
+                        return -1;
+                    }
+                    curPtr = endPtr + offset;
+                    break;
+                default:
+                    ABORT_IF_EX(true, "Invalid seek mode");
 			}
-			if ( newPtr < basePtr || newPtr > endPtr )
-				return (size_t)-1;
-			curPtr = newPtr;
-			return (size_t)(curPtr - basePtr);
+            ABORT_IF_EX(curPtr < basePtr || curPtr > endPtr, "Seek math was wrong");
+			return curPtr - basePtr;
 		}
 	};
 }
@@ -690,7 +703,6 @@ int fiodOpenWrite(const char* filename, bool userdir) {
 	return fd;
 }
 
-#if platBuild == BUILD_SERVER
 size_t fiodGetString(int fd, char* string, size_t length)
 {
 	FILE_MAP::iterator it = s_fileMap.find(fd);
@@ -717,7 +729,6 @@ size_t fiodGetString(int fd, char* string, size_t length)
 
 	return (size_t)(writePtr - string);
 }
-#endif
 
 #if platOS == OS_WIN32
 

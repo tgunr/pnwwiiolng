@@ -54,6 +54,8 @@ public:
 	{
 		if (_ref != p) {
 			std::swap(_ref, p);
+            if (_ref)
+                _ref->ref();
 			if (p)
 				p->unref();
 		}

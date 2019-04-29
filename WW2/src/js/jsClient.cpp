@@ -142,7 +142,6 @@ JSPropertySpec jsClient::jsproperties[] =
 	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
 	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
@@ -2510,6 +2509,12 @@ JSPropertySpec jsBrigade::jsproperties[] =
 	{"objective",		jsBrigade::OBJECTIVE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"mobilespawns",	jsBrigade::MOBILESPAWNS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isbrigade",		jsBrigade::ISBRIGADE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isgarrison",		jsBrigade::ISGARRISON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isfrontlinelinked", jsBrigade::ISFLLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isfrontline",		jsBrigade::ISFL_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isenemylinked",	jsBrigade::ISENEMYLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"hasaf",			jsBrigade::HASAF_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
+	{"hasnavy",			jsBrigade::HASNAVY_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"issquadbrigade",	jsBrigade::ISSQUADBRIGADE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"callsign",		jsBrigade::CALLSIGN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"oic",				jsBrigade::OIC_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
@@ -2892,6 +2897,44 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case ISBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(detail.isBrigade());
 		break;
+		case ISGARRISON_PROP:
+			*val = BOOLEAN_TO_JSVAL(detail.isGarrison());
+			break;
+		case ISFLLINKED_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool fllinked = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE_LINKED));
+				*val = BOOLEAN_TO_JSVAL(fllinked);
+			}
+			break;
+		case ISFL_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool fl = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE));
+				*val = BOOLEAN_TO_JSVAL(fl);
+			}
+			break;
+		case ISENEMYLINKED_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool felinked = (stratobj && (stratobj->StratFlags(true) & CP_STAT_ENEMY_LINKED));
+				*val = BOOLEAN_TO_JSVAL(felinked);
+			}
+			break;
+		case HASNAVY_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool hasnavy = (stratobj && (stratobj->StratFlags(true) & CP_STAT_HAS_NAVYBASE ));
+				*val = BOOLEAN_TO_JSVAL(hasnavy);
+			}
+			break;
+		case HASAF_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool hasaf = (stratobj && (stratobj->StratFlags(true) & CP_STAT_HAS_AIRBASE));
+				*val = BOOLEAN_TO_JSVAL(hasaf);
+			}
+			break;
 		case ISSQUADBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadBrigade(detail.brigadeID()));
 		break;
@@ -4346,6 +4389,13 @@ JS_FUNCTION_DEF(jsBrigadeControlNotice, veto)
 					        jsnotice->notice.m_brigadeID,
 							jsnotice->notice.m_target,
 							jsnotice->notice.m_origin);
+				break;
+			case BrigadeControlNotice::REQ_COUNTRY_CHANGE:
+
+				req.vetoBrigadeCountryChange(PlayerClient()->ChatConnection(),
+					        jsnotice->notice.m_brigadeID,
+							jsnotice->notice.m_origin,
+							(WWII_COUNTRY)jsnotice->notice.m_country);
 				break;
 		}
 

@@ -5,7 +5,7 @@
 *************************************************************************************************/
 // World War ][ Online specific imap functions
 
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include <string>
 #include <vector>
 

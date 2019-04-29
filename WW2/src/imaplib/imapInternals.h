@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 
 /************************************************************************************************
 	imap internal data structures. Nothing outside of libimap sees this.

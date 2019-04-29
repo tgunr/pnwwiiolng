@@ -295,6 +295,10 @@ LOGICAL          gDisableMouseHiding = false;
 LOGICAL          gDisableGameTopmost = true;
 #endif
 
+#if platOS == OS_MACOS
+LOGICAL          MacNoKeychainUsage = false;
+#endif
+
 #ifdef BETA_RELEASE
 	LOGICAL			gCheckPlanarPlacement;
 	UINT32			gPersDecalOverride;

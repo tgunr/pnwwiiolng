@@ -21,17 +21,18 @@ namespace Strat
 	public:
 		CaptureContribution() : CaptureContributionEvent() {}
 		CaptureContribution(Strat::CaptureContributionEvent::Status withStatus
-							, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit);
+							, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forPlayerCountry, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit);
 
 		Strat::CaptureContributionEvent::Status		status() const { return m_status; }
 		FacilityStruct&		facility() const { return *m_facility; }
 		ChatHandle			handle() const { return m_handle; }
 		UINT32				playerID() const { return m_playerID; }
+		UINT32				playerCountry() const { return m_playerCountry; }
 		UINT32				sortieID() const { return m_sortieID; }
 		UINT32				missionID() const { return m_missionID; }
 		const HCUnit&		unit() const { return *m_unit; }
 
-	public: static void Queue(Strat::CaptureContributionEvent::Status forStatus, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit);
+	public: static void Queue(Strat::CaptureContributionEvent::Status forStatus, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forPlayerCountry, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit);
 
 	// Check if the queue is empty
 	public: static bool IsQueueEmpty();

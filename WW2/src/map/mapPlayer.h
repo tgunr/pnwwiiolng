@@ -11,9 +11,10 @@
 
 #include "chat/chatGroupsType.h"
 //#include "server/serverTypes.h"
-#include "miss/missionTypes.h"
-#include "miss/missionPacket.h"
 #include "map/mapPlayerTypes.h"
+#include "miss/missionPacket.h"
+#include "miss/missionTypes.h"
+#include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiPermissions.h"
 #include "wwii/wwiiPlayer.h"
 
@@ -41,16 +42,39 @@ namespace Scoring
 	class Sortie;
 }
 
+class DeferredGarrisonChangeNotice
+{
+public:
+	DeferredGarrisonChangeNotice(UINT32 id, HCUnit *unit, WWII_COUNTRY oldCountry, BRANCH_ENUM oldBranch,
+								  WWII_COUNTRY country) : unitID(id), hcUnit(unit),
+		originalUnitCountry(oldCountry), originalUnitBranch(oldBranch), newCountry(country)
+	{
+	}
+
+	UINT32 getUnitID() const { return unitID; }
+	HCUnit * getHCUnit() const { return hcUnit; }
+	WWII_COUNTRY getOriginalUnitCountry() const { return originalUnitCountry; }
+	BRANCH_ENUM getOriginalUnitBranch() const { return originalUnitBranch; }
+	WWII_COUNTRY getNewCountry() const { return newCountry; }
+
+private:
+	UINT32 unitID;
+	HCUnit *hcUnit;
+	WWII_COUNTRY originalUnitCountry;
+	BRANCH_ENUM originalUnitBranch;
+	WWII_COUNTRY newCountry;
+};
+
 class Player : public wwiiPlayer
 {
 public:
 	Player();
-	Player(SINT32 teulIndex, const Auth::Dispatch& disp, const playerid_t forPlayerID);
+	Player(SINT32 teulIndex, const Auth::Dispatch &disp, const playerid_t forPlayerID);
 	virtual ~Player();
 
 	UINT32 accountGoodUntil() const
 	{
-		if ( meteredAccess() )
+		if (meteredAccess())
 			return ((teulTime() / 60) + m_minuteBalance) * 60 + 59;
 		return m_accountGoodUntil;
 	}
@@ -60,19 +84,19 @@ public:
 	// Is persona able to post* at all*?
 	bool ableToPost() const;
 
-	bool ableToPostIn(const class Brigade&) const;
+	bool ableToPostIn(const class Brigade &) const;
 
-	void addMobileSpawnee() { ++ missionPacket().scoring().spawnees; }
+	void addMobileSpawnee() { ++missionPacket().scoring().spawnees; }
 
-	void addStratHit(const class MissionDamageEvent&);
+	void addStratHit(const class MissionDamageEvent &);
 
 	// Lookup this personas current mission
-	class Mission* activeMission() const;
+	class Mission *activeMission() const;
 
 	void analyzeDamageHistory();
 
 	// Use the supplied mission packet to populate helper fields etc
-	void applyMissionPacket(class MissionPacket& newMP);
+	void applyMissionPacket(class MissionPacket &newMP);
 
 	// Increase and save player rank if they are below max rank
 	void bumpRank();
@@ -85,7 +109,7 @@ public:
 
 	void cancelWeapon(bool notifyStrat);
 
-	const ChatPermissions* chatPermissions() const { return m_permissions; }
+	const ChatPermissions *chatPermissions() const { return m_permissions; }
 
 	// Charge next minutely balance if the player is due.
 	bool charge();
@@ -102,13 +126,13 @@ public:
 	// clear out additional fields.
 	void clearSortieResults(bool leavingMission);
 
-	void debug(const char* message) const;
-	void debug(const char* label, const char* mask, ...) const;
+	void debug(const char *message) const;
+	void debug(const char *label, const char *mask, ...) const;
 
 	void deflateMissionPacket();
 
 	// Mark that a persona is entering a mission
-	bool enterMission(class Mission* mission);
+	bool enterMission(class Mission *mission);
 
 	// Evaluate a players mission packet for scoring purposes
 	// (Assumes all pertinent data has been gathered)
@@ -118,7 +142,7 @@ public:
 	virtual void ExitBrigade(UINT32 state) override;
 	void ExitMission();
 
-	bool fillMissionPacket(class Mission*);
+	bool fillMissionPacket(class Mission *);
 
 	bool hasActiveMission() const { return (activeMission() != nullptr); }
 
@@ -146,12 +170,12 @@ public:
 	bool mirrorToChat();
 
 	//! Send player to a cell host.
-	bool mirrorToCellHost(Server::ServerInfo* cellhost);
+	bool mirrorToCellHost(Server::ServerInfo *cellhost);
 
-	class Mission* mission() const { return m_mission; }
+	class Mission *mission() const { return m_mission; }
 
-	const MissionPacket& missionPacket() const { return m_mp; }
-	MissionPacket& missionPacket() { return m_mp; }
+	const MissionPacket &missionPacket() const { return m_mp; }
+	MissionPacket &missionPacket() { return m_mp; }
 
 	void notifyChatOfCell() const;
 
@@ -164,13 +188,13 @@ public:
 
 	// Receive and interpret a capacity response
 	// calls evaluateMissionPacket()
-	void processCapacityResponse(const FULL_OBJ_ID, const WEAPON_SERIAL&, const bool vehicleDelivered);
+	void processCapacityResponse(const FULL_OBJ_ID, const WEAPON_SERIAL &, const bool vehicleDelivered);
 
 	void saveMissionPacket();
 
 	// Player has selected (or unselected) their affiliations
-	bool SelectBrigade(Brigade* brigade);
-	MISSION_CODE selectMission(class Mission* mission, bool enter);
+	bool SelectBrigade(Brigade *brigade);
+	MISSION_CODE selectMission(class Mission *mission, bool enter);
 	void selectNullPersona();
 	// Retrieve the player-specific fields from the DB
 	bool selectPlayer(const playerid_t newPlayerID);
@@ -183,14 +207,14 @@ public:
 	void sendUpdateToChat(bool force = false);
 
 	void SetBranch(BRANCH_ENUM newBranch);
-	void SetBrigade(Brigade* newBrig);
+	void SetBrigade(Brigade *newBrig);
 	void SetChecksumIsDirty(bool toState) { m_flags.checksumsDirty = toState; }
 	virtual void SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide) override;
 	void SetDecal(UINT8 newDecal) { m_mp.m_vehicle.decal = newDecal; }
-	virtual bool SetInstance(const Instance::Descriptor& _instance) override;
-	void SetGroups(const char* groupList);
+	virtual bool SetInstance(const Instance::Descriptor &_instance) override;
+	void SetGroups(const char *groupList);
 	void SetMeteredAccess(UINT32 newMinuteBalance);
-	void SetMission(Mission* to);
+	void SetMission(Mission *to);
 	void SetPersonaID(UINT32 newID) { m_personaID = newID; }
 	// Set mission packet flags to correspond to persona flags
 	void SetPersonaMissionFlags();
@@ -201,9 +225,9 @@ public:
 	void SetSquadHandle(const ChatHandle newHandle) { m_squadHandle = newHandle; }
 	void SetState(MM_PERS_STATE toState);
 	// Set the mission target
-	void SetTarget(const FacilityStruct* facility);
+	void SetTarget(const FacilityStruct *facility);
 	void SetVehicleState(MM_VEH_STATE toState) { m_vehicleState = toState; }
-	void SetWeapon(const WEAPON_SERIAL& weapon);
+	void SetWeapon(const WEAPON_SERIAL &weapon);
 
 	bool isSpawned() const { return inState(PERS_SPAWNING) | vehicleState(MM_VEH_INXFER); }
 
@@ -235,7 +259,7 @@ public:
 	bool vehicleState(MM_VEH_STATE query) const { return m_vehicleState == query; }
 
 	// Read accessors
-	Brigade* brigade() const { return m_brigade; }
+	Brigade *brigade() const { return m_brigade; }
 	UINT32 customerID() const { return m_customerID; }
 	UINT8 decal() const { return m_mp.m_vehicle.decal(); }
 	bool isBuzzard() const { return m_isBuzzard; }
@@ -247,12 +271,12 @@ public:
 	UINT32 points() const { return m_rankPointsEarned; }
 	UINT32 progress() const;
 	bool promoted() const { return m_promoted; }
-	const Rank& useRank() const { return *m_useRank; }
-	const Rank& actualRank() const { return *m_actualRank; }
+	const Rank &useRank() const { return *m_useRank; }
+	const Rank &actualRank() const { return *m_actualRank; }
 	UINT32 roomListFlags() const { return m_roomFlags; }
 	MM_PERS_STATE state() const { return m_state; }
-	const WEAPON_SERIAL& weapon() const { return m_weapon; }
-	WEAPON_SERIAL& weapon() { return m_weapon; }
+	const WEAPON_SERIAL &weapon() const { return m_weapon; }
+	WEAPON_SERIAL &weapon() { return m_weapon; }
 
 	//! Returns the cell they are spawned to or 0.
 	//! @seealso getCellHost()
@@ -264,110 +288,114 @@ public:
 	// For the scoring sortie thing.
 	void closeCurrentSortie();
 	void newSortie(UINT32 newSortieID, bool isPilot);
-	const Scoring::Sortie* sortie() const { return m_sortie; }
-	Scoring::Sortie* sortie() { return m_sortie; }
+	const Scoring::Sortie *sortie() const { return m_sortie; }
+	Scoring::Sortie *sortie() { return m_sortie; }
 
+	void mapNotifyPlayerInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry, BRANCH_ENUM originalUnitBranch,
+								WWII_COUNTRY newCountry);
 public:
 	// Event handlers.
-	bool onDespawn(SINT32 teulIndex);	//! Process return-to-map signal from client.
+	bool onDespawn(SINT32 teulIndex); //! Process return-to-map signal from client.
 
 public:
-
-	//Playermask is individual permissions that a player has it is NOT rank related
-	//Personamask is permissions related specifically to the persona
+	// Playermask is individual permissions that a player has it is NOT rank related
+	// Personamask is permissions related specifically to the persona
 	// this includes rank related privs.
-	//Permmask is a bitwise or of the two other masks
+	// Permmask is a bitwise or of the two other masks
 	// this is where permissions should be checked
-	PermissionMask	m_playerMask;		// Base account permissions
-	PermissionMask	m_personaMask;		// Set via updateMask()
-	TeulTimeMS		m_nextSpam;
+	PermissionMask m_playerMask;  // Base account permissions
+	PermissionMask m_personaMask; // Set via updateMask()
+	TeulTimeMS m_nextSpam;
 
-	UINT64			m_lastHCUpdate;		// Last HCUnit position update
-	FLOAT64VECTOR	m_customSpawnLocation;
+	UINT64 m_lastHCUpdate; // Last HCUnit position update
+	FLOAT64VECTOR m_customSpawnLocation;
 
-	UINT32			m_customerID;		// Billing ID
-	UINT32 			timeIn;
-	UINT32			m_rankPointsEarned;	//how many they currently have
-	UINT32			m_sideLockTime;
-	UINT32			m_portal;
+	UINT32 m_customerID; // Billing ID
+	UINT32 timeIn;
+	UINT32 m_rankPointsEarned; // how many they currently have
+	UINT32 m_sideLockTime;
+	UINT32 m_portal;
 
-	MM_PERS_STATE	m_state;
-	MM_VEH_STATE	m_vehicleState;
+	MM_PERS_STATE m_state;
+	MM_VEH_STATE m_vehicleState;
 
-	//system time at which a side was chosen.
-	//ability to select side is based of this time
-	WWII_SIDE		m_lastSide;
-	WWII_SIDE		m_sessionSide;
+	// system time at which a side was chosen.
+	// ability to select side is based of this time
+	WWII_SIDE m_lastSide;
+	WWII_SIDE m_sessionSide;
 
-	class Brigade*	m_brigade;
-	class Mission*	m_mission;
+	class Brigade *m_brigade;
+	class Mission *m_mission;
 
-	UINT32			m_roomFlags;		// Last known room list flags
-	UINT32			m_loginState;		// How far into their login they are
-	UINT32			m_loginSub;			// Sub-state for login process
-	UINT32			m_nextLaunch;		// When player can next launch (based on delays etc)
+	UINT32 m_roomFlags;  // Last known room list flags
+	UINT32 m_loginState; // How far into their login they are
+	UINT32 m_loginSub;   // Sub-state for login process
+	UINT32 m_nextLaunch; // When player can next launch (based on delays etc)
 
 	// Stats
-	UINT32			m_lastPoll;			// Last opinion poll player responded to
+	UINT32 m_lastPoll; // Last opinion poll player responded to
 
-	const Rank*		m_useRank;			// Pointer to the Rank of our effective rank
-	const Rank*		m_actualRank;		// Pointer to the Rank of our actual rank
+	const Rank *m_useRank;	// Pointer to the Rank of our effective rank
+	const Rank *m_actualRank; // Pointer to the Rank of our actual rank
+	DeferredGarrisonChangeNotice * m_deferredGarrisonChangeNotice;
 
 public:
-	bool			m_hasValidMissionPacket : 1;	// Is the mission packet valid?
-	bool			m_registered : 1;			// True if this persona is the registered instance
-	bool			m_launchPermitted:1;		// Whether player is allowed to click launch yet
-	bool			m_wantMobileSpawn:1;		// Has player asked for a mobile spawn?
-	bool			m_requestedCapacity : 1;	// True when capacity has been requested.
-	bool			m_receivedCapacity : 1;		// True when we've received a capacity reply
-	bool			m_needsChatSync:1;			// Needs to be sync'd with chat
-	bool			m_promoted : 1; 			// If their last mission gave a promotion
-	bool			m_clientActivated : 1;		// Has the client been activated yet?
-	bool			m_xferedToChat : 1;			// Has the client completed chat transfer yet?
-	bool			m_allowPollVote : 1;		// Defaults to no
-	bool			m_hasBalanced : 1;
-	bool			m_hasSelectedPersonaOnce : 1;	// has selected a persona at least once
-	bool			m_useCustomSpawnLocation : 1;
-	bool			m_isBuzzard : 1;
-	bool			m_implementAntiAddiction : 1;
-	UINT32			m_spawnedAsSide : 2;		// Which side they spawned as - or 0.
-	UINT32			m_lastSpawnedTo;			//! Address of cell they were last sent to.
+	bool m_hasValidMissionPacket : 1; // Is the mission packet valid?
+	bool m_registered : 1;			  // True if this persona is the registered instance
+	bool m_launchPermitted : 1;		  // Whether player is allowed to click launch yet
+	bool m_wantMobileSpawn : 1;		  // Has player asked for a mobile spawn?
+	bool m_requestedCapacity : 1;	 // True when capacity has been requested.
+	bool m_receivedCapacity : 1;	  // True when we've received a capacity reply
+	bool m_needsChatSync : 1;		  // Needs to be sync'd with chat
+	bool m_promoted : 1;			  // If their last mission gave a promotion
+	bool m_clientActivated : 1;		  // Has the client been activated yet?
+	bool m_xferedToChat : 1;		  // Has the client completed chat transfer yet?
+	bool m_allowPollVote : 1;		  // Defaults to no
+	bool m_hasBalanced : 1;
+	bool m_hasSelectedPersonaOnce : 1; // has selected a persona at least once
+	bool m_useCustomSpawnLocation : 1;
+	bool m_isBuzzard : 1;
+	bool m_implementAntiAddiction : 1;
+	UINT32 m_spawnedAsSide : 2; // Which side they spawned as - or 0.
+	UINT32 m_lastSpawnedTo;		//! Address of cell they were last sent to.
 
-	//save the mission packet for later
-	//in mmSpawn.c we'll ship it off in a
-	//persXfer struct to the updater
-	MissionPacket	m_mp;				// Mission packet
-	FULL_OBJ_ID		m_weapOrigin;		// object id of the current origin facility
-	WEAPON_SERIAL	m_weapon;
+	// save the mission packet for later
+	// in mmSpawn.c we'll ship it off in a
+	// persXfer struct to the updater
+	MissionPacket m_mp;		  // Mission packet
+	FULL_OBJ_ID m_weapOrigin; // object id of the current origin facility
+	WEAPON_SERIAL m_weapon;
 
 private:
-	SORTIE_DAMAGE_HISTORY	m_damageRecord, m_repairRecord;
-	CHAT_GROUPS		m_groups;
-	const ChatPermissions* m_permissions;
+	SORTIE_DAMAGE_HISTORY m_damageRecord, m_repairRecord;
+	CHAT_GROUPS m_groups;
+	const ChatPermissions *m_permissions;
 
 	// Accounting
-	UINT32				m_accountGoodUntil;		//!< When does metered play time expire?
-	UINT32				m_minuteBalance;		//!< Metered balance
-	UINT32				m_nextCharge;			//!< Next time to charge balance
-	Scoring::Sortie*	m_sortie;				//!< Sortie in-progress.
+	UINT32 m_accountGoodUntil; //!< When does metered play time expire?
+	UINT32 m_minuteBalance;	//!< Metered balance
+	UINT32 m_nextCharge;	   //!< Next time to charge balance
+	Scoring::Sortie *m_sortie; //!< Sortie in-progress.
 
 public:
 	struct
 	MISSION_RESULTS*	m_missionResults;		//!< Last held mission result.
 };
 
-extern void* teulGetPersonaData(SINT32);
+extern void *teulGetPersonaData(SINT32);
 
 class PlayerInterface
 {
 public:
-	static Player* Lookup(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
-	static Player* Lookup(UINT32 playerID);
+	static Player *Lookup(SINT32 teulIndex) { return (Player *)teulGetPersonaData(teulIndex); }
+	static Player *Lookup(UINT32 playerID);
 };
 
 extern void mapSendChatUpdates();
 extern void mapSendHCUpdates();
 extern void mapProcessLogins();
+extern void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry,
+									   BRANCH_ENUM originalUnitBranch, WWII_COUNTRY newCountry);
 
 extern void mapCheckSideCounts();
 

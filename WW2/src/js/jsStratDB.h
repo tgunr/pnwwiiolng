@@ -25,6 +25,7 @@ public:
 	JS_FUNCTION(defend);
 	JS_FUNCTION(clear);
 	JS_FUNCTION(validmissionorigin);
+	JS_FUNCTION(changegarrisoncountry);
 
 	enum
 	{

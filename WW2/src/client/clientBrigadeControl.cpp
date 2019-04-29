@@ -211,6 +211,50 @@ bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, co
 }
 
 //////////////////////////////////////////////////////////////////////
+// H/C: Propose a CP/garrison country change.
+
+bool BrigadeControlRequest::requestBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country)
+{
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
+		return false;
+
+	// You must specify where you want to move it to and where you want to move it from
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
+
+	m_action = REQ_COUNTRY_CHANGE;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = destination;
+	m_country = country;
+
+	return send(teulIndex);
+}
+
+//////////////////////////////////////////////////////////////////////
+// H/C: Propose veto of a CP/garrison country change.
+
+bool BrigadeControlRequest::vetoBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country)
+{
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
+		return false;
+
+	// You must specify where you want to move it to and where you want to move it from
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
+
+	m_action = REQ_VETO;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = destination;
+	m_country = country;
+
+	return send(teulIndex);
+}
+
+//////////////////////////////////////////////////////////////////////
 // H/C: Veto an objective (attack/defend/clear)
 
 bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target)
@@ -352,6 +396,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_REPLACE:			return BCD_OfficerBrigade(this, "proposal.replace", me);		// Request to take over from an existing OIC
 				case REQ_REMOVE:			return BCD_SponsorOfficerBrigade(this, "proposal.remove", me);		// Want to remove an OIC
 				case REQ_MOVE:				return BCD_SponsorBrigadeOriginTarget(this, "proposal.move", me);		// Move a brigade
+				case REQ_COUNTRY_CHANGE:	return BCD_SponsorGarrisonCountryChange(this, "proposal.changecountry", me);		// Change a garrisons's country
 
 				case REQ_ATTACK:
 				case REQ_DEFEND:
@@ -367,6 +412,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_NOMINATE:			return BCD_OfficerSponsorBrigade(this, "vetoed.nominate", me);		// Nominate a player for OIC of a brigade
 				case REQ_REMOVE:			return BCD_SponsorOfficerBrigade(this, "vetoed.remove", me);		// Want to remove an OIC
 				case REQ_MOVE:				return BCD_SponsorBrigadeOriginTarget(this, "vetoed.move", me);			// Move a brigade
+				case REQ_COUNTRY_CHANGE:	return BCD_SponsorGarrisonCountryChange(this, "vetoed.changecountry", me);		// Change a garrisons's country
 
 				case REQ_ATTACK:
 				case REQ_DEFEND:
@@ -389,6 +435,13 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				return BCD_SponsorBrigadeOriginTarget(this, "unit.moved", false);
 			else
 				return BCD_BrigadeOriginTarget(this, "unit.moved.system", false);
+		}
+		case _COUNTRY_CHANGED:	// CPs country with garrison was changed
+		{
+			if(m_sponsor)
+				return BCD_SponsorGarrisonCountryChange(this, "country.changed", false);
+			else
+				return BCD_GarrisonCountryChange(this, "country.changed.system", false);
 		}
 	}
 

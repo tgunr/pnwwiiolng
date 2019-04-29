@@ -63,10 +63,12 @@ protected:
 	void SetDispatch(const Auth::Dispatch& source, UINT32 overridingCustomerID = 0);
 
 public:
-	void* operator new(size_t size);
-	void operator delete(void* ptr);
-
-	wwiiPlayer() : m_teulIndex(-1) {}
+	wwiiPlayer() : m_teulIndex(-1), m_playerID(0), m_personaID(0), m_squadID(0), m_updateMode(0),
+                   m_netcode(false), m_brigadeID(0), m_missionID(0), m_sortieID(0), m_weaponSpecNo(0),
+                   m_side(WWII_NO_SIDE), m_country(WWII_NO_COUNTRY), m_branch(BRANCH_NOT_USED),
+                   m_maxRank(0), m_maxSquadRank(0), m_realRank(0), m_realSquadRank(0),
+                   m_chatHandle(0), m_matchHandle(0), m_squadHandle(0), m_permissionMask(0),
+                   m_instance(0, 0), m_hostInstance(nullptr), m_flags(), m_dispatch() {}
 	wwiiPlayer(const wwiiPlayer* rhs) = delete;
 	wwiiPlayer(const wwiiPlayer& rhs) = delete;
 
@@ -167,9 +169,6 @@ public:	///TODO:INST make me protected
 
 public:
 	void setDisconnected() { m_teulIndex = -1; }
-
-public:
-	static void logStats();
 };
 
 extern SINT32 wwiiRegisterPlayerMessageCallback();

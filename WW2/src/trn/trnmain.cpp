@@ -237,8 +237,8 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 {
 	FULL_OBJ_ID fid;
 
-	fid.cell.ox		= scx << 4;
-	fid.cell.oy		= scy << 4;
+	fid.cell.ox		= static_cast<SINT16>(static_cast<UINT16>(scx) << 4);
+	fid.cell.oy		= static_cast<SINT16>(static_cast<UINT16>(scy) << 4);
 	fid.id			= id;
 	fid.objClass	= 0;
 	fid.objType		= 0;
@@ -1016,13 +1016,13 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
 	trnopSetSC(sc);
 
 	if ( poolModel->IsStaticTerrainModel() ) {
-		FLOAT64VECTOR WorldOriginOffset;
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		FLOAT64VECTOR worldOriginOffset;
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
 		piMATRIX worldTransform = objInfo.transform;
-		worldTransform._41 -= (float)WorldOriginOffset.x;
-		worldTransform._42 -= (float)WorldOriginOffset.y;
-		worldTransform._43 -= (float)WorldOriginOffset.z;
+		worldTransform._41 -= (float)worldOriginOffset.x;
+		worldTransform._42 -= (float)worldOriginOffset.y;
+		worldTransform._43 -= (float)worldOriginOffset.z;
 
 		obmgrCreateModelInstance(newname, worldTransform, true);
 	} else if ( ! obmgrCreateModelInstance(newname) ) {
@@ -1104,7 +1104,7 @@ LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
                     trnCDTerrainObject* tto = (trnCDTerrainObject*)(obj->lpspare);
                     if ( tto )
                     {
-                        b.add( tto->BBox1.x+WorldOriginOffset.x, tto->BBox1.y+WorldOriginOffset.y, tto->BBox2.x+WorldOriginOffset.x, tto->BBox2.y+WorldOriginOffset.y );
+                        b.add( tto->BBox1.x+worldOriginOffset.x, tto->BBox1.y+worldOriginOffset.y, tto->BBox2.x+worldOriginOffset.x, tto->BBox2.y+worldOriginOffset.y );
                         if ( counter==0 )
                         {
                             avgz = (tto->BBox1.z + tto->BBox2.z) / 2;

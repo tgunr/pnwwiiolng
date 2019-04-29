@@ -1,8 +1,8 @@
 #ifndef _CFML_H
 #define _CFML_H
 
-// Requires the expat library for CFML parser
-#include "imap/xmlparse.h"
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 /************************************************************************************************
 	imapcfml
@@ -98,8 +98,7 @@ void cfmlWriteMouseAxis(cfmlWriterRef, int edit,  int idx, int halfaxis,
 						int invert, const char* axis, int emulatejoystick);
 
 // read
-cfmlParserRef cfmlNewParser(void* userdata, cfmlReadCallback, XML_StartElementHandler,
-							XML_EndElementHandler, XML_CharacterDataHandler);
+cfmlParserRef cfmlNewParser(void* userdata, cfmlReadCallback, startElementSAXFunc, endElementSAXFunc, charactersSAXFunc);
 void cfmlParserFree(cfmlParserRef);
 
 int cfmlParse(cfmlParserRef);

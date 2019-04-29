@@ -4107,7 +4107,7 @@ UINT32 trncdCollideWithAllTerrainObjects(FASTCOLLIDE** CollisionList, UINT32* Nu
 trnCDTerrainObject*	TO;
 UINT32				Count;
 FLOAT32				mnx, mny, mnz, mxx, mxy, mxz;
-FLOAT64VECTOR		WorldOriginOffset;
+FLOAT64VECTOR		worldOriginOffset;
 
 	if (CollisionList == nullptr)
 	{
@@ -4124,7 +4124,7 @@ FLOAT64VECTOR		WorldOriginOffset;
 	return 0;
 #endif
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	Count = 0;
 
@@ -4318,7 +4318,7 @@ UINT32 trncdCollideWithListOfTerrainObjects(FASTCOLLIDE** CollisionList, UINT32*
 trnCDTerrainObject*	TO;
 UINT32				Count;
 FLOAT32				mnx, mny, mnz, mxx, mxy, mxz;
-FLOAT64VECTOR		WorldOriginOffset;
+FLOAT64VECTOR		worldOriginOffset;
 
 
 	if (CollisionList == nullptr || TOList == nullptr)
@@ -4338,7 +4338,7 @@ FLOAT64VECTOR		WorldOriginOffset;
 	_odeCollide(*OldPnt, *NewPnt, CollisionList, *NumCollisionSlotsLeft);
 #endif
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	Count = 0;
 	while (Count < MaxNumInTOList)
@@ -5724,8 +5724,8 @@ UINT32 trnUpdateObjectFlags(SINT32 x, SINT32 y, UINT32 id, SINT16 ownership, SIN
 {
 	sdm_full_obj_id fullid;
 	memset(&fullid, 0x0, sizeof(sdm_full_obj_id));
-	fullid.cell.ox = x << 4;
-	fullid.cell.oy = y << 4;
+	fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(x) << 4);
+	fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(y) << 4);
 	fullid.id = id;
 
 	StratDB::StratObject* stratobj = StratDB::FindStratObject(fullid);
@@ -6193,7 +6193,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 	piVECTOR CollidePnt;
 	OBJECT * CollideObject;
 	SINT32 PolyNum;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	UINT32 i,j;
 	UINT32 TempNum1;
 
@@ -6211,8 +6211,8 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 		CollisionList[j].CollideTime = 10000000000000000000.0f;
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	worldOriginOffset.z = -worldOriginOffset.z;
 
 	NumCollides = 0;
 
@@ -6228,7 +6228,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 								 MS_TO_S(frametime),
 								 0,
 								 0,
-								 &WorldOriginOffset,
+								 &worldOriginOffset,
 								 0,
 								 0);
 

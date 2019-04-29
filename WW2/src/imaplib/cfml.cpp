@@ -1,3 +1,4 @@
+#include "syscfg.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -23,7 +24,9 @@ struct cfml_parser
 	char buf[CFML_BUFFER_SIZE];
 	void* userdata;
 	cfmlReadCallback read;
-	XML_Parser xmlparser;
+    startElementSAXFunc startElement;
+    endElementSAXFunc endElement;
+    charactersSAXFunc dataNode;
 };
 
 static void cfmlWriteCommonFields(cfmlWriterRef ref, int edit,  int idx, int* len);
@@ -373,8 +376,8 @@ void cfmlWriteMouseAxis(cfmlWriterRef ref, int edit,  int idx, int halfaxis,
 	cfmlNewParser
 *************************************************************************************************/
 
-cfmlParserRef cfmlNewParser(void* userdata, cfmlReadCallback read , XML_StartElementHandler start,
-							XML_EndElementHandler end, XML_CharacterDataHandler data)
+cfmlParserRef cfmlNewParser(void* userdata, cfmlReadCallback read , startElementSAXFunc start,
+							endElementSAXFunc end, charactersSAXFunc data)
 {
  	cfmlParserRef ref = (cfmlParserRef)calloc(1, sizeof(cfml_parser));
  	
@@ -382,11 +385,9 @@ cfmlParserRef cfmlNewParser(void* userdata, cfmlReadCallback read , XML_StartEle
  	{
 	 	ref->userdata = userdata;
  		ref->read = read;
-	 	ref->xmlparser = XML_ParserCreate(NULL);
-
- 		XML_SetElementHandler(ref->xmlparser, start, end);
-		XML_SetCharacterDataHandler(ref->xmlparser, data);
-		XML_SetUserData(ref->xmlparser, userdata);
+        ref->startElement = start;
+        ref->endElement = end;
+        ref->dataNode = data;
 	}
 	
 	return ref;
@@ -400,7 +401,6 @@ void cfmlParserFree(cfmlParserRef ref)
 {
 	if(ref)
 	{
-		XML_ParserFree(ref->xmlparser);
 		free(ref);
 	}
 }
@@ -411,16 +411,21 @@ void cfmlParserFree(cfmlParserRef ref)
 
 int cfmlParse(cfmlParserRef ref)
 {
-	for(;;)
-	{
-		int len = ref->read(ref->userdata, CFML_BUFFER_SIZE, ref->buf);
-		int isFinal = (len != CFML_BUFFER_SIZE);
-		
-		XML_Parse(ref->xmlparser, ref->buf, len, isFinal);
-		
-		if(isFinal) break;
-	}
-	return 0;
+    xmlParserCtxtPtr parser = nullptr;
+    xmlSAXHandler sax;
+    
+    memset(&sax, 0, sizeof(sax));
+    sax.startElement = ref->startElement;
+    sax.endElement = ref->endElement;
+    sax.characters = ref->dataNode;
+    parser = xmlCreateIOParserCtxt(&sax, ref->userdata, [] (void *context, char *buf, int len) {
+        cfmlParserRef ref_ = reinterpret_cast<cfmlParserRef>(context);
+        return ref_->read(ref_->userdata, len, buf);
+    }, nullptr, ref, XML_CHAR_ENCODING_NONE);
+    
+    int res = xmlParseDocument(parser);
+    xmlFreeParserCtxt(parser);
+    return res < 0 ? 1 : 0;
 }
 
 /************************************************************************************************

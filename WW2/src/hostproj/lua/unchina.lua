@@ -6,7 +6,7 @@ do
  if cp:isEnemyLinked() then
   if cp:isCity() then
    if cp.country == WWII_CHINA then
-    cp:changeOwnership(cp.originalCountry, true, true)
+    cp:changeOwnershipFromScript(cp.originalCountry, true, true)
    end
   end
  end

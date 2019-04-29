@@ -316,6 +316,10 @@ extern LOGICAL          gDisableMouseHiding; // Don't hide the mouse while the g
 extern LOGICAL          gDisableGameTopmost; // Use HWND_TOP instead of HWND_TOPMOST in SetWindowPos() on Windows. On by default when debugging.
 #endif
 
+#if platOS == OS_MACOS
+extern LOGICAL          MacNoKeychainUsage;
+#endif
+
 #ifdef BETA_RELEASE
 extern LOGICAL			gCheckPlanarPlacement;
 extern UINT32			gPersDecalOverride;

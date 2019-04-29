@@ -15,7 +15,7 @@ struct CHAR_INPUT
 
 };
 
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include "imap/iac.h"
 
 #define NUM_IAC_QUEUE_ENTRIES		256

@@ -11,7 +11,7 @@
 #include "math/math3d.h"
 #include "pers/persmain.h"
 #include "imap/ww2func.h"
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include "fp/fpFPS.h"
 #include "tut/TutorialManager.h"
 

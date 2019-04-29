@@ -188,6 +188,9 @@
     <Filter Include="auth">
       <UniqueIdentifier>{e23d7e80-2e2b-4cd4-82a7-841bbda438a0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="imaplib">
+      <UniqueIdentifier>{64e477d6-5b2b-485e-aabb-3927a03f46b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1646,6 +1649,17 @@
     </ClInclude>
     <ClInclude Include="..\..\src\fio\fiostructure.h">
       <Filter>fio</Filter>
+    <ClInclude Include="..\..\src\imaplib\cfml.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imap.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imapInternals.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imapTypes.h">
+      <Filter>imaplib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2701,6 +2715,14 @@
     </ClCompile>
     <ClCompile Include="..\..\src\fio\fiostructure.cpp">
       <Filter>fio</Filter>
+    <ClCompile Include="..\..\src\imaplib\cfml.cpp">
+      <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imaplib\imap.cpp">
+      <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imaplib\imapKeymap.cpp">
+      <Filter>imaplib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

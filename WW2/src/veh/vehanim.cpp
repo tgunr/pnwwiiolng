@@ -1960,7 +1960,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
     piVECTOR Pos;
     FLOAT64VECTOR UsePos;
     OBJECT* Object = nullptr;
-    FLOAT64VECTOR WorldOriginOffset;
+    FLOAT64VECTOR worldOriginOffset;
 
 	if (Vehicle == nullptr)
 	{
@@ -1981,7 +1981,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
         return 0;
     }
 
-    trnGetWorldOriginOffset(&WorldOriginOffset);
+    trnGetWorldOriginOffset(&worldOriginOffset);
 
 	StateAnims = &Vehicle->StateAnimation;
 

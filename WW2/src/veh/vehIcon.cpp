@@ -12,7 +12,7 @@
 #include "ld/ldpix.h"
 #include "rn/rnvis.h"
 #include "rn/rntext.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMain.h"
@@ -204,7 +204,7 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	if(!PlayerVehicle) return 0;
 
-	FLOAT64VECTOR WorldOriginOffset, DeltaVec;
+	FLOAT64VECTOR worldOriginOffset, DeltaVec;
 	FLOAT32 Dist, Percent;
 	piVECTOR TempVec;
 	FLOAT32 TempFloat;
@@ -287,10 +287,10 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	SCEN_MGR->SetVehicleIcon(Vehicle);
 
 	// get vector to vehicle from camera
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	TempVec.x = (FLOAT32)( Vehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-	TempVec.y = (FLOAT32)( Vehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-	TempVec.z = (FLOAT32)(-Vehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	TempVec.x = (FLOAT32)( Vehicle->PosData.RenderPos.x - worldOriginOffset.x);
+	TempVec.y = (FLOAT32)( Vehicle->PosData.RenderPos.y - worldOriginOffset.y);
+	TempVec.z = (FLOAT32)(-Vehicle->PosData.RenderPos.z - worldOriginOffset.z);
 	mathAddVectors(&TempVec,&TempVec,&playpos);
 	math3dNormalize(&TempVec);
 

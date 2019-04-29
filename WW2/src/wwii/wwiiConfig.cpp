@@ -150,6 +150,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "objective.warningPeriodM",		TYPE_SINT,	&host_config.objective.warningPeriod_m,1440,"10",	"Duration of AO budet warnings (minutes)" }
 ,	{ "oic.attackVoteTimeS",		TYPE_SINT,	&host_config.oic.attackVoteTime_s,		3600,	"60",	"Duration of attack requests (seconds)" }
 ,	{ "oic.moveVoteTimeS",			TYPE_SINT,	&host_config.oic.moveVoteTime_s,		3600,	"60",	"Duration of move request proposals (seconds)" }
+,	{ "oic.countryChangeVoteTimeS",	TYPE_SINT,	&host_config.oic.changeCountryVoteTime_s,		3600,	"60",	"Duration of change country request proposals (seconds)" }
 ,	{ "oic.nominationVoteTimeS",	TYPE_SINT,	&host_config.oic.nominationVoteTime_s,	3600,	"60",	"Duration of nomination proposals (seconds)" }
 ,	{ "oic.offerTimeS",				TYPE_SINT,	&host_config.oic.offerTime_s,			3600,	"90",	"Duration of OIC offers (seconds)" }
 ,	{ "oic.removalVoteTimeS",		TYPE_SINT,	&host_config.oic.removalVoteTime_s,		3600,	"60",	"Duration of OIC removal proposals (seconds)" }
@@ -240,6 +241,12 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "supply.trickleSlices",		TYPE_SINT,	&host_config.supply.trickleSlices,		0,		"15",	"Number of slices (intervals) at which supply is trickled" }
 ,	{ "supply.trickleStartM",		TYPE_SINT,	&host_config.supply.trickleStart_m,		0,		"15",	"Time delay for first trickle (minutes)" }
 ,	{ "supply.trickleTimeM",		TYPE_INT,	&host_config.supply.trickleTime_m,		0,		"180",	"Time from start to completion of trickle (minutes)" }
+
+,   { "supply.garrisonTrickleTimeM",TYPE_INT,	&host_config.supply.garrisonTrickleTime_m,		0,		"180",	"Time from start to completion of trickle for a Garrison (minutes)" }
+,   { "supply.garrisonInactiveTimeM",TYPE_INT,	&host_config.supply.garrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes)" }
+,   { "supply.mGarrisonTrickleTimeM",TYPE_INT,	&host_config.supply.mGarrisonTrickleTime_m,		0,		"30",	"Time from start to completion of trickle for a Garrison (minutes) after the country was manually changed" }
+,   { "supply.mGarrisonInactiveTimeM",TYPE_INT,	&host_config.supply.mGarrisonInactiveTime_m,		0,		"15",	"Time it takes before a Garrison becomes active (minutes) after the country was manually changed" }
+,   { "supply.noPenaltySwitchPeriodM",TYPE_INT,	&host_config.supply.noPenaltySwitchPeriod_m,		0,		"5",	"Time (minutes) that HC has to switch garrison ownership without a trickle penalty" }
 
 ,	{ "throttle.enabled",			TYPE_BOOL,	&host_config.throttle.enabled,			0,		"y",	"Enable depot throttling" }
 ,	{ "throttle.percentage",		TYPE_BYTE,	&host_config.throttle.percentage,		100,	"5",	"Percentage equipment to expose at throttles" }

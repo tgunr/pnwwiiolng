@@ -497,14 +497,8 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
     // of the generation counter effectively acts as a cancellation point within Teul's core
     // processing loop. Since we use relaxed ordering for all operations on the atomic, we don't
     // take any memory barrier overhead on x86.
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-    // GCC on Linux, because Debian 8, doesn't support atomics. We don't technically need it here so bypass it
-    static uint64_t pollGeneration = 0;
-    uint64_t currentPollGeneration = pollGeneration++;
-#else
     static std::atomic_uint64_t pollGeneration(0);
     uint64_t currentPollGeneration = pollGeneration.fetch_add(1, std::memory_order_relaxed);
-#endif
     
     // Use RAII semantics to force regenerate of the pollset even if we hit a cancellation point.
     // This is not hugely efficient, but it has the virtue that we'll never leave the pollset in a weird state.
@@ -585,22 +579,14 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
             teulClose(endpoint);
         }
         
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-		if (currentPollGeneration != pollGeneration - 1) {
-#else
         if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
-#endif
             return;
         }
 
         // This is the major point of possible reentrancy - it's all but guaranteed to reenter in many cases.
         _routeCallbacks(endpoint);
 
-#if platOS == OS_LINUX && defined(__GNUC__) && !defined(__clang_major__)
-		if (currentPollGeneration != pollGeneration - 1) {
-#else
         if (currentPollGeneration != pollGeneration.load(std::memory_order_relaxed) - 1) {
-#endif
             return;
         }
     }
@@ -814,6 +800,8 @@ void ENDPOINT::updateSocketEvents()
         pollData.fd[slot].events |= POLLOUT;
     }
 	pollData.fd[slot].revents = 0;
+ 
+    dbugLog(_FLD, "POLLSET: t:%d sock:" PRF_SOCKET " slot:%u events:0x%hx", teulIndex(), PRA_SOCKET(socket), slot, pollData.fd[slot].events);
 }
 
 static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const UINT32 payloadSize, ENDPOINT& endpoint)
@@ -823,15 +811,7 @@ static void _attemptDecryption(DATA_GRAM* dgram, char * const decrypted, const U
     }
     ABORT_UNLESS(dgram->contents->packetToken() == Teul::PacketToken::Encrypted);
 
-#ifdef FIX_CRYPTO_MISALIGNMENT
-    std::unique_ptr<char[]> tempData = std::make_unique<char[]>((payloadSize + 3) & ~3);
-    
-    memcpy(tempData.get(), decrypted, payloadSize);
-    endpoint.decrypt(reinterpret_cast<unsigned char * const>(tempData.get()), payloadSize);
-    memcpy(decrypted, tempData.get(), payloadSize);
-#else
     endpoint.decrypt(reinterpret_cast<unsigned char * const>(decrypted), payloadSize);
-#endif
 }
 
 static bool _isValidSynData(const Teul::PacketHeader* const header, size_t payloadSize)
@@ -1027,11 +1007,4 @@ SINT32 teulModIdle(const TeulTimeMS duration_)
 void ENDPOINT::setConnected()
 {
 	m_connected = true;
-	updateSocketEvents();
-}
-
-void ENDPOINT::setWritesPending(const bool pending_)
-{
-	m_writesPending = pending_;
-	updateSocketEvents();
 }

@@ -354,7 +354,7 @@ static NSString *placeholderHTML = @""
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.battlegroundeurope.com/pgservers.html"]);
+            NSURL * __nonnull playgateURL = reinterpret_cast<NSURL * __nonnull>([NSURL URLWithString:@"https://www.wwiionline.com/pgservers.html"]);
             NSURLRequest *playnetHome = [NSURLRequest requestWithURL:playgateURL];
             
             [frame loadRequest:playnetHome];
@@ -702,6 +702,7 @@ extern NSString *WebActionOriginalURLKey;
     // server, which is apparently pretending to be arena 1 (e.g. "live").
     [arenaMenu.menu addItemWithTitle:@"Campaign" action:nullptr keyEquivalent:@""].tag = 1;
     [arenaMenu.menu addItemWithTitle:@"Training / Events" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"Closed Beta" action:nullptr keyEquivalent:@""].tag = 222;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = YES;
 #endif
@@ -813,6 +814,10 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)removeAllKeychainEntries
 {
+    if (MacNoKeychainUsage) {
+        return;
+    }
+    
     NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
 
     for (NSArray *account in [self allKeychainAccountNames]) {
@@ -835,6 +840,10 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)saveUserNamePassword
 {
+    if (MacNoKeychainUsage) {
+        return;
+    }
+    
     // The entered credentials are valid!
     if (_passwordEntryIsInitial) {
         // We used already-saved credentials successfully. Don't bother.
@@ -877,6 +886,10 @@ extern NSString *WebActionOriginalURLKey;
         [passwordField setStringValue:@""];
         rememberUserPassword = NO;
         [rememberPasswordCheckbox setState:NSOffState];
+        
+        if (MacNoKeychainUsage) {
+            return;
+        }
         
         NSArray *accounts = [self allKeychainAccountNames];
         

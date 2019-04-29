@@ -85,3 +85,6 @@ extern	FLOAT64VECTOR*	mathNormalize( FLOAT64VECTOR* vec );
 
 extern void mathVectorMultiply64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
 extern void mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
+
+extern FLOAT64VECTOR mathGetClosestPointOnLine(const FLOAT64VECTOR* lineStart, const FLOAT64VECTOR* lineEnd, FLOAT64VECTOR* point);
+

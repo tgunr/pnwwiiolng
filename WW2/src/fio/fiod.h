@@ -36,6 +36,8 @@ extern bool fiodFileExists(const char* name, bool userdir = false);
 
 extern void fiodmkdir(const char* path);
 
+extern size_t fiodGetString(int hfile, char* string, size_t length);
+
 #if platBuild == BUILD_CLIENT
 
 extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
@@ -59,8 +61,6 @@ size_t fiocfgRead(int fd, void* dptr, size_t length);
 #endif
 
 #else // platBuild == BUILD_CLIENT
-
-extern size_t fiodGetString(int hfile, char* string, size_t length);
 
 template<typename _Type>
 static int fiodGet(int fd, _Type& into)

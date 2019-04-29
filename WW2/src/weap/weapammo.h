@@ -48,6 +48,7 @@ struct weapAmmo
 
 	LOGICAL FirstUpdate : 1;
 	LOGICAL KillAmmo : 1;
+	bool    flybySoundPlayed = false;
 
 	FLOAT64VECTOR Position;
 	FLOAT64VECTOR LastCollidePos;

@@ -1,3 +1,4 @@
+#include "syscfg.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,9 +15,9 @@ extern imap inputMap;
 
 static void imapKeymapAddEntry(imapKeymapRef ref, imap_keymap_entry* entry);
 
-static void cfmlStartElementHandler(void *userdata, const XML_Char *name, const XML_Char **atts);
-static void cfmlEndElementHandler(void *userdata, const XML_Char *name);
-static void cfmlDataHandler(void *userdata, const XML_Char *s, int len);
+static void cfmlStartElementHandler(void *userdata, const xmlChar *name, const xmlChar **atts);
+static void cfmlEndElementHandler(void *userdata, const xmlChar *name);
+static void cfmlDataHandler(void *userdata, const xmlChar *s, int len);
 
 static void cfmlWriteButtonEntry(cfmlWriterRef cfmlRef, imap_keymap_entry* entry);
 static void cfmlWriteAxisEntry(cfmlWriterRef cfmlRef, imap_keymap_entry* entry);
@@ -415,11 +416,12 @@ static void imapKeymapAddEntry(imapKeymapRef ref, imap_keymap_entry* entry)
 	cfmlStartElementHandler
 *************************************************************************************************/
 
-static void cfmlStartElementHandler(void *userdata, const XML_Char *name, const XML_Char **atts)
+static void cfmlStartElementHandler(void *userdata, const xmlChar *name_, const xmlChar **atts)
 {
 	parser_data* parserData = (parser_data*)userdata;
-	const XML_Char** pair = atts;
-	const XML_Char *key, *value;
+	const xmlChar** pair = atts;
+    const char *name = reinterpret_cast<const char *>(name_);
+	const char *key, *value;
 	imap_keymap_entry* entry;
 	parser_entry_data* entryData;
 	int idx, elementIdx, cfmlIdx = 0;
@@ -430,11 +432,10 @@ static void cfmlStartElementHandler(void *userdata, const XML_Char *name, const 
 	language[0] = keyboard[0] = per[0] = parserData->data[0] = '\0';
 
 	// tag attributes
-	while(*pair)
+	while(pair && *pair)
 	{
-		key = *pair++;
-		value = *pair++;
-	 	
+		key = reinterpret_cast<const char *>(*pair++);
+		value = reinterpret_cast<const char *>(*pair++);
 	 	
 		if(!istrcmp(key, CFML_CONTROLSET_LANGUAGE)) 		// LANGUAGE
 		{
@@ -628,8 +629,9 @@ static void cfmlStartElementHandler(void *userdata, const XML_Char *name, const 
 	cfmlEndElementHandler
 *************************************************************************************************/
 
-static void cfmlEndElementHandler(void *userdata, const XML_Char *name)
+static void cfmlEndElementHandler(void *userdata, const xmlChar *name_)
 {
+    const char *name = reinterpret_cast<const char *>(name_);
 	parser_data* parserData = (parser_data*)userdata;
 	
 	// </CONTROL>
@@ -754,7 +756,7 @@ static void cfmlEndElementHandler(void *userdata, const XML_Char *name)
 	cfmlDataHandler
 *************************************************************************************************/
 
-static void cfmlDataHandler(void *userdata, const XML_Char *s, int len)
+static void cfmlDataHandler(void *userdata, const xmlChar *s, int len)
 {
 	parser_data* parserData = (parser_data*)userdata;
 	int dlen = strlen(parserData->data);
