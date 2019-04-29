@@ -5,7 +5,7 @@
 	<key>content</key>
 	<dict>
 		<key>identifier</key>
-		<string>Layout.C56C44CB-AD4A-4BD9-BE9A-F6969AEADBF9</string>
+		<string>Layout.D0326A54-6755-410A-9F45-23C905A8C202</string>
 		<key>options</key>
 		<dict>
 			<key>backgroundImageName</key>
@@ -18,43 +18,43 @@
 			<array>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.9969E0E5-715E-476E-9B3D-CA24C1656036</string>
+					<string>LayoutItem.F87BA9A3-A426-4058-AD6C-A7E08754F823</string>
 					<key>name</key>
 					<string>Application Support</string>
 					<key>position</key>
-					<string>{528, 272}</string>
+					<string>{512, 272}</string>
 					<key>type</key>
 					<string>file</string>
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.4C798B1C-1746-4BA6-B345-096AD359D5E8</string>
+					<string>LayoutItem.F879A1A5-8AD1-4B09-B553-72512E2CB648</string>
 					<key>name</key>
-					<string>Applications</string>
+					<string>WWIIOnline</string>
 					<key>position</key>
-					<string>{528, 144}</string>
+					<string>{288, 272}</string>
 					<key>type</key>
-					<string>applications</string>
+					<string>file</string>
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.7E6D1067-AA63-47DB-8C6E-60736542E48A</string>
+					<string>LayoutItem.C5D88F8F-6844-4FA8-8EE2-EF46138DA14D</string>
 					<key>name</key>
 					<string>World War II Online.app</string>
 					<key>position</key>
-					<string>{272, 144}</string>
+					<string>{288, 144}</string>
 					<key>type</key>
 					<string>file</string>
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.368B6024-2B27-4968-8504-E8AD0804F0B9</string>
+					<string>LayoutItem.BB83796E-2142-42C6-BA3A-E528419A3E95</string>
 					<key>name</key>
-					<string>WWIIOnloine</string>
+					<string>Applications</string>
 					<key>position</key>
-					<string>{272, 272}</string>
+					<string>{512, 144}</string>
 					<key>type</key>
-					<string>file</string>
+					<string>applications</string>
 				</dict>
 			</array>
 			<key>windowInsets</key>
