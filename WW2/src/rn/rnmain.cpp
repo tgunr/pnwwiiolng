@@ -500,6 +500,14 @@ LOGICAL rnmainInit()
         bSoundEnable = FALSE;
 	}
 
+#if platOS == OS_MACOS
+        //  Macs initialise graphics in WWIIOnline a lot quicker than Windows,
+        //  so to allow the spalshscreen to be seen rather than blink in and out
+        //  on the Mac Client.
+        //  1000000us = 1 second.
+        usleep(1000000);
+#endif
+    
 	rnlogoUpdateStatus("loading.objects");
 	if (!obmainInit())
 	{
