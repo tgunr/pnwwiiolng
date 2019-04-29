@@ -120,7 +120,7 @@ BEGIN
             VALUE "FileDescription", "World War II Online - Settings"
             VALUE "FileVersion", "1.1.0.0"
             VALUE "InternalName", "Settings"
-            VALUE "LegalCopyright", "© 1999-2019, Playnet, Inc. / CRS."
+            VALUE "LegalCopyright", "Copyright © 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved."
             VALUE "OriginalFilename", "Settings.exe"
             VALUE "ProductName", "Settings: World War II Online - Application"
             VALUE "ProductVersion", "1.1.0.0"

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="cfg">
@@ -151,6 +151,9 @@
     </Filter>
     <Filter Include="wwii">
       <UniqueIdentifier>{08c462a7-8e30-4cf6-9aa3-4f066dc07981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{fbc1e2bf-537c-46ab-a015-3286467aa3a6}</UniqueIdentifier>
     </Filter>
     <Filter Include="physics">
       <UniqueIdentifier>{e621ff6e-56b6-4fc8-8a0b-0408ae186925}</UniqueIdentifier>
@@ -1647,8 +1650,6 @@
     <ClInclude Include="..\..\src\miss\missionJoinRequest.h">
       <Filter>miss</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\fio\fiostructure.h">
-      <Filter>fio</Filter>
     <ClInclude Include="..\..\src\imaplib\cfml.h">
       <Filter>imaplib</Filter>
     </ClInclude>
@@ -1660,6 +1661,9 @@
     </ClInclude>
     <ClInclude Include="..\..\src\imaplib\imapTypes.h">
       <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fio\fiostructure.h">
+      <Filter>fio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2713,8 +2717,6 @@
     <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
       <Filter>sys</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\fio\fiostructure.cpp">
-      <Filter>fio</Filter>
     <ClCompile Include="..\..\src\imaplib\cfml.cpp">
       <Filter>imaplib</Filter>
     </ClCompile>
@@ -2724,16 +2726,22 @@
     <ClCompile Include="..\..\src\imaplib\imapKeymap.cpp">
       <Filter>imaplib</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\fio\fiostructure.cpp">
+      <Filter>fio</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\cursor.cur">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\WW2.rc2">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\wwii1.ico">
+      <Filter>res</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WW2.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\cursor.cur" />
-    <None Include="res\WW2.rc2" />
-    <None Include="res\wwii1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\..\..\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
 </Project>
