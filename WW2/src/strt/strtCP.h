@@ -40,7 +40,7 @@ extern void strtAcceptConvoy(CONVOYSTRUCT& convoy);
 extern void strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID);
 
 // Capture a facility and report it.
-extern void strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds);
+extern void strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID, const HCUnit* unit, UINT32 seconds);
 
 // Force an initial-timer based redraw of capture table for a facility
 extern bool strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force=false, bool quietly=false);

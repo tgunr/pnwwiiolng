@@ -29,8 +29,8 @@ static CONTRIBUTIONS		contributions;
 //	------------------------------	Declarations
 
 Strat::CaptureContribution::CaptureContribution(Strat::CaptureContributionEvent::Status withStatus
-					, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
-	: CaptureContributionEvent(withStatus, forFacility.uOID, forHandle, forPlayerID, forSortieID, forMissionID, forUnit.unitID())
+					, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forPlayerCountry, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
+	: CaptureContributionEvent(withStatus, forFacility.uOID, forHandle, forPlayerID, forPlayerCountry, forSortieID, forMissionID, forUnit.unitID())
 	, m_facility(&forFacility), m_unit(&forUnit)
 {
 }
@@ -120,7 +120,7 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 	else if ( newValue > 100.0 )
 		newValue = 100.0;
 
-	const WWII_SIDE forSide = claimant.unit().side();
+	const WWII_SIDE forSide = wwiiSide(claimant.playerCountry());
 	const FLOAT32 delta = newValue - this->m_captureProgress;
 
 	if ( delta != 0 )
@@ -138,13 +138,14 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 			strtCaptureAndLog(this
 								, claimant.handle()
 								, claimant.playerID()
+								, claimant.playerCountry()
 								, claimant.missionID()
 								, &claimant.unit()
 								, teulTime() - this->m_captureStateChanged
 								);
 
 			if ( this->m_captureBuilding )
-				strtSendCaptureScoreNotice(this->m_captureBuilding->fullObjID, claimant.unit().side());
+				strtSendCaptureScoreNotice(this->m_captureBuilding->fullObjID, forSide);
 		}
 		else
 		{
@@ -168,7 +169,7 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 // Add a capture contribution to a facility
 
 void
-Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
+Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility, const ChatHandle forHandle, UINT32 forPlayerID, UINT32 forPlayerCountry, UINT32 forSortieID, UINT32 forMissionID, const HCUnit& forUnit)
 {
 	if ( forFacility.isCaptureEnabled() == false )
 	{
@@ -177,7 +178,7 @@ Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility
 		return;
 	}
 
-	Strat::CaptureContribution contrib(withStatus, forFacility, forHandle, forPlayerID, forSortieID, forMissionID, forUnit);
+	Strat::CaptureContribution contrib(withStatus, forFacility, forHandle, forPlayerID, forPlayerCountry, forSortieID, forMissionID, forUnit);
 	contributions.push(contrib);
 }
 

@@ -875,7 +875,7 @@ _recvCaptureContrib(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	Strat::CaptureContribution::Queue(event.m_status, *forFacility, event.m_handle, event.m_playerID, event.m_sortieID, event.m_missionID, *forUnit);
+	Strat::CaptureContribution::Queue(event.m_status, *forFacility, event.m_handle, event.m_playerID, event.m_playerCountry, event.m_sortieID, event.m_missionID, *forUnit);
 
 	return a->offset;
 }

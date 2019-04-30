@@ -360,6 +360,19 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 			if (supplyFacility == nullptr)
 				throw PostRequestFail("no supplying facility", SPAWN_NO_BRIGADE_SUPPLY);
 		}
+		else
+		{
+			// when spawning in an enemy town, 
+			// if either link is open but owned by a different country then abort
+			if ((facility->cp->side != unit->side()) && 
+				(facility->m_incomingLink != nullptr && facility->m_incomingLink->firebase != nullptr &&
+				facility->m_incomingLink->firebase->isOpen() && facility->m_incomingLink->firebase->country != facility->country) ||
+				(facility->m_outgoingLink != nullptr && facility->m_outgoingLink->firebase != nullptr &&
+				facility->m_outgoingLink->firebase->isOpen() && facility->m_outgoingLink->firebase->country != facility->country))
+			{
+				throw PostRequestFail("no friendly fb for garrison supply", SPAWN_NO_BRIGADE_SUPPLY);
+			}
+		}
 
 		WeapJoinRequestNode *joinNode = _getNewJoinNode(request.customerID, request.handle, request.missionID);
 		if (joinNode == nullptr)
@@ -478,7 +491,7 @@ POSTED_WEAPON::detachJoiners(bool announceFails)
 }
 
 static void
-_cleanUpJoinNode(WeapJoinRequestNode* joinNode, FULL_OBJ_ID originFacilityID)
+_cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 {
 	switch (joinNode->m_joinList->m_type)
 	{
@@ -506,7 +519,7 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode, FULL_OBJ_ID originFacilityID)
 				_validateCrew(postedWeapon);
 
 				// We have to be able to push the vehicle count up by 1.
-				postedWeapon.returnWeapon(true, false, originFacilityID);
+				postedWeapon.returnWeapon(true, false);
 				return;
 			}
 			else
@@ -756,6 +769,8 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 
 	currentWeapon->m_SpawnedFromMobileSpawn = request.usedMobileSpawn;
 
+	// Get the Facility that this weapon originated from.
+	currentWeapon->m_SpawnedFromFacility = currentWeapon->m_facility;
 
 	TELL_TESTER(currentWeapon->m_commander
 				, "v#%u spawning %s at %s"
@@ -870,7 +885,7 @@ strtProcessSpawnCancel(const MM_SPAWN_CANCEL& spawnCancel)
 	if (!joinNode)
 		return false;
 
-	_cleanUpJoinNode(joinNode, spawnCancel.originFacility);
+	_cleanUpJoinNode(joinNode);
 
 	return true;
 }
@@ -1654,8 +1669,7 @@ _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 	{
 		// If there is a Garrison of the same branch and movement type in the CP that we are trying to RTB to
 		// then try to deposit the weapon there.
-		StratHCUnit *newUnit
-			= weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
+		StratHCUnit *newUnit = weapon->m_facility->CP().getGarrisonHCUnit(weapon->m_brigade->branch(), weapon->m_brigade->movementType());
 		if (newUnit)
 		{
 			if (newUnit->depositWeapons(weapon->spec(), 1, true, nullptr) == false)
@@ -1665,7 +1679,7 @@ _returnWeaponToGarrison(POSTED_WEAPON *weapon)
 			}
 			_returnLog(weapon, "manually-supplied to Garrison");
 			weapon->detachReinforcement();
-			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->shortName());
+			chatSendLocalizedMessage(weapon->m_commander, LSTR_NOTE, LSTR_EQUIPMENT_DELIVERED, newUnit->name());
 		}
 		else
 		{
@@ -1775,7 +1789,7 @@ _rescue(POSTED_WEAPON* weapon)
 // was delivered to its brigade from its division or to a different Garrison.
 
 bool
-POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID originFacilityID)
+POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 {
 	bool returnable = (isNonSupplied() == false);
 	bool rtbed = false;
@@ -1829,38 +1843,35 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID or
 	{
 		if (m_supplyingBrigade->isGarrison())
 		{
-			// Get the Facility that this weapon originated from.
-			FacilityStruct* parentFacility = strtGetFacility(originFacilityID);
-			
-			// If we spawned in at this town or we spawned via an MS then we do NOT want to overstock the Garrision that's here
-			// so the weapon is returned to it's own Garrison.
-			if (parentFacility != nullptr && parentFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
+			// If we haven't spawned in yet or we spawned at this town or we spawned via an MS then we do NOT want to overstock
+			// the Garrision that's here so the weapon is returned to it's own Garrison.
+			if (m_SpawnedFromFacility == nullptr || m_SpawnedFromFacility->cpID == m_facility->cpID || (m_SpawnedFromMobileSpawn && (m_weaponSerial.spec.wCategory == _INFANTRY || m_weaponSerial.spec.wClass == 7)))
 			{
 				if (_returnToOrigin(*this) == true)
-						{
-							TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
-							rescue = false;
-						}
-						else
-						{
-							TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
-							_returnLog(this, "failed to deliver");
-							rescue = true;
-						}
+				{
+					TELL_TESTER(m_commander, "Returned #%u to origin", m_weaponSerial.serial);
+					rescue = false;
+				}
+				else
+				{
+					TELL_TESTER(m_commander, "Could not return #%u to origin", m_weaponSerial.serial);
+					_returnLog(this, "failed to deliver");
+					rescue = true;
+				}
 			}
 			else
 			{
-				// Try to over-stock the Garrison at the town where we rtb-ed
+				// Try to over-stock the Garrison at the town where we RTBed
 				if (_returnWeaponToGarrison(this) == true)
 				{
-					TELL_TESTER(m_commander, "returned #%u to different Garrison", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Returned #%u to different Garrison", m_weaponSerial.serial);
 					rescue = false;
 					if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
 						vehicleDelivered = true;
 				}
 				else
 				{
-					TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+					TELL_TESTER(m_commander, "Could not return #%u to a different Garrison", m_weaponSerial.serial);
 					_returnLog(this, "failed to deliver");
 					rescue = true;
 				}
@@ -1877,19 +1888,19 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit, FULL_OBJ_ID or
 
 			if (_returnToOrigin(*this) == true)
 			{
-				TELL_TESTER(m_commander, "returned #%u to origin", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Returned #%u to origin", m_weaponSerial.serial);
 				rescue = false;
 			}
 			else if (_returnToBrigade(this) == true)
 			{
-				TELL_TESTER(m_commander, "returned #%u to brigade", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Returned #%u to brigade", m_weaponSerial.serial);
 				rescue = false;
 				if (m_brigade && m_supplyingBrigade && m_brigade->parent() == m_supplyingBrigade)
 					vehicleDelivered = true;
 			}
 			else
 			{
-				TELL_TESTER(m_commander, "could not return #%u", m_weaponSerial.serial);
+				TELL_TESTER(m_commander, "Could not return #%u", m_weaponSerial.serial);
 				_returnLog(this, "failed to deliver");
 				rescue = true;
 			}

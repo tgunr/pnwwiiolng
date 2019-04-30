@@ -353,7 +353,7 @@ UINT32 HCUnit::GetArmyGarrison(FULL_OBJ_ID cpID)
 	HCUnit::GetGarrisonUnits(garrisons, cpID);
 	for (HCUnit *unit : garrisons)
 	{
-		if (!unit->isMarineUnit() && !unit->isParatroopUnit())
+		if (!unit->isParatroopUnit() && (unit->branch() == BRANCH_LAND))
 		{
 			brigadeID = unit->m_unitID;
 			break;
