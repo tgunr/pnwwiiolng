@@ -5320,7 +5320,8 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 }
 
 /************************************************************************************************
-	vehmainPPOBuild
+	vehmainPPOBuild:
+		Used to deploy FMS' and PPOs
 *************************************************************************************************/
 
 PlayerPlacedObject* vehmainPPOBuild(void) {
@@ -5345,6 +5346,8 @@ PlayerPlacedObject* vehmainPPOBuild(void) {
 	// set our callbacks
     if (fru != nullptr)
     {
+		uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("ppos.truck.alert").c_str());
+			
         // do one update to check our current validity
         if(fpPPOUpdate())
         {
