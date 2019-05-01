@@ -5325,17 +5325,24 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 *************************************************************************************************/
 
 PlayerPlacedObject* vehmainPPOBuild(void) {
+	
 	// Just in case since this isn't tied with the FPS PPO code yet.
-	if ( activePPOList.size() < (size_t)activePPOIndex + 1 ) activePPOIndex = 0;
-	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr ) return nullptr;
+	if ( activePPOList.size() < (size_t)activePPOIndex + 1 )
+		activePPOIndex = 0;
+	
+	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr )
+		return nullptr;
 
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if ( veh == nullptr ) return nullptr;
+	if ( veh == nullptr )
+		return nullptr;
 
 	// Only the Mission Leader can replace an existing mobile spawn.
 	PPOSpec& spec = *activePPOList[activePPOIndex];
-	if ( spec.spawnable ) {
-		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() ) {
+	if ( spec.spawnable )
+	{
+		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() )
+		{
 			fpPPOAlert("ppos.fru.notleader");
 			return nullptr;
 		}
@@ -5374,9 +5381,13 @@ void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult)
 	bool isError;
 
 	if ( enumResult == MSDR_GRANTED || enumResult == MSDR_UNDEPLOYED )
+	{
 		isError = false;
+	}
 	else
+	{
 		isError = true;
+	}
 
 	uiChatPrintLineFeedback(IDE_LANG_MOBILE, enumResult, isError);
 
