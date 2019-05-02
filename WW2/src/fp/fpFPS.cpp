@@ -12404,6 +12404,12 @@ FLOAT64 fpFPSGetBridgeRepair()
 	return -fpsTrooper.bridgeRepairJoules;
 }
 
+FLOAT64 fpFPSGetFbDamage()
+{
+	// FB veh spawn damage override from fpsData.txt
+	return fpsTrooper.fbDamageJoules;
+}
+
 FLOAT32 fpFPSGetConcussionMod()
 {
 	return (fpsTrooper.concussionMod) ? (FLOAT32)fpsTrooper.concussionMod: 1.0f;
