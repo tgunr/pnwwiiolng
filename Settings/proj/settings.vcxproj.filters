@@ -58,6 +58,9 @@
     <Filter Include="WW2 - src\include">
       <UniqueIdentifier>{47f6d4af-fbae-4ab8-929b-e2380fd59acc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WW2 - src\log">
+      <UniqueIdentifier>{c8344718-5160-467f-ac04-ceee7e398640}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cfg\cfgData.cpp">
@@ -145,6 +148,18 @@
     </ClInclude>
     <ClInclude Include="..\..\WW2\src\include\systypes.h">
       <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\syscfg.h">
+      <Filter>Settings Files\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\log\log.h">
+      <Filter>WW2 - src\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\fio\fio.h">
+      <Filter>WW2 - src\fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\d3d\mmeapi.h">
+      <Filter>Settings Files\d3d</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

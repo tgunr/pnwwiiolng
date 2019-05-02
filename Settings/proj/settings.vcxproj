@@ -83,8 +83,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\..\WW2\src;..\include;..\src\cfg;..\src\d3d;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EXE_BUILD=BUILD_EXE_SETTINGS;WIN32;_WINDOWS;_SETTINGS_EXE_;LIBXML_STATIC;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -133,8 +133,8 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EXE_BUILD=BUILD_EXE_SETTINGS;WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;LIBXML_STATIC;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -172,8 +172,8 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>EXE_BUILD=BUILD_EXE_SETTINGS;WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;GLEW_STATIC;platOS=OS_WIN32;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -226,17 +226,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\WW2\src\fio\fio.h" />
     <ClInclude Include="..\..\WW2\src\fio\fiostructure.h" />
     <ClInclude Include="..\..\WW2\src\include\platforms.h" />
     <ClInclude Include="..\..\WW2\src\include\systypes.h" />
+    <ClInclude Include="..\..\WW2\src\log\log.h" />
     <ClInclude Include="..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\src\cfg\cfgData.h" />
     <ClInclude Include="..\src\d3d\dx3dinfo.h" />
+    <ClInclude Include="..\src\d3d\mmeapi.h" />
     <ClInclude Include="..\src\file\file.h" />
     <ClInclude Include="..\src\language\language.h" />
     <ClInclude Include="..\src\load\load.h" />
     <ClInclude Include="..\src\sys\cpuid.h" />
     <ClInclude Include="..\src\sys\registry.h" />
+    <ClInclude Include="..\src\sys\syscfg.h" />
     <ClInclude Include="..\src\unicode\ConvertUTF.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="settings.h" />

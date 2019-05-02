@@ -3,11 +3,11 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#include "d3d\mmeapi.h"
+#include "mmeapi.h"
 #include "dsound.h"
 #include <vector>
 
-#include "d3d\dx3dinfo.h"
+#include "dx3dinfo.h"
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "d3d9.lib")

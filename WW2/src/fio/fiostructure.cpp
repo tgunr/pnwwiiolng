@@ -79,6 +79,7 @@ LOGICAL fioStructureInit()
     LOGICAL userWorkingPathSet = FALSE;
     
     const wwiiolpath_string WW2filename = L"\\WW2.exe";			// \\WW2.exe
+	const wwiiolpath_string WW2filenameMC = L"\\MultiClient.exe";			// \\MultiClient.exe
     const wwiiolpath_string DirNameBIN = L"\\bin";				//  -> bin
     const wwiiolpath_string DirNameDATA = L"\\data";			//  -> data
     const wwiiolpath_string DirNameDOCS = L"\\docs";			//  -> docs
@@ -92,7 +93,8 @@ LOGICAL fioStructureInit()
 	int returnResult = -10;
 	wwiiolpath_string exeFullPath = L"";
 	wwiiolpath_string exeName = L"";
-	bool  WW2exeExists = false;
+	bool  WW2exe_Exists = false;
+	bool  WW2exeMC_Exists = false;
 	struct _stat buf;
 	std::wstring filename = L"";
 
@@ -133,24 +135,19 @@ LOGICAL fioStructureInit()
 
 	if (returnResult != 0)
 	{
-		wwiiolpath_string tmp = WWIIOnlineDirName + L" - File System.";
-
 		switch (errno)
 		{
 		case ENOENT:
 			//  printf("File %s not found.\n", filename);
-			MessageBox(nullptr, L"Unable to locate WW2.exe. Aborting.", tmp.c_str(), MB_ICONSTOP | MB_OK);
 			returnResult = -15;
             break;
 		case EINVAL:
 			//  printf("Invalid parameter to _stat.\n");
-			//  MessageBox(nullptr, L"Invalid parameter to _stat.", tmp.c_str(), MB_ICONSTOP | MB_OK);
 			returnResult = -20;
 			break;
 		default:
 			//  Should never be reached.
 			//  printf("Unexpected error in _stat.\n");
-			//  MessageBox(nullptr, L"Unexpected error in _stat.", tmp.c_str(), MB_ICONSTOP | MB_OK);
 			returnResult = -25;
 		}
 
@@ -160,16 +157,64 @@ LOGICAL fioStructureInit()
 #if EXE_BUILD != BUILD_EXE_SETTINGS
         dbugLog(_FLA, "&HFFFE - Unable to locate WW2.exe - Aborting %d.", returnResult);
 #endif
-        WW2exeExists = false;
+        WW2exe_Exists = false;
+	}
+	else
+	{
+		WW2exe_Exists = true;
+	}
+
+	//  Locate MultiClient.exe.
+	filename = exePath + WW2filenameMC;
+	returnResult = -10;
+	returnResult = _wstat(filename.c_str(), &buf);
+
+	if (returnResult != 0)
+	{
+		switch (errno)
+		{
+		case ENOENT:
+			//  printf("File %s not found.\n", filename);
+			returnResult = -15;
+			break;
+		case EINVAL:
+			//  printf("Invalid parameter to _stat.\n");
+			returnResult = -20;
+			break;
+		default:
+			//  Should never be reached.
+			//  printf("Unexpected error in _stat.\n");
+			returnResult = -25;
+		}
+
+		//  Could not locate WW2.exe file within the install folder at its detected location.
+		//  This should NOT happen.
+
+#if EXE_BUILD != BUILD_EXE_SETTINGS
+		dbugLog(_FLA, "&HFFFE - Unable to locate MultiClient.exe - Aborting %d.", returnResult);
+#endif
+		WW2exeMC_Exists = false;
+	}
+	else
+	{
+		WW2exeMC_Exists = true;
+	}
+
+
+	if (WW2exe_Exists == false && WW2exeMC_Exists == false)
+	{
+		wwiiolpath_string tmp = WWIIOnlineDirName + L" - File System."; 
+		MessageBox(nullptr, L"Unable to locate WW2.exe. Aborting.", tmp.c_str(), MB_ICONSTOP | MB_OK);
+
 		fioStructureInit_Value = FALSE;
-		
+
 		//  NO FALLBACK
 		goto ERR_EXIT_POINT;
 	}
 	else
 	{
 		returnResult = -10;
-		WW2exeExists = true;
+		WW2exeMC_Exists = true;
 	}
 	//  exePath: Setup - END.
 

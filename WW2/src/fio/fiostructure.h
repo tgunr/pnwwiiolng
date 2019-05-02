@@ -24,7 +24,7 @@
 #define __FileIOStructure__
 
 //  Selected exe Build.
-//  REQUIRES EXE_BUILD to be set. ( #define EXE_BUILD BUILD_EXE_WW2 )
+//  REQUIRES EXE_BUILD to be set.
 #define BUILD_EXE_WW2		0	//  WW2.exe
 #define BUILD_EXE_SETTINGS	1	//  settings.exe
 #define BUILD_EXE_PLAYGATE	2	//  Playgate.exe

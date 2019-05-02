@@ -4,7 +4,7 @@
 #pragma once
 #include "afxwin.h"
 
-#include "d3d\dx3dinfo.h"
+#include "dx3dinfo.h"
 
 // CsettingsDlg dialog
 class CsettingsDlg : public CDialog

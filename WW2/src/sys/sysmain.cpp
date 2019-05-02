@@ -760,7 +760,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			((PIMAGE_OPTIONAL_HEADER)OPTHDROFFSET (Imagebase))->SizeOfCode));
 #endif
     fioSet(ISARCHIVE);
-	AddArchives();
+	//  AddArchives();
+	AddArchives_WC();
+
 #else
 
 	if(WantDataDir)
