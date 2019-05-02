@@ -1401,9 +1401,9 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 	if ( vehSide == object->facility->side )
 		return 0LL;
 
-	if ( object->facility->type == FACILITY_FIREBASE && weapon.spec.wCategory != _INFANTRY )
+	if ( object->facility->type == FACILITY_FIREBASE && !(weapon.spec.wCategory == _INFANTRY || weapon.spec.wCategory == _AIRCRAFT) )
 	{
-		dbugLog(_FLI, "ignoring %" PR64BitUT " non-infantry damage joules to half-damaged firebase", damageJoules);
+		dbugLog(_FLI, "ignoring %" PR64BitUT " non-infantry/bomber damage joules to a firebase", damageJoules);
 		return 0LL;
 	}
 
