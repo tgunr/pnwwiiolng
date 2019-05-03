@@ -1697,7 +1697,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if (currentWeaponModel == BUILD_TOOL)
 				{
-					uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("hud.tut.ppo").c_str());
+					uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("ppos.infantry.alert").c_str());
 					fpPPOReset();
 				}
 
