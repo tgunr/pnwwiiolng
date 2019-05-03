@@ -281,7 +281,7 @@ LOGICAL          gCustomTerrain;
 UINT32			gEZMode;
 UINT32			GameInProgress; // 0 = not running, 1 = running, 2 = quitting
 
-UINT32			Convergence; // Global (default) Airplane gun convergence setting
+UINT32			Convergence = 200; // Global (default) Airplane gun convergence setting
 UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
