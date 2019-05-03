@@ -1,7 +1,7 @@
 ﻿; BOF ========================================================================
 ; File: WWIIOL_Installer_Template.iss
 ; Software: Inno Setup Compiler 5.6.1 (u)
-; Date: April 8, 2018, April 3, 2019
+; Date: April 8, 2018, May 3, 2019
 ; Revision by: Mathew "james10" Hogan - MJH
 
 ; Addresses:
@@ -57,6 +57,45 @@
 ; ============================================================================
 
 
+; ===  Install Automation.  ==================================================
+
+; Release Type
+#ifdef m_ReleaseType
+
+  #if LowerCase(m_ReleaseType) == "rc"
+    #define ReleaseType "ReleaseCandidate"
+  #endif
+
+  #if LowerCase(m_ReleaseType) == "alpha"
+    #define ReleaseType "Alpha"
+  #endif
+
+  #if LowerCase(m_ReleaseType) == "beta"
+    #define ReleaseType "Beta"
+
+  #endif
+
+#endif
+
+
+; Build Type
+#ifdef m_BuildType
+
+  #if LowerCase(m_BuildType) == "full"
+    #define InstallerBuildType "installFull"
+  #endif
+
+  #if LowerCase(m_BuildType) == "patch"
+    #define InstallerBuildType "installPatcher"
+  #endif
+
+  #if LowerCase(m_BuildType) == "rollback"
+    #define InstallerBuildType "installRollback"
+  #endif
+
+#endif
+
+
 ; ===  Game Install Root Names.  =============================================
 #define RootNameBGE "Battleground Europe"
 #define RootNameWWIIOnline "WWIIOnLine"
@@ -88,7 +127,7 @@
 #define InstallerExcludePatterns "*.gitignore, *.placeholder, *.DS_Store"
 #define InstallerSoftwareVersion "1.0.0.0"
 #define InstallerPublisher "Playnet Inc / CRS."
-#define InstallerCopyright "© 1999-2019, Playnet Inc / CRS."
+#define InstallerCopyright "© 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved.."
 #define InstallerGroupName "Cornered Rat Software"
 #define InstallerRootPathName "CRS"
 #define InstallerBaseFileName "wwiiol_"
@@ -234,7 +273,7 @@
 [Setup]
 #if UseSignTool == "yes"
   SignedUninstaller=yes
-  SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
+  #SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
 
 #else
   SignedUninstaller=no
@@ -315,6 +354,7 @@ OutputDir={#FileOutputPath}
 
 
 ; Installer - Options
+; SetupLogging=yes
 Compression=lzma
 SolidCompression=yes
 ; SolidCompression=no
@@ -359,12 +399,7 @@ VersionInfoProductTextVersion={#WWIIOnlineInstallVersion}{#WWIIOnlineInstallVers
 ExitSetupTitle={#WWIIOnlineAppName} - Exit Setup
 SelectLanguageTitle={#WWIIOnlineAppName} - Setup Language
 SetupAppTitle={#WWIIOnlineAppName} - Setup. {#WWIIOnlineInstallVersion}{#WWIIOnlineInstallVersionType}
-
-#if InstallerBuildType == "installPatcher"
-  SetupWindowTitle={#WWIIOnlineAppName} - Patch
-#else
-  SetupWindowTitle={#WWIIOnlineAppName} - Setup
-#endif
+SetupWindowTitle={#WWIIOnlineAppName} - Setup
 
 
 [CustomMessages]

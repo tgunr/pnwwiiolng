@@ -7,7 +7,7 @@
 :: _PlayArchBuilder.bat  [ /rc | /alpha | /beta ]
 
 :: Defaults = /rc (release candidate)
-:: Playarc_Output = %wwiiroot%wwiiolng\ww2assets\oswin\archivefiles\release-candidate
+:: Playarc_Output = %wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-candidate
 
 :: Launching Directory = The directory where the BAT file is located when it was Launched.
 :: NOTE: ALL of the other paths are relative to this directory within the < wwiiolng > directory tree.
@@ -15,10 +15,12 @@
 :: EXIT Codes:
 :: 1 = for some reason the Launching Directory is not set.
 :: 2 = unable to locate the _PlayArchBuilder.bat (this) file. This file should be located in the Launching Directory.
-:: 3 = Invalaid Command Line Switch.
-:: 4 = Completed - With Errors.
+:: 3 = unable to locate the wwiiolng Root Directory.
+:: 4 = unable to locate the ww2mods Root Directory.
+:: 5 = Invalaid Command Line Switch.
+:: 6 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-Apr-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
 
 :: Disable / Enable = DebugBat.
 :: One option MUST be SET.
@@ -75,26 +77,56 @@ IF NOT DEFINED ReleaseVersion (
 	SET ReleaseVersion=/rc
 )
 
-rem WWIIOnline source root directory.
-SET wwiiroot=%launchingdir%..\..\
+rem Locate and Set the Repos Root Directory.
+CD /D "%LaunchingDir%"\..\..
+
+SET RepoRootDIR=%CD%
+
+CD /D "%RepoRootDIR%
+
+rem Locate and Set the wwiiolng Root Directory.
+IF /I NOT EXIST "wwiiolng\" (
+	@echo.
+	@echo wwiiolng: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 3
+) else (
+	@echo Located the wwiiolng Directory.
+	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
+)
+
+rem Locate and Set the ww2mods Root Directory.
+IF /I NOT EXIST "ww2mods\" (
+	@echo.
+	@echo ww2mods: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 4
+) else (
+	@echo Located the ww2mods Directory.
+	SET modsRootDIR=%RepoRootDIR%\ww2mods
+)
+
+CD /D "%LaunchingDir%"
 
 rem Archiving files - Source Files.
-SET Playarc_BIN=%wwiiroot%wwiiolng\Tools\PlayBuilder\
-SET Playarc_DATA=%wwiiroot%ww2mods\DATA\
+SET Playarc_BIN=%wwiiolngRootDIR%\Tools\PlayBuilder
+SET Playarc_DATA=%modsRootDIR%\DATA
 
 rem Archive files - Output Store.
 IF /I "%ReleaseVersion%" == "/RC" (
-	SET Playarc_Output=%wwiiroot%wwiiolng\ww2assets\oswin\archivefiles\release-candidate\
+	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-candidate
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
-	SET Playarc_Output=%wwiiroot%wwiiolng\ww2assets\oswin\archivefiles\release-alpha\
+	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-alpha
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
-	SET Playarc_Output=%wwiiroot%wwiiolng\ww2assets\oswin\archivefiles\release-beta\
+	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-beta
 	GOTO check1
 )
 
@@ -104,7 +136,7 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 @echo ====  _PlayArchBuilder: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 3
+EXIT 5
 
 :check1
 
@@ -115,11 +147,21 @@ CD /D "%LaunchingDir%"
 @echo Bat File Launching Directory  ==  :  %CD%
 @echo.
 
-@echo Release Version  ===============  :  %ReleaseVersion%
+rem CD /D "%RepoRootDIR%"
+rem @echo Repo Root Directory  =========  :  %CD%
+rem @echo.
+
+rem CD /D "%LaunchingDir%"
+CD /D "%wwiiolngRootDIR%"
+@echo wwiiolng Root Directory  =======  :  %CD%
 @echo.
 
-CD /D "%wwiiroot%"
-@echo WWIIOnline source root path  ===  :  %CD%
+CD /D "%LaunchingDir%"
+CD /D "%modsRootDIR%"
+@echo ww2mods Root Directory  ========  :  %CD%
+@echo.
+
+@echo Release Version  ===============  :  %ReleaseVersion%
 @echo.
 
 CD /D "%LaunchingDir%"
@@ -170,7 +212,7 @@ rem ============================================================================
 @echo.
 @echo ====  Creating New Playarc Files.
 @echo on
-%Playarc_BIN%winbalancer.exe %Playarc_DATA% %Playarc_Output%
+%Playarc_BIN%\winbalancer.exe %Playarc_DATA% %Playarc_Output%
 @echo off
 
 @echo.
@@ -178,16 +220,16 @@ rem ============================================================================
 @echo Playarc Files - Build:
 
 @echo on
-%Playarc_BIN%win.exe %Playarc_Output%playarc01.ww2 %Playarc_Output%playarc01.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc02.ww2 %Playarc_Output%playarc02.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc03.ww2 %Playarc_Output%playarc03.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc04.ww2 %Playarc_Output%playarc04.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc05.ww2 %Playarc_Output%playarc05.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc06.ww2 %Playarc_Output%playarc06.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc07.ww2 %Playarc_Output%playarc07.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc08.ww2 %Playarc_Output%playarc08.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc09.ww2 %Playarc_Output%playarc09.txt
-%Playarc_BIN%win.exe %Playarc_Output%playarc10.ww2 %Playarc_Output%playarc10.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc01.ww2 %Playarc_Output%\playarc01.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc02.ww2 %Playarc_Output%\playarc02.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc03.ww2 %Playarc_Output%\playarc03.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc04.ww2 %Playarc_Output%\playarc04.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc05.ww2 %Playarc_Output%\playarc05.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc06.ww2 %Playarc_Output%\playarc06.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc07.ww2 %Playarc_Output%\playarc07.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc08.ww2 %Playarc_Output%\playarc08.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc09.ww2 %Playarc_Output%\playarc09.txt
+%Playarc_BIN%\win.exe %Playarc_Output%\playarc10.ww2 %Playarc_Output%\playarc10.txt
 @echo off
 
 @echo.
@@ -204,7 +246,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT 6
 ) else (
 	@echo       Game Playarc files Build  ==  Completed.
 )

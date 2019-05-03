@@ -34,7 +34,7 @@ BEGIN
             VALUE "FileDescription", "World War II Online - Game Client\0"
             VALUE "FileVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"
             VALUE "InternalName", "WW2\0"
-            VALUE "LegalCopyright", "Copyright © 1999-${DATEYEAR} Playnet, Inc & CRS LLC. All Rights Reserved.\0"
+            VALUE "LegalCopyright", "© 1999-${DATEYEAR} Playnet, Inc & CRS LLC. All Rights Reserved.\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "WW2.exe\0"
             VALUE "PrivateBuild", "\0"

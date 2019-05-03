@@ -19,11 +19,13 @@
 :: EXIT Codes:
 :: 1 = for some reason the Launching Directory is not set.
 :: 2 = unable to locate the _MakeDiffs.bat (this) file. This file should be located in the Launching Directory.
-:: 3 = Invalaid Command Line Switch.
-:: 4 = unable to locate the xdelta3.exe file. This file is REQUIRED.
-:: 5 = Completed - With Errors.
+:: 3 = unable to locate the wwiiolng Root Directory.
+:: 4 = unable to locate the ww2mods Root Directory.
+:: 5 = Invalaid Command Line Switch.
+:: 6 = unable to locate the xdelta3.exe file. This file is REQUIRED.
+:: 7 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-Apr-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
 
 :: Disable / Enable = DebugBat.
 :: One option MUST be SET.
@@ -84,25 +86,58 @@ IF NOT DEFINED ReleaseVersion (
 	SET ReleaseVersion=/rc
 )
 
+rem Locate and Set the Repos Root Directory.
+CD /D "%LaunchingDir%"\..\..
+
+SET RepoRootDIR=%CD%
+
+CD /D "%RepoRootDIR%
+
+rem Locate and Set the wwiiolng Root Directory.
+IF /I NOT EXIST "wwiiolng\" (
+	@echo.
+	@echo wwiiolng: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 3
+) else (
+	@echo Located the wwiiolng Directory.
+	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
+)
+
+rem Locate and Set the ww2mods Root Directory.
+IF /I NOT EXIST "ww2mods\" (
+	@echo.
+	@echo ww2mods: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 4
+) else (
+	@echo Located the ww2mods Directory.
+	SET modsRootDIR=%RepoRootDIR%\ww2mods
+)
+
+CD /D "%LaunchingDir%"
+
 rem Release EXE versions.
 IF /I "%ReleaseVersion%" == "/RC" (
-	SET previouspath=.\release-candidate\previous
-	SET currentpath=.\release-candidate\current
-	SET outputpath=.\release-candidate\diff
+	SET previouspath=%LaunchingDir%\release-candidate\previous
+	SET currentpath=%LaunchingDir%\release-candidate\current
+	SET outputpath=%LaunchingDir%\release-candidate\diff
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
-	SET previouspath=.\release-alpha\previous
-	SET currentpath=.\release-alpha\current
-	SET outputpath=.\release-alpha\diff
+	SET previouspath=%LaunchingDir%\release-alpha\previous
+	SET currentpath=%LaunchingDir%\release-alpha\current
+	SET outputpath=%LaunchingDir%\release-alpha\diff
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
-	SET previouspath=.\release-beta\previous
-	SET currentpath=.\release-beta\current
-	SET outputpath=.\release-beta\diff
+	SET previouspath=%LaunchingDir%\release-beta\previous
+	SET currentpath=%LaunchingDir%\release-beta\current
+	SET outputpath=%LaunchingDir%\release-beta\diff
 	GOTO check1
 )
 
@@ -112,15 +147,12 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 @echo ====  _MakeDiffs.bat: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 3
+EXIT 5
 
 :check1
 
-SET xdelta3path=..\ww2assets\oswin
-
+SET xdelta3path=%wwiiolngRootDIR%\ww2assets\oswin
 CD /D "%xdelta3path%"
-@echo xdelta3.exe Directory  :  %CD%
-@echo.
 
 rem xdelta3.exe is REQUIRED for this process.
 IF /I NOT EXIST "xdelta3.exe" (
@@ -130,7 +162,7 @@ IF /I NOT EXIST "xdelta3.exe" (
 	@echo xdelta3.exe: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT 6
 ) else (
 	@echo Located xdelta3.exe file.
 )
@@ -142,29 +174,44 @@ CD /D "%LaunchingDir%"
 @echo==========================================================================================================
 @echo.
 CD /D "%LaunchingDir%"
-@echo Bat File Launching Directory  :  %CD%
+@echo Bat File Launching Directory  ==  :  %CD%
 @echo.
 
-@echo Release Version    =======    :  %ReleaseVersion%
+rem CD /D "%RepoRootDIR%"
+rem @echo Repo Root Directory  =========  :  %CD%
+rem @echo.
+
+rem CD /D "%LaunchingDir%"
+CD /D "%wwiiolngRootDIR%"
+@echo wwiiolng Root Directory  =======  :  %CD%
 @echo.
 
+CD /D "%LaunchingDir%"
+CD /D "%modsRootDIR%"
+@echo ww2mods Root Directory  ========  :  %CD%
+@echo.
+
+@echo Release Version  ===============  :  %ReleaseVersion%
+@echo.
+
+CD /D "%LaunchingDir%"
 CD /D "%previouspath%"
-@echo Previous Path  =============  :  %CD%
+@echo Previous Path  =================  :  %CD%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%currentpath%"
-@echo Current Path  ==============  :  %CD%
+@echo Current Path  ==================  :  %CD%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%outputpath%"
-@echo Output (diff) Path  ========  :  %CD%
+@echo Output (diff) Path  ============  :  %CD%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%xdelta3path%"
-@echo xdelta3.exe Path  ==========  :  %CD%
+@echo xdelta3.exe Path  ==============  :  %CD%
 @echo.
 @echo==========================================================================================================
 
@@ -253,7 +300,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 5
+	EXIT 7
 ) else (
 	@echo       Create - Differential [Patching] files  ==  Completed.
 )

@@ -2,9 +2,9 @@
 
 :: =====================================================================================================
 
-:: PrepareNewRelease.bat - Command Line:
+:: _PrepareNewRelease.bat - Command Line:
 
-:: PrepareNewRelease.bat [ /rc | /alpha | /beta | /rcdb | /alphadb | /betadb ]
+:: _PrepareNewRelease.bat [ /rc | /alpha | /beta | /rcdb | /alphadb | /betadb ]
 
 
 :: Default = /rc  (.\release-candidate -- ww2ExePath=..\.\build\client\Release\bin):
@@ -23,11 +23,13 @@
 
 :: EXIT Codes:
 :: 1 = for some reason the Launching Directory is not set.
-:: 2 = Invalaid Command Line Switch.
-:: 3 = unable to locate the PrepareNewRelease.bat (this) file. This file should be located in the Launching Directory.
-:: 4 = Completed - With Errors.
+:: 2 = unable to locate the _PrepareNewRelease.bat (this) file. This file should be located in the Launching Directory.
+:: 3 = unable to locate the wwiiolng Root Directory.
+:: 4 = unable to locate the ww2mods Root Directory.
+:: 5 = Invalaid Command Line Switch.
+:: 6 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-Apr-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
 
 :: Disable / Enable = DebugBat
 SET DebugBat="false"
@@ -44,15 +46,9 @@ rem SET DebugBat="true"
 @echo===================================================================================================
 
 rem SET LaunchingDir=%CD% - Has < Run as Admin > issues.
-SET LaunchingDir=%~dp0
-SET ReleaseVersion=%~1%
-
-SET ww2AssetsPath=..\.\ww2assets
-rem SET ww2PlayarcPath=..\.\ww2assets\oswin\archivefiles
-rem SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles
+SET launchingdir=%~dp0
 
 IF NOT DEFINED LaunchingDir (
-	@echo.
 	@echo.
 	@echo.
 	@echo _PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
@@ -61,52 +57,108 @@ IF NOT DEFINED LaunchingDir (
 	EXIT 1
 )
 
+CD /D "%LaunchingDir%"
+@echo Bat File Launching Directory  :  %CD%
+@echo.
+
+rem If _PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
+IF /I NOT EXIST "_PrepareNewRelease.bat" (
+	@echo.
+	@echo.
+	@echo _PrepareNewRelease.bat: file NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 2
+) else (
+	@echo Located _PrepareNewRelease.bat file.
+	@echo.
+)
+
+SET ReleaseVersion=%~1%
+
 IF NOT DEFINED ReleaseVersion (
-	@echo.
-	@echo.
 	@echo _PrepareNewRelease.bat: Using /rc command line option.
+	@echo.
 	SET ReleaseVersion=/rc
 )
 
+rem Locate and Set the Repos Root Directory.
+CD /D "%LaunchingDir%"\..\..
+
+SET RepoRootDIR=%CD%
+
+CD /D "%RepoRootDIR%
+
+rem Locate and Set the wwiiolng Root Directory.
+IF /I NOT EXIST "wwiiolng\" (
+	@echo.
+	@echo wwiiolng: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 3
+) else (
+	@echo Located the wwiiolng Directory.
+	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
+)
+
+rem Locate and Set the ww2mods Root Directory.
+IF /I NOT EXIST "ww2mods\" (
+	@echo.
+	@echo ww2mods: directory NOT found - ABORTING.
+	IF /I %DebugBat% == "true" @pause
+
+	EXIT 4
+) else (
+	@echo Located the ww2mods Directory.
+	SET modsRootDIR=%RepoRootDIR%\ww2mods
+)
+
+CD /D "%LaunchingDir%"
+
+SET ww2AssetsPath=%wwiiolngRootDIR%\ww2assets
+
 rem Release EXE versions.
 IF /I "%ReleaseVersion%" == "/RC" (
-	SET TargetRootPath=.\release-candidate
-	rem SET ww2ExePath=..\.\build\client\Release\bin
-	SET ww2ExePath=..\.\build\client\Debug\bin
+	SET TargetRootPath=%LaunchingDir%\release-candidate
+	rem SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-candidate
+	
+	rem @echo %TargetRootPath%
+	
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
-	SET TargetRootPath=.\release-alpha
-	SET ww2ExePath=..\.\build\client\Release\bin
+	SET TargetRootPath=%LaunchingDir%\release-alpha
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-alpha
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
-	SET TargetRootPath=.\release-beta
-	SET ww2ExePath=..\.\build\client\Release\bin
+	SET TargetRootPath=%LaunchingDir%\release-beta
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-beta
 	GOTO check1
 )
 
 rem Debug EXE versions.
 IF /I "%ReleaseVersion%" == "/RCDB" (
-	SET TargetRootPath=.\release-candidate
-	SET ww2ExePath=..\.\build\client\Debug\bin
+	SET TargetRootPath=%LaunchingDir%\release-candidate
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHADB" (
-	SET TargetRootPath=.\release-alpha
-	SET ww2ExePath=..\.\build\client\Debug\bin
+	SET TargetRootPath=%LaunchingDir%\release-alpha
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETADB" (
-	SET TargetRootPath=.\release-beta
-	SET ww2ExePath=..\.\build\client\Debug\bin
+	SET TargetRootPath=%LaunchingDir%\release-beta
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	GOTO check1
 )
 
@@ -116,7 +168,7 @@ IF /I "%ReleaseVersion%" == "/BETADB" (
 @echo ====  _PrepareNewRelease.bat: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 2
+EXIT 5
 
 :check1
 
@@ -125,33 +177,48 @@ EXIT 2
 @echo===================================================================================================
 @echo.
 CD /D "%LaunchingDir%"
-@echo Bat File Launching Directory  :  %CD%
+@echo Bat File Launching Directory  ==  :  %CD%
 @echo.
+
+rem CD /D "%RepoRootDIR%"
+rem @echo Repo Root Directory  ===========  :  %CD%
+rem @echo.
+
+rem CD /D "%LaunchingDir%"
+CD /D "%wwiiolngRootDIR%"
+@echo wwiiolng Root Directory  =======  :  %CD%
+@echo.
+
+CD /D "%LaunchingDir%"
+CD /D "%modsRootDIR%"
+@echo ww2mods Root Directory  ========  :  %CD%
+@echo.
+
 
 CD /D "%TargetRootPath%"
-@echo Target Root Path    ======    :  %CD%
+@echo Target Root Path  ==============  :  %CD%
 @echo.
 
-@echo Release Version    =======    :  %ReleaseVersion%
+@echo Release Version  ===============  :  %ReleaseVersion%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%ww2AssetsPath%"
-@echo WW2 Assets Path    =======    :  %CD%
+@echo WW2 Assets Path  ===============  :  %CD%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%ww2PlayarcPath%"
-@echo WW2 Playarc Path    ======    :  %CD%
+@echo WW2 Playarc Path  ==============  :  %CD%
 @echo.
 
 CD /D "%LaunchingDir%"
 CD /D "%ww2ExePath%"
-@echo WW2 EXE Path:    =========    :  %CD%
+@echo WW2 EXE Path:  =================  :  %CD%
 
 IF /I %DebugBat% == "true" ( 
 	@echo.
-	@echo Debug:    ================    :  ON
+	@echo Debug:  ========================  :  ON
 )
 @echo.
 @echo===================================================================================================
@@ -162,20 +229,6 @@ IF /I %DebugBat% == "true" @pause
 
 CD /D "%LaunchingDir%"
 @echo ====  Current Working Directory  :  %CD%
-
-rem If _PrepareNewRelease.bat file is not here, we are probably in the WRONG directory which can be VERY BAD.
-IF /I NOT EXIST "_PrepareNewRelease.bat" (
-	@echo.
-	@echo.
-	@echo.
-	@echo _PrepareNewRelease.bat: file NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
-
-	EXIT 3
-) else (
-	@echo.
-	@echo Located _PrepareNewRelease.bat file.
-)
 
 @echo.
 @echo.
@@ -328,6 +381,7 @@ rem ============================================================================
 @echo %CD% should now be Empty.
 @echo.
 @echo.
+@echo.
 
 @echo===================================================================================================
 @echo.
@@ -454,7 +508,8 @@ IF %ERRORLEVEL% NEQ 0 (
 
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT 6
+	
 ) else (
 	@echo ====  Completed.
 	@echo.
