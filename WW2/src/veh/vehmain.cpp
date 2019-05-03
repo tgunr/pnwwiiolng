@@ -3186,7 +3186,9 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 		}
 	}
 	else
+	{
 		Side = wwiiSide(Country);
+	}
 
 	if (TO->ObjId.objClass == CLASS_BUILDING)// && TO->ObjId.objType == BUILDING_GENERIC)
 	{
@@ -3206,14 +3208,31 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 				}
 			}
 
-			if(bld /*&& bld->pid.objClass == CLASS_BUILDING*/ && bld->pid.objType == FACILITY_FIREBASE)
+			// Special handling for FBs, only infantry and bombers can damage them
+			if(bld && bld->pid.objType == FACILITY_FIREBASE && (ShooterVehicle->VehicleType->Type == VEH_TYPE_AIR || ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON))
 			{
-				if (ShooterVehicle && ShooterVehicle->VehicleType->Type != VEH_TYPE_PERSON)
+				std::string fbObjectName = TO->ObjName();
+
+				// Bombers are only allowed to damage the FB Vehicle Spawn and "other" items at an FB
+				if (ShooterVehicle->VehicleType->Type == VEH_TYPE_AIR && fbObjectName == "infantryfb1c")
 				{
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Bomber damage to the firebase infantry spawn suppressed!");
 					return 0;
 				}
-				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
+
+				// If infantry put satchels on the FB Vehicle Spawn or "other items at the FB, bump up the joules
+				if (ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON && fbObjectName != "infantryfb1c")
+				{
+					const FLOAT64 energyOverride = fpFPSGetFbDamage();
+
+					if (energyOverride >= 1.0f )
+					{
+						Energy = energyOverride;
+						Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper FB veh spawn damage override from fpsData.txt, damage set to %g", Energy);
+					}
+				}
+
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Bomber or Infantry damage to firebase allowed!");
 			}
 		}
 	}
