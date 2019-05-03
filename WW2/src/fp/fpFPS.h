@@ -203,6 +203,7 @@ extern void		fpFPSSetStandingOnVehicle (LOGICAL value);
 
 extern FLOAT64		fpFPSGetBridgeDamage ();
 extern FLOAT64		fpFPSGetBridgeRepair ();
+extern FLOAT64		fpFPSGetFbDamage ();
 
 extern FLOAT32		fpFPSGetConcussionMod ();
 

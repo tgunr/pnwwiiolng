@@ -980,6 +980,9 @@ void fpFPSDataReadFPSFile()
 		case bridgeRepairJoules_hash:
 			fpsTrooper.bridgeRepairJoules = (FLOAT64) atof (varData);
 		break;
+		case fbDamageJoules_hash:
+			fpsTrooper.fbDamageJoules = (FLOAT64) atof (varData);
+		break;
 		case redScreenFadeTime_hash:
 			fpsTrooper.redScreenFadeTime = (FLOAT32) atof (varData);
 		break;
