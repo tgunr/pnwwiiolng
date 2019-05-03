@@ -1225,9 +1225,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 						CP_STAT_ENEMY_INFANTRY |
 						CP_STAT_HEAVY_ENEMY_INF |
 						CP_STAT_ENEMY_SEACRAFT |
-						CP_STAT_HEAVY_ENEMY_SEA |
-						CP_STAT_ENEMY_AIRCRAFT |
-						CP_STAT_HEAVY_ENEMY_AIR))
+						CP_STAT_HEAVY_ENEMY_SEA))
 			{
 				tip += _renderer->tooltip("widgets.map.tooltip.enemy");
 				tip += L"\n";
