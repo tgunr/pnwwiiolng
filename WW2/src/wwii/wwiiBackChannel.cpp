@@ -56,7 +56,7 @@ bool wwiiBackChannelConnect(SINT32 hostTeulIndex, const char* serverIP, UINT16 p
 		switch (resp)
 		{
 		case RN_SK_CONNECTING:
-			uiChatPrintLineColor(colorGREENALPHA, uiLocString("connect.netcode3.enabled").c_str());
+			//uiChatPrintLineColor(colorGREENALPHA, uiLocString("connect.netcode3.enabled").c_str());
 			break;
 		case RN_SK_FAILED:
 			uiChatPrintLineColor(colorYELLOWALPHA, uiLocString("connect.netcode3.failed").c_str());
