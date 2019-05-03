@@ -3602,11 +3602,15 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 	: phui::js::Object(&jsclass,jsfunctions,jsproperties)
 {
 	JS_CONSTRUCTOR_LOCK;
-	phui::js::Array* typehit, *numhit, *numkilled;
+	phui::js::Array* typehit, *numhit, *numkilled, *enemyunits, *enemycallsigns;
 
 	DefineProperty("typehit", typehit = new phui::js::Array);
 	DefineProperty("numhit", numhit = new phui::js::Array);
 	DefineProperty("numkilled", numkilled = new phui::js::Array);
+	// Arrays for all enemy units and their callsigns, to be sent to the client
+	// Used as results.enemyunits and results.enemycallsigns in the client's JS
+	DefineProperty("enemyunits", enemyunits = new phui::js::Array);
+	DefineProperty("enemycallsigns", enemycallsigns = new phui::js::Array);
 
 	StratDB::StratObject* stratobj = StratDB::FindStratObject(results.rtbFacility);
 	if(stratobj)
@@ -3620,6 +3624,17 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 			typehit->SetElement(new jsVehtype(vehtype),i);
 			numhit->SetElement(INT_TO_JSVAL(results.hitArray[i].numVehiclesHit),i);
 			numkilled->SetElement(INT_TO_JSVAL(results.hitArray[i].numVehiclesKilled),i);
+		}
+	}
+
+	// Populate the enemy unit and callsign arrays
+	for(UINT32 i = 0; i < results.kills; i++)
+	{
+		vehType const* enemyVehType = vehTypeGetBySpec(results.enemiesArray[i].vehSpec);
+		if(enemyVehType)
+		{
+			enemyunits->SetElement(new jsVehtype(enemyVehType), i);
+			enemycallsigns->SetElement(phui::js::NewString(chatGetWideCallsign(results.enemiesArray[i].callsignId)), i);
 		}
 	}
 
