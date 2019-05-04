@@ -57,7 +57,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo _MakeDiffs.bat: Launching Directory is not set - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 1
+	EXIT /B 1
 )
 
 CD /D "%LaunchingDir%"
@@ -71,7 +71,7 @@ IF /I NOT EXIST "_MakeDiffs.bat" (
 	@echo _MakeDiffs.bat: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 2
+	EXIT /B 2
 ) else (
 	@echo.
 	@echo Located _MakeDiffs.bat file.
@@ -99,7 +99,7 @@ IF /I NOT EXIST "wwiiolng\" (
 	@echo wwiiolng: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 3
+	EXIT /B 3
 ) else (
 	@echo Located the wwiiolng Directory.
 	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
@@ -111,7 +111,7 @@ IF /I NOT EXIST "ww2mods\" (
 	@echo ww2mods: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT /B 4
 ) else (
 	@echo Located the ww2mods Directory.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
@@ -147,7 +147,7 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 @echo ====  _MakeDiffs.bat: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 5
+EXIT /B 5
 
 :check1
 
@@ -162,7 +162,8 @@ IF /I NOT EXIST "xdelta3.exe" (
 	@echo xdelta3.exe: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 6
+	EXIT /B 6
+
 ) else (
 	@echo Located xdelta3.exe file.
 )
@@ -300,7 +301,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 7
+	EXIT /B 7
 ) else (
 	@echo       Create - Differential [Patching] files  ==  Completed.
 )

@@ -49,7 +49,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo _PlayArchBuilder.bat: Launching Directory is not set - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 1
+	EXIT /B 1
 )
 
 CD /D "%LaunchingDir%"
@@ -63,7 +63,7 @@ IF /I NOT EXIST "_PlayArchBuilder.bat" (
 	@echo _PlayArchBuilder.bat: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 2
+	EXIT /B 2
 ) else (
 	@echo Located _PlayArchBuilder.bat file.
 	@echo.
@@ -90,7 +90,7 @@ IF /I NOT EXIST "wwiiolng\" (
 	@echo wwiiolng: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 3
+	EXIT /B 3
 ) else (
 	@echo Located the wwiiolng Directory.
 	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
@@ -102,7 +102,7 @@ IF /I NOT EXIST "ww2mods\" (
 	@echo ww2mods: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT /B 4
 ) else (
 	@echo Located the ww2mods Directory.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
@@ -136,7 +136,7 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 @echo ====  _PlayArchBuilder: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 5
+EXIT /B 5
 
 :check1
 

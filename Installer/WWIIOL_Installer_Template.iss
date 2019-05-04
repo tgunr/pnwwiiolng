@@ -127,7 +127,7 @@
 #define InstallerExcludePatterns "*.gitignore, *.placeholder, *.DS_Store"
 #define InstallerSoftwareVersion "1.0.0.0"
 #define InstallerPublisher "Playnet Inc / CRS."
-#define InstallerCopyright "© 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved.."
+#define InstallerCopyright "© 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved."
 #define InstallerGroupName "Cornered Rat Software"
 #define InstallerRootPathName "CRS"
 #define InstallerBaseFileName "wwiiol_"

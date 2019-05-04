@@ -54,7 +54,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo _PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 1
+	EXIT /B 1
 )
 
 CD /D "%LaunchingDir%"
@@ -68,7 +68,7 @@ IF /I NOT EXIST "_PrepareNewRelease.bat" (
 	@echo _PrepareNewRelease.bat: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 2
+	EXIT /B 2
 ) else (
 	@echo Located _PrepareNewRelease.bat file.
 	@echo.
@@ -95,7 +95,7 @@ IF /I NOT EXIST "wwiiolng\" (
 	@echo wwiiolng: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 3
+	EXIT /B 3
 ) else (
 	@echo Located the wwiiolng Directory.
 	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
@@ -107,7 +107,7 @@ IF /I NOT EXIST "ww2mods\" (
 	@echo ww2mods: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT /B 4
 ) else (
 	@echo Located the ww2mods Directory.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
@@ -168,7 +168,7 @@ IF /I "%ReleaseVersion%" == "/BETADB" (
 @echo ====  _PrepareNewRelease.bat: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 5
+EXIT /B 5
 
 :check1
 
@@ -508,7 +508,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 6
+	EXIT /B 6
 	
 ) else (
 	@echo ====  Completed.

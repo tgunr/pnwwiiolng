@@ -56,7 +56,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo Deploy-Beta.bat: Launching Directory is not set - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 1
+	EXIT /B 1
 )
 
 CD /D "%LaunchingDir%"
@@ -71,7 +71,7 @@ IF /I NOT EXIST "Deploy-Beta.bat" (
 	@echo Deploy-Beta.bat: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 2
+	EXIT /B 2
 ) else (
 	@echo Located Deploy-Beta.bat file.
 	@echo.
@@ -100,7 +100,7 @@ IF /I NOT EXIST "wwiiolng\" (
 	@echo wwiiolng: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 3
+	EXIT /B 3
 ) else (
 	@echo Located the wwiiolng Directory.
 	SET wwiiolngRootDIR=%RepoRootDIR%\wwiiolng
@@ -112,7 +112,7 @@ IF /I NOT EXIST "ww2mods\" (
 	@echo ww2mods: directory NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 4
+	EXIT /B 4
 ) else (
 	@echo Located the ww2mods Directory.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
@@ -137,7 +137,7 @@ IF /I NOT EXIST "%InnoAppPath%"\"%InnoAppEXE%" (
 	@echo iscc.exe Inno Command Line Compiler: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 5
+	EXIT /B 5
 ) else (
 	@echo Located iscc.exe Inno Command Line Compiler.
 )
@@ -150,7 +150,7 @@ IF /I NOT EXIST "%InnoScriptPath%"\"%InnoScriptName%" (
 	@echo WWIIOL_Installer_Template.iss Inno Script: file NOT found - ABORTING.
 	IF /I %DebugBat% == "true" @pause
 
-	EXIT 6
+	EXIT /B 6
 ) else (
 	@echo Located WWIIOL_Installer_Template.iss Inno Script.
 )
@@ -188,7 +188,7 @@ IF /I "%ReleaseVersion%" == "/BETADB" (
 @echo ====  Deploy-Beta.bat: Invalaid Command Line Switch - ABORTING.
 IF /I %DebugBat% == "true" @pause
 
-EXIT 7
+EXIT /B 7
 
 :check1
 
@@ -230,6 +230,10 @@ CD /D "%LaunchingDir%"
 rem @echo on
 rem CALL _MakeDiffs.bat /beta
 rem @echo off
+
+rem CD /D "%LaunchingDir%"
+rem @echo.
+rem @echo.
 
 @echo Creating the Beta Release, Full Install.
 @echo.
