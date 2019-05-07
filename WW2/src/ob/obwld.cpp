@@ -849,6 +849,7 @@ logTimerEndExtMacro(parseWor);
 
 #ifdef DEBUG_WW2
 	if (DebugBuildingMDLFilesOnly) {
+		Write_Debug("Done building MDL files.Bailing out."); 
 		fprintf(stderr, "Done building MDL files. Bailing out.");
 		exit(0);
 	}

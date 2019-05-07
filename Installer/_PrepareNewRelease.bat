@@ -32,8 +32,13 @@
 :: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
 
 :: Disable / Enable = DebugBat
-SET DebugBat="false"
-rem SET DebugBat="true"
+SET DebugBat=false
+rem SET DebugBat=true
+
+:: The main release.sh script uses the opt/ww2mods directory within the wwiiolng directory AND NOT a separate ww2mods directory.
+:: SET DevSetupMODS=false = release.sh script use (wwiiolng/opt/ww2mods)
+SET DevSetupMODS=true
+SET DevSetupMODS=false
 
 :: =====================================================================================================
 
@@ -52,7 +57,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo.
 	@echo.
 	@echo _PrepareNewRelease.bat: Launching Directory is not set - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 1
 )
@@ -66,7 +71,7 @@ IF /I NOT EXIST "_PrepareNewRelease.bat" (
 	@echo.
 	@echo.
 	@echo _PrepareNewRelease.bat: file NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 2
 ) else (
@@ -93,7 +98,7 @@ rem Locate and Set the wwiiolng Root Directory.
 IF /I NOT EXIST "wwiiolng\" (
 	@echo.
 	@echo wwiiolng: directory NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 3
 ) else (
@@ -102,16 +107,48 @@ IF /I NOT EXIST "wwiiolng\" (
 )
 
 rem Locate and Set the ww2mods Root Directory.
+CD /D "%LaunchingDir%"
+
+IF %DevSetupMODS% == true GOTO devMODS
+IF %DevSetupMODS% == false GOTO scriptMODS
+
+IF /I %DebugBat% == true @pause
+
+EXIT /B 5
+rem ==========
+
+:devMODS
+CD /D "%RepoRootDIR%
+
 IF /I NOT EXIST "ww2mods\" (
 	@echo.
 	@echo ww2mods: directory NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 4
 ) else (
-	@echo Located the ww2mods Directory.
+	@echo Located the ww2mods Directory - Default Dev usage.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
 )
+
+GOTO setupModsDone
+rem ==========
+
+:scriptMODS
+CD /D "%wwiiolngRootDIR%"
+
+IF /I NOT EXIST "opt\ww2mods\" (
+	@echo.
+	@echo ww2mods: directory NOT found - ABORTING.
+	IF /I %DebugBat% == true @pause
+
+	EXIT /B 4
+) else (
+	@echo Located the ww2mods Directory - Release Script usage.
+	SET modsRootDIR=%wwiiolngRootDIR%\opt\ww2mods
+)
+
+:setupModsDone
 
 CD /D "%LaunchingDir%"
 
@@ -120,25 +157,21 @@ SET ww2AssetsPath=%wwiiolngRootDIR%\ww2assets
 rem Release EXE versions.
 IF /I "%ReleaseVersion%" == "/RC" (
 	SET TargetRootPath=%LaunchingDir%\release-candidate
-	rem SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
-	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-candidate
-	
-	rem @echo %TargetRootPath%
-	
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
 	SET TargetRootPath=%LaunchingDir%\release-alpha
-	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-alpha
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
 	SET TargetRootPath=%LaunchingDir%\release-beta
-	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
+	SET ww2ExePath=%wwiiolngRootDIR%\build\client\BetaRelease\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-beta
 	GOTO check1
 )
@@ -166,9 +199,10 @@ IF /I "%ReleaseVersion%" == "/BETADB" (
 @echo.
 @echo.
 @echo ====  _PrepareNewRelease.bat: Invalaid Command Line Switch - ABORTING.
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
 
 EXIT /B 5
+rem ==========
 
 :check1
 
@@ -225,7 +259,7 @@ IF /I %DebugBat% == "true" (
 @echo.
 @echo.
 
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
 
 CD /D "%LaunchingDir%"
 @echo ====  Current Working Directory  :  %CD%
@@ -506,20 +540,24 @@ IF %ERRORLEVEL% NEQ 0 (
 	@echo.
 	@echo.
 
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 6
 	
 ) else (
 	@echo ====  Completed.
-	@echo.
-	@echo You can now run the appropriate _MakeDiffs.bat to populate the diff directory for use by the patch installer script.
-	@echo.
-	@echo The %TargetRootPath% directory should be sufficiently populated for the full installer script to be run.
+	
+	IF /I %DevSetupMODS% == "true" (
+		@echo.
+		@echo You can now run the appropriate _MakeDiffs.bat to populate the diff directory for use by the patch installer script.
+		@echo.
+		@echo The %TargetRootPath% directory should be sufficiently populated for the full installer script to be run.
+	)
 )
 @echo.
 @echo===================================================================================================
 @echo.
 @echo.
 
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
+

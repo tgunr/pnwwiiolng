@@ -48,8 +48,8 @@
 
 
 ; ===  Script Debug. (Un-comment only One)  ==================================
-#define ScriptDebug "yes"
-; #define ScriptDebug "no"    ;Default
+; #define ScriptDebug "yes"
+#define ScriptDebug "no"    ;Default
 
 
 ; ===  Should not edit below this line.   ====================================

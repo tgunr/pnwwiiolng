@@ -24,8 +24,13 @@
 
 :: Disable / Enable = DebugBat.
 :: One option MUST be SET.
-SET DebugBat="false"
-rem SET DebugBat="true"
+SET DebugBat=false
+rem SET DebugBat=true
+
+:: The main release.sh script uses the opt/ww2mods directory within the wwiiolng directory AND NOT a separate ww2mods directory.
+:: SET DevSetupMODS=false = release.sh script use (wwiiolng/opt/ww2mods)
+SET DevSetupMODS=true
+SET DevSetupMODS=false
 
 :: =====================================================================================================
 
@@ -47,7 +52,7 @@ IF NOT DEFINED LaunchingDir (
 	@echo.
 	@echo.
 	@echo _PlayArchBuilder.bat: Launching Directory is not set - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 1
 )
@@ -61,7 +66,7 @@ IF /I NOT EXIST "_PlayArchBuilder.bat" (
 	@echo.
 	@echo.
 	@echo _PlayArchBuilder.bat: file NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 2
 ) else (
@@ -88,7 +93,7 @@ rem Locate and Set the wwiiolng Root Directory.
 IF /I NOT EXIST "wwiiolng\" (
 	@echo.
 	@echo wwiiolng: directory NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 3
 ) else (
@@ -97,16 +102,48 @@ IF /I NOT EXIST "wwiiolng\" (
 )
 
 rem Locate and Set the ww2mods Root Directory.
+CD /D "%LaunchingDir%"
+
+IF %DevSetupMODS% == true GOTO devMODS
+IF %DevSetupMODS% == false GOTO scriptMODS
+
+IF /I %DebugBat% == true @pause
+
+EXIT /B 5
+rem ==========
+
+:devMODS
+CD /D "%RepoRootDIR%
+
 IF /I NOT EXIST "ww2mods\" (
 	@echo.
 	@echo ww2mods: directory NOT found - ABORTING.
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT /B 4
 ) else (
-	@echo Located the ww2mods Directory.
+	@echo Located the ww2mods Directory - Default Dev usage.
 	SET modsRootDIR=%RepoRootDIR%\ww2mods
 )
+
+GOTO setupModsDone
+rem ==========
+
+:scriptMODS
+CD /D "%wwiiolngRootDIR%"
+
+IF /I NOT EXIST "opt\ww2mods\" (
+	@echo.
+	@echo ww2mods: directory NOT found - ABORTING.
+	IF /I %DebugBat% == true @pause
+
+	EXIT /B 4
+) else (
+	@echo Located the ww2mods Directory - Release Script usage.
+	SET modsRootDIR=%wwiiolngRootDIR%\opt\ww2mods
+)
+
+:setupModsDone
 
 CD /D "%LaunchingDir%"
 
@@ -134,9 +171,10 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 @echo.
 @echo.
 @echo ====  _PlayArchBuilder: Invalaid Command Line Switch - ABORTING.
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
 
 EXIT /B 5
+rem ==========
 
 :check1
 
@@ -182,7 +220,7 @@ CD /D "%Playarc_Output%"
 @echo.
 @echo.
 
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
 
 CD /D "%LaunchingDir%"
 
@@ -244,7 +282,7 @@ IF %ERRORLEVEL% NEQ 0 (
 	@echo.
 	@echo.
 	
-	IF /I %DebugBat% == "true" @pause
+	IF /I %DebugBat% == true @pause
 
 	EXIT 6
 ) else (
@@ -256,4 +294,5 @@ IF %ERRORLEVEL% NEQ 0 (
 @echo.
 @echo.
 
-IF /I %DebugBat% == "true" @pause
+IF /I %DebugBat% == true @pause
+

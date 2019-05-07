@@ -854,9 +854,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 #endif	//	EVENT_LOG
 
+
+	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+	//  This may interrupt the Client Build process.
+
 	if (WantedCopyOldSetup == TRUE)
 	{
+#ifdef DEBUG_WW2
+		if (DebugBuildingMDLFilesOnly == false)
+		{
+			CopyOldSetupFiles_WIN();
+		}
+#else
 		CopyOldSetupFiles_WIN();
+#endif
 	}
 
 	if (!sndsDriverConfig(hInstance))
