@@ -363,12 +363,12 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 		else
 		{
 			// when spawning in an enemy town, 
-			// if either link is open but owned by a different country then abort
+			// if either link is open but owned by the different side then abort
 			if ((facility->cp->side != unit->side()) && 
 				(facility->m_incomingLink != nullptr && facility->m_incomingLink->firebase != nullptr &&
-				facility->m_incomingLink->firebase->isOpen() && facility->m_incomingLink->firebase->country != facility->country) ||
+				facility->m_incomingLink->firebase->isOpen() && facility->m_incomingLink->firebase->side != facility->side) ||
 				(facility->m_outgoingLink != nullptr && facility->m_outgoingLink->firebase != nullptr &&
-				facility->m_outgoingLink->firebase->isOpen() && facility->m_outgoingLink->firebase->country != facility->country))
+				facility->m_outgoingLink->firebase->isOpen() && facility->m_outgoingLink->firebase->side != facility->side))
 			{
 				throw PostRequestFail("no friendly fb for garrison supply", SPAWN_NO_BRIGADE_SUPPLY);
 			}
