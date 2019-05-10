@@ -26,9 +26,9 @@ function build_step {
         out_msg='About to '$1$' '$3$' press any key to continue'
         read -p "$out_msg" -n 1 -r 
         echo    # (optional) move to a new line
-        echo "Step "$buildstep". "$2" "$3
+        echo "   >>>>>>>>>>    ==============================       Step "$buildstep". "$2" "$3
     else
-        echo "Step "$buildstep". "$2" "$3
+        echo "   >>>>>>>>>>    ==============================       Step "$buildstep". "$2" "$3
     fi
 
     if (( skipto > 0 )) ; then
@@ -37,8 +37,6 @@ function build_step {
         else
             skip_step=false
         fi
-    else
-        skip_step=false
     fi
 
     buildstep=$((buildstep+1))
@@ -77,7 +75,7 @@ WWII_ROOT=$(pwd)
 WW2MODS="$WWII_ROOT/opt/ww2mods"
 WW2ARCHIVES_ROOT=""
 WW2ARCHIVES_RELEASE=""
-INSTALLER_ROOT="$WWII_ROOT/Installer"
+INSTALLER_ROOT=""
 INSTALLER_RELEASE=""
 DEBUGDIR="$WWII_ROOT/build/client/Debug/Bin"
 RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
@@ -88,6 +86,7 @@ ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
 PREV_RELEASE="$PROGRAMFILES\\CRS\\WWIIOnline\\"
+MDL_COMMANDLINE_ARGS="--args -BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
 
 InstallerScriptName="WWIIOL_Installer_Template.iss"
 build_release=""
@@ -112,6 +111,10 @@ echo
 echo
 echo "-----------------------------------------------------------------------------------------------------------------------"
 echo $(date +%F_%T)"  >>>>  Release Script Starting."
+echo
+echo "Note: Press Ctrl + C to Exit the script."
+echo
+echo
 build_step "configure" "Configing" "script options"
 echo
 echo
@@ -122,7 +125,7 @@ echo "                   -- b = Beta Release - BetaRelease EXE Build"
 echo "                   -- e to Exit the script."
 echo    # (optional) move to a new line
 
-while read -p "Enter the Installer Build Type ( r | a | b | e ): "  -n 1 -r ; do
+while read -p "Enter the Installer Build Type ( r|a|b|e ) : "  -n 1 -r ; do
     case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
         "r")
             build_release=$Client_release
@@ -169,6 +172,7 @@ if [ "$OSTYPE" == "cygwin" ] ; then
     echo "Detected Windows under cygwin"
 
     myos="win"
+    INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/oswin/archivefiles"
 
 elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
@@ -177,6 +181,8 @@ elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "WARNING: DO NOT DO ANYTHING while build is running, especially when DropDMG is running!!!!"
 
     myos="osx"
+    # INSTALLER_ROOT="$WWII_ROOT/WW2/proj/mac/WW2 Release Items/DropDMG"
+    INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/osmac/archivefiles"
 
 else
@@ -214,18 +220,26 @@ else
 
     #validate xcode version
     xcodepath=$(which xcodebuild)
-    echo "Apple Xcode  ==================  :  < "$gitpath" >"
+    echo "Apple Xcode Path  =============  :  < "$xcodepath" >"
     if [ ! -x "$xcodepath" ] ; then
-        exit_msg=${exit_msg}'|Pre-requisites ERROR: XCode is not available, install version $min_xcode_version_major.$min_xcode_version_minor or greater.'
+        exit_msg=${exit_msg}'|Pre-requisites ERROR: XCode is not available. Please install version $min_xcode_version_major.$min_xcode_version_minor or greater.'
         found_prereq_errors=true
 
     else
         xcode_version=$(xcodebuild -version)
         version_rsp=(${xcode_version// / })
         version_nums=(${version_rsp[1]//\./ })
+        echo " * Apple Xcode Version  =======  :  < "$xcode_version" >"
+        # echo " * Apple Xcode Version_rsp  ===  :  < "$version_rsp" >"
+        # echo " * Apple Xcode Version_nums  ==  :  < "${version_nums[0]}"."${version_nums[1]}"."${version_nums[2]}" >"
 
-        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor  && version_nums[0] == min_xcode_version_major )); then
+        if (( version_nums[0] < min_xcode_version_major )) || (( version_nums[1] < min_xcode_version_minor  && version_nums[0] == min_xcode_version_major )); then
             exit_msg=${exit_msg}'|Pre-requisites ERROR: Xcode version incorrect, update to version '$min_xcode_version_major'.'$min_xcode_version_minor' or greater.' 
+            found_prereq_errors=true
+        fi
+
+        if (( version_nums[0] > 9 )); then
+            exit_msg=${exit_msg}'|Pre-requisites ERROR: Xcode versions later than 9.4.1 are Currently (May 2019) Incompatible with World War II Online builds.'
             found_prereq_errors=true
         fi
     fi
@@ -239,28 +253,34 @@ fi
 
 # make sure the opt/ww2mods directory exists
 if [ ! -d "opt/ww2mods" ] ; then
-    exit_msg=$exit_msg'|Pre-requisites ERROR: ww2mods is not loaded (or linked) through opt directory, please correct.'
+    exit_msg=$exit_msg'|Pre-requisites ERROR: ww2mods is not loaded (or linked) through opt directory. Please correct it.'
     found_prereq_errors=true
 fi
 
-# set the installer root and archive root directory. $INSTALLER_ROOT $WW2ARCHIVES_ROOT (OSTYPE)is set earlier.
+# set the installer root and archive root directory. $INSTALLER_ROOT $WW2ARCHIVES_ROOT (OSTYPE) is set earlier.
 case $build_release in
     $Client_release)
         INSTALLER_RELEASE=$INSTALLER_ROOT"/release-candidate"
         WW2ARCHIVES_RELEASE=$WW2ARCHIVES_ROOT"/release-candidate"
         ;;
+
     $Client_alpha)
         INSTALLER_RELEASE=$INSTALLER_ROOT"/release-alpha"
         WW2ARCHIVES_RELEASE=$WW2ARCHIVES_ROOT"/release-alpha"
         ;;
+
     $Client_beta)
         INSTALLER_RELEASE=$INSTALLER_ROOT"/release-beta"
         WW2ARCHIVES_RELEASE=$WW2ARCHIVES_ROOT"/release-beta"
         ;;
 esac
 
+if [ "$myos" == "osx" ] ; then
+    WW2ARCHIVES_RELEASE=$WW2ARCHIVES_ROOT
+fi
+
 # make sure the installer release directory exists, set earlier.
-if [ ! -d $INSTALLER_RELEASE ] ; then
+if [ ! -d "$INSTALLER_RELEASE" ] ; then
     exit_msg=$exit_msg'|Pre-requisites ERROR: The directory: '$INSTALLER_RELEASE', does not exist. Please create it.'
     found_prereq_errors=true
 fi
@@ -271,14 +291,15 @@ if [ ! -d $WW2ARCHIVES_RELEASE ] ; then
     found_prereq_errors=true
 fi
 
+echo "ww2Mods Directory  ============  :  < "$WW2MODS" >"
+echo "Playarc Release Directory  ====  :  < "$WW2ARCHIVES_RELEASE" >"
 echo "Installer Release Directory  ==  :  < "$INSTALLER_RELEASE" >"
-echo "Playarc Root Directory  =======  :  < "$WW2ARCHIVES_ROOT" >"
 
 # Build Windows Patch Installers?
 if [ "$myos" == "win" ] ; then
     echo
     echo
-    while read -p "Build Windows Patch Installers (y|n) :" -n 1 -r ; do
+    while read -p "Build Windows Patch Installers ( y|n ) : " -n 1 -r ; do
         case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
             "y")
                 build_patch=true
@@ -329,13 +350,15 @@ if [ "$found_prereq_errors" = true ] ; then
     exit 1
 fi
 
+#
 # Pre-requisites checking Completed.
+#
 
 noprompt=false
 
 echo
 echo
-while read -p "Build using all the default responses? (y|n) :" -n 1 -r ; do
+while read -p "Build using all the default responses? ( y|n ) : " -n 1 -r ; do
         case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
             "y")
                 noprompt=true
@@ -359,11 +382,12 @@ releasetype=${arrayBranchElements[0]}
 releaseversion=${arrayBranchElements[1]}
 
 isrelease=false
+rebuildMDLfiles=false
 
 if [ "$noprompt" = false ]; then
     echo
     echo
-    while read -p "Is this a formal release? (y|n) :" -n 1 -r ; do
+    while read -p "Is this a formal release? ( y|n ) : " -n 1 -r ; do
         case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
             "y")
                 break
@@ -385,21 +409,23 @@ fi
 
 if [[ $REPLY =~ ^[Yy]$ ]] ; then
     if [ "$releasetype" != "release" ] && [ "$releasetype" != "hotfix" ]; then
-        exit_msg="Formal releases must be on a release or hotfix branch, create a release or hotfix branch and restart build."
+        exit_msg="Formal releases must be on a release or hotfix branch, create a release or hotfix branch and restart the build."
 
         exit 1
     fi
 
     echo "Release version is "$releaseversion
+
     isrelease=true
+    rebuildMDLfiles=true
 
 else
     if [ "$releasetype" == "feature" ] ; then
         if [ "$noprompt" = false ]; then
             echo
-            echo "WARNING! You are building from a feature branch which is normally unwise . . ."
+            echo "WARNING! You are building from a Feature branch which is normally unwise . . ."
             echo
-            while read -p "Are you sure you want to continue? (y|n) :" -n 1 -r ; do
+            while read -p "Are you sure you want to continue? ( y|n ) : " -n 1 -r ; do
                 case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
                     "y")
                         break
@@ -425,12 +451,37 @@ else
                 exit 1
         fi
     fi
+
+    if [ "$noprompt" = false ]; then
+        echo
+        echo
+        echo "At the moment, ALL of the .mdl files will NOT be Rebuilt."
+        while read -p "Do you wish to Rebuild ALL of the .mdl files Now? ( y|n ) : " -n 1 -r ; do
+            case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
+                "y")
+                    rebuildMDLfiles=true
+                    break
+                    ;;
+
+                "n")
+                    rebuildMDLfiles=false
+                    break
+                    ;;
+
+                *)
+                    echo
+                    ;;
+            esac
+        done
+    else
+        rebuildMDLfiles=false
+    fi
 fi
 
 echo
 echo
-# build_step "test" "Testing" "repositories"
-echo "Testing repositories."
+build_step "test" "Testing" "repositories"
+# echo "Testing repositories."
 
 if [ "$myos" == "osx" ] ; then
     osascript -e 'tell app "Xcode" to quit'
@@ -460,7 +511,7 @@ if [ -n "$cleanedfiles" ] ; then
     else
         if [ "$noprompt" = false ]; then
             echo
-            while read -p "Would you like to clean the repositories first? (y|n) :" -n 1 -r ; do
+            while read -p "Would you like to clean the repositories first? ( y|n ) : " -n 1 -r ; do
                 case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
                     "y")
                         clean_repo=true
@@ -485,7 +536,7 @@ fi
 
 echo
 echo
-while read -p "Deploy to Steam when finished? (y|n) :" -n 1 -r ; do
+while read -p "Deploy to Steam when finished? ( y|n ) : " -n 1 -r ; do
     case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
         "y")
             build_steam=true
@@ -508,16 +559,21 @@ echo
 echo "Options Selected:"
 echo "  Installer Build type          : "$build_release
 echo "  Detected Operating System     : "$([[ $myos == "win" ]] && echo "Win" || echo "Mac")
-echo "  Build Windows Patches         : "$([[ $build_patch == true ]] && echo "Yes" || echo "No")
+
+if [ "$myos" == "win" ] ; then
+    echo "  Build Windows Patch Files     : "$([[ $build_patch == true ]] && echo "Yes" || echo "No")
+fi
+
 echo "  Use Default Responses         : "$([[ $noprompt == true ]] && echo "Yes" || echo "No")
 echo "  Formal Release                : "$([[ $isrelease == true ]] && echo "Yes" || echo "No")
+echo "  Rebuild ALL .mdl Files        : "$([[ $rebuildMDLfiles == true ]] && echo "Yes" || echo "No")
 echo "  Clean the Repositories        : "$([[ $clean_repo == true ]] && echo "Yes" || echo "No")
 echo "  Deploy to Steam when finished : "$([[ $build_steam == true ]] && echo "Yes" || echo "No")
 echo
 
-echo "To continue with the Options Showen above,"
+echo "To continue with the Options Shown above,"
 echo "please (V)erify to proceed OR (A)bort to exit."
-while read -p "(V)erify OR (A)bort (v|a) :" -n 1 -r ; do
+while read -p "(V)erify  OR  (A)bort ( v|a ) :" -n 1 -r ; do
     case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
         "v")
             break
@@ -536,15 +592,17 @@ while read -p "(V)erify OR (A)bort (v|a) :" -n 1 -r ; do
     esac
 done
 
-# exit_msg=$exit_msg'|Configure Testing.'
-# exit 1
-
 
 ################################################################
 
 #    Run
 
 ################################################################
+
+
+# ==========================================================================
+# skip_step=true
+# ==========================================================================
 
 
 if [ "$skip_step" = false ]; then
@@ -560,7 +618,7 @@ if [ "$skip_step" = false ]; then
         
         if [ "$noprompt" = false ]; then
             echo "The above files will be affected, please (V)erify to proceed OR (A)bort to exit."
-            while read -p "(V)erify OR (A)bort (v|a):" -n 1 -r ; do
+            while read -p "(V)erify  OR  (A)bort ( v|a ): " -n 1 -r ; do
                 case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
                     "v")
                         break
@@ -640,6 +698,7 @@ fi
 echo
 echo "TODO: libxml prebuild"
 
+
 ################################################################
 
 #    Build Debug Client (Debug) for .mdl creation.
@@ -648,24 +707,46 @@ echo "TODO: libxml prebuild"
 
 mac_product_base_name="World\ War\ II\ Online"
 mac_product_name=$mac_product_base_name
+target_file='WW2/WW2OL.xcodeproj/project.pbxproj'
+buildBackupTag="_BUILD_BAK"
+
+if [ "$myos" == "osx" ] ; then
+    touch $WW2ARCHIVES_RELEASE/playarc.ww2
+
+    # Mac.app Project. Backup the Project Files.
+    echo
+    echo "Backup the Mac Project Files."
+    echo
+
+    cp -rvp "WW2/WW2OL.xcodeproj" "WW2/WW2OL$buildBackupTag.xcodeproj"
+    cp -rvp "WW2/proj/mac/Info.plist" "WW2/proj/mac/Info$buildBackupTag.plist"
+
+    echo
+    echo "Mac Project Files Backup Completed."
+    echo
+fi
+
 if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
+
     echo
     echo "Updating CFBundleName and PRODUCT_NAME"
 
+    # Set Build Client Title on the Original Files.
+    mac_product_name=$mac_product_base_name
+
     case $build_release in
         $Client_alpha)
-            mac_product_name=$mac_product_name"\ Alpha"
+            mac_product_name="$mac_product_base_name\ Alpha"
             ;;
 
         $Client_beta)
-            mac_product_name=$mac_product_name"\ Beta"
+            mac_product_name="$mac_product_base_name\ Beta"
             ;;
     esac
 
     strip_name=`echo "$mac_product_name" | sed 's/\\\//g'`
     plutil -replace CFBundleName -string "$strip_name"  WW2/proj/mac/Info.plist
 
-    target_file='WW2/WW2OL.xcodeproj/project.pbxproj'
     grepresult=$(grep "$mac_product_name" $target_file)
 
     if [ ! -n "$grepresult" ] ; then
@@ -674,16 +755,18 @@ if [ "$isrelease" = false ] && [ "$myos" == "osx" ] ; then
     fi
 fi
 
-if [ "$myos" == "osx" ] ; then
-    touch $WW2ARCHIVES_RELEASE/playarc.ww2
-fi
-
 mac_app_name=$mac_product_name".app"
+
+if [ "$myos" == "osx" ] ; then
+    echo
+    echo "Mac Build Product Name: "$mac_product_name
+    echo "Mac app Name: "$mac_app_name
+fi
 
 echo
 echo
 bld_config="Debug"
-build_step "build" "Building" "debug version for .mdl file creation"
+build_step "build" "Building" "debug client for .mdl file creation"
 
 if [ "$skip_step" = false ]; then
     if [ "$myos" == "win" ] ; then
@@ -707,27 +790,28 @@ if [ "$skip_step" = false ]; then
 
     else
         # Building Debug client - Mac (.mdl files)
-        if [ "$isrelease" = true ] ; then
-            echo "Cleaning build"
-            xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
-        fi
+#        if [ "$isrelease" = true ] ; then
+#            echo "Cleaning build"
+#            xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
+#        fi
+#        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
 
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean build PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
     fi
 fi
 
 
 ################################################################
 
-#  ReBuild the .mdl files in the wwiiolng/opt/ww2mods directory.
+#  ReBuild the .mdl files.
 
 ################################################################
 
-echo
-build_step "remove" "Removing" "old .mdl files"
+# Removing Old .mdl files from the opt/ww2mods directory
 if [ "$skip_step" = false ]; then
-    if [ "$isrelease" = true ] ; then
-        # Removing Old .mdl files from the opt/ww2mods directory
+    if [ "$isrelease" = true ] || [ "$rebuildMDLfiles" = true ] ; then
+        echo
+        build_step "remove" "Removing" "old .mdl files"
         find "$WW2MODS" -name "*.mdl" -delete
     fi
 fi
@@ -736,7 +820,7 @@ if [ "$myos" == "win" ] ; then
     # Building New .mdl files - Win
     cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
     chmod 550 "$WW2MODS/ww2mods.bat"
-    
+
     echo
     build_step "copy" "Copying" "Debug binaries into WW2MODS"
     if [ "$skip_step" = false ]; then
@@ -767,9 +851,12 @@ else
 
     echo
     build_step "build" "Building" "mdl files - Mac"
-    ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
-    ww2path=$(echo $ww2path | sed 's/\\//g')
-    open -W "$ww2path" --args -BuildMDLOnly -data 1 -datadir "$(pwd)/opt/ww2mods/DATA/" -window 1
+    if [ "$skip_step" = false ]; then
+        ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
+        ww2path=$(echo $ww2path | sed 's/\\//g')
+
+        open -W "$ww2path" $MDL_COMMANDLINE_ARGS
+    fi
 fi
 
 mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
@@ -807,15 +894,18 @@ if [ "$skip_step" = false ]; then
             fi
 
         else
-            exit_msg="Error: Failed to locate: "$INSTALLER_ROOT"/_PlayArchBuilder.bat , build aborted."
+            exit_msg="Error: Failed to locate: "$INSTALLER_ROOT"/_PlayArchBuilder.bat, build aborted."
 
             exit 1
         fi
         popd
 
     else
+        # Build the playbuilder
         xcodebuild -project archivetools/playbuilder.xcodeproj -scheme 'playbuilder Release' clean build
-        archivetools/build/Release/playbuilder --verbose opt/ww2mods/DATA WW2Archives
+
+        # Build the Playarc file.
+        archivetools/build/Release/playbuilder --verbose $WW2MODS/DATA $WW2ARCHIVES_RELEASE
 
     fi
 fi
@@ -868,17 +958,44 @@ if [ "$skip_step" = false ]; then
         fi
 
     else
-        if [ "$isrelease" = true ] ; then
-            echo "Cleaning build"
-            xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
-        fi
+#        if [ "$isrelease" = true ] ; then
+#            echo "Cleaning build"
+#            xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
+#        fi
+#        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
 
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 
-if [ "$myos" == "win" ] ; then
+if [ "$myos" == "osx" ] ; then
 
+    # Restore the Original Mac Project Files.
+    echo
+    echo "Restore the Original Mac Project Files."
+    echo
+
+    # Delete the Altered Files.
+    rm -rf "WW2/WW2OL.xcodeproj"
+    rm -rf "WW2/proj/mac/Info.plist"
+
+    # Restore the Original Files.
+    mv -fnv "WW2/WW2OL"$buildBackupTag".xcodeproj" "WW2/WW2OL.xcodeproj"
+    mv -fnv "WW2/proj/mac/Info"$buildBackupTag".plist" "WW2/proj/mac/Info.plist"
+
+    echo
+    echo "Mac Project Files Restore Completed."
+    echo
+fi
+
+
+# ==========================================================================
+# skip_step=false
+# ==========================================================================
+
+
+if [ "$myos" == "win" ] ; then
+    echo
     echo
     build_step "copy" "Copying" "preparing the installer source directories - Win"
     if [ "$skip_step" = false ]; then
@@ -902,149 +1019,232 @@ if [ "$myos" == "win" ] ; then
         popd
 
         # chmod -R 550 $INSTALLER_RELEASE/.
-    fi
 
-    # make sure the previous release for the patch to apply exists
-    if [ "$build_patch" = true ] ; then
-        if [ ! -f "$INSTALLER_RELEASE/WW2.exe" ] ; then
+        # make sure the previous release for the patch to apply exists
+        if [ "$build_patch" = true ] ; then
+            if [ ! -f "$INSTALLER_RELEASE/WW2.exe" ] ; then
+                echo
+                echo "WARNING: The previous release directory ('$INSTALLER_RELEASE'),"
+                echo "WARNING: does not contain a valid release."
+                echo "WARNING: The Windows Patch Install WILL NOT be built."
+                build_patch=false
+            fi
+        fi
+
+        if [ "$build_patch" = true ] ; then
             echo
-            echo "WARNING: The previous release directory ('$INSTALLER_RELEASE'),"
-            echo "WARNING: does not contain a valid release."
-            echo "WARNING: The Windows Patch Install WILL NOT be built."
-            build_patch=false
-        fi
-    fi
+            echo
+            build_step "create" "Creating" "diff files for patcher"
 
-    if [ "$build_patch" = true ] ; then
+            if [ "$skip_step" = false ]; then
+                pushd "$INSTALLER_ROOT"
 
-        echo
-        echo
-        build_step "create" "Creating" "diff files for patcher"
+                if [ -f "_MakeDiffs.bat" ] ; then
+                    ./_MakeDiffs.bat /$build_release
 
-        if [ "$skip_step" = false ]; then
-            pushd "$INSTALLER_ROOT"
-            if [ -f "_MakeDiffs.bat" ] ; then
-                ./_MakeDiffs.bat /$build_release
+                    ExitStatus=$?
+                    if [ "$ExitStatus" != "0" ] ; then
+                        exit_msg="Error: _MakeDiffs.bat returned: "$ExitStatus" Exit Status, build aborted."
 
-                ExitStatus=$?
-                if [ "$ExitStatus" != "0" ] ; then
-                    exit_msg="Error: _MakeDiffs.bat returned: "$ExitStatus" Exit Status, build aborted."
+                        exit 1
+                    fi
+                else
+                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_MakeDiffs.bat, build aborted."
 
                     exit 1
                 fi
-
-            else
-                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_MakeDiffs.bat, build aborted."
-
-                exit 1
+                popd
             fi
-            popd
-        fi
 
-        echo
-        echo
-        build_step "build" "Building" "complete running patch install scripts: Patch"
-        if [ "$skip_step" = false ]; then
-            pushd "$INSTALLER_ROOT"
-            if [ -f "$InstallerScriptName" ] ; then
-                iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=patch
+            echo
+            echo
+            build_step "build" "Building" "complete running patch install scripts: Patch"
+            if [ "$skip_step" = false ]; then
+                pushd "$INSTALLER_ROOT"
 
-                ExitStatus=$?
-                if [ "$ExitStatus" != "0" ] ; then
-                    exit_msg="Error: The Patch Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+                if [ -f "$InstallerScriptName" ] ; then
+                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=patch
+
+                    ExitStatus=$?
+                    if [ "$ExitStatus" != "0" ] ; then
+                        exit_msg="Error: The Patch Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+
+                        exit 1
+                    fi
+                else
+                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Patch Install build aborted."
 
                     exit 1
                 fi
-            else
-                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Patch Install build aborted."
-
-                exit 1
+                popd
             fi
-            popd
-        fi
 
 
 ################################################################
 
-echo TODO  Rollback Patcher is INCOMPLETE.
+echo "TODO  Rollback Patcher is INCOMPLETE."
 echo
 
 ################################################################
 
-#        echo
-#        echo
-#        build_step "create" "Creating" "diff files for patcher (rollback)"
-#        if [ "$skip_step" = false ]; then
-#            pushd "$INSTALLER_ROOT"
-#            if [ -f "_MakeDiffs.bat" ] ; then
-#                ./_MakeDiffs.bat /$build_release
-#            else
-#                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_MakeDiffs.bat, build aborted."
-#                exit 1
-#            fi
-#            popd
-#        fi
-#        echo
-#        echo
-#        build_step "build" "Building" "complete running patch install scripts: Rollback"
-#        if [ "$skip_step" = false ]; then
-#            pushd "$INSTALLER_ROOT"
-#            if [ -f "$InstallerScriptName" ] ; then
-#                iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=rollback
-#                ExitStatus=$?
-#                if [ "$ExitStatus" != "0" ] ; then
-#                    exit_msg="Error: The Rollback Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+#            echo
+#            echo
+#            build_step "create" "Creating" "diff files for patcher (rollback)"
+#            if [ "$skip_step" = false ]; then
+#                pushd "$INSTALLER_ROOT"
+
+#                if [ -f "_MakeDiffs.bat" ] ; then
+#                    ./_MakeDiffs.bat /$build_release
+
+#                    ExitStatus=$?
+#                    if [ "$ExitStatus" != "0" ] ; then
+#                        exit_msg="Error: _MakeDiffs.bat returned: "$ExitStatus" Exit Status, build aborted."
+
+#                        exit 1
+#                    fi
+#                else
+#                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_MakeDiffs.bat, build aborted."
+
 #                    exit 1
 #                fi
-#            else
-#                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Rollback Install build aborted."
-#                exit 1
+#                popd
 #            fi
-#            popd
-#        fi
-    fi
 
-    echo
-    echo
-    build_step "build" "Building" "complete running full install scripts: Full Install"
-    if [ "$skip_step" = false ]; then
-        pushd "$INSTALLER_ROOT"
-        if [ -f "$InstallerScriptName" ] ; then
-            iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=full
+#            echo
+#            echo
+#            build_step "build" "Building" "complete running patch install scripts: Rollback"
+#            if [ "$skip_step" = false ]; then
+#                pushd "$INSTALLER_ROOT"
 
-            ExitStatus=$?
-            if [ "$ExitStatus" != "0" ] ; then
-                exit_msg="Error: The Full Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+#                if [ -f "$InstallerScriptName" ] ; then
+#                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=rollback
 
-                exit 1
+#                    ExitStatus=$?
+#                    if [ "$ExitStatus" != "0" ] ; then
+#                        exit_msg="Error: The Rollback Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+
+#                        exit 1
+#                    fi
+#                else
+#                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Rollback Install build aborted."
+
+#                    exit 1
+#                fi
+#                popd
+#            fi
+
+            echo
+            echo
+            build_step "build" "Building" "complete running full install scripts: Full Install"
+            if [ "$skip_step" = false ]; then
+                pushd "$INSTALLER_ROOT"
+
+                if [ -f "$InstallerScriptName" ] ; then
+                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=full
+
+                    ExitStatus=$?
+                    if [ "$ExitStatus" != "0" ] ; then
+                        exit_msg="Error: The Full Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+
+                        exit 1
+                    fi
+                else
+                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Full Install build aborted."
+
+                    exit 1
+                fi
+                popd
             fi
-        else
-            exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Full Install build aborted."
-
-            exit 1
         fi
-        popd
     fi
-else
 
+else
     echo
-    echo
-    build_step "create" "Creating" "dmg file"
+    build_step "create" "Creating" "Mac DMG file"
     if [ "$skip_step" = false ]; then
-        mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
-        cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
-        cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
-        plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
-        app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
-        app_path=$(echo $app_path | sed 's/\\//g')
-        /Applications/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
+
+        # Cleaned Names - Remove the \ from the names.
+        # mac_base_name="World\ War\ II\ Online", mac_product_name=$mac_product_base_name"\ Alpha"
+        DMG_Image_Dir_Name=`echo "$mac_product_name" | sed 's/\\\//g'`
+
+        # mac_app_name=$mac_product_name".app"
+        DMG_WW2_App_Name=`echo "$mac_app_name" | sed 's/\\\//g'`
+
+        # Root Directories.
+        DMG_Repo_Root="$WWII_ROOT/WW2/proj/mac/WW2 Release Items/DropDMG"
+        DMG_User_Root="$HOME/Library/Application Support/DropDMG"
+        DMG_WW2_App_Source="WW2/proj/mac/build/"$bld_config_dir"/"$DMG_WW2_App_Name
+
+        # DropDMG Config Files.
+        DMG_Config_Source=$DMG_Repo_Root"/ConfigFiles"
+        DMG_Config_Destination=$DMG_User_Root
+
+        # ww2assets Directory.
+        DMG_Assets_Root="$WWII_ROOT/ww2assets"
+
+        echo
+        if [ -d "$INSTALLER_RELEASE/$DMG_Image_Dir_Name" ] ; then
+            echo "Deleting an Old DMG Image Directory: $INSTALLER_RELEASE/$DMG_Image_Dir_Name."
+            echo
+            echo
+            rm -rf "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+        fi
+
+        dmgfiles=`find $INSTALLER_RELEASE -name "*.dmg" -print`
+
+        if [ ! -n "$dmg" ] ; then
+            echo "Deleting ALL DMG Disk Image (.dmg) Files in the: $INSTALLER_RELEASE directory."
+            echo
+            echo
+
+            find "$INSTALLER_RELEASE" -name "*.dmg" -delete
+        fi
+
+        echo "Create a New DMG Image Directory."
+        echo
+        cp -rv "$DMG_Repo_Root/World War II Online DropDMG Template/" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+
+        echo
+        echo
+        echo "Update the readme.rtf file -> DMG Image Directory / WWIIOnline."
+        echo
+        cp -v "$DMG_Assets_Root/readme.rtf" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name/WWIIOnline/"
+
+        echo
+        echo
+        echo "Update the license.rtf file -> Repo ConfigFiles / Licenses / WW2_Lic."
+        echo
+        cp -v "$DMG_Assets_Root/docs/license.rtf" "$DMG_Repo_Root/ConfigFiles/Licenses/WW2_Lic/en.rtf"
+
+        echo
+        echo
+        echo "Copy the repository DropDMG config files to the user directory."
+        echo
+        mkdir -p "$DMG_User_Root"{Configurations,Layouts,Licenses}
+        cp -rv "$DMG_Repo_Root/ConfigFiles/" "$DMG_User_Root/"
+
+        echo
+        echo
+        echo "Copy the WWIIOL app to the DMG Image Directory."
+        echo
+        cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name/"
+
+        if [ "$skip_step" = false ]; then
+            echo
+            echo
+            echo "Create the DMG package for the Mac."
+            echo
+            # plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/WW2_Config.plist"
+
+            /Applications/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name WW2_Config "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+        fi
     fi
 fi
 
+echo
+echo
 if [ "$build_steam" = true ] ; then
 
-    echo
-    echo
     build_step "deploy" "Deploying" "to Steam"
     if [ "$skip_step" = false ]; then
         echo "When prompted to allow steam accesss to the network, enable it please."

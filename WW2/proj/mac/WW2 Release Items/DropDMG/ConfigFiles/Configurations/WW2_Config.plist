@@ -12,6 +12,8 @@
 			<true/>
 			<key>customIcon</key>
 			<integer>1</integer>
+			<key>deleteAfterCreating</key>
+			<false/>
 			<key>encryption</key>
 			<integer>0</integer>
 			<key>format</key>

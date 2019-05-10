@@ -18,7 +18,27 @@
 			<array>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.F87BA9A3-A426-4058-AD6C-A7E08754F823</string>
+					<string>LayoutItem.E577A285-2884-4053-A4A3-532B2A5FB7EE</string>
+					<key>name</key>
+					<string>Applications</string>
+					<key>position</key>
+					<string>{512, 144}</string>
+					<key>type</key>
+					<string>applications</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.530B5C48-471E-4EFC-93F9-6E3EA8AF51EE</string>
+					<key>name</key>
+					<string>${APP_BASENAME}.app</string>
+					<key>position</key>
+					<string>{288, 144}</string>
+					<key>type</key>
+					<string>application</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>LayoutItem.05A5B264-7E18-439F-A65F-E18A7970B430</string>
 					<key>name</key>
 					<string>Application Support</string>
 					<key>position</key>
@@ -28,33 +48,13 @@
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.F879A1A5-8AD1-4B09-B553-72512E2CB648</string>
+					<string>LayoutItem.872C684B-8F6E-485D-AD6E-EFEFB2D58621</string>
 					<key>name</key>
 					<string>WWIIOnline</string>
 					<key>position</key>
 					<string>{288, 272}</string>
 					<key>type</key>
 					<string>file</string>
-				</dict>
-				<dict>
-					<key>identifier</key>
-					<string>LayoutItem.C5D88F8F-6844-4FA8-8EE2-EF46138DA14D</string>
-					<key>name</key>
-					<string>World War II Online.app</string>
-					<key>position</key>
-					<string>{288, 144}</string>
-					<key>type</key>
-					<string>file</string>
-				</dict>
-				<dict>
-					<key>identifier</key>
-					<string>LayoutItem.BB83796E-2142-42C6-BA3A-E528419A3E95</string>
-					<key>name</key>
-					<string>Applications</string>
-					<key>position</key>
-					<string>{512, 144}</string>
-					<key>type</key>
-					<string>applications</string>
 				</dict>
 			</array>
 			<key>windowInsets</key>
