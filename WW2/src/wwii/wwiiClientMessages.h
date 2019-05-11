@@ -26,3 +26,4 @@ extern void wwiiActivateCell(LOGICAL);
 extern UINT32 wwiiGetUpdateNo(bool increment = true);
 extern void wwiiResetUpdateNo();
 extern UINT32 wwiiHitsPrime();
+extern void checkThemeChange(UINT32 theme);

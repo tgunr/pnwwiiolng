@@ -47,8 +47,6 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 ,	"path"
 };
 
-#define PATH_SEPSTR "/"
-
 ////////////////////////////////////////////////////////////////////////////////
 // Registry of all the known config vars.
 
@@ -64,17 +62,17 @@ static ConfigVars& _getConfigVars()
 // Variables.
 
 const CFG_PATH(pnPath, PN_PLAYNET_PATH, "PLAYNET_PATH", true, "Hard-coded playnet directory.");
-CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
+CFG_PATH(dataDir, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "data", "DATA_DIR", true, "Top level directory for game data.");
 CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
 CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
 CFG_PATH(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
 CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
-CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
+CFG_PATH(thblitzPath, "th_blitz" OS_PATHSEP "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
 CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", false, "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
-CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
+CFG_PATH(luaPath, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
 CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
-CFG_PATH(teulWebPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "web" PATH_SEPSTR "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
+CFG_PATH(teulWebPath, PN_PLAYNET_PATH OS_PATHSEP "wwiiol" OS_PATHSEP "web" OS_PATHSEP "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
 CFG_PATH(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
 CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
 
@@ -122,7 +120,6 @@ CFG_STRING(authdbPort, "3306", "AUTH_DB_PORT", PN_AUTH_REQUIRED, "Port of the Au
 CFG_STRING(authdbPassword, nullptr, "AUTH_DB_PASSWD", PN_AUTH_REQUIRED, "Password to use for the auth database.");
 CFG_STRING(authdbSchema, nullptr, "AUTH_DB_SCHEMA", PN_AUTH_REQUIRED, "Schema to use for auth data.");
 CFG_STRING(authdbUser, nullptr, "AUTH_DB_USER", PN_AUTH_REQUIRED, "Username when connecting to the auth database.");
-CFG_STRING(authRelayBillingEndpoint, nullptr, "AUTH_RELAY_BILLING_ENDPOINT", PN_AUTH_REQUIRED, "Endpoint for auth relay to connect with billing server");
 
 #undef PN_AUTH_REQUIRED
 
@@ -378,9 +375,10 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
-		// Windows needs to have WinSock initialized to be able to
-		// resolve names for addresses.
+#if platOS == OS_WIN32
+		// Windows needs to have WinSock initialized to be able to resolve names for addresses.
 		Teul::InitializeWinsock();
+#endif
 		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();

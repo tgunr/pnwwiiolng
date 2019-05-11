@@ -39,7 +39,7 @@
 
 // WWIIOL specific.
 #include "strt/strtCPFlags.h"
-#include "omg/omgChat.hxx"
+#include "chat/omgChat.h"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
@@ -340,7 +340,7 @@ static bool _foundMaterial(std::vector<std::string>& texnames, const char* texna
 
 	for(unsigned int i = 0; i < texnames.size(); i++)
 	{
-		if(!stricmp(texnames[i].c_str(), texname))
+		if(!strcasecmp(texnames[i].c_str(), texname))
 			return true;
 	}
 
@@ -909,7 +909,8 @@ bool PlayerPlacedObject::Update()
 
 			// Used to offset progress by however much progress we already have
 
-			float progress = float(coolDownProgress) / float(spec->coolDown);
+            
+            float progress = (spec->coolDown)?(float(coolDownProgress) / float(spec->coolDown)):0.0f;
 
 			char script[128+1];
 			snprintf(script, 128, "game.oncooldown(%f)", progress);
@@ -1610,12 +1611,6 @@ namespace {
 	}
 }
 
-// Gives a significant boost to HE damage if even the actual joules delivered are minimal.
-#define HE_AOE_BOOST 1
-// Boosts AP rounds to roughly HE levels of damage against the FMS/ATG Emplacement
-// Primarily to balance the British, who lack HE for their early-tier tanks.
-#define AP_DAMAGE_BOOST 1
-
 // !!!HACK!!!
 // This entire setup is based on values gathered through testing and what's in
 // the ammo data files, so any changes could bring this whole thing crumbling
@@ -1631,7 +1626,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	using Joules = SINT64;
 	const weapAmmoType& src = *round.AmmoType;
 
-	// Small-arms & Shrapnel [0-1k]
+	// Small-arms [0-1k]
 	const Joules smallarms_min = 0;
 	const Joules smallarms_max = 4000;
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC &&
@@ -1647,7 +1642,6 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	}
 
 	if ( src.SubType == WEAPAMMO_SUBTYPE_GRENADE ) {
-#if HE_AOE_BOOST
 		if ( src.ExplosiveEnergy < 500000 ) {
 			// Shrapnel [10k]
 			return joules > 5000 ? 10000 : 0;
@@ -1656,19 +1650,6 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 			// Should be far higher, but only the Axis have one, so...
 			return joules > 5000 ? 15000 : 0;
 		}
-#else
-		if ( src.ExplosiveEnergy < 500000 ) {
-			// Shrapnel [10k]
-			const Joules shrap_min = 384000;
-			const Joules shrap_max = 614000;
-			return InterpDamage(shrap_min, 9000, shrap_max, 11000, joules);
-		} else {
-			// Concussion [35k]
-			const Joules gren_min = 380000;
-			const Joules gren_max = 390000;
-			return InterpDamage(gren_min, 34000, gren_max, 36000, joules);
-		}
-#endif
 	}
 
 	// Ignore system-created "shaped charge jet" effects.
@@ -1684,13 +1665,7 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 
 	// Mortar [600k]
 	if ( src.SubType == WEAPAMMO_SUBTYPE_MORTAR ) {
-#if HE_AOE_BOOST
 		return joules > 5000 ? 600000 : 0;
-#else
-		const Joules mortar_min = 3000000;
-		const Joules mortar_max = 4000000;
-		return InterpDamage(mortar_min, 280000, mortar_max, 320000, joules);
-#endif
 	}
 
 	// AP/HE* [varies]
@@ -1699,35 +1674,28 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 			// HE* [750-1000k]
 			const Joules he_min = 250000;
 			const Joules he_max = 6500000;
-#if HE_AOE_BOOST
-			if ( joules > 100000 )
+			if ( joules > 100000 ) // Boost HE effectiveness around the edge of its effect
 				joules = std::max(joules, he_min / 2);
-#endif
 			return InterpDamage(he_min, 750000, he_max, 1000000, joules);
 		} else {
 			// Non-HE*
+			// x2 is to make up for HE's tendency to hit more than once
 			if ( src.AmmoWeight < 0.25 ) {
-				// Autocannon [75k]
+				// Autocannon [300k x2]
 				const Joules ac_min = 42500;
 				const Joules ac_max = 44000;
-#if AP_DAMAGE_BOOST
-				// Autocannon [300k x2]
 				return InterpDamage(ac_min, 280000, ac_max, 320000, joules) * 2;
-#else
-				return InterpDamage(ac_min, 70000, ac_max, 75000, joules);
-#endif
 			} else {
-				// AP [150-250k]
+				// AP [750-1000k x2]
 				// Note the Panhard is a bit under half due to its tiny gun,
 				// but this is reflected through the math anyway.
 				const Joules ap_min = 200000;
 				const Joules ap_max = 3000000;
-#if AP_DAMAGE_BOOST
-				// AP [750-1000k x2]
-				return InterpDamage(ap_min, 750000, ap_max, 1000000, joules) * 2;
-#else
-				return InterpDamage(ap_min, 150000, ap_max, 250000, joules);
-#endif
+				SINT64 damage = InterpDamage(ap_min, 750000, ap_max, 1000000, joules) * 2;
+				// HACK: Because asking to create something consistent is apparently too much,
+				// so just create a mess of special cases and exceptions as problems roll in.
+				damage = std::min(damage, (SINT64)1000000);
+				return damage;
 			}
 		}
 	}
@@ -1737,10 +1705,8 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
 		const Joules aaa_min = 36000;
 		const Joules aaa_max = 600000;
-#if HE_AOE_BOOST
-		if ( joules > 5000 )
+		if ( joules > 5000 ) // Boost HE effectiveness around the edge of its effect
 			joules = std::max(joules, aaa_min / 2);
-#endif
 		return InterpDamage(aaa_min, 300000 / 4, aaa_max, 1000000 / 4, joules);
 	}
 
@@ -1753,10 +1719,8 @@ SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
 	if ( src.SubType == WEAPAMMO_SUBTYPE_BOMB ) {
 		const Joules bomb_min = 50000000;
 		const Joules bomb_max = 190000000;
-#if HE_AOE_BOOST
-		if ( joules > 100000 )
+		if ( joules > 100000 ) // Boost HE effectiveness around the edge of its effect
 			joules = std::max(joules, bomb_min / 2);
-#endif
 		return InterpDamage(bomb_min, 10000000, bomb_max, 25000000, joules);
 	}
 

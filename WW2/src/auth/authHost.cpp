@@ -19,9 +19,7 @@
 #include "auth/authPlaygateTypes.h"
 #include "auth/authGame.h"
 #include "auth/authHostMessages.h"
-#include "dbse/dbseHandle.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "include/infoHostMessages.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiIRC.h"
@@ -188,7 +186,7 @@ _releaseConnection(const SINT32 teulIndex)
 	delete cdata;
 
 	dbugLog(_FLD, "t:%d connection closed", teulIndex);
-	teulClose(teulIndex, Teul::Closing::AuthRelease);
+	teulClose(teulIndex);
 
 	return;
 }
@@ -533,7 +531,9 @@ _updatePresenter(const SINT32 teulIndex, ARENA_REQ& request, UINT32 platform)
 		return false;
 	}
 
-	UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
+
 	dbugLog(_FLI, "t:%d user on ip %s needs presenter upgrade from version %s.  sending them to %s"
 				, teulIndex, teulGetAddress(destAddress), teulGetAddress(request.presenterVersion), launch.data);
 	return true;
@@ -670,7 +670,8 @@ void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 		return;
 	}
 
-	UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	Auth::ClientData* cdata = new Auth::ClientData(teulIndex, platform, destAddress, request.oVersion, request.username, (char*)request.password);
 
 	teulSetPersonaData(teulIndex, cdata);
@@ -799,7 +800,7 @@ static std::pair<playerid_t, std::string> _otpValidateUser(const Teul::uWeb::HTT
 
 static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response, const Teul::uWeb::RESTAPIParams &params)
 {
-    if (params.find("arena_id") == params.end() || !params["arena_id"].is_string() ||
+    if (params.find("arena_id") == params.end() || (!params["arena_id"].is_string() && !params["arena_id"].is_number_unsigned()) ||
         params.find("user_id") == params.end() || !params["user_id"].is_number_unsigned() ||
         params.find("app_version") == params.end() || !params["app_version"].is_number_unsigned() ||
         params.find("app_platform") == params.end() || !params["app_platform"].is_number_unsigned())
@@ -808,17 +809,23 @@ static void _otpDispatchRequestHandler(const Teul::uWeb::HTTPRequest &request, T
         return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
     }
     
-    std::string arena_id_raw = params["arena_id"];
+    arenaid_t arena_id = 0;
     
+    if (params["arena_id"].is_string()) {
+        std::string arena_id_raw = params["arena_id"];
+        
 #ifndef NDEBUG
-    // Do this extra check in debug only; it's wasted cycles in release
-    if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
-        dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
-        return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
-    }
+        // Do this extra check in debug only; it's wasted cycles in release
+        if (arena_id_raw.find_first_not_of("0123456789") != std::string::npos) {
+            dbugLog(_FLA, "uWeb: Received bad request (bad arena ID pull) from relay - %s", params.dump().c_str());
+            return Teul::uWeb::HTTPResponseBuilder(request).status(400).header("Connection", "close").content("<h1>400 Bad Request</h1>").build(response);
+        }
 #endif
+        arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
+    } else {
+        arena_id = params["arena_id"];
+    }
     
-    arenaid_t arena_id = std::strtoul(arena_id_raw.c_str(), nullptr, 10);
     userid_t user_id = params["user_id"];
     uint32_t app_version = params["app_version"];
     uint32_t app_platform = params["app_platform"];
@@ -930,11 +937,17 @@ main(int argc, const char* argv[])
 
 	threadsEnable();
     
-    static const Teul::uWeb::RESTAPIRouteList routes = {
+    static const Teul::uWeb::RESTAPIRouteList v1routes = {
         { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
         { { "POST" }, "/cluster/{arena_id}/dispatch", _otpDispatchRequestHandler },
     };
-    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, routes));
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v1 API", "/v1", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, v1routes));
+    
+    static const Teul::uWeb::RESTAPIRouteList v2routes = {
+        { { "GET"  }, "/reload/all", _reloadAuthDBRequestHandler },
+        { { "POST" }, "/cluster/arena/dispatch", _otpDispatchRequestHandler },
+    };
+    Teul::uWeb::s_debugServer.addVirtualPrefix("v2 API", "/v2", std::bind(Teul::uWeb::RESTRouter, std::placeholders::_1, std::placeholders::_2, v2routes));
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
@@ -1234,8 +1247,9 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	char appVer[64+1], ipStr[64+1];
 
 	// Get the local network address excluding the last octet.
-	const UINT32 localAddress = teulGetEndpointLocalAddress(teulIndex);
-
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 localAddress = ep ? ep->localAddress() : Teul::INVALID_INDEX;
+    UINT32 clientAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	UINT32 destAddress = bestServer.extAddress;
 
 	//hack since teulGetAddress sucks
@@ -1282,7 +1296,6 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	dispatch.m_appVersion = request.appVersion & clientMask;
 
 	//send dispatch message
-	UINT32 clientAddress = teulGetEndpointRemoteAddress(teulIndex);
 	_sendDispatch(dispatch, reply.otp, clientAddress, bestServer.teulIndex);
 }
 
@@ -1307,7 +1320,9 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 	UINT32 platform = 0;
 
 	char ip[64+1];
-	cdata.address = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+
+    cdata.address = ep ? ep->destAddress() : Teul::INVALID_INDEX;
 	strsafecpy(ip, teulGetAddress(cdata.address));
 
 	platform = cdata.platform;
@@ -1587,10 +1602,10 @@ authGetGameList(const SINT32 teulIndex)
 
 	///TODO: Notify the client of this problem.
 	// No data until you are logged in.
-	if (cdata == NULL)
+	if (!cdata)
 	{
 		dbugLog(_FLW, "t:%d GetGameList with no cdata", teulIndex);
-		return NULL;
+		return nullptr;
 	}
 	const std::vector<UCHAR>& clientSubs = cdata->m_subscribedArenaIDs;
 	
@@ -1683,7 +1698,9 @@ Auth::LoginRequest::process(const SINT32 teulIndex)
 	}
 
 	// Get teul's information about this connection such as IP address etc.
-	const UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
+    ENDPOINT *ep = teulGetEndpoint(teulIndex);
+    UINT32 destAddress = ep ? ep->destAddress() : Teul::INVALID_INDEX;
+
 	dbugLog(_FLI, "t:%d auth login request plat:%u ip:%s ov:%u c:%s p:%s"
 					, teulIndex
 					, m_platform

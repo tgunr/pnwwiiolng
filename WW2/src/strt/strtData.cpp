@@ -2283,7 +2283,7 @@ strtGetCPByName(const char* name)
 
 //////////////////////////////////////////////////////////////////////
 // Indexes for quickly looking up cp/facilities by oid
-#define MAX_CP_LIST_OIDS		1000
+#define MAX_CP_LIST_OIDS		2000
 #define	MAX_FACILITY_LIST_OIDS	(MAX_CP_LIST_OIDS*7)
 
 CPStruct* cpOIDList[MAX_CP_LIST_OIDS];

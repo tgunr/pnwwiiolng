@@ -70,7 +70,7 @@ int sysmain()
 		ddpEngine(NULL);
 #ifdef DEBUG_WW2
         if (frames % 100 == 0) {
-            Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
+            //Write_Debug("Current FPS: %.1f", 1000.0 / gFPS );
         }
 #endif
     }
@@ -119,7 +119,7 @@ int sysmainInitApp()
 #endif
 	ddpSetDDRender(rnlogoRender);
 
-	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate))
+	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedDisplayDevice), WantedRefreshRate))
 	{
 		printf("ddpCreateWnd failed!\n");
 		return -1;

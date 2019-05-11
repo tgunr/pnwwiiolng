@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/rebase_texture_files.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #6 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -36,21 +35,14 @@ RebasePath(char const* BasePath,
 }
 
 
-bool RebaseTextureFiles(input_file&     InputFile,
-                        key_value_pair* KeyValues,
-                        granny_int32x   NumKeyValues,
-                        granny_memory_arena*)
+granny_file_info*
+RebaseTextureFiles(char const*          OriginalFilename,
+                   char const*          OutputFilename,
+                   granny_file_info*    Info,
+                   key_value_pair*      KeyValues,
+                   granny_int32x        NumKeyValues,
+                   granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from %s\n", InputFile.Filename);
-        return false;
-    }
-
     char const* BasePath = FindFirstValueForKey(KeyValues, NumKeyValues, "basepath");
     if (BasePath == 0)
     {
@@ -66,13 +58,20 @@ bool RebaseTextureFiles(input_file&     InputFile,
             RebasePath(BasePath, Info->Textures[TexIdx]->FromFileName);
     }}
 
-
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
+static const char* HelpString =
+    (" RebaseTextureFiles is intended to change the filestrings reported\n"
+     " for textures from absolute paths (used by Max and Maya), to paths\n"
+     " relative to the root of your game data directory, the character\n"
+     " file itself, or any other root you want to specify.\n"
+     "\n"
+     "    preprocessor RebaseTextureFiles file.gr2 -output file_relative.gr2 \\\n"
+     "        -basepath c:/game/data/root\n");
+     
 
-static CommandRegistrar RegRebaseTextureFiles(eSingleFile_MultiRun,
-                                              RebaseTextureFiles,
+static CommandRegistrar RegRebaseTextureFiles(RebaseTextureFiles,
                                               "RebaseTextureFiles",
-                                              "Given a -basepath argument, makes any absolute textures relative to that path, if possible");
+                                              "Makes any absolute textures relative to a basepath, if possible",
+                                              HelpString);

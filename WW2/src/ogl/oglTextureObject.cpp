@@ -6,7 +6,6 @@ Description:
 #include "ogl/oglTextureObject.h"
 #include "ogl/States.h"
 #include "osgImport/ref_ptr.h"
-#include "draw/sneaky.h"
 
 using TboMap = std::map<std::string, ref_ptr<oglTextureObject>>;
 static TboMap tbos;
@@ -113,7 +112,7 @@ void oglTextureObject::Create(int size, int format, GLenum usage)
     glBufferData(GL_TEXTURE_BUFFER, bytesize, 0, usage);
     TextureBufferObjectBind::BindBuffer(0);
 
-	gl_GenTextures(1, &texture);
+	glGenTextures(1, &texture);
     TextureState::Bind(0, texture, GL_TEXTURE_BUFFER);
 	glTexBufferEXT(GL_TEXTURE_BUFFER, internalformat, buffer);
     TextureState::Disable();

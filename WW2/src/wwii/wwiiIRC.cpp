@@ -187,7 +187,7 @@ _terminate(const char* reason)
 // IRC-aware signal handler
 
 using SignalHandler = void(*)(int);
-#if !defined(HAVE_SIGACTION)
+#if platOS == OS_WIN32
 struct sigaction { SignalHandler sa_handler; };
 #endif
 static const int MaxSignals = 32;
@@ -235,7 +235,7 @@ _ircSigHandler(int signo)
 static void
 _setSig(int signum)
 {
-#if defined(HAVE_SIGACTION)
+#if platOS != OS_WIN32
 	struct sigaction sa;
 	sa.sa_handler = _ircSigHandler;
 	sigfillset(&sa.sa_mask);

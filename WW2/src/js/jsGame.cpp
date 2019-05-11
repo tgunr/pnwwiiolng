@@ -862,7 +862,7 @@ JS_FUNCTION_DEF(jsGame, despawn)
 	}
 
 	persSetDeathCamForNextUpdate();
-	vehExitVehicle(1,0,0);
+	vehExitVehicle();
 	return JS_TRUE;
 }
 
@@ -1819,7 +1819,7 @@ JS_FUNCTION_DEF(jsGame, setplayerdata)
 
 	if(me)
 	{
-		if(stricmp(name.c_str(), "weapon") == 0)
+		if(strcasecmp(name.c_str(), "weapon") == 0)
 		{
 			WEAPON_SPEC spec;
 			spec.fromShort((UINT16)atoi(value.c_str()));
@@ -2010,14 +2010,15 @@ JS_FUNCTION_DEF(jsGame, getworldtoscreen)
 
 JS_FUNCTION_DEF(jsGame, resetcontrollers)
 {
-    // We don't actually do this for now because it breaks the Steam overlay
-    
-	// reset devices in case a new one was added
-	//dimainKill();
-	//dimainInit();
+	// Un-acquire and release any current joysticks before searching for
+	// and initialising any that are now connected.
+	dimainKillJoysticks();
+	dimainInitJoysticks();
+
+	dimainInitTrackIR();
 
 	// reselect presets based on new devices and current selections
-	//imapLoadPresets();
+	imapLoadPresets();
 
 	return JS_TRUE;
 }
@@ -2659,10 +2660,10 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = settings->jsVal();
 		break;
 		case SCREENWIDTH_PROP:
-			*val = INT_TO_JSVAL(WantedWidth);
+			*val = INT_TO_JSVAL(ddpGetWidth());
 		break;
 		case SCREENHEIGHT_PROP:
-			*val = INT_TO_JSVAL(WantedHeight);
+			*val = INT_TO_JSVAL(ddpGetHeight());
 		break;
 		case TRAINING_PROP:
 			*val = BOOLEAN_TO_JSVAL(TUT_ACTIVE && !SCEN_MGR->IsActive());
@@ -2677,7 +2678,7 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 			if(le)
 			{
-				if(!lastentered.valid() || stricmp(le->Name(), lastentered.ptr()->stratobj->Name()))
+				if(!lastentered.valid() || strcasecmp(le->Name(), lastentered.ptr()->stratobj->Name()))
 					lastentered = new jsStratObject(le->FullObjID());
 
 				*val = lastentered->jsVal();
@@ -3733,7 +3734,7 @@ JSBool jsBlendEditor::GetProperty(JSContext* ctx, int propid, jsval* val)
 					const char* s = fileList[f];
 					const char* ptr = strstr(s, ".");
 
-					if(!stricmp(ptr, ".gr2"))
+					if(!strcasecmp(ptr, ".gr2"))
 						_animations->SetElement(phui::js::NewString(s), i++);
 				}
 			}

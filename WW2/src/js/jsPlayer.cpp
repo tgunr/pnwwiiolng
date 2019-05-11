@@ -277,7 +277,7 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 						weapAmmoType* at = weap.WeaponType->AmmoType[0];
 						const char* ammoName = (const char*)at->Name;
 
-						if(_stricmp(ammoName, "satchelgeneric") == 0 || _stricmp(ammoName, "germsatchel") == 0)
+						if(strcasecmp(ammoName, "satchelgeneric") == 0 || strcasecmp(ammoName, "germsatchel") == 0)
 							strcat(name, "_heat");
 						else // satchelhighexplosive
 							strcat(name, "_he");

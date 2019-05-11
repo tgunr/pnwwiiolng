@@ -774,6 +774,7 @@ int obcsCullAndSortObjects(int numobjects, OBJECT* object)
                 skipdrawflags |= (lpobj->flag3 & (OBJECT_CLOUDS | OBJECT_RAINCLOUDS));
             }
 
+            bool visFOVcheck = rnvisFOVCheck(lpobj);
 			if(skipdrawflags)
 			{
                 skipdrawflags = 0;
@@ -785,7 +786,7 @@ int obcsCullAndSortObjects(int numobjects, OBJECT* object)
             if(gCustomTerrain)
                 shadowcull.Cull(lpobj);
 
-			if(!(lpobj->flag2 & OBJECT_ISFPS) && !rnvisFOVCheck(lpobj))
+			if(!(lpobj->flag2 & OBJECT_ISFPS) && !visFOVcheck)
 			{
 				continue;
 			}

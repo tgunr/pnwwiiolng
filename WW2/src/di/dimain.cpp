@@ -237,6 +237,61 @@ SINT32 j;
 	return TRUE;
 }
 
+LOGICAL dimainInitJoysticks()
+{
+	SINT32 i;
+	SINT32 j;
+
+	if (!dipInitJoysticksOnly())
+	{
+		return FALSE;
+	}
+
+	dipSetupJoystick();
+
+	for (i = 0; i < NUM_IAC_QUEUE_ENTRIES; i++)
+	{
+		g_lastBuffer[i] = false;
+	}
+
+	g_xlastaxisms = 0;
+	g_ylastaxisms = 0;
+	g_zlastaxisms = 0;
+	g_lastbuttonsms[0] = false;
+	g_lastbuttonsms[1] = false;
+	g_lastbuttonsms[2] = false;
+	g_lastbuttonsms[3] = false;
+
+	for (i = 0; i < IAC_MAX_JOYSTICKS; i++)
+	{
+		g_xlastposjs[i] = 1;
+		g_ylastposjs[i] = 1;
+		g_zlastposjs[i] = 1;
+		g_xlastrotjs[i] = 1;
+		g_ylastrotjs[i] = 1;
+		g_zlastrotjs[i] = 1;
+		g_lastslider[i][0] = 1;
+		g_lastslider[i][1] = 1;
+		g_lastpov[i][0] = 1;
+		g_lastpov[i][1] = 1;
+	}
+
+	for (j = 0; j < IAC_MAX_JOYSTICKS; j++)
+	{
+		for (i = 0; i < IAC_JOYSTICK_MAX_BUTTONS; i++)
+		{
+			g_lastbuttonsjs[j][i] = false;
+		}
+	}
+
+	return TRUE;
+}
+
+void dimainInitTrackIR()
+{
+	InitTrackIR();
+}
+
 ////////////////////////////////////////
 // Function: dimainVKToIAC
 // Description: Virtual Key to IAC code
@@ -377,6 +432,13 @@ void dimainKill()
 	dipKill();
 
     Write_Log(LOG_OLD, LOG_INFO, "[dimainKill]");
+}
+
+void dimainKillJoysticks()
+{
+	dipKillJoystick();
+
+	Write_Log(LOG_OLD, LOG_INFO, "[dimainKillJoysticks]");
 }
 
 //////////////////////////////////////////////////////////

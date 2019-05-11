@@ -1156,8 +1156,8 @@ void EZManager::EZTurret::UpdateReticle()
 	TargetView* target = dynamic_cast<TargetView*>(reticle);
 	if(!target) return;
 
-	FLOAT64 centerX		= (FLOAT64)WantedWidth * .5;
-	FLOAT64 centerY		= (FLOAT64)WantedHeight * .5;
+	FLOAT64 centerX		= (FLOAT64)ddpGetWidth() * .5;
+	FLOAT64 centerY		= (FLOAT64)ddpGetHeight() * .5;
 
 	FLOAT64 xDiff		= fabs(centerX - screenPos.x());
 	FLOAT64 yDiff		= fabs(centerY - screenPos.y());
@@ -1194,8 +1194,8 @@ void EZManager::EZTurret::PostUpdate()
 
 	if(screenPos.z() < 1.0f)
 	{
-		FLOAT64 centerX = WantedWidth * .5f;
-		FLOAT64 centerY	= WantedHeight * .5f;
+		FLOAT64 centerX = ddpGetWidth() * .5f;
+		FLOAT64 centerY	= ddpGetHeight() * .5f;
 
 		// check for traverse overshoots
 		if(abs((SINT32)screenPos.x() - (SINT32)centerX) <= CAMERA_THRESHOLD)
@@ -1310,8 +1310,8 @@ EZManager::EZTurret::TURRET_STATUS EZManager::EZTurret::GetStatus()
 	if(screenPos.z() >= 1.0f) // behind us
 		return TURRET_STATUS_TRACKING;
 
-	FLOAT64 centerX					= WantedWidth * .5f;
-	FLOAT64 centerY					= WantedHeight * .5f;
+	FLOAT64 centerX					= ddpGetWidth() * .5f;
+	FLOAT64 centerY					= ddpGetHeight() * .5f;
 	const SINT32 focalThreshold		= 100; // pixels
 
 	SINT32 cxDiff = abs((SINT32)screenPos.x() - (SINT32)centerX);
@@ -1338,8 +1338,8 @@ void EZManager::EZTurret::TrackToCamera()
 	// now we're going to move the turret towards the camera
 	if(screenPos.length2() && !EZ_MGR->HasFlag(EZManager::FREELOOK))
 	{
-		FLOAT64 cx = (FLOAT64)WantedWidth * .5;
-		FLOAT64 cy = (FLOAT64)WantedHeight * .5;
+		FLOAT64 cx = (FLOAT64)ddpGetWidth() * .5;
+		FLOAT64 cy = (FLOAT64)ddpGetHeight() * .5;
 
 		UINT32 cxDiff = (UINT32)abs((SINT32)screenPos.x() - (SINT32)cx);
 
@@ -1371,7 +1371,7 @@ void EZManager::EZTurret::TrackToCamera()
 				mlTraverseTurretSpeed(-speed, 0, 0);
 		}
 
-		FLOAT64 screenY	= (screenPos.z() >= 1.0f) ? WantedHeight - screenPos.y() : screenPos.y();
+		FLOAT64 screenY	= (screenPos.z() >= 1.0f) ? ddpGetHeight() - screenPos.y() : screenPos.y();
 		UINT32 cyDiff = (UINT32)abs((SINT32)screenY - (SINT32)cy);
 
 		if(cyDiff > CAMERA_THRESHOLD)

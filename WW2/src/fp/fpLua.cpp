@@ -689,6 +689,9 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"BRITISH_PARA_PACK_SELF",BRITISH_PARA_PACK_SELF);
    tolua_constant(tolua_S,"GERMAN_PARA_PACK_SELF",GERMAN_PARA_PACK_SELF);
    tolua_constant(tolua_S,"FRENCH_PARA_PACK_SELF",FRENCH_PARA_PACK_SELF);
+   tolua_constant(tolua_S,"AMERICAN_PARA_PACK",AMERICAN_PARA_PACK);
+   tolua_constant(tolua_S,"AMERICAN_PARA_NOPACK",AMERICAN_PARA_NOPACK);
+   tolua_constant(tolua_S,"AMERICAN_PARA_PACK_SELF",AMERICAN_PARA_PACK_SELF);
    tolua_constant(tolua_S,"BRITISH_ML",BRITISH_ML);
    tolua_constant(tolua_S,"GERMAN_ML",GERMAN_ML);
    tolua_constant(tolua_S,"FRENCH_ML",FRENCH_ML);

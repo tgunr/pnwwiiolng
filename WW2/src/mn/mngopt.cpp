@@ -19,8 +19,8 @@ enum key_TYPE
 	EDWORD,
 	EFLOAT,
 	EDOUBLE,
-	ESTRING
-
+	ESTRING,
+	EWSTRING
 };
 
 struct GVAR
@@ -37,6 +37,7 @@ struct GVAR
         float *floatValue;
         double *doubleValue;
         char *stringValue;
+        wchar_t *wstringValue;
     } valuePtr;
     size_t maxLength;
 };
@@ -53,6 +54,7 @@ static constexpr size_t sizeof_a(T (&)[N]) { return N; }
 #define FLOAT_KEY_DEF(cmd, var) { cmd, EFLOAT, { &var }, 0 }
 #define DOUBLE_KEY_DEF(cmd, var) { cmd, EDOUBLE, { &var }, 0 }
 #define STRING_KEY_DEF(cmd, var) { cmd, ESTRING, { reinterpret_cast<char *>(&var[0]) }, sizeof_a(var) }
+#define WSTRING_KEY_DEF(cmd, var) { cmd, EWSTRING, { reinterpret_cast<wchar_t *>(&var[0]) }, array_size(var) }
 
 //  lowercase ONLY!
 static GVAR vars[] = {
@@ -62,6 +64,8 @@ static GVAR vars[] = {
     INT_KEY_DEF("alpha", WantedAlpha),
     LOGICAL_KEY_DEF("hdw", WantedHdw),
     { "stencil", ELOGICAL, { &WantedStencil }, 0 }, // HACK
+    LOGICAL_KEY_DEF("fullscreen", WantedFullscreen),
+    LOGICAL_KEY_DEF("fullscreen", WantedBorderless),
     LOGICAL_KEY_DEF("window", WantedWindow),
     { "staccato", ELOGICAL, { &UseStaccato }, 0 }, // HACK
     STRING_KEY_DEF("ticket", TicketFile),
@@ -70,7 +74,6 @@ static GVAR vars[] = {
     STRING_KEY_DEF("serverport", GameServerPort),
     STRING_KEY_DEF("serverotp", GameServerOTP),
     STRING_KEY_DEF("apid", ServerApID),
-    STRING_KEY_DEF("serverprotocol", ServerProtocol),
     NULL_KEY_DEF("steamlogin", UseSteamLogin),
     NULL_KEY_DEF("settings", LaunchSettingsOnly),
     LOGICAL_KEY_DEF("log", WantedUserLogEnabled),
@@ -82,7 +85,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("logcomm", g_log_comm),
     NULL_KEY_DEF("logfps", g_log_fps),
     NULL_KEY_DEF("logweap", g_log_weap),
-    STRING_KEY_DEF("screen", WantedVideoCard),
+    STRING_KEY_DEF("screen", WantedDisplayDevice),
     NULL_KEY_DEF("nospawn", OverrideSpawner),
     NULL_KEY_DEF("console", OpenConsole),
     LOGICAL_KEY_DEF("ragdolls", gRagdolls),
@@ -91,9 +94,14 @@ static GVAR vars[] = {
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
     STRING_KEY_DEF("authserverport", gAuthServerPort),
+    STRING_KEY_DEF("authrelayurl", gAuthRelayURL),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
+#if platOS == OS_WIN32
+    WSTRING_KEY_DEF("datadir", DataPath),
+#else
     STRING_KEY_DEF("datadir", DataPath),
+#endif
 #ifdef DEBUG_WW2
     NULL_KEY_DEF("buildmdlonly", DebugBuildingMDLFilesOnly),
 #endif
@@ -180,6 +188,9 @@ LOGICAL mngoptParse()
                 break;
             case ESTRING:
                 strlcpy(foundCmd->valuePtr.stringValue, value.c_str(), foundCmd->maxLength);
+                break;
+            case EWSTRING:
+                mbstowcs(foundCmd->valuePtr.wstringValue, value.c_str(), foundCmd->maxLength);
                 break;
         }
     }

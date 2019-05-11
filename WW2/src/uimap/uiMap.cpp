@@ -249,6 +249,34 @@ phui::View* uiMapCreate(_xmlNode* xmlnode, phui::View* parent)
 			xmlFree(val);
 		}
 
+		val = xmlGetProp(xmlnode, (xmlChar*)"maxpanx");
+		if (val)
+		{
+			mapview->SetMaxPanX((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"maxpany");
+		if (val)
+		{
+			mapview->SetMaxPanY((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"minpanx");
+		if (val)
+		{
+			mapview->SetMinPanX((float)atof((char*)val));
+			xmlFree(val);
+		}
+
+		val = xmlGetProp(xmlnode, (xmlChar*)"minpany");
+		if (val)
+		{
+			mapview->SetMinPanY((float)atof((char*)val));
+			xmlFree(val);
+		}
+
 		for(xmlNodePtr node = xmlnode->children; node; node = node->next)
 		{
 			uiMapAddLayer(mapview, node);
@@ -463,8 +491,17 @@ void PlayerMapObject::DrawSelf(SuperCellMapView* mv)
 		//else
 
          */
-
-        width = height = 2000.0f/SDM_SUPERCELL_SIZE/mv->MapScale();
+		
+		// Max zoomed out scale
+		if (mv->MapScale() < 0.01)
+		{
+			// Reduces the scale from 100km to 25km
+			width = height = 500.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
+		}
+		else 
+		{
+			width = height = 2000.0f / SDM_SUPERCELL_SIZE / mv->MapScale();
+		}
 
 		x = -width/2; y = -height/2;
 
@@ -563,7 +600,13 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	float scx, scy;
 	mv->PositionSuperCell(&scx, &scy);
 
-	width = 1000.0f/SDM_SUPERCELL_SIZE/mapscale; height = 16 / iconscale;
+	width = 1000.0f/SDM_SUPERCELL_SIZE/mapscale;
+	if (mapscale < 0.01)
+	{
+		// 25km
+		width = width / 4;
+	}
+	height = 16 / iconscale;
 	x = 0; //-120/iconscale;
 	y = -(mv->Height()/2 - (mv->Height() - 40))/iconscale;
 	glTranslatef(scx+x, scy+y, 0);
@@ -576,10 +619,20 @@ void ScaleMapObject::DrawSelf(SuperCellMapView* mv)
 	phui::draw_gl_quad(box.verts, uv);
 
 	char scalestr[32];
-	if(mapscale <= 1)
-		snprintf(scalestr, 31, "%.0f km", 1/mapscale);
+	// Max zoomed out scale
+	if (mapscale < 0.01)
+	{
+		// Reduces the scale from 100km to 25km
+		snprintf(scalestr, 31, "%.0f km", (1.0 / mapscale) / 4.0);
+	}
+	else if (mapscale <= 1)
+	{
+		snprintf(scalestr, 31, "%.0f km", 1.0 / mapscale);
+	}
 	else
-		snprintf(scalestr, 31, "%.0f m", 1000.0/mapscale);
+	{
+		snprintf(scalestr, 31, "%.0f m", 1000.0 / mapscale);
+	}
 
 	//glTranslatef(width-ctx->FontAdvance(0,scalestr)/iconscale/2, 0, 0);
 	glTranslatef(((ctx->FontAdvance(0, scalestr) + 2) * -1) / iconscale, 0, 0);
@@ -687,46 +740,37 @@ static std::set<std::string> TerrainObjectSpecials;
 
 static int get_trnobj_texturedata(SDM_ObjInfo const* info, int* texid, int* x, int* y, int* width, int* height, float* uv)
 {
-	if(_trnobjtexturemap.size() == 0)
-	{
-//#if GREEN_INSTALL == 1
-    loadTextureMap("ui/textures/atlas/mapbld_small.xy");
-//#else
-//    loadTextureMap("ui/textures/atlas/mapbld.xy");
-//#endif
-    TerrainObjectSpecials.insert("infantrypit1"); // these overrides shold match GenerateIcons.cpp
-    TerrainObjectSpecials.insert("atgunpit1");
-    TerrainObjectSpecials.insert("farmruin");
-  }
+	if(_trnobjtexturemap.size() == 0) {
+		loadTextureMap("ui/textures/atlas/mapbld_small.xy");
+		TerrainObjectSpecials.insert("infantrypit1"); // these overrides shold match GenerateIcons.cpp
+		TerrainObjectSpecials.insert("atgunpit1");
+		TerrainObjectSpecials.insert("farmruin");
+	}
 
 	std::string objname = info->objname;
-  std::string directory;
+	std::string directory;
 
 	size_t n;
 	n = objname.find_last_of("/\\");
 
-	if(n != std::string::npos)
-  {
-    directory = objname.substr(0,n);
-    objname.erase(0, n+1);
+	if(n != std::string::npos) {
+		directory = objname.substr(0,n);
+		objname.erase(0, n+1);
 
-    if ( directory == "to" )
-    {
-      if ( TerrainObjectSpecials.find(objname) == TerrainObjectSpecials.end() )
-      {
-        *texid = -1;
-        return -1;
-      }
-    }
-  }
+		if ( directory == "to" ) {
+			if ( TerrainObjectSpecials.find(objname) == TerrainObjectSpecials.end() ) {
+				*texid = -1;
+				return -1;
+			}
+		}
+	}
 
 	objname += "_icon";
 
-  if ( _trnobjtexturemap.find(objname) == _trnobjtexturemap.end() )
-  {
-    *texid = -1;
-    return -1;
-  }
+	if ( _trnobjtexturemap.find(objname) == _trnobjtexturemap.end() ) {
+		*texid = -1;
+		return -1;
+	}
 
 	trnobjtextureinfo& objinfo = _trnobjtexturemap[objname];
 
@@ -1215,7 +1259,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 			cr->animFlagIcons[WWII_FRANCE]		= uiGetTexture("ui/uidata/icons/brigade/frenbat-anim.bmp");
 			cr->animFlagIcons[WWII_GERMANY]		= uiGetTexture("ui/uidata/icons/brigade/germbat-anim.bmp");
 
-			cr->iconsize = 32 * WantedHeight / 768.0f;
+			cr->iconsize = 32 * ddpGetHeight() / 768.0f;
 			cr->cpupdateonclick = Online;
 			cr->tooltip = uiLocString;
 

@@ -52,7 +52,6 @@
 
 #include "str/stringLib.h"
 #include "sdm/sdmLoad.h"
-#include "dbse/dbseHandle.h"
 #include "sdm/sdmParse.h"
 #include "include/mydbQuery.h"
 
@@ -519,7 +518,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 			, "INSERT INTO strat_facility"
 				"(facility_oid,facility_ox,facility_oy"
 				",facility_type,facility_id,facility_subtype"
-				",cp_oid"
+				",cp_oid,cp_ox,cp_oy,cp_id"
 				",name,objectname"
 				",side,country"
 				",originalside,originalcountry"
@@ -550,7 +549,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 	p += sprintf(p
 				, "%c(%u,%d,%d"
 					",%u,%u,%u"
-					",%u"
+					",%u,%d,%d,%u"
 					",'%s','%s'"
 					",%u,%u"
 					",%u,%u"
@@ -561,7 +560,7 @@ dbseSaveFACILITY(FACWITHID* facw)
 				, (p > start) ? ',' : ' '
 				, facw->fac_oid, facw->ox, facw->oy
 				, facility->oid.objType, facility->oid.id, facility->subType
-				, cp_oid, g_name, g_fileName
+				, cp_oid, facility->cpid.cell.ox, facility->cpid.cell.oy, facility->cpid.id,g_name, g_fileName
 				, wwiiSide(facw->owner), facw->owner
 				, facility->originalSide, facility->originalCountry
 				, facw->sx, facw->sy
@@ -634,7 +633,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 		start = _statement + sprintf(_statement
 			, "INSERT INTO strat_object"
 				"(object_oid, object_ox,object_oy,object_type,object_id,object_subtype,"
-				  "facility_oid,name,objectname,control,scx,scy,absx,absy,added)"
+				  "facility_oid,facility_ox,facility_oy,facility_id,name,objectname,control,scx,scy,absx,absy,added)"
 				"VALUES");
 		p = start;
 	}
@@ -667,7 +666,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 
 	p += sprintf(p, "%c(%u,%d,%d"
 					",%u,%u,%u"
-					",%u"
+					",%u,%d,%d,%u"
 					",'%s','%s'"
 					",'%s'"
 					",%d,%d"
@@ -676,7 +675,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 			, (p > start) ? ',' : ' '
 			, buildw->oid, buildw->ox, buildw->oy
 			, building->oid.objType, building->oid.id, building->subType
-			, fac_oid
+			, fac_oid, sx, sy, building->pid.id
 			, g_name, g_fileName
 			, building->Xcontrol ? "true" : "false"
 			, sx, sy

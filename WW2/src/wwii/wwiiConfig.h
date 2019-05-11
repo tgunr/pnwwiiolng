@@ -40,6 +40,7 @@ struct cfARENA
 	UINT16	despawnTime_s;			//!< Seconds to wait before despawning
 	char	mobileSpawnWaypoint[MAX_HANDLE_SIZE];
 	UCHAR	allowDirectSpawn;		//!< Should we allow direct spawning (Multi-Client)
+	UINT16  theme;					//!< Non-zero applies client themes like: Christmas, Veterens, Halloween, etc.
 };
 
 struct cfBALANCE
@@ -113,6 +114,14 @@ struct cfSCORE
 	UINT16		stratDmgInterval_s;		//!< Number of seconds between strat damages to get score.
 	UINT16		maxGlobalSharedRank;	//!< Cross-side rank sharing.
 	UINT16		maxSideSharedRank;		//!< Cross-country rank sharing within a side.
+	UINT16		destroyAI;		//!< Points awarded for destroying an AI
+	UINT16		infResupplier;		//!< Points awarded for resupplying another player
+	UINT16		resupply;		//!< Points awarded for resupplying equipment while on a resupply mission
+	UINT16		destroyFMS;		//!< Points awarded for destroying an FMS
+	UINT16		repairBridge;		//!< Points awarded for repairing a bridge
+	UINT16		damageBridge;		//!< Points awarded for damaging a bridge
+	UINT16		damageFactory;		//!< Points awarded for damaging a factory
+	UINT16		damageFB;		//!< Points awarded for damaging an FB
 };
 
 struct cfSQUAD
@@ -172,6 +181,8 @@ struct cfUPDATE
 	UCHAR	avoidRepeats;		//!< Try to avoid sending vehicles we haven't received updates for.
 	UCHAR	countingEnabled;	//!< Enable packing counting
 	UCHAR	starvationLimit_s;	//!< Seconds without updates before we kick them
+	UINT16	accumDelayLimit_ms;	//!< Maxium Accumulated Delay allowed before considering a player kick
+	UINT16	timeAtLimitBeforeKick_s;//!< Number of seconds accumulated delay must remain at maximum before player is kicked
 	UCHAR	errorThrottling;	//!< Throttle updates on errors/lag
 	UCHAR	visLimitThrottling;	//!< Whether or not to enable vis limit throttling
 	UCHAR	defaultUM;			//!< Which update framing mode to use by default

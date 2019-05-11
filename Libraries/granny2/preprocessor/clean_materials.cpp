@@ -1,14 +1,15 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/clean_materials.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #18 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 #include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -16,8 +17,9 @@ typedef set<granny_material*> MaterialSet;
 typedef set<granny_texture*>  TextureSet;
 
 
-void CleanUnreferencedMaterials(granny_file_info* FileInfo,
-                                granny_memory_arena* TempArena)
+void
+CleanUnreferencedMaterials(granny_file_info*    FileInfo,
+                           granny_memory_arena* TempArena)
 {
     MaterialSet MeshReferencedMaterials;
 
@@ -43,7 +45,7 @@ void CleanUnreferencedMaterials(granny_file_info* FileInfo,
     {
         inserted = false;
 
-		MaterialSet TempMaterials;
+        MaterialSet TempMaterials;
         {for(MaterialSet::iterator itr = MeshReferencedMaterials.begin();
              itr != MeshReferencedMaterials.end();
              ++itr)
@@ -58,11 +60,57 @@ void CleanUnreferencedMaterials(granny_file_info* FileInfo,
                 {for(granny_int32x Map = 0; Map < MeshMaterial->MapCount; ++Map)
                 {
                     granny_material* SubMaterial = MeshMaterial->Maps[Map].Material;
-					TempMaterials.insert(SubMaterial);
-                    //FinalMaterials.insert(MeshMaterial->Maps[Map].Material);
-                    //if (SubMaterial->Texture != NULL)
-                    //    FinalTextures.insert(SubMaterial->Texture);
+                    TempMaterials.insert(SubMaterial);
                 }}
+
+                // And check the ExtendedData of each material to make sure that we
+                // haven't missed any textures hiding in there.  Check the first level
+                // only.
+                if (MeshMaterial->ExtendedData.Type &&
+                    MeshMaterial->ExtendedData.Object)
+                {
+                    granny_uint8* ObjectPtr = (granny_uint8*)MeshMaterial->ExtendedData.Object;
+                    for (granny_data_type_definition* TypeItr = MeshMaterial->ExtendedData.Type;
+                         TypeItr->Type != GrannyEndMember;
+                         ++TypeItr)
+                    {
+                        if (TypeItr->Type == GrannyReferenceMember)
+                        {
+                            void* Pointer = *(void**)ObjectPtr;
+                            if (Pointer)
+                            {
+                                if (find(FileInfo->Textures,
+                                         FileInfo->Textures + FileInfo->TextureCount,
+                                         (granny_texture*)Pointer)
+                                    != (FileInfo->Textures + FileInfo->TextureCount))
+                                {
+                                    FinalTextures.insert((granny_texture*)Pointer);
+                                }
+                            }
+                        }
+                        else if (TypeItr->Type == GrannyArrayOfReferencesMember)
+                        {
+                            granny_int32 ArrayCount = *(granny_int32*)ObjectPtr;
+                            void** PointerArray = *(void***)(ObjectPtr + sizeof(granny_int32));
+
+                            for (int i = 0; i < ArrayCount; ++i)
+                            {
+                                void* Pointer = *PointerArray;
+
+                                if (find(FileInfo->Textures,
+                                         FileInfo->Textures + FileInfo->TextureCount,
+                                         (granny_texture*)Pointer)
+                                    != (FileInfo->Textures + FileInfo->TextureCount))
+                                {
+                                    FinalTextures.insert((granny_texture*)Pointer);
+                                }
+                                ++PointerArray;
+                            }
+                        }
+
+                        ObjectPtr += GrannyGetMemberTypeSize(TypeItr);
+                    }
+                }
             }
         }}
 
@@ -110,31 +158,31 @@ void CleanUnreferencedMaterials(granny_file_info* FileInfo,
     }
 }
 
-bool CleanMaterials(input_file&     InputFile,
-                    key_value_pair* KeyValues,
-                    granny_int32x   NumKeyValues,
-                    granny_memory_arena* TempArena)
+granny_file_info*
+CleanMaterials(char const*          OriginalFilename,
+               char const*          OutputFilename,
+               granny_file_info*    Info,
+               key_value_pair*      KeyValues,
+               granny_int32x        NumKeyValues,
+               granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* FileInfo = GrannyGetFileInfo(File);
-    if (FileInfo == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input model file\n");
-        return false;
-    }
-
     // Remove unused materials and textures
-    CleanUnreferencedMaterials(FileInfo, TempArena);
-
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, FileInfo, File, true, true, false);
+    CleanUnreferencedMaterials(Info, TempArena);
+    return Info;
 }
 
 
-static CommandRegistrar RegCleanMaterials(eSingleFile_NoMultiRun,
-                                          CleanMaterials,
+static char const* HelpString =
+    (" Granny exports every available material from the Maya and Max material\n"
+     " graphs in typical usage. This command loops through the meshes, and\n"
+     " only preserves material objects that are directly reachable from a\n"
+     " granny_mesh, which can save space at runtime.\n"
+     "\n"
+     "    preprocessor CleanMaterials char.gr2 -output char_proc.gr2\n"
+     "    preprocessor CleanMaterials char.gr2 -output char.gr2\n");
+
+static CommandRegistrar RegCleanMaterials(CleanMaterials,
                                           "CleanMaterials",
-                                          "Removes unreferenced materials from the file");
+                                          "Removes unreferenced materials from the file",
+                                          HelpString);
 

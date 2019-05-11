@@ -1,16 +1,15 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/make_string_database.cpp $
-// $DateTime: 2009/05/14 13:59:08 $
-// $Change: 21707 $
-// $Revision: #18 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "make_string_database.h"
 
 #include <set>
 #include <string>
-#include <assert.h>
 #include <algorithm>
 
 using namespace std;
@@ -36,6 +35,11 @@ typedef set<char const*, string_less_fn> RemapStringSet;
 granny_uint32 GatherStringsCallback(void *Data, char const *String);
 granny_uint32 RemapStringsCallback(void *Data, char const *String);
 
+void f(char const* v);
+
+template <class T> void t(char const* v) { }
+template <class T> void tf(T const* v) { }
+
 bool ExtractStrings(input_file*     InputFiles,
                     granny_int32x   NumInputFiles,
                     key_value_pair* KeyValues,
@@ -49,10 +53,19 @@ bool ExtractStrings(input_file*     InputFiles,
         return false;
     }
 
+    for (int Idx = 0; Idx < NumInputFiles; ++Idx)
+    {
+        if (InputFiles[Idx].GrannyFile->Header->StringDatabaseCRC != 0)
+        {
+            ErrOut("file \"%s\" already has remapped strings, cannot extract!\n", InputFiles[Idx].Filename);
+            return false;
+        }
+    }
+
     RemapStringSet FinalStrings;
 
     // Always insert the NULL and empty string...
-    FinalStrings.insert(NULL);
+    FinalStrings.insert((char const*)0);
     FinalStrings.insert("");
 
     // Pull the currents strings out of the input database
@@ -156,6 +169,12 @@ bool RemapStrings(input_file& InputFile,
         }
     }
 
+    if (InputFile.GrannyFile->Header->StringDatabaseCRC != 0)
+    {
+        ErrOut("file already has remapped strings!\n");
+        return false;
+    }
+
     // Get the string database
     granny_file* DatabaseFile = GrannyReadEntireFile(DatabaseName);
     if (DatabaseFile == NULL)
@@ -174,14 +193,14 @@ bool RemapStrings(input_file& InputFile,
 
         if (Database->StringCount == 0)
         {
-            ErrOut("input Database doesn't appear to be valid (no strings)\n", DatabaseName);
+            ErrOut("input Database '%s' doesn't appear to be valid (no strings)\n", DatabaseName);
             return false;
         }
         {for(granny_int32 Idx = 2; Idx < Database->StringCount; ++Idx)
         {
             if (string_less_fn()(Database->Strings[Idx], Database->Strings[Idx-1]))
             {
-                ErrOut("input Database doesn't appear to be valid (unsorted entries)\n", DatabaseName);
+                ErrOut("input Database '%s' doesn't appear to be valid (unsorted entries)\n", DatabaseName);
                 return false;
             }
         }}
@@ -225,7 +244,7 @@ bool RemapStrings(input_file& InputFile,
         ErrOut("MISSING STRINGS found in %s, was this file included in the database build?\n", OutputFile);
     }
 
-    assert(DatabaseFile);
+    pp_assert(DatabaseFile);
     GrannyFreeFile(DatabaseFile);
 
     return true;
@@ -269,12 +288,37 @@ granny_uint32 RemapStringsCallback(void *Data, char const *String)
 }
 
 
+static const char* HelpString =
+    (" ExtractStrings/RemapStrings: These commands allow you to create\n"
+     " a granny_string_database from a collection of Granny files, and\n"
+     " remap the source file strings to indices in that database.\n"
+     "\n"
+     " For example, consider the trivial case of 2 files, \"char1.gr2\"\n"
+     " and \"char2.gr2\".\n"
+     "\n"
+     "    preprocessor ExtractStrings char1.gr2 char2.gr2 -database strings.gsd\n"
+     "\n"
+     "    preprocessor RemapStrings char1.gr2 -output char1_remap.gr2 -database strings.gsd\n"
+     "    preprocessor RemapStrings char2.gr2 -output char2_remap.gr2 -database strings.gsd\n"
+     "\n"
+     " The first command builds the database, and the second remaps the strings. Note that\n"
+     " you may add to an existing database, we could have just as easily written:\n"
+     "\n"
+     "    preprocessor ExtractStrings char1.gr2 -database strings.gsd\n"
+     "    preprocessor ExtractStrings char2.gr2 -database strings.gsd\n"
+     "\n"
+     " for the extraction phase. However, every time you modify the database \n"
+     " you must remap all of the files that are remapped using that set of\n"
+     " strings. It's possible that in the extraction phase, strings may be\n"
+     " moved to alternate indices, which would invalidate the previous mappings.\n");
 
 // Register the commands
 static CommandRegistrar RegExtractStrings(ExtractStrings, "ExtractStrings",
-                                          "Creates or updates a string_database with the input files' strings (use -database to specify)");
+                                          "Creates or updates a string_database with the input files' strings (use -database to specify)",
+                                          HelpString);
 
 static CommandRegistrar RegRemapStrings(eSingleFile_NoMultiRun, RemapStrings, "RemapStrings",
-                                        "Remaps the strings in the given file to the input string_database (use -database to specify)");
+                                        "Remaps the strings in the given file to the input string_database (use -database to specify)",
+                                        HelpString);
 
 

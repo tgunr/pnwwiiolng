@@ -1,29 +1,28 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/remove_namespace.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #9 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <assert.h>
 #include <vector>
 #include <algorithm>
 
 using namespace std;
 
 static char const*
-ModifyName(char const* InputName,
+ModifyName(char* InputName,
            bool RemovingAll,
            char const* TargetNamespace)
 {
     if (RemovingAll)
     {
-        char const* LastColon = strrchr(InputName, ':');
+        char* LastColon = strrchr(InputName, ':');
 
         if (!LastColon)
             return InputName;
@@ -40,11 +39,22 @@ ModifyName(char const* InputName,
     }
     else if (TargetNamespace)
     {
+        char* Position = InputName;
         granny_int32x const TargetLen = (granny_int32x)strlen(TargetNamespace);
+        granny_int32x InputLen  = (granny_int32x)strlen(InputName) + 1;
 
-        if (_strnicmp(TargetNamespace, InputName, TargetLen) == 0)
+        while (*Position)
         {
-            InputName += TargetLen;
+            if (_strnicmp(Position, TargetNamespace, TargetLen) == 0)
+            {
+                memmove(Position, Position + TargetLen, InputLen-TargetLen);
+                InputLen -= TargetLen;
+            }
+            else
+            {
+                ++Position;
+                --InputLen;
+            }
         }
     }
 
@@ -90,7 +100,7 @@ CreateTrackMatches(granny_file_info*         Info,
 
                     {for (int BoneIdx = 0; BoneIdx < Model->Skeleton->BoneCount; ++BoneIdx)
                     {
-                        granny_int32x Key =
+                        granny_uint32 Key =
                             GrannyVectorTrackKeyForBone(Model->Skeleton, BoneIdx, Track.Name);
 
                         if (Key == Track.TrackKey)
@@ -129,7 +139,7 @@ RemoveNamespaceDriver(granny_file_info* Info,
     vector<VectorTrackMatch> TrackMatches;
     CreateTrackMatches(Info, TrackMatches);
 
-#define DO_MOD(Name) Name = ModifyName(Name, RemovingAll, TargetNamespace)
+#define DO_MOD(Name) Name = ModifyName((char*)(Name), RemovingAll, TargetNamespace)
     {for(granny_int32x ModelIdx = 0; ModelIdx < Info->ModelCount; ++ModelIdx)
     {
         granny_model* Model = Info->Models[ModelIdx];
@@ -186,40 +196,34 @@ RemoveNamespaceDriver(granny_file_info* Info,
     }}
 #undef MOD
 
+    GrannyResortAllFileTrackGroups(Info);
     RefreshTrackKeys(Info, TrackMatches);
 
     return true;
 }
 
-bool RemoveAllNamespaces(input_file& InputFile,
-                         key_value_pair* KeyValues,
-                         granny_int32x   NumKeyValues,
-                         granny_memory_arena* Arena)
+granny_file_info*
+RemoveAllNamespaces(char const*          OriginalFilename,
+                    char const*          OutputFilename,
+                    granny_file_info*    Info,
+                    key_value_pair*      KeyValues,
+                    granny_int32x        NumKeyValues,
+                    granny_memory_arena* TempArena)
 
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     RemoveNamespaceDriver(Info, true, 0);
 
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
-bool RemoveNamespace(input_file&     InputFile,
-                     key_value_pair* KeyValues,
-                     granny_int32x   NumKeyValues,
-                     granny_memory_arena* Arena)
+granny_file_info*
+RemoveNamespace(char const*          OriginalFilename,
+                char const*          OutputFilename,
+                granny_file_info*    Info,
+                key_value_pair*      KeyValues,
+                granny_int32x        NumKeyValues,
+                granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
     char const* TargetName = FindFirstValueForKey(KeyValues, NumKeyValues, "namespace");
     if (TargetName == 0)
     {
@@ -227,28 +231,34 @@ bool RemoveNamespace(input_file&     InputFile,
         return false;
     }
 
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     RemoveNamespaceDriver(Info, false, TargetName);
 
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
+static const char* HelpString =
+    (" RemoveNamespace and RemoveAllNamespaces are utilities for processing\n"
+     " Maya files in which scene references have introduced namespace\n"
+     " prefixes to object names.\n"
+     "\n"
+     " If you know the specific namespace you want to remove from the file,\n"
+     " say, 'Robot:', then you can use RemoveNamespace (note the quoting):\n"
+     "\n"
+     "    preprocessor RemoveNamespace robot.gr2 -output robot.gr2 -namespace \"Robot:\"\n"
+     "\n"
+     " If you'd prefer to simply remove *all* namespaces in the file,\n"
+     " regardless of string, then use:\n"
+     "\n"
+     "    preprocessor RemoveAllNamespaces robot.gr2 -output robot.gr2\n"
+     "\n"
+     " This will turn all strings of the form '*:thing' into 'thing'\n");
 
-static CommandRegistrar RegRemoveNamespace(eSingleFile_NoMultiRun,
-                                           RemoveNamespace,
+static CommandRegistrar RegRemoveNamespace(RemoveNamespace,
                                            "RemoveNamespace",
-                                           "Removes a Maya namespace prefix string from animation/model/skeleton entries");
+                                           "Removes a Maya namespace prefix string from animation/model/skeleton entries",
+                                           HelpString);
 
-static CommandRegistrar RegRemoveAllNamespaces(eSingleFile_NoMultiRun,
-                                               RemoveAllNamespaces,
+static CommandRegistrar RegRemoveAllNamespaces(RemoveAllNamespaces,
                                                "RemoveAllNamespaces",
-                                               "Removes all Maya namespaces from animation/model/skeleton entries");
-
+                                               "Removes all Maya namespaces from animation/model/skeleton entries",
+                                               HelpString);

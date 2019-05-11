@@ -10,7 +10,6 @@
 #include "include/vars.h"
 #include "fio/fio.h"
 #include "trn/trnsky.h"
-#include "draw/sneaky.h"
 #include "ogl/GLCounter.h"
 
 #include <string>
@@ -158,7 +157,7 @@ SINT32 CFbo::createRenderCubemap(GLint filtermin,
     t.target = GL_TEXTURE_CUBE_MAP_ARB;
     t.attachment = GL_COLOR_ATTACHMENT0_EXT;
 
-    gl_GenTextures(1, &t.texture);
+    glGenTextures(1, &t.texture);
 
     // Initialize color texture
     glBindTexture(GL_TEXTURE_CUBE_MAP_ARB, t.texture);
@@ -232,7 +231,7 @@ SINT32 CFbo::createDepthTextureFBO(GLuint texid)
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
 
     m_depthtexture[fbo] = texid;
 
@@ -260,7 +259,7 @@ SINT32 CFbo::createRenderTexture(GLint filtermin,
     t.target = target;
     t.attachment = GL_COLOR_ATTACHMENT0_EXT;
 
-    gl_GenTextures(1, &t.texture);
+    glGenTextures(1, &t.texture);
 
     // Initialize color texture
     glBindTexture(target, t.texture);
@@ -368,7 +367,7 @@ LOGICAL CFbo::activateCubemapTarget(SINT32 texture, SINT32 depth, SINT32 face)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -442,7 +441,7 @@ LOGICAL CFbo::activateTarget(SINT32 texture, SINT32 depth)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -469,7 +468,7 @@ LOGICAL CFbo::activateDepthTextureFBO(GLuint fbo)
 
     if(!checkStatus())
     {
-        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+        glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
         return FALSE;
     }
 
@@ -498,7 +497,7 @@ void CFbo::deactivate()
                                  GL_RENDERBUFFER_EXT,
                                  0);
 
-    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+    glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
     m_isbound = FALSE;
 
     glViewport(0, 0, piGetWidth(), piGetHeight());

@@ -168,9 +168,15 @@ LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 /////////////////////////////////////////////////////
 UCHAR* loclLangGetString(ENUM_CATEGORIES enumCategory, UINT32 uID)
 {
-	static char buffer[128+1];
-	snprintf(buffer, 128, "loc.%s.%d", loclGetStringCategory(enumCategory), uID);
-	return (UCHAR*)buffer;
+    static std::unordered_map<uint64_t, std::string> s_cache;
+    
+    uint64_t cacheid = (static_cast<uint64_t>(enumCategory) << 32) | static_cast<uint64_t>(uID);
+    auto it = s_cache.find(cacheid);
+    if (it != s_cache.end()) {
+        return reinterpret_cast<UCHAR *>(const_cast<char *>(it->second.data()));
+    }
+    s_cache.emplace(cacheid, std::string("loc.") + reinterpret_cast<char *>(loclGetStringCategory(enumCategory)) + "." + std::to_string(uID));
+    return reinterpret_cast<UCHAR *>(const_cast<char *>(s_cache.at(cacheid).data()));
 
 	/*
     SINT32 category = (SINT32)enumCategory;

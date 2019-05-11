@@ -1,15 +1,14 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/combine_elements.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #14 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 
 bool CombineObjectElement(granny_file_info* BaseObject,
                           granny_file_info** Secondaries,
@@ -32,7 +31,7 @@ bool CombineElements(input_file*     InputFiles,
         return false;
     }
 
-    granny_file_info* Info = GrannyGetFileInfo(InputFiles[0].GrannyFile);
+    granny_file_info* Info = ExtractFileInfo(InputFiles[0]);
     if (Info == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input file\n");
@@ -43,7 +42,7 @@ bool CombineElements(input_file*     InputFiles,
 
     {for(granny_int32x File = 1; File < NumInputFiles; ++File)
     {
-        Secondaries[File-1] = GrannyGetFileInfo(InputFiles[File].GrannyFile);
+        Secondaries[File-1] = ExtractFileInfo(InputFiles[File]);
         if (Secondaries[File-1] == 0)
         {
             ErrOut("unable to obtain a granny_file_info from: %s\n", InputFiles[File].Filename);
@@ -68,15 +67,19 @@ bool CombineElements(input_file*     InputFiles,
     delete [] Secondaries;
 
     // Write out the resulting file...
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFiles[0].GrannyFile, true, true, true);
+    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFiles[0].GrannyFile, true, true, true, TempArena);
 }
 
 
 // Handy little utilities for dealing with ArrayOfRef members
-#define AOR_ExtractCountAndPtr(Count, Pointer, Memory)      \
+#if _MSC_VER
+  #pragma warning(disable:4127)
+#endif
+
+#define AOR_ExtractCountAndPtr(Count, Pointer, Memory)          \
     do {                                                    \
-        Count   = *((granny_int32*)(Memory));               \
-        Pointer = *((void**)((granny_uint8*)Memory + 4));   \
+        Count   = *((granny_int32*)(Memory));                   \
+        Pointer = *((void**)((granny_uint8*)Memory + 4));       \
     } while (false)
 
 #define AOR_SetCountAndPtr(Count, Pointer, Memory)          \
@@ -219,12 +222,9 @@ bool CombineObjectElement(granny_file_info* BaseObject,
 
                     // Bad Type value...
                 default:
-                    assert(false);
+                    pp_assert(false);
                     return false;
             }
-
-
-            return true;
         }
 
         // Advance in the object, and the type array
@@ -235,7 +235,22 @@ bool CombineObjectElement(granny_file_info* BaseObject,
     return false;
 }
 
+static char const* HelpString =
+    (" CombineElements is an all-purpose file combiner.  Using the first file\n"
+     " specified, it will create an output file that represents that first\n"
+     " file, plus a specified set of elements from subsequent files.\n"
+     " The elements that may be combined are any of the array elements at\n"
+     " the top level of granny_file_info.  (e.g. Textures, Animations, etc.)\n"
+     "\n"
+     " A common and handy way to use this command is to create a combined\n"
+     " character gr2 from a mesh/model plus a list of animations.\n"
+     "\n"
+     "    preprocessor CombineElements model.gr2 anim0.gr2 anim1.gr2 \\\n"
+     "                 -combine Animations\n");
+
+
 
 static CommandRegistrar RegCombineElements(CombineElements, "CombineElements",
-                                           "Combines root level elements of the granny_file_info");
+                                           "Combines root level elements of the granny_file_info",
+                                           HelpString);
 

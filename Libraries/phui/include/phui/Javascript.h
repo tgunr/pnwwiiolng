@@ -109,7 +109,7 @@ static JSPropertySpec jsproperties[];
 
 #define JS_FUNCTION(func) static JSBool func(JSContext*, JSObject*, uintN, jsval*, jsval*)
 #define JS_FUNCTION_DEF(class, func) JSBool class::func(JSContext* ctx, JSObject* jsobj, uintN argc, jsval* argv, jsval* rval)
-#define JS_FUNCTION_SPEC(class, func, argc) {#func, class::func, argc}
+#define JS_FUNCTION_SPEC(class, func, argc) {#func, class::func, argc, 0, 0}
 
 template<class T>
 T Cast(JSContext* ctx, JSObject* obj) 

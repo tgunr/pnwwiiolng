@@ -7,9 +7,9 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "dbug/dbugExtErrors.h"
 #include "build_info.hpp"
 
+#include <mysql.h>
 #if platOS != OS_WIN32
 #include <netinet/in.h>
 #else
@@ -70,19 +70,18 @@
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulVersion.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiHostMessages.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -168,7 +167,8 @@ mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsig
 	activate.teulIndex = 0;
 	activate.playerID = 0;
 	activate.otp = 0;
-
+	activate.theme = host_config.arena.theme;
+	
 	const SINT32 activateResult = wwiiSendActivate(teulIndex, &activate);
 	if ( activateResult < 0 )
 	{
@@ -305,8 +305,7 @@ Player::mirrorToCellHost(Server::ServerInfo* const server)
 	auto mirror = new PersonaMirrorTo<CELL_HOST>(pxd, server, "cell");
 	server->mirrorPlayer(mirror);
 
-	UINT8 cell_ip = static_cast<UINT8>(GetPublicAddress(server->stats.address) & 0xff);
-	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, cell_ip, server->stats.port, OTP());
+	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, GetPublicAddress(server->stats.address), server->stats.port, OTP());
 	const SINT32 retval = connIns.send(teulIndex());
 
 	m_lastSpawnedTo = server->stats.address;
@@ -402,7 +401,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player != nullptr)
 	{
-		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
+		teulClose(player->teulIndex());
 		player->setDisconnected();
 	}
 }
@@ -1275,6 +1274,12 @@ main(int argc, const char* argv[])
 
 		if ( teulClock64 >= nextHousekeeping )
 		{
+			// keep DB connection alive
+			if (mysql_ping(dbh) != 0) {
+				dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+				threadsDBReconnect(dbh);
+			}       
+
 			if ( _housekeeping() == false )
 				nextHousekeeping = teulClock64 + 5000;
 		}

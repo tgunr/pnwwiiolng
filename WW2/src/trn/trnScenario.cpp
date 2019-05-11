@@ -2108,7 +2108,7 @@ static void HandleClutterObject(const std::vector<Vec2f>& bucket, int color, voi
                          (SINT64)list[i].pos.y() * (SINT64)103515051525LL);
 
         char buff[256];
-        const char* obj;
+		const char *obj = nullptr;
         float rot = 0;
 
         if(color == ScenarioColors::RED)

@@ -1,13 +1,13 @@
 #if !defined(DX10_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/dx10/dx10_rendering.h $
-// $DateTime: 2009/08/31 23:08:23 $
-// $Change: 23017 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
 // See .cpp file for details...
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <d3d10.h>
@@ -18,9 +18,9 @@ struct DemoTexture
 {
     char* Name;
     ID3D10Texture2D* TextureBuffer;
-	ID3D10ShaderResourceView* TextureView;
+    ID3D10ShaderResourceView* TextureView;
 
-	DemoTexture();
+    DemoTexture();
     ~DemoTexture();
 };
 
@@ -31,9 +31,9 @@ struct DemoMesh
     std::vector<DemoTexture*> MaterialBindings;
 
     ID3D10Buffer* IndexBuffer;
-	DXGI_FORMAT   IndexBufferFormat;
+    DXGI_FORMAT   IndexBufferFormat;
 
-	ID3D10Buffer* VertexBuffer;
+    ID3D10Buffer* VertexBuffer;
 
     DemoMesh();
     ~DemoMesh();

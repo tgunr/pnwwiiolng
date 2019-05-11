@@ -60,14 +60,18 @@
 #include "client/clientStrtQueue.h"
 #include "uimap/CPRenderer.h"
 #include "strt/strtClientMessages.h"
+#include "chat/chatMissionInvite.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatBrigadeControl.h"
+#include "chat/omgChat.h"
 #include "client/clientBrigadeControlDescriptors.h"
 #include "map/mapHCUnitLocations.h"
-#include "omg/omgChat.hxx"
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiThemes.h"
+#include "spt/sptmain.h"
+#include "wwii/wwiiClientMessages.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -272,7 +276,7 @@ void GameClient::ProcessCrewPostExpired(FE_POST_EXPIRED const& crewexpired)
 void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 {
 	Client::ProcessForcedCellExit(exitCode);
-	vehExitVehicle(1, 0, 0);
+	vehExitVehicle(exitCode);
 }
 
 /************************************************************************************************
@@ -286,6 +290,8 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 	// scenarios have custom time of day and weather
 	if(!SCEN_MGR->IsActive())
 	{
+		checkThemeChange(static_cast<UINT32>(update.theme));
+
 		trnTODSetTimeOfDay(update.gametime);
 		trnTODSetTimeMultiplier((FLOAT32)update.factor);
 
@@ -1744,9 +1750,10 @@ void GameClient::ProcessMissionInvite(const MissionInvite& invite)
 {
 	Client::ProcessMissionInvite(invite);
 
-	// eventually we'll use this to let the host send down
-	// player or squad invites; not used for now
-	//jsclient->RunScript("game.onmissioninvite()");
+	// HACK: Squad recruiter invites are mandatory and use a different
+	// path because derp.
+	if ( invite.m_isDirective == 0 )
+		jsclient->RunScript("game.onmissioninvite()");
 }
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags)

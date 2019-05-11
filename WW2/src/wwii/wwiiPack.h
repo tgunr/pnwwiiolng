@@ -16,6 +16,10 @@ static inline SINT32 wwiiPackCountry(PackMode mode, UCHAR* const data, SINT32 of
 	return teulPackUINT32(mode, data, offset, (UINT32*)country, 4);
 }
 
+static inline SINT32 wwiiPackBranch(PackMode mode, UCHAR* const data, SINT32 offset, BRANCH_ENUM* country, SINT32 /*size*/) {
+	return teulPackUINT32(mode, data, offset, (UINT32*)country, 3);
+}
+
 extern SINT32 wwiiPackWeaponSpec(PackMode mode, UCHAR* data, SINT32 offset, WEAPON_SPEC* const object, SINT32 /*size*/);
 
 extern SINT32 wwiiPackWeaponSerial(PackMode mode, UCHAR* data, SINT32 offset, struct WEAPON_SERIAL* const object, SINT32 /*size*/);

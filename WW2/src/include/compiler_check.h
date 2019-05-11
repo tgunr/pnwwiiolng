@@ -22,6 +22,10 @@
 #define __has_feature_or_ext(...) __has_feature(__VA_ARGS__) || __has_extension(__VA_ARGS__)
 #endif
 
+#ifndef __has_include
+#define __has_include(...) 0
+#endif
+
 #ifdef __clang_major__
 #define __is_Clang() 1
 #else

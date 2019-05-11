@@ -17,7 +17,6 @@
 #include "wwii/wwiiTypes.h"
 
 #if defined(IS_MAP_HOST)
-#include "teul/teulServer.h"
 #include "map/mapDB.h"
 #include "chat/chatConstants.h"
 #include "mm/mmMain.h"
@@ -57,7 +56,7 @@ static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex);
-		teulClose(a->teulIndex, Teul::Closing::AbortedApp);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 

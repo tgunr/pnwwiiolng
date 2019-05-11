@@ -603,7 +603,7 @@ piVECTOR		vmn, vmx, sv[3];
 piVECTOR		psl[3];
 piVECTOR const*		psnorms;
 piINDICES*		ptris;
-piMATRIX*		lpmat;
+piMATRIX*		lpmat = nullptr;
 
 	vmn = lpshad->obox[0];
 	vmx = lpshad->obox[1];

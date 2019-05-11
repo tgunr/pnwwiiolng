@@ -102,6 +102,8 @@ extern SINT32          	WantedRefreshRate;
 extern SINT32           WantedAlpha;		// desired/actual alpha
 extern LOGICAL          WantedHdw;			// desired/actual hardware
 extern SINT32           WantedStencil;		// desired/actual hardware
+extern LOGICAL          WantedFullscreen;	// desired/actual window
+extern LOGICAL          WantedBorderless;	// desired/actual window
 extern LOGICAL          WantedWindow;		// desired/actual window
 extern SINT32			WantedMode;			// desired/actual mode
 extern SINT32           WantedSide;         // User selected side from webpage.
@@ -114,12 +116,11 @@ extern SINT8			HackID[128];		// used for hacker detection (comes from playgate o
 extern LOGICAL			AltFont;            // testing if true use alternate UI font
 extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
-extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
 extern LOGICAL          LaunchSettingsOnly; // stand-alone settings (for mac initially)
 extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
-extern SCHAR			WantedVideoCard[64];// desired video card name
+extern SCHAR			WantedDisplayDevice[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution
 extern SCHAR			WantedSoundCard[64];// desired sound card name
 
@@ -174,8 +175,8 @@ extern LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when
 
 extern LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-extern SINT8			DataPath[_MAX_PATH];//=PREPATH;
-extern SINT8			UserDataPath[_MAX_PATH];
+extern fullpath_t DataPath[_MAX_PATH];
+extern fullpath_t UserDataPath[_MAX_PATH];
 
 extern FLOAT32			FieldOfView;		// FOV in degrees
 extern FLOAT32			HorizontalFieldOfView;
@@ -188,7 +189,6 @@ extern LOGICAL			g_enableVSync;	    // Lock the frame rate to refresh rate
 extern SINT32			ShadowSizeSelect;	// A number representing shadow texture size											// (1-8) means "2^n"
 											// (1-8) means "2^n"
 											// 0 means "No Shadows"
-extern SINT8			Playarc[_MAX_PATH]; // path the archiver, usually just "playarc"
 /**/
 
 extern SINT32           nErrorCode;         // Set to any user specified error code
@@ -284,6 +284,7 @@ extern UINT32			CurrentConv; // Current airplane gun convergence setting
 extern FLOAT32			aimMouse;	// Aiming mouse sensitivity
 extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gAuthServerPort[64];
+extern char             gAuthRelayURL[128]; // Auth relay URL override
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 

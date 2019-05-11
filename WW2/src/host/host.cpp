@@ -11,6 +11,8 @@
 #include "include/clustercfg.h"
 
 #include <stack>
+#include <sys/stat.h>
+#include <string>
 
 #include "build_info.hpp"
 #include "chat/chatCellHostSupportMessages.h"
@@ -32,7 +34,6 @@
 #include "host/hostPlayer.h"
 #include "host/hostStats.h"
 #include "host/hostTimeUpdate.h"
-#include "host/hostTiming.h"
 #include "host/hostVehicle.h"
 #include "host/hostVehicleRequest.h"
 #include "include/wthrTime.h"
@@ -71,7 +72,7 @@
 #include "strt/strtUpdaterHostMessages.h"
 #include "strt/strtUpdaterSupportMessages.h"
 #include "teul/teulBlipRepeater.h"
-#include "teul/teulClosingEnums.h"
+#include "teul/teulEndpointImpl.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
@@ -521,6 +522,9 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	: wwiiPlayer()
 	, m_lastTimeRx(0ULL)
 	, m_lastTimeRxed(0ULL)
+	, m_hostClientOffset_ms(0ULL)
+	, m_ibdTimeReachedMaxAccumDelay(0ULL)
+	, m_obdTimeReachedMaxAccumDelay(0ULL)
 	, vehicle(nullptr)
 	, m_antiHack(nullptr)
 	, state(Player::_RESERVED)
@@ -550,6 +554,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	, m_hasDied(false)
 	, exitFacility(nullObjID)
 	, m_fpsBuildingID(nullObjID)
+	, m_exitTeulIndex(0)
 {
 	this->state = Player::_RESERVED;
 	this->sendClose = TRUE;
@@ -635,7 +640,7 @@ _exitPlayer(Player& player)
 		return;
 
 	player.m_hasExited = true;
-
+	player.m_exitTeulIndex = player.teulIndex();
 	if ( player.sortieID() > 0 && player.playerID() > 0 )
 	{
 		DBThread::Do(DBThread::Default
@@ -657,7 +662,7 @@ _exitPlayer(Player& player)
 	{
 		dbugLog(_FLA, "t:%d p:%u no player data", teulIndex, player.playerID());
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex, Teul::Closing::ExitNoPlayer);
+			teulClose(teulIndex);
 	}
 	else
 	{
@@ -666,7 +671,7 @@ _exitPlayer(Player& player)
 		player.Release(teulIndex, Server::ReleaseType::EConn);
 
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex, Teul::Closing::ExitWithPlayer);
+			teulClose(teulIndex);
 	}
 }
 
@@ -1273,7 +1278,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN )
 		{
-			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%d", teulIndex, error, Server::myServerInfo.m_players.size());
+			dbugLog(_FLN, "t:%d closing cleanly (no player info) err:%d connCount:%zu", teulIndex, error, Server::myServerInfo.m_players.size());
 			return;
 		}
 		else
@@ -1286,7 +1291,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	{
 		if ( error == ENOTCONN && teulIndex == player->teulIndex() )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%d", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
+			dbugLog(_FLI, "t:%d p:%u c:%s v:%u disconnected, userConn:%zu", teulIndex, player->playerID(), player->callsign(), player->sortieID(), Server::myServerInfo.m_players.size());
 			player->SetTeulIndex(-1);
 		}
 		else
@@ -1302,7 +1307,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 static void
 _acceptFunction(ENDPOINT& endpoint)
 {
-	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%d"
+	dbugLog(_FLD, "t:%d incoming connection from %s:%hu conn#%zu"
 					, endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort()
 					, Server::myServerInfo.m_players.size()
 					);
@@ -1325,6 +1330,9 @@ Player::isInGracePeriod(UINT32 gracePeriod_s, bool includeFirstConnection) const
 void
 Player::resetUpdateSeq()
 {
+	m_hostClientOffset_ms = 0;
+	m_ibdTimeReachedMaxAccumDelay = 0;
+	m_obdTimeReachedMaxAccumDelay = 0;
 	m_expectUpdateNo = 0;
 	m_updatePrime = INIT_UPDATE_PRIME;
 }
@@ -1341,10 +1349,6 @@ _illegalPacketSequence(SINT32 teulIndex)
 
 	Player* persona = (Player*)ServerInterface::LookupByTeulIndex(teulIndex);
 	if ( persona == nullptr )
-		return;
-
-	// Give them a grace period after reconnecting
-	if ( persona->isInGracePeriod(60) )
 		return;
 
 	dbugLog(_FLW, "t:%d p:%u invalid packet sequence", teulIndex, persona->playerID());
@@ -1399,7 +1403,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 
 		if ( player != nullptr )
 		{
-			dbugLog(_FLI, "t:%d p:%u c:%s connection closed, %d connections remaining"
+			dbugLog(_FLI, "t:%d p:%u c:%s connection closed, %zu connections remaining"
 						, teulIndex
 						, player->playerID()
 						, player->callsign()
@@ -1409,7 +1413,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 		}
 		else
 		{
-			dbugLog(_FLI, "t:%d personaless connection closed, %d connections remaining"
+			dbugLog(_FLI, "t:%d personaless connection closed, %zu connections remaining"
 						, teulIndex
 						, Server::myServerInfo.m_players.size()
 						);
@@ -1542,6 +1546,50 @@ _addNewServer(Server::ServerInfo* server, const bool isEntering)
 			dbugLog(_FLN,"new cellhost detected");
 
 		///TODO: Send my vehicle list to this server
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Makes sure this cell is still supposed to be running
+//  - doesn't need to check very often, every .2Hz is fine
+//
+void
+_cellStatusCheck()
+{
+	// TODO: no point in doing anything in a CIAB environment as its not really setup for multi-cell right now
+	if (!Server::IsBroadcastViaController()) 
+	{
+		std::string name(cv_defaultLogPath.GetString());
+		name += "/NODE_DOWN";
+
+		struct stat info;
+		if (stat(name.c_str(), &info) == 0) 
+		{
+			if (Server::myServerInfo.stats.status != Server::SERVER_MAINTENANCE)
+			{
+				dbugLog(_FLI, "Detected node is being shut down, notify other servers");
+
+				// flag indicates we should not be running, initiate maintenance mode
+				Server::myServerInfo.stats.status = Server::SERVER_MAINTENANCE;
+			}
+			dbugLog(_FLI, "%u open connections remaining", Server::myServerInfo.m_players.size());
+			if (Server::myServerInfo.m_players.size() == 0) 
+			{
+				// mark this cell host for termination
+				dbugLog(_FLI, "Cell host ready for termination");
+				g_hostTerminating = true;			
+			}
+		}
+		else 
+		{
+			if (!g_hostTerminating && Server::myServerInfo.stats.status == Server::SERVER_MAINTENANCE)
+			{
+				dbugLog(_FLI, "Detected node shutdown was aborted, notify other servers");
+
+				// flag indicates we should not be running, initiate maintenance mode
+				Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
+			}
+		}
 	}
 }
 
@@ -1786,18 +1834,13 @@ HostVehicle::hasConnectedPlayers() const
 static void
 _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 {
-	TIMER_USE_HERE
-
-	TIMER_START
 	vehicles.clear();
 	vehicles.reserve(maxVehicles);
-	TIMER_STOP("gvwfu_alloc");
 
 #ifdef DEBUG_UPDATES
 	const TeulTimeMS lowend = teulClock64 - 100;
 	bool reportedLagging = false;
 #endif
-	TIMER_START
 	for (auto it = _vehicleHash.begin(), end = _vehicleHash.end(); it != end;)
 	{
 #ifdef DEBUG_UPDATES
@@ -1819,19 +1862,26 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 			continue;
 		}
 
-		if ( vehicle->m_nextUpdateClock > teulClock64 )
-		{
-#ifdef DEBUG_UPDATES
-			++vehiclesSkipped;
-#endif
-			continue;
-		}
-
 		unsigned int fail = 0;
-		if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
-			++fail;
-		else if ( PN_UNLIKELY(vehicle->hasConnectedPlayers() == false) )
-			++fail;
+
+		// accelerate the notification to killers of vehicle death
+		if (!vehicle->hasBeenNotifiedOfVehicleDeath())
+		{
+			if ( vehicle->m_nextUpdateClock > teulClock64 )
+			{
+#ifdef DEBUG_UPDATES
+				++vehiclesSkipped;
+#endif
+				continue;
+			}
+
+			if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
+				++fail;
+			else if ( PN_UNLIKELY(vehicle->hasConnectedPlayers() == false) )
+				++fail;
+		} else {
+			vehicle->setVehicleNeedsDeathNotice( false );	
+		}
 
 		if ( PN_LIKELY(fail == 0) )
 		{
@@ -1852,29 +1902,23 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 			vehicle->setNextUpdate(vehicle->m_updateInterval);
 		}
 	}
-	TIMER_STOP("gvwfu_sel");
 
 	if ( PN_UNLIKELY(vehicles.empty()) )
 		return;
 
 	if ( vehicles.size() > maxVehicles )
 	{
-		TIMER_START
 		dbugLog(_FLA, "%" PRSizeT " vehicles want updates, limit is %u", vehicles.size(), maxVehicles);
 		sort(vehicles.begin(), vehicles.end(), [](auto lhs, auto rhs) { return lhs->m_nextUpdateClock < rhs->m_nextUpdateClock; });
 		vehicles.resize(maxVehicles);
-		TIMER_STOP("gvwfu_shrink");
 	}
 
 #ifdef DEBUG_UPDATES
 	vehiclesReviewed = vehicles.size();
 #endif
 
-	TIMER_START
 	sort(vehicles.begin(), vehicles.end(), [](auto lhs, auto rhs) { return lhs->m_cell < rhs->m_cell; });
-	TIMER_STOP("gvwfu_sort");
 
-	TIMER_START
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::HOST_LOCALITY_UPDATES_Y));
 	for ( auto it = vehicles.begin(), end = vehicles.end(); it != end; ++it )
 	{
@@ -1884,7 +1928,6 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	}
 	if ( outgoing.empty() == false )
 		serverSendPacketToType(outgoing, CHAT_HOST);
-	TIMER_STOP("gvwfu_loc");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1923,10 +1966,9 @@ _checkPlayerEjectionCountdown(Player* persona)
 static inline bool
 _checkPlayerTimeToLive(Player* player)
 {
-	if ( PN_LIKELY(player->m_timeToLive <= 0) )
+	if ( PN_LIKELY(player->m_timeToLive == 0) )
 		return false;
-	player->m_timeToLive--;
-	if ( player->m_timeToLive > 0 )
+	if ( player->m_timeToLive > teulClock64 )
 		return false;
 
 	dbugLog(_FLW, "t:%d exhausted timeToLive", player->teulIndex());
@@ -1964,7 +2006,7 @@ _starvedUpdates(Player* player, HostVehicle* vehicle, bool despawnTimerActive)
 	const UINT32 maxUpdatesBetweenRxs = (FE_UPDATES_PER_SECOND * host_config.update.starvationLimit_s);
 	if ( PN_UNLIKELY(player->m_updatesSinceRX > maxUpdatesBetweenRxs) )
 	{
-		commForcePlayerExit(*player, "*too few updates from client", true);
+		commForcePlayerExit(*player, "too few updates from client", true);
 		return true;
 	}
 
@@ -1988,6 +2030,64 @@ _calculatePingTime(Teul::Packet& packet, Player* const player, size_t pingOffset
 static bool
 _sendPacket(Teul::Packet& packet, Player* const player, const SINT32 sortieID, size_t pingOffset)
 {
+
+	ENDPOINT* endpoint = teulGetEndpoint(player->teulIndex());
+	if (!player->m_hasExited && player->m_timeToLive == 0 && endpoint != nullptr && endpoint->m_impl != nullptr && !endpoint->m_impl->m_sendQueue.empty())
+	{
+		// we currently have a queue built up to this user, lets check and see how deep it is
+		UINT32 updtInterval = framings[player->getCurrentFramingMode()].updateInterval;
+		size_t queueSize = endpoint->m_impl->m_sendQueue.size();
+
+		dbugLog(_FLD, "OBD: Client (%s %d) send queue is now %d, estimated at %d ms with update interval %d (mode %d)",
+			player->callsign(),
+			player->playerID(),
+			queueSize, (queueSize * updtInterval), updtInterval, player->getCurrentFramingMode());
+
+		if (queueSize * updtInterval >= host_config.update.accumDelayLimit_ms)
+		{
+			// this player is not accepting updates at the rate we would expect, put them on a tight leash
+			// No delay yet recorded
+			if (player->m_obdTimeReachedMaxAccumDelay == 0)
+			{
+				player->m_obdTimeReachedMaxAccumDelay = teulClock64;
+				// Player has exceeded our grace delay allottment and most be booted
+				dbugLog(_FLW, "*** OBD: Player's accumulated packet delay exceeded limits (%s %d) : queueSize %d, first detection ***",
+					player->callsign(),
+					player->playerID(),
+					queueSize);
+			}
+			else
+			{
+				TeulTimeMS heldTime_ms = teulClock64 - player->m_obdTimeReachedMaxAccumDelay;
+				if (heldTime_ms >= static_cast<TeulTimeMS>(host_config.update.timeAtLimitBeforeKick_s * 1000))
+				{
+					// Player has exceeded our grace delay allottment and most be booted
+					dbugLog(_FLW, "*** OBD: Player's accumulated packet delay exceeded limits (%s %d) : queueSize %d, for %f seconds***",
+						player->callsign(),
+						player->playerID(),
+						queueSize,
+						static_cast<float>(heldTime_ms) / 1000.0);
+					commForcePlayerExit(*player, "Slow client updates (Inbound)", true);
+					return false;
+				}
+				else
+					dbugLog(_FLD, "*** OBD: Player's accumulated packet delay within hold limits (%s %d) : queueSize %d, for %f seconds***",
+						player->callsign(),
+						player->playerID(),
+						queueSize,
+						static_cast<float>(heldTime_ms) / 1000.0);
+			}
+		}
+		else if (player->m_obdTimeReachedMaxAccumDelay)
+		{
+			dbugLog(_FLD, "OBD: Resetting client (%s, %d) time reached maximum packet delay outbound, fell below threshold - queue size currently %d", 
+				player->callsign(),
+				player->playerID(),
+				queueSize);
+			player->m_obdTimeReachedMaxAccumDelay = 0;
+		}
+	}
+
 	_calculatePingTime(packet, player, pingOffset);
 
 	// If the player has netcode enhancements enabled, specify a UDP protocol preference
@@ -2049,28 +2149,19 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	// Prep the world update.
 
-//	TIMER_RESET
-//	TIMER_USE_HERE
-
-//	TIMER_START
 	// Go over our previous vis list and check for vehicles which have
 	// gone out of range or despawned.
 	// Create our new world update / vis list by scanning the nearby
 	// "sector"s of the cell-grid for vehicles and shuffling them
 	// through all kinds of linked lists to build our final vis list.
 	vehicle->UpdateVehicleList();
-//	TIMER_STOP("updatevlist");
 
-//	TIMER_START
 	// Produce the vis list in 3 levels of accuracy and prepare
 	// as packed data.
 	vehicle->CreateWorldUpdate();
-//	TIMER_STOP("createwu");
 
 	// Send vehicle removes.
-//	TIMER_START
 	vehicle->SendRemoveList();
-//	TIMER_STOP("sendrmv");
 
 	assert( wu.header.numVehicles <= framings[vehicle->framingMode].maxVehiclesPerFrame() );
 
@@ -2079,28 +2170,23 @@ _sendNextUpdate(HostVehicle* const vehicle)
 #endif
 
 	// Assume 16-bytes per vehicle.
-//	TIMER_START
 	Teul::Packet packet(Teul::PacketId(Comm::CallbackX, WORLD_UPDATE_Y));
 	packet.reserve(sizeof(wu.header) + wu.header.numVehicles * 80);
 	wu.packet = &packet;
 
 	packet.append(wu.header);
-//	TIMER_STOP("pktprep");
 
 //	vehicle->m_lastUpdateCount = (UINT32)numUpdates;
 //	vehicle->m_lastUpdateSent = teulClock64;
 
 	// Pack the world update into "out.message"; if this is a multi-crew
 	// vehicle, this will save us having to pack it for each player.
-	//TIMER_START
 	const SINT32 packResult = updtPackWORLD_UPDATE(TEUL_PACK, nullptr, 0, &wu, 0);
-//	TIMER_STOP("pack");
 	if ( PN_UNLIKELY(packResult < 0) )
 	{
 		dbugLog(_FLA, "v:%u c:%s pack world update failed: %d"
 						, vehicle->index, vehicle->callsign()
 						, packResult);
-//		TIMER_REPORT(50)
 		return true;
 	}
 	
@@ -2133,20 +2219,14 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		if ( PN_UNLIKELY(!player->active || player->teulIndex() < 0) )
 			continue;
 
-//		TIMER_START
 		if ( PN_UNLIKELY(_checkPlayerTimeToLive(player)) )
 			continue;
-//		TIMER_STOP("plyr:chkttl");
 
-//		TIMER_START
 		if ( PN_UNLIKELY(_checkPlayerEjectionCountdown(player)) )
 			continue;
-//		TIMER_STOP("plyr:ejectctr");
 
-//		TIMER_START
 		if ( PN_UNLIKELY(_starvedUpdates(player, vehicle, vehHolder->vehicle->m_despawnTimerActive)) )
 			continue;
-//		TIMER_STOP("plyr:starved");
 
 		if ( PN_UNLIKELY(player->m_updatesSinceRX > updatesBehind) )
 			updatesBehind = player->m_updatesSinceRX;
@@ -2164,7 +2244,6 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		players.push_back(player);
 	}
 
-//	TIMER_START
 	if ( players.empty() == false )
 	{
 
@@ -2208,7 +2287,6 @@ _sendNextUpdate(HostVehicle* const vehicle)
 			updatesFailing = true;
 		}
 	}
-//	TIMER_STOP("sendpkt");
 
 	// If we had trouble sending updates, we may need to throttle the
 	// rate at which we're sending data, or the amount of data.
@@ -2240,7 +2318,6 @@ _sendNextUpdate(HostVehicle* const vehicle)
 			}
 		}
 	}
-//	TIMER_REPORT(100)
 
 	return result;
 }
@@ -2255,6 +2332,7 @@ _runHost()
 
 	// Time out ghosts every half a second.
 	Teul::housekeeper expiryHouseKeeper(_expireVehicles, 500);
+	Teul::housekeeper cellStatusHouseKeeper(_cellStatusCheck, 5000);
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -2267,25 +2345,17 @@ _runHost()
 	// This loop is the core of the cell host.
 	teulSyncClock();
 
-	TIMER_USE_HERE
-
 	for ( ; ; )
 	{
-		TIMER_RESET
-
 		if (PN_UNLIKELY(g_hostTerminating == true))
 			return;
 
 		// Because dbugLog is not threadsafe, any worker
 		// threads have to queue up their log messages for
 		// us to consume. Write upto 64 log entries.
-		TIMER_START
 		threadsCallNextCallback();
-		TIMER_STOP("threads");
 
-		TIMER_START
 		teulUpdateTransport(25);
-		TIMER_STOP("networking");
 
 		// The host self-instruments with a number of "event"
 		// counters, which are periodically written to
@@ -2308,13 +2378,11 @@ _runHost()
 		// For any sorties that have completed the spawning
 		// process, save off the data.
 		///TODO: Delegate this to a freaking thread.
-		TIMER_START
 		g_sortieSpawns.Commit();
 		// And for any sorties that are despawning, save
 		// off that data.
 		///TODO: Delegate to a thread.
 		g_sortieReturns.Commit();
-		TIMER_STOP("commits");
 
 		// Run housekeeping routines.
 		///TODO: Move to general housekeeping.
@@ -2322,21 +2390,17 @@ _runHost()
 
 		// Process any new cell host events
 		///TODO: Move to general housekeeping.
-		TIMER_START
 		strtUpdaterProcessEvents();
-		TIMER_STOP("strtevents");
 
 		// Every half second or so, expire timed out vehicles.
 		///TODO: Move to general houskeeping.
-		TIMER_START
 		expiryHouseKeeper.poll();
-		TIMER_STOP("expiry");
+
+		cellStatusHouseKeeper.poll();
 
 		// Force the dispatch of any queued up "vehicle despawned"
 		// notifications to the rest of the cluster.
-		TIMER_START
 		hostQueueVehicleRemove(0, 0);
-		TIMER_STOP("qremove");
 
 		// If the funny farm is enabled, run it, so long as we're
 		// not a reserved (no-users) cell host.
@@ -2366,9 +2430,7 @@ _runHost()
 
 		// Search the local vehicle list for suitable vehicles to
 		// send updates to.
-		TIMER_START
 		_getVehiclesWaitingForUpdates(nextVehicles, maxUpdates);
-		TIMER_STOP("gvwfu");
 
 		UINT32 updatesSent = 0;
 
@@ -2387,7 +2449,6 @@ _runHost()
 		const TeulTimeMS updateCycleTimeout = started + _MAX_TIME_PER_PASS_MS;
 
 		// Now generate world updates for all of the vehicles we selected.
-		TIMER_START
 		for ( auto it = nextVehicles.begin(), end = nextVehicles.end(); it != end; ++it )
 		{
 			HostVehicle* const vehicle = *it;
@@ -2400,8 +2461,6 @@ _runHost()
 			if ( _sendNextUpdate(vehicle) )
 				++updatesSent;
 		}
-		TIMER_STOP("updts");
-		TIMER_REPORT(250)
 
 #ifdef DEBUG_UPDATES
 		static UINT32 nextStatsReport = teulTime();
@@ -2558,7 +2617,7 @@ hostSmiteCustomer(const playerid_t playerID)
 
 	if ( player->teulIndex() >= 0 )
 	{
-		teulClose(player->teulIndex(), Teul::Closing::Smite);
+		teulClose(player->teulIndex());
 	}
 }
 

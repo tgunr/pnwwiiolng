@@ -729,7 +729,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 		break;
 		case POSTED_WEAPON::_SPAWNED:
 			dbugLog(_FLA,"v:%u recieved spawnRequest for spawned vehicle weapon %p!", serial, currentWeapon);
-			response.code = SPAWN_ERROR;
+			response.code = SPAWN_RESERVATION_CANCELLED;
 			return false;
 		case POSTED_WEAPON::_FREE:
 		case POSTED_WEAPON::_CANCELLED:
@@ -743,7 +743,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	if ( !currentWeapon->spawn() )
 	{
 		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
-		response.code = SPAWN_ERROR;
+		response.code = SPAWN_WEAPON_NOT_AT_FACILITY;
 		return false;
 	}
 
@@ -1725,6 +1725,8 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	if ( m_playerExitCode == PEXIT_OVER_FRIENDLY_TERRITORY && isDead() == false )
 		rescuable = true;
 	else if ( m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false )
+		rescuable = true;
+	else if (isDead() && !hasBeenHit)
 		rescuable = true;
 	switch ( m_status )
 	{

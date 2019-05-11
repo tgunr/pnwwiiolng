@@ -18,7 +18,6 @@
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "include/configVars.h"
-#include "include/luaClient.h"
 #include "include/luaGlue.h"
 #include "miss/missionDamageEvent.h"
 #include "miss/missionPack.h"
@@ -59,7 +58,6 @@
 #include "strt/strtWeaponsReturn.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulUtils.h"
 #include "weap/weapWeapon.h"
 #include "wwii/wwiiCallbacks.h"
@@ -265,7 +263,7 @@ SINT32
 strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPattern, UINT32 fogPattern)
 {
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y));
-	outgoing.construct<Host::TimeUpdate>(gameTime, timeFactor, weatherPattern, fogPattern);
+	outgoing.construct<Host::TimeUpdate>(gameTime, timeFactor, weatherPattern, fogPattern, host_config.arena.theme);
 	return serverSendPacketToPeers(outgoing);
 }
 
@@ -844,72 +842,13 @@ SERIAL_NUMBER_REQUEST::receive(SINT32 teulIndex, SERIAL_NUMBER_REQUEST& incoming
 }
 
 //////////////////////////////////////////////////////////////////////
-// Execute a Lua script.
-
-static SINT32
-_recvLua(ACTION_OBJECT* const a)
-{
-	const UINT32 bytes = a->sizeInBytes();
-	if ( bytes <= 1 )	// null byte is included
-		return a->offset;
-
-	const char* const input = (char*)(a->packed);
-	if ( input[bytes - 1] != '\0' )
-	{
-		char sender[81];
-		if (a->endpoint)
-			teulGetAddress(a->endpoint->fromAddress(), sender, sizeof(sender));
-		else
-			strsafecpy(sender, "?.?.?.?");
-		dbugLog(_FLW, "t:%d ip:%s ignoring non-nul-terminated input", a->teulIndex, sender);
-		return -EINVAL;
-	}
-
-	dbugLog(_FLI, "luaSrc: received command: %s", input);
-
-	if ( input[0] == ';' )
-	{
-		std::string object(cv_luaPath.GetString());
-		object += input + 1;
-		object += ".lua";
-		Lua::RunScript(object.c_str());
-	}
-	else
-	{
-		char sender[81];
-		strprintf(sender, "t:%d ip:%s", a->teulIndex, (a->endpoint ? teulGetAddress(a->endpoint->fromAddress()) : "?.?.?.?"));
-		std::string object(input);
-		Lua::RunObject(sender, object);
-	}
-
-	Lua::SCRIPT_RESULTS& results = Lua::Results();
-	dbugLog(_FLI, "luaSrv: returning %" PRSizeT " lines of results", results.size());
-	Lua::SCRIPT_RESULTS::iterator it;
-	std::string reply = "";
-	for ( it = results.begin(); it != results.end(); ++it )
-	{
-		reply += *it;
-	}
-
-	dbugLog(_FLI, "reply:[%s]", reply.c_str());
-	reply += LUA_END_SEQ;
-
-	const size_t lenWithNullByte = reply.length() + 1;
-	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y), reply.c_str(), lenWithNullByte);
-	outgoing.setUnencrypted();
-	outgoing.send(a->teulIndex);
-
-	results.clear();
-
-	return a->offset;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Receive a capture contribution event
 
 static SINT32
 _recvCaptureContrib(ACTION_OBJECT* const a)
 {
+	//dbugLog(_FLN, "Strat receive capture contrib.");
+
 	if ( a->canRead<Strat::CaptureContributionEvent>() == false )
 		return -EINVAL;
 
@@ -1079,27 +1018,12 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Host-host and luaclient messages.
-
-static SINT32
-_registerInterHostCallbacks()
-{
-	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
-	{
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLua);
-	}
-	END_CALLBACK_REGISTRATION(Host::CallbackX)
-}
-
-//////////////////////////////////////////////////////////////////////
 // Public functions
 
 //Installs our callbacks
 SINT32
 strtHostInstallCallbacks()
 {
-	_registerInterHostCallbacks();
-
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 	{
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
@@ -1141,6 +1065,8 @@ strtHostInstallCallbacks()
 void
 strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 {
+	//dbugLog(_FLN, "Strat strtSendCaptureScoreNotice()");
+
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));
 	outgoing.construct<CaptureScore>(fid, forSide);
@@ -1153,6 +1079,8 @@ strtSendCaptureScoreNotice(const FULL_OBJ_ID fid, WWII_SIDE forSide)
 void
 strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable)
 {
+	//dbugLog(_FLN, "Strat send capture state.");
+
 	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureState_Y));
 	auto& state = outgoing.allocate<CaptureState>();
 	state.populate(facility, forSide, rate, spawnable);

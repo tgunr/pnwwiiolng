@@ -11,7 +11,6 @@
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
 #include "include/mydbQuery.h"
 #include "map/mapArenaDescription.h"
@@ -34,6 +33,7 @@
 #include "strt/strtData.h"
 #include "strt/strtFacilityStruct.h"
 #include "tut/tutGroupProgress.h"
+#include "weap/weapLoadIndexes.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiErrorTypes.h"
@@ -42,8 +42,6 @@
 #include "wwii/wwiiThreads.h"
 
 bool activeCountries[MAX_COUNTRIES];
-
-extern void weapLoadIndexes(DB::handle_t* conn);
 
 struct DB_PERM_STRUCT
 {
@@ -107,15 +105,11 @@ static void _removePrefix(std::string& from, const std::string& prefix)
 static void
 _setArenaDescriptionHostRevision()
 {
-	char hostRevision[200];
-	strprintf(hostRevision, "c:%s d:%s (%s)", PN_code_git_commitish_string, PN_data_git_commitish_string, cv_stratLanguage.GetString());
-
-	std::string revision = hostRevision;
-	_removePrefix(revision, "branches/");
-	_removePrefix(revision, "tags/");
-	g_arenaDescription["host_rev"] = revision;
-
-	dbugLog(_FLI, "set arena host revision to '%s'", revision.c_str());
+    g_arenaDescription["host_rev"] =
+        std::string("c:") + PN_code_git_commitish_string + " " +
+        std::string("d:") + PN_data_git_commitish_string + " " +
+        std::string("(")  + cv_stratLanguage.GetString() + ")";
+	dbugLog(_FLI, "set arena host revision to '%s'", g_arenaDescription["host_rev"].c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,8 +135,6 @@ static void _initializeBrigadeLocations()
 static bool
 _readArenaDescription()
 {
-	_setArenaDescriptionHostRevision();
-
 	try
 	{
 		DBQuery q(dbh, QRY_SELECT_ARENA_DESCRIPTION);
@@ -162,6 +154,9 @@ _readArenaDescription()
 			dbugLog(_FLI, "arena config: %s=%s", name, value);
 		}
 
+        // Do this after loading from DB so our host_rev will always override
+        // one that may or may not be in the DB instead of vice versa.
+        _setArenaDescriptionHostRevision();
 		return true;
 	}
 	catch (std::exception& e)
@@ -190,7 +185,7 @@ _connectGameDB()
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
 			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-			"  `clientTime` timestamp NOT NULL,"
+			"  `clientTime` datetime NULL,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -262,26 +257,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 
 	try
 	{
-		TeulTimeMS entryTime = teulClock64;
-
-#undef TIME_QUERIES
-#ifdef TIME_QUERIES
-		TeulTimeMS startTime;
-
-		teulSyncClock();
-		startTime = teulClock64;
-#endif
-
 		DBQuery q(dbh, "CALL `auth`.`p_get_player_details`(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
-
-#ifdef TIME_QUERIES
-		teulSyncClock();
-
-		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "`auth`.`p_get_player_details` appears to be taking too long: apparent:%" PR64BitUT "ms, actual:%" PR64BitUT "ms"
-							, teulClock64 - entryTime
-							, teulClock64 - startTime);
-#endif
 
 		if ( q.HasRows() == false )
 			throw std::invalid_argument("No such playerID");
@@ -318,14 +294,10 @@ Player::selectPlayer(const playerid_t forPlayerID)
 
 		SetMeteredAccess(details.minuteBalance);
 
-#ifdef TIME_QUERIES
-		teulSyncClock();
-#endif
-		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%" PRPermMaskT " player:%" PRPermMaskT " mb:%u %s took %" PR64BitUT "ms"
+		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%" PRPermMaskT " player:%" PRPermMaskT " mb:%u %s"
 						, teulIndex(), playerID(), callsign(), m_customerID
 						, permissionMask(), m_playerMask
-						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered")
-						, teulClock64 - entryTime);
+						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered"));
 
 		return true;
 	}
@@ -391,22 +363,7 @@ bool mapFillPersonaData(Player* const player)
 
 	try
 	{
-		TeulTimeMS entryTime = teulClock64;
-#ifdef TIME_QUERIES
-		TeulTimeMS startTime;
-		teulSyncClock();
-		startTime = teulClock64;
-#endif
-
 		DBQuery q(dbh, QRY_SELECT_PERSONA_REFRESH, player->personaID(), Server::myServerInfo.stats.arenaID);
-
-#ifdef TIME_QUERIES
-		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %" PR64BitUT "ms, actual %" PR64BitUT "ms"
-							, teulClock64 - entryTime
-							, teulClock64 - startTime
-							);
-#endif
 
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw std::logic_error("No rows for this player/persona");
@@ -432,15 +389,10 @@ bool mapFillPersonaData(Player* const player)
 
 		player->SetMeteredAccess(newMinuteBalance);
 
-#ifdef TIME_QUERIES
-		teulSyncClock();
-#endif
-
 		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
 						, player->minuteBalance()
-						, teulClock64 - entryTime
 						);
 
 		return true;

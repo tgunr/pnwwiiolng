@@ -17,7 +17,7 @@
 --! Victory Condition: Capture X% of the map.
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-VictoryConitions.Condition.percentage_of_map_owned = {
+VictoryConditions.Condition.percentage_of_map_owned = {
 	['Value'] = 10						-- Something we can squeeze stuff around.
 ,	['Rule'] = function (self, side)
 

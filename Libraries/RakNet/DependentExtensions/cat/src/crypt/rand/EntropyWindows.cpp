@@ -186,7 +186,7 @@ void FortunaFactory::PollInvariantSources(int pool_index)
     GetCurrentHwProfileA((LPHW_PROFILE_INFOA)&Sources.hw_profile);
 
     // Windows version
-    Sources.win_ver = GetVersion();
+	Sources.win_ver = 6;
 
     // Registry quota
     GetSystemRegistryQuota(&Sources.reg_quota[0], &Sources.reg_quota[1]);

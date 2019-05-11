@@ -12,7 +12,7 @@
 
 using namespace std;
 
-char const* const GlobalSceneFilename = "media\\combined.gr2";
+char const* const GlobalSceneFilename = "media\\pixo_run_walk.gr2";
 
 // ---------------------------------------------------------
 // Scene instance objects
@@ -78,7 +78,8 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
             return EXIT_FAILURE;
         }
 
-        if (CreateDemoTextures() == false || CreateDemoModels() == false ||
+        if (CreateSimpleTextures(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures) == false ||
+            CreateSimpleModels(g_pD3DDevice, GlobalScene.SceneFileInfo, GlobalScene.Textures, GlobalScene.Models, false)   == false ||
             CreateSharedPoses() == false  || InitCameraAndLights() == false)
         {
             return EXIT_FAILURE;
@@ -92,7 +93,7 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
     assert(GlobalScene.Models.size() == 1);
     assert(GlobalScene.SceneFileInfo->AnimationCount == 2);
     {
-        DemoModel* Model = GlobalScene.Models[0];
+        SimpleModel* Model = GlobalScene.Models[0];
 
         {for(granny_int32x AnimIdx = 0;
              AnimIdx < GlobalScene.SceneFileInfo->AnimationCount;
@@ -190,10 +191,9 @@ INT WINAPI WinMain( HINSTANCE, HINSTANCE, LPSTR, INT )
 
    Also, don't forget that manually constructing these blends gives you maximum
    flexibility (and potential efficiency), but costs you time spent working out and
-   debugging your blend routines.  The Granny Animation Blend Graph ($BlendGraph) can help
-   you quickly and easily construct complex blend trees, so you'll want to check that out
-   as well, $TutorialDAG2 is a good choice for your next step.
- */
+   debugging your blend routines.  Check out the new Granny Animation Studio for a
+   way to graphically assemble your characters!
+*/
 
 /* DEFTUTORIALEND */
 

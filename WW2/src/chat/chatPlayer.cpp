@@ -44,13 +44,13 @@
 #include "server/serverInterface.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverServerInfo.h"
+#include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTypeEnums.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
@@ -927,6 +927,9 @@ Player::isVisibleTo(const Player* viewer, bool ignoreSide) const
 	// GMs can always send to everyone
 	if ( viewer->isGM() )
 		return true;
+	// Training chat can be turned OFF.
+	if (m_trOff)
+		return false;
 	// Non-GMs get "unreachable" when a GM is in GM hide mode
 	if ( isGM() )
 		return ( !m_gmHide );

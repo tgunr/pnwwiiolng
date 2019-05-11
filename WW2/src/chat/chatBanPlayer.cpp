@@ -21,6 +21,8 @@
 #include "chat/chatTimeInterval.h"
 #include "include/mydbQuery.h"
 
+using namespace std::chrono_literals;
+
 struct BAN
 {
 	BAN(const ChatHandle handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle issuerHandle)
@@ -127,30 +129,29 @@ _banSuccess(void* data)
 static void
 _processBan(DB::handle_t* conn, BAN& ban)
 {
-	char* p = nullptr;
 	Chat::Name name(ban.m_handle);
 	Chat::Name issuer(ban.m_issuerHandle);
-	char    *message = nullptr;
 
 	try
 	{
-		mysql_ping(conn);
-
 		dbugLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
-		message = new char[strlen(ban.m_message.c_str())*2 + 1];
-		mysql_real_escape_string(conn, message, ban.m_message.c_str(), ban.m_message.length());
+        std::unique_ptr<char[]> message(new char[strlen(ban.m_message.c_str())*2 + 1]);
+        
+		if (mysql_real_escape_string(conn, message.get(), ban.m_message.c_str(), ban.m_message.length()) == static_cast<unsigned long>(~0)) {
+            throw std::domain_error("mysql escaping error");
+        }
 
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
-		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
+		static constexpr const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
+  
+        std::unique_ptr<char, std::function<void(char*)>> query(
+            threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message.get()),
+            std::free);
 
-		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message);
-		DBQuery q(conn, p);
-
-		delete message;
-		message = nullptr;
+		DBQuery q(conn, query.get());
 
 		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
@@ -163,23 +164,15 @@ _processBan(DB::handle_t* conn, BAN& ban)
 		ban.m_playerID = playerID;
 		ban.m_banNo = q.Row().NextUInt();
 
+        dbugLog(_FLN, "p:%u subj:%s %" PR64BitUT " vs %" PR64BitUT " issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 		threadCallback(_banSuccess, &ban);
-
-		dbugLog(_FLN, "p:%u subj:%s %" PR64BitUT " vs %" PR64BitUT " issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{
-		if (message != nullptr) {
-			delete [] message;
-		}
-
 		ban.m_message = e.what();
+        dbugLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
 		threadCallback(_banFail, &ban);
-		dbugLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
 	}
-
-	if ( p )
-		threadsFreeText(p);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -188,12 +181,26 @@ _processBan(DB::handle_t* conn, BAN& ban)
 void BanThread::dbrun()
 {
 	dbugLog(_FLI, "Ban Queue Thread active");
+	UINT32 banThreadRef = 101;
 
 	while ( !isCancelled() )
 	{
-		auto ban = banQueue.getNext();
-		if (ban)
+		BAN *ban = nullptr;
+		if (!banQueue.getNextWithin(5s, &ban)) 
+		{
+			if (isDBConnectionGone(m_conn)) 
+			{
+				threadsDBReconnect(&m_conn, banThreadRef, this);
+			}
+		} 
+		else 
+		{
 			_processBan(m_conn, *ban);
+			if (isDBConnectionGone(m_conn))
+			{
+				threadsDBReconnect(&m_conn, banThreadRef, this);
+			}
+		}
 	}
 }
 
@@ -211,5 +218,6 @@ void chatStartBanThread()
 void chatCancelBanThread()
 {
 	_banThread.cancel();
+    _banThread.join();
 	banQueue.destroy();
 }

@@ -15,7 +15,6 @@
 #include "wwii/wwiiSerialNumber.h"
 
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"
@@ -1041,7 +1040,7 @@ strtStartNewDay()
 
 	DBThread::Do(DBThread::Default
 					, "INSERT"
-						" INTO `wwiionline`.`wthr_report` (real_start, game_day, start_time, weather_pattern, rain_pattern, weather_forecast)"
+						" INTO `strat`.`wthr_report` (real_start, game_day, start_time, weather_pattern, rain_pattern, weather_forecast)"
 						" VALUES (NOW(), %u, %u, %u, %u, %u)"
 							, g_gameDay
 							, wthrGetGameTime()

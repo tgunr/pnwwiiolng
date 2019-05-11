@@ -42,11 +42,12 @@
 #include "chat/chatUserNLA.h"
 #include "chat/chatHoldFallVote.h"
 #include "chat/chatTimeInterval.h"
+#include "chat/omgChat.h"
 #include "ui/uiMain.h"
 #include "ui/uiChat.h"
-#include "omg/omgChat.hxx"
 #include "sdm/StratDB.h"
 #include "chat/chatDotCommandList.h"
+#include "miss/missionJoinRequest.h"
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
 #include "client/GameClient.h"
@@ -68,6 +69,7 @@ static	TEUL_CALLBACK* _SEND_LOCALITY;
 static	TEUL_CALLBACK* _SEND_RECRUITER_REQUEST;
 
 TEUL_CALLBACK* HoldFallVote::s_callback;
+TEUL_CALLBACK* MissionJoinRequest::callback;
 
 static FULL_OBJ_ID _lastTargetFullObjID = {{0,0},0,0,0};
 
@@ -233,6 +235,11 @@ bool
 AWS::Request::send(SINT32 chatConnection)
 {
 	return ( teulSend(chatConnection, AWS::callback, this) >= 0 );
+}
+
+bool
+MissionJoinRequest::Request::send(SINT32 chatConnection) {
+	return (teulSend(chatConnection, MissionJoinRequest::callback, this) >= 0);
 }
 
 //The actual send function for Messages
@@ -647,6 +654,14 @@ HoldFallVote::~HoldFallVote()
 }
 
 //////////////////////////////////////////////////////////////////////
+// Request/receive info for joining another players' mission
+
+static SINT32 _sendJoinMiss(ACTION_OBJECT* const a) {
+	MissionJoinRequest::Request* request = (MissionJoinRequest::Request*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Send a request for a server tracked object to the host
 
 void
@@ -713,6 +728,8 @@ chatInstallClientCallbacks()
 		REGISTER_SENDRECV(Chat::AWS_Y, _sendAWS, _recvAWS, AWS::callback);
 
 		REGISTER_RECEIVER(Chat::HOLD_FALL_INFO_Y, _recvHoldFallInfo);
+
+		REGISTER_SENDER(Chat::JOIN_MISSION_Y, _sendJoinMiss, MissionJoinRequest::callback);
 
         REGISTER_RECEIVER(Chat::OMG_Y, _recvChatMissionStatus);
 

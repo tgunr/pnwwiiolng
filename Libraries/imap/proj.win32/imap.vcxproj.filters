@@ -28,10 +28,13 @@
     <ClInclude Include="..\src\imapInternals.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\imap.h">
+    <ClInclude Include="..\include\imap\imapTypes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\imapTypes.h">
+    <ClInclude Include="..\include\imap\imap.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\imap\xmlparse.h">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

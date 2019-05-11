@@ -87,4 +87,7 @@ private:
     bool m_isConnecting;
 };
 
-
+// The RakNet headers are extremely fond of polluting global namespaces,
+// including macros. Undef a few of the more egregious disasters.
+#undef INVALID_SOCKET
+#undef SOCKET_ERROR

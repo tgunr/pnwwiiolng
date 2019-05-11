@@ -16,6 +16,8 @@ enum {
 
 	LOGICAL dipInit();
 
+	LOGICAL dipInitJoysticksOnly();
+
 	void dipKillKeyboard();
 	void dipKillMouse();
 	void dipKillJoystick();

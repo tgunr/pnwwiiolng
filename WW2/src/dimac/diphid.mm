@@ -95,7 +95,7 @@ const KEYCODE_MAP_ELEM KEYCODE_MAP[] =
 	{']',				DIK_RBRACKET,		IAC_RIGHTBRACKET,		kHIDUsage_KeyboardCloseBracket},			
 	{'O',				DIK_O,				IAC_O,					kHIDUsage_KeyboardO},						
 	{'U',				DIK_U,				IAC_U,					kHIDUsage_KeyboardU},						
-	{'[',				DIK_LBRACKET,		IAC_LEFTBRACKET,		kHIDUsage_KeyboardOpenBracket},				
+	{'[',				DIK_LBRACKET,		IAC_LEFTBRACKET,		kHIDUsage_KeyboardOpenBracket},
 	{'I',				DIK_I,				IAC_I,					kHIDUsage_KeyboardI},						
 	{'P',				DIK_P,				IAC_P,					kHIDUsage_KeyboardP},						
 	{0,					DIK_Return,			IAC_ENTER,				kHIDUsage_KeyboardReturnOrEnter},			
@@ -270,6 +270,23 @@ LOGICAL dipInit(void)
 	
 	return TRUE;
 }
+
+LOGICAL dimainInitJoysticks()
+{
+
+    return dipSetupJoystick();
+}
+
+void dimainKillJoysticks()
+{
+    // no need to kill anything on mac side, just re-init
+}
+
+void dimainInitTrackIR()
+{
+    // TODO: no support yet for trackIR
+}
+
 
 LOGICAL dipSetupKeyboard(void)
 {	
@@ -541,11 +558,13 @@ LOGICAL dipSetupMouse(void)
 
 void checkIfInFront()
 {
-    pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
-    pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
-    appHidden = !NSApp.active || (runningApp != activeWW2Id);
-    if (appHidden) {
-        lastmouseinit = FALSE;
+    @autoreleasepool {
+        pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
+        pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
+        appHidden = !NSApp.active || (runningApp != activeWW2Id);
+        if (appHidden) {
+            lastmouseinit = FALSE;
+        }
     }
 }
 

@@ -459,7 +459,7 @@ static bool ReadGroup()
 		if(s_conversionFile.length() <= 7)
 		{
 			bTopmostObject = false;
-			if (stricmp(group->id, s_conversionFile.c_str()))
+			if (strcasecmp(group->id, s_conversionFile.c_str()))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
 							group->id, s_conversionFile.c_str());
@@ -549,18 +549,12 @@ static bool ReadVertexCoordinate(void* pvc, piUNIFIED_VERTEX* vertices)
 	fltVERTEXCOORDINATE vc;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vc.colorname	= ShortEndian(vertcoord->colorname);
 	vc.flags		= ShortEndian(vertcoord->flags);
 	vc.x			= DoubleEndian(vertcoord->x);
 	vc.y			= DoubleEndian(vertcoord->y);
 	vc.z			= DoubleEndian(vertcoord->z);
 	vc.color		= LongEndian(vertcoord->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vc.x;
 	pos.y = (float)vc.y;
@@ -588,9 +582,6 @@ static bool ReadVertexNormal(void* pvn, piUNIFIED_VERTEX* vertices)
 	fltVERTEXNORMAL vn;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vn.colorname	= ShortEndian(vertnorm->colorname);
 	vn.flags		= ShortEndian(vertnorm->flags);
 	vn.x			= DoubleEndian(vertnorm->x);
@@ -600,9 +591,6 @@ static bool ReadVertexNormal(void* pvn, piUNIFIED_VERTEX* vertices)
 	vn.j			= FloatEndian(vertnorm->j);
 	vn.k			= FloatEndian(vertnorm->k);
 	vn.color		= LongEndian(vertnorm->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vn.x;
 	pos.y = (float)vn.y;
@@ -635,10 +623,6 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 	fltVERTEXUV vuv;
 	piVECTOR	pos;
 
-
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vuv.colorname	= ShortEndian(vertuv->colorname);
 	vuv.flags		= ShortEndian(vertuv->flags);
 	vuv.x			= DoubleEndian(vertuv->x);
@@ -647,9 +631,6 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 	vuv.u			= FloatEndian(vertuv->u);
 	vuv.v			= FloatEndian(vertuv->v);
 	vuv.color		= LongEndian(vertuv->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vuv.x;
 	pos.y = (float)vuv.y;
@@ -694,10 +675,6 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 	fltVERTEXNORMALUV vnuv;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
-
 	vnuv.colorname	= ShortEndian(vertnormuv->colorname);
 	vnuv.flags		= ShortEndian(vertnormuv->flags);
 	vnuv.x			= DoubleEndian(vertnormuv->x);
@@ -709,10 +686,6 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 	vnuv.u			= FloatEndian(vertnormuv->u);
 	vnuv.v			= FloatEndian(vertnormuv->v);
 	vnuv.color		= LongEndian(vertnormuv->color);
-
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vnuv.x;
 	pos.y = (float)vnuv.y;
@@ -1787,10 +1760,6 @@ static bool ReadDOF()
 		return false;
 	fltDOF& dof = *dofPtr;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
-
 	dof.reserved		= LongEndian(dof.reserved);
 	dof.originx			= DoubleEndian(dof.originx);
 	dof.originy			= DoubleEndian(dof.originy);
@@ -1838,10 +1807,6 @@ static bool ReadDOF()
 	dof.curxscale		= DoubleEndian(dof.curxscale);
 	dof.incxscale		= DoubleEndian(dof.incxscale);
 	dof.flags			= LongEndian(dof.flags);
-
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	if (!CreateLevel(&lpobj))
 	{
@@ -2085,7 +2050,7 @@ static bool ReadLongID()
 			// Make sure we are staring at the same address for topmost
 			if (lastobject == groups[0])
 			{
-				if (stricmp(lastobject->name, s_conversionFile.c_str()))
+				if (strcasecmp(lastobject->name, s_conversionFile.c_str()))
 				{
 					FLTItemFileError("ReadLongID", lastobject->name, s_conversionFile.c_str());
 					return false;
@@ -2316,7 +2281,7 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define SHOWLDMSGS 1
+//#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
 # define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);

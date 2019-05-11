@@ -46,6 +46,7 @@
 #include "chat/chatBrigadeControlList.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatMotds.h"
+#include "chat/omgChat.h"
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
@@ -56,47 +57,22 @@
 #include "strt/strtTypes.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
-#include "omg/omgChat.hxx"
 #include "teul/raknetConn.h"
 
 using namespace ww2;
 
 #include "fio/fio.h"
 
-// How to log something to the WW2_Log.txt file.
-
 void clientErrorLog(const char* const fmt, ...)
 {
-	FILE* fp = Fio::OpenLogFile();
-	if ( fp == nullptr )
-		return;
+    // Inefficient as crud but oh well.
+    va_list args;
+    char *cbuf = nullptr;
+    va_start(args, fmt);
+    vasprintf(&cbuf, fmt, args);
+    std::unique_ptr<char[], std::function<void(void*)>> buf(cbuf, free);
 
-	const time_t now = teulTime();
-	const UINT32 milis = (UINT32)(teulClock64 % 1000ULL);
-	char myTime[49];
-	char myYear[10];
-#if platOS == OS_WIN32
-	tm* myTm = localtime(&now);
-	strftime(myTime, 48, "%a %b %d %X", myTm);
-	strftime(myYear, 9, "%Y", myTm);
-#else
-  struct tm tmStruct;
-	strftime(myTime, 48, "%a %b %d %X", localtime_r(&now, &tmStruct));
-	strftime(myYear, 9, "%Y", localtime_r(&now, &tmStruct));
-#endif
-    if ( myTime[0] == 0 )
-		strcpy(myTime, "unknown");
-
-	fprintf(fp, "[%s.%03u %s] ", myTime, milis, myYear);
-
-	va_list(args);
-	va_start(args, fmt);
-	vfprintf(fp, fmt, args);
-	va_end(args);
-
-	fprintf(fp, "\n");
-
-	fclose(fp);
+    Write_Log(LOG_ERROR, LOG_FATAL, "%s", buf.get());
 }
 
 // default player info
@@ -2929,7 +2905,7 @@ bool ww2::Client::InitTeul(void) {
 
 	char dbugFileName[21];
 	strprintf(dbugFileName, "wwiiClient");
-	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr);
 	if ( err > -1 ) {
 		err = commInstallClientCallbacks() 	|
 			chatInstallClientCallbacks()	|
@@ -3631,10 +3607,12 @@ void HostState::Update()
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connecting", DisplayName());
 			break;
 			case CONNECTED:
-                if (hostType == Teul::Connection::Cell)
-                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(), connection->m_serverAddr.m_hostIP - (parent->connection->m_serverAddr.m_hostIP & 0xff));
-                else
+                if (hostType == Teul::Connection::Cell) {
+                    uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected to %d", DisplayName(),
+                        (connection->m_serverAddr.m_hostIP & 0xff) - (parent->connection->m_serverAddr.m_hostIP & 0xff));
+                } else {
                     uiChatPrintLineColor(colorORANGEALPHA, L"%ls: connected", DisplayName());
+                }
                 break;
 			case FATAL:
 				uiChatPrintLineColor(colorORANGEALPHA, L"%ls: fatal condition", DisplayName());
@@ -3978,10 +3956,12 @@ static void _describeState(const wchar_t* const hostName, std::wstring& into, co
 	SINT32 reason = 0;
 	TeulDeltaMS lastRx_ms = 0;
 	const bool success = Teul::GetEndpointStatus(state->Index(), &reason, &lastRx_ms);
+
 	if ( success == false )
 	{
 		if ( reason < 0 )
 			reason = -reason;
+
 		switch ( reason )
 		{
 		case EINVAL:
@@ -4004,12 +3984,12 @@ static void _describeState(const wchar_t* const hostName, std::wstring& into, co
 		return;
 	}
 
-	if ( lastRx_ms <= 5000 )
+	if ( lastRx_ms <= 5000 ) {
 		into += LocOrStr(L"?network.state.label.ok?", L"-OK-");
-	else
-	{
-		wchar_t lastRx[65];
-		swprintf(lastRx, sizeof(lastRx) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
+	} else {
+		wchar_t lastRx[65] = {0};
+
+		swprintf(lastRx, (sizeof(lastRx) / sizeof(lastRx[0])) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
 		into += lastRx;
 	}
 }
@@ -4030,7 +4010,7 @@ std::wstring clientGetNetworkState()
 	if ( client->CellState()->Connected() && g_lastPing > 0 )
 	{
 		wchar_t ping[65];
-		swprintf(ping, sizeof(ping) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
+		swprintf(ping, (sizeof(ping) / sizeof(ping[0])) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
 		states += ping;
 	}
 	else

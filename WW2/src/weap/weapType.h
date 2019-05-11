@@ -111,6 +111,8 @@ struct weapAmmoType
 	FLOAT32 FuzeTime;
 	FLOAT32 FuseStartSpeedLoss;
 	UINT32	FuzeType; // for variable fuzing
+	
+	FLOAT32 ArmingTime; // for variable arming timers
 
 	FLOAT32 SelfDestructTime;
 
@@ -121,7 +123,7 @@ struct weapAmmoType
 	LOGICAL IsPlaced; // ammo is placed on something to work
 
 	FLOAT32 GrenadeRotateRate;
-	LOGICAL IsSmokeGrenade;
+	SINT32 HasSmoke; // 1 for only smoke, 2 for smoke without disabling other functionality
 
 	LOGICAL UseGhostRoundSTO; // do we use an sto for the ghost round so everyone is sycned up?
 

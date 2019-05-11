@@ -70,8 +70,8 @@ DEBUGDIR="$WWII_ROOT/build/client/Debug/Bin"
 LIBDIR="$WWII_ROOT/Installer/libs"
 RELEASEDIR="$WWII_ROOT/build/client/Release/Bin"
 #RELEASELIBDIR="$WWII_ROOT/Build/lib/Win32/Release"
-PRODUCTS="WW2.exe Playgate.exe"
-DATADIRS="DirectXRedist loc playgate screens"
+PRODUCTS="WW2.exe Playgate.exe Settings.exe"
+DATADIRS="DirectXRedist loc playgate"
 DATAFILES="steam_appid.txt eula.txt license.rtf readme.rtf regions.txt tos.txt wwii1.ico"
 ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
@@ -140,7 +140,7 @@ else
         xcode_version=$(xcodebuild -version)
         version_rsp=(${xcode_version// / })
         version_nums=(${version_rsp[1]//\./ })
-        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor )); then
+        if (( version_nums[0] < min_xcode_version_major ))  || (( version_nums[1] < min_xcode_version_minor  && version_nums[0] == min_xcode_version_major )); then
             exit_msg=${exit_msg}'|Xcode version incorrect, update to version '$min_xcode_version_major'.'$min_xcode_version_minor' or greater' 
             found_prereq_errors=true
         fi
@@ -370,7 +370,7 @@ if [ "$build_patch" = true ] ; then
     winpath2bash "$PREV_RELEASE"
     build_step "copy" "copying" "over previous release for patch from $bashpath"
     if [ "$skip_step" = false ]; then
-        rsync -auv "$bashpath/" "$INSTALLER/previous/"
+        rsync -av "$bashpath/" "$INSTALLER/previous/"
     fi
 fi
 
@@ -527,13 +527,11 @@ if [ "$skip_step" = false ]; then
             exit 1
         fi
     else
-        codesign=''
         if [ "$isrelease" = true ] ; then
             echo "Cleaning build"
             xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' clean PROVISIONING_PROFILE= CODE_SIGN_IDENTITY= WARNING_CFLAGS=-w
-            codesign='Developer ID Application: Playnet Inc (J63A54QWD2)'
         fi
-        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= "CODE_SIGN_IDENTITY=$codesign" WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
+        xcodebuild -project WW2/WW2OL.xcodeproj -scheme $bld_config' Client' build PROVISIONING_PROFILE= WARNING_CFLAGS=-w GCC_PREPROCESSOR_DEFINITIONS='$GCC_PREPROCESSOR_DEFINITIONS '$extradefines
     fi
 fi
 
@@ -550,7 +548,6 @@ if [ "$myos" == "win" ] ; then
             echo "Setting perms on $dstfile"
             chmod 550 $dstfile
         done
-        cp $WWII_ROOT/Installer/previous/Settings.exe $WWII_ROOT/Installer/current/.
         chmod 550 $WWII_ROOT/Installer/current/.
     fi
 
@@ -574,7 +571,7 @@ if [ "$myos" == "win" ] ; then
     if [ "$skip_step" = false ]; then
         for folder in $DATADIRS ; do
             mkdir -p "Installer/current/DATA/$folder"
-            rsync -auv --exclude=".DS_Store" "$WW2MODS/DATA/$folder/" "$INSTALLER/current/DATA/$folder/"
+            rsync -auv --exclude=".DS_Store" "$INSTALLER/Dependencies/$folder/" "$INSTALLER/current/DATA/$folder/"
         done
     fi
 
@@ -601,14 +598,25 @@ if [ "$myos" == "win" ] ; then
         build_step "create" "Creating" "diff files for patcher"
         if [ "$skip_step" = false ]; then
             pushd "$INSTALLER"
-            ./MakeDiffs.bat
+            ./MakeDiffs.bat previous current
             popd
         fi
 
         fname="Installer/$prefix - Patch.iss"
         build_step "build" "Building" "complete running patch install scripts: "$fname
         if [ "$skip_step" = false ]; then
-            iscc "$fname"
+            iscc "$fname" /Dcurr=current /Dprev=previous
+        fi
+        if [ "$skip_step" = false ]; then
+            pushd "$INSTALLER"
+            ./MakeDiffs.bat current previous
+            popd
+        fi
+
+        fname="Installer/$prefix - Patch.iss"
+        build_step "build" "Building" "complete running patch install scripts: "$fname
+        if [ "$skip_step" = false ]; then
+            iscc "$fname" /Dcurr=previous /Dprev=current
         fi
     fi
 
@@ -620,16 +628,13 @@ if [ "$myos" == "win" ] ; then
 else
     build_step "create" "Creating" "dmg file"
     if [ "$skip_step" = false ]; then
-        pushd "WW2/proj/mac/WW2 Release Items/DropDMG"
-        unzip -o DropDMG.zip
-        popd
         mkdir -p "$HOME/Library/Application Support/DropDMG/"{Configurations,Layouts}
         cp 'WW2/proj/mac/WW2 Release Items/DropDMG/Configurations/ww2.plist' "$HOME/Library/Application Support/DropDMG/Configurations"
         cp -r 'WW2/proj/mac/WW2 Release Items/DropDMG/Layouts/ww2' "$HOME/Library/Application Support/DropDMG/Layouts"
         plutil -replace 'content.options.destinationFolder' -string "$( pwd )/Installer/release/macrelease" "$HOME/Library/Application Support/DropDMG/Configurations/ww2.plist"
         app_path='WW2/proj/mac/build/'$bld_config_dir'/'$mac_app_name
         app_path=$(echo $app_path | sed 's/\\//g')
-        WW2/proj/mac/WW2\ Release\ Items/DropDMG/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
+        /Applications/DropDMG.app/Contents/Frameworks/DropDMGFramework.framework/Versions/A/dropdmg --config-name ww2 "$app_path"
     fi
 fi
 

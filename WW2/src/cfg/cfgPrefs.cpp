@@ -12,7 +12,6 @@
 #include "cfg/cfgw2.h"
 #include "ld/ldpix.h"
 #include "pi/pi.h"
-#include "cfg/cfgLoad.h"
 #include "locl/loclLang.h"
 #include "veh/vehIcon.h"
 #include "pi/piinfo.h"
@@ -80,7 +79,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.sound",				&WantedSoundCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedSoundCard) - 1, true	},
 	{"app.bsoundenable",		&bSoundEnable,				cfgPARAM_BOOLEAN,	0,		0,	1, true	},
 	{"app.b3dsoundenable",		&b3DSoundEnable,			cfgPARAM_BOOLEAN,	0,		0,	1, true	},
-	{"app.video",				&WantedVideoCard,			cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoCard) - 1, true	},
+	{"app.video",				&WantedDisplayDevice,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedDisplayDevice) - 1, true	},
 	{"app.resolution",			&WantedVideoResolution,		cfgPARAM_STRING,	0,		0,	(int)sizeof(WantedVideoResolution) - 1, true	},
 	{"app.bnoframerunahead",	&bNoFrameRunahead,			cfgPARAM_BOOLEAN,	0,		0,	1, false	},
 #if platOS == OS_MACOS
@@ -1060,7 +1059,7 @@ void cfgPrefsSetDefaults()
 	gr2DrawFlags = 1;
 #endif
 
-	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "800x600x32");
+	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "0x0x0");
 
 	// special processing gets handled by a call to cfgPrefsSyncGlobals() next
 }
@@ -1081,14 +1080,16 @@ void cfgPrefsSetResolution()
 	strncpy(str, WantedVideoResolution, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedWidth = atoi(str);
+	if ( WantedWidth == 0 )
+		WantedWidth = atoi(str);
 
 	// Height
 	Length = strcspn(WantedVideoResolution + Position, "x");
 	strncpy(str, WantedVideoResolution + Position, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	WantedHeight = atoi(str);
+	if ( WantedHeight == 0 )
+		WantedHeight = atoi(str);
 
 	// Depth
 	Length = strcspn(WantedVideoResolution + Position, "x");

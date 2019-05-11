@@ -251,10 +251,8 @@ void InfantryPredictor::NewMessageReceived(Timestamp timestamp, FrameTime frame)
 //------------------------------------------------------------------------------
 
 void InfantryPredictor::UpdateInterpolation(void) {
-	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) ) {
-		pred_pos = curr_msg;
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) )
 		return;
-	}
 
 	Update to = curr_msg;
 	to.pos += to.vel * ((curr_msg.frametime - pred_pos.frametime) / 1000.0);
@@ -297,8 +295,13 @@ void InfantryPredictor::UpdateInterpolation(void) {
 //==============================================================================
 
 const Update& InfantryPredictor::Interpolate(FrameTime frame) {
-	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) || is_dead || (frame == pred_pos.frametime && ! dirty) )
+	if ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) )
+		return curr_msg;
+
+	if ( is_dead || (frame == pred_pos.frametime && ! dirty) ) {
+		pred_pos.animationFlags = curr_msg.animationFlags;
 		return pred_pos;
+	}
 
 	gr2AnimBitPacker flags(curr_msg.animationFlags);
 
@@ -380,10 +383,9 @@ const Update& InfantryPredictor::Interpolate(FrameTime frame) {
 
 //==============================================================================
 
-// HACK: Used for offline clones
-void InfantryPredictor::ForceSync(void) {
-	NewPosDataUpdate(pred_pos.timestamp, pred_pos.frametime);
-	pred_pos = prev_msg = curr_msg;
+void InfantryPredictor::SetCloneFlags(UINT32 flags_) {
+	assert ( (_vehicle->Flags & VEH_FLAGS_IS_CLONE) );
+	curr_msg.animationFlags = flags_;
 }
 
 //==============================================================================

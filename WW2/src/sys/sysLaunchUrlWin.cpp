@@ -68,7 +68,7 @@ static inline void trim(std::string &s)
 	rtrim(s);
 }
 
-bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response)
+bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPResponse &response, uint64_t &errorCode)
 {
 	// local storage for breaking down the request URL
 	char hostName[100];
@@ -86,25 +86,26 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 	components.dwSchemeLength = sizeof(scheme);
 	HINTERNET base = NULL, conn = NULL, req = NULL;
 	bool success = false;
-	DWORD lastError = 0;
 
 	// organize all calls in a try-catch so open handles can be cleaned up without duplicating too much code
 	try {
 		if (!InternetCrackUrlA(request.url.c_str(), 0, ICU_DECODE, &components))
 		{
-			lastError = GetLastError();
+			errorCode = (1ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Unable to parse URL");
 		}
 
 		HINTERNET base = InternetOpen(WW2PCClient_userAgent.c_str(), INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
 		if (base == NULL)
 		{
+			errorCode = (2ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Unable to get out of the local network");
 		}
 
 		HINTERNET conn = InternetConnectA(base, components.lpszHostName, components.nPort, nullptr, nullptr, INTERNET_SERVICE_HTTP, 0, 0);
 		if (conn == NULL)
 		{
+			errorCode = (3ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Unable to establish a connection");
 		}
 
@@ -123,6 +124,7 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 		HINTERNET req = HttpOpenRequestA(conn, request.method.c_str(), components.lpszUrlPath, nullptr, nullptr, acceptTypes, flags, 0);
 		if (req == NULL)
 		{
+			errorCode = (4ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Unable to open a Http request");
 		}
 
@@ -138,12 +140,13 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 
 		// Use ASCII variant so we don't have to do an extra conversion on the multipart boundary just for the header here.
 		if (!HttpSendRequestA(req, compiledHeaders.c_str(), -1, const_cast<char *>(request.content.c_str()), request.content.length())) {
-			lastError = GetLastError();
+			errorCode = (5ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Send request failed");
 		}
 
 		DWORD status_code = 0, status_code_len = sizeof(status_code);
 		if (!HttpQueryInfo(req, HTTP_QUERY_STATUS_CODE | HTTP_QUERY_FLAG_NUMBER, &status_code, &status_code_len, 0)) {
+			errorCode = (6ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("Unable to get status code");
 		}
 		response.responseCode = static_cast<int>(status_code);
@@ -153,6 +156,7 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 		if (!HttpQueryInfoA(req,
 			HTTP_QUERY_RAW_HEADERS_CRLF, tchHeader, &dwHeaderSize, 0))
 		{
+			errorCode = (7ULL << 32) | static_cast<uint64_t>(GetLastError());
 			throw std::exception("unable to get response headers");
 		}
 		
@@ -184,47 +188,46 @@ bool sysExecuteHTTPRequest(const sysBasicHTTPRequest &request, sysBasicHTTPRespo
 			if (!HttpQueryInfo(req, HTTP_QUERY_CONTENT_LENGTH |
 				HTTP_QUERY_FLAG_NUMBER, &dwLength, &dwLengthSize, 0))
 			{
-				lastError = GetLastError();
+				errorCode = (8ULL << 32) | static_cast<uint64_t>(GetLastError());
 				throw std::exception("unable to get size of content");
 			}
 
-			static char rawResponseBuffer[MAX_RESPONSE_LENGTH];
-			DWORD dwRead;
-			do {
+			DWORD dwRead = 0;
+			do
+			{
+				char rawResponseBuffer[MAX_RESPONSE_LENGTH];
+
+				RtlSecureZeroMemory(rawResponseBuffer, sizeof(rawResponseBuffer));
 				dwRead = 0;
-				if (!InternetReadFile(req, rawResponseBuffer, MAX_RESPONSE_LENGTH, &dwRead) || dwRead == 0)
-				{
+				if (!InternetReadFile(req, rawResponseBuffer, MAX_RESPONSE_LENGTH, &dwRead)) {
+					errorCode = (9ULL << 32) | static_cast<uint64_t>(GetLastError());
+					throw std::exception("unable to read content");
+				}
+				if (dwRead == 0) {
 					break;
 				}
 
 				// Do something with the buffer, and get more data
-				success = true;
-				response.content.append(rawResponseBuffer);
-				rawResponseBuffer[0] = 0;
-
+				response.content.append(rawResponseBuffer, dwRead);
 			} while (dwRead > 0);
 		}
+		success = true;
 	}
 	catch (const std::exception& e)
 	{
 		dbugLog(_FLW, "Exception while executing http request: %s", e.what());
-		if (lastError != 0)
-		{
-			LPVOID lpMsgBuf;
-			FormatMessage(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM |
-				FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				lastError,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-				(LPTSTR)&lpMsgBuf,
-				0, NULL);
-			dbugLog(_FLW, "LastError: %s", lpMsgBuf);
-			LocalFree(lpMsgBuf);
-
-		}
-
+		LPVOID lpMsgBuf;
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM |
+			FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			(DWORD)(errorCode & 0x0FFFFFFFFULL),
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR)&lpMsgBuf,
+			0, NULL);
+		dbugLog(_FLW, "LastError: %s", lpMsgBuf);
+		LocalFree(lpMsgBuf);
 	}
 
 	if (base != NULL) InternetCloseHandle(base);

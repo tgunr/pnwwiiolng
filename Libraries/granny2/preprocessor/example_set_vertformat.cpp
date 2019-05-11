@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/example_set_vertformat.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #15 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 
 
 char const* PWNT3232VertexComponentNames[] = {
@@ -25,6 +24,12 @@ bool ExampleSetVertFormat(input_file&     InputFile,
                           granny_int32x   NumKeyValues,
                           granny_memory_arena* TempArena);
 
+
+static const char* HelpString =
+    (" ExampleSetVertFormat is the tutorial for demonstrating\n"
+     " how to create a custom preprocessor command.  Please read\n"
+     " the description in the Granny documentation for more\n"
+     " information\n");
 
 /* DEFTUTORIAL EXPGROUP(TutorialPreprocessor) (TutorialPreprocessor_Introduction, Introduction) */
 /* This tutorial will show you how to create custom operations that integrate with the
@@ -79,8 +84,6 @@ bool ExampleSetVertFormat(input_file&     InputFile,
 */
 
 
-
-
 /* DEFTUTORIAL EXPGROUP(TutorialPreprocessor) (TutorialPreprocessor_ExampleSetVertFormat, ExampleSetVertFormat) */
 /* A preprocessor command takes only 3 inputs, input file(s), a list of key value
    pairs that you use to setup the command options, and a $memory_arena as a convenience,
@@ -115,10 +118,10 @@ bool ExampleSetVertFormat(input_file&     InputFile,
 */
 
 // Uncomment to enable this command
-// static CommandRegistrar RegExampleSetVertFormat(eSingleFile_NoMultiRun,
-//                                                 ExampleSetVertFormat,
-//                                                 "ExampleSetVertFormat",
-//                                                 "Sets the format of any skinned meshes to granny_pwnt3232_vertex");
+static CommandRegistrar RegExampleSetVertFormat(eSingleFile_NoMultiRun,
+                                                ExampleSetVertFormat,
+                                                "ExampleSetVertFormat",
+                                                "Sets the format of any skinned meshes to granny_pwnt3232_vertex", HelpString);
 
 
 bool ExampleSetVertFormat(input_file&     InputFile,
@@ -134,7 +137,12 @@ bool ExampleSetVertFormat(input_file&     InputFile,
     */
     RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
 
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
+    /* Note that normally you would call $GetFileInfo, but in the preprocessor, there is a
+       small utility that helps when you are using Granny to build a game that supports
+       user mods.  You may safely ignore this in almost all cases.  Either line below will
+       work fine. */
+    // granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
+    granny_file_info* Info = ExtractFileInfo(InputFile);
     if (Info == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input file\n");
@@ -149,15 +157,7 @@ bool ExampleSetVertFormat(input_file&     InputFile,
     for (int i = 0; i < Info->MeshCount; i++)
     {
         granny_mesh* Mesh = Info->Meshes[i];
-        assert(Mesh);
-
-        /* Assume there are no morph targets.  We can modify this easily to support them
-           if required.*/
-        if (GrannyGetMeshMorphTargetCount(Mesh) != 0)
-        {
-            ErrOut("mesh %s contains morph targets, failure!\n", Mesh->Name);
-            return false;
-        }
+        pp_assert(Mesh);
 
         /* When we find a skinned mesh, allocate our array of converted vertices from the
            input $memory_arena.  An arena is essentially just a controllable heap that you
@@ -168,31 +168,60 @@ bool ExampleSetVertFormat(input_file&     InputFile,
            tracking the memory for clean up. */
         if (!GrannyMeshIsRigid(Mesh))
         {
-            granny_int32x const VertexCount = GrannyGetMeshVertexCount(Mesh);
-            granny_pwnt3232_vertex* NewVertices =
-                PushArray(TempArena, VertexCount, granny_pwnt3232_vertex);
+            {
+                granny_int32x const VertexCount = GrannyGetMeshVertexCount(Mesh);
+                granny_pwnt3232_vertex* NewVertices =
+                    PushArray(TempArena, VertexCount, granny_pwnt3232_vertex);
 
-            /* The meat of the command.  Note that if you are changing the number of
-               weights, you should always call $OneNormalizeWeights to make sure that the
-               weights of each vert sum to 1. */
-            GrannyConvertVertexLayouts(VertexCount,
-                                       GrannyGetMeshVertexType(Mesh),
-                                       GrannyGetMeshVertices(Mesh),
-                                       GrannyPWNT3232VertexType,
-                                       NewVertices);
-            GrannyOneNormalizeWeights(VertexCount,
-                                      GrannyPWNT3232VertexType,
-                                      NewVertices);
+                /* The meat of the command.  Note that if you are changing the number of
+                   weights, you should always call $OneNormalizeWeights to make sure that the
+                   weights of each vert sum to 1. */
+                GrannyConvertVertexLayouts(VertexCount,
+                                           GrannyGetMeshVertexType(Mesh),
+                                           GrannyGetMeshVertices(Mesh),
+                                           GrannyPWNT3232VertexType,
+                                           NewVertices);
+                GrannyOneNormalizeWeights(VertexCount,
+                                          GrannyPWNT3232VertexType,
+                                          NewVertices);
 
-            /* Note that I've hardcoded the names of the vertex components, since we know
-               which format we're using, but you can easily make this dynamic. */
-            Mesh->PrimaryVertexData->VertexType = GrannyPWNT3232VertexType;
-            Mesh->PrimaryVertexData->Vertices   = (granny_uint8*)NewVertices;
-            Mesh->PrimaryVertexData->VertexComponentNameCount = PWNT3232NumVertexComponents;
-            Mesh->PrimaryVertexData->VertexComponentNames     = PWNT3232VertexComponentNames;
+                /* Note that I've hardcoded the names of the vertex components, since we know
+                   which format we're using, but you can easily make this dynamic. */
+                Mesh->PrimaryVertexData->VertexType = GrannyPWNT3232VertexType;
+                Mesh->PrimaryVertexData->Vertices   = (granny_uint8*)NewVertices;
+                Mesh->PrimaryVertexData->VertexComponentNameCount = PWNT3232NumVertexComponents;
+                Mesh->PrimaryVertexData->VertexComponentNames     = PWNT3232VertexComponentNames;
+            }
 
             // We can leave the annotation and the VertexCount fields
             // alone, they don't change.
+
+            /* Do the same thing to the morph target's vertex datas.*/
+            for (int MorphIdx = 0; MorphIdx < GrannyGetMeshMorphTargetCount(Mesh); MorphIdx++)
+            {
+                granny_int32x const VertexCount = GrannyGetMeshMorphVertexCount(Mesh,MorphIdx);
+                granny_pwnt3232_vertex* NewVertices =
+                    PushArray(TempArena, VertexCount, granny_pwnt3232_vertex);
+
+                /* The meat of the command.  Note that if you are changing the number of
+                   weights, you should always call $OneNormalizeWeights to make sure that the
+                   weights of each vert sum to 1. */
+                GrannyConvertVertexLayouts(VertexCount,
+                                           GrannyGetMeshMorphVertexType(Mesh,MorphIdx),
+                                           GrannyGetMeshMorphVertices(Mesh,MorphIdx),
+                                           Mesh->PrimaryVertexData->VertexType,
+                                           NewVertices);
+                GrannyOneNormalizeWeights(VertexCount,
+                                          Mesh->PrimaryVertexData->VertexType,
+                                          NewVertices);
+
+                /* Note that I've hardcoded the names of the vertex components, since we know
+                   which format we're using, but you can easily make this dynamic. */
+                Mesh->MorphTargets[MorphIdx].VertexData->VertexType = Mesh->PrimaryVertexData->VertexType;
+                Mesh->MorphTargets[MorphIdx].VertexData->Vertices   = (granny_uint8*)NewVertices;
+                Mesh->MorphTargets[MorphIdx].VertexData->VertexComponentNameCount = Mesh->PrimaryVertexData->VertexComponentNameCount;
+                Mesh->MorphTargets[MorphIdx].VertexData->VertexComponentNames     = Mesh->PrimaryVertexData->VertexComponentNames;
+            }
         }
     }
 
@@ -220,31 +249,31 @@ bool ExampleSetVertFormat(input_file&     InputFile,
         return false;
     }
 
-    granny_file_builder *Builder =
-        GrannyBeginFile(GrannyStandardSectionCount, GrannyCurrentGRNStandardTag,
-                        InputFile.GrannyFile->SourceMagicValue,
-                        GrannyGetTemporaryDirectory(),
-                        "Prefix");
+    /* Next, we're going to use the WriteInfoPreserve interface to output the file simply,
+       but you could use a $file_data_tree_writer to flatten and encode the $file_info
+       hierarchy with full control.  If you need to tightly control sectioning, or other
+       output options, here's the place.  (See $FileManipulation for some examples.) */
+    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile,
+                             true, true, true, TempArena);
 
-    /* Next use a $file_data_tree_writer to flatten and encode the $file_info hierarchy.
-       If you need to tightly control sectioning, or other output options, here's the
-       place.  (See $FileManipulation for some examples.) */
-    granny_file_data_tree_writer *Writer =
-        GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
-                                       GrannyStandardDiscardableSection, 0);
-    GrannyWriteDataTreeToFileBuilder(Writer, Builder);
-    GrannyEndFileDataTreeWriting(Writer);
-
-    bool success = GrannyEndFile(Builder, OutputFile);
-    if (!success)
-    {
-        ErrOut("failed to write to %s\n", OutputFile);
-    }
-
-    return success;
-
-    // Alternative: use the SimpleWriteInfo utility function
-    // return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    // granny_file_builder *Builder =
+    //     GrannyBeginFile(GrannyStandardSectionCount, GrannyCurrentGRNStandardTag,
+    //                     InputFile.GrannyFile->SourceMagicValue,
+    //                     GrannyGetTemporaryDirectory(),
+    //                     "Prefix");
+    //
+    // granny_file_data_tree_writer *Writer =
+    //     GrannyBeginFileDataTreeWriting(GrannyFileInfoType, Info,
+    //                                    GrannyStandardDiscardableSection, 0);
+    // GrannyWriteDataTreeToFileBuilder(Writer, Builder);
+    // GrannyEndFileDataTreeWriting(Writer);
+    //
+    // bool success = GrannyEndFile(Builder, OutputFile);
+    // if (!success)
+    // {
+    //     ErrOut("failed to write to %s\n", OutputFile);
+    // }
+    // return success;
 }
 
 /* DEFTUTORIAL EXPGROUP(TutorialPreprocessor) (TutorialPreprocessor_Summary, Summary) */

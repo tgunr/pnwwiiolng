@@ -1,50 +1,18 @@
 #if !defined(DX9_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/camera_utilities/camera_utilities.h $
-// $DateTime: 2007/01/11 12:51:45 $
-// $Change: 14164 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
 // See .cpp file for details...
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
+#include "simple_model_helper.h"
 #include <d3d9.h>
 #include <vector>
-
-struct DemoTexture
-{
-    char* Name;
-    IDirect3DTexture9* TextureBuffer;
-
-    DemoTexture();
-    ~DemoTexture();
-};
-
-struct DemoMesh
-{
-    granny_mesh*         Mesh;
-    granny_mesh_binding* MeshBinding;
-    std::vector<DemoTexture*> MaterialBindings;
-
-    IDirect3DIndexBuffer9*  IndexBuffer;
-    IDirect3DVertexBuffer9* VertexBuffer;
-
-    DemoMesh();
-    ~DemoMesh();
-};
-
-struct DemoModel
-{
-    granny_model_instance* ModelInstance;
-    std::vector<DemoMesh*>      BoundMeshes;
-
-    granny_real32 InitialMatrix[16];
-
-    DemoModel();
-    ~DemoModel();
-};
 
 struct DemoScene
 {
@@ -53,8 +21,8 @@ struct DemoScene
     granny_file      *SceneFile;
     granny_file_info *SceneFileInfo;
 
-    std::vector<DemoTexture*> Textures;
-    std::vector<DemoModel*>   Models;
+    std::vector<SimpleTexture*> Textures;
+    std::vector<SimpleModel*>   Models;
 
     // For the purposes of this sample, we'll be sampling the model
     // animation immediately before rendering, which allows us to share
@@ -89,12 +57,9 @@ extern const char* MainWindowTitle;
 extern HWND g_hwnd;
 extern bool GlobalRunning;
 
-bool CreateDemoTextures();
-bool CreateDemoModels();
 bool CreateSharedPoses();
 bool InitCamera();
 bool InitLights();
-void RenderModel(DemoModel*);
 void Update(granny_real32 const CurrentTime,
             granny_real32 const DeltaTime);
 
@@ -107,12 +72,6 @@ extern bool DKeyDown;
 // Handy functions.
 bool InitializeD3D();
 void CleanupD3D();
-void SetTransposedMatrix4x4(LPDIRECT3DDEVICE9 D3DDevice,
-                            int ShaderConstant,
-                            float const *Matrix );
-void SetTransposedMatrix4x3(LPDIRECT3DDEVICE9 D3DDevice,
-                            int ShaderConstant,
-                            float const *Matrix );
 
 void Render(int Width, int Height);
 

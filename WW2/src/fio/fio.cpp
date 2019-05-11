@@ -24,33 +24,26 @@ static SINT32 fio_switch;
 
 void fioInit()
 {
-    memset(UserDataPath, 0, sizeof(UserDataPath));
-
 #if platOS == OS_WIN32
-
-	// default to current directory
+	// Default to current directory
 	std::wstring path = L".";
 
-	// TODO: Use FOLDERID_RoamingAppData instead
+	// TODO: Switch to FOLDERID_RoamingAppData
 	wchar_t *docsPath = nullptr;
-	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &docsPath))) {
+	if ( SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &docsPath)) ) {
 		path = docsPath;
+		path += L"\\Battleground Europe\\"; // TODO: Switch to WWIIOL
 		CoTaskMemFree(docsPath);
 	}
 
-	// This used to look in the registry, but it turns out the installer never sets anything interesting for
-	// the registry key in question in the first place, so heck with it, just hardcode the name until it gets
-	// moved to the proper place.
-	path += L"\\Battleground Europe\\";
+	strsafecpy(UserDataPath, path.c_str());
 
 	// Ensure our subdirectory exists
-	CreateDirectory(path.c_str(), nullptr);
-
-	// Save it off as an ASCII path
-	strcpy_s(UserDataPath, std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(path).c_str());
+	CreateDirectory(UserDataPath, nullptr);
 #elif platOS == OS_MACOS
-    strlcpy(UserDataPath, macDocumentsPath(), _MAX_PATH);
-#endif // OS_WIN32
+	// TODO: Need a Mac guy to verify this will work nicely
+	strsafecpy(UserDataPath, macDocumentsPath());
+#endif
 }
 
 
@@ -135,11 +128,8 @@ int fioOpen(const char* const filename)
 	switch(fio_switch)
     {
 		case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			fd = fiodOpen(fn);
-			fiodSetPrepath(nullptr);
-		}
+			WITH ( UsingUserdir() )
+				fd = fiodOpen(fn);
 		break;
         case ISDIRECTORY:
        	default:
@@ -159,13 +149,14 @@ int fioOpen(const char* const filename)
 
 FILE* fioUserFile(const char* filename, const char* mode)
 {
-	std::string path = UserDataPath;
-    path += filename;
-
+	fullpath_t path[PN_MAX_PATH];
+	WITH ( UsingUserdir() )
+		GetFullPath(path, filename);
+	
 #if platOS == OS_WIN32 && defined(_UNICODE)
-    return _wfopen(UTF16(path.c_str()), UTF16(mode));
+	return _wfopen(path, UTF16(mode));
 #else
-	return fopen(path.c_str(), mode);
+	return fopen(path, mode);
 #endif
 }
 
@@ -180,11 +171,8 @@ int fioOpenWrite(const char* filename)
 	switch(fio_switch)
 	{
 		case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			fd = fiodOpenWrite(filename);
-			fiodSetPrepath(nullptr);
-		}
+			WITH ( UsingUserdir() )
+				fd = fiodOpenWrite(filename);
 		break;
 		case ISDIRECTORY:
 			fd = fiodOpenWrite(filename);
@@ -229,12 +217,8 @@ LOGICAL fioModified(SINT32* modified, const char* filename)
     switch(fio_switch)
     {
 		case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			LOGICAL result = fiodModified(modified,filename);
-			fiodSetPrepath(nullptr);
-			return result;
-		}
+			WITH ( UsingUserdir() )
+				return fiodModified(modified,filename);
 		break;
         case ISDIRECTORY:
 		default:
@@ -271,6 +255,38 @@ int fioEOF(int fd)
     }
 }
 
+// Short-cut function to test file for existance with options
+bool fioFileExists(std::string base, std::string suffix, std::string extension)
+{
+	std::string filename = base + suffix + extension;
+	return fioFileExists(filename.c_str());
+}
+
+/************************************************************************************************
+ fioFileExists
+ *************************************************************************************************/
+
+bool fioFileExists(const char* name)
+{
+	switch(fio_switch)
+	{
+		case -1:
+			return false;
+			break;
+		case ISUSERDIRECTORY:
+			WITH ( UsingUserdir() )
+			return fiodFileExists(name);
+			break;
+		case ISDIRECTORY:
+		default:
+			return fiodFileExists(name);
+			break;
+		case ISARCHIVE:
+			return fioaFileExists(name);
+			break;
+	}
+}
+
 /************************************************************************************************
 	fioFileSize
 *************************************************************************************************/
@@ -283,12 +299,8 @@ size_t fioFileSize(const char* name)
 			return -1;
 		break;
         case ISUSERDIRECTORY:
-		{
-			fiodSetPrepath(UserDataPath);
-			size_t size = fiodFileSize(name);
-			fiodSetPrepath(nullptr);
-			return size;
-		}
+			WITH ( UsingUserdir() )
+				return fiodFileSize(name);
 		break;
         case ISDIRECTORY:
         default:
@@ -673,12 +685,13 @@ namespace Fio
 
 	void DeleteLogFile()
 	{
-		std::string path = UserDataPath;
-		path += Fio::LogFileName();
+		fullpath_t path[PN_MAX_PATH];
+		WITH ( UsingUserdir() )
+			GetFullPath(path, Fio::LogFileName());
 #if platOS == OS_WIN32
-		_unlink(path.c_str());
+		_wunlink(path);
 #else
-		unlink(path.c_str());
+		unlink(path);
 #endif
 	}
 

@@ -50,8 +50,8 @@ static DebugLogger _logger;
 const char* errorTypes[] = {
 	"F",		// fatal error detected, exit program
 	"A",		// error detected, operation aborted
-	"M",		// error detected, routine recovered, operation continues
 	"W",		// possible error detected, operation continues
+    "M",        // error detected, routine recovered, operation continues
 	"N",		// note, operation continues
 	"I",		// informational message
 	"D",		// debug level message
@@ -119,7 +119,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
         return;
 
 	// Already qualified.
-	if ( filename[0] == '.' || filename[0] == '/' || filename[0] == '\\' || filename[1] == ':' )
+#if platOS == OS_WIN32
+    if ( filename[0] == '\\' || (isalpha(filename[0]) && filename[1] == ':' && filename[2] == '\\')  ) // yes, this is short-string-safe
+#else
+	if ( (filename[0] == '.' && filename[1] == '/') || filename[0] == '/' )
+#endif
 		strsafecpy(output, filename, outputSize);
 	else
 	{
@@ -131,11 +135,7 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
-#if platOS == OS_WIN32
-			snprintf(output, outputSize, "%s\\%s", defaultPath, filename);
-#else
-			snprintf(output, outputSize, "%s/%s", defaultPath, filename);
-#endif
+			snprintf(output, outputSize, "%s%c%s", defaultPath, OS_PATHSEP_C, filename);
 			return;
 		}
 
@@ -356,8 +356,6 @@ void dbugInit(LogMode logMode, const char* const filename)
 	}
 #endif
 
-    teulSyncClock();
-
     if ( file >= 0 ) {
         dbugLog(_FLM, "%s", _OPEN_MSG);
         dbugLog(_FLM, "Version: %s (%s%s, %s)", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, PN_build_platform_string);
@@ -484,7 +482,7 @@ SINT32	dbugGetErrno()
 }
 
 // OS-provided basename() on POSIX systems is bad.
-static const char* sane_basename(const char* const filepath) noexcept
+const char* sane_basename(const char* const filepath) noexcept
 {
 	const char* slash = strrchr(filepath, '\\');
 	if (PN_UNLIKELY(!slash))

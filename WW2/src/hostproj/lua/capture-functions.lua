@@ -77,22 +77,22 @@ local P = {
 	-- Maximum number of people we bother tabulating
 ,	maxCapContributors = 12
 	-- After max contributors, points is based on a target time
-,	minCaptureTime = 30
+,	minCaptureTime = 60
 	-- Table of target times for a given number of players
 ,	captureTimeTable =
 	{
-		180		-- 1 guy
-	,	112		-- 2
-	,	102		-- 3
-	,	 93		-- 4
-	,	 83		-- 5
-	,	 74		-- 6
-	,	 65		-- 7
-	,	 56		-- 8
-	,	 47		-- 9
-	,	 38		-- 10
-	,	 30		-- 11
-	,	 30		-- 12
+		225		-- 1 guy
+	,	205		-- 2
+	,	180		-- 3
+	,	160		-- 4
+	,	135		-- 5
+	,	120		-- 6
+	,	105		-- 7
+	,	90		-- 8
+	,	 90		-- 9
+	,	 75		-- 10
+	,	 60		-- 11
+	,	 60		-- 12
 	}
 }
 
@@ -298,41 +298,27 @@ end
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
--- Calculate a scaling factor based on population
---    NOTE: Overpopulated side currently gets no adverse scaling
+-- Calculate scaling factor based on population
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
 function P.ProgressScaleForSide(side)
-	local underPopRateMap = {{0.4, 1.5}, {0.5, 1.4}, {0.6, 1.3}, {0.7, 1.2}, {0.8, 1.1}}
-
 	local axisPop = chatGetPopulation(AXIS)
 	local alliedPop = chatGetPopulation(ALLIED)
 
-	-- Return no scaling for the overpopulated side
-	if ( ((axisPop > alliedPop) and (side == AXIS) ) or ((alliedPop > axisPop) and (side == ALLIED))) then
-		return 1.0
-	end
-
-	local under = math.min(axisPop, alliedPop)
 	local over = math.max(axisPop, alliedPop)
-
-	-- protect against DIV0
-	if (over == 0) then
+	local under = math.min(axisPop, alliedPop)
+	if ( under == 0 ) then
 		return 1.0
 	end
+	local overpop = over / under;
 
-	local perc = under / over
 
-	local rate = 1.0
-	for i = 1, #underPopRateMap, 1 do
-		if perc <= underPopRateMap[i][1] then
-			rate = underPopRateMap[i][2]
-			break
-		end
+	if ( ((axisPop > alliedPop) and (side == AXIS) ) or ((alliedPop > axisPop) and (side == ALLIED)) ) then
+		return math.max(1.0 - (overpop - 1.0), 0.5)
+	else
+		return math.min(overpop, 1.5)
 	end
-
-	return rate
 end
 
 ----------------------------------------------------------------------

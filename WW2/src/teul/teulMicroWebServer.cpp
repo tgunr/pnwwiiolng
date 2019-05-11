@@ -17,25 +17,12 @@
 #include <fcntl.h>
 #include "fio/fio.h"
 
-#if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
+#if __has_include(<sys/sendfile.h>)
 #include <sys/sendfile.h>
 #endif
 
-#if platOS != OS_WIN32
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <poll.h>
-#define PATH_SEPARATOR "/"
-
-#else
-
-#include <winsock2.h>
-#pragma comment(lib, "event.lib")
+#if platOS == OS_WIN32
 #pragma comment(lib, "ws2_32.lib")
-#define poll(...) WSAPoll(__VA_ARGS__)
-#define PATH_SEPARATOR "\\"
-
 #endif
 
 #ifndef O_BINARY
@@ -162,7 +149,7 @@ std::string URLDecode(const std::string &input)
     while ((loc = result.find_first_of('%', loc)) != std::string::npos) {
         std::string escape = result.substr(loc + 1, 2);
         uint8_t highNibble = 0, lowNibble = 0;
-        
+
         if (escape.length() == 2 && hexToBin(escape[0], highNibble) && hexToBin(escape[1], lowNibble)) {
             result.replace(loc, 3, std::string(1, ((highNibble & 0x0f) << 4) | (lowNibble & 0x0f)));
         } else {
@@ -181,7 +168,7 @@ struct WebError
     {
         if (!error_) {
             std::unordered_map<int, std::string>::const_iterator it = s_knownResponseCodes.find(m_code);
-            
+
             if (it != s_knownResponseCodes.end()) {
                 m_error = it->second;
             }
@@ -202,11 +189,11 @@ class HTTPRequestHeaderReader
 {
     public:
         HTTPRequestHeaderReader(HTTPRequest &request);
-    
+
         bool readMoreData(const std::string &data); // return true if found terminating \r\n\r\n, pass empty data for EOF, throw exception on error
         size_t getBytesUsed() const;
         void validateRequest() const; // Throw exception on error
-    
+
     private:
         HTTPRequest &m_request;
         std::string m_parseBuffer;
@@ -226,7 +213,7 @@ bool HTTPRequestHeaderReader::readMoreData(const std::string &data)
             throw WebError(400); \
         } \
     } while (0)
-    
+
     // If we got EOF, there's nothing to yield for, throw bad request immediately
     #define yield_if(cond) do { \
         bad_request_if(data.length() == 0); \
@@ -234,49 +221,49 @@ bool HTTPRequestHeaderReader::readMoreData(const std::string &data)
             return false; \
         } \
     } while (0)
-    
+
     m_parseBuffer += data; // Yes this is an "unnecessary" data copy, but it makes things a lot easier.
-    
+
     // Parse method
     if (m_request.method == "") {
         std::string::size_type nextWhitespace = m_parseBuffer.find_first_of(' ', m_parsePointer);
-        
+
         yield_if(nextWhitespace == std::string::npos); // No whitespace found yet
         bad_request_if(nextWhitespace == m_parsePointer); // Whitespace is next character
         m_request.method = m_parseBuffer.substr(m_parsePointer, nextWhitespace - m_parsePointer);
         m_parsePointer = nextWhitespace + 1;
     }
-    
+
     // Parse path
     if (m_request.path == "") {
         std::string::size_type nextWhitespace = m_parseBuffer.find_first_of(' ', m_parsePointer);
-        
+
         yield_if(nextWhitespace == std::string::npos);
         bad_request_if(nextWhitespace == m_parsePointer);
         m_request.path = m_parseBuffer.substr(m_parsePointer, nextWhitespace - m_parsePointer);
         m_parsePointer = nextWhitespace + 1;
     }
-    
+
     // Parse version
     if (m_request.version == "") {
         std::string::size_type nextCrlf = m_parseBuffer.find("\r\n", m_parsePointer);
-        
+
         yield_if(nextCrlf == std::string::npos);
         bad_request_if(nextCrlf == m_parsePointer);
         m_request.version = m_parseBuffer.substr(m_parsePointer, nextCrlf - m_parsePointer);
         m_parsePointer = nextCrlf + 2;
     }
-    
+
     // Parse headers - need this extra state variable here because "no headers" is a valid HTTP/1.0 request
     // (therefore orderedHeaders.size() == 0 is not a sufficient check)
     while (!m_seenHeaderTerminator) {
         std::string::size_type nextCrlf = m_parseBuffer.find("\r\n", m_parsePointer);
-        
+
         yield_if(nextCrlf == std::string::npos);
         if (nextCrlf == m_parsePointer) {
             m_seenHeaderTerminator = true;
         }
-        
+
         std::string rawHeader = m_parseBuffer.substr(m_parsePointer, nextCrlf - m_parsePointer);
 
         m_parsePointer = nextCrlf + 2;
@@ -285,22 +272,22 @@ bool HTTPRequestHeaderReader::readMoreData(const std::string &data)
             break;
         }
         ABORT_IF_EX(m_seenHeaderTerminator, "How can we have marked headers as terminated but have a non-empty header?");
-        
+
         std::string::size_type separatorPos = rawHeader.find(": ");
-        
+
         bad_request_if(separatorPos == std::string::npos || separatorPos == 0); // Missing or empty header name
-        
+
         std::string headerName = rawHeader.substr(0, separatorPos);
         std::string headerValue = rawHeader.substr(separatorPos + 2);
         std::string lowerHeaderName;
-        
+
         std::transform(headerName.begin(), headerName.end(), std::back_inserter(lowerHeaderName), [] (char c) { return tolower(c); });
         m_request.orderedHeaders.push_back(rawHeader);
         m_request.headers.insert({ lowerHeaderName, headerValue });
     }
-    
+
     return m_seenHeaderTerminator;
-    
+
     #undef yield_if
     #undef bad_request_if
 }
@@ -318,7 +305,7 @@ size_t HTTPRequestHeaderReader::getBytesUsed() const
 void HTTPRequestHeaderReader::validateRequest() const
 {
     // Well-formedness checks
-    
+
     // Method must be purely alphabetical
     if (m_request.method.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") != std::string::npos) {
         throw WebError(400);
@@ -380,7 +367,8 @@ class HTTPRequestBodyReader
 {
     public:
         HTTPRequestBodyReader() : m_bufferedBody() {}
-    
+        virtual ~HTTPRequestBodyReader() {}
+
         virtual bool readMoreData(const std::string &data) = 0; // return true if body complete, pass empty data for "EOF received", throw exception on error
         std::string &getFinalRequestBody() { return m_bufferedBody; } // Purposely not const so main request parser can move instead of copy
         virtual size_t getUsedBytes() const = 0;
@@ -393,6 +381,7 @@ class HTTPBlindRequestBodyReader : public HTTPRequestBodyReader
 {
     public:
         HTTPBlindRequestBodyReader() : HTTPRequestBodyReader(), m_seenBytes(0) {}
+        virtual ~HTTPBlindRequestBodyReader() override {}
         virtual bool readMoreData(const std::string &data) override {
             m_bufferedBody += data;
             m_seenBytes += data.length();
@@ -411,12 +400,13 @@ class HTTPDefinedRequestBodyReader : public HTTPRequestBodyReader
         virtual bool readMoreData(const std::string &data) override {
             if (data.length() > 0) {
                 size_t meaningfulLength = m_definedLength - m_bufferedBody.length();
-                
+
                 m_bufferedBody += data.substr(0, std::min(meaningfulLength, data.length()));
             }
             ABORT_IF_EX(m_bufferedBody.length() > m_definedLength, "Someone made a math error, actual buffered data should never exceed desired amount");
             return m_bufferedBody.length() == m_definedLength;
         }
+        virtual ~HTTPDefinedRequestBodyReader() override {}
         virtual size_t getUsedBytes() const override { return m_definedLength; }
     private:
         size_t m_definedLength;
@@ -429,6 +419,7 @@ class HTTPChunkedRequestBodyReader : public HTTPRequestBodyReader
         HTTPChunkedRequestBodyReader() :
             HTTPRequestBodyReader(),
             m_state(State::ReadingChunkSize), m_parseBuffer(), m_parsePointer(0), m_currentChunkLength(0) {}
+        virtual ~HTTPChunkedRequestBodyReader() override {}
         virtual bool readMoreData(const std::string &data) override;
         virtual size_t getUsedBytes() const override { return m_parsePointer; } // used bytes != result length in chunked encoding
     private:
@@ -462,13 +453,13 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
     // production code". Don't believe me? Here's the bibliography:
     // http://www.chiark.greenend.org.uk/~sgtatham/coroutines.html
     // http://brainwagon.org/2005/03/05/coroutines-in-c/#comment-1878
-    
+
 	#define bad_request_if(cond) do { \
 		if ((cond)) { \
 			throw WebError(400); \
 		} \
 	} while (0)
-	
+
 	// If we got EOF, there's nothing to yield for, throw bad request immediately
 	#define yield_if(cond) do { \
 		bad_request_if(data.length() == 0); \
@@ -476,22 +467,22 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
 			return false; \
 		} \
 	} while (0)
-	
+
     static const std::string HTTPHexDigChars = "ABCDEFabcdef0123456789"; // "HEXDIG" ABNF
 	static const std::string HTTPTokenChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%^'*+-.^_`|-"; // "tchar" ABNF
 	static const std::string HTTPQDChars = "\t !#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"; // "qdchar" ABNF
-	
+
 	m_parseBuffer += data;
 	while (m_parsePointer < m_parseBuffer.length()) {
 		switch (m_state) {
 			case State::ReadingChunkSize: { //1*HEXDIG
 				std::string::size_type nextNonhex = m_parseBuffer.find_first_not_of(HTTPHexDigChars, m_parsePointer);
-				
+
 				yield_if(nextNonhex == std::string::npos);
 				bad_request_if(nextNonhex == m_parsePointer);
 				bad_request_if(m_parseBuffer[nextNonhex] != ';' && m_parseBuffer[nextNonhex] != '\r');
 				ABORT_IF_EX(nextNonhex < m_parsePointer, "Can't seek backwards!");
-				
+
 				m_currentChunkLength = std::stoull(m_parseBuffer.substr(m_parsePointer, nextNonhex - m_parsePointer), nullptr, 16);
 				m_parsePointer = nextNonhex;
 				if (m_parseBuffer[nextNonhex] == ';') {
@@ -504,12 +495,12 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
 			case State::ReadingChunkExtensionName: { //*( ";" chunk-ext-name [ "=" chunk-ext-val ] )
 				ABORT_IF_EX(m_parseBuffer[m_parsePointer] != ';', "State machine shouldn't get here without a ; showing");
 				std::string::size_type nextToken = m_parseBuffer.find_first_not_of(HTTPTokenChars, m_parsePointer + 1);
-				
+
 				yield_if(nextToken == std::string::npos);
 				bad_request_if(nextToken == m_parsePointer + 1);
 				bad_request_if(m_parseBuffer[nextToken] != '=' && m_parseBuffer[nextToken] != ';' && m_parseBuffer[nextToken] != '\r');
 				ABORT_IF_EX(nextToken < m_parsePointer + 1, "Can't seek backwards!");
-				
+
 				// We don't recognize any chunk extensions, spec says ignore them
 				dbugLog(_FLD, "uWebServerClient: Ignoring chunk-extension with name %s", m_parseBuffer.substr(m_parsePointer + 1, nextToken - m_parsePointer - 1).c_str());
 				m_parsePointer = nextToken;
@@ -525,12 +516,12 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
 			case State::ReadingChunkExtensionValue: { //token / quoted-string
 				ABORT_IF_EX(m_parseBuffer[m_parsePointer] != '=', "State machine shouldn't get here without an = showing");
                 std::string::size_type nextToken = m_parseBuffer.find_first_not_of(HTTPTokenChars, m_parsePointer + 1);
-                
+
                 yield_if(nextToken == std::string::npos);
                 bad_request_if(m_parseBuffer[nextToken] != '"' && m_parseBuffer[nextToken] != ';' && m_parseBuffer[nextToken] != '\r');
                 bad_request_if(m_parseBuffer[nextToken] == '"' && nextToken != m_parsePointer + 1);
                 ABORT_IF_EX(nextToken < m_parsePointer + 1, "Can't seek backwards");
-                
+
                 // We don't recognize any chunk extensions, spec says ignore them
                 if (m_parseBuffer[nextToken] != '"') {
                     dbugLog(_FLD, "uWebServerClient: Ignore chunk-ext with value %s", m_parseBuffer.substr(m_parsePointer + 1, nextToken - m_parsePointer - 1).c_str());
@@ -549,7 +540,7 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
 				ABORT_IF_EX(m_parseBuffer[m_parsePointer] != '"', "State machine shouldn't get here without a \" showing");
 				yield_if(m_parsePointer == m_parseBuffer.length() - 1);
 				std::string::size_type nextNonQD = m_parsePointer;
-				
+
 				do {
 					nextNonQD = m_parseBuffer.find_first_not_of(HTTPQDChars, nextNonQD + 1);
 					yield_if(nextNonQD == std::string::npos);
@@ -602,7 +593,7 @@ bool HTTPChunkedRequestBodyReader::readMoreData(const std::string &data)
 			}
 			case State::ReadingChunkTrailers: { //*( header-field CRLF )
 				std::string::size_type nextCrlf = m_parseBuffer.find("\r\n", m_parsePointer);
-				
+
 				yield_if(nextCrlf == std::string::npos);
 				if (nextCrlf == m_parsePointer) {
 					m_state = State::ReadingChunkEnding;
@@ -648,18 +639,18 @@ bool HTTPRequestParser::parseMoreData(const std::string &data)
             return false; \
         } \
     } while (0)
-    
+
     #define bad_request_if(cond) do { \
         if ((cond)) { \
             throw WebError(400); \
         } \
     } while (0)
-    
+
     m_bytesSoFar += data.length();
     dbugLog(_FLD, "uWebServerClient: Parser parsing %zu bytes data", data.length());
-    
+
     std::string::size_type dataStart = 0;
-    
+
     // All state cases are fallthrough - the only purpose of the state machine
     // is to compensate for the lack of a true "yield" primitive (this not being
     // a coroutine). This is a very simple linear progression.
@@ -671,10 +662,10 @@ bool HTTPRequestParser::parseMoreData(const std::string &data)
         case State::ParsingHeaders: {
             yield_if(!m_headersParser->readMoreData(data));
             m_headersParser->validateRequest();
-            
+
             auto transferEncoding = m_request.headers.find("transfer-encoding");
             auto contentLength = m_request.headers.find("content-length");
-            
+
             if (transferEncoding != m_request.headers.end()) {
                 bad_request_if(contentLength != m_request.headers.end());
                 bad_request_if(transferEncoding->second != "chunked"); // we should eventually support gzip,compress,deflate and multiple TEs
@@ -685,11 +676,11 @@ bool HTTPRequestParser::parseMoreData(const std::string &data)
             } else {
                 m_bodyParser = std::make_unique<HTTPBlindRequestBodyReader>();
             }
-            
+
             ABORT_IF_EX(m_headersParser->getBytesUsed() > m_bytesSoFar, "Headers parsing can't use more bytes than have been received!");
             std::string::size_type leftoverBytes = m_bytesSoFar - m_headersParser->getBytesUsed();
             ABORT_IF_EX(leftoverBytes > data.length(), "It should not be possible to have more bytes leftover from parsing headers than the most recent buffer.");
-            
+
             dataStart = data.length() - leftoverBytes;
             m_state = State::ParsingBody;
             FALLTHROUGH;
@@ -754,7 +745,7 @@ HTTPResponseBuilder &HTTPResponseBuilder::status(int responseCode, const std::st
     m_response.responseCode = responseCode;
     if (statusMessage == "") {
         std::unordered_map<int, std::string>::const_iterator it = s_knownResponseCodes.find(responseCode);
-        
+
         if (it != s_knownResponseCodes.end()) {
             m_response.statusMessage = it->second;
         } else {
@@ -787,7 +778,7 @@ HTTPResponseBuilder &HTTPResponseBuilder::content(const std::string &data, bool 
     } else {
         m_response.responseData = data;
     }
-    
+
     if (!suppressAutoContentLength) {
         return this->header("Content-Length", std::to_string(m_response.responseData.length()), true);
     } else {
@@ -808,7 +799,7 @@ HTTPResponseBuilder &HTTPResponseBuilder::file(const std::string &filePath, bool
         if (extLoc != std::string::npos) {
             std::string ext = filePath.substr(extLoc);
             auto it = std::find_if(s_mimeMap.begin(), s_mimeMap.end(), [&ext] (const auto &kv) { return strcasecmp(kv.first.c_str(), ext.c_str()) == 0; });
-            
+
             if (it != s_mimeMap.end()) {
                 this->header("Content-Type", it->second);
             } else {
@@ -874,8 +865,12 @@ bool Client::pollSocket()
     // https://msdn.microsoft.com/en-us/library/windows/desktop/ms741669(v=vs.85).aspx says:
     // "If the POLLPRI flag is set on a socket for the Microsoft Winsock provider, the WSAPoll function will fail."
     pollfd pfd{ m_clientSock, POLLIN, 0 };
+#if platOS != OS_WIN32
     int pollResult = poll(&pfd, 1, 100);
-    
+#else
+    int pollResult = WSAPoll(&pfd, 1, 100);
+#endif
+
     if (pollResult == SOCKET_ERROR) {
         // If the error was "try again" or "oops, syscall interrupt", just poll again
         if (dbugGetErrno() != EAGAIN && dbugGetErrno() != EINTR) {
@@ -886,7 +881,7 @@ bool Client::pollSocket()
     } else if (pollResult == 0) {
         return false;
     }
-    
+
     // This is really just here for yucks. No one uses URG. What do you think
     // this is, FTP? Telnet? Also we didn't set POLLPRI above because Windows.
     if ((pfd.revents & POLLPRI) != 0) {
@@ -899,38 +894,38 @@ bool Client::pollSocket()
         cancel();
         return false;
     }
-    
+
     if ((pfd.revents & POLLNVAL) != 0) {
         dbugLog(_FLW, "uWebServerClient: " PRF_SOCKET " is invalid? Giving up.", static_cast<SOCKET>(m_clientSock));
         cancel();
         return false;
     }
-    
+
     if ((pfd.revents & POLLERR) != 0) {
         dbugLog(_FLW, "uWebServerClient: Received socket-level error notification on " PRF_SOCKET ", closing", static_cast<SOCKET>(m_clientSock));
         cancel();
         return false;
     }
-    
+
     if ((pfd.revents & POLLHUP) != 0) {
         dbugLog(_FLD, "uWebServerClient: Received transport-layer disconnect on " PRF_SOCKET, static_cast<SOCKET>(m_clientSock));
         return true; // DON'T cancel here! EOF is not an immediate shutdown condition, especially in Connection: close HTTP/1.0, return true to process an EOF buffer
     }
-    
+
     // Oh, and just for good measure...
     if ((pfd.revents & POLLRDNORM) == 0 && (pfd.revents & POLLIN) == 0) {
         dbugLog(_FLM, "uWebServerClient: poll() on " PRF_SOCKET " returned with no data and no timeout? What?", static_cast<SOCKET>(m_clientSock));
         cancel();
         return false;
     }
-    
+
     return true;
 }
 
 size_t Client::readData()
 {
     ssize_t recvResult = recv(m_clientSock, &m_transferBuffer[0], m_transferBuffer.length(), 0);
-    
+
     if (recvResult < 0) {
         dbugLog(_FLI, "uWebServerClient: recv error %d on " PRF_SOCKET ", closing", dbugGetErrno(), static_cast<SOCKET>(m_clientSock));
         cancel();
@@ -940,7 +935,7 @@ size_t Client::readData()
         dbugLog(_FLD, "uWebServerClient: received EOF on " PRF_SOCKET, static_cast<SOCKET>(m_clientSock));
         return 0;
     }
-    
+
     // We already checked that the result is greater than zero, and it is
     // guaranteed that sizeof(size_t) >= sizeof(ssize_t), so this cast is safe.
     return static_cast<size_t>(recvResult);
@@ -949,7 +944,7 @@ size_t Client::readData()
 void Client::handleData(size_t nbytes)
 {
     HTTPResponse response;
-    
+
     try {
         if (!m_requestParser.parseMoreData(m_transferBuffer)) {
             if (nbytes == 0) {
@@ -960,16 +955,16 @@ void Client::handleData(size_t nbytes)
 
         // Got a complete request
         Server::VirtualHandlerEntry handler = m_owner.client_findHandlerForRequest(m_requestParser.getRequest());
-        
+
         ABORT_IF_EX(!handler.handler, "No handler, not even the default one?");
         handler.handler(m_requestParser.getRequest(), response);
-        
+
         checkForCancellation();
         sendResponse(response); // Sending a file-based response can throw errors
         dbugLog(_FLD, "uWebServerClient: Client %d sent %d for %s %s",
             static_cast<SOCKET>(m_clientSock), response.responseCode,
             m_requestParser.getRequest().method.c_str(), m_requestParser.getRequest().path.c_str());
-        
+
         if (m_requestParser.getRequest().version == "HTTP/1.1") {
             // HTTP/1.1 defaults to keep-alive and closes with Connection: close or blind request body
             auto it = m_requestParser.getRequest().headers.find("connection");
@@ -1027,25 +1022,25 @@ void Client::handleData(size_t nbytes)
 void Client::run()
 {
     m_currentRequestStart = std::chrono::steady_clock::now();
-    
+
     while (!isCancelled()) {
         if ((std::chrono::steady_clock::now() - m_currentRequestStart) > std::chrono::seconds(10)) { \
             dbugLog(_FLD, "uWebServerClient: request timeout (10 seconds) on " PRF_SOCKET " exceeded", static_cast<SOCKET>(m_clientSock));
             cancel();
             break;
         }
-        
+
         if (!pollSocket()) {
             continue;
         }
         checkForCancellation();
         m_transferBuffer.resize(2048, '\0');
-        
+
         size_t nbytes = readData();
-        
+
         checkForCancellation();
         m_transferBuffer.resize(nbytes);
-        
+
         if (nbytes > 0) {
             m_currentRequestStart = std::chrono::steady_clock::now(); // we got data, reset timeout
         }
@@ -1058,7 +1053,7 @@ static int _processAndOpenResponseFile(const std::string &rootPath, const std::s
 {
     int filefd = -1;
     struct stat sbuf;
-    
+
 #if platOS == OS_WIN32
     // Ironically, the place where path length limits are the biggest
     // problem - Windows - is also the place where there're no *at() APIs to
@@ -1069,7 +1064,7 @@ static int _processAndOpenResponseFile(const std::string &rootPath, const std::s
 #else
     // Both MacOS (>= 10.10) and Linux have openat()
     int dirfd = open(rootPath.c_str(), O_RDONLY | O_DIRECTORY);
-    
+
     if (dirfd < 0) {
         dbugLog(_FLW, "uWebServerClient: Failed to open server root directory %s: %d", rootPath.c_str(), errno);
         throw WebError(404);
@@ -1081,7 +1076,7 @@ static int _processAndOpenResponseFile(const std::string &rootPath, const std::s
         dbugLog(_FLI, "uWebServerClient: Failed to open virtual path %s: %d", virtualPath.c_str(), errno);
         throw WebError(404);
     }
-    
+
     if (fstat(filefd, &sbuf) < 0) {
         dbugLog(_FLA, "uWebServerClient: Succeeded at opening file %s but couldn't stat it because %d??", virtualPath.c_str(), errno);
         close(filefd);
@@ -1107,7 +1102,7 @@ static void _tryClientSend(int sock, const void *buffer, size_t buflen)
 #endif
 
     ssize_t sendResult = send(sock, reinterpret_cast<const char *>(buffer), buflen, 0);
-    
+
     // Blocking socket = no need to check for partial send (well, close enough)
     if (sendResult < static_cast<ssize_t>(buflen)) { // Already range-checked the length so this won't underflow
         throw SendFailureError();
@@ -1120,7 +1115,7 @@ static void _tryClientSendFile(int sock, const Fio::FD &filefd, off_t filesize)
     // Oh, and TransmitFile() is useless because it doesn't exist on Windows 7.
     char transferBuffer[4096];
     int readBytes = 0;
-    
+
     // Upside-down loop!
     do {
         if (readBytes > 0) {
@@ -1134,7 +1129,7 @@ static void _tryClientSendFile(int sock, const Fio::FD &filefd, off_t filesize)
     }
 #elif platOS == OS_MACOS
     off_t sent = filesize;
-    
+
     // Annoying BSD and its completely different signature and semantics for sendfile()...
     // I mean come on, the fd and sock arguments in flipped order!?
     if (sendfile(filefd, sock, 0, &sent, nullptr, 0) < 0 && sent < filesize) {
@@ -1157,24 +1152,24 @@ void Client::sendResponse(const HTTPResponse &response)
         dbugLog(_FLA, "uWebServerClient: Response has no status message");
         throw WebError(500);
     }
-    
+
     try {
         Fio::FD filefd;
         off_t fileSize = -1;
-        
+
         if (response.responseVirtualFilePath.length() > 0) {
             // Lots of special handling for file sends
-            if (response.responseVirtualFilePath[0] != PATH_SEPARATOR[0]) {
+            if (response.responseVirtualFilePath[0] != OS_PATHSEP[0]) {
                 dbugLog(_FLA, "uWebServerClient: Virtual file paths must always start with the path separator");
                 throw WebError(500);
             }
             filefd.assign(_processAndOpenResponseFile(m_owner.rootPath(), response.responseVirtualFilePath, fileSize));
         }
-        
+
         // This would be a great place for llvm::Twine(), 'cause doing this with raw
         // std::strings is a bit inefficient.
         std::string responseStr = response.version + " " + std::to_string(response.responseCode) + " " + response.statusMessage + "\r\n";
-        
+
         for (const std::string &hdr : response.orderedHeaders) {
             if (strncasecmp(hdr.c_str(), "Content-Length:", sizeof("Content-Length:") - 1) == 0 && filefd) {
             	continue;
@@ -1188,7 +1183,7 @@ void Client::sendResponse(const HTTPResponse &response)
         }
         responseStr += "\r\n";
         _tryClientSend(m_clientSock, responseStr.c_str(), responseStr.length());
-        
+
         if (response.responseData.length() > 0) {
             _tryClientSend(m_clientSock, response.responseData.c_str(), response.responseData.length());
         }
@@ -1208,7 +1203,7 @@ static SOCKET _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
 	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-    
+
 	if (sock == INVALID_SOCKET) {
 		dbugLog(_FLA, "uWebServer terminated: unable to open listenSock [" PRF_SOCKET ", %d]", sock, errno);
 		return sock;
@@ -1223,13 +1218,13 @@ static SOCKET _establishListenSocket(const unsigned short port_)
 	// Describe our end of the socket we want:
 	//  IPv4 (AF_INET), all addresses (INADDR_ANY) and the specified port.
 	sockaddr_in addr;
-    
+
 	addr.sin_family = AF_INET;
 	addr.sin_addr.s_addr = INADDR_ANY;
 	addr.sin_port = htons(port_);
 
 	int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr));
-	
+
     if (bindResult < 0) {
 		dbugLog(_FLA, "uWebServer terminated: unable to bind listenSock on port %hu [" PRF_SOCKET ", %d]", port_, sock, errno);
 		OS_CLOSESOCKET(sock);
@@ -1237,7 +1232,7 @@ static SOCKET _establishListenSocket(const unsigned short port_)
 	}
 
 	int listenResult = listen(sock, 16);
-    
+
 	if (listenResult < 0) {
 		dbugLog(_FLA, "uWebServer terminated: unable to set listen socket to listening on port %hu [" PRF_SOCKET ", %d]", port_, sock, bindResult);
 		OS_CLOSESOCKET(sock);
@@ -1287,7 +1282,11 @@ void Server::run()
 
     while (!isCancelled()) {
         reap();
+#if platOS != OS_WIN32
         switch (poll(&listen_pollfd, 1, 100)) {
+#else
+        switch (WSAPoll(&listen_pollfd, 1, 100)) {
+#endif
             case 0: // timeout
                 continue;
             case SOCKET_ERROR:
@@ -1301,22 +1300,22 @@ void Server::run()
 
 		socklen_t sockLen = sizeof(addr);
 		SOCKET newSock = accept(m_listenSock, reinterpret_cast<sockaddr *>(&addr), &sockLen);
-        
+
 		if (newSock < 0) {
             checkForCancellation(OS_CLOSESOCKET(newSock));
             dbugLog(_FLI, "uWebServer error on accept: %d (%d)", newSock, errno);
 			continue;
 		}
-        
+
         std::unique_ptr<Client> client = std::make_unique<Client>(*this, newSock);
         {
             std::lock_guard<std::mutex> lock(m_clientList_mutex);
             auto it = m_clientList.insert(m_clientList.end(), std::move(client));
-            
+
             (*it)->start(it);
         }
 	}
-    
+
     // Destroy all clients
     {
         std::lock_guard<std::mutex> lock(m_clientList_mutex);
@@ -1328,7 +1327,7 @@ void Server::run()
 void Server::reap()
 {
     std::lock_guard<std::mutex> lock(m_clientList_mutex);
-    
+
     reap_unlocked();
 }
 
@@ -1340,7 +1339,7 @@ void Server::reap_unlocked()
 void Server::client_unregisterClient(ClientList::iterator &client)
 {
     std::lock_guard<std::mutex> lock(m_clientList_mutex);
-    
+
     // Defunct list is required because otherwise a client would try to delete
     // itself while still running on its own thread.
     m_defunctClientList.splice(m_defunctClientList.end(), m_clientList, client);
@@ -1361,22 +1360,22 @@ void Server::indexHandler(const HTTPRequest &request, HTTPResponse &response)
 void Server::physicalHandler(const HTTPRequest &request, HTTPResponse &response)
 {
     ABORT_IF_EX(request.path.length() < 1, "Request path should never be empty, something's wrong in the request parser");
-    
+
     if (request.path[0] != '/') {
         throw WebError(400);
     }
     if (request.method != "GET") {
         throw WebError(405);
     }
-    
+
     std::string::size_type separatorLoc = request.path.find_first_of("#?");
     std::string rawVirtualPath = request.path.substr(0, separatorLoc); // substr(0,npos) returns whole string
-    
+
     // Disallow encoded path separator in path
     if (rawVirtualPath.find("%2F") != std::string::npos || rawVirtualPath.find("%2f") != std::string::npos) {
         throw WebError(400);
     }
-    
+
     std::vector<std::string> componentizedVirtualPath = split_string(rawVirtualPath, "/");
     std::vector<std::string> decodedVirtualPathComponents;
     std::transform(componentizedVirtualPath.begin(), componentizedVirtualPath.end(), std::back_inserter(decodedVirtualPathComponents),
@@ -1386,13 +1385,13 @@ void Server::physicalHandler(const HTTPRequest &request, HTTPResponse &response)
         std::string(), [] (const std::string &a, const std::string &b) { return a + (a.length() ? "/" : "") + b; }
     );
     std::string sanitizedVirtualPath = string_replace(decodedVirtualPath, "/../", "");
-    
+
     if (sanitizedVirtualPath.rfind("/..") == sanitizedVirtualPath.length() - 3) {
         sanitizedVirtualPath = sanitizedVirtualPath.substr(0, sanitizedVirtualPath.length() - 3);
     }
-    
-    std::string platformVirtualPath = string_replace(sanitizedVirtualPath, "/", PATH_SEPARATOR);
-    
+
+    std::string platformVirtualPath = string_replace(sanitizedVirtualPath, "/", OS_PATHSEP);
+
     // The actual check for a 404 won't happen until the sender routines attempt
     // to send the response.
     return HTTPResponseBuilder(request)
@@ -1406,20 +1405,20 @@ Server::VirtualHandlerEntry Server::client_findHandlerForRequest(const HTTPReque
 {
     {
         std::shared_lock<std::shared_timed_mutex> lock(m_config_mutex);
-        
+
         // Try exact path match first, since that's a simple hash lookup. My
         // kingdom for C++17's if (auto foo = ...) construct.
         for (auto it = m_virtualFileHandlers.find(request.path); it != m_virtualFileHandlers.end(); ) {
             return it->second;
         }
-        
+
         // No match by exact path, iterate looking for longest matching prefix.
         // There is a 100% chance there's a more efficient data structure for
         // dealing with this lookup (think trie), but that's more trouble than
         // it's worth for this usage.
         VirtualHandlers::iterator longestMatch = m_virtualFileHandlers.end();
         std::string::const_iterator::difference_type longestMatchLength = 0;
-        
+
         for (auto it = m_virtualFileHandlers.begin(), end = m_virtualFileHandlers.end(); it != end; ++it) {
             if (!it->second.prefixMatch) {
                 continue; // Not a prefix match handler, don't even try
@@ -1427,10 +1426,10 @@ Server::VirtualHandlerEntry Server::client_findHandlerForRequest(const HTTPReque
             if (it->first.length() > request.path.length()) {
                 continue; // The request path is shorter than the prefix to match; this check also makes it safe to use std::mismatch() in C++11 mode
             }
-            
+
             auto mismatchLoc = std::mismatch(it->first.begin(), it->first.end(), request.path.begin(), request.path.end());
             auto matchLength = std::distance(it->first.begin(), mismatchLoc.first);
-            
+
 #ifndef NDEBUG
             ABORT_IF_EX(static_cast<std::string::size_type>(matchLength) >= request.path.length(), "Exact match not found by hash lookup?");
 #endif
@@ -1453,7 +1452,7 @@ void Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHan
 {
 	std::unique_lock<std::shared_timed_mutex> lock(m_config_mutex);
 	m_virtualFileHandlers[path_] = VirtualHandlerEntry{ handler_, false, desc_ };
-    
+
     m_resourceList.erase(m_resourceList.end() - 1);
 	if (m_resourceList.length() > 2) {
         m_resourceList += ",";
@@ -1465,7 +1464,7 @@ void Server::addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFil
 {
 	std::unique_lock<std::shared_timed_mutex> lock(m_config_mutex);
 	m_virtualFileHandlers[prefix_] = VirtualHandlerEntry{ handler_, true, desc_ };
-    
+
     m_resourceList.erase(m_resourceList.end() - 1);
 	if (m_resourceList.length() > 2) {
         m_resourceList += ",";
@@ -1474,19 +1473,14 @@ void Server::addVirtualPrefix(std::string desc_, std::string prefix_, VirtualFil
 }
 
 //////////////////////////////////////////////////////////////////////
-#ifndef NDEBUG
-#define status_if(cond, stat, ...) do { \
-    if ((cond)) { \
-        return HTTPResponseBuilder(request) \
-            .status(stat, ## __VA_ARGS__) \
-            .header("Connection", "close") \
-            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
-            .build(response); \
-    } \
-} while(0)
-#else
-#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
-#endif
+static inline void rest_status_if(bool condition, unsigned int code, const char * const additional)
+{
+    if (!condition) {
+        return;
+    }
+    dbugLog(_FLD, "uWebServerRESTClient: Returning status %d: %s", code, additional);
+    throw WebError(code);
+}
 
 static std::vector<std::string> _getURLPathComponents(const std::string &requestPath)
 {
@@ -1496,12 +1490,12 @@ static std::vector<std::string> _getURLPathComponents(const std::string &request
 void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAPIRouteList &routes)
 {
     std::vector<std::string> components = _getURLPathComponents(request.path);
-    
+
     // Verify API path
-    status_if(components.size() < 3, 400, "Not enough path components (3)");
-    status_if(components[0] != "", 400, "How did you get here with no /?");
-    status_if(components[1] != "v1", 400, "How did you get here with no version?");
-    
+    rest_status_if(components.size() < 3, 400, "Not enough path components (3)");
+    rest_status_if(components[0] != "", 400, "How did you get here with no /?");
+    // Second component was implicitly verified by the virtual prefix handler
+
     // Basic RESTful routing (not very smart yet)
     RESTAPIRoute bestMatchingRoute;
     size_t bestMatchingRouteScore = 0;
@@ -1512,13 +1506,13 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
         bool routeMatch = true;
         size_t routeScore = 0;
         RESTAPIParams routeParams = nlohmann::json::object();
-        
+
         if (std::find(route.allowedMethods.begin(), route.allowedMethods.end(), request.method) == route.allowedMethods.end()) { continue; }
         if (routeComponents.size() != components.size() - 1) { continue; }
-        status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
+        rest_status_if(routeComponents.size() < 2 || routeComponents[0] != "", 500, "Bad route in route table");
         for (size_t i = 1; i < routeComponents.size(); ++i) {
             const std::string &component = routeComponents[i];
-            
+
             if (component.length() > 2 && component.front() == '{' && component.back() == '}') {
                 routeParams[component.substr(1, component.length() - 2)] = components[i + 1];
             } else if (component != components[i + 1]) {
@@ -1534,34 +1528,31 @@ void RESTRouter(const HTTPRequest &request, HTTPResponse &response, const RESTAP
             bestMatchingRouteParams = routeParams;
         }
     }
-    status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
-    status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
-    
-    status_if(request.requestData.size() > 0 &&
-              (request.headers.find("content-type") == request.headers.end() ||
-              request.headers.at("content-type") != "application/json"), 400, "Request data must be JSON");
-    
+    rest_status_if(bestMatchingRouteScore == 0, 404, "No matching routes"); // A matching route must always have at least one non-parameterized path component
+    rest_status_if(!bestMatchingRoute.handler, 501, "Unimplemented route");
+
     nlohmann::json requestParams = nlohmann::json::object();
+
     if (request.requestData.size() > 0) {
+        auto contentType = request.headers.find("content-type");
+
+        rest_status_if(contentType == request.headers.end(), 400, "Request with data must have a Content-type");
+        rest_status_if(!has_prefix(contentType->second, "application/json"), 400, "Request data must be JSON");
+
         try {
             requestParams = nlohmann::json::parse(request.requestData);
-        } catch (std::invalid_argument &e) {
-            status_if(true, 400, "Bad JSON");
+        } catch (nlohmann::json::parse_error &e) {
+            rest_status_if(true, 400, "Bad JSON");
         }
     }
-    status_if(!requestParams.is_object(), 400, "Request JSON must be object");
-    
+    rest_status_if(!requestParams.is_object(), 400, "Request JSON must be object");
+
     for (nlohmann::json::iterator it = bestMatchingRouteParams.begin(); it != bestMatchingRouteParams.end(); ++it) {
-        status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
-        // Technically this is more of an ABORT_IF, but what the hey.
+        rest_status_if(requestParams.find(it.key()) != requestParams.end(), 400, "Request JSON can't have a parameter matching a name in the route parameters");
         requestParams[it.key()] = it.value();
     }
-    
-    try {
-        return bestMatchingRoute.handler(request, response, requestParams);
-    } catch (std::domain_error &) {
-        status_if(true, 400, "JSON contained invalid type");
-    }
+
+    return bestMatchingRoute.handler(request, response, requestParams);
 }
 
 //////////////////////////////////////////////////////////////////////

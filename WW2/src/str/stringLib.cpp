@@ -162,3 +162,61 @@ std::string strtrim(const std::string &str)
 
     return str.substr(snwspos, (enwspos + 1) - snwspos);
 }
+
+#if platOS == OS_WIN32
+int vasprintf(char **result, const char *fmt, va_list args)
+{
+    size_t len = static_cast<size_t>(_vscprintf(fmt, args));
+    if (len >= INT_MAX) { return -1; }
+    *result = reinterpret_cast<char *>(calloc(1, len + 1));
+    vsnprintf_s(*result, len + 1, _TRUNCATE, fmt, args);
+    return (int)len;
+}
+#endif
+
+#if platOS == OS_LINUX
+#include <openssl/evp.h>
+#include <openssl/bio.h>
+#include <openssl/buffer.h>
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+    BIO *base64_filter = BIO_new(BIO_f_base64());
+    BIO_set_flags(base64_filter, BIO_FLAGS_BASE64_NO_NL);
+
+    BIO *buffer_bio = BIO_new(BIO_s_mem());
+    
+    BIO_push(base64_filter, buffer_bio);
+    BIO_write(base64_filter, buffer, bufferLength);
+    BIO_flush(base64_filter);
+    
+    char *data = nullptr;
+    long length = BIO_get_mem_data(buffer_bio, &data);
+    std::string result(data, static_cast<size_t>(length));
+    
+    BIO_free_all(base64_filter);
+    return result;
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+    BIO *buffer_bio = BIO_new(BIO_s_mem());
+    BIO_write(buffer_bio, input.data(), input.length());
+
+    BIO *base64_filter = BIO_new(BIO_f_base64());
+    BIO_push(base64_filter, buffer_bio);
+    BIO_set_flags(base64_filter, BIO_FLAGS_BASE64_NO_NL);
+    
+    int readAmount = BIO_read(base64_filter, outputBuffer, static_cast<int>(*ioBufferLength));
+    
+    BIO_free_all(base64_filter);
+    
+    if (readAmount > 0) {
+        *ioBufferLength = static_cast<size_t>(readAmount);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+#endif

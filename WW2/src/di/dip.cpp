@@ -60,11 +60,12 @@ HRESULT				dirval;
 		return TRUE;
 	}
 
-	// Manage the DirectInput Object
+	// Create a DirectInput Object
+	// You should create a single DirectInput object and not release it until the application terminates.
 	dirval = DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpdi, nullptr);
 	if (dirval != DI_OK)
 	{
-		Write_Debug("Could not create a direct input device");
+		Write_Debug("Could not create a DirectInput Object");
 		return FALSE;
 	}
 
@@ -115,6 +116,58 @@ HRESULT				dirval;
 	return TRUE;
 }
 
+LOGICAL dipInitJoysticksOnly()
+{
+	HRESULT	dirval;
+
+	if (lpdi == nullptr)
+	{
+		Write_Debug("Joystick Init failed, DirectInput object isn't initialized (0x%x)", lpdi);
+		return FALSE;
+	}
+
+	dirval = lpdi->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&joyconfig8);
+	numjoysticks = 0;
+
+	if (dirval == DI_OK)
+	{
+		int index = 0;
+		dirval = -1;
+
+		for (int i = 0; i < MAX_JOYSTICKS; i++)
+		{
+			index = i;
+			dirval = joyconfig8->GetConfig(index, &joystickconfigs[index], DIJC_GUIDINSTANCE);
+
+			if (dirval != DI_OK)
+				continue;
+
+			numjoysticks++;
+		}
+
+		joyconfig8->Release();
+	}
+
+	numdidi = 0;
+	dirval = DIError(lpdi->EnumDevices(0, (LPDIENUMDEVICESCALLBACK)DIEnumDevicesProc, nullptr, DIEDFL_ATTACHEDONLY));
+	if (dirval != DI_OK)
+	{
+		Write_Debug("Enumeration of direct input devices failed");
+		return FALSE;
+	}
+
+	Write_Debug("Direct Input Devices");
+	for (int i = 0; i < numdidi; i++)
+	{
+		Write_Debug("%d - Name: %s, Product: %s", i, uiUTF16toUTF8(didi[i].tszInstanceName), uiUTF16toUTF8(didi[i].tszProductName));
+		DIDeviceDetails(didi[i].dwDevType);
+	}
+
+	numjsd = 0;
+
+	return TRUE;
+}
+
 
 // Always unacquire the device before calling Release().
 void dipKillKeyboard()
@@ -151,7 +204,6 @@ static void KillJoystick(SINT32 number)
 }
 
 
-// Always unacquire the device before calling Release().
 void dipKillJoystick()
 {
 SINT32		i;
@@ -777,6 +829,7 @@ LOGICAL dipSetupJoystick()
             continue;
         }
 
+		// Loop through all detected devices.
         for(int q = 0; q < numdidi; q++)
         {
             if(IsEqualGUID(didi[q].guidInstance, joystickconfigs[i].guidInstance))

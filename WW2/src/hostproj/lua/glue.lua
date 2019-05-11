@@ -557,10 +557,10 @@ function blowFirebase(targetFB)
 end
 
 ----------------------------------------------------------------------
--- Blow a firebase
+-- Open a firebase
 
 gluehelp['openFirebase'] = "(fb) Closes the opposing firebase"
-function blowFirebase(targetFB)
+function openFirebase(targetFB)
  local fb = getFacility(targetFB)
  if fb == nil then return error("Invalid FB " .. targetFB) end
  if fb.type ~= FACILITY_FIREBASE then

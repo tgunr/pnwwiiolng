@@ -38,6 +38,7 @@
 #include "math/matheul.h"
 #include "math/mathUnitConversion.h"
 #include "math/mathvect.h"
+#include "miss/missionJoinRequest.h"
 #include "ml/mlCompon.h"
 #include "ml/mlgauges.h"
 #include "ml/mlutility.h"
@@ -63,7 +64,6 @@
 #include "sdm/StratDB.h"
 #include "spt/sptmain.h"
 #include "str/stringLib.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulKit.h"
 #include "tools/lightTool.h"
 #include "trn/speedgrass.h"
@@ -120,6 +120,14 @@ namespace Chat { extern HostCommands g_hostDotCommands; }
 #ifdef GR2_BLEND_EDITOR
 #include "pers/pershud.h"
 #endif
+
+namespace {
+	// FEEDBACK: Bad callsign '%s'
+	static SINT32 _badCallsign(const std::wstring& input) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str());
+		return DC_HANDLED;
+	}
+}
 
 /************************************************************************************************
 	uiDotCommand
@@ -365,7 +373,7 @@ static SINT32 dot_help(const wchar_t* line)
 
 			for(; itr != _dotCommands.end(); ++itr)
 			{
-				if(itr->second.locCmd && wstrncasecmp(cmd, itr->second.locCmd, DOT_COMMAND_SIZE) == 0)
+				if(itr->second.locCmd && wcsncasecmp(cmd, itr->second.locCmd, DOT_COMMAND_SIZE) == 0)
 					break; // found one!
 			}
 		}
@@ -389,7 +397,7 @@ static SINT32 dot_help(const wchar_t* line)
 
 				std::wstring hostCommand = UTF16(info.command.c_str());
 
-				if(wstrncasecmp(cmd, hostCommand.c_str(), DOT_COMMAND_SIZE) == 0)
+				if(wcsncasecmp(cmd, hostCommand.c_str(), DOT_COMMAND_SIZE) == 0)
 				{
 					const std::wstring& usage = uiLocString((const char*)loclLangGetString(IDE_LANG_HOST, (UINT32)info.usage));
 
@@ -584,6 +592,38 @@ static SINT32 dot_fuze(const char* line)
 #endif
 
 /************************************************************************************************
+	Join mission by callsign
+*************************************************************************************************/
+
+static SINT32 dot_join(const char* line)
+{
+	if ( ! Online ) return DC_HANDLED;
+	if ( uiInGame() ) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"Cannot /join while in game");
+		return DC_HANDLED;
+	}
+
+	ARGV argv(line, 1, false);
+	if ( argv.argc != 1 ) {
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/join <callsign>");
+		return DC_HANDLED;
+	}
+
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( handle == 0LL )
+		return _badCallsign(argv[1]);
+
+	MissionJoinRequest::Request request(handle);
+	request.send(PlayerClient()->ChatConnection());
+
+	return DC_HANDLED;
+}
+
+static SINT32 dot_j(const char* line) {
+	return dot_join(line);
+}
+
+/************************************************************************************************
 	Mission Auto Leader
 *************************************************************************************************/
 
@@ -596,7 +636,7 @@ static SINT32 dot_autoleader(const char* line)
 
 	if(argc > 0)
 	{
-		autoleader = (!stricmp(onoff, "on")) ? true: false;
+		autoleader = (!strcasecmp(onoff, "on")) ? true: false;
 		cfgPrefsSetGlobal(cfgAUTO_LEADER, &autoleader, true);
 	}
 
@@ -609,13 +649,6 @@ static SINT32 dot_autoleader(const char* line)
 /************************************************************************************************
 	Squad Management Commands
 *************************************************************************************************/
-
-// FEEDBACK: Bad callsign '%s'
-static SINT32 _badCallsign(const std::wstring& input)
-{
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str());
-	return DC_HANDLED;
-}
 
 static SINT32 dot_recruit(const char* line)
 {
@@ -651,7 +684,7 @@ static SINT32 dot_recruiting(const char* line)
 
 		if(argc > 0)
 		{
-			recruiting = (!stricmp(onoff, "on")) ? true: false;
+			recruiting = (!strcasecmp(onoff, "on")) ? true: false;
 			cfgPrefsSetGlobal(cfgIS_RECRUITING, &recruiting, true);
 			uiRunScript("game.onchangerecruiting()");
 		}
@@ -1039,7 +1072,7 @@ static SINT32 dot_graduate(const char* line)
 	// set it if specified
 	if(argc > 0)
 	{
-		if(!stricmp(group, "true"))
+		if(!strcasecmp(group, "true"))
 		{
 			const char* groups[] = { "infantry", "armor", "fighter" };
 
@@ -1050,7 +1083,7 @@ static SINT32 dot_graduate(const char* line)
 
 			uiChatPrintLine("Basic training is compulsory, all other tutorial groups have been set to complete.");
 		}
-        else if (!stricmp(group, "false"))
+        else if (!strcasecmp(group, "false"))
         {
             const char* groups[] = { "basic", "infantry", "armor", "fighter" };
 
@@ -1487,7 +1520,7 @@ static SINT32 dot_vspawn(const char* line)
 				{
 					gr2AnimBitPacker bp = gr2AnimBitPacker(veh->AnimationBits);
 					bp.useAltTrooperMesh = 1;
-					veh->interpolator.SetFlags(bp.pack());
+					veh->interpolator.SetCloneFlags(bp.pack());
 					/*
 					veh->AnimationBits = bp.pack();
 					veh->VehicleObjectData->PlaneObject->animModel->SetFlag(gr2AnimTrooper::USE_ALT_MODEL);
@@ -1761,7 +1794,7 @@ static int dot_conn(const char* line)
 
 	ww2::HostState* state = PlayerClient()->GetHostStateByType(type);
 
-	if(!stricmp(command, "report"))
+	if(!strcasecmp(command, "report"))
 	{
 		uiChatPrintLine(L"%s index is %d", PlayerClient()->MapState()->DisplayName(), PlayerClient()->MapState()->Index());
 		uiChatPrintLine(L"%s index is %d", PlayerClient()->ChatState()->DisplayName(), PlayerClient()->ChatState()->Index());
@@ -1772,7 +1805,7 @@ static int dot_conn(const char* line)
 		uiChatPrintLine("Invalid host state specified!");
 		return DC_HANDLED;
 	}
-	else if(!stricmp(command, "lock"))
+	else if(!strcasecmp(command, "lock"))
 	{
 		state->active = !state->active;
 
@@ -1781,20 +1814,20 @@ static int dot_conn(const char* line)
 		else
 			uiChatPrintLine(L"%ls state is NOT active!", state->DisplayName());
 	}
-	else if(!stricmp(command, "disco"))
+	else if(!strcasecmp(command, "disco"))
 	{
 		uiChatPrintLine(L"Disconnecting %ls state with error code %d!", state->DisplayName(), error);
 		state->Disconnect(error);
 	}
-	else if(!stricmp(command, "error") && state->connection)
+	else if(!strcasecmp(command, "error") && state->connection)
 	{
 		uiChatPrintLine(L"Erroring %ls state with error code %d!", state->DisplayName(), error);
 		((ClientHostConnection*)state->connection)->SetError(PlayerClient(), error);
 	}
-	else if(!stricmp(command, "close") && state->connection)
+	else if(!strcasecmp(command, "close") && state->connection)
 	{
 		uiChatPrintLine(L"Closing %ls state!", state->DisplayName());
-		teulClose(state->Index(), error);
+		teulClose(state->Index());
 	}
 
     return DC_HANDLED;
@@ -2025,7 +2058,7 @@ static SINT32 dot_gr2debug(const char* line)
 
 		for(int i = 0; i < 8; i++)
 		{
-			if(!stricmp(flags[i], flag))
+			if(!strcasecmp(flags[i], flag))
 			{
 				UINT32 mask = (1<<i);
 
@@ -2158,7 +2191,7 @@ static SINT32 dot_imapkey(const char* line)
 
 static SINT32 dot_discohost(const char* line)
 {
-	teulClose(PlayerClient()->CellConnection(), Teul::Closing::DiscoCell);
+	teulClose(PlayerClient()->CellConnection());
 	return DC_HANDLED;
 }
 
@@ -2168,7 +2201,7 @@ static SINT32 dot_discohost(const char* line)
 
 static SINT32 dot_discochat(const char* line)
 {
-	teulClose(PlayerClient()->ChatConnection(), Teul::Closing::DiscoChat);
+	teulClose(PlayerClient()->ChatConnection());
 	return DC_HANDLED;
 }
 
@@ -2665,7 +2698,7 @@ static SINT32 dot_exhaust(const char* line)
 
     sscanf(line, "%*s%s", szBuff);
 
-    bOn = !_stricmp(szBuff, "on");
+    bOn = !strcasecmp(szBuff, "on");
 
     for(i = 0; i < ML_MAX_ENGINES; i++)
     {
@@ -2814,7 +2847,7 @@ static SINT32 dot_tree(const char* line)
 
     sscanf(p, "%d %s", &index, onoff);
 
-    sptDrawOn(index, !_stricmp(onoff, "on"));
+    sptDrawOn(index, !strcasecmp(onoff, "on"));
 
     return DC_HANDLED;
 }
@@ -3106,14 +3139,14 @@ static int dot_whereami(const char* line)
 		char options[25+1];
 		sscanf(line, "%*s %25s", options);
 
-		if(stricmp(options, "save") == 0)
+		if(strcasecmp(options, "save") == 0)
 		{
 			// auto add this to our clipboard
 			wchar_t clipboard[128+1];
 			swprintf(clipboard, 128, L"%.2f %.2f %.2f", veh->PosData.Pos.x, veh->PosData.Pos.y, veh->PosData.Pos.z);
 			piinfoClipboard(clipboard);
 		}
-		else if(stricmp(options, "saveall") == 0)
+		else if(strcasecmp(options, "saveall") == 0)
 		{
 			// auto add this to our clipboard
 			wchar_t clipboard[128+1];
@@ -4157,7 +4190,7 @@ static SINT32 dot_tspawn(const char* input)
 #if platOS != OS_MACOS
 static SINT32 dot_heightmap(const char* in)
 {
-    extern void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, const char* filename);
+    extern void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, wchar_t* filename);
 
     char model[128] = {0};
     int res = 0;
@@ -4219,7 +4252,7 @@ static SINT32 dot_heightmap(const char* in)
         pos.x() = x;
     }
 
-    ddpSaveImgAsBitmap(img, res, res, "heightmap.bmp");
+    ddpSaveImgAsBitmap(img, res, res, L"heightmap.bmp");
 
     return DC_HANDLED;
 }
@@ -5714,7 +5747,7 @@ static SINT32 dot_scenario(const char* line)
 
 	sscanf(line, "%*s %25s %255s %u %u %u", command, argument, &team, &round, &stage);
 
-	if(!stricmp(command, "start"))
+	if(!strcasecmp(command, "start"))
 	{
 		uiChatPrintLine("Starting scenario: %s as team %d", argument, team);
 
@@ -5775,12 +5808,12 @@ static SINT32 dot_scenario(const char* line)
 
 		SCEN_MGR->Start(path.c_str());
 	}
-	else if(!stricmp(command, "stop"))
+	else if(!strcasecmp(command, "stop"))
 	{
 		uiChatPrintLine("Stopping scenario!");
 		SCEN_MGR->Stop();
 	}
-	else if(!stricmp(command, "reload"))
+	else if(!strcasecmp(command, "reload"))
 	{
 		Scenario* running = SCEN_MGR->GetScenario();
 
@@ -5799,7 +5832,7 @@ static SINT32 dot_scenario(const char* line)
 			uiChatPrintLine("No scenario running!");
 		}
 	}
-	else if(!stricmp(command, "edit"))
+	else if(!strcasecmp(command, "edit"))
 	{
 		if(!SCEN_MGR->IsActive())
 			SCEN_MGR->Start(editContent);
@@ -5808,12 +5841,12 @@ static SINT32 dot_scenario(const char* line)
         bool mode = SCEN_MGR->GetEditMode();
         SCEN_MGR->SetEditMode(!mode);
 	}
-	else if(!stricmp(command, "export"))
+	else if(!strcasecmp(command, "export"))
 	{
 		SCEN_MGR->ExportEditPoints();
 		uiChatPrintLine("Exporting current edit area!");
 	}
-	else if(!stricmp(command, "events"))
+	else if(!strcasecmp(command, "events"))
 	{
 		if(SCEN_MGR->HasFlag(ScenarioManager::RUN_EVENTS))
 		{
@@ -5826,7 +5859,7 @@ static SINT32 dot_scenario(const char* line)
 			SCEN_MGR->SetFlag(ScenarioManager::RUN_EVENTS, true);
 		}
 	}
-	else if(!stricmp(command, "icons"))
+	else if(!strcasecmp(command, "icons"))
 	{
 		if(SCEN_MGR->HasFlag(ScenarioManager::ENEMY_ICONS))
 		{
@@ -5839,12 +5872,12 @@ static SINT32 dot_scenario(const char* line)
 			SCEN_MGR->SetFlag(ScenarioManager::ENEMY_ICONS, true);
 		}
 	}
-	else if(!stricmp(command, "team"))
+	else if(!strcasecmp(command, "team"))
 	{
 		uiChatPrintLine("Setting team to %d", team);
 		SCEN_MGR->SetTeam(team);
 	}
-	else if(!stricmp(command, "reload"))
+	else if(!strcasecmp(command, "reload"))
 	{
 		uiChatPrintLine("Reloading scenario content!");
 		SCEN_MGR->LoadContent();
@@ -6236,9 +6269,11 @@ static SINT32 dot_fog(const char* line)
 	ReloadVehiclesCmd
 *************************************************************************************************/
 
-static SINT32 dot_reloadvehicles(const char* line)
+static SINT32 dot_reloadvehicles(const char*)
 {
 	vehtypeInit();
+	fpFPSDataReadFPSFile();
+	_ReadAmmoTypes();
 	return DC_HANDLED;
 }
 
@@ -6954,7 +6989,7 @@ static SINT32 dot_invites(const char* line)
 
 	if(argc > 0)
 	{
-		invites = (!stricmp(onoff, "on")) ? true: false;
+		invites = (!strcasecmp(onoff, "on")) ? true: false;
 		cfgPrefsSetGlobal(cfgSQUAD_INVITES, &invites, true);
 		uiRunScript("game.onchangeinvites()");
 	}
@@ -6981,9 +7016,9 @@ static int dot_ragdolls(const char* line)
 
 	if(sscanf(line, "%*s %32s", newval))
 	{
-		if(!stricmp(newval, "on"))
+		if(!strcasecmp(newval, "on"))
 			cfgPrefsSetBool("app.ragdolls", true);
-		else if(!stricmp(newval, "off"))
+		else if(!strcasecmp(newval, "off"))
 			cfgPrefsSetBool("app.ragdolls", false);
 	}
 
@@ -7229,7 +7264,7 @@ static int dot_vehprint(const char* line)
 
 		for(; v != nullptr; v = v->getNext())
 		{
-			if(stricmp(callsign, (const char*)v->Handle) == 0)
+			if(strcasecmp(callsign, (const char*)v->Handle) == 0)
 				break;
 		}
 
@@ -7393,9 +7428,9 @@ static int dot_clientinfo_command(const wchar_t *line)
 {
     char *encodedText = ChatClientInfo().encode();
 #if platOS == OS_WIN32
-	swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%S\x01.%ls", encodedText, line);
+	swprintf(_LastCommand, (sizeof(_LastCommand) / sizeof(_LastCommand[0])) - 1, L"\x01%S\x01.%ls", encodedText, line);
 #else
-    swprintf(_LastCommand, sizeof(_LastCommand), L"\x01%s\x01.%ls", encodedText, line);
+    swprintf(_LastCommand, (sizeof(_LastCommand) / sizeof(_LastCommand[0])) - 1, L"\x01%s\x01.%ls", encodedText, line);
 #endif
     return DC_PASS_USE_LAST;
 }
@@ -7413,7 +7448,7 @@ static int dot_host_command(const wchar_t* line)
 
 	for(; it != _dotCommands.end(); ++it)
 	{
-		if(it->second.locCmd && wstrncasecmp(pcmd, it->second.locCmd, DOT_COMMAND_SIZE) == 0)
+		if(it->second.locCmd && wcsncasecmp(pcmd, it->second.locCmd, DOT_COMMAND_SIZE) == 0)
 		{
 			// make the command english
 			std::wstring command = L"/";
@@ -7507,14 +7542,14 @@ int uiDotCommand(const wchar_t* line)
 
 		for(; it != _dotCommands.end(); ++it)
 		{
-			if(it->second.locCmd && wstrncasecmp(pcmd, it->second.locCmd, DOT_COMMAND_SIZE) == 0)
+			if(it->second.locCmd && wcsncasecmp(pcmd, it->second.locCmd, DOT_COMMAND_SIZE) == 0)
 				break; // found one!
 		}
 	}
 
     if(it != _dotCommands.end() && (!it->second.key || (it->second.key && HasKeyFile)))
     {
-        if(wstrncasecmp(pcmd, L"doover", DOT_COMMAND_SIZE) != 0)
+        if(wcsncasecmp(pcmd, L"doover", DOT_COMMAND_SIZE) != 0)
 			wcsncpy(_LastCommand, line, 255);
 
 		if(it->second.asciiFunc)
@@ -7665,7 +7700,7 @@ const wchar_t* uiDotCommandMatch(const wchar_t* search, bool again)
 
 								for(size_t p = 0; p < possibles.size(); p++)
 								{
-									if(wstrncasecmp(command, possibles.at(p).c_str(), DOT_COMMAND_SIZE) == 0)
+									if(wcsncasecmp(command, possibles.at(p).c_str(), DOT_COMMAND_SIZE) == 0)
 									{
 										found = true;
 										break;
@@ -7745,6 +7780,8 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(conv, false);
 	ADD_DOT_COMMAND(emote, false);
 	ADD_DOT_COMMAND(em, false);
+	ADD_DOT_COMMAND(join, false);
+	ADD_DOT_COMMAND(j, false);
 	ADD_DOT_COMMAND(autoleader, false);
 	ADD_DOT_COMMAND(recruit, false);
 	ADD_DOT_COMMAND(recruiting, false);

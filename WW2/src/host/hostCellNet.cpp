@@ -28,7 +28,9 @@
 #include "teul/teulEndpointDefs.h"
 #include "wwii/wwiiThreads.h"
 #include "server/serverServerInfo.h"
+#if platOS != OS_WIN32
 #include <execinfo.h>
+#endif
 
 #include "wwii/wwiiHash.h"
 using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
@@ -72,6 +74,7 @@ hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const 
 {
 
 #ifdef DEV_BUILD
+#if platOS != OS_WIN32
 	char temp_buff[bytes * 3 + 1];
 	for (UINT32 i=0; i < bytes; i++)
 	{
@@ -79,6 +82,7 @@ hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const 
 	}
 	temp_buff[bytes*3] = 0;
 	dbugLog(_FLD, "MultiCell: Incoming packet: %s", temp_buff);
+#endif
 #endif
 
 	const unsigned char* const end = input + bytes;

@@ -10,6 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <json.hpp>
+#include <mysql.h>
 #include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
@@ -22,7 +23,6 @@
 #include "chat/chatChannelNumber.h"
 #include "chat/chatConstants.h"
 #include "chat/chatData.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
 #include "chat/chatDotCommand.h"
@@ -64,7 +64,6 @@
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatUnitMotds.h"
 #include "chat/chatClientMessages.h"
-#include "dbse/dbseClient.h"
 #include "inst/instHostInstance.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
@@ -80,10 +79,10 @@
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
+#include "strt/strtChatSupportMessages.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
@@ -94,6 +93,7 @@
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
@@ -591,9 +591,9 @@ _processDelayedBan()
 		if ( (ban.m_start > 0) & (ban.m_start <= teulTime()) )
 		{
 			if ( ban.m_days <= 90 )
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Contact agm@playnet.com.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 			else
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Contact agm@playnet.com assistance.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 
 			Chat::Name name(ban.m_handle);
 			strprintf(days, "%u days", ban.m_days);
@@ -2391,7 +2391,6 @@ void
 _acceptPlayerConnection(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN, "t:%d player connection from %s:%hu", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
-	endpoint.setNagleEnabled(true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2815,6 +2814,12 @@ _houseKeeping()
 	,	_lowFrequencyHouseKeeping
 	,	nullptr
 	};
+
+	// keep DB connection alive
+	if (mysql_ping(dbh) != 0) {
+		dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+		threadsDBReconnect(dbh);
+	}
 
 	if ( housekeeping[step] == nullptr )
 	{
@@ -3664,6 +3669,7 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallHostCallbacks() < 0);
 	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
+	ABORT_IF(strtChatSupportInstallCallbacks() < 0);
 
 	//End broadcast configuration
 
@@ -3714,6 +3720,7 @@ main(int argc, const char* argv[])
 		index.addAlias("m", "tell");
 		index.addAlias("m", "t");
 		index.addAlias("m", "r");
+		index.addAlias("trainers", "tr");
 
 		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
 

@@ -32,9 +32,7 @@
 #include "trn/trnvars.h"
 #include "trn/trntod.h"
 #include "draw/draw2d.h"
-#include "cfg/cfgLoad.h"
 #include "sn/sndsSoundControl.h"
-#include "dbug/dbugExtErrors.h"
 #include "pers/pershud.h"
 #include "ml/mlCompon.h"
 #include "locl/loclLang.h"
@@ -110,8 +108,8 @@
 
 static void PrintDateTime();
 
-static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie);
-static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp);
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT32* cookie);
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT32* otp);
 
 static FLOAT32 _ViewScaleFactor;
 static FLOAT32 _ZBufferNearVal;
@@ -272,8 +270,6 @@ namespace {
 }
 
 void rncheckPlaygateParams(void) {
-	UINT16 CommType;
-
 	// temp hack until command line params set for going online
 	if ( BypassString[0] != '\0' ) {
 		if ( BypassString[0] == 'R' )
@@ -290,7 +286,6 @@ void rncheckPlaygateParams(void) {
 		}
 
 		GamePort = WWII::Net::Ports::MapHost;
-		CommType = PROTOCOL_TCP;
 		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
 #if defined(BETA_RELEASE)
@@ -308,13 +303,12 @@ void rncheckPlaygateParams(void) {
 		}
 
 		GamePort = WWII::Net::Ports::MapHost;
-		CommType = TCP;
 		GameOTP = AUTH_BYPASS_OTP;
 #else
 		if ( TicketFile[0] != 0 )
-			_ParseTicketFile(&GameHost, &GamePort, &CommType, &GameOTP);
+			_ParseTicketFile(&GameHost, &GamePort, &GameOTP);
 		else if ( GameServerIP[0] != 0 )
-			_ParseCommandArgs(&GameHost, &GamePort, &CommType, &GameOTP);
+			_ParseCommandArgs(&GameHost, &GamePort, &GameOTP);
 #endif
 	}
 }
@@ -357,9 +351,6 @@ void rnconnectToServer(void) {
 		teulGetHost(gClientV, &appversion);
 	else
 		teulGetHost(PN_product_version_string, &appversion);
-
-	if ( teulMaskNetworkAddress(0) == 0 )
-		teulSetNetworkMask(GameHost);
 
 	if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
 		throw ClientNetError("connect.fail");
@@ -442,13 +433,6 @@ LOGICAL rnmainInit()
 	uiInit();
 	dimainInit();
 
-#if platOS == OS_WIN32
-	// We have to do this here again because a dll loaded with dimainInit() resets the FPU exception mask
-	// and we do want to get FPU exceptions for all the other things done here
-	// OGS: Not on the Mac, you don't :)
-	SetupFPU(true);
-#endif
-
 	// Setup variables
 	if (!SetupVariables())
 	{
@@ -507,15 +491,6 @@ LOGICAL rnmainInit()
 
 		rnmainResetPlayer();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-	rnlogoUpdateStatus("loading.extresource");
-	if(!adInit())
-    {
-        // Not an error
-        Write_Log(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
-    }
-#endif
 
 	rnlogoUpdateStatus("loading.sounds.init");
 	if (!sndsInit())
@@ -750,10 +725,6 @@ void rnmainKill()
 		Online = 0;
 		ww2::Client::Kill();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-    adKill();
-#endif
 
 	sptExitApp();
 
@@ -1236,7 +1207,7 @@ inline std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
     return s;
 }
 
-static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie) {
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT32* cookie) {
 	LOGICAL	retval = TRUE;
 	std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
 
@@ -1255,11 +1226,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
 		if ( !ipPort.empty() ) {
 			*port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
 		}
-		std::getline(ticketFileStream, serverprotocol);
-		std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
-		if ( !ipProt.empty() ) {
-			*protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
-		}
+		std::getline(ticketFileStream, serverprotocol); // ignore
 		std::getline(ticketFileStream, otp); // cookie
 		std::string otpText = otp.substr(otp.find(" ")+1);
 		if ( !otpText.empty() ) {
@@ -1297,7 +1264,7 @@ static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UI
 	return(retval);
 }
 
-static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp) {
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT32* otp) {
 
 	if ( GameServerIP[0] == 0 )
 		return FALSE;
@@ -1312,7 +1279,6 @@ static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, U
 	}
 
 	*port = (UINT16)strtoul(GameServerPort, nullptr, 10);
-	*protocol = PROTOCOL_TCP;
 
 	*otp = strtoul(GameServerOTP, nullptr, 10);
 

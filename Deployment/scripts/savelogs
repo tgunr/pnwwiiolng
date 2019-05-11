@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 HOMEDIR='/home/wwiiol'
 LOGDIR='/home/wwiiol/logs/'
 DATE=`date +%Y-%m-%d-%H.%M.%S`
@@ -14,5 +14,10 @@ do
   mv -f $HOMEDIR/$i/core.* $LOGDIR$DATE/core.$i 2>/dev/null
  fi
 done
-mv /tmp/*.*.log $LOGDIR$DATE >/dev/null 2>&1 &
+mv /tmp/*.*.log $LOGDIR$DATE >/dev/null 2>&1
+if [[ -n $(find $LOGDIR$DATE -type f) ]]; then
+	(cd $LOGDIR && tar -c -z -f "$DATE.tar.gz" "$DATE" && rm -r "$DATE")
+else
+	rm -r $LOGDIR$DATE
+fi
 

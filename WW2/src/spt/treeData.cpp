@@ -11,6 +11,7 @@ Description:
 #include "scen/ScenarioManager.h"
 #include "fio/fio.h"
 #include "wwii/wwiiHash.h"
+#include "wwii/wwiiThemes.h"
 
 #include <vector>
 #include <deque>
@@ -37,9 +38,9 @@ static int totaltrees = 0;
 
 static std::vector<float> billboardTexCoords;
 
-static ref_ptr<oglVertexBuffer> vbo;
+static oglVertexBuffer *vbo;
 
-using TreeSet = std::unordered_set<unsigned int>;
+using TreeSet = std::unordered_set<Tree *>;
 static TreeSet activetrees;
 
 #if USE_PREALLOCATED_TREES
@@ -58,7 +59,7 @@ static void addToFreeList(Tree* t);
 ------------------------------------------------------------------*/
 oglVertexBuffer* treeDataGetVBO()
 {
-    return vbo.get();
+    return vbo;
 }
 
 /*-----------------------------------------------------------------
@@ -130,25 +131,27 @@ static void loadXML(const char* path)
 {
     std::string dir = path;
 
-#if CHRISTMAS
-    dir += "Christmas_Tree/trees.xml";
-#else
+	if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+	{
+    	dir += "Christmas_Tree/trees.xml";
+	}
+	else
+	{
+		if(gCustomTerrain) {
+			dir = SCEN_MGR->MapPath("trees.xml");
 
-    if(gCustomTerrain) {
-        dir = SCEN_MGR->MapPath("trees.xml");
+			int fd = fioOpen(dir.c_str());
 
-        int fd = fioOpen(dir.c_str());
-
-        if (fd == -1) {
-            dir = path;
-            dir += "trees.xml";
-        } else {
-            fioClose(fd);
-        }
-    } else {
-        dir += "trees.xml";
-    }
-#endif
+			if (fd == -1) {
+				dir = path;
+				dir += "trees.xml";
+			} else {
+				fioClose(fd);
+			}
+		} else {
+			dir += "trees.xml";
+		}
+	}
 
     XMLLoader load(dir.c_str());
 
@@ -468,7 +471,7 @@ Tree* treeDataGetFreeTree()
     t = new Tree;
 #endif
 
-    activetrees.insert((unsigned int)t);
+    activetrees.insert(t);
 
     totaltrees++;
 
@@ -487,17 +490,17 @@ void treeDataFreeTree(Tree* t)
     SDB_RemoveTree(t);
 #endif
 
-    TreeSet::iterator itr = activetrees.find((unsigned int)t);
+    TreeSet::iterator itr = activetrees.find(t);
 
     if(itr != activetrees.end())
     {
+        activetrees.erase(itr);
 #if USE_PREALLOCATED_TREES
         releaseActiveTree(t);
         addToFreeList(t);
 #else
         delete t;
 #endif
-        activetrees.erase(itr);
         totaltrees--;
     }
 }
@@ -506,7 +509,7 @@ void treeDataFreeTree(Tree* t)
 Module: treeDataIsValid
 Description:
 ------------------------------------------------------------------------*/
-bool treeDataIsValid(unsigned int address)
+bool treeDataIsValid(Tree *address)
 {
     TreeSet::iterator itr = activetrees.find(address);
     return itr != activetrees.end();

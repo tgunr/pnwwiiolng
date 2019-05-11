@@ -6,7 +6,7 @@
 // NOTES:
 //         1. Pull out list of servers so the code is independent of what is being controlled
 
-$version = '0.2.1';
+$version = '0.2.2';
 
 include '/playnet/bin/gamecontrolvars.php';
 //
@@ -20,7 +20,10 @@ include '/playnet/bin/gamecontrolvars.php';
 //        'version' => '1.35.8.1', 'description' => "Open Beta", 'visibility' => 'visible',
 //        'hosts' => [
 //            1 => [ 'hostname' => 'cluster1-1', 'command' => 'strat' ], 2 => [ 'hostname' => 'cluster1-2', 'command' => 'chat' ],
-//            4 => [ 'hostname' => 'cluster1-4', 'command' => 'cell' ],   3 => [ 'hostname' => 'cluster1-3', 'command' => 'map' ],
+//            3 => [ 'hostname' => 'cluster1-3', 'command' => 'map' ],
+//        ],
+//        'cells' => [
+//            1 => [ 'hostname' => 'cluster1-4', 'activate' => true ],
 //        ],
 //   ];
 //
@@ -30,8 +33,8 @@ function do_help($msg) {
     if (!is_null($msg)) {
         print "{$msg}\n\n";
     }
-    print "devcontrol version {$version}\n";
-    print "Usage: {$argv[0]} {start|stop|restart|savelogs} cluster {name|ID}\n";
+    print "gamecontrol version {$version}\n";
+    print "Usage: {$argv[0]} {start|stop|stby|restart|savelogs} {cluster|cell} {name|ID} [cell Num]\n";
     print "\n";
     print "Cluster is one of:\n";
     foreach ($clusters as $cluster) {
@@ -44,14 +47,17 @@ function do_help($msg) {
     }
     print "\n";
     print "Examples:\n";
-    print "\tdevcontrol start cluster Dev1\n";
-    print "\tdevcontrol stop cluster Dev2\n";
+    print "\tgamecontrol start cluster Dev1\n";
+    print "\tgamecontrol stop cluster Dev2\n";
+    print "\tgamecontrol stop cell Dev2 3\n";
+    print "\tgamecontrol stby cell Dev2 4\n";
+    print "\tgamecontrol start cell Dev2 1\n";
     exit(0);
 }
 
 function commandForHost($host, $action, $needTerm) {
     $cmds = [ '-l', 'wwiiol',
-                '-i', '/root/.ssh/id_rsa.pn.authdev',
+                '-i', '/root/.ssh/id_rsa.master',
                 "{$host['hostname']}.playnet.com",
                 $action
            ];
@@ -61,9 +67,12 @@ function commandForHost($host, $action, $needTerm) {
     return escapeshellcmd('ssh') . ' ' .  implode(' ', array_map('escapeshellarg', $cmds));
 }
 
-function controlCommandForHost($host, $action) {
-    $processmap = [ 'strat' => 'stratd', 'chat' => 'chatd', 'map' => 'mmhostd', 'cell' => 'cellhost'];
-    return "/playnet/bin/nodecontrol {$action} {$processmap[$host['command']]}";
+function controlCommandForHost($host, $action, $cmd = "") {
+	if (empty($cmd)) {	
+    	$processmap = [ 'strat' => 'stratd', 'chat' => 'chatd', 'map' => 'mmhostd'];
+		$cmd = $processmap[$host['command']];
+	}
+    return "/playnet/bin/nodecontrol {$action} {$cmd}";
 }
 
 function runCommand($cmd) {
@@ -79,19 +88,54 @@ function runCommand($cmd) {
 }
 
 function startCluster($cluster) {
+
     foreach ($cluster['hosts'] as $n => $host) {
+		if ($host['command'] === 'map') {
+			// start all activated cells
+			startCell($cluster, 0);
+		}
         runCommand(commandForHost($host, controlCommandForHost($host, 'start'), true));
-        if (isset($delays[$n])) {
-            print "Waiting {$delays[$n]} seconds before next command.\n";
-            sleep($delays[$n]);
-        }
     }
+}
+
+function startCell($cluster, $cellnum) {
+
+    foreach ($cluster['cells'] as $n => $cellhost) {
+		if ($cellnum == 0 || $n == $cellnum) {
+			if ($cellhost['activate']) {
+				runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'start', 'cellhost'), true)); 
+			} else {
+    			print "Not starting deactivated cell #{$n}, tagging as standby : {$cellhost['hostname']}\n";
+        	    runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stby', 'cellhost'), false));
+			}	
+		}
+	}
 }
 
 function stopCluster($cluster) {
     foreach ($cluster['hosts'] as $n => $host) {
+		if ($host['command'] === 'map') {
+			// stop all cells
+			stopCell($cluster, 0);
+		}
         runCommand(commandForHost($host, controlCommandForHost($host, 'stop'), false));
     }
+}
+
+function stopCell($cluster, $cellnum) {
+    foreach ($cluster['cells'] as $n => $cellhost) {
+		if ($cellnum == 0 || $n == $cellnum) {
+        	  runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stop', 'cellhost'), false));
+		}
+	}
+}
+
+function stbyCell($cluster, $cellnum) {
+    foreach ($cluster['cells'] as $n => $cellhost) {
+		if ($n == $cellnum) {
+        	  runCommand(commandForHost($cellhost, controlCommandForHost($cellhost, 'stby', 'cellhost'), false));
+		}
+	}
 }
 
 function restartCluster($cluster) {
@@ -99,6 +143,13 @@ function restartCluster($cluster) {
     print "Waiting 5 seconds before starting cluster up again.\n";
     sleep(5);
     startCluster($cluster);
+}
+
+function restartCell($cluster, $cellnum) {
+    stopCell($cluster, $cellnum);
+    print "Waiting 5 seconds before starting cluster up again.\n";
+    sleep(5);
+    startCell($cluster, $cellnum);
 }
 
 function savelogsCluster($cluster) {
@@ -115,11 +166,16 @@ if ($argc < 4) {
     do_help("Not enough arguments");
 }
 
-if (($type = $argv[2]) !== 'cluster') {
+$type = $argv[2];
+if ($type !== 'cluster' && $type !== 'cell') {
     do_help("Only cluster control is currently supported");
 }
 
-if (!in_array($cmd = $argv[1], ['start', 'stop', 'restart', 'savelogs'])) {
+if ($type == 'cluster' && !in_array($cmd = $argv[1], ['start', 'stop', 'restart', 'savelogs'])) {
+    do_help("Unknown operation {$cmd}");
+}
+
+if ($type == 'cell' && !in_array($cmd = $argv[1], ['start', 'stop', 'stby', 'restart', 'savelogs'])) {
     do_help("Unknown operation {$cmd}");
 }
 
@@ -131,34 +187,53 @@ if (ctype_digit($which)) {
     $cluster = $clusters[intval($which)];
 } else {
     foreach ($clusters as $maybeCluster) {
-	if (isset($maybeCluster['name']) && strtolower($maybeCluster['name']) === strtolower($which)) {
+		if (isset($maybeCluster['name']) && strtolower($maybeCluster['name']) === strtolower($which)) {
             $cluster = $maybeCluster;
         } else if (isset($maybeCluster['names'])) {
-		foreach ($maybeCluster['names'] as $name) {
-			if (strtolower($name) == strtolower($which)) {
-				$cluster = $maybeCluster;
-				break;
+			foreach ($maybeCluster['names'] as $name) {
+				if (strtolower($name) == strtolower($which)) {
+					$cluster = $maybeCluster;
+					break;
+				}
 			}
 		}
-	}
     }
     if (!isset($cluster)) {
         do_help("Unknown cluster name {$which}");
     }
 }
 
+if ($type === 'cell') {
+   $cellnum = $argv[4];
+}
+
 print "Operating on {$which} (ID {$cluster['clusterid']}, arena ID {$cluster['arenaid']})\n";
-if ($cmd === 'start') {
-    startCluster($cluster);
-} else if ($cmd === 'stop') {
-    stopCluster($cluster);
-} else if ($cmd === 'restart') {
-    restartCluster($cluster);
-} else if ($cmd === 'savelogs') {
-    savelogsCluster($cluster);
+if ($type === 'cell') {
+	if ($cmd === 'start') {
+    	startCell($cluster, $cellnum);
+	} else if ($cmd === 'stop') {
+    	stopCell($cluster, $cellnum);
+	} else if ($cmd === 'stby') {
+    	stbyCell($cluster, $cellnum);
+	} else if ($cmd === 'restart') {
+    	restartCell($cluster, $cellnum);
+	} else {
+		print "Bad command- this shouldn't happen.\n";
+		exit(128);
+	}
 } else {
-    print "Bad command- this shouldn't happen.\n";
-    exit(128);
+	if ($cmd === 'start') {
+    	startCluster($cluster);
+	} else if ($cmd === 'stop') {
+    	stopCluster($cluster);
+	} else if ($cmd === 'restart') {
+    	restartCluster($cluster);
+	} else if ($cmd === 'savelogs') {
+    	savelogsCluster($cluster);
+	} else {
+		print "Bad command- this shouldn't happen.\n";
+		exit(128);
+	}
 }
 
 ?>

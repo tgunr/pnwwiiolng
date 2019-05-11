@@ -216,7 +216,7 @@ ServerConnection::doDisconnect()
 	if ( usedTeulIndex >= 0 )
 	{
 		m_teulIndex = -1;
-		teulClose(usedTeulIndex, Teul::Closing::PeerDoDisc);
+		teulClose(usedTeulIndex);
 	}
 }
 
@@ -414,7 +414,7 @@ _onPeerConnect(ENDPOINT& endpoint)
 	if ( Server::BroadcastMaskAddress(endpoint.fromAddress()) != endpoint.fromAddress() )
 	{
 		dbugLog(_FLA, "t:%d ip:%s unexpected peering attempt", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
-		teulClose(endpoint, Teul::Closing::PeerBadSrc);
+		teulClose(endpoint);
 		return;
 	}
 
@@ -439,7 +439,7 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 	if ( PN_UNLIKELY(info == nullptr) )
 	{
 		dbugLog(_FLA, "t:%d ip:%s type:%u unknown server attempted connection", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hello.m_type);
-		teulClose(endpoint, Teul::Closing::PeerBadSrv);
+		teulClose(endpoint);
 		return -EINVAL;
 	}
 	ABORT_IF( info->stats.type != hello.m_type );

@@ -70,6 +70,7 @@
 #include "wwii/wwiiUTF.h"
 #include "ez/EZManager.h"
 #include "ld/ldtexture.h"
+#include "fio/fio.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -282,7 +283,7 @@ int uiInit()
 	_pictx->SetIO(&fioCallbacks);
 
 	_msgloop = new phui::MessageLoop;
-	_viewport = new phui::Viewport(_pictx, 0,0,(float)WantedWidth,(float)WantedHeight);
+	_viewport = new phui::Viewport(_pictx, 0,0,(float)ddpGetWidth(),(float)ddpGetHeight());
 
 	// this also sets the default font for _pictx
 	if(!uiSetFontSize(cfgPrefsGetInt(cfgPrefsGetGlobalName(cfgFONT_SIZE), UI_FONT_SIZE)))
@@ -380,12 +381,7 @@ int uiPostInit()
   }
 
 
-//#if GREEN_INSTALL == 1
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapbld_small.dds");
-//#else
-//	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapbld.dds");
-//#endif
-
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/mapcp.dds");
 	piTextureAtlasSet::getInstance()->loadAtlas("ui/textures/atlas/ui.dds");
 
@@ -626,7 +622,7 @@ static float lastMouseX,lastMouseY;
 	sysGetMousePosition(&g_iMouseX, &g_iMouseY);
 
 	x = (float)g_iMouseX;
-	y = (float)(WantedHeight-g_iMouseY);
+	y = (float)(ddpGetHeight()-g_iMouseY);
 
 	if(uiCursorState() != 0)
 	{
@@ -1554,7 +1550,7 @@ int uiCursorState()
 bool uiSetFontSize(unsigned int fontsize, const char* font)
 {
 	const char* setFont = (font) ? font: UI_FONT_NAME;
-	return (_viewport) ? _viewport->SetDefaultFont(setFont, (int)(fontsize * WantedHeight / 768.0)): false;
+	return (_viewport) ? _viewport->SetDefaultFont(setFont, (int)(fontsize * ddpGetHeight() / 768.0)): false;
 }
 
 /************************************************************************************************
@@ -1796,89 +1792,6 @@ static std::string munge_filename(const char* name)
 
 	return path;
 }
-
-// this function is obsolete and will be deleted pretty soon
-// once I make sure the new ui.dtd loading stuff is working properly
-#if(0)
-static int openLocDTD(const char* name)
-{
-	return -1;
-
-	// Cache language between calls, so it needs to start
-	// as an absolutely-not-zero value.
-	static UINT32 language = ~0;
-
-	///OPT: Move the inside of the if to a subroutine,
-	///and move the variables with it.
-	std::string path, filename;
-	size_t filesize;
-	char* buffer;
-	int fd = -1;
-	int fd1 = -1;
-
-	filename = name;
-	if(filename.compare(0, 6, "loc://") == 0)
-		filename = filename.substr(6);
-
-	if(language != gLanguage)
-	{
-		language = gLanguage;
-
-		fd = fiocfgOpenWrite(filename.c_str(), true);
-		if(fd > -1)
-		{
-			path = "languages/"; path += g_szLanguages[gLanguage]; path += "/";
-			path += filename;
-
-			int fd2 = -1;
-#ifdef BETA_RELEASE
-			fd2 = fd1 = fiodOpen(path.c_str());
-#endif
-			if(fd1 < 0)
-				fd1 = fioOpen(path.c_str());
-
-			if(fd1 > -1)
-			{
-				if(fd2 > -1)
-					filesize = fiodFileSize(path.c_str()) - skipWordPadGarbage(fd1);
-				else
-					filesize = fioFileSize(path.c_str()) - skipWordPadGarbage(fd1);
-
-				buffer = new char[filesize];
-
-				fioRead(fd1, buffer, filesize);
-				fioWrite(fd, buffer, filesize);
-
-				delete [] buffer;
-				fioClose(fd1);
-			}
-			fioPutc(fd,'\n');
-
-			if(language > 0)
-			{
-				path = "languages/english/";
-				path += filename;
-				fd1 = fioOpen(path.c_str());
-
-				if(fd1 > -1)
-				{
-					filesize = fioFileSize(path.c_str()) - skipWordPadGarbage(fd1);
-					buffer = new char[filesize];
-
-					fioRead(fd1, buffer, filesize);
-					fioWrite(fd, buffer, filesize);
-
-					delete [] buffer;
-					fioClose(fd1);
-				}
-			}
-		}
-		fioClose(fd);
-	}
-
-	return fiocfgOpen(filename.c_str(), true);
-}
-#endif
 
 void locInitStrings(bool force)
 {
@@ -2216,7 +2129,7 @@ static int uiLoadImageFileToSurface(const char* Filename)
     std::string basename = Filename;
 
     basename = basename.substr(0, basename.find_last_of('.'));
-    for (char &c : basename) { c = tolower(c); } // assumes ASCII; this will Breaking Bad on Unicode
+	std::transform(basename.begin(), basename.end(), basename.begin(), ::tolower);
 
 	texid = piGetNamedTexture(basename.c_str());
 	if (piIsTexture(texid, 0)) {
@@ -2224,26 +2137,28 @@ static int uiLoadImageFileToSurface(const char* Filename)
 		return texid;
 	}
 
-    std::string ddsname = basename + ".dds";
-
-	if(piIsTexture(texid = ldddsLoadDDSTexture2D(ddsname.c_str(), TransparentColor, LDPIX_NO_TEXTURE_GENERATE), 0)) {
-		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
-		return texid;
+	if (fioFileExists(basename, "", ".dds"))
+	{
+		std::string ddsname = basename + ".dds";		
+		if(piIsTexture(texid = ldddsLoadDDSTexture2D(ddsname.c_str(), TransparentColor, LDPIX_NO_TEXTURE_GENERATE), 0)) {
+			piSetTextureName(texid, const_cast<char *>(basename.c_str()));
+			return texid;
+		}
 	}
 
     std::string bmpname = basename + ".bmp";
-    std::string alphaname = basename + "_alpha.bmp";
+	std::string alphaname = basename + "_alpha.bmp";
 	TEXTURE *lptex = nullptr;
-    int alphaFD = fioOpen(alphaname.c_str());
-
-    fioClose(alphaFD); // This is yet another very hacky workaround for broken "need to know if it exists before using it" logic
-    if (alphaFD != -1) { // Technically a use-after-free, but FDs are just integers so it doesn't matter
+	
+	bool isAlpha = fioFileExists(alphaname, "", "");
+    if (isAlpha) {
         TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
     }
+	
     if (piIsTexture(texid = ldbmpLoadBMPFileToSurface(bmpname.c_str(), TransparentColor, 0), 0)) {
 		lptex = piGetTextureData(texid);
 		piSetTextureName(texid, const_cast<char *>(basename.c_str()));
-        if (alphaFD != -1) {
+        if (isAlpha) {
 			if (!ldbmpLoadBMPAlphaFileToSurface(alphaname.c_str(), texid, 0)) {
 				piFreeMipTextures(texid);
 				return -1;

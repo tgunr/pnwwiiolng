@@ -3,6 +3,10 @@
 #include <Windows.h>
 #include <VersionHelpers.h>
 
+#pragma message("This bit of nonsense makes up for the ancient precompiled js.lib we're using")
+#pragma message("REMOVE THIS ASAP")
+extern "C" __declspec(dllexport) FILE *_iob[3] = {stdin, stdout, stderr};
+
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
 #include "sys/sysAntihack.h"
@@ -31,10 +35,6 @@
 #include "sn/sndsSoundTypes.h"
 #include "build_info.hpp"
 #include "auth/authDefaults.h"
-
-#ifdef CRASH_HANDLER
-#include "sys/crashhandler.h"
-#endif
 
 #ifdef ANTIHACK
 #include "tools/diddle.h"
@@ -85,6 +85,40 @@ static void AddArchives();
 
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
+
+std::string Base64Encode(void const *buffer, size_t bufferLength)
+{
+	DWORD neededLen = 0;
+	
+	if (CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			nullptr, &neededLen
+	)) {
+		std::string str(neededLen, 0);
+		
+		CryptBinaryToStringA(
+			reinterpret_cast<const BYTE *>(buffer), bufferLength,
+			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
+			const_cast<LPSTR>(str.data()), &neededLen);
+		return str;
+	} else {
+		return "";
+	}
+}
+
+bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
+{
+	DWORD localLength = static_cast<DWORD>(*ioBufferLength);
+	if (CryptStringToBinaryA(
+		input.data(), 0, CRYPT_STRING_BASE64,
+		reinterpret_cast<BYTE *>(outputBuffer), &localLength, nullptr, nullptr
+	)) {
+		*ioBufferLength = static_cast<size_t>(localLength);
+		return true;
+	}
+	return false;
+}
 
 void decompressStatus (SINT32 archive_index)
 {
@@ -254,10 +288,13 @@ BOOL				bOsVersionInfo;
 	memset(&osvi, 0, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 
+    __pragma(warning(push));
+	__pragma(warning(disable : 4996));
 	if (!(bOsVersionInfo = GetVersionEx((OSVERSIONINFO*)&osvi)))
 	{
 		return FALSE;
 	}
+	__pragma(warning(pop));
 
 	switch (osvi.dwPlatformId)
 	{
@@ -453,77 +490,6 @@ struct LANGANDCODEPAGE
 
 #endif	//	EVENT_LOG
 
-//////////////////////////////////////////////////////////////////////
-//	void SetupFPU(bool enableExceptions)
-//
-//	Defines the behaviour of the CPUs floating point unit, including exception.
-//	It can be extended for setting the SSE2 unit as well (use __control87_2).
-//  This should be condidered a global definition, so make sure these states are not overwritten elsewhere!
-//////////////////////////////////////////////////////////////////////
-void SetupFPU(bool enableExceptions)
-{
-	static bool		configHasBeenPrinted	= false;
-
-
-//#ifdef BETA_RELEASE
-#if(DEBUG_FPU)
-	unsigned int	FPUexceptionMask	= _MCW_EM;
-	// Usually we don't need to detect an underflow
-//	unsigned int	FPUexceptionMask = _MCW_EM - (_EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW + _EM_UNDERFLOW);
-	if(enableExceptions)	FPUexceptionMask -= (_EM_INVALID + _EM_ZERODIVIDE + _EM_OVERFLOW);
-
-	_clearfp();
-	_control87(FPUexceptionMask, _MCW_EM);
-#endif
-
-	//float test = 0.0f;
-	//float tester = 0.1f / test;
-	//float tester2 = sqrt(-1.23f);
-
-	if(configHasBeenPrinted) return;
-
-#if defined(EVENT_LOG)
-	char*			status[2]	= { "disabled", "enabled" };
-	unsigned int	fp_cw		= 0;
-    unsigned int	fp_mask		= 0;
-    unsigned int	bits;
-
-    fp_cw = _control87( fp_cw,
-                        fp_mask );
-
-    Write_Debug("\n===========================");
-    Write_Debug("          FPU-SETUP        ");
-    Write_Debug("===========================");
-    Write_Debug("Interrupt Exception Masks");
-    bits = fp_cw & MCW_EM;
-	Write_Debug("  Invalid Operation exception	: %s", status[(bits & EM_INVALID) == 0]);
-	Write_Debug("  Denormalized exception		: %s", status[(bits & EM_DENORMAL) == 0]);
-	Write_Debug("  Divide-By-Zero exception		: %s", status[(bits & EM_ZERODIVIDE) == 0]);
-	Write_Debug("  Overflow exception			: %s", status[(bits & EM_OVERFLOW) == 0]);
-	Write_Debug("  Underflow exception			: %s", status[(bits & EM_UNDERFLOW) == 0]);
-	Write_Debug("  Precision exception			: %s", status[(bits & EM_INEXACT) == 0]);
-    Write_Debug("");
-
-    bits = fp_cw & MCW_IC;
-    if(bits == IC_AFFINE)		Write_Debug("Infinity Control = affine");
-    if(bits == IC_PROJECTIVE )	Write_Debug("Infinity Control = projective");
-
-    bits = fp_cw & MCW_RC;
-    if(bits == RC_NEAR)       Write_Debug("Rounding Control = near");
-    if(bits == RC_DOWN)       Write_Debug("Rounding Control = down");
-    if(bits == RC_UP)         Write_Debug("Rounding Control = up");
-    if(bits == RC_CHOP)       Write_Debug("Rounding Control = chop");
-
-    bits = fp_cw & MCW_PC;
-    if(bits == PC_24)         Write_Debug("Precision Control = 24 bits");
-    if(bits == PC_53)         Write_Debug("Precision Control = 53 bits");
-	if(bits == PC_64)         Write_Debug("Precision Control = 64 bits");
-    Write_Debug("===========================\n");
-#endif
-
-	configHasBeenPrinted	= true;
-}
-
 //#ifndef BETA_RELEASE
 #ifdef ANTIHACK
 static const unsigned char FIRST_CHAR = '0';
@@ -676,11 +642,6 @@ char GetOSBuild()
 // This is the actual winmain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	int		x, y, w, h, wh, xy;
-	int		bpp, hdw, stencil, wnd;
-	MSG		msg;
-	RECT	rect;
-
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
@@ -705,10 +666,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	dbugInit(LogMode::OFF, "wwiiClient");
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
-#endif
-
-#ifdef CRASH_HANDLER
-	InstallCrashHandler();
 #endif
 
 #ifdef DIRECT3D
@@ -743,13 +700,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	NetFrameSync::InitializeHashes();
 
-	WantedWidth = GetSystemMetrics(SM_CXSCREEN);
-	WantedHeight = GetSystemMetrics(SM_CYSCREEN);
-	WantedBpp = TEX_BPP;
-	WantedAlpha = TEX_ALPHA;
-	WantedHdw = TRUE;
-	WantedStencil = 0;
-	WantedWindow = FALSE;
 #ifdef DEBUG_WW2
 	WantedUserLogEnabled = TRUE;
 	//TBD: Disabled for now, force debug clients to specify so we can use it for QA testing.
@@ -760,27 +710,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WantDataDir = TRUE;
 	HasKeyFile = FALSE;
 #endif
-
-	SystemParametersInfo(SPI_GETWORKAREA, 0, &rect, 0);
-	x = ((rect.right - rect.left) - WantedWidth) / 2;
-	y = ((rect.bottom - rect.top) - WantedHeight) / 2;
-
-	// Note: This is an appropriate use of the registry: a user preference it doesn't hurt to lose - Gadget
-	if (sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_SIZE, (DWORD*)&wh) &&
-		sysregGetHKeyDword(HKEY_CURRENT_USER, REG_KEY_MAIN, REG_MAIN_LOC, (DWORD*)&xy))
-	{
-		if (320 <= LOWORD(wh) && 240 <= HIWORD(wh))
-		{
-			WantedWidth = LOWORD(wh);
-			WantedHeight = HIWORD(wh);
-		}
-
-		if (rect.right > (LOWORD(xy) + LOWORD(wh)) && rect.bottom > (HIWORD(xy) + HIWORD(wh)))
-		{
-			x = LOWORD(xy);
-			y = HIWORD(xy);
-		}
-	}
 
 #if defined(BETA_RELEASE) || defined(ALPHA_RELEASE) || defined(DEBUG_WW2)
 	LogEnabled = TRUE;
@@ -800,7 +729,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
         Write_Debug("CoInitializeEx FAILED with error: %x", hr);
     }
 
-	SetupFPU(true);
 	memInit();
 
 #ifdef DIRECT3D
@@ -944,26 +872,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 #endif	//	EVENT_LOG
 
-	w = WantedWidth;
-	h = WantedHeight;
-	bpp = WantedBpp;
-	hdw = WantedHdw;
-	stencil = WantedStencil;
-	wnd = WantedWindow;
-
 	if (!sndsDriverConfig(hInstance))
 	{
 		return 0;
 	}
-
-	WantedX				= x;
-	WantedY				= y;
-	WantedWidth			= w;
-	WantedHeight		= h;
-	WantedBpp			= bpp;
-	WantedHdw			= hdw;
-	WantedStencil		= stencil;
-	WantedWindow		= wnd;
 
 	TexBpp				= WantedBpp;
 	TexAlpha			= WantedAlpha;
@@ -1010,13 +922,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
+	if ( ! ddpCreateWnd() )
 	{
 		ddpKill();
 		return(0);
 	}
 #endif	// OPENGL3D
 
+	MSG msg;
 	do
 	{
 		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
@@ -1047,6 +960,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #else	// DONT_USE_THREAD
 
+	MSG msg;
 	if (threadhandle = systhreadCreate(ddpEngine, &running))
 	{
 		do

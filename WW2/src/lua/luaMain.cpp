@@ -426,7 +426,7 @@ int _luaLoadLib(lua_State* L)
 	{
 		for(int i = 0; i < GPT_NUM_TYPES; i++)
 		{
-			if(!_stricmp(lib, _gameLibs[i]))
+			if(!strcasecmp(lib, _gameLibs[i]))
 				return luaLoadLib((GAME_PKG_TYPE)i, L);
 		}
 	}

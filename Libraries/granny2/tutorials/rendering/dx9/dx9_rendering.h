@@ -1,13 +1,13 @@
 #if !defined(DX9_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/dx9/dx9_rendering.h $
-// $DateTime: 2008/09/16 09:51:54 $
-// $Change: 18437 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
 // See .cpp file for details...
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <d3d9.h>
@@ -114,6 +114,7 @@ void SetTransposedMatrix4x4(D3DXHANDLE ShaderConstant,
 
 void Render(int Width, int Height);
 
+#define MainWindowTitle TEXT("DirectX9 GrannySample")
 LRESULT CALLBACK MainWindowCallback(HWND Window, UINT Message,
                                     WPARAM WParam, LPARAM LParam);
 

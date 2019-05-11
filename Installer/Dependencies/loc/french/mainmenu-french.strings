@@ -1,0 +1,174 @@
+﻿/* NSMenuItem : <title: > (oid:1241) */
+" " = " ";
+
+/* NSTextField ((waiting for download to begin)) : <title:(waiting for download to begin)> (oid:1100) */
+"(waiting for download to begin)" = "(téléchargement de attente à commencer)";
+
+/* NSMenuItem : <title:About World War ][ Online> (oid:58) */
+"About World War ][ Online" = "Au sujet de World War ][ Online";
+
+/* NSButton (Accept Terms of Service) : <title:Accept Terms of Service> (oid:1295) */
+"Accept Terms of Service" = "Accepter les limites du service";
+
+/* NSButton (Back) : <title:Back> (oid:1148) */
+"Back" = "Arrière";
+
+/* NSMenuItem : <title:Best> (oid:1185) */
+"Best" = "Mieux";
+
+/* NSButton (Bigger) : <title:Bigger> (oid:1150) */
+"Bigger" = "Plus grand";
+
+/* NSMenuItem : <title:Bring All to Front> (oid:5) */
+"Bring All to Front" = "Apporter tous à l'avant";
+
+/* NSButton (Calibrate) : <title:Calibrate> (oid:1245) */
+"Calibrate" = "Calibrer";
+
+/* NSButton (Cancel) : <title:Cancel> (oid:1223) */
+"Cancel" = "Annulation";
+
+/* NSButton (Clear Password) : <title:Clear Password> (oid:1090) */
+"Clear Password" = "Mot de passe clair";
+
+/* NSTextField (Colors:) : <title:Colors:> (oid:1195) */
+"Colors:" = "Couleurs:";
+
+/* NSTextField (Connection:) : <title:Connection:> (oid:1186) */
+"Connection:" = "Raccordement:";
+
+/* NSMenuItem : <title:English> (oid:1171) */
+"English" = "Anglais";
+
+/* NSButton (Forward) : <title:Forward> (oid:1149) */
+"Forward" = "Avant";
+
+/* NSMenuItem : <title:French> (oid:1173) */
+"French" = "Français";
+
+/* NSMenuItem : <title:German> (oid:1169) */
+"German" = "Allemand";
+
+/* NSMenuItem : <title:Hide Others> (oid:145) */
+"Hide Others" = "Cacher d'autres";
+
+/* NSMenuItem : <title:Hide World War ][ Online> (oid:134) */
+"Hide World War ][ Online" = "Cacher World War ][ Online";
+
+/* NSButton (Home) : <title:Home> (oid:1146) */
+"Home" = "Page d'accueil";
+
+/* NSMenuItem : <title:Italian> (oid:1172) */
+"Italian" = "Italien";
+
+/* NSTextField (Joystick 1:) : <title:Joystick 1:> (oid:1226) */
+"Joystick 1:" = "Joystick 1:";
+
+/* NSTextField (Joystick 2:) : <title:Joystick 2:> (oid:1227) */
+"Joystick 2:" = "Joystick 2:";
+
+/* NSTextField (Joystick 3:) : <title:Joystick 3:> (oid:1228) */
+"Joystick 3:" = "Joystick 3:";
+
+/* NSTextField (Joystick 4:) : <title:Joystick 4:> (oid:1229) */
+"Joystick 4:" = "Joystick 4:";
+
+/* NSTextField (Language:) : <title:Language:> (oid:1174) */
+"Language:" = "Langue:";
+
+/* NSMenu : <title:MainMenu> (oid:29) */
+"MainMenu" = "Menu principal";
+
+/* NSButton (Manual) : <title:Manual> (oid:1147) */
+"Manual" = "Manuel";
+
+/* NSMenuItem : <title:Millions (32 bit)> (oid:1194) */
+"Millions (32 bit)" = "Millions (32 bit)";
+
+/* NSMenuItem : <title:Minimize> (oid:23) */
+"Minimize" = "Réduire au minimum";
+
+/* NSTextField (Monitor:) : <title:Monitor:> (oid:1197) */
+"Monitor:" = "Moniteur:";
+
+/* NSButton (OK) : <title:OK> (oid:1222) */
+"OK" = "OK";
+
+/* NSMenu : <title:OtherViews> (oid:1240) */
+"OtherViews" = "D'autres vues";
+
+/* NSTextField (Password:) : <title:Password:> (oid:1307) */
+"Password:" = "Mot de passe:";
+
+/* NSWindow (Patch Download) : <title:Patch Download> (oid:1095) */
+"Patch Download" = "Mise à jour";
+
+/* NSBox (Patch Download Progress) : <title:Patch Download Progress> (oid:1097) */
+"Patch Download Progress" = "Progrès de la mise à jour";
+
+/* NSButton (Play Offline) : <title:Play Offline> (oid:1089) */
+"Play Offline" = "Jeu en différé";
+
+/* NSButton (Play Online) : <title:Play Online> (oid:1086) */
+"Play Online" = "Jeu en ligne";
+
+/* NSMenuItem : <title:Preferences...> (oid:129) */
+"Preferences..." = "Préférences...";
+
+/* NSMenuItem : <title:Primary> (oid:1183) */
+"Primary" = "Primaire";
+
+/* NSMenuItem : <title:Quit> (oid:136) */
+"Quit" = "Stoppé";
+
+/* NSButton (README) : <title:README> (oid:1135) */
+"README" = "README";
+
+/* NSTextField (Refresh Rate:) : <title:Refresh Rate:> (oid:1196) */
+"Refresh Rate:" = "La vitesse de régénération:";
+
+/* NSButton (Reload) : <title:Reload> (oid:1152) */
+"Reload" = "Recharge";
+
+/* NSTextField (Resolution:) : <title:Resolution:> (oid:1190) */
+"Resolution:" = "Résolution:";
+
+/* NSButton (Save password) : <title:Save password> (oid:1294) */
+"Save password" = "Économiser le mot de passe";
+
+/* NSMenuItem : <title:Secondary> (oid:1184) */
+"Secondary" = "Secondary";
+
+/* NSMenuItem : <title:Services> (oid:131) */
+"Services" = "Services";
+
+/* NSWindow (Settings) : <title:Settings> (oid:1165) */
+"Settings" = "Arrangements";
+
+/* NSMenuItem : <title:Show All> (oid:150) */
+"Show All" = "Show All";
+
+/* NSButton (Smaller) : <title:Smaller> (oid:1151) */
+"Smaller" = "Montrer tous";
+
+/* NSMenuItem : <title:Spanish> (oid:1170) */
+"Spanish" = "Espagnol";
+
+/* NSButton (Stop) : <title:Stop> (oid:1153) */
+"Stop" = "Arrêt";
+
+/* NSMenuItem : <title:Thousands (16 bit)> (oid:1193) */
+"Thousands (16 bit)" = "Milliers (16 bit)";
+
+/* NSButton (Training Server) : <title:Training Server> (oid:1094) */
+"Training Server" = "Serveur de formation";
+
+/* NSTextField (User Name: ) : <title:User Name:
+> (oid:1306) */
+"User Name:\n" = "Nom d'utilisateur:\n";
+
+/* NSMenu : <title:Window> (oid:24) */
+"Window" = "Fenêtre";
+/* NSWindow (World War ][ Online) : <title:World War ][ Online> (oid:1084) */
+"World War ][ Online" = "World War ][ Online";
+

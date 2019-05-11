@@ -24,7 +24,6 @@
 #include "server/serverServerInfo.h"
 #include "strt/strtEvents.h"
 #include "teul/teulBasic.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiConfig.h"

@@ -1,26 +1,27 @@
 #if !defined(OPENGL_RENDERING_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/rendering/opengl/opengl_rendering.h $
-// $DateTime: 2007/06/19 22:57:25 $
-// $Change: 15236 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <stdio.h>
 #include <assert.h>
 #include <vector>
 
-#ifdef _MACOSX
-#include "/usr/include/GL/glew.h"
-#include <GLUT/glut.h>
+#if defined(_MACOSX) || defined(linux)
+  #include <GL/glew.h>
+  #include <GL/glut.h>
 #else
-#include "glew.h"
-#include "glut.h"
+  #include "glew.h"
+  #include "glut.h"
+
+  #pragma warning(disable : 4505)
 #endif
 
-#pragma warning(disable : 4505)	
 
 struct DemoTexture
 {

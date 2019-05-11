@@ -44,7 +44,6 @@ extern void obdrawDrawWaterRefraction();
 
 extern void obdrawDrawObject(const OBJECT* o, int units = 0);
 extern void obdrawDrawObjectInstanced(const OBJECT* o, int units = 0, int primcount = 1);
-extern void obdrawDrawAdvertisements();
 extern void obdrawDrawUnsorted();
 extern void obdrawDrawSorted();
 extern void obdrawDrawSortedCockpit();
@@ -118,3 +117,5 @@ extern int obdrawGetMultiTextureID(int offset);
 extern void obdrawCull();
 extern void obdrawDrawShadowCasters();
 extern void obdrawGetMultiTextureMatrix(int offset, Matrixf& matrix);
+
+extern float GetDistance(OBJECT * lplod, bool multiply);

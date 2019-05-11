@@ -65,6 +65,7 @@
 #include "map/mapConstants.h"
 #include "map/mapHCUnitLocations.h"
 #include "map/mapPersonaUpdate.h"
+#include "miss/missionJoinRequest.h"
 #include "miss/missionMobileSpawnWaypoint.h"
 #include "miss/missLeaderChange.h"
 #include "score/scorePacket.h"
@@ -76,7 +77,6 @@
 #include "strt/strtConstants.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"
@@ -277,6 +277,34 @@ _recvAWS(ACTION_OBJECT* const a)
 	}
 
 	chatProcessAWSRequest(player, request);
+
+	return a->offset;
+}
+
+//////////////////////////////////////////////////////////////////////
+//
+
+static SINT32
+_recvJoinMission(ACTION_OBJECT* const a) {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
+	MissionJoinRequest::Request request(a);
+
+	Player* target = PlayerInterface::Lookup(request.player);
+	if ( target == nullptr ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->playerID() == player.playerID() ) {
+		player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, "/join");
+	} else if ( player.side() != target->side() || target->missionID() == 0 ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
+	} else if ( target->missionID() == player.missionID() ) {
+		player.message(LSTR_CAUTION, LSTR_JOINMISSION_ALREADYONMISSION);
+	} else {
+		// HACK: Omitting squad to show we aren't related to a recruiter join. Blech.
+		MissionInvite invite(target->missionID(), target->country(), target->branch(),
+		                     target->brigadeID(), target->chatHandle(), target->squadHandle(), false);
+		MISSION_INVITE_MSG outgoing(invite);
+		outgoing.send(player.teulIndex());
+	}
 
 	return a->offset;
 }
@@ -940,7 +968,7 @@ _recvMessage(ACTION_OBJECT* const a)
 		// mark start, find end
 		char *start = ++p;
 
-		p = strchr(p, '\x01');
+		p = strchr(p, '\x01');// Returns a pointer to the first occurrence of '\x01' in the C string.
 		if (!p) {
 
 			dbugLog(_FLA, "Client chat packet received with no terminating control character");
@@ -954,10 +982,14 @@ _recvMessage(ACTION_OBJECT* const a)
 			// decode it
 			message.clientInfo.decode(start);
 
-			// remove it from the message - source is null terminated, limit to max IRC length
-			strsafecpy(message.m_message, p, MAX_IRC_LEN);
+            // Get the length of the message without the clientInfo.
+            size_t newLengthOfMessage = strlen(p);
 
-			message.m_length -= (p - message.m_message);
+			// Copy the message without the clientInfo back into the original message
+            // Note that destination and source memory overlaps.
+            memmove(message.m_message, p, MAX_IRC_LEN);
+
+            message.m_length = newLengthOfMessage;
 		}
 		else
 		{
@@ -1103,10 +1135,9 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "INSERT INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
-const char* const _PROGRESS_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_id=values(player_id),group_name=values(group_name),progress=values(progress)";
+const char* const _PROGRESS_UPDATE_PREFIX = "REPLACE INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 
-static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, _PROGRESS_UPDATE_SUFFIX);
+static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, "");
 
 SINT32
 Tutorial::GroupProgress::receive(Player* player) const
@@ -1717,6 +1748,7 @@ chatInstallHostCallbacks()
 		REGISTER_MSG_SENDER(Chat::MISSION_INVITE_Y, MISSION_INVITE_MSG);
 		REGISTER_SENDRECV(Chat::AWS_Y, _sendAWS, _recvAWS, AWS::callback);
 		REGISTER_SENDER(Chat::HOLD_FALL_INFO_Y, _sendHoldFallInfo, HoldFallVote::s_callback);
+		REGISTER_RECEIVER(Chat::JOIN_MISSION_Y, _recvJoinMission);
 		REGISTER_SENDER(Chat::OMG_Y, _sendChatMissionStatus, Chat::MissionStatus::s_callback);
 		REGISTER_MSG_SENDER(Chat::RECRUITER_LIST_Y, RECRUITER_LIST);
 		REGISTER_RECEIVER(Chat::RECRUITER_REQUEST_Y, _recvRecruiterRequest);

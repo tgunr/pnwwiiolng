@@ -15,7 +15,6 @@
 #include "wwii/wwiiTypes.h" 			// For REL_OBJ_ID
 #include "updt/updtTypes.h" 			// For turret_t
 #include "include/mobileSpawnEnums.h"	// For MSPAWN_RESULT
-#include "draw/sneaky.h"
 
 #include "physics/physicsmain.h"
 #include "veh/vehInterpolator.h"
@@ -322,7 +321,7 @@ struct vehVehicle
 	mlObjectData* 	VehicleObjectData; 	// 3d object data
 
 	VisualDamageBody* ChunksOfCrap;
-	AltPointer<struct vehVehicle> xNext;
+	struct vehVehicle *xNext = nullptr;
 // FPS and vehicle riding
 	UINT32	RideSeatNum; // special values VEH_HOIST_RIDE_SEAT, VEH_TROOPER_ON_DECK_RIDE_SEAT, VEH_TOWED_VEHICLE
 	UINT32	RideVehicleHostIndex;
@@ -424,8 +423,8 @@ struct vehVehicle
 	void clear();
 	bool isHulked();
 
-	struct vehVehicle* getNext() { return xNext.get(); }
-	void setNext(struct vehVehicle*x) { xNext.set(x); }
+	struct vehVehicle* getNext() { return xNext; }
+	void setNext(struct vehVehicle*x) { xNext = x; }
 
 	LOGICAL isSTO() {return (SINT32)VehicleHostIndex < 0;}
 
@@ -524,7 +523,7 @@ vehanimVehicleStateType const* vehFindStateByName(vehType*, const char* name);
 // shouldn't be here
 UINT32 vehApplyDamageToObject(const FLOAT64& Energy, struct trnCDTerrainObject*, vehVehicle* InShooterVehicle, struct weapAmmo* Ammo);
 
-UINT32 	vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach);
+UINT32 	vehExitVehicle(unsigned int exitCode = PEXIT_DEAD);
 UINT32 	vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach);
 
 SINT32 	vehAttachToRidePoint(vehVehicle*);

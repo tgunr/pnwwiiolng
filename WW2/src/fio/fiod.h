@@ -1,10 +1,19 @@
 #pragma once
 // The defines for the Archive portion of fiod
 
+#include "wwii/wwiiUTF.h"
+
 namespace IO { class MappedFile; }
 
-extern const char* fiodGetPrepath();
-extern void fiodSetPrepath(char* newpath);
+// TODO: Can be made internal
+extern const fullpath_t* fiodGetPrepath();
+extern void fiodSetUserpath(bool userpath);
+
+struct UsingUserdir {
+	UsingUserdir(bool userdir = true) { fiodSetUserpath(userdir); }
+	~UsingUserdir() { fiodSetUserpath(false); }
+	operator bool(void) const { return false; }
+};
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);
 extern IO::MappedFile* fiodGetMappedFile(int fd);
@@ -21,6 +30,7 @@ extern int fiodEOF(int hfile);
 extern LOGICAL fiodAccess(const char* filename, bool userdir = false);
 extern LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir = false);
 extern size_t fiodFileSize(const char* name, bool userdir = false);
+extern bool fiodFileExists(const char* name, bool userdir = false);
 
 extern void fiodmkdir(const char* path);
 
@@ -59,3 +69,14 @@ static int fiodGet(int fd, _Type& into)
 #if RECORD_FILES
     extern void dumpFileRefs();
 #endif
+
+
+//==============
+
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname);
+
+template <size_t N>
+UINT32 GetFullPath(fullpath_t(&path)[N], const char* name) {
+	static_assert ( N == PN_MAX_PATH , "All fio paths must be properly sized" );
+	return GetFullPath_unsafe(path, name);
+}
