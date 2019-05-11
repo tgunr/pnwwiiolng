@@ -15,12 +15,18 @@ bool chatPatrolBrigadeElections();
 // opportunity to block the movement.
 void chatBrigadeMoveProposal(UINT32 brigadeID, const struct FULL_OBJ_ID destination, ChatHandle byHandle);
 
+// Place a country change proposal for a CP, inform HC officers giving them opportunity to block
+void chatCPCountryChangeProposal(const struct FULL_OBJ_ID destination, WWII_COUNTRY country, ChatHandle byHandle);
+
 // Take a player out of the OIC position of the specified brigade
 void chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle handle);
 
 // Let people know that a unit has been moved
 class HCUnit;
 void chatAnnounceBrigadeMove(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL_OBJ_ID destination, ChatHandle byHandle);
+
+// Let people know that the country has changed
+void chatAnnounceCountryChange(const HCUnit& unit, const FULL_OBJ_ID origin, const FULL_OBJ_ID destination, ChatHandle byHandle);
 
 // Handle the arrival of an Attack Order result
 void chatBrigadeAttackOrderResponse(struct AttackOrder& incoming);

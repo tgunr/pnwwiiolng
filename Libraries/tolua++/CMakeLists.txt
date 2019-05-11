@@ -4,40 +4,24 @@
 ## Redistribution and use of this file is allowed according to the terms of the MIT license.
 ## For details see the COPYRIGHT file distributed with LuaDist.
 ## Please note that the package source code is licensed under its own license.
-
+CMAKE_MINIMUM_REQUIRED ( VERSION 3.12.0 )
 PROJECT ( toluapp C )
-CMAKE_MINIMUM_REQUIRED ( VERSION 2.8.3 )
-IF (CMAKE_VERBOSE_MAKEFILE)
-    INCLUDE ( cmake/dist.cmake )
-ENDIF ( )
-
-IF ( NOT MSVC )
-	IF (PN_BUILD_32BIT AND NOT PN_CLUSTER STREQUAL "rPI" )
-		SET(CMAKE_CXX_FLAGS "-m32")
-		SET(CMAKE_C_FLAGS "-m32")
-	ENDIF()
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-value")
-	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-value")
-ENDIF ( )
-
-INCLUDE_DIRECTORIES ( include src/lib ${LUA_INCLUDE_DIR} )
 
 # Build lib
-FILE ( GLOB SRC_LIBTOLUAPP src/lib/*.c )
-
-ADD_LIBRARY ( libtolua++ STATIC ${SRC_LIBTOLUAPP} )
-TARGET_LINK_LIBRARIES ( libtolua++ ${LUA_LIBRARIES} )
-SET_TARGET_PROPERTIES ( libtolua++ PROPERTIES CLEAN_DIRECT_OUTPUT 1 )
-IF(MSVC)
-    SET_TARGET_PROPERTIES ( libtolua++ PROPERTIES
-        COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS )
+FILE( GLOB SRC_LIBTOLUAPP src/lib/*.c )
+ADD_LIBRARY( libtolua++ STATIC ${SRC_LIBTOLUAPP} )
+TARGET_INCLUDE_DIRECTORIES( libtolua++ PUBLIC include PRIVATE src/lib ${LUA_INCLUDE_DIR} )
+TARGET_LINK_LIBRARIES( libtolua++ PUBLIC ${LUA_LIBRARIES} )
+IF ( MSVC )
+	TARGET_COMPILE_DEFINITIONS( libtolua++ PRIVATE "-D_CRT_SECURE_NO_WARNINGS" )
 ENDIF()
 
 # Build app
-INCLUDE_DIRECTORIES ( src/bin )
-ADD_EXECUTABLE ( tolua++ src/bin/tolua.c src/bin/toluabind.c )
-TARGET_LINK_LIBRARIES ( tolua++ libtolua++ ${LUA_LIBRARIES} )
+ADD_EXECUTABLE( tolua++ src/bin/tolua.c src/bin/toluabind.c )
+TARGET_INCLUDE_DIRECTORIES( tolua++ PRIVATE src/bin )
+TARGET_LINK_LIBRARIES( tolua++ libtolua++ )
 
-SET ( TOLUAPP_EXECUTABLE tolua++ PARENT_SCOPE )
-SET ( TOLUAPP_LIBRARIES libtolua++ PARENT_SCOPE )
-SET ( TOLUAPP_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include PARENT_SCOPE )
+# Export names to parent scope
+SET( TOLUAPP_EXECUTABLE tolua++ PARENT_SCOPE )
+SET( TOLUAPP_LIBRARIES libtolua++ PARENT_SCOPE )
+SET( TOLUAPP_INCLUDE_DIR "" PARENT_SCOPE )

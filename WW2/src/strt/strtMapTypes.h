@@ -148,6 +148,7 @@ struct MM_SPAWN_GRANT_REQUEST
 	FULL_OBJ_ID		facility;
 	UINT32			missionID;
 	UINT32			playerID;
+	bool            usedMobileSpawn;
 };
 
 struct MM_SPAWN_GRANT_RESPONSE
@@ -169,8 +170,8 @@ struct MM_SPAWN_DENY
 //This message tells the strat system to cancel a spawn
 struct MM_SPAWN_CANCEL
 {
-	UINT32	customerID;
-	FULL_OBJ_ID	facility; //The facility the mmhost wants information on
+	UINT32	      customerID;
+	FULL_OBJ_ID	  facility; //The facility the mmhost wants information on
 	WEAPON_SERIAL weaponSerial;
 };
 

@@ -400,7 +400,7 @@ char s[32];
 UINT32 mlGaugeUpdatePlayerGaugeData(mlVehicleData* VehicleData,OBJECT * Object)
 {
 FLOAT64VECTOR TempVec1;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 FLOAT64ATT TempAtt,TempAtt1;
 FLOAT32 TempNum;
 piVECTOR TempPos;
@@ -715,10 +715,10 @@ static SINT32 LastUpdateTime;
 	// do agl check
 	_VarData.AGLMeters = 0.0f;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	TempPos.x = (FLOAT32)(VehicleData->AdjustedForCGPos.x - WorldOriginOffset.x);
-	TempPos.y = (FLOAT32)(VehicleData->AdjustedForCGPos.y - WorldOriginOffset.y);
-	TempPos.z = -(FLOAT32)(VehicleData->AdjustedForCGPos.z - WorldOriginOffset.z);
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	TempPos.x = (FLOAT32)(VehicleData->AdjustedForCGPos.x - worldOriginOffset.x);
+	TempPos.y = (FLOAT32)(VehicleData->AdjustedForCGPos.y - worldOriginOffset.y);
+	TempPos.z = -(FLOAT32)(VehicleData->AdjustedForCGPos.z - worldOriginOffset.z);
 
 	V1 = TempPos;
 	V1.z += 1000.0f;
@@ -727,9 +727,9 @@ static SINT32 LastUpdateTime;
 
 	if (trncdCollideDownMediumList(&TempPos,&V1) == TRUE)
 	{
-		TempPos.x = (FLOAT32)(V1.x + WorldOriginOffset.x);
-		TempPos.y = (FLOAT32)(V1.y + WorldOriginOffset.y);
-		TempPos.z = (FLOAT32)(V1.z + WorldOriginOffset.z);
+		TempPos.x = (FLOAT32)(V1.x + worldOriginOffset.x);
+		TempPos.y = (FLOAT32)(V1.y + worldOriginOffset.y);
+		TempPos.z = (FLOAT32)(V1.z + worldOriginOffset.z);
 		TempPos.z = -TempPos.z;
 
 		_VarData.AGLMeters = (FLOAT32)(VehicleData->VehiclePos.z - TempPos.z);

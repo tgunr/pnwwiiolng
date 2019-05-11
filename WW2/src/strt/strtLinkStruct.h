@@ -50,6 +50,7 @@ public:
 	FULL_OBJ_ID		firebaseID;
 
 	UINT32			m_uid;			// Databases's unique ID for me
+	UINT16			cpOIDList_index;	// Index into cpOIDList array
 };
 
 //tolua_end

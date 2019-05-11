@@ -11,7 +11,7 @@
 #include "phui/Util.h"
 
 #include "gl/glplat.h"
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include "ui/uiMain.h"
 #include "ui/uiKeymap.h"
 #include "imap/ww2func.h"

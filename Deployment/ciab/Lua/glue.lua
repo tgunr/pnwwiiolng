@@ -517,7 +517,7 @@ function setCP(targetCP, country, announce, force)
  local ctry = getCountry(country)
  if type(ctry) ~= 'number' then return error("Unrecognized country "..country) end
  if force or cp.country ~= ctry then
-  cp:changeOwnership(ctry, true, not(announce))
+  cp:changeOwnershipFromScript(ctry, true, not(announce))
  end
  strtSaveCP(cp)
  return cp
@@ -949,7 +949,7 @@ end
 -- Unfortunately, you have to look up all the player details yourself
 -- for now.
 
-function captureAndLog(theFac, thePlayer, customerID, theMissionID, theHCUnit)
+function captureAndLog(theFac, thePlayer, customerID, country, theMissionID, theHCUnit)
  local fac = getFacility(theFac)
  if fac == nil then return error("Unknown facility: " .. theFac) ; end
  local handle = getHandle(thePlayer)
@@ -957,7 +957,7 @@ function captureAndLog(theFac, thePlayer, customerID, theMissionID, theHCUnit)
  local unit = getHCUnit('104atr')
  if unit == nil then return error("Unknown HC Unit: " .. theHCUnit) ; end
  local seconds = 60
- strtCaptureAndLog(fac, handle, customerID, theMissionID, unit, seconds)
+ strtCaptureAndLog(fac, handle, customerID, country, theMissionID, unit, seconds)
  print("Captured " .. fac.name)
 end
 

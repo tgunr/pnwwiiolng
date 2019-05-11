@@ -293,6 +293,13 @@ SINT8            gClientV[32]; // Version to submit
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;
+LOGICAL          gDisableMouseClipping = false;
+LOGICAL          gDisableMouseHiding = false;
+LOGICAL          gDisableGameTopmost = true;
+#endif
+
+#if platOS == OS_MACOS
+LOGICAL          MacNoKeychainUsage = false;
 #endif
 
 #ifdef BETA_RELEASE

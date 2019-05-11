@@ -13,8 +13,12 @@ namespace PNRandom
     // Return min <= x <= max
     inline int random(int mn, int mx)
     {
-        int diff = mx - mn + 1;
-        return mn + (randomMT() % diff);
+        if (mn == 0 && mx == RAND_MAX) {
+            return randomMT();
+        } else {
+            int diff = mx - mn + 1;
+            return mn + (randomMT() % diff);
+        }
     }
 
     inline float random(float mn, float mx)

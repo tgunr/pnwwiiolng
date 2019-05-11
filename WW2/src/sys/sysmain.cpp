@@ -3,10 +3,6 @@
 #include <Windows.h>
 #include <VersionHelpers.h>
 
-#pragma message("This bit of nonsense makes up for the ancient precompiled js.lib we're using")
-#pragma message("REMOVE THIS ASAP")
-extern "C" __declspec(dllexport) FILE *_iob[3] = {stdin, stdout, stderr};
-
 //#define _WIN32_WINNT	0x0400
 #include <stdarg.h>
 #include "sys/sysAntihack.h"
@@ -85,40 +81,6 @@ static void AddArchives();
 
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
-
-std::string Base64Encode(void const *buffer, size_t bufferLength)
-{
-	DWORD neededLen = 0;
-	
-	if (CryptBinaryToStringA(
-			reinterpret_cast<const BYTE *>(buffer), bufferLength,
-			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
-			nullptr, &neededLen
-	)) {
-		std::string str(neededLen, 0);
-		
-		CryptBinaryToStringA(
-			reinterpret_cast<const BYTE *>(buffer), bufferLength,
-			CRYPT_STRING_BASE64 | CRYPT_STRING_NOCRLF,
-			const_cast<LPSTR>(str.data()), &neededLen);
-		return str;
-	} else {
-		return "";
-	}
-}
-
-bool Base64Decode(const std::string &input, void *outputBuffer, size_t *ioBufferLength)
-{
-	DWORD localLength = static_cast<DWORD>(*ioBufferLength);
-	if (CryptStringToBinaryA(
-		input.data(), 0, CRYPT_STRING_BASE64,
-		reinterpret_cast<BYTE *>(outputBuffer), &localLength, nullptr, nullptr
-	)) {
-		*ioBufferLength = static_cast<size_t>(localLength);
-		return true;
-	}
-	return false;
-}
 
 void decompressStatus (SINT32 archive_index)
 {
@@ -648,6 +610,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!mngoptParse()) {
 		return 0;
 	}
+
+	// Declare our "DPI awareness" (air quotes are very required here) as early
+	// as possible. The only reason this goes below mngoptParse() is so we can
+	// later add as -nodpiaware option for testing or whatever.
+	// TODO: Add a -dpiawareness option or something.
+	// TODO: Use an API availability check (Windows version checks above are
+	//       very very wrong and unusable) to enable usage of the newer
+	//       SetProcessDpiAwarenessContext() (Win 10 1607) or
+	//       SetProcessDpiAwareness() (Win 8.1) when available.
+	SetProcessDPIAware();
 
 	// We may need to restart if this is a Steam version that wasn't launched properly.
 	if ( !InitSteam() )

@@ -39,7 +39,7 @@ extern void threadsDBReconnect(DBHANDLE& dbh);
 extern void threadsDBReconnect(DB::handle_t ** conn, UINT32 threadRef, PNThread *pThread);
 
 // Open a new database connection in a thread-safe way
-extern DB::handle_t* threadsOpenDBConnection(bool enableAutoCommit);
+extern DB::handle_t* threadsOpenDBConnection();
 
 // Close a connection.
 extern void threadsCloseDBConnection(DB::handle_t* conn);

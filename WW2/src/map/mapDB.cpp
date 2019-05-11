@@ -40,6 +40,7 @@
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRank.h"
 #include "wwii/wwiiThreads.h"
+#include "mm/mmdbPersonaSelections.h"
 
 bool activeCountries[MAX_COUNTRIES];
 
@@ -121,7 +122,7 @@ static void _initializeBrigadeLocations()
 	HCUNIT_INDEX::iterator it;
 	for (it = hcUnits.begin(); it != hcUnits.end(); ++it) {
 		HCUnit* unit = it->second;
-		if (!unit->isBrigade() && !unit->isDivision())
+		if (!unit->isBrigade() && !unit->isDivision() && !unit->isGarrison())
 			continue;
 		if (unit->homeCPID().id == 0)
 			continue;
@@ -389,10 +390,10 @@ bool mapFillPersonaData(Player* const player)
 
 		player->SetMeteredAccess(newMinuteBalance);
 
-		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " tr:%u took %" PR64BitUT "ms"
+		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
-						, player->minuteBalance()
+						, (uint64_t)player->minuteBalance()
 						);
 
 		return true;
@@ -484,10 +485,8 @@ _errExit(const WWII_ERROR_INFO& info, const Player& player, const UINT32 platfor
 	}
 
 	std::string error = info.data.piExitInfo.errorMessage.string;
-//	DB::handle_t* conn = threadsOpenDBConnection(false);
 	DBThread::EscapeString(src);
 	DBThread::EscapeString(error);
-//	threadsCloseDBConnection(conn);
 
 	player.log(_FLN, "Received PIEXIT ver %s exit info type %u at %s:%u: %s"
 						, clientVersion, info.errorType
@@ -771,7 +770,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 		for ( auto it = hcUnits.begin(); it != hcUnits.end(); ++it )
 		{
 			HCUnit& unit = *(it->second);
-			if ( unit.isBrigade() == false || unit.isTrainingUnit() == true )
+			if ( (unit.isBrigade() == false && unit.isGarrison() == false) || unit.isTrainingUnit() == true )
 				continue;
 			if ( unit.homeCPID().Key() == host_config.routDestination[unit.country()] )
 				continue;
@@ -797,6 +796,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 	if ( player->m_sideLockTime > 0 )
 		m_sidelocked = player->m_lastSide;
 
+	bool savePersona = false;
 	for ( size_t i = 0; i < count; ++i )
 	{
 		PersonaSummary& ps = m_summaries[i];
@@ -809,6 +809,27 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			ps.m_lastUsed = now - lastUsed;
 		else
 			ps.m_lastUsed = 0;
+
+		// Verify the brigade is for this persona is valid
+		if (ps.m_brigadeID != 0)
+		{
+			HCUnit *unit = HCUnit::Lookup(ps.m_brigadeID);
+			if (unit == nullptr || (unit->side() != wwiiSide(ps.m_countryID)))
+			{
+				Brigade * brigade = (Brigade *)HCUnit::GetTrainingUnit(ps.m_countryID, ps.m_branchID);
+				if (brigade != nullptr)
+				{
+					ps.m_brigadeID = brigade->brigadeID();
+					savePersona = true;
+					dbugLog(_FLD, "New unit id %d being returned for player %d, persona %d", ps.m_brigadeID, player->playerID(),
+							ps.m_personaID);
+				}
+				else
+				{
+					dbugLog(_FLW, "Could not find training unit for country %d, branch %d", ps.m_countryID, ps.m_branchID);
+				}
+			}
+		}
 
 		if ( lockReason == PersonaSummary::_ARENALOCK )
 		{
@@ -832,6 +853,9 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 		}
 	}
+
+	if (savePersona)
+		mmdbSavePersonaSelection(player);
 
 	m_activeMission.populate(player->activeMission());
 

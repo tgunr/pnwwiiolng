@@ -16,7 +16,7 @@
 #include "pers/pershud.h"
 #include "pers/persgunsight.h"
 #include "pers/persbombsight.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "uimap/uiMap.h"
 #include "fp/fpFPS.h"

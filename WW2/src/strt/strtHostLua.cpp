@@ -302,7 +302,7 @@ stratProcessLuaEventQueue()
 {
 //	static std::string code = "if LuaEvent then LuaEvent.ProcessQueue() end";
 //	Lua::RunObject("LuaEventQueue", code);
-	static std::string code = Lua::CompileCode("if LuaEvent then LuaEvent.ProcessQueue() end", "EventQueue");
+	static std::string code = Lua::CompileCode("if LuaEvent then\n\tLuaEvent.ProcessQueue()\nend\n", "EventQueue");
 	Lua::RunObject("EventQueue", code);
 }
 

@@ -670,7 +670,10 @@ static bool ddpResetWindow(void) {
 		             SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 	}
 
-	ClipCursor(&renderrect);
+#if DEBUG_WW2
+	if (!gDisableMouseClipping)
+#endif
+		ClipCursor(&renderrect);
 
 	//--------------
 
@@ -1157,7 +1160,10 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_SETFOCUS:
 	{
 		OnSetFocus((HWND) wParam);
-		ClipCursor(&renderrect);
+#if DEBUG_WW2
+		if (!gDisableMouseClipping)
+#endif
+			ClipCursor(&renderrect);
 		break;
 	}
 	case WM_KILLFOCUS:
@@ -1481,16 +1487,18 @@ static LOGICAL OnNcActivate(LOGICAL bActive)
 
 	if (bActive)
 	{
-#if RELEASE_CLIENT != 0
-		SetWindowPos(myhwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
+		HWND insertPos = HWND_TOPMOST;
+#if DEBUG_WW2
+		if (gDisableGameTopmost) {
+			insertPos = HWND_TOP;
+		}
 #endif
+		SetWindowPos(myhwnd, insertPos, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
 		dipAcquire();
 	}
 	else
 	{
-#if RELEASE_CLIENT != 0
 		SetWindowPos(myhwnd, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE|SWP_NOACTIVATE);
-#endif
 		dipUnacquire();
 	}
 
@@ -1689,13 +1697,18 @@ void ddpShowCursor()
 {
 	int count = ShowCursor(TRUE);
 	while(count <= 1)
-			count = ShowCursor(TRUE);
+		count = ShowCursor(TRUE);
 	SetCursor(cursor);
 	cursorvisible = 1;
 }
 
 void ddpHideCursor()
 {
+#if DEBUG_WW2
+	if (gDisableMouseHiding) {
+		return;
+	}
+#endif
 	int count = ShowCursor(FALSE);
 	while(count > -1)
 		count = ShowCursor(FALSE);

@@ -290,13 +290,20 @@ extern SINT8            gClientV[32]; // Version to submit
 
 #ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;
+extern LOGICAL          gDisableMouseClipping; // No ClipCursor() on Windows. Mac doesn't do this.
+extern LOGICAL          gDisableMouseHiding; // Don't hide the mouse while the game is frontmost. Mac doesn't need this (LLDB is smarter than VS)
+extern LOGICAL          gDisableGameTopmost; // Use HWND_TOP instead of HWND_TOPMOST in SetWindowPos() on Windows. On by default when debugging.
+#endif
+
+#if platOS == OS_MACOS
+extern LOGICAL          MacNoKeychainUsage;
 #endif
 
 #ifdef BETA_RELEASE
-	extern LOGICAL			gCheckPlanarPlacement;
-	extern UINT32			gPersDecalOverride;
-	extern UINT32			gUnitDecalOverride;
-	extern UINT32			gr2DrawFlags;
+extern LOGICAL			gCheckPlanarPlacement;
+extern UINT32			gPersDecalOverride;
+extern UINT32			gUnitDecalOverride;
+extern UINT32			gr2DrawFlags;
 #endif	// #ifdef BETA_RELEASE
 
 static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }

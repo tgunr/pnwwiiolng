@@ -141,6 +141,30 @@ strtEnemyLink(CPStruct& cp, bool state)
 	}
 }
 
+void
+strtFrontlineLink(CPStruct& cp, bool state)
+{
+	cp.m_frontlineLinked = state;
+	if (state)
+		cp.flags |= CP_STAT_FRONTLINE_LINKED;
+	else
+	{
+		cp.flags &= ~CP_STAT_FRONTLINE_LINKED;
+	}
+}
+
+void
+strtFrontline(CPStruct& cp, bool state)
+{
+	cp.m_frontline = state;
+	if (state)
+		cp.flags |= CP_STAT_FRONTLINE;
+	else
+	{
+		cp.flags &= ~CP_STAT_FRONTLINE;
+	}
+}
+
 static inline void
 _checkSupplyLinksIn(const Supercell& sc)
 {
@@ -791,6 +815,7 @@ _checkCPLinks()
 		cp->numLinks = 0;
 		cp->numOpenLinks = 0;
 		strtEnemyLink(*cp, false);
+		strtFrontlineLink(*cp, false);
 
 		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]
 			; facility != nullptr
@@ -814,11 +839,22 @@ _checkCPLinks()
 			}
 			else
 			{
-				if ( isValidSide(otherCP->side) && otherCP->country != WWII_CHINA )	// Russia is neutral-hostile
+				// Find towns that are not of the same side but linked, thus making them Frontline
+				if (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)	// Russia is neutral-hostile
+				{
 					strtEnemyLink(*cp, true);
+					cp->m_townstatus = FRONT_LINE;
+				}
 
 				facility->m_outgoingLink->setEnabled(false);
 				facility->m_incomingLink->setEnabled(false);
+			}
+			
+			// Find the Reserve towns by looking for towns that have the same side and where the otherCP is a Frontline town and where the town is not Frontline 
+			if ((otherCP->ControllingSide() == cp->ControllingSide()) && (otherCP->m_townstatus == FRONT_LINE) && (cp->m_townstatus != FRONT_LINE))
+			{
+				strtFrontlineLink(*cp, true);
+				cp->m_townstatus = RESERVE;
 			}
 		}
 
@@ -834,6 +870,154 @@ _checkCPLinks()
 
 	dbugLog(_FLN,"finished cp link inits for %u cps", totalCPs);
 #endif
+}
+
+static void
+_setTownStatus()
+{
+	SINT64 totalBL = 0;
+	SINT64 totalFL = 0;
+	SINT64 totalRL = 0;
+	SINT64 totalIN = 0;
+	SINT64 totalNS = 0;
+	SINT64 totalLinked = 0;
+	bool linkDetected = false;
+	SINT64 totalChecked = 0;
+	CPStruct* cp;
+//	FacilityStruct* facility;
+
+	for (cp = Strat::cpList; cp != nullptr; cp = cp->next)
+	{
+		linkDetected = false;
+		bool hasAirOrNavalbase = false;
+		totalChecked++;
+
+		//Default status is INACTIVE. Set status to BACK_LINE if there is an air base or a naval base
+		if (cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+		{
+			hasAirOrNavalbase = true;
+		}
+		if (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr)
+		{
+			hasAirOrNavalbase = true;
+		}
+
+		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //Iterate though linked towns list
+		{
+			LinkStruct* outLink = *it;
+			if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+				continue;
+
+			linkDetected = true;
+			const CPStruct* const otherCP = outLink->endDepot->cp;
+
+			// Find towns that are not of the same side but linked, thus making them Frontline
+			if ((otherCP->side != cp->side) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+			{
+				//Linked town is enemy
+				cp->m_townstatus = FRONT_LINE;
+			}
+			if (otherCP->m_townstatus == FRONT_LINE)
+			{
+				if (cp->m_townstatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
+				{
+					cp->m_townstatus = BACK_LINE;
+				}
+			}
+			if (otherCP->m_townstatus == BACK_LINE)
+			{
+				if (cp->m_townstatus != FRONT_LINE && cp->m_townstatus != BACK_LINE) //Dont change to lower status if higher status has been detected
+				{
+					cp->m_townstatus = RESERVE;
+				}
+			}
+
+/*
+			if (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)	// Russia is neutral-hostile
+			{
+				cp->m_townstatus = FRONT_LINE;
+			}
+
+			if ((otherCP->ControllingSide() == cp->ControllingSide()) && (otherCP->m_townstatus == FRONT_LINE) && (cp->m_townstatus != FRONT_LINE))
+			{
+				strtFrontlineLink(*cp, true);
+				cp->m_townstatus = BACK_LINE;
+			}
+
+			if (otherCP->m_townstatus == FRONT_LINE && (cp->m_townstatus == INACTIVE))
+			{
+				cp->m_townstatus = BACK_LINE;
+				dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
+				totalBL++;
+			}
+*/
+		}
+		if (linkDetected)
+		{
+			totalLinked++;
+		}
+		else
+		{
+			cp->m_townstatus = INACTIVE;
+		}
+
+		_setTownStatusFlags(cp);
+
+		switch (cp->m_townstatus)
+		{
+		case FRONT_LINE:
+			totalFL++;
+			dbugLog(_FLN, "Set FRONT_LINE town status init for %s", cp->name);
+			break;
+		case BACK_LINE:
+			totalRL++;
+			dbugLog(_FLN, "Set BACK_LINE town status init for %s", cp->name);
+			break;
+		case RESERVE:
+			totalBL++;
+			dbugLog(_FLN, "Set RESERVE town status init for %s", cp->name);
+			break;
+		case INACTIVE:
+			totalIN++;
+			dbugLog(_FLN, "Set INACTIVE town status init for %s", cp->name);
+			break;
+		default:
+			totalNS++;
+			dbugLog(_FLN, "No           town status set  for %s", cp->name);
+			break;
+		}
+	}
+
+  	dbugLog(_FLN, "finished town status inits for %u front line cps", totalFL);
+	dbugLog(_FLN, "finished town status inits for %u back line cps", totalRL);
+	dbugLog(_FLN, "finished town status inits for %u reserve cps", totalBL);
+	dbugLog(_FLN, "finished town status inits for %u inactive cps", totalIN);
+	dbugLog(_FLN, "Towns with no status set   for %u total cps", totalNS);
+	dbugLog(_FLN, "finished town status inits for %u total cps", totalChecked);
+}
+
+void
+_setTownStatusFlags(CPStruct* cp)
+{
+	switch (cp->m_townstatus)
+	{
+	case FRONT_LINE:
+		strtFrontline(*cp, true);
+		strtFrontlineLink(*cp, false);
+		break;
+	case BACK_LINE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, true);
+		break;
+	case RESERVE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	case INACTIVE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	}
 }
 
 static void
@@ -878,6 +1062,10 @@ strtInitializeStratData()
 	_resetAllObjects();
 
 	_checkCPLinks();
+
+#ifdef IS_STRAT_HOST
+	_setTownStatus();
+#endif
 
 	_checkSupplyLinks();
 
@@ -1932,10 +2120,10 @@ _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLI, "forcing %d:%d ownership on %s from %d:%d"
-					, country, side
+	dbugLog(_FLI, "forcing ownership of %s from side: %d to %d and country: %d to %d"
 					, cp.name
-					, cp.country, cp.side
+		            , cp.side, side
+					, cp.country, country
 					);
 #endif
 
@@ -1981,11 +2169,11 @@ _cpControl(CPStruct& cp, WWII_COUNTRY country)
 	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLI, "forcing %d:%d control on %s from %d:%d"
-					, country, side
-					, cp.name
-					, cp.country, cp.side
-					);
+	dbugLog(_FLI, "forcing control of %s from side: %d to %d and country: %d to %d"
+		, cp.name
+		, cp.side, side
+		, cp.country, country
+	);
 #endif
 
 	cp.controllingSide = side;

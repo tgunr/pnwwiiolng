@@ -2,9 +2,11 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <BinOutDir>$(SolutionDir)build\client\$(Configuration)\Bin\</BinOutDir>
-    <LibOutDir>$(SolutionDir)build\client\$(Configuration)\Lib\</LibOutDir>
-    <IntOutDir>$(SolutionDir)build\client\$(Configuration)\Tmp\$(TargetName)\</IntOutDir>
+    <BuildPrefix Condition="'$(WW2_BUILD_PREFIX)' == ''">$(SolutionDir)\build</BuildPrefix>
+    <BuildPrefix Condition="'$(WW2_BUILD_PREFIX)' != ''">$(WW2_BUILD_PREFIX)</BuildPrefix>
+    <BinOutDir>$(BuildPrefix)\client\$(Configuration)\Bin\</BinOutDir>
+    <LibOutDir>$(BuildPrefix)\client\$(Configuration)\Lib\</LibOutDir>
+    <IntOutDir>$(BuildPrefix)\client\$(Configuration)\Tmp\$(TargetName)\</IntOutDir>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />

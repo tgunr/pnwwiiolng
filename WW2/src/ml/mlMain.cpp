@@ -182,7 +182,7 @@
 #define _NUM_CP_LOOPS 100
 
 #define MIN_VEHICLE_TOW_DISTANCE 3.0 // added to vehicle radius
-#define MIN_TOW_DISTANCE 2.0
+#define MIN_TOW_DISTANCE 3.0
 #define MIN_HOIST_XY_DISTANCE2 	9.0
 #define MIN_HOIST_Z_DISTANCE2  	1.0
 #define MIN_RIDE_XY_DISTANCE2 	9.0
@@ -1129,24 +1129,24 @@ UINT32 mlCalcVehicleCenterOfMass(mlVehicleData* VehicleData)
 #ifdef BETA_RELEASE
 	if(VehicleObjectAnalysis && DisplayPhysics && IsFirstTic) // CG and Model Position
 	{
-		FLOAT64VECTOR WorldOriginOffset;
+		FLOAT64VECTOR worldOriginOffset;
 		FLOAT64VECTOR Pos1;
 		piVECTOR V1;
 
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
 		Pos1 = VehicleData->VehiclePos;
-		V1.x = (FLOAT32)(Pos1.x - WorldOriginOffset.x);
-		V1.y = (FLOAT32)(Pos1.y - WorldOriginOffset.y);
-		V1.z = (FLOAT32)(-Pos1.z - WorldOriginOffset.z);
+		V1.x = (FLOAT32)(Pos1.x - worldOriginOffset.x);
+		V1.y = (FLOAT32)(Pos1.y - worldOriginOffset.y);
+		V1.z = (FLOAT32)(-Pos1.z - worldOriginOffset.z);
 
 		draw3dDebugMarkPoint(&V1, colorWHITEALPHA, 1);
 
 	// let's do the model center point while we're at it
 		Pos1 = VehicleData->AdjustedForCGPos;
-		V1.x = (FLOAT32)(Pos1.x - WorldOriginOffset.x);
-		V1.y = (FLOAT32)(Pos1.y - WorldOriginOffset.y);
-		V1.z = (FLOAT32)(-Pos1.z - WorldOriginOffset.z);
+		V1.x = (FLOAT32)(Pos1.x - worldOriginOffset.x);
+		V1.y = (FLOAT32)(Pos1.y - worldOriginOffset.y);
+		V1.z = (FLOAT32)(-Pos1.z - worldOriginOffset.z);
 
 		draw3dDebugMarkPoint(&V1, colorREDALPHA, 1);
 	}
@@ -3769,7 +3769,7 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 	piVECTOR TempVec = {0, 0, 0};
 	OBJECT* TowTarget = nullptr;
 	vehVehicle* CurrentVehicle = nullptr;
-	FLOAT64VECTOR WorldOriginOffset = {0, 0, 0};
+	FLOAT64VECTOR worldOriginOffset = {0, 0, 0};
 	FLOAT64VECTOR HitchPos = {0, 0, 0},AttachPos = {0, 0, 0};
 
 	DeltaVec.x = DeltaVec.y = DeltaVec.z = 0.0f;
@@ -3778,7 +3778,7 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 	{
 		Force.x = Force.y = Force.z = 0.0;
 		TowTarget = nullptr;
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
 		mathVectorMultiply64(&AttachPos,&Component->CurrentRelativePos,&VehicleData->VehicleAttMat);
 		mathAddVectors(&AttachPos,&AttachPos,&VehicleData->AdjustedForCGPos);
@@ -3805,9 +3805,9 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 				TempVec.z = TowTarget->dof->dofmatrix2._43;
 				math3dVectorMultiply(&TempVec,&TempVec,&TowTarget->mat);
 
-				HitchPos.x = TempVec.x + WorldOriginOffset.x;
-				HitchPos.y = TempVec.y + WorldOriginOffset.y;
-				HitchPos.z = -(TempVec.z + WorldOriginOffset.z);
+				HitchPos.x = TempVec.x + worldOriginOffset.x;
+				HitchPos.y = TempVec.y + worldOriginOffset.y;
+				HitchPos.z = -(TempVec.z + worldOriginOffset.z);
 
 				mathSubVectors(&DeltaVec,&HitchPos,&AttachPos);
 
@@ -9024,18 +9024,18 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 	OBJECT* CollideObject = nullptr;
 	piVECTOR V1,V2;
  	FLOAT32 Height = 0;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	FLOAT64VECTOR Pos;
 	piVECTOR CollidePos;
 	FLOAT32 RollCoefficient;
 	if(Vehicle->ModelData == nullptr) return 0;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 	Pos = (Vehicle->ModelData) ? Vehicle->ModelData->AdjustedForCGPos : Vehicle->PosData.RenderPos;
 
-	V1.x = (FLOAT32)(Pos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(Pos.y - WorldOriginOffset.y);
-	V1.z = (FLOAT32)(Pos.z - WorldOriginOffset.z); V1.z = -V1.z;
+	V1.x = (FLOAT32)(Pos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(Pos.y - worldOriginOffset.y);
+	V1.z = (FLOAT32)(Pos.z - worldOriginOffset.z); V1.z = -V1.z;
 	V2 = V1; V2.z += 10000.0; V1.z -= 10000.0;
 
 	trncdCollideWithVehiclesAndTerrain(&V1,&V2,&CollidePos,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);
@@ -9045,9 +9045,9 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 		FLOAT64VECTOR WorldCollidePos;
 		WorldCollidePos.x = CollidePos.x; WorldCollidePos.y = CollidePos.y; WorldCollidePos.z = CollidePos.z;
 		mathVectorMultiply64(&WorldCollidePos, &WorldCollidePos, &CollideObject->mat);
-		mathAddVectors(&WorldCollidePos, &WorldCollidePos, &WorldOriginOffset); WorldCollidePos.z = -WorldCollidePos.z;
+		mathAddVectors(&WorldCollidePos, &WorldCollidePos, &worldOriginOffset); WorldCollidePos.z = -WorldCollidePos.z;
 
-		Height = (FLOAT32)(Pos.z - WorldOriginOffset.z);
+		Height = (FLOAT32)(Pos.z - worldOriginOffset.z);
 		if(Vehicle->VehicleObjectData)
 			Height += Vehicle->VehicleObjectData->LowestPoint;
 
@@ -9090,8 +9090,8 @@ SINT32 mlVehicleToggleHoist(mlVehicleData* VehicleData)
 		mathVectorMultiply64(&AttachPos, &AttachPos, &VehicleData->VehicleAttMat);
 		mathAddVectors(&AttachPos, &AttachPos, &VehicleData->AdjustedForCGPos);
 
-		FLOAT64VECTOR WorldOriginOffset;
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		FLOAT64VECTOR worldOriginOffset;
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
 		// find a hoist point in range
 		for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
@@ -9110,9 +9110,9 @@ SINT32 mlVehicleToggleHoist(mlVehicleData* VehicleData)
 				math3dVectorMultiply(&TempVec, &TempVec, &Object->mat);
 
 				FLOAT64VECTOR DeltaVec, HoistPos;
-				HoistPos.x = TempVec.x + WorldOriginOffset.x;
-				HoistPos.y = TempVec.y + WorldOriginOffset.y;
-				HoistPos.z = -(TempVec.z + WorldOriginOffset.z);
+				HoistPos.x = TempVec.x + worldOriginOffset.x;
+				HoistPos.y = TempVec.y + worldOriginOffset.y;
+				HoistPos.z = -(TempVec.z + worldOriginOffset.z);
 
 				mathSubVectors(&DeltaVec, &HoistPos, &AttachPos);
 				if (DeltaVec.x * DeltaVec.x + DeltaVec.y * DeltaVec.y < MIN_HOIST_XY_DISTANCE2 &&
@@ -9229,8 +9229,8 @@ SINT32 mlVehicleRideTransport(mlVehicleData* VehicleData)
 		mathVectorMultiply64(&AttachPos, &AttachPos, &VehicleData->VehicleAttMat);
 		mathAddVectors(&AttachPos, &AttachPos, &VehicleData->AdjustedForCGPos);
 
-		FLOAT64VECTOR WorldOriginOffset;
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		FLOAT64VECTOR worldOriginOffset;
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
 		if(RideVehicle->VehicleObjectData == nullptr) return 0;
 
@@ -9246,9 +9246,9 @@ SINT32 mlVehicleRideTransport(mlVehicleData* VehicleData)
 				math3dVectorMultiply(&TempVec, &TempVec, &Object->mat);
 
 				FLOAT64VECTOR DeltaVec, SeatPos;
-				SeatPos.x = TempVec.x + WorldOriginOffset.x;
-				SeatPos.y = TempVec.y + WorldOriginOffset.y;
-				SeatPos.z = -(TempVec.z + WorldOriginOffset.z);
+				SeatPos.x = TempVec.x + worldOriginOffset.x;
+				SeatPos.y = TempVec.y + worldOriginOffset.y;
+				SeatPos.z = -(TempVec.z + worldOriginOffset.z);
 
 				mathSubVectors(&DeltaVec, &SeatPos, &AttachPos);
 				if( DeltaVec.x * DeltaVec.x + DeltaVec.y * DeltaVec.y < MIN_RIDE_XY_DISTANCE2 &&
@@ -9284,12 +9284,12 @@ static SINT32 mlHoistCollisions(vehVehicle* Vehicle)
 {
 	LOGICAL Collided = FALSE;
 	vehVehicle* HoistedVehicle;
-	FLOAT64VECTOR WorldOffsetOrigin;
+	FLOAT64VECTOR worldOriginOffset;
 	piVECTOR OldPos, NewPos;
 	LOGICAL UpdateWinch = FALSE;
 	OBJECT* HoistObject;
 
-	trnGetWorldOriginOffset(&WorldOffsetOrigin); WorldOffsetOrigin.z = -WorldOffsetOrigin.z;
+	trnGetWorldOriginOffset(&worldOriginOffset); worldOriginOffset.z = -worldOriginOffset.z;
 
 	HoistedVehicle = vehFindRidingVehicle(Vehicle->VehicleHostIndex, VEH_HOIST_RIDE_SEAT, VEH_TYPE_GROUND);
 	if(HoistedVehicle)
@@ -9338,7 +9338,7 @@ static SINT32 mlHoistCollisions(vehVehicle* Vehicle)
 				vehVehicle* CollideVehicle = mlHoistCollideRoundWithVehicles(nullptr, &OldPos, &NewPos);
 				if(CollideVehicle)
 				{
-					if(-OldPos.z < CollideVehicle->PosData.RenderPos.z + CollideVehicle->VehicleObjectData->HighestPoint - WorldOriginOffset.z)
+					if(-OldPos.z < CollideVehicle->PosData.RenderPos.z + CollideVehicle->VehicleObjectData->HighestPoint - worldOriginOffset.z)
 					{
 						UpdateWinch = TRUE;
 						Vehicle->ModelData->TurretTraverseRate[Vehicle->ModelData->HoistTurretNum-1] = -1;
@@ -9375,7 +9375,7 @@ static SINT32 mlHoistCollisions(vehVehicle* Vehicle)
 		if(!Collided && LineCollideObject)
 		{
 			FLOAT64VECTOR Pos = HoistedVehicle->PosData.RenderPos;
-			mathSubVectors(&Pos,&Pos,&WorldOffsetOrigin);
+			mathSubVectors(&Pos,&Pos,&worldOriginOffset);
 
 			LineCollideObject->flag2 &= ~OBJECT_DONT_UPDATE;
 			mlMoveAndRotateObject(LineCollideObject,  &Pos,  &HoistedVehicle->PosData.RenderAtt);
@@ -9617,14 +9617,14 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	UINT32 NumCollisionSlotsLeft = 32;
 	piVECTOR		SphereCenter;
 	UINT32			Collision;
-	FLOAT64VECTOR 	WorldOriginOffset;
+	FLOAT64VECTOR 	worldOriginOffset;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	worldOriginOffset.z = -worldOriginOffset.z;
 
-	SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-	SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-	SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+	SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - worldOriginOffset.x);
+	SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - worldOriginOffset.y);
+	SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - worldOriginOffset.z);
 
 	mlUtilityCheckLineSphereCollide(&Collision, &SphereCenter, OldPos, NewPos, CurrentVehicle->VehicleObjectData->Radius);
 
@@ -10057,7 +10057,7 @@ UINT32 i;
 
 static void _LeakTest()
 {
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	FASTCOLLIDE CollideList[32], *CollideListPtr;
 	UINT32 NumCollisions;
 	piVECTOR start, end, att;
@@ -10066,7 +10066,7 @@ static void _LeakTest()
 	piMATRIX mat;
 	SINT32 size;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	maxdim = -1;
 
@@ -10095,12 +10095,12 @@ static void _LeakTest()
 			 math3dVectorMultiply(&end, &end, &mat);
 
 			// translate
-			start.x += (FLOAT32)(VehicleData->VehiclePos.x - WorldOriginOffset.x);
-			start.y += (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
-			start.z += (FLOAT32)(VehicleData->VehiclePos.z - WorldOriginOffset.z);
-			end.x += (FLOAT32)(VehicleData->VehiclePos.x - WorldOriginOffset.x);
-			end.y += (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
-			end.z += (FLOAT32)(VehicleData->VehiclePos.z - WorldOriginOffset.z);
+			start.x += (FLOAT32)(VehicleData->VehiclePos.x - worldOriginOffset.x);
+			start.y += (FLOAT32)(VehicleData->VehiclePos.y - worldOriginOffset.y);
+			start.z += (FLOAT32)(VehicleData->VehiclePos.z - worldOriginOffset.z);
+			end.x += (FLOAT32)(VehicleData->VehiclePos.x - worldOriginOffset.x);
+			end.y += (FLOAT32)(VehicleData->VehiclePos.y - worldOriginOffset.y);
+			end.z += (FLOAT32)(VehicleData->VehiclePos.z - worldOriginOffset.z);
 
 			// randomly flip z's (sigh)
 			start.z = -start.z;
@@ -10112,7 +10112,7 @@ static void _LeakTest()
 			CollideListPtr = CollideList; NumCollisions = 32;
 			weapCollideRoundWithVehicles(&CollideListPtr, &NumCollisions,
 											&start, &end, frametime/1000.0f, frametime/1000.0f,
-											TRUE, TRUE, &WorldOriginOffset, FALSE, 0);
+											TRUE, TRUE, &worldOriginOffset, FALSE, 0);
 			NumCollisions = 32 - NumCollisions;
 
 			if(NumCollisions > 0)
@@ -10157,7 +10157,7 @@ static void _LeakTest()
 //
 LOGICAL mlIsFPSOnWater(mlVehicleData * VehicleData, LOGICAL* onWater)
 {
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 piVECTOR V1,V2;
 FLOAT32 RollCoefficientMult;
 OBJECT * Object;
@@ -10176,10 +10176,10 @@ trnCDTerrainObject*	TO;
 
 	TO = nullptr;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
-	V1.x = (FLOAT32)(VehicleData->VehiclePos.x - WorldOriginOffset.x);
-	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
+	V1.x = (FLOAT32)(VehicleData->VehiclePos.x - worldOriginOffset.x);
+	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - worldOriginOffset.y);
 	V1.z = -(FLOAT32)(VehicleData->VehiclePos.z);
 
 	V2 = V1;
@@ -10721,10 +10721,10 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 			OBJECT * TowTarget;
 			OBJECT * Object;
 			vehVehicle* CurrentVehicle;
-			FLOAT64VECTOR WorldOriginOffset;
+			FLOAT64VECTOR worldOriginOffset;
 			UINT32 OkToContinue;
 			DeltaVec.x = DeltaVec.y = DeltaVec.z = 0.0f;
-			trnGetWorldOriginOffset(&WorldOriginOffset);
+			trnGetWorldOriginOffset(&worldOriginOffset);
 
 			mathVectorMultiply64(&AttachPos,&Component->CurrentRelativePos,&VehicleData->VehicleAttMat);
 			mathAddVectors(&AttachPos,&AttachPos,&VehicleData->AdjustedForCGPos);
@@ -10779,9 +10779,9 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 							TempVec.z = Object->dof->dofmatrix2._43;
 							math3dVectorMultiply(&TempVec,&TempVec,&Object->mat);
 
-							HitchPos.x = TempVec.x + WorldOriginOffset.x;
-							HitchPos.y = TempVec.y + WorldOriginOffset.y;
-							HitchPos.z = -(TempVec.z + WorldOriginOffset.z);
+							HitchPos.x = TempVec.x + worldOriginOffset.x;
+							HitchPos.y = TempVec.y + worldOriginOffset.y;
+							HitchPos.z = -(TempVec.z + worldOriginOffset.z);
 
 							mathSubVectors(&DeltaVec,&HitchPos,&AttachPos);
 

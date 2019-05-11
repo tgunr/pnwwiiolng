@@ -162,7 +162,7 @@ Chat::PersonaUpdate::PersonaUpdate(
 }
 
 //////////////////////////////////////////////////////////////////////
-// Receive a brigade move notice
+// Receive a brigade move notice (used my mmhostd)
 
 template<>
 SINT32
@@ -180,6 +180,40 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 		unit->setHomeCPID(data.m_destination);
 	}
 
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Receive a Garrison country change (used my mmhostd)
+template<>
+SINT32
+GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+{
+	GarrisonCountryChange& data = incoming.data();
+
+	if (data.m_actionable)
+	{
+		dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG for unit %d, new country %d, action %d, actionable %d",
+			data.m_brigadeID, data.m_newCountryId, data.m_action, data.m_actionable);
+
+		HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
+		if (unit != nullptr)
+		{
+			dbugLog(_FLD, "Garrison is name is %s", unit->name());
+			data.process(unit->m_unitID, data.m_newCountryId);
+			CPStruct* cp = strtGetCP(unit->m_homeCPID);
+			if (cp != nullptr)
+			{
+				UINT32 armyGarrison = HCUnit::GetArmyGarrison(unit->m_homeCPID);
+				if (data.m_brigadeID == armyGarrison)
+				{
+					dbugLog(_FLD, "Old country is %d, new is %d", cp->controllingCountry, data.m_newCountryId);
+					cp->controllingCountry = data.m_newCountryId;
+				}
+			
+			}
+		}
+	}
 	return 0;
 }
 
@@ -342,6 +376,8 @@ chatInstallSupportCallbacks()
 
 		REGISTER_RECEIVER(Chat::MAP_PERSONA_UPDATE_Y, _recvMapPersonaUpdate);
 		REGISTER_RECEIVER(Chat::MAP_REFRESH_PLAYER_Y, _recvRefreshPlayer);
+
+		REGISTER_MSG(Chat::GARRISON_COUNTRY_Y, GARRISON_COUNTRY_CHANGE_MSG);
 	}
 	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }

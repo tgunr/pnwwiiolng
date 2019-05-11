@@ -36,7 +36,6 @@
 #include "map/mapData.h"
 #include "map/mapDB.h"
 #include "map/mapHostMessages.h"
-#include "map/mapMinuteBalance.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapThreads.h"
@@ -1003,16 +1002,6 @@ public:
 	}
 };
 
-static void
-_logWWIIPlayerStats()
-{
-	static TeulTimeMS nextBlip = 0ULL;
-	if ( teulClock64 < nextBlip )
-		return;
-	wwiiPlayer::logStats();
-	nextBlip = teulClock64 + 60 * 1000;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Periodic "housekeeping" routines that are run every few seconds.
 
@@ -1034,7 +1023,6 @@ _housekeeping()
 	,	_pollChecksums
 #endif
 	,	Instance::RecordPopulations
-	,	_logWWIIPlayerStats
 	,	[](){ chatHousekeepGroupPermissions(); }
 	,	mapExpireSorties
 	,	mapRequestBrigadeDetailsUpdate
@@ -1263,7 +1251,6 @@ main(int argc, const char* argv[])
 			mapSendChatUpdates
 		,	mapProcessLogins
 		,	mapSendHCUpdates
-		,	mapChargeMinutes
 		,	nullptr
 		};
 		static Housekeeper housekeeper(functions);

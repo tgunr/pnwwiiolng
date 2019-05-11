@@ -17,7 +17,7 @@
 #include "fx/postRender.h"
 #include "gr2/gr2Anim.h"
 #include "gr2/gr2Main.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "include/vars.h"
 #include "locl/loclMain.h"
@@ -1553,7 +1553,7 @@ FLOAT32 Delta;
 piVECTOR TargetPosBase;
 FLOAT64VECTOR TargetPos,TargetVel,TargetAcc;
 FLOAT64VECTOR Acc;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 piVECTOR TempPos;
 SINT32 TempNum;
 FLOAT32 MinHeight;
@@ -1640,10 +1640,10 @@ static piVECTOR _LastVec;
 		_GetPlayerPos(&TargetPosBase,&AttMat);
 		*Pos = TargetPosBase;
 
-		trnGetWorldOriginOffset(&WorldOriginOffset);
-		TargetPos.x = TargetPosBase.x - WorldOriginOffset.x;
-		TargetPos.y = TargetPosBase.y - WorldOriginOffset.y;
-		TargetPos.z = TargetPosBase.z - WorldOriginOffset.z;
+		trnGetWorldOriginOffset(&worldOriginOffset);
+		TargetPos.x = TargetPosBase.x - worldOriginOffset.x;
+		TargetPos.y = TargetPosBase.y - worldOriginOffset.y;
+		TargetPos.z = TargetPosBase.z - worldOriginOffset.z;
 
 
 		Vec.x = Vec.y = Vec.y = 0;
@@ -4173,12 +4173,12 @@ UINT32 persUpdateCockpitSmoke()
 #if(0)
 FLOAT32 TimeBurning;
 FLOAT32 SmokeOpacity;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 FLOAT64VECTOR Pos;
 piVECTOR RotationRate;
 FLOAT32 Delta,SmokeLevel;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	// cockpit smoke effect
 	if (_Persona.VehicleAttached != nullptr)
@@ -4255,9 +4255,9 @@ FLOAT32 Delta,SmokeLevel;
 			Pos.x = playdir.x * 0.06 - playpos.x;
 			Pos.y = playdir.y * 0.06 - playpos.y;
 			Pos.z = playdir.z * 0.06 - playpos.z;
-			Pos.x += WorldOriginOffset.x;
-			Pos.y += WorldOriginOffset.y;
-			Pos.z = -(Pos.z + WorldOriginOffset.z);
+			Pos.x += worldOriginOffset.x;
+			Pos.y += worldOriginOffset.y;
+			Pos.z = -(Pos.z + worldOriginOffset.z);
 
 			RotationRate.x = mathGetFloat32ChaoticNumber() * 2.0f * PI;
 			RotationRate.y = mathGetFloat32ChaoticNumber() * 1.0f * 2.0f - 1.0f;

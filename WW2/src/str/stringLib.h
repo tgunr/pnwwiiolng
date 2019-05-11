@@ -23,12 +23,12 @@ extern int vasprintf(char **result, const char *fmt, va_list args);
 
 static inline size_t strlcpy(char *dest, const char *src, size_t len) {
     strcpy_s(dest, len, src);
-    return 1; // strlen(dest) - not worth the CPU time
+    return strlen(dest);
 }
 
 static inline size_t strlcat(char *dest, const char *src, size_t len) {
     strcat_s(dest, len, src);
-    return 1; // strlen(dest) - not worth the CPU time
+    return strlen(dest);
 }
 
 #else

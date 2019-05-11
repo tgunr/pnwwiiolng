@@ -8,6 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+
 #include "chat/chatConstants.h"
 #include "chat/chatDefines.h"
 #include "chat/chatGCITypes.h"
@@ -36,6 +37,7 @@
 static bool
 _setObjectsOwner(ObjectStruct* objectList, WWII_SIDE side, WWII_COUNTRY country)
 {
+	//dbugLog(_FLN, "Performing _setObjectsOwner");
 	if (objectList == nullptr || side == 0 || country == 0)
 		return false;
 
@@ -71,6 +73,7 @@ _findMajorityOwner(const CPStruct& cp, WWII_SIDE side)
 	WWII_COUNTRY maxOwner = WWII_NO_COUNTRY;
 	FacilityStruct* ab = nullptr;
 
+	//dbugLog(_FLN, "Performing _findMajorityOwner");
 	// A single AB means there's no contest
 	if ( cp.numArmyBases == 1 )
 		return cp.facilityTypeIndex[FACILITY_ARMYBASE]->country;
@@ -137,7 +140,8 @@ _findMajorityOwner(const CPStruct& cp, WWII_SIDE side)
 static inline void
 _decFacilities(CPStruct& cp, WWII_SIDE side)
 {
-	if ( side > 0 && side < MAX_SIDES )
+	//dbugLog(_FLN, "Performing _decFacilities");
+	if (side > 0 && side < MAX_SIDES)
 	{
 		if ( cp.facilitiesOwned[side] > 0 )
 			cp.facilitiesOwned[side]--;
@@ -152,7 +156,8 @@ _decFacilities(CPStruct& cp, WWII_SIDE side)
 static inline void
 _incFacilities(CPStruct& cp, WWII_SIDE side)
 {
-	if ( side > 0 && side < MAX_SIDES )
+	//dbugLog(_FLN, "Performing _incFacilities");
+	if (side > 0 && side < MAX_SIDES)
 	{
 		if ( cp.facilitiesOwned[side] < cp.ownableFacilities )
 			cp.facilitiesOwned[side]++;
@@ -167,7 +172,8 @@ _incFacilities(CPStruct& cp, WWII_SIDE side)
 static bool
 _updateABCounts(CPStruct& cp, WWII_SIDE newSide, WWII_SIDE oldSide)
 {
-	if ( cp.armyBasesOwned[oldSide] > 0 )
+	//dbugLog(_FLN, "Performing _updateABCounts");
+	if (cp.armyBasesOwned[oldSide] > 0)
 		cp.armyBasesOwned[oldSide]--;
 	else
 		cp.armyBasesOwned[oldSide] = 0;
@@ -202,7 +208,8 @@ _setFBsToMatch(FacilityStruct& ab)
 {
 	FacilityStruct* fb;
 
-	for ( fb = ab.CP().facilityTypeIndex[FACILITY_FIREBASE]; fb != nullptr; fb = fb->typeNext )
+	//dbugLog(_FLN, "Performing _setFBsToMatch");
+	for (fb = ab.CP().facilityTypeIndex[FACILITY_FIREBASE]; fb != nullptr; fb = fb->typeNext)
 	{
 		if ( fb->armyBase->uOID == ab.uOID && fb->country != ab.country && fb->side == ab.side )
 		{
@@ -226,8 +233,9 @@ CaptureAction::CaptureAction(FacilityStruct& withFacility, WWII_COUNTRY withNewC
 }
 
 void
-CaptureAction::Execute()
+CaptureAction::Execute(bool manualCapture)
 {
+	//dbugLog(_FLN, "Performing CaptureAction::Execute");
 	// Preparation
 	for ( int i = 1; i < MAX_SIDES; i++ )
 	{
@@ -253,7 +261,8 @@ CaptureAction::Execute()
 void
 CaptureAction::ChangeOwner()
 {
-	if ( m_facility.type == FACILITY_FIREBASE )
+	//dbugLog(_FLN, "Performing CaptureAction::ChangeOwner");
+	if (m_facility.type == FACILITY_FIREBASE)
 		return;
 
 	if ( m_facility.canBeCaptured() )
@@ -279,10 +288,10 @@ CaptureAction::ChangeOwner()
 	{
 		m_leftContention = true;
 
-		if ( m_cp.side != m_newSide )
-		{
+		//if ( m_cp.side != m_newSide )
+		//{
 			m_setOwner = true;
-		}
+		//}
 	}
 	else if ( m_cp.isContested() == false && m_cp.facilitiesOwned[m_newSide] == 1 )
 	{
@@ -321,6 +330,7 @@ CaptureAction::ChangeOwner()
 void
 chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const CPStruct& cp_, const FULL_OBJ_ID facID_)
 {
+	//dbugLog(_FLN, "Performing chatSendGCIMessage");
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::GAME_GCI_MESSAGE_Y));
 	outgoing.construct<Chat::GCIMessage>(gci_, side_, cp_.fullObjID, facID_, cp_.name);
 	serverSendPacketToType(outgoing, CHAT_HOST);
@@ -332,6 +342,7 @@ chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const CPStruct& cp_, const FU
 void
 CaptureAction::Announce() const
 {
+	//dbugLog(_FLN, "Performing CaptureAction::Announce");
 	dbugLog(_FLI, "cp:%s %s %s from %s to %s. con=%s, control=%s, owner=%s"
 					, m_cp.name
 					, (m_reclamation ? "retaking" : "taking")
@@ -381,6 +392,9 @@ CaptureAction::Announce() const
 				oldSideGCI = GCI_CP_CAPTURED;
 
 			newSideGCI = GCI_CP_ACQUIRED;
+
+			// The CP has been captured so we update the Garrison to the new country.
+			m_cp.changeAllGarrisonCountries(m_newCountry, false);
 		}
 		else
 		{
@@ -408,7 +422,8 @@ CaptureAction::Announce() const
 void
 CaptureAction::EnterContention() const
 {
-	//Set contention flag
+	//dbugLog(_FLN, "Performing CaptureAction::EnterContention");
+	// Set contention flag
 	m_cp.setContention(true);
 
 	dbugLog(_FLI, "cp %s %d:%d:%d has entered contention", m_cp.name, m_cp.fullObjID.cell.ox, m_cp.fullObjID.cell.oy, m_cp.fullObjID.id);
@@ -428,8 +443,9 @@ CaptureAction::EnterContention() const
 void
 CaptureAction::SetControl() const
 {
+	//dbugLog(_FLN, "Performing CaptureAction::SetControl");
 	strtEnemyLink(m_cp, false);
-//	cp.numOpenLinks = 0;
+	//	cp.numOpenLinks = 0;
 
 	dbugLog(_FLI,"cp:%s is now controlled by side %u, country %u", m_cp.name, m_cp.controllingSide, m_cp.controllingCountry);
 
@@ -466,6 +482,9 @@ CaptureAction::SetControl() const
 							, facility->name, facility->uOID
 							, m_cp.controllingSide);
 					strtCloseBase(*facility);
+
+					// Disable the Garrison
+					m_cp.disableAllGarrisons();
 				}
 				else
 				{
@@ -479,6 +498,8 @@ CaptureAction::SetControl() const
 					{
 						strtCloseBase(*facility);
 						strtOpenBase(*facility);
+						// Enable the Garrison
+						m_cp.enableAllGarrisons();
 					}
 				}
 
@@ -500,6 +521,7 @@ CaptureAction::SetControl() const
 void
 CaptureAction::LeaveContention() const
 {
+	//dbugLog(_FLN, "Performing CaptureAction::LeaveContention");
 	// Clear out running flags
 	m_cp.endContention();
 
@@ -543,15 +565,18 @@ CaptureAction::LeaveContention() const
 
 	strtQueueCPStatus(&m_cp);
 	strtSaveCP(&m_cp);
+	bool justCaptured = true; // This is needed to trigger town status check because town status may not have changed as a result of capture
+	m_cp.checkTownStatus(&m_cp, justCaptured, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Finish the capture event.
 
 void
-CaptureAction::ApplyEffects() const
+CaptureAction::ApplyEffects(bool manualCapture) const
 {
-	if ( m_enteredContention == true )
+	//dbugLog(_FLN, "Performing CaptureAction::ApplyEffects");
+	if (m_enteredContention == true)
 		EnterContention();
 
 	// Must leave contention before we mess with control
@@ -559,8 +584,11 @@ CaptureAction::ApplyEffects() const
 		LeaveContention();
 
 	// Assign control to the new controller, if neccessary
-	if ( m_setControl == true )
-		SetControl();
+	if (m_setControl == true)
+//	if (m_leftContention == true)
+		{
+			SetControl();
+		}
 
 	// If we've changed the owner of the town, or we've changed
 	// the controller of the town, or we're coming out of
@@ -575,9 +603,15 @@ CaptureAction::ApplyEffects() const
 	// Bounce any brigades that should no-longer be here.
 	m_cp.checkHCUnits();
 
+	// Set the last capture time only when switching sides 
+	if (m_leftContention == true && m_oldSide != m_newSide && !m_reclamation)
+	{
+		m_cp.setLastCaptureTime(teulTime());
+	}
+
 	// When we take ownership of a new town, destroy any outgoing
 	// firebases this would give us to enemy towns.
-	if ( m_leftContention == true && m_setOwner == true )
+	if ( m_leftContention == true && m_setOwner == true && !m_reclamation)
 	{
 		CPStruct::LINKS::iterator it;
 		for ( it = m_cp.m_links.begin(); it != m_cp.m_links.end(); ++it )

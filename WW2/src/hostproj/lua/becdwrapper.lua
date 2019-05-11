@@ -83,12 +83,12 @@ function becd.start_file( name, title )
 
 	if not title or title == '' or title == ' ' then
 		becd.errors = true
-		return becd.error( "Campaign doesn't have a title, I'm not loading that." )
+		return becd.error( "The Map doesn't have a title, unable to load..." )
 	end
 
-    print( string.format( "becd: starting file '%s', title '%s'", becd.file, becd.title ) )
+    print( string.format( "BECD: Starting file '%s', title '%s'", becd.file, becd.title ) )
 
-	systemMessage( string.format( "Loading Campaign '%s'", becd.title ) )
+	systemMessage( string.format( "Loading Map '%s'", becd.title ) )
 
 	-- Make sure that capture etc are disabled for now.
 	if host_config.arena.lock < 7 then
@@ -100,7 +100,12 @@ function becd.start_file( name, title )
 	-- Move all HCUnits off-map.
 	for unit in allStratHCUnits()
 	do
-		deploy( unit, "offmap", 0, false )
+		local hcunit = getHcUnit(unit)
+		
+		if not hcunit:isGarrison() then
+			deploy( unit, "offmap", 0, false )
+		end
+		
 		resetUnitSupply( unit )
 	end
 
@@ -116,6 +121,8 @@ end
 
 function becd.start_cps()
 	if becd.errors then return end
+
+    print( "BECD: Starting CPs" )
 end
 
 ----------------------------------------------------------------------
@@ -143,7 +150,7 @@ end
 function becd.end_cps()
 	if becd.errors then return end
 
-    print( "becd: finished cps" )
+    print( "BECD: Finished CPs" )
 	strtBroadcastCPs()
 end
 
@@ -152,6 +159,8 @@ end
 
 function becd.start_toes()
 	if becd.errors then return end
+
+    print( "BECD: Starting TOEs" )
 end
 
 ----------------------------------------------------------------------
@@ -159,6 +168,8 @@ end
 
 function becd.end_toes()
 	if becd.errors then return end
+
+    print( "BECD: Finished TOEs" )
 end
 
 ----------------------------------------------------------------------
@@ -166,6 +177,8 @@ end
 
 function becd.start_hcunit_toes()
 	if becd.errors then return end
+
+    print( "BECD: Starting HC Unit TOEs" )
 end
 
 ----------------------------------------------------------------------
@@ -173,6 +186,8 @@ end
 
 function becd.end_hcunit_toes()
 	if becd.errors then return end
+
+    print( "BECD: Finished HC Unit TOEs" )
 end
 
 ----------------------------------------------------------------------
@@ -185,11 +200,7 @@ end
 function becd.start_hcunit_cps()
 	if becd.errors then return end
 
-    print( "becd: starting hcunit_cps" )
-
-    for unit in allStratHCUnits() do
-      undeploy(unit)
-    end
+    print( "BECD: Starting HC Unit CPs" )
 end
 
 ----------------------------------------------------------------------
@@ -228,6 +239,8 @@ end
 
 function becd.end_hcunit_cps()
 	if becd.errors then return end
+
+    print( "BECD: Finished HC Unit CPs" )
 end
 
 ----------------------------------------------------------------------
@@ -235,6 +248,8 @@ end
 
 function becd.start_fbs()
 	if becd.errors then return end
+
+    print( "BECD: Starting FBs" )
 end
 
 ----------------------------------------------------------------------
@@ -278,6 +293,8 @@ end
 
 function becd.end_fbs()
 	if becd.errors then return end
+
+    print( "BECD: Finished FBs" )
 end
 
 ----------------------------------------------------------------------
@@ -285,6 +302,8 @@ end
 
 function becd.start_params()
 	if becd.errors then return end
+
+    print( "BECD: Starting Params" )
 end
 
 ----------------------------------------------------------------------
@@ -300,19 +319,21 @@ end
 
 function becd.end_params()
 	if becd.errors then return end
+
+    print( "BECD: Finished Params" )
 end
 
 ----------------------------------------------------------------------
 -- Invoked at the end of a script.
 
 function becd.end_file()
-    print( "becd: finished file" )
+    print( "BECD: Finished file" )
 
 	if becd.errors then
-		systemMessage( string.format( "Campaign load failed." ) )
-		gmMessage( string.format( "ERRORS WHILE LOADING CAMPAIGN FILE. See logs for details." ) )
+		systemMessage( string.format( "Map load failed..." ) )
+		gmMessage( string.format( "ERRORS WHILE LOADING MAP FILE. See logs for details." ) )
 	else
-		systemMessage( string.format( "'%s' campaign loaded.", becd.title ) )
+		systemMessage( string.format( "'%s' Map loaded.", becd.title ) )
 	end
 
 	CPMonitor:Enable()

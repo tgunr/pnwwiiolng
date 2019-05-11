@@ -103,6 +103,10 @@ struct FLOAT64VECTOR {
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
+
+
+	FLOAT64 length();
+
 };
 
 //--------------
@@ -128,6 +132,17 @@ inline FLOAT64VECTOR operator / (const FLOAT64VECTOR& v, double s)
 
 inline FLOAT64VECTOR operator /= (FLOAT64VECTOR& v, double s)
 { v = v / s; return v; }
+
+inline FLOAT64VECTOR operator - (const FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{
+	return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+}
+
+inline FLOAT64 FLOAT64VECTOR::length() 
+{
+	return sqrt(x * x + y * y + z * z);
+}
+
 
 //==============================================================================
 

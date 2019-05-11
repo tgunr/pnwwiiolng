@@ -8,6 +8,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "wwii/wwiiRTBCodes.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 extern SINT32 strtInstallMapCallbacks();
 
@@ -41,4 +42,3 @@ extern SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 mi
 extern SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool multicrew);
 
 extern SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join);
-
