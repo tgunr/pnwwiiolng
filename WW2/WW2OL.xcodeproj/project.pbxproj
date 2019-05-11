@@ -3295,7 +3295,6 @@
 						DevelopmentTeam = 755QPC3L4G;
 					};
 					8D0C4E890486CD37000505A6 = {
-						DevelopmentTeam = 755QPC3L4G;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -3879,6 +3878,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
