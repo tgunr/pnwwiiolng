@@ -81,6 +81,7 @@ public:
 
 	unsigned int StratFlags(bool filter = false) const;
 	unsigned int UpdateTime() const { return _updatetime; }
+	boolean IsLoaded() const { return _loaded;  }
 	int VisLevel() const { return _vislevel;}
 
 // updated from strat server
@@ -102,6 +103,7 @@ public:
 	void SetName(const char* name);
 	void SetCountry(int country);
 	void SetUpdateTime(unsigned int t) { _updatetime = t; }
+	void SetLoaded(boolean loaded) { _loaded = loaded; }
 	void SetStratFlags(unsigned int flags)  { _stratflags = flags; }
 	void SetVisLevel(int vislevel) { _vislevel = vislevel; }
 	void AddStratFlags(unsigned int flags)  { _stratflags |= flags; }
@@ -160,6 +162,7 @@ union StratTypeUnion
 	int _side, _country;
 	unsigned int _stratflags;
 	unsigned int _updatetime;
+	boolean _loaded;
 	int _vislevel;
 
 	std::string _name;

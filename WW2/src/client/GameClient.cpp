@@ -903,8 +903,9 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 				{
 					trnUpdateObjectStatus(stratobj->SupercellX(), stratobj->SupercellY(), stratobj->Id(), entry.ownership(), -1);
 				}
-				else if (stratobj->StratClass() == SDM_CLASS_CP && (entry.flags() & CP_STAT_CONTENTION) == 0)
+				else if (stratobj->StratClass() == SDM_CLASS_CP && (!stratobj->IsLoaded() || (entry.flags() & CP_STAT_CONTENTION) == 0))
 				{
+					stratobj->SetLoaded(true);
 					_setFacilityOwnershipsToMatchCP(stratobj, data);
 				}
 			}
