@@ -288,6 +288,7 @@ extern FLOAT32          aimFOVAdjust;
 
 extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gAuthServerPort[64];
+extern char             gAuthRelayURL[128]; // Auth relay URL override
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 extern SINT8            gLogMask[_MAX_PATH];	// Gobal logmask value to specify subsystem to match.

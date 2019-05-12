@@ -87,19 +87,21 @@ UINT32			WindowRefreshRate;	// desired refresh rate
 UINT32			DefTextureFormat;
 UINT32			DefTextureAlphaFormat;
 
-SINT32           WantedX;			// desired/actual x
-SINT32           WantedY;			// desired/actual y
-SINT32           WantedWidth;		// desired/actual width
-SINT32           WantedHeight;		// desired/actual height
-SINT32           WantedBpp;			// desired/actual bpp
-SINT32          	WantedRefreshRate;
-SINT32           WantedAlpha;		// desired/actual alpha
-LOGICAL          WantedHdw;			// desired/actual hardware
-SINT32           WantedStencil;		// desired/actual hardware
-LOGICAL          WantedWindow;		// desired/actual window
+SINT32          WantedX;			// desired/actual x
+SINT32          WantedY;			// desired/actual y
+SINT32          WantedWidth;		// desired/actual width
+SINT32          WantedHeight;		// desired/actual height
+SINT32          WantedBpp;			// desired/actual bpp
+SINT32          WantedRefreshRate;
+SINT32          WantedAlpha;		// desired/actual alpha
+LOGICAL         WantedHdw;			// desired/actual hardware
+SINT32          WantedStencil;		// desired/actual hardware
+LOGICAL         WantedFullscreen;   // desired/actual window
+LOGICAL         WantedBorderless;   // desired/actual window
+LOGICAL         WantedWindow;		// desired/actual window
 SINT32			WantedMode;			// desired/actual mode
-SINT32           WantedSide;         // User selected side from webpage.
-SINT32			UseStaccato;		// are we using the staccato sound system?
+SINT32          WantedSide;         // User selected side from webpage.
+SINT32          UseStaccato;		// are we using the staccato sound system?
 SINT8			TicketFile[_MAX_PATH];
 SINT8			GameServerIP[64];	// IP of server to connect to
 SINT8			GameServerPort[64];	// Port of server to connect to
