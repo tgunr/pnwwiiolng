@@ -1321,7 +1321,7 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorCYANALPHA);
 
 	return TRUE;
 }
@@ -1354,7 +1354,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorCYANALPHA);
 
 	V1.x = Ptr[2];
 	V1.y = Ptr[3];
@@ -1375,7 +1375,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorCYANALPHA);
 
 	V1.x = Ptr[4];
 	V1.y = Ptr[5];
@@ -1396,7 +1396,7 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+	_draw3dLine(&V1,&V2,colorCYANALPHA);
 
 	return TRUE;
 }

@@ -256,15 +256,15 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 				break;
 
 			if (MountNumber >= VEH_MAX_MOUNTS)
-				WriteLog(LOG_VEHICLE, LOG_WARN, "Mount Number for %s too big", Component->ComponentName);
+				Write_Log(LOG_VEHICLE, LOG_WARN, "Mount Number for %s too big", Component->ComponentName);
 			if (ConfigNumber >= VEH_MAX_LOADOUTS)
-				WriteLog(LOG_VEHICLE, LOG_WARN, "Config/Loadout number for %d too big", Component->ComponentName);
+				Write_Log(LOG_VEHICLE, LOG_WARN, "Config/Loadout number for %d too big", Component->ComponentName);
 			if (WeaponNumber >= VEH_MAX_WEAPONS_PER_MOUNT)
-				WriteLog(LOG_VEHICLE, LOG_WARN, "Too many weapons in %s", Component->ComponentName);
+				Write_Log(LOG_VEHICLE, LOG_WARN, "Too many weapons in %s", Component->ComponentName);
 
 			if (VehicleType->Loadout[ConfigNumber].WeaponTypes[MountNumber][WeaponNumber] == nullptr)
 			{
-				WriteLog(LOG_VEHICLE, LOG_WARN, "Loadout file for vehicle has no weapon for mount %d, loadout/config %d, weaponnum %d",
+				Write_Log(LOG_VEHICLE, LOG_WARN, "Loadout file for vehicle has no weapon for mount %d, loadout/config %d, weaponnum %d",
 							MountNumber+1, ConfigNumber+1, WeaponNumber+1);
 			}else
 			{
@@ -281,7 +281,9 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 		case ML_WEAPON_AMMOCOUNT4:
 			if(MountData->NumberOfWeaponsInMount > 0)
 			{
-				int ammoAmount = 3 * atoi(VarContents);
+//                int ammoAmount = atoi(VarContents);
+                int ammoAmount = 3 * atoi(VarContents);
+
 				MountData->Weapons[MountData->NumberOfWeaponsInMount-1].NumTotalRounds[VarNum-ML_WEAPON_AMMOCOUNT1]		= (ammoAmount >= 0) ? ammoAmount: 0;
 				MountData->Weapons[MountData->NumberOfWeaponsInMount-1].NumRoundsAmmoLeft[VarNum-ML_WEAPON_AMMOCOUNT1]	= ammoAmount;
 			}
@@ -329,7 +331,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 			strcpy((char*)MountData->AmmoExplosionDamageComponent[VarNum - ML_WEAPON_AMMOEXPLOSION_DAMAGECOMPONENT1], VarContents);
 			vehFindHitmapObjectNumByName(&CompNum, (UCHAR*)VarContents, VehicleType->VehicleTypeNum);
 			if(CompNum == 0)
-				WriteLog(LOG_VEHICLE, LOG_WARN,"Ammo Explosion damage component %s not found in %s", VarContents, Component->ComponentName);
+				Write_Log(LOG_VEHICLE, LOG_WARN,"Ammo Explosion damage component %s not found in %s", VarContents, Component->ComponentName);
 		break;
 		case ML_WEAPON_USEBOMBBAY:
 			MountData->UseBombBay = atoi(VarContents);
@@ -372,7 +374,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 			MountData->MinConvergence = (FLOAT32)atof(VarContents);
 		break;
 		default:
-			WriteLog(LOG_VEHICLE, LOG_WARN, "Unidentified variable %s in component %s\n", VarName, Component->ComponentName);
+			Write_Log(LOG_VEHICLE, LOG_WARN, "Unidentified variable %s in component %s\n", VarName, Component->ComponentName);
 		break;
 
 	}
@@ -393,7 +395,7 @@ UINT32 mlLoadBeltFile(weapWeapon* Weapon,UCHAR* VarContents,SINT32 AmmoGroupNum)
 	SINT32 File = fioOpen(Buffer);
 	if (File == -1)
 	{
-		WriteLog(LOG_VEHICLE, LOG_WARN,"Belt file %s not found", Buffer);
+		Write_Log(LOG_VEHICLE, LOG_WARN,"Belt file %s not found", Buffer);
 		return 1;
 	}
 
@@ -517,7 +519,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 
 		if (Component->CurrentDamage > Component->DamageLevels[0])
 		{
-			if (Mount->WeaponJammed == 0) WriteLog(LOG_WEAPON, LOG_INFO, "Weapon jammed due to damage to weapon");
+			if (Mount->WeaponJammed == 0) Write_Log(LOG_WEAP, LOG_INFO, "Weapon jammed due to damage to weapon");
 
 			Mount->WeaponJammed = 1;
 		}
@@ -547,7 +549,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 			{
 				if (Mount->WeaponJammed == 0)
 				{
-					WriteLog(LOG_WEAPON, LOG_INFO, "Weapon jammed due to damage to ammo");
+					Write_Log(LOG_WEAP, LOG_INFO, "Weapon jammed due to damage to ammo");
 				}
 				Mount->WeaponJammed = 1;
 			}
@@ -605,7 +607,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 							}
 							if (TempInt1 == 4)
 							{
-								WriteLog(LOG_WEAPON, LOG_WARN, "Error! Exploding ammo for weapon that is emtpy(1)!");
+								Write_Log(LOG_WEAP, LOG_WARN, "Error! Exploding ammo for weapon that is emtpy(1)!");
 								TempInt1 = 0;
 							}
 
@@ -618,7 +620,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 							if (TempInt == 4)
 							{
 								TempInt = 0;
-								WriteLog(LOG_WEAPON, LOG_WARN, "Error! Exploding ammo for weapon that is empty(2)!");
+								Write_Log(LOG_WEAP, LOG_WARN, "Error! Exploding ammo for weapon that is empty(2)!");
 								++Mount->Weapons[TempInt1].NumRoundsAmmoLeft[TempInt];
 							}
 							Ammo = Mount->Weapons[TempInt1].BeltSequence[TempInt][Mount->Weapons[TempInt1].BeltSequencePosition[TempInt]];
@@ -674,7 +676,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 										}
 										else
 										{
-											WriteLog(LOG_WEAPON, LOG_WARN,"Attempting to fuel-damage hit location %s, component %s, hit location not found",
+											Write_Log(LOG_WEAP, LOG_WARN,"Attempting to fuel-damage hit location %s, component %s, hit location not found",
 															Mount->AmmoExplosionDamageComponent[j],
 															Component->ComponentName);
 										}
@@ -932,11 +934,11 @@ static void _SetupConvergence(mlWeaponMount * Mount,vehVehicle* Vehicle,FLOAT64 
 	FireDOF = Mount->WeaponFirePoints[0];
 
 	// now determine alignment angle
-	persGunsightAlignDOF(&Mount->ConvergenceMat,FireDOF,ViewDOF,(FLOAT32)ConvergenceRange);
+	persGunsightAlignDOF(&Mount->ConvergenceMat,FireDOF,ViewDOF,(FLOAT32)ConvergenceRange * 2);
 
 	// finally adjust this alignment for ammunition drop at that range
 	Att.y = Att.z = 0.0f;
-	persGunsightCalcSightAngle(&Att.x,(char*)Mount->Weapons[0].BeltSequence[0][0]->Name,(FLOAT32)ConvergenceRange);
+	persGunsightCalcSightAngle(&Att.x,(char*)Mount->Weapons[0].BeltSequence[0][0]->Name,(FLOAT32)ConvergenceRange * 2);
 	mathEul_ToMatrix(&TempMat,EulOrdXYZs,&Att);
 
 	math3dMatrixMultiply(&Mount->ConvergenceMat,&TempMat,&Mount->ConvergenceMat);

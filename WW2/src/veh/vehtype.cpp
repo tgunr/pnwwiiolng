@@ -559,7 +559,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 
 	if (VehicleSoundFile == -1)
 	{
-		WriteDebug("Can't find Sound file %s for vehicle %s", FileName, CurrentVehicle->Id);
+		Write_Debug("Can't find Sound file %s for vehicle %s", FileName, CurrentVehicle->Id);
 		return 0;
 	}
 
@@ -581,7 +581,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 				Num++;
 				if (Num >= VEH_MAX_ENGINESOUND_SPEED_RANGES)
 				{
-					WriteDebug("Too many speed ranges in file %s",FileName);
+					Write_Debug("Too many speed ranges in file %s",FileName);
 					Num--;
 				}
 			}
@@ -689,7 +689,7 @@ UCHAR* VarContents;
 
 	if (VehicleLoadoutFile == -1)
 	{
-		WriteDebug("Can't find Loadout file %s for vehicle %s",
+		Write_Debug("Can't find Loadout file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -776,7 +776,7 @@ UCHAR* VarContents;
 			weapFindWeaponTypeByName(&(CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon]),VarContents);
 			if (CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon] == nullptr)
 			{
-				WriteDebug("Unrecognized weapon %s, in mount %d, loadout %d",
+				Write_Debug("Unrecognized weapon %s, in mount %d, loadout %d",
 							VarContents,
 							CurrentMount,
 							Loadout);
@@ -898,7 +898,7 @@ UCHAR _BombsightTypeNames[3][32] =
 
 	if (VehicleTurretFile == -1)
 	{
-		WriteDebug("Can't find turret file %s for vehicle %s",
+		Write_Debug("Can't find turret file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -973,13 +973,15 @@ UCHAR _BombsightTypeNames[3][32] =
 
 		if (strcmp((char*)VarName,"elevationrate") == 0)
 		{
-			CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)1.5;
+//            CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
+            CurrentVehicle->TurretElevateRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)4.0;
 		}
 
 		if (strcmp((char*)VarName,"traverserate") == 0)
 		{
-			CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)2.0;
-		}
+//            CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents);
+            CurrentVehicle->TurretTraverseRate[CurrentPos] = (FLOAT32)atof((char*)VarContents) * (FLOAT32)4.0;
+        }
 
         if(strcmp((char*)VarName, "turretelevate") == 0)
         {
@@ -1020,7 +1022,7 @@ UCHAR _BombsightTypeNames[3][32] =
 			}
 			else
 			{
-				Write_Log(LOG_VEHICLE, LOG_WARN, "Unrecognized turret %d type \"%s\"",
+				Write_Debug("Unrecognized turret %d type \"%s\"",
 							CurrentPos,
 							VarContents);
 			}
@@ -1148,7 +1150,7 @@ UCHAR* VarContents1;
 
 	if (VehicleDamageFile == -1)
 	{
-		WriteDebug("Can't find damage hit list file %s for vehicle %s",
+		Write_Debug("Can't find damage hit list file %s for vehicle %s",
 					FileName,
 					CurrentVehicle->Id);
 		return 0;
@@ -1209,7 +1211,7 @@ UCHAR* VarContents1;
             }
 			else
 			{
-				WriteDebug("Invalid line -%s=%s in %s",
+				Write_Debug("Invalid line -%s=%s in %s",
 							VarName,
 							VarContents1,
 							FileName);

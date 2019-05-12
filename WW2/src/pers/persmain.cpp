@@ -1526,15 +1526,15 @@ OBJECT * TempObj;
 	// do screen shake
 	if (frametime - _Persona.ShakeHeadStartTime < SHAKE_HEAD_DURATION)
 	{
-//		FLOAT32 DeltaTime = (frametime - _Persona.ShakeHeadStartTime) / (FLOAT32)SHAKE_HEAD_DURATION;
-//		Att->z += (FLOAT32)sin(DeltaTime * 2 * PI) * 0.1f;
+		FLOAT32 DeltaTime = (frametime - _Persona.ShakeHeadStartTime) / (FLOAT32)SHAKE_HEAD_DURATION;
+		Att->z += (FLOAT32)sin(DeltaTime * 2 * PI) * 0.1f;
 	}
 
 	if(g_fShakeMagnitude > 0)
 	{
-//		Att->x += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
-//		Att->y += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
-//		Att->z += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
+		Att->x += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
+		Att->y += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
+		Att->z += (FLOAT32)mathGetFloat32ChaoticNumber() * g_fShakeMagnitude;
 	}
 
 	return 0;
@@ -2009,28 +2009,28 @@ static SINT32 _LastCallTime;
 					&Mat1);
 
 	// accentuate head bobbing when in scope
-//	if (FieldOfView < 45.0f)
-//	{
-//		FLOAT32 Mult;
-//
-//		Mult = 1;
-//
-//		AttChange.Pitch *= Mult;
-//		AttChange.Roll *= Mult;
-//		AttChange.Yaw *= Mult;
-//
-//		Att1.x = -(float)AttChange.Pitch/2;
-//		Att1.y = (float)AttChange.Roll/2;
-//		Att1.z = (float)AttChange.Yaw/2;
-//		mathEul_ToMatrix(&Matrix,EulOrdXYZs,&Att1);
-//
-//	}
-//	else
-//	{
+	if (FieldOfView < 45.0f)
+	{
+		FLOAT32 Mult;
+
+		Mult = 1;
+
+		AttChange.Pitch *= Mult;
+		AttChange.Roll *= Mult;
+		AttChange.Yaw *= Mult;
+
+		Att1.x = -(float)AttChange.Pitch/2;
+		Att1.y = (float)AttChange.Roll/2;
+		Att1.z = (float)AttChange.Yaw/2;
+		mathEul_ToMatrix(&Matrix,EulOrdXYZs,&Att1);
+
+	}
+	else
+	{
 		AttChange.Pitch = AttChange.Roll = AttChange.Yaw = 0.0;
 
 		Matrix = IdentityMatrix;
-//	}
+	}
 
 //	Matrix = IdentityMatrix;
 	Matrix._41 = (float)(Displacement.x) * ScaleFactor;
@@ -5739,18 +5739,19 @@ void persGetCameraPosition(piVECTOR* pos)
 
 void persShakeCamera(FLOAT32 mag, SINT32 duration)
 {
-//	if(vehmainHasBailedOut() || mag <= .0001f || duration <= 0) // resets shake
-//	{
+    if (true)
+    //    if(vehmainHasBailedOut() || mag <= .0001f || duration <= 0) // resets shake
+	{
 		g_fShakeMagnitude = 0;
 		_shaketime = 0;
 		_shakeduration = 0;
-//	}
-//	else if(g_fShakeMagnitude || !_shaketime) // don't overshake!
-//	{
-//		g_fShakeMagnitude = mag;
-//		_shaketime = frametime;
-//		_shakeduration = duration;
-//	}
+	}
+	else if(g_fShakeMagnitude || !_shaketime) // don't overshake!
+	{
+		g_fShakeMagnitude = mag;
+		_shaketime = frametime;
+		_shakeduration = duration;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -431,7 +431,7 @@ UINT32 VarNum;
 UCHAR * VarName;
 UCHAR * VarContents;
 SINT32 EngineListPos;
-mlEngineData * EngineData;
+mlEngineData * EngineData = nullptr;
 UINT32 Size;
 
 
@@ -524,7 +524,7 @@ UINT32 Size;
 
 			if (VarNum == 0)
 			{
-				WriteDebug("Unidentified variable %s in file %s\n",VarName,EngineListFilename);
+				Write_Debug("Unidentified variable %s in file %s\n",VarName,EngineListFilename);
 				continue;
 			}
 
@@ -540,12 +540,13 @@ UINT32 Size;
 
 						if ((*EngineList)->EngineData[EngineListPos].Type == 0)
 						{
-							WriteDebug("Engine type %s not recognized in file %s\n",VarContents,UseFileName);
+							Write_Debug("Engine type %s not recognized in file %s\n",VarContents,UseFileName);
 						}
 					break;
 				case ML_ENGINE_VARNAME_BASEHORSEPOWER:
-						EngineData->BaseHorsePower = atof((char*)VarContents) * 1.2;
-					break;
+//                    EngineData->BaseHorsePower = atof((char*)VarContents);
+                    EngineData->BaseHorsePower = atof((char*)VarContents) * 1.5;
+                    break;
 				case ML_ENGINE_VARNAME_BASEHPALT:
 						EngineData->BaseHorsePowerAlt = atof((char*)VarContents);
 					break;
@@ -553,7 +554,8 @@ UINT32 Size;
 						EngineData->BaseHpManifoldPress = atof((char*)VarContents);
 					break;
 				case ML_ENGINE_VARNAME_BASEHPRPM:
-						EngineData->BaseHpRpm = atof((char*)VarContents) * 1.1;
+//                        EngineData->BaseHpRpm = atof((char*)VarContents);
+                        EngineData->BaseHpRpm = atof((char*)VarContents) * 1.25;
 						EngineData->MaxSafeRPM = EngineData->BaseHpRpm;
 					break;
 				case ML_ENGINE_VARNAME_FUELPERHPSEC:
@@ -705,10 +707,11 @@ UINT32 Size;
 						EngineData->CriticalRpm = atof((char*)VarContents);
 						break;
 				case ML_ENGINE_VARNAME_STARTERRPM:
-						EngineData->StarterRpm = atof((char*)VarContents);
+                        EngineData->StarterRpm = atof((char*)VarContents);
 						break;
 				case ML_ENGINE_VARNAME_STARTERHP:
-						EngineData->StarterHp = atof((char*)VarContents) * 1.2;
+//                        EngineData->StarterHp = atof((char*)VarContents);
+                        EngineData->StarterHp = atof((char*)VarContents) * 1.5;
 						break;
 				case ML_ENGINE_VARNAME_MAXPOWERCOOLSPEED:
 						EngineData->MaxPowerCoolSpeed = atof((char*)VarContents);
@@ -726,7 +729,7 @@ UINT32 Size;
 						EngineData->MaxInjWepBoost = atof((char*)VarContents);
 				break;
 				default:
-						WriteDebug("Unidentified variable %s in file %s\n",VarContents,EngineListFilename);
+						Write_Debug("Unidentified variable %s in file %s\n",VarContents,EngineListFilename);
 						break;
 			}
 		}
@@ -817,7 +820,7 @@ vehVehicle* Vehicle;
 				{
 					ComponentData->EngineData = nullptr;
 					strcpy((char*)ComponentData->EngineName,"");
-					WriteDebug("Unable to find engine type %s in component %s\n",VarContents,Component->ComponentName);
+					Write_Debug("Unable to find engine type %s in component %s\n",VarContents,Component->ComponentName);
 				}
 			break;
 		case ML_ENGINECOM_VARNAME_PROPELLORCOM:
@@ -1120,7 +1123,7 @@ vehVehicle* Vehicle;
 				vehFindHitmapObjectNumByName(&ComponentNum, (UCHAR*)VarContents, Vehicle->VehicleType->VehicleTypeNum);
 				if (ComponentNum == 0)
 				{
-					WriteDebug("Fuel fire damage component %s not found in %s", VarContents, Component->ComponentName);
+					Write_Debug("Fuel fire damage component %s not found in %s", VarContents, Component->ComponentName);
 				}
 			}
 		}
@@ -1128,7 +1131,7 @@ vehVehicle* Vehicle;
 		case ML_ENGINECOM_VARNAME_PROPAIRFOIL:
 			if (AirfoilList == nullptr)
 			{
-				WriteDebug("Attempting to add a propellor airfoil with no airfoils in vehicle!");
+				Write_Debug("Attempting to add a propellor airfoil with no airfoils in vehicle!");
 				break;
 			}
 			Found = 0;
@@ -1146,7 +1149,7 @@ vehVehicle* Vehicle;
 			if (Found == 0)
 			{
 				ComponentData->PropAirfoil = nullptr;
-				WriteDebug("Airfoil type %s for component %s not found",VarContents,Component->ComponentName);
+				Write_Debug("Airfoil type %s for component %s not found",VarContents,Component->ComponentName);
 			}
 
 			break;
@@ -1157,7 +1160,7 @@ vehVehicle* Vehicle;
 			ComponentData->PropInducedDragMult = (FLOAT32)atof(VarContents);
 			break;
 		default:
-			WriteDebug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
+			Write_Debug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
 			break;
 
 	}
@@ -1275,7 +1278,7 @@ UINT32 TempInt;
 									RightTrackClutch);
 			break;
 		case ML_ENGINE_SUBTYPE_TORQUEGENERATOR:
-			WriteDebug("ERROR: no support for torque generator\n");
+			Write_Debug("ERROR: no support for torque generator\n");
 //				_UpdateTorqueGenerator(EngineComponentData,
 //										Component,
 //										DeltaTime,
@@ -1643,7 +1646,7 @@ static UINT32 _HandleFuelTankDamage(mlEngineComponentData* TankData, mlComponent
 						}
 					else
 					{
-						WriteDebug("Attempting to ammo-damage hit location %s, component %s, hit location not found",
+						Write_Debug("Attempting to ammo-damage hit location %s, component %s, hit location not found",
 										TankData->FuelBurnDamageComponent[i],
 										Component->ComponentName);
 					}
