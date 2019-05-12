@@ -124,7 +124,7 @@ PoolModel*  obmgrAddModelToPool(const char* path, LOGICAL forceModelLoading, UIN
 
 			if(fd < 0)
 			{
-				Write_Log(LOG_OLD, LOG_INFO, "* %s missing from the archive *", str.c_str());
+				WriteLog(LOG_OLD, LOG_INFO, "* %s missing from the archive *", str.c_str());
 				return 0;
 			}
 
@@ -542,7 +542,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 			if(!piIsTexture(id, 0))
 			{
-				Write_Log(LOG_OLD, LOG_WARN, "[obpoolqueueHandleTexture] %s** FAILED**", path.c_str());
+				WriteLog(LOG_OLD, LOG_WARN, "[obpoolqueueHandleTexture] %s** FAILED**", path.c_str());
 			}
 
             // Ticket #4627
@@ -1050,7 +1050,7 @@ void PoolNode::load(PoolModel* model, int fd)
 
 			if(!piIsTexture(id, 0))
 			{
-				Write_Log(LOG_OLD, LOG_WARN, "[obpoolqueueHandleTexture] %s** FAILED**", path.c_str());
+				WriteLog(LOG_OLD, LOG_WARN, "[obpoolqueueHandleTexture] %s** FAILED**", path.c_str());
 			}
 
             // Ticket #4627
@@ -1676,19 +1676,19 @@ void PoolModel::LoadMDL(const char* path)
 
 	if(	mdlHeader.company != PLAYNET_COMPANY )
     {
-        Write_Debug("[LoadMDL] mdlHeader.company != PLAYNET_COMPANY. Probably need to rebuild MDLs");
+        WriteDebug("[LoadMDL] mdlHeader.company != PLAYNET_COMPANY. Probably need to rebuild MDLs");
         return;
     }
 
 	if(	mdlHeader.filetype != PLAYNET_OBJECTFILE )
     {
-        Write_Debug("[LoadMDL] mdlHeader.filetype != PLAYNET_OBJECTFILE. Probably need to rebuild MDLs");
+        WriteDebug("[LoadMDL] mdlHeader.filetype != PLAYNET_OBJECTFILE. Probably need to rebuild MDLs");
         return;
     }
 
 	if(	mdlHeader.version != OBJECTFILE_VERSION )
     {
-        Write_Debug("[LoadMDL] mdlHeader.version != OBJECTFILE_VERSION. Probably need to rebuild MDLs");
+        WriteDebug("[LoadMDL] mdlHeader.version != OBJECTFILE_VERSION. Probably need to rebuild MDLs");
         return;
     }
 
@@ -1738,7 +1738,7 @@ void PoolModel::LoadMDL(const char* path)
 
 		if(!subModelReference.poolModel)
 		{
-			Write_Debug("Instance model %s not found!", subModelFileName.c_str());
+			WriteDebug("Instance model %s not found!", subModelFileName.c_str());
 			piExitProgram(_FL, "Instance model not found!");
 		}
 
@@ -1984,7 +1984,7 @@ void PoolModel::RebuildMDL()
 	topmostObj = ldfltLoad(fltPath, 1.0f, 1);
 	if(!topmostObj)
 	{
-		Write_Debug("Error loading FLT file for %s", fltPath.c_str());
+		WriteDebug("Error loading FLT file for %s", fltPath.c_str());
 		piExitProgram(_FL, "MDLreb failed");
 	}
 
@@ -2056,7 +2056,7 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	MODELMATERIALS::const_iterator	cur;
 
 
-	Write_Debug("Starting to save %s", mdlpath.c_str());
+	WriteDebug("Starting to save %s", mdlpath.c_str());
 
 	hfile = fioOpenWrite(mdlpath.c_str());
 	if(hfile == -1)
@@ -2153,7 +2153,7 @@ void PoolModel::SaveMDL(const POOLOBJHDR* poolobjhdr,
 	fioPutl(hfile, length);
 
 	fioClose(hfile);
-	Write_Debug("Pool object tree saved as %s", mdlpath.c_str());
+	WriteDebug("Pool object tree saved as %s", mdlpath.c_str());
 
 	return;
 }
@@ -2259,7 +2259,7 @@ void PoolModel::CollectModelReferences(OBJECT* o)
 				subModelReference.poolModel = (_poolmap.find(modelName))->second;
 				if(!subModelReference.poolModel)
 				{
-					Write_Debug("Instance model %s not found!", modelName.c_str());
+					WriteDebug("Instance model %s not found!", modelName.c_str());
 					piExitProgram(_FL, "Instance model not found!");
 				}
 
@@ -2628,7 +2628,7 @@ void PoolModel::CheckModelSanity()	const
 			modelname.find("clutter")		== std::string::npos	&&
 			modelname.find("muzzleflash")	== std::string::npos	)
 		{
-			Write_Log(LOG_FPS, LOG_INFO, "Empty model: %s", modelname.c_str());
+			WriteLog(LOG_FPS, LOG_INFO, "Empty model: %s", modelname.c_str());
 			piExitProgram(_FL, "Empty model found!");
 		}
 	}

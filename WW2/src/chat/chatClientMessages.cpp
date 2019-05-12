@@ -349,7 +349,7 @@ _recvTuneToChannel(ACTION_OBJECT* const a)
 	SCHAR name[MAX_HANDLE_SIZE];
 	chatGetCallsign(name, tune.m_handle);
 
-	dbugLog(_FLD, "t:%d tuned rid %d to %d [%s] rx %d tx %d"
+	WriteLog(LOG_COMM, LOG_DEBUG, "t:%d tuned rid %d to %d [%s] rx %d tx %d"
 					, a->teulIndex
 					, tune.m_radioIndex
 					, tune.m_type
@@ -373,7 +373,7 @@ static SINT32 _recvUpdateChannel(ACTION_OBJECT* const a)
 	Chat::UpdateChannel update;
 	update.packer(TEUL_UNPACK, a);
 
-	dbugLog(_FLD, "received update channel from %d, radioIndex: %u, status: %d"
+	WriteLog(LOG_COMM, LOG_DEBUG, "received update channel from %d, radioIndex: %u, status: %d"
 					, a->teulIndex, update.radioIndex, update.receiveStatus
 					);
 
@@ -537,7 +537,7 @@ SINT32 EditString::receive(SINT32 teulIndex)
 	case _PERMISSION_DENIED:	// WTF do you think you're doing?
 	break;
 	default:
-		Write_Debug("invalid esm response");
+		WriteDebug("invalid esm response");
 	break;
 	}
 
@@ -556,7 +556,7 @@ _recvServerTrackedObjects(ACTION_OBJECT* const a)
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &count, 8);
 	if ( PN_UNLIKELY(count <= 0) )
 	{
-		Write_Log(LOG_COMM, LOG_WARN, "Invalid STO count");
+		WriteLog(LOG_COMM, LOG_WARN, "Invalid STO count");
 		return -EINVAL;
 	}
 
@@ -568,7 +568,7 @@ _recvServerTrackedObjects(ACTION_OBJECT* const a)
 		wwiiPackServerTrackedObjectType(TEUL_UNPACK, a->packed, a->offset, &type, 0);
 		if ( !clientReceiveServerTrackedObject(a->teulIndex, type, a) )
 		{
-			Write_Log(LOG_COMM, LOG_WARN, "Unsupported STO type %d", type);
+			WriteLog(LOG_COMM, LOG_WARN, "Unsupported STO type %d", type);
 			break;
 		}
 	}

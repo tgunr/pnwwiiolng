@@ -42,7 +42,7 @@ static SOUNDCACHE* GetNewSound()
 
     if(g_sndFree.empty())
     {
-        Write_Log(LOG_SOUND, LOG_WARN, "[GetNewSound] ** FAILED ** ");
+        WriteLog(LOG_SOUND, LOG_WARN, "[GetNewSound] ** FAILED ** ");
         return nullptr;
     }
 
@@ -66,7 +66,7 @@ static LOGICAL FreeSound(SOUNDCACHE* lpSnd)
     if(numsndused <= 0)
     {
         const SCHAR* p = "[FreeSound] Attempt to free sound when none are used!";
-        Write_Log(LOG_SOUND, LOG_INFO, p);
+        WriteLog(LOG_SOUND, LOG_INFO, p);
 
         return FALSE;
     }
@@ -208,14 +208,14 @@ static SOUNDCACHE* _preloadSoundCache(const SCHAR* name)
 
 	if(!sndsPlatformLoadSound(&sc->theSound))
 	{
-        Write_Log(LOG_SOUND, LOG_WARN, "FAILED to load %s", name);
+        WriteLog(LOG_SOUND, LOG_WARN, "FAILED to load %s", name);
 		FreeSound(sc);
 		return FALSE;
 	}
 
     g_hashSnd.insert(std::make_pair(name, sc));
 
-    //Write_Log(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
+    //WriteLog(LOG_SOUND, LOG_INFO, "** PLEASE CACHE %s **", name);
 
     return sc;
 #endif

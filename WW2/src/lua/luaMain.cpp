@@ -128,7 +128,7 @@ static inline void _report(UINT32 level, const char* message)
 
 	uiChatPrintLine("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
 	//uiConsoleprintf("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
-	Write_Log(LOG_UI, LOG_FATAL, "LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
+	WriteLog(LOG_UI, LOG_FATAL, "LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////

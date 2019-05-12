@@ -150,7 +150,7 @@ piVECTOR	  faces[6][4]={{{-1, 1, 1},
 
 		lplast = lpobj;
 
-    Write_Debug("Created environment object: %s", tname);
+    WriteDebug("Created environment object: %s", tname);
   }
 
   return(TRUE);

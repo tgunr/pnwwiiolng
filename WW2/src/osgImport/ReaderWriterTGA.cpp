@@ -471,14 +471,14 @@ Image* ReadTGAFile(const std::string& name)
     int height_ret;
     int numComponents_ret;
 
-    Write_Log(LOG_TEXTURE, LOG_INFO, "[ReadTGAFile] Reading image %s", name.c_str());
+    WriteLog(LOG_TEXTURE, LOG_INFO, "[ReadTGAFile] Reading image %s", name.c_str());
 
     int fd = -1;
     fd = fioOpen(name.c_str());
 
     if(fd < 0)
     {
-        Write_Debug("[ReadTGAFile] cannot load %s image", name.c_str());
+        WriteDebug("[ReadTGAFile] cannot load %s image", name.c_str());
         return nullptr;
     }
 
@@ -486,7 +486,7 @@ Image* ReadTGAFile(const std::string& name)
 
     if(imageData == nullptr)
     {
-        Write_Debug("[ReadTGAFile] cannot open %s", name.c_str());
+        WriteDebug("[ReadTGAFile] cannot open %s", name.c_str());
         return nullptr;
     }
 

@@ -114,7 +114,7 @@ FLOAT64VECTOR worldOriginOffset;
 	}
 	else
 	{
-//		Write_Debug("The ground could not be located!");
+//		WriteDebug("The ground could not be located!");
 		retpos->x = oldpos.x;
 		retpos->y = oldpos.y;
 		retpos->z = 0.0f;
@@ -154,7 +154,7 @@ FLOAT64VECTOR worldOriginOffset;
 	}
 	else
 	{
-//		Write_Debug("The ground could not be located!");
+//		WriteDebug("The ground could not be located!");
 		retpos->x = oldpos.x;
 		retpos->y = oldpos.y;
 		retpos->z = 0.0f;
@@ -185,7 +185,7 @@ COLLISION	collision;
 	}
 	else
 	{
-		////Write_Debug("The ground could not be located!");
+		////WriteDebug("The ground could not be located!");
 	}
 
 	return(retval);
@@ -214,7 +214,7 @@ COLLISION	collision;
 	}
 	else
 	{
-		////Write_Debug("The ground could not be located!");
+		////WriteDebug("The ground could not be located!");
 	}
 
 	return(retval);
@@ -253,7 +253,7 @@ piMATRIX	mat;
 
 	if (!trnopCollideDown(&cpos, &poly, &pos))
 	{
-		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
+		WriteDebug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
 		return(FALSE);
 	}
 
@@ -331,7 +331,7 @@ piMATRIX	mat;
 
     if(!trnopCollideDownWithDTL(&cpos, &pos, &poly, _superCell))
 	{
-		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
+		WriteDebug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
 		return(FALSE);
 	}
 
@@ -385,7 +385,7 @@ OBJECT*	lpatt;
 
 static LOGICAL OnGroundLOD(OBJECT* lpobj, UINT32 lod)
 {
-	//Write_Debug("Processing LOD %d for on ground", lod);
+	//WriteDebug("Processing LOD %d for on ground", lod);
 
 	if (lpobj->flags & OBJECT_LOD)
 	{
@@ -411,7 +411,7 @@ static LOGICAL PlaceOnGround(OBJECT* lpobj)
 {
 int			i;
 
-	Write_Debug("Place on ground: %s", lpobj->name);
+	WriteDebug("Place on ground: %s", lpobj->name);
 
 	for (i=1; i < 10; i++)
 	{
@@ -435,7 +435,7 @@ static LOGICAL PlaceRelativeToGround(OBJECT* lpobj)
 {
 int		i;
 
-	Write_Debug("Place relative to ground: %s", lpobj->name);
+	WriteDebug("Place relative to ground: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightPlaceLOD))
@@ -455,7 +455,7 @@ int		i;
 */
 static LOGICAL PlaceAbsolute(OBJECT* lpobj)
 {
-	Write_Debug("Place absolute: %s", lpobj->name);
+	WriteDebug("Place absolute: %s", lpobj->name);
 	return TRUE;
 }
 
@@ -504,7 +504,7 @@ piMATRIX	mat;
 OBJECT*	lpbase;
 
 
-	//Write_Debug("Processing LOD %d for height conformance", lod);
+	//WriteDebug("Processing LOD %d for height conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
         if(lpobj->child->flag2 & OBJECT_IS_ROTATED)
@@ -529,7 +529,7 @@ OBJECT*	lpbase;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-		Write_Debug("HeightPlaceLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
+		WriteDebug("HeightPlaceLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
 		return(FALSE);
 	}
 
@@ -587,7 +587,7 @@ OBJECT*	lpbase;
 			}
 			else
 			{
-				Write_Debug("HeightPlaceLOD: Could not find the ground for 'base' for object '%s'", lpobj->name);
+				WriteDebug("HeightPlaceLOD: Could not find the ground for 'base' for object '%s'", lpobj->name);
 			}
 		}
 	}
@@ -608,7 +608,7 @@ piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
 
-	//Write_Debug("Processing LOD %d for height conformance", lod);
+	//WriteDebug("Processing LOD %d for height conformance", lod);
 
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
@@ -634,7 +634,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-		Write_Debug("HeightConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
+		WriteDebug("HeightConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
 		return(FALSE);
 	}
 
@@ -747,7 +747,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-					Write_Debug("HeightConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
+					WriteDebug("HeightConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
 				}
 			}
 		}
@@ -770,7 +770,7 @@ static LOGICAL PlaceHeightConform(OBJECT* lpobj)
 {
 int			i;
 
-	Write_Debug("Place height conform: %s", lpobj->name);
+	WriteDebug("Place height conform: %s", lpobj->name);
 
 	for (i=1; i < 10; i++)
 	{
@@ -848,7 +848,7 @@ SINT32		i, poly;
 	}
 	else
 	{
-		Write_Debug("Could not find the ground in OctetReplace (%s)", lpobj->name);
+		WriteDebug("Could not find the ground in OctetReplace (%s)", lpobj->name);
 	}
 
 	return (TRUE);
@@ -978,7 +978,7 @@ piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
-	//Write_Debug("Processing LOD %d for bottom conformance", lod);
+	//WriteDebug("Processing LOD %d for bottom conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
 		math3dVectorMultiply(&pos, &lpobj->child->pos, &lpobj->child->mat);
@@ -994,7 +994,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-		Write_Debug("BottomConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
+		WriteDebug("BottomConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
 		return(FALSE);
 	}
 
@@ -1038,7 +1038,7 @@ OBJECT*	lpbase, *lpnext;
 		lpnext = lpnext->attached;
 	}
 
-	Write_Debug("Elevating subobject by %f meters", dz / ScaleFactor);
+	WriteDebug("Elevating subobject by %f meters", dz / ScaleFactor);
 
 	mat = IdentityMatrix;
 	mat._41 = 0.0f;
@@ -1068,7 +1068,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-					Write_Debug("BottomConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
+					WriteDebug("BottomConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
 				}
 			}
 		}
@@ -1092,7 +1092,7 @@ static LOGICAL PlaceBottomConform(OBJECT* lpobj)
 {
 SINT32		i;
 
-	Write_Debug("Place bottom conform: %s", lpobj->name);
+	WriteDebug("Place bottom conform: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, BottomConformLOD))
@@ -1233,7 +1233,7 @@ FLOAT32 TempNum;
 
 			if (TriNum == (UINT32)-1)
 			{
-				Write_Debug("Miscollide on place 10 mode");
+				WriteDebug("Miscollide on place 10 mode");
 				TriNum = 0;
 			}
 
@@ -1258,7 +1258,7 @@ FLOAT32 TempNum;
 	}
 	else
 	{
-		Write_Debug("Could not find the ground in ConformRadialLODIterate (%s)", lpobj->name);
+		WriteDebug("Could not find the ground in ConformRadialLODIterate (%s)", lpobj->name);
 	}
 
 	return (TRUE);
@@ -1410,7 +1410,7 @@ OBJECT*	lpatt;
 
 static LOGICAL DownLOD(OBJECT* lpobj, UINT32 lod)
 {
-	//Write_Debug("Processing LOD %d for down", lod);
+	//WriteDebug("Processing LOD %d for down", lod);
 	DownLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1426,7 +1426,7 @@ static LOGICAL PlaceDown(OBJECT* lpobj)
 {
 SINT32		i;
 
-	//Write_Debug("Place down: %s", lpobj->name);
+	//WriteDebug("Place down: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
@@ -1445,7 +1445,7 @@ static LOGICAL PlaceConformRadial(OBJECT* lpobj)
 {
 SINT32		i;
 
-	//Write_Debug("Place conform radial: %s", lpobj->name);
+	//WriteDebug("Place conform radial: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
@@ -1523,7 +1523,7 @@ OBJECT*	lpatt;
 
 static LOGICAL RotateLOD(OBJECT* lpobj, UINT32 lod)
 {
-	//Write_Debug("Processing LOD %d for rotate", lod);
+	//WriteDebug("Processing LOD %d for rotate", lod);
 	RotateLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1539,7 +1539,7 @@ static LOGICAL PlaceRotate(OBJECT* lpobj)
 {
 SINT32		i;
 
-	Write_Debug("Place and rotate: %s", lpobj->name);
+	WriteDebug("Place and rotate: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, RotateLOD))
@@ -1791,7 +1791,7 @@ OBJECT*			TempObj;
 	obplyrRotateAndTranslateObjectTree(lpobj, mat, translation);
 
 
-	//Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
+	//WriteDebug("trnopOrientSubobjects for '%s'", lpobj->name);
 
 	// lpobj should point to a Topmost object
 	lpsub = nullptr;
@@ -1841,7 +1841,7 @@ OBJECT*			TempObj;
 			place = atoi(ptr);
 		}
 
-		//Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
+		//WriteDebug(" subobject '%s', place = %d", lpsub->name, place);
 		switch (place)
 		{
 			case OBJVAL_ON_GROUND:

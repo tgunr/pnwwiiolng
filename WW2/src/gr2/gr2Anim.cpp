@@ -5437,7 +5437,7 @@ void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const 
 
 SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 {
-	FLOAT64VECTOR	worldOriginOffset;
+	FLOAT64VECTOR	WorldOriginOffset;
 	piVECTOR		V1,V2;
 	OBJECT*			pObject;
 	SINT32			surfID;
@@ -5445,18 +5445,18 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	if (!vehicle || !offset)
 		return -1;
 
-	trnGetWorldOriginOffset(&worldOriginOffset);
+	trnGetWorldOriginOffset(&WorldOriginOffset);
 
 	if (vehicle->ModelData)
 	{
-		V1.x = (FLOAT32)(vehicle->ModelData->VehiclePos.x - worldOriginOffset.x + offset->x);
-		V1.y = (FLOAT32)(vehicle->ModelData->VehiclePos.y - worldOriginOffset.y + offset->y);
+		V1.x = (FLOAT32)(vehicle->ModelData->VehiclePos.x - WorldOriginOffset.x + offset->x);
+		V1.y = (FLOAT32)(vehicle->ModelData->VehiclePos.y - WorldOriginOffset.y + offset->y);
 		V1.z = -(FLOAT32)(vehicle->ModelData->VehiclePos.z + offset->z);
 	}
 	else
 	{
-		V1.x = (FLOAT32)(vehicle->PosData.RenderPos.x - worldOriginOffset.x + offset->x);
-		V1.y = (FLOAT32)(vehicle->PosData.RenderPos.y - worldOriginOffset.y + offset->y);
+		V1.x = (FLOAT32)(vehicle->PosData.RenderPos.x - WorldOriginOffset.x + offset->x);
+		V1.y = (FLOAT32)(vehicle->PosData.RenderPos.y - WorldOriginOffset.y + offset->y);
 		V1.z = -(FLOAT32)(vehicle->PosData.RenderPos.z - offset->z);
 	}
 
@@ -5475,8 +5475,8 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 
 	strprintf(buf, "inffoot_%d", counter);
 
-	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &worldOriginOffset);
-	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &worldOriginOffset);
+	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
+	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
 
 	id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
 	draw3dSetDebugObjectFlipZ(id,FALSE);
@@ -5536,7 +5536,6 @@ SINT32 gr2AnimHitMapLocation(SINT32 boneNum)
 
 FLOAT64 gr2AnimGetLocationThickness(SINT32 boneNum)
 {
-				  //PERSON_LOCATION[4] = {"head", "torso", "arms", "legs"};
 	static FLOAT64 PERSON_THICKNESS[4] = {0.0055, 0.0065, 0.0012, 0.0025};
 
 	return (fpHitMap[boneNum] >= 0 && fpHitMap[boneNum] < FP_HIT_LOCATION_NUM)

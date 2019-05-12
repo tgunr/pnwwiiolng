@@ -186,7 +186,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlGetBounds on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlGetBounds on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -309,7 +309,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlGetObjectBounds on object '%s' was %u", lpmain->name, rdcount);
+	WriteDebug("Cycles used for ldmdlGetObjectBounds on object '%s' was %u", lpmain->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -417,7 +417,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcSurfaceNormals on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcSurfaceNormals on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -508,7 +508,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcCollisionNormals on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcCollisionNormals on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -575,7 +575,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcVertexNormals on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcVertexNormals on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -1045,7 +1045,7 @@ __int64		rdcount, rdcount1, rdcount2;
 			sec >= numv ||
 			thd >= numv)
 		{
-			Write_Debug("Invalid vertex index in object!");
+			WriteDebug("Invalid vertex index in object!");
 			return(FALSE);
 		}
 
@@ -1120,7 +1120,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcNormals on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcNormals on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -1181,7 +1181,7 @@ __int64		rdcount, rdcount1, rdcount2;
 			sec >= numv ||
 			thd >= numv)
 		{
-			Write_Debug("Invalid vertex index in object!");
+			WriteDebug("Invalid vertex index in object!");
 			return(FALSE);
 		}
 
@@ -1252,7 +1252,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcNormals1 on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcNormals1 on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);
@@ -1297,7 +1297,7 @@ __int64		rdcount, rdcount1, rdcount2;
 			sec >= numv ||
 			thd >= numv)
 		{
-			Write_Debug("Invalid vertex index in object!");
+			WriteDebug("Invalid vertex index in object!");
 			return(FALSE);
 		}
 
@@ -1351,7 +1351,7 @@ __int64		rdcount, rdcount1, rdcount2;
 #ifdef SPECIAL_LOG
 	rdcount2 = piReadTimeStamp64();
 	rdcount = rdcount2 - rdcount1;
-	Write_Debug("Cycles used for ldmdlCalcNormals2 on object '%s' was %u", lpobj->name, rdcount);
+	WriteDebug("Cycles used for ldmdlCalcNormals2 on object '%s' was %u", lpobj->name, rdcount);
 #endif
 
 	return(TRUE);

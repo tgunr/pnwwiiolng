@@ -106,7 +106,7 @@ LOGICAL fpTPSLoad()
 
 	tpsBlendTypeBits = TPS_BLENDTYPE_NUM_TYPES;
 
-	Write_Log (LOG_FPS, LOG_INFO, "Blend type bits used = %d",
+	WriteLog (LOG_FPS, LOG_INFO, "Blend type bits used = %d",
 		tpsBlendTypeBits + tpsBlendWeapBits + tpsBlendPoseBits + tpsBlendMoveBits + tpsBlendPointBits);
 
 
@@ -127,7 +127,7 @@ LOGICAL fpTPSLoad()
 		{
 			if (fpTPSInfantryMeshFiles[i][j][0] != 0)
 			{
-//				Write_Log (LOG_FPS, LOG_INFO, "Country %d, LOD %d, loading mesh %s", i, j, fpTPSInfantryMeshFiles[i][j]);
+//				WriteLog (LOG_FPS, LOG_INFO, "Country %d, LOD %d, loading mesh %s", i, j, fpTPSInfantryMeshFiles[i][j]);
 				gr2Model::Load(fpTPSInfantryMeshFiles[i][j], skeleton, nullptr, 0, -1, (j < 2));
 			}
 		}
@@ -142,13 +142,13 @@ LOGICAL fpTPSLoad()
 		{
 			if (fpTPSWeaponMeshFiles[i][j][0] != 0)
 			{
-//				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading weapon mesh %s", i, j, fpTPSWeaponMeshFiles[i][j]);
+//				WriteLog (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading weapon mesh %s", i, j, fpTPSWeaponMeshFiles[i][j]);
 				gr2Model::Load(fpTPSWeaponMeshFiles[i][j], nullptr, nullptr, 0, -1, (j < 2));
 			}
 
 			if (fpTPSWeaponMeshAltFiles[i][j][0] != 0)
 			{
-//				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading alt weapon mesh %s", i, j, fpTPSWeaponMeshAltFiles[i][j]);
+//				WriteLog (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading alt weapon mesh %s", i, j, fpTPSWeaponMeshAltFiles[i][j]);
 				gr2Model::Load(fpTPSWeaponMeshAltFiles[i][j], nullptr, nullptr, 0, -1, (j < 2));
 			}
 		}
@@ -239,14 +239,14 @@ LOGICAL fpTPSLoad()
 		{
 			if (fpTPSTwitchFiles[i][j][0] != 0)
 			{
-//				Write_Log (LOG_FPS, LOG_INFO, "Pose %d, twitch %d, loading blend %s", i, j, fpTPSTwitchFiles[i][j]);
+//				WriteLog (LOG_FPS, LOG_INFO, "Pose %d, twitch %d, loading blend %s", i, j, fpTPSTwitchFiles[i][j]);
 				fpTPSTwitchBlends[i][j] = gr2LoadBlendedAnimation (fpTPSTwitchFiles[i][j], boneCount);
 				if (fpTPSTwitchBlends[i][j] == nullptr)
 				{
 					char errorMessage[255];
 
 					snprintf (errorMessage, 254, "ERROR loading blend %s", fpTPSTwitchFiles[i][j]);
-					Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
+					WriteLog (LOG_FPS, LOG_INFO, "%s", errorMessage);
 					piExitProgram (_FL, errorMessage);
 				}
 			}
@@ -320,7 +320,7 @@ LOGICAL fpTPSLoad()
 				char errorMessage[255];
 
 				snprintf (errorMessage, 254, "ERROR finding patch %s", fpTPSPatchTextureNames[i]);
-				Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
+				WriteLog (LOG_FPS, LOG_INFO, "%s", errorMessage);
 				piExitProgram (_FL, errorMessage);
 			}
 		}
@@ -348,7 +348,7 @@ LOGICAL fpTPSLoad()
 		char errorMessage[255];
 
 		snprintf (errorMessage, 254, "ERROR too many faces in face file .. %d > %d", fpTPSNumFaces, MAX_FACES);
-		Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
+		WriteLog (LOG_FPS, LOG_INFO, "%s", errorMessage);
 		piExitProgram (_FL, errorMessage);
 	}
 	memcpy (fpTPSFaceTexIDs, faceIDs, sizeof(SINT32)*fpTPSNumFaces);

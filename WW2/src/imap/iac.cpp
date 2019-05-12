@@ -861,7 +861,8 @@ static void iac_joystick_info(int mode, unsigned int* iac, char* name, int maxle
 				iacInfo->isAxis = iacInfo->axisType = 0;
 			}else if(IAC_IS_JOYSTICK_POV(*iac))
 			{
-				if(name) snprintf(name, maxlen, "POV%d%s", idx, JOY_POV_NAMES[*iac - JOY_POV_BEGIN[iacInfo->deviceIdx-1][idx-1]]);
+				if(name)
+                    snprintf(name, maxlen, "POV%d%s", idx, JOY_POV_NAMES[*iac - JOY_POV_BEGIN[iacInfo->deviceIdx-1][idx-1]]);
 				iacInfo->isAxis = iacInfo->axisType = 0;
 			}
 		}

@@ -266,7 +266,7 @@ int				expendable;
 				}
 				else
 				{
-					Write_Log(LOG_FPS, LOG_INFO, "ERROR: Unable to find JMM file: %s", JMMFileName);
+					WriteLog(LOG_FPS, LOG_INFO, "ERROR: Unable to find JMM file: %s", JMMFileName);
 				}
 			}
 		}
@@ -275,12 +275,12 @@ int				expendable;
 	if (!fpFPSLoadModels(vehicle) )
 	{
 		// bad bad bad
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
-		Write_Log (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
+		WriteLog (LOG_FPS, LOG_INFO, "**************FPS Load Models failed!");
 		return FALSE;
 	}
 
@@ -410,7 +410,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			}
 		}
 
-		// Write_Log (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
+		// WriteLog (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
 
 		// adjust our z down
 		vd->VehiclePos.z -= (Velocity * (ft10mscount - pd->LastFallTime10ms) / 100.0f);
@@ -609,7 +609,7 @@ static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			fallFarSoundPlayed = true;
 		}
 
-//				Write_Log (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
+//				WriteLog (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
 
 		LastPos.z = LastPos.z - Velocity * (ft10mscount - pd->LastFallTime10ms) / 100.0f;
 
@@ -774,7 +774,7 @@ static bool _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaTime
 	{
 		vehAttachToRidePoint(Vehicle);
 		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
-//		Write_Log (LOG_FPS, LOG_INFO, "Vehicle Yaw = %f", mlRAD_TO_DEG(FPSRideVehicle->PosData.Att.Yaw));
+//		WriteLog (LOG_FPS, LOG_INFO, "Vehicle Yaw = %f", mlRAD_TO_DEG(FPSRideVehicle->PosData.Att.Yaw));
 		fpFPSDoRidingShake();
 	}
 	else
@@ -895,7 +895,7 @@ static bool _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaTime
 	{
 		vehAttachToRidePoint(Vehicle);
 		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
-//		Write_Log (LOG_FPS, LOG_INFO, "Vehicle Yaw = %f", mlRAD_TO_DEG(FPSRideVehicle->PosData.Att.Yaw));
+//		WriteLog (LOG_FPS, LOG_INFO, "Vehicle Yaw = %f", mlRAD_TO_DEG(FPSRideVehicle->PosData.Att.Yaw));
 		fpFPSDoRidingShake();
 	}
 	else
@@ -1402,7 +1402,7 @@ LOGICAL fpGetEyePoint(mlVehicleData* pVehicleData, piMATRIX* pMatrix, LOGICAL al
 //FLOAT32 fpGetZAdjust(int pose, int move, int point, int type)
 FLOAT32 fpGetZAdjust(int pose, int move, int type)
 {
-	//Write_Log (LOG_FPS, LOG_INFO, "Z ADJUST: pose = %d, move = %d", pose, move);
+	//WriteLog (LOG_FPS, LOG_INFO, "Z ADJUST: pose = %d, move = %d", pose, move);
 
 	// load adjustments if needed
 	if(_fpsAdjustments.empty())

@@ -35,4 +35,4 @@ CMakeScripts
 WW2GameHosts.build
 
 WW2/World War II Online.app
-
+*.xcscmblueprint

@@ -67,7 +67,19 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
+            argument = "-authserver auth.playnet.com"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-logg false"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-clientv 1.35.18.0"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

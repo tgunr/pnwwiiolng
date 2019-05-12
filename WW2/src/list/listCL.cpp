@@ -35,7 +35,7 @@ _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 		reason = "node already present";
 	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		dbugLog(_FLX, "can't add item %p after node %p to list %p: %s", node, inpoint, list, reason);
+		WriteLog(LOG_TEUL, LOG_ABORT, "can't add item %p after node %p to list %p: %s", node, inpoint, list, reason);
 		return FALSE;
 	}
 
@@ -72,7 +72,7 @@ _listAddItemBefore(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 		reason = "node already present";
 	if (PN_UNLIKELY(reason != nullptr))
 	{
-		dbugLog(_FLX, "can't add item %p before node %p to list %p: %s", node, inpoint, list, reason);
+		WriteLog(LOG_TEUL, LOG_ABORT, "can't add item %p before node %p to list %p: %s", node, inpoint, list, reason);
 		return FALSE;
 	}
 
@@ -124,13 +124,13 @@ listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 		reason = "already in list";
 	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, reason);
+		WriteLog(LOG_TEUL, LOG_ABORT, "can't add item %p to list %p: %s", node, list, reason);
 		return FALSE;
 	}
 
 	if ( node->prev != nullptr && node->prev->next == node )
 	{
-		dbugLog(_FLX,"illegal pointer chain node %p list %p!",node,list);
+		WriteLog(LOG_TEUL, LOG_ABORT,"illegal pointer chain node %p list %p!",node,list);
 		return FALSE;
 	}
 
@@ -160,7 +160,7 @@ LOGICAL listCLAppendList(LISTHEADER** dest, LISTHEADER** source)
 
 	if (dest == nullptr ||  source == nullptr )
 	{
-		dbugLog(_FLX,"invalid params to listCLAppendList dest %p  source %p "
+		WriteLog(LOG_TEUL, LOG_ABORT,"invalid params to listCLAppendList dest %p  source %p "
 					, dest, source);
 		return FALSE;
 	}
@@ -198,7 +198,7 @@ listCLPushItemEnd(LISTHEADER** list, LISTHEADER* node)
 		reason = "already in list";
 	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, reason);
+		WriteLog(LOG_TEUL, LOG_ABORT, "can't add item %p to list %p: %s", node, list, reason);
 		return FALSE;
 	}
 
@@ -229,7 +229,7 @@ LISTHEADER
 	}
 	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		dbugLog(_FLX, "cant extract item %p to list %p: %s", node, list, reason);
+		WriteLog(LOG_TEUL, LOG_ABORT, "cant extract item %p to list %p: %s", node, list, reason);
 		return nullptr;
 	}
 
@@ -275,7 +275,7 @@ LOGICAL listCLMoveItemAfter(LISTHEADER* inpoint, LISTHEADER* node)
 {
 	if ( PN_UNLIKELY(inpoint == nullptr || node == nullptr || inpoint == node) )
 	{
-		dbugLog(_FLX, "cant move item %p after node %p",node,inpoint);
+		WriteLog(LOG_TEUL, LOG_ABORT, "cant move item %p after node %p",node,inpoint);
 		return FALSE;
 	}
 
@@ -294,7 +294,7 @@ LOGICAL listCLMoveItemBefore(LISTHEADER* inpoint, LISTHEADER* node)
 {
 	if ( PN_UNLIKELY(inpoint == nullptr || node == nullptr || inpoint == node) )
 	{
-		dbugLog(_FLX, "cant move item %p before node %p",node,inpoint);
+		WriteLog(LOG_TEUL, LOG_ABORT, "cant move item %p before node %p",node,inpoint);
 		return FALSE;
 	}
 
@@ -317,14 +317,14 @@ LISTHEADER*  part, *nextPart;
 
 	if ( PN_UNLIKELY(numitems <= 0 || itemsize <= 0) )
 	{
-		dbugLog(_FLX, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
+		WriteLog(LOG_TEUL, LOG_ABORT, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
 		return(FALSE);
 	}
 
 	LISTHEADER* free = (LISTHEADER*)memCalloc(itemsize, numitems);
 	if ( PN_UNLIKELY(free == nullptr))
 	{
-		dbugLog(_FLX,"couldnt allocate memory for new list!!!");
+		WriteLog(LOG_TEUL, LOG_ABORT,"couldnt allocate memory for new list!!!");
 		return nullptr;
 	}
 
@@ -349,13 +349,13 @@ LISTHEADER*  part, *nextPart, *list;
 
 	if ( numitems <= 0 || itemsize <= 0)
 	{
-		dbugLog(_FLX, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
+		WriteLog(LOG_TEUL, LOG_ABORT, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
 		return(FALSE);
 	}
 
 	if ( PN_UNLIKELY(free == nullptr) )
 	{
-		dbugLog(_FLX,"NULL memory for new list!!!");
+		WriteLog(LOG_TEUL, LOG_ABORT,"NULL memory for new list!!!");
 		return nullptr;
 	}
 

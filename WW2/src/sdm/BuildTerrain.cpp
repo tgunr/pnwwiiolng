@@ -549,7 +549,7 @@ static void LoadStratFile(const char* fileName)
 	hfile = fopen(fileName, "rb");
 	if (hfile == nullptr)	return;
 
-	Write_Debug("Loading CPF file %s", fileName);
+	WriteDebug("Loading CPF file %s", fileName);
 	do
 	{
 		if (feof(hfile))	break;
@@ -576,7 +576,7 @@ static void LoadStratFile(const char* fileName)
 							&pcp->ctype,
 							&pcp->flags,
 							&pcp->serial);
-			if(length != 11)	{ Write_Debug("Unable to scan the input CP line"); }
+			if(length != 11)	{ WriteDebug("Unable to scan the input CP line"); }
 
 			chokepointCPFmap[StratObjId(pcp->cpid.scx, pcp->cpid.scy, pcp->cpid.id)] = pcp;
 		}
@@ -604,7 +604,7 @@ static void LoadStratFile(const char* fileName)
 							&pfac->fsubtype,
 							&pfac->flags,
 							&pfac->serial);
-			if(length != 15)	{ Write_Debug("Unable to scan the input Facility line"); }
+			if(length != 15)	{ WriteDebug("Unable to scan the input Facility line"); }
 
 			pfac->next = pcp->facility;
 			pcp->facility = pfac;
@@ -634,7 +634,7 @@ static void LoadStratFile(const char* fileName)
 							&pbld->bsubtype,
 							&pbld->flags,
 							&pbld->serial);
-			if (length != 14)	{ Write_Debug("Unable to scan the input Building line"); }
+			if (length != 14)	{ WriteDebug("Unable to scan the input Building line"); }
 
 			pbld->next = pfac->building;
 			pfac->building = pbld;
@@ -676,7 +676,7 @@ static void LoadStratFile(const char* fileName)
 							&plink->distance,
 							&plink->flags,
 							&plink->serial);
-			if (length != 27)	{ Write_Debug("Unable to scan the input Link line"); }
+			if (length != 27)	{ WriteDebug("Unable to scan the input Link line"); }
 
 			plink->next = pbld->link;
 			pbld->link = plink;
@@ -705,7 +705,7 @@ static void LoadStratFile(const char* fileName)
 							&pwaypoint->subtype,
 							&pwaypoint->flags,
 							&pwaypoint->serial);
-			if (length != 15)	{ Write_Debug("Unable to scan the input Waypoint line"); }
+			if (length != 15)	{ WriteDebug("Unable to scan the input Waypoint line"); }
 
 			pwaypoint->next = plink->waypoint;
 			plink->waypoint = pwaypoint;

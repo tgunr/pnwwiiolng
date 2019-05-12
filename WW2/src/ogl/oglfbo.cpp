@@ -195,7 +195,7 @@ SINT32 CFbo::createRenderCubemap(GLint filtermin,
 
         if(s)
         {
-            Write_Log(LOG_OLD, LOG_INFO, (const SCHAR*)s);
+            WriteLog(LOG_OLD, LOG_INFO, (const SCHAR*)s);
         }
 
         return -1;
@@ -291,7 +291,7 @@ SINT32 CFbo::createRenderTexture(GLint filtermin,
 
         if(s)
         {
-            Write_Log(LOG_OLD, LOG_INFO, (const SCHAR*)s);
+            WriteLog(LOG_OLD, LOG_INFO, (const SCHAR*)s);
         }
 
         return -1;
@@ -517,7 +517,7 @@ LOGICAL CFbo::initialize()
     if(!GLEW_EXT_framebuffer_object)
     {
         const SCHAR* s = "[CFbo::initialize] No frame buffer support for FBO";
-        Write_Log(LOG_OLD, LOG_INFO, s);
+        WriteLog(LOG_OLD, LOG_INFO, s);
         m_supported = FALSE;
         return FALSE;
     }
@@ -527,7 +527,7 @@ LOGICAL CFbo::initialize()
     if(!m_supported)
     {
         const SCHAR* s = "[CFbo::initialize] No shader support for FBO";
-        Write_Log(LOG_OLD, LOG_INFO, s);
+        WriteLog(LOG_OLD, LOG_INFO, s);
         return FALSE;
     }
 
@@ -536,7 +536,7 @@ LOGICAL CFbo::initialize()
     if(!m_fbo)
     {
         const SCHAR* s = "[CFbo::initialize] Failed to create Framebuffer Object";
-        Write_Log(LOG_OLD, LOG_INFO, s);
+        WriteLog(LOG_OLD, LOG_INFO, s);
         m_supported = FALSE;
         return FALSE;
     }
@@ -561,42 +561,42 @@ LOGICAL CFbo::checkStatus()
     {
     case GL_FRAMEBUFFER_COMPLETE_EXT:
         {
-            //Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_COMPLETE_EXT");
+            //WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_COMPLETE_EXT");
             return TRUE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
             return FALSE;
         }
     case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
         {
-            Write_Log(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_UNSUPPORTED_EXT");
+            WriteLog(LOG_OLD, LOG_INFO, "GL_FRAMEBUFFER_UNSUPPORTED_EXT");
             return FALSE;
         }
     }

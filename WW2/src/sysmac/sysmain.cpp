@@ -110,7 +110,7 @@ int sysmainInitApp()
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
 	Enable_Log(LOG_ALL, WantedUserLogEnabled);
-	Set_Log_Level(LOG_INFO);
+	Set_Log_Level(LOG_WARN);
 
 #if USE_OSG
 	ddpSetD3DRender(osgGameUpdate);

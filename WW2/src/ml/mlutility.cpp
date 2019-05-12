@@ -104,7 +104,7 @@ UINT32 mlUtilityFindComponentByName(mlComponent** ComponentPtr,
 	}
 
 	*ComponentPtr = nullptr;
-	Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
+	WriteDebug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
 
 	return 0;
 }

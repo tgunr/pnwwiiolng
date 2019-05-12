@@ -1501,7 +1501,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
-					Write_Log(LOG_VEHICLE,LOG_WARN,s);
+					WriteLog(LOG_VEHICLE,LOG_WARN,s);
 
 					piExitProgram(_FL,s);
 
@@ -1523,7 +1523,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
-					Write_Log(LOG_VEHICLE,LOG_WARN,s);
+					WriteLog(LOG_VEHICLE,LOG_WARN,s);
 
 					piExitProgram(_FL,s);
 
@@ -1545,7 +1545,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
-					Write_Log(LOG_VEHICLE,LOG_WARN,s);
+					WriteLog(LOG_VEHICLE,LOG_WARN,s);
 
 					piExitProgram(_FL,s);
 
@@ -1571,7 +1571,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 								StateType->Name,
 								(char*)StateType->Emitter,
 								Vehicle->VehicleType->Description);
-						Write_Log(LOG_VEHICLE,LOG_WARN,s);
+						WriteLog(LOG_VEHICLE,LOG_WARN,s);
 
 						piExitProgram(_FL,s);
 
@@ -1596,7 +1596,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 							StateType->Name,
 							(char*)StateType->Emitter,
 							Vehicle->VehicleType->Description);
-					Write_Log(LOG_VEHICLE,LOG_WARN,s);
+					WriteLog(LOG_VEHICLE,LOG_WARN,s);
 
 					piExitProgram(_FL,s);
 
@@ -1689,7 +1689,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 	                (SCHAR*)pStateType->Emitter,
 	                Vehicle->VehicleType->Description);
 
-	        Write_Log(LOG_VEHICLE,LOG_WARN, szBuff);
+	        WriteLog(LOG_VEHICLE,LOG_WARN, szBuff);
 	    }
 
 	    pAnim->ExhaustSmokeEmitter[q][0] = lpLeft;
@@ -1712,7 +1712,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 	                (SCHAR*)pStateType->Emitter,
 	                Vehicle->VehicleType->Description);
 
-	        Write_Log(LOG_VEHICLE,LOG_WARN, szBuff);
+	        WriteLog(LOG_VEHICLE,LOG_WARN, szBuff);
 	    }
 
 	    pAnim->ExhaustSmokeEmitter[q][1] = lpRight;
@@ -1795,7 +1795,7 @@ UINT32 _DoWingVortexState(vehVehicle*pVeh,
                     (SCHAR*)pStateType->Emitter,
                     pVeh->VehicleType->Description);
 
-			Write_Log(LOG_VEHICLE,LOG_WARN, s);
+			WriteLog(LOG_VEHICLE,LOG_WARN, s);
 
 			piExitProgram(_FL, s);
         }
@@ -1845,7 +1845,7 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
 	                (SCHAR*)pStateType->Emitter,
 	                Vehicle->VehicleType->Description);
 
-	        Write_Log(LOG_VEHICLE,LOG_WARN, szBuff);
+	        WriteLog(LOG_VEHICLE,LOG_WARN, szBuff);
 	    }
 
         pAnim->TreadDustEmitter[q] = lpEmit;
@@ -2859,7 +2859,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
                 {
                     if(StateType->Name)
                     {
-                        Write_Log(LOG_OLD, LOG_INFO, "[HandleVisDamage] **FAILED** to find StateSubType for %s", StateType->Name);
+                        WriteLog(LOG_OLD, LOG_INFO, "[HandleVisDamage] **FAILED** to find StateSubType for %s", StateType->Name);
                     }
 
                     Vehicle->StateAnimation.ExplosionOn[StateType->Data] = TRUE;
@@ -2915,7 +2915,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
                 {
                     if(StateType->Name)
                     {
-                        Write_Log(LOG_OLD, LOG_INFO, "[HandleVisDamage] **FAILED** to find StateSubType for %s", StateType->Name);
+                        WriteLog(LOG_OLD, LOG_INFO, "[HandleVisDamage] **FAILED** to find StateSubType for %s", StateType->Name);
                     }
 
                     Vehicle->StateAnimation.ExplosionOn[StateType->Data] = FALSE;

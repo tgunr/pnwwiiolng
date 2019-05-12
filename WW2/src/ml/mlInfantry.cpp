@@ -475,7 +475,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 									//
 									// also, insure the vehicle is moving at all
 
-									Write_Debug ("CollideVector %f", collideVector.x * collideVector.x +
+									WriteDebug ("CollideVector %f", collideVector.x * collideVector.x +
 										collideVector.y * collideVector.y);
 
 									if ((collideVector.x * collideVector.x +
@@ -485,7 +485,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 											 Vehicle->PosData.Vel.y * Vehicle->PosData.Vel.y +
 											 Vehicle->PosData.Vel.z * Vehicle->PosData.Vel.z) > 0.0)
 										{
-//											Write_Debug ("DIE!DIE!DIE!");
+//											WriteDebug ("DIE!DIE!DIE!");
 											persKillCrew();
 										}
 									}
@@ -748,7 +748,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 	if (xConflictFlag)
 	{
 		Vel->x = 0;
-		Write_Debug ("X Conflict, velocity Zeroed");
+		WriteDebug ("X Conflict, velocity Zeroed");
 	}
 	else
 	{
@@ -772,7 +772,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 	if (yConflictFlag)
 	{
 		Vel->y = 0;
-		Write_Debug ("Y Conflict, velocity Zeroed");
+		WriteDebug ("Y Conflict, velocity Zeroed");
 	}
 	else
 	{
@@ -863,7 +863,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 	if (((originalVelocity.x != 0.0) || (originalVelocity.y != 0.0) || (Vel->x != 0.0) || (Vel->y != 0.0))
 		&& ((originalVelocity.x != Vel->x) || (originalVelocity.y != Vel->y))
 		)
-	Write_Debug ("Eye (%lf, %lf) .. Initial (%lf, %lf) .. End (%lf, %lf) .. Fudge (%lf, %lf)",
+	WriteDebug ("Eye (%lf, %lf) .. Initial (%lf, %lf) .. End (%lf, %lf) .. Fudge (%lf, %lf)",
 		eyePoint.x, eyePoint.y,
 		originalVelocity.x, originalVelocity.y,
 		Vel->x, Vel->y,
@@ -1021,7 +1021,7 @@ SINT32 mlInfantryInsideVehicleCheck (mlVehicleData* pVehicleData, piVECTOR* eyeP
 			colObject = CurrentVehicle->VehicleObjectData->CollideInternObject;
 		else
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "No Bounding Box found for collision!!");
+			WriteLog (LOG_FPS, LOG_INFO, "No Bounding Box found for collision!!");
 			continue;
 		}
 

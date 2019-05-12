@@ -380,7 +380,7 @@ static void _ReadComponentFiles()
 			{
 				char str[256];
 				snprintf(str, 255, "_ReadComponentFiles: Can't open component file: %s", fileName);
-				Write_Debug(str);
+				WriteDebug(str);
 			}
 
 			continue;
@@ -643,7 +643,7 @@ UINT32 vehCreateNewVehicle(vehVehicle**VehiclePtr, UINT32 HostIndex, SINT32 Vehi
 	vehType const* vehtype = vehtypeGetByIndex(VehicleType);
 	if(vehtype == nullptr)
 	{
-		Write_Debug("Attempted to create a vehicle with invalid id number %d",VehicleType);
+		WriteDebug("Attempted to create a vehicle with invalid id number %d",VehicleType);
 		return 0;
 	}
 
@@ -2719,7 +2719,7 @@ static void _sendSTODamage(vehVehicle*veh, vehDamageQue* que)
 
     if(!sto)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[_sendSTODamage] FAILED to find STO for %d", -veh->VehicleNum);
+        WriteLog(LOG_PHYSICS, LOG_INFO, "FAILED to find STO for %d", -veh->VehicleNum);
         return;
     }
 
@@ -2753,7 +2753,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 		if (DQ->NumRoundsHit[i] <= 0)
 			continue;
 
-		Write_Debug("WEAP HIT component %s, num individual hits: %d, damage: %f",
+		WriteDebug("WEAP HIT component %s, num individual hits: %d, damage: %f",
 							CurrentVehicle->VehicleType->DamageObjects[i-1],
 							DQ->NumRoundsHit[i],
 							DQ->DamageAccrued[i]);
@@ -2773,7 +2773,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 	if(Count == 0)
 		return 0;
 
-	Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Sending hit packet for vehicle, index = %u, ident = %u, handle = %s, hits = %u",
+	WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Sending hit packet for vehicle, index = %u, ident = %u, handle = %s, hits = %u",
 					CurrentVehicle->VehicleHostIndex,
 					CurrentVehicle->VehicleNum,
 					CurrentVehicle->Handle,
@@ -2817,7 +2817,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 		if ( compID >= VEH_MAX_DAMAGE_OBJECTS )
 		{
-			Write_Debug("Received bad hit damage component number");
+			WriteDebug("Received bad hit damage component number");
 			continue;
 		}
 
@@ -2848,7 +2848,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 	ModelData->NewDamage = 1;
 
-	Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Received hit message from host, vehicle index = %d",
+	WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Received hit message from host, vehicle index = %d",
 				hit.m_target);
 
 	g_MyHitMessages.push_back(hit);
@@ -2859,7 +2859,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 		if (comp.NumHits > 0)
 		{
-			Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Hit part %s, damage approx %lf/hit, hits = %d",
+			WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Hit part %s, damage approx %lf/hit, hits = %d",
 						Vehicle->VehicleType->DamageObjects[comp.compID-1],
 						ModelData->DamageAccrued[comp.compID] / comp.NumHits,
 						comp.NumHits);
@@ -2902,7 +2902,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 	}
 	else
 	{
-		Write_Debug("WEAP Hit message DOES NOT applies to player's vehicle (error condition)");
+		WriteDebug("WEAP Hit message DOES NOT applies to player's vehicle (error condition)");
 	}
 
 #ifdef BETA_RELEASE
@@ -3156,7 +3156,7 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 	if ((Joules < DamThreshold) && (Joules>= 0))
 	{
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP insufficient energy %.0g J to damage %s, threshold %d J, scx = %d, scy = %d, id = %d",
+		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP insufficient energy %.0g J to damage %s, threshold %d J, scx = %d, scy = %d, id = %d",
 					Joules, TO->TerrainMasterObject->name, DamThreshold, SuperCellX, SuperCellY, Id);
 		return 0;
 	}
@@ -3180,7 +3180,7 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 				if (energyOverride >= 1.0f )
 				{
 					Energy = energyOverride;
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper bridge damage override from fpsData.txt, damage set to %g", Energy);
+					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper bridge damage override from fpsData.txt, damage set to %g", Energy);
 				}
 			}
 		}
@@ -3210,10 +3210,10 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 			{
 				if (ShooterVehicle && ShooterVehicle->VehicleType->Type != VEH_TYPE_PERSON)
 				{
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
+					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
 					return 0;
 				}
-				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
+				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
 			}
 		}
 	}
@@ -3225,10 +3225,10 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 		if (ShooterVehicle && ShooterVehicle->VehicleType->Type != VEH_TYPE_PERSON)
 		{
-			Write_Log(LOG_WEAP, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
+			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
 			return 0;
 		}
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
+		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
 	}
 	else
 	{
@@ -3266,7 +3266,7 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 		ShooterVehicle->DamageQue.Damage[SlotNum] += Energy;
 
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %.1f J to %s (%d, %d, %d)",
+		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %.1f J to %s (%d, %d, %d)",
 					Energy, TO->TerrainMasterObject->name,
 					TO->StratSupercellX, TO->StratSupercellY, TO->StratSupercellX, TO->ObjId.id);
 	}
@@ -3883,7 +3883,7 @@ void VehicleSTO::deactivate()
     }
     else
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[VehicleSTO::deactivate] Unable to free vehicle");
+        WriteLog(LOG_OLD, LOG_INFO, "[VehicleSTO::deactivate] Unable to free vehicle");
     }
 
 	ServerTrackedObject::deactivate();
@@ -4773,13 +4773,13 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 {
 	if ( Vehicle == nullptr)
 	{
-		Write_Log(LOG_WEAP,LOG_WARN,"nullptr vehicle!!");
+		WriteLog(LOG_WEAPON,LOG_WARN,"nullptr vehicle!!");
 		return 0;
 	}
 
 	if (!vehValid(Vehicle) )
 	{
-		Write_Log(LOG_WEAP,LOG_WARN,"corrupt vehicle!!");
+		WriteLog(LOG_WEAPON,LOG_WARN,"corrupt vehicle!!");
 		return 0;
 	}
 
@@ -4809,14 +4809,14 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 	if (ComponentNum == 0)
 	{
-		Write_Log(LOG_WEAP,LOG_WARN,"Damaged component zero!!");
+		WriteLog(LOG_WEAPON,LOG_WARN,"Damaged component zero!!");
 		return 0;
 	}
 
 	// Cast to UINT32 to ensure it is never negative
 	if ((UINT32)ComponentNum > VEH_MAX_DAMAGE_OBJECTS)
 	{
-		Write_Log(LOG_WEAP,LOG_WARN,"INVALID Component specified in vehApplyDamageToVehicleComponent! %d", ComponentNum);
+		WriteLog(LOG_WEAPON,LOG_WARN,"INVALID Component specified in vehApplyDamageToVehicleComponent! %d", ComponentNum);
 		return 0;
 	}
 
@@ -4844,7 +4844,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 // If we're below the damage threshold, set energy and isImportant to 0.
 	if(Energy < Vehicle->VehicleType->DamageThreshold[ComponentNum-1])
 	{
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP insufficient energy %f J to damage %s, threshold %f J",
+		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP insufficient energy %f J to damage %s, threshold %f J",
 					Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1], Vehicle->VehicleType->DamageThreshold[ComponentNum-1]);
 		Energy = 0;
 		Vehicle->DamageQue.isImportant[ComponentNum]  = 0;
@@ -4872,7 +4872,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 	if(Energy)
 	{
-		Write_Log(LOG_WEAP, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %f J to %s", Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1]);
+		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %f J to %s", Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1]);
 
 #if WANT_OFFLINE_RAGDOLL
 		if(!Online && Vehicle != PlayerVehicle && (frametime - Vehicle->VehicleInitTime) > 2000)
@@ -5354,7 +5354,7 @@ PlayerPlacedObject* vehmainPPOBuild(void) {
     }
     else
     {
-        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+        WriteLog(LOG_WEAPON, LOG_WARN, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
     }
 
 	return fru;
@@ -6303,8 +6303,8 @@ UINT32 vehmainDetermineComponentKiller(mlComponent* killedComponent)
 					}
 #endif
 
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Determined KilledBy due to damage to hitmap %d .. shooter = %u", comp.compID, hit.m_shooter);
-					Write_Log(LOG_COMM, LOG_INFO, "COMM Sending KilledBy message to host .. vehicle index = %u", hit.m_shooter);
+					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Determined KilledBy due to damage to hitmap %d .. shooter = %u", comp.compID, hit.m_shooter);
+					WriteLog(LOG_COMM, LOG_INFO, "COMM Sending KilledBy message to host .. vehicle index = %u", hit.m_shooter);
 
 					return shooter;
 				}
@@ -6336,7 +6336,7 @@ UINT32 vehmainDeterminePlinkKiller()
 			uiChatPrintLine("Plink kill from %u killed us with %d ms into window", lastHit.m_shooter, delta);
 #endif
 
-			Write_Log(LOG_WEAP, LOG_INFO, "Bailoutkill Determined by last hit from %u %ums ago", lastHit.m_shooter, delta);
+			WriteLog(LOG_WEAPON, LOG_INFO, "Bailoutkill Determined by last hit from %u %ums ago", lastHit.m_shooter, delta);
 
 			return lastHit.m_shooter;
 		}

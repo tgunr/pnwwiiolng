@@ -262,7 +262,7 @@ UINT64 beginhere = GetMicroSeconds();
     count += GetMicroSeconds() - beginhere;
     if ((++number % 256) == 0)
     {
-        Write_Debug("Average static lighting time: %lu us", count);
+        WriteDebug("Average static lighting time: %lu us", count);
         count = 0;
     }
 #endif

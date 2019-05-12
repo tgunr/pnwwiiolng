@@ -804,7 +804,7 @@ LOGICAL fxMiscInit()
 
     if(_meshsize == 0)
     {
-        Write_Log(LOG_OLD, LOG_INFO, "[fxMiscInit] **FAILED** to create mesh");
+        WriteLog(LOG_OLD, LOG_INFO, "[fxMiscInit] **FAILED** to create mesh");
         return FALSE;
     }
 

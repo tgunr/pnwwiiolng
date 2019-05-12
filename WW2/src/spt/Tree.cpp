@@ -204,7 +204,7 @@ bool CTree::LoadSPTFile(const char* filename,
 
 	if ( ! result )
     {
-        Write_Log(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
+        WriteLog(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
         return false;
     }
     SetBranchLightingMethod(CSpeedTreeRT::LIGHT_DYNAMIC);
@@ -225,7 +225,7 @@ bool CTree::LoadSPTFile(const char* filename,
 
     if(!Compute(nullptr, seed))
     {
-        Write_Log(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
+        WriteLog(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
         return false;
     }
 
@@ -1222,7 +1222,7 @@ void CTree::SetupFrondGeometryDeprecated()
         if(fronds.m_pNumStrips[i] == 0)
         {
             Enable_Log(LOG_OLD, 1);
-            Write_Log(LOG_OLD, LOG_INFO, "[FRONDS] TREE = %s LOD = %d", treename.c_str(), i);
+            WriteLog(LOG_OLD, LOG_INFO, "[FRONDS] TREE = %s LOD = %d", treename.c_str(), i);
             Enable_Log(LOG_OLD, 0);
         }
     }
@@ -1348,7 +1348,7 @@ void CTree::SetupFrondGeometry()
         if(fronds.m_pNumStrips[i] == 0)
         {
             Enable_Log(LOG_OLD, 1);
-            Write_Log(LOG_OLD, LOG_INFO, "[FRONDS] TREE = %s LOD = %d", treename.c_str(), i);
+            WriteLog(LOG_OLD, LOG_INFO, "[FRONDS] TREE = %s LOD = %d", treename.c_str(), i);
             Enable_Log(LOG_OLD, 0);
         }
     }
@@ -1468,7 +1468,7 @@ void CTree::SetupBranchGeometry()
         if(branches.m_pNumStrips[i] == 0)
         {
             Enable_Log(LOG_OLD, 1);
-            Write_Log(LOG_OLD, LOG_INFO, "[BRANCHES] TREE = %s LOD = %d", treename.c_str(), i);
+            WriteLog(LOG_OLD, LOG_INFO, "[BRANCHES] TREE = %s LOD = %d", treename.c_str(), i);
             Enable_Log(LOG_OLD, 0);
         }
     }
@@ -1602,7 +1602,7 @@ void CTree::SetupBranchGeometryDeprecated()
         if(branches.m_pNumStrips[i] == 0)
         {
             Enable_Log(LOG_OLD, 1);
-            Write_Log(LOG_OLD, LOG_INFO, "[BRANCHES] TREE = %s LOD = %d", treename.c_str(), i);
+            WriteLog(LOG_OLD, LOG_INFO, "[BRANCHES] TREE = %s LOD = %d", treename.c_str(), i);
             Enable_Log(LOG_OLD, 0);
         }
     }

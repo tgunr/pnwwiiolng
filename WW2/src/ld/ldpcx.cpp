@@ -112,7 +112,7 @@ int   stream;
 
 	if (!piLockTextureMemorySurface(texid, 0, &pisd))
 	{
-		Write_Debug("Could not get a lock on the text surface");
+		WriteDebug("Could not get a lock on the text surface");
 		piFreeTexture(texid, 0);
 		return(-1);
 	}

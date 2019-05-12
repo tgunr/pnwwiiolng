@@ -2012,7 +2012,7 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 	if(st == nullptr)
 	{
 #ifdef BETA_RELEASE
-		Write_Log(LOG_VEHICLE, LOG_WARN,  "no visdamage group called %s in state file!", visdamgroup);
+		WriteLog(LOG_VEHICLE, LOG_WARN,  "no visdamage group called %s in state file!", visdamgroup);
 #endif
 		return;
 	}

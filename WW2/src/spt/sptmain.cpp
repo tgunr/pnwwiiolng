@@ -2712,7 +2712,7 @@ bool sptCollideWithTree(Tree *tree,
 
     if ( count != tree->collidematinv.size() )
     {
-        Write_Debug("Base tree collision objects count != tree collidematinv matrix count!");
+        WriteDebug("Base tree collision objects count != tree collidematinv matrix count!");
         return false;
     }
 
@@ -3342,7 +3342,7 @@ bool sptIsTreeCollidable(short base)
 
 	if(!tree)
 	{
-		Write_Log(LOG_OLD, LOG_INFO, "[sptIsTreeCollidable] ERROR: No Basetrees!");
+		WriteLog(LOG_OLD, LOG_INFO, "[sptIsTreeCollidable] ERROR: No Basetrees!");
 		return false;
 	}
 

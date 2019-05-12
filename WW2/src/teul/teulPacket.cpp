@@ -174,7 +174,7 @@ Teul::Packet::receive(ENDPOINT& endpoint_)
 {
 	if ( PN_UNLIKELY(header().packetToken() != Teul::PacketToken::Encrypted && header().packetToken() != Teul::PacketToken::Unencrypted) )
 	{
-		dbugLog(_FLW, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
 		return -EINVAL;
 	}
 
@@ -182,14 +182,14 @@ Teul::Packet::receive(ENDPOINT& endpoint_)
 
 	if ( PN_UNLIKELY(packetSizeBytes() < headerSizeBytes()) )
 	{
-		dbugLog(_FLW, "t:%d malformed packet header", endpoint_.teulIndex());
+		WriteLog(LOG_TEUL, LOG_WARN, "t:%d malformed packet header", endpoint_.teulIndex());
 		return -EINVAL;
 	}
 
 	TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(header().m_callX, header().m_callY);
 	if ( PN_UNLIKELY(callback == nullptr) )
 	{
-		dbugLog(_FLM, "t:%d cbx:%u cby:%u no such callback", endpoint_.teulIndex(), header().m_callX, header().m_callY);
+		WriteLog(LOG_TEUL, LOG_RECOVER, "t:%d cbx:%u cby:%u no such callback", endpoint_.teulIndex(), header().m_callX, header().m_callY);
 		return -EINVAL;
 	}
 

@@ -92,7 +92,7 @@ SINT32 weaponsInit()
 
 	if (WeaponListFile == -1)
 	{
-		Write_Debug("Can't find data/vehicles/weapons.txt file!");
+		WriteDebug("Can't find data/vehicles/weapons.txt file!");
 		return -1;
 	}
 
@@ -169,7 +169,7 @@ SINT32 weaponsInit()
                             {
                                 char s[128];
                                 strprintf(s, "ghostammotype %s not found", VarContents);
-                                Write_Debug(s);
+                                WriteDebug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
                                 piExitProgram(_FL, s);
 #endif
@@ -192,7 +192,7 @@ SINT32 weaponsInit()
                             {
                                 char s[128];
                                 strprintf(s, "ammotype %s not found", VarContents);
-                                Write_Debug(s);
+                                WriteDebug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
                                piExitProgram(_FL, s);
 #endif
@@ -241,7 +241,7 @@ SINT32 weaponsInit()
 					}
 					break;
 					default:
-						Write_Debug("Unidentified var %s in file %s",VarName,FileName);
+						WriteDebug("Unidentified var %s in file %s",VarName,FileName);
 					break;
 				}
 			}
@@ -361,7 +361,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 
 	if (Weapon->WeaponType == nullptr)
 	{
-		Write_Debug("Attempted to fire a weapon without a weapontype");
+		WriteDebug("Attempted to fire a weapon without a weapontype");
 		return 0;
 	}
 
@@ -694,7 +694,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 			}
 			else
 			{
-				Write_Debug ("FireDelta = 0.0!");
+				WriteDebug ("FireDelta = 0.0!");
 			}
 
 			// These variables were added because the variables are Covert,

@@ -80,6 +80,15 @@ namespace {
 #endif
 
 
+// Helper macros for cleaning up all the client/server ifdefs.
+#if platBuild == BUILD_SERVER
+# define ON_SERVER( _expr_ ) _expr_
+# define ON_CLIENT( _expr_ )
+#else
+# define ON_SERVER( _expr_ )
+# define ON_CLIENT( _expr_ ) _expr_
+#endif
+
 #define P2_BASE			10000	// Fast X/Y is position expressed in 100ms.
 
 #define FIRST_TIME_TURRET_SIZE ((8*sizeof(turret_t))+1)
@@ -205,7 +214,7 @@ std::vector<std::wstring> updtGetNvHistory()
 	wchar_t buffer[128];
 	for ( auto it = nvHistory.begin(), end = nvHistory.end(); it != end; ++it )
 	{
-		swprintf(buffer, (sizeof(buffer) / sizeof(buffer[0])) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
+		swprintf(buffer, sizeof(buffer) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
 		result = buffer;
 		result += it->description;
 		results.push_back(result);

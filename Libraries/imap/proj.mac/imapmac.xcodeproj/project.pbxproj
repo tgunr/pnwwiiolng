@@ -1,0 +1,251 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0859C082109E7AD000C4ED36 /* cfml.c in Sources */ = {isa = PBXBuildFile; fileRef = 0859C07D109E7AD000C4ED36 /* cfml.c */; };
+		0859C083109E7AD000C4ED36 /* cfml.h in Headers */ = {isa = PBXBuildFile; fileRef = 0859C07E109E7AD000C4ED36 /* cfml.h */; };
+		0859C084109E7AD000C4ED36 /* imap.c in Sources */ = {isa = PBXBuildFile; fileRef = 0859C07F109E7AD000C4ED36 /* imap.c */; };
+		0859C085109E7AD000C4ED36 /* imapInternals.h in Headers */ = {isa = PBXBuildFile; fileRef = 0859C080109E7AD000C4ED36 /* imapInternals.h */; };
+		0859C086109E7AD000C4ED36 /* imapKeymap.c in Sources */ = {isa = PBXBuildFile; fileRef = 0859C081109E7AD000C4ED36 /* imapKeymap.c */; };
+		0859C09B109E7D3C00C4ED36 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 0859C09A109E7D3C00C4ED36 /* libxml2.dylib */; };
+		0859C09F109E7D5000C4ED36 /* imap.h in Headers */ = {isa = PBXBuildFile; fileRef = 0859C09C109E7D5000C4ED36 /* imap.h */; };
+		0859C0A0109E7D5000C4ED36 /* imapTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0859C09D109E7D5000C4ED36 /* imapTypes.h */; };
+		0859C0A1109E7D5000C4ED36 /* xmlparse.h in Headers */ = {isa = PBXBuildFile; fileRef = 0859C09E109E7D5000C4ED36 /* xmlparse.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0859C07D109E7AD000C4ED36 /* cfml.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cfml.c; sourceTree = "<group>"; };
+		0859C07E109E7AD000C4ED36 /* cfml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cfml.h; sourceTree = "<group>"; };
+		0859C07F109E7AD000C4ED36 /* imap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imap.c; sourceTree = "<group>"; };
+		0859C080109E7AD000C4ED36 /* imapInternals.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imapInternals.h; sourceTree = "<group>"; };
+		0859C081109E7AD000C4ED36 /* imapKeymap.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = imapKeymap.c; sourceTree = "<group>"; };
+		0859C09A109E7D3C00C4ED36 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		0859C09C109E7D5000C4ED36 /* imap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imap.h; path = ../include/imap/imap.h; sourceTree = SOURCE_ROOT; };
+		0859C09D109E7D5000C4ED36 /* imapTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imapTypes.h; path = ../include/imap/imapTypes.h; sourceTree = SOURCE_ROOT; };
+		0859C09E109E7D5000C4ED36 /* xmlparse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xmlparse.h; path = ../include/imap/xmlparse.h; sourceTree = SOURCE_ROOT; };
+		D2AAC046055464E500DB518D /* libimapmac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libimapmac.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D289987405E68DCB004EDB86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0859C09B109E7D3C00C4ED36 /* libxml2.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0859C07C109E7AD000C4ED36 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				0859C09C109E7D5000C4ED36 /* imap.h */,
+				0859C09D109E7D5000C4ED36 /* imapTypes.h */,
+				0859C09E109E7D5000C4ED36 /* xmlparse.h */,
+				0859C07D109E7AD000C4ED36 /* cfml.c */,
+				0859C07E109E7AD000C4ED36 /* cfml.h */,
+				0859C07F109E7AD000C4ED36 /* imap.c */,
+				0859C080109E7AD000C4ED36 /* imapInternals.h */,
+				0859C081109E7AD000C4ED36 /* imapKeymap.c */,
+			);
+			name = src;
+			path = ../src;
+			sourceTree = SOURCE_ROOT;
+		};
+		0859C099109E7D1100C4ED36 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				0859C09A109E7D3C00C4ED36 /* libxml2.dylib */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+		08FB7794FE84155DC02AAC07 /* imapmac */ = {
+			isa = PBXGroup;
+			children = (
+				0859C099109E7D1100C4ED36 /* lib */,
+				0859C07C109E7AD000C4ED36 /* src */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = imapmac;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC046055464E500DB518D /* libimapmac.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC043055464E500DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0859C083109E7AD000C4ED36 /* cfml.h in Headers */,
+				0859C085109E7AD000C4ED36 /* imapInternals.h in Headers */,
+				0859C09F109E7D5000C4ED36 /* imap.h in Headers */,
+				0859C0A0109E7D5000C4ED36 /* imapTypes.h in Headers */,
+				0859C0A1109E7D5000C4ED36 /* xmlparse.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC045055464E500DB518D /* imapmac */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "imapmac" */;
+			buildPhases = (
+				D2AAC043055464E500DB518D /* Headers */,
+				D2AAC044055464E500DB518D /* Sources */,
+				D289987405E68DCB004EDB86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = imapmac;
+			productName = imapmac;
+			productReference = D2AAC046055464E500DB518D /* libimapmac.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "imapmac" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* imapmac */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2AAC045055464E500DB518D /* imapmac */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC044055464E500DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0859C082109E7AD000C4ED36 /* cfml.c in Sources */,
+				0859C084109E7AD000C4ED36 /* imap.c in Sources */,
+				0859C086109E7AD000C4ED36 /* imapKeymap.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB91EC08733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = imapmac;
+			};
+			name = Debug;
+		};
+		1DEB91ED08733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = imapmac;
+			};
+			name = Release;
+		};
+		1DEB91F008733DB70010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../include\"";
+				ONLY_ACTIVE_ARCH = NO;
+				PREBINDING = NO;
+				SDKROOT = macosx10.13;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		1DEB91F108733DB70010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = NO;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../include\"";
+				PREBINDING = NO;
+				SDKROOT = macosx10.13;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB91EB08733DB70010E9CD /* Build configuration list for PBXNativeTarget "imapmac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91EC08733DB70010E9CD /* Debug */,
+				1DEB91ED08733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB91EF08733DB70010E9CD /* Build configuration list for PBXProject "imapmac" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB91F008733DB70010E9CD /* Debug */,
+				1DEB91F108733DB70010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

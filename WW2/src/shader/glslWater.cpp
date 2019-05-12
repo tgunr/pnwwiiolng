@@ -722,7 +722,7 @@ static void DrawScenarioCoastEffectBin()
 
         if(!oglIsTexture(foam, 0))
         {
-            Write_Debug("Coast scenarios need seafoam.dds");
+            WriteDebug("Coast scenarios need seafoam.dds");
         }
 
         surface = new RenderStateSet;
@@ -900,7 +900,7 @@ static void DrawScenarioCoastBin()
 
         if(!oglIsTexture(foam, 0))
         {
-            Write_Debug("Coast scenarios need seafoam.dds");
+            WriteDebug("Coast scenarios need seafoam.dds");
         }
 
         surface = new oglMaterial;
@@ -1898,7 +1898,7 @@ void glslScenarioCoastSetup(OBJECT* o, const char* shader)
 
     if(!oglIsTexture(wh, 0))
     {
-        Write_Debug("Coast scenarios need waterheight.dds");
+        WriteDebug("Coast scenarios need waterheight.dds");
     }
 
     scenariocoast = new RenderStateSet;
@@ -1931,7 +1931,7 @@ void glslScenarioCoastSetup(OBJECT* o, const char* shader)
 
     if(!oglIsTexture(wh, 0))
     {
-        Write_Debug("Coast scenarios need waterheight.dds");
+        WriteDebug("Coast scenarios need waterheight.dds");
     }
 
     scenariocoast = new oglMaterial;
@@ -1971,7 +1971,7 @@ void glslScenarioRiverSetup(OBJECT* o, const char* shader)
 
     if(!oglIsTexture(wh, 0))
     {
-        Write_Debug("River scenarios need waterheight.dds");
+        WriteDebug("River scenarios need waterheight.dds");
     }
 
     scenarioriver = new RenderStateSet;
@@ -2014,7 +2014,7 @@ void glslScenarioRiverSetup(OBJECT* o, const char* shader)
 
     if(!oglIsTexture(wh, 0))
     {
-        Write_Debug("River scenarios need waterheight.dds");
+        WriteDebug("River scenarios need waterheight.dds");
     }
 
     scenarioriver = new oglMaterial;

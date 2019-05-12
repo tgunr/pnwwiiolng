@@ -329,7 +329,7 @@ UCHAR * VarContents;
 	AirfoilFile = fioOpen((char*)UseFileName);
 	if (AirfoilFile == -1)
 	{
-		Write_Debug("Can't find airfoil list filename %s\n",(char*)AirfoilListFilename);
+		WriteDebug("Can't find airfoil list filename %s\n",(char*)AirfoilListFilename);
 		*AirfoilList = nullptr;
 		return 1;
 	}
@@ -403,7 +403,7 @@ UCHAR * VarContents;
 
 			if (VarNum == 0)
 			{
-				Write_Debug("Unidentified variable %s in file %s\n",VarName,AirfoilListFilename);
+				WriteDebug("Unidentified variable %s in file %s\n",VarName,AirfoilListFilename);
 				continue;
 			}
 
@@ -436,7 +436,7 @@ UCHAR * VarContents;
 
 					break;
 				default:
-						Write_Debug("Unidentified variable %s in file %s\n",VarName,AirfoilListFilename);
+						WriteDebug("Unidentified variable %s in file %s\n",VarName,AirfoilListFilename);
 						break;
 			}
 
@@ -467,7 +467,7 @@ UCHAR Buffer[256];
 
 	if (StallFile == -1)
 	{
-		Write_Debug("Can't open stall file %s\n",(char*)StallFileName);
+		WriteDebug("Can't open stall file %s\n",(char*)StallFileName);
 		return 1;
 	}
 
@@ -495,7 +495,7 @@ UCHAR Buffer[256];
 
 		if (VarNum == 0)
 		{
-			Write_Debug("Unidentified variable %s in file %s\n",VarName,StallFileName);
+			WriteDebug("Unidentified variable %s in file %s\n",VarName,StallFileName);
 			continue;
 		}
 
@@ -517,7 +517,7 @@ UCHAR Buffer[256];
 					AirfoilData->ClMovement = atof((char*)VarContents);
 				break;
 			default:
-					Write_Debug("Unidentified variable %s in file %s\n",(char*)VarName,(char*)StallFileName);
+					WriteDebug("Unidentified variable %s in file %s\n",(char*)VarName,(char*)StallFileName);
 					break;
 		}
 		continue;
@@ -548,7 +548,7 @@ UCHAR Buffer[256];
 
 	if (CompressFile == -1)
 	{
-		Write_Debug("Can't open Compressibility file %s\n",(char*)CompressFileName);
+		WriteDebug("Can't open Compressibility file %s\n",(char*)CompressFileName);
 		return 1;
 	}
 
@@ -576,7 +576,7 @@ UCHAR Buffer[256];
 
 		if (VarNum == 0)
 		{
-			Write_Debug("Unidentified variable %s in file %s\n",VarName,CompressFileName);
+			WriteDebug("Unidentified variable %s in file %s\n",VarName,CompressFileName);
 			continue;
 		}
 
@@ -596,7 +596,7 @@ UCHAR Buffer[256];
 				AirfoilData->CompressClMovement = atof((char*)VarContents);
 				break;
 			default:
-					Write_Debug("Unidentified variable %s in file %s\n",(char*)VarName,(char*)CompressFileName);
+					WriteDebug("Unidentified variable %s in file %s\n",(char*)VarName,(char*)CompressFileName);
 					break;
 		}
 		continue;
@@ -629,7 +629,7 @@ UCHAR Buffer[256];
 
 	if (PolarFile == -1)
 	{
-		Write_Debug("Can't open polar file %s\n",(char*)PolarFilename);
+		WriteDebug("Can't open polar file %s\n",(char*)PolarFilename);
 		return 1;
 	}
 
@@ -720,7 +720,7 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 			if (Found == 0)
 			{
 				ComponentData->AirfoilData = nullptr;
-				Write_Debug("Airfoil type %s for component %s not found",VarContents,Component->ComponentName);
+				WriteDebug("Airfoil type %s for component %s not found",VarContents,Component->ComponentName);
 			}
 
 			break;
@@ -796,7 +796,7 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 			if (Found == 0)
 			{
 				ComponentData->SlotAirfoilData = nullptr;
-				Write_Debug("Airfoil slot deployed type %s for component %s not found",VarContents,Component->ComponentName);
+				WriteDebug("Airfoil slot deployed type %s for component %s not found",VarContents,Component->ComponentName);
 			}
 			break;
 
@@ -1001,7 +1001,7 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 			ComponentData->MaxDamageSpeed = mathUnitAsciiToMetric(VarContents);
 		break;
 		default:
-			Write_Debug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
+			WriteDebug("Unidentified variable %s in component %s\n",VarName,Component->ComponentName);
 		break;
 	}
 
@@ -2142,12 +2142,12 @@ UINT32 AbleToComputeCLMult;
 		}
 		if (AbleToComputeCLMult != 1)
 		{
-			Write_Debug("Unable to compute CLMult for wing section %s",
+			WriteDebug("Unable to compute CLMult for wing section %s",
 						Component->ComponentName);
 		}
 		else
 		{
-			Write_Debug("Component %s CLMult = %lf",Component->ComponentName,AirfoilComponentData->CLMult);
+			WriteDebug("Component %s CLMult = %lf",Component->ComponentName,AirfoilComponentData->CLMult);
 		}
 
 		AirfoilComponentData->CLMultCalculated = 1;

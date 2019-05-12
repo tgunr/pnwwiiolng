@@ -59,7 +59,7 @@ LOGICAL loclLangInit(ENUM_LANGUAGES enumLang)
         {
 // Need front end defined, since this module is used for settings.exe
 #if platBuild == BUILD_CLIENT
-            Write_Debug("[loclLangInit] **Loading language table FAILED**");
+            WriteDebug("[loclLangInit] **Loading language table FAILED**");
 #endif
             return FALSE;
         }

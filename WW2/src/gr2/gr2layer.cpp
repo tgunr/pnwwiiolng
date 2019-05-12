@@ -1,5 +1,8 @@
 #include "syscfg.h" // Path is project specific.
 
+#include <string>
+#include <vector>
+
 #include "gr2/gr2layer.h"
 #include "gr2/gr2Physics.h"
 #include "mem/mem.h"
@@ -16,19 +19,20 @@
 #include "xml/XMLLoader.h"
 #include "ob/obc.h"
 #include "shader/glslNormal.h"
+#include <stack>
 #include "gr2/gr2Main.h"
 #include "ogl/oglMaterial.h"
 #include "scen/ScenarioManager.h"
 #include "ogl/States.h"
 #include "ld/ldtexture.h"
+
 #include "ui/uiChat.h"
+
 #include "str/stringLib.h"
 #include "ogl/oglGlobalStates.h"
 #include "ob/obdraw.h"
 #include "ld/lddds.h"
 #include "ogl/GLCounter.h"
-
-using namespace std::string_literals;
 
 #define ALLOW_RESURRECT
 //#undef ALLOW_RESURRECT
@@ -207,7 +211,7 @@ static void gr2Error(granny_log_message_type type, granny_log_message_origin ori
 #if GR2_USE_XML_BLENDS
 static gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount);
 #endif
-static gr2AnimationBlend* gr2LoadBlendedAnimationTXT(const SCHAR* blendfile, SINT32 boneCount);
+static gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount);
 
 #if GR2_USE_XML_BLENDS
 static XML_TAG_HANDLER(xmlBlendTagHandler);
@@ -4570,127 +4574,370 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCount)
 {
-    static std::string prepath{GR2DATA_PREPATH};
-    std::string path = prepath + blendfile;
+    std::string path = GR2DATA_PREPATH + std::string(blendfile);
 	gr2AnimationBlend *blend = nullptr;
 
-#if GR2_USE_XML_BLENDS
-    // strip extension, if any
-    path = path.substr(0, path.rfind(".")); // substr(0,npos) == entire string
+	// strip extension, if any
+	path = path.substr(0, path.rfind(".")); // substr(0,npos) == entire string
 
     // try the xml version of the file first
+#if GR2_USE_XML_BLENDS
     blend = gr2LoadBlendedAnimationXML((path + ".xml").c_str(), boneCount);
+#endif
 
-    // if it failed or wasn't requested, try the .txt version of the file
-    if (!blend) {
+	// if it failed or wasn't requested, try the .txt version of the file
+	if (!blend) {
         blend = gr2LoadBlendedAnimationTXT(const_cast<char *>((path + ".txt").c_str()), boneCount);
     }
-#else
-    // Already has .txt extension by default
-    blend = gr2LoadBlendedAnimationTXT(path.data(), boneCount);
-#endif
 
     return blend;
 }
 
-gr2AnimationBlend* gr2LoadBlendedAnimationTXT(const SCHAR* blendfile, SINT32 boneCount)
+static SINT32 _translateBoneIndex(SINT32 bone)
 {
-    SINT32 blendFileID = fioOpen(blendfile);
-    if (blendFileID == -1) {
-        return nullptr;
-    }
+	static gr2Model* oldSkeleton = nullptr;
+	static gr2Model* newSkeleton = nullptr;
 
-	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND]{};
-	SINT32 numAnimFiles = 0, type = gr2AnimationBlend::BASE;
-	FLOAT32 mod1 = 0.0f, mod2 = 0.0f;
-    std::string buf(255, 0);
-    size_t len = 0;
-    
-    while (numAnimFiles < GR2_MAX_ANIMS_PER_BLEND && (len = (fioGetLine(blendFileID, const_cast<char *>(buf.data()), 255))) > 0) {
-		if (buf[0] == '#' || len < 2) {
-			continue;
-        } else if (strcmp(buf.data(), "version 2") == 0) {
-            ; // silently accept, we don't translate anymore
-        } else if (strncmp(buf.data(), "type ", sizeof("type ") - 1) == 0) {
-            if (numAnimFiles != 0 || sscanf(buf.data(), "type %d %f %f", &type, &mod1, &mod2) < 1) {
-                Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad type line ''%s'' in blendfile %s", buf.data(), blendfile);
-                piExitProgram(_FL, "gr2LoadBlendedAnimation: Bad type line in blendfile");
-            }
-        } else if (strncmp(buf.data(), "anim ", sizeof("anim ") - 1) == 0) {
-            animSpec *spec = &loadedMasks[numAnimFiles];
-            std::fill_n(&spec->tracks[0], 255, UNUSED_TRACK_VALUE);
-            strsafecpy(spec->animationFile, TPS_MAIN_DIRECTORY TPS_ANIMATIONS_DIRECTORY);
-            char name[232];
-            
-            std::fill_n(&name[0], sizeof(name), 0);
-            if (sscanf(buf.data(), "anim %230[^.].GR2 %f", name, &spec->defaultWeight) != 2) {
-                Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line ''%s'' in blendfile %s", buf.data(), blendfile);
-                piExitProgram(_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
-            }
-            strsafecat(spec->animationFile, name);
-        } else if (strcmp(buf.data(), "end") == 0) {
-            ++numAnimFiles;
-        } else {
-            animSpec *spec = &loadedMasks[numAnimFiles];
-            int boneIdx = -1;
-            float boneWeight = 0.0f;
-            
-            if (sscanf(buf.data(), "%d %f", &boneIdx, &boneWeight) != 2 || boneIdx < 0) {
-                Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line ''%s'' in animation %s blendfile %s",
-                          buf.data(), spec->animationFile, blendfile);
-                piExitProgram(_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
-            }
-            if (boneWeight != spec->defaultWeight) {
-                spec->tracks[boneIdx] = boneWeight;
-            }
-        }
+	if(oldSkeleton == nullptr)
+	{
+		oldSkeleton = gr2LoadModel("TPS\\troopskel", nullptr, nullptr, 1);
+		newSkeleton = gr2Model::Load(fpTPSSkeletonFile, nullptr, nullptr, 1);
 	}
-	fioClose(blendFileID);
+
+	if(bone < oldSkeleton->skeleton->BoneCount)
+		return gr2ModelFindBone(newSkeleton, (SCHAR*)oldSkeleton->skeleton->Bones[bone].Name);
+
+	return -1;
+}
+
+static const char* _translateAnimation(const char* animFile)
+{
+	static char path[254+1];;
+	const char* ptr = path;
+
+	if(!strcasecmp(animFile, "TPS\\animations\\trot"))
+		strncpy(path, "TPS\\animations\\Anim_Stand_Run01", MAX_GR2_PATH_SIZE);
+	else if(!strcasecmp(animFile, "TPS\\animations\\walk"))
+		strncpy(path, "TPS\\animations\\anim_stand_walk01", MAX_GR2_PATH_SIZE);
+	else if(!strcasecmp(animFile, "TPS\\animations\\sprint"))
+		strncpy(path, "TPS\\animations\\Anim_Stand_Sprint01", MAX_GR2_PATH_SIZE);
+	else if(!strcasecmp(animFile, "TPS\\animations\\crawl") || !strcasecmp(animFile, "TPS\\animations\\crawlrifle"))
+		strncpy(path, "TPS\\animations\\anim_prone_rifle_crawl", MAX_GR2_PATH_SIZE);
+	else if(!strcasecmp(animFile, "TPS\\animations\\kneel"))
+		strncpy(path, "TPS\\animations\\Anim_Kneel_Base", MAX_GR2_PATH_SIZE);
+	else if(!strcasecmp(animFile, "TPS\\animations\\rifleprone"))
+		strncpy(path, "TPS\\animations\\anim_prone_rifle_base", MAX_GR2_PATH_SIZE);
+	else
+		strncpy(path, animFile, MAX_GR2_PATH_SIZE);
+
+	return ptr;
+}
+
+gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount)
+{
+	animSpec loadedMasks[GR2_MAX_ANIMS_PER_BLEND]{};
+
+	char		buf[255];
+	char		tString[255];
+	int			scanReturn;
+	int			numAnimFiles = 0;
+	SCHAR* ptr;
+	SINT32 i, j;
+	gr2AnimationBlend* newBlend;
+
+	SINT32 blendFileID = fioOpen(blendfile);
+	if (blendFileID == -1) return nullptr;
+
+	bool translateBones = true;
+	SINT32 type = gr2AnimationBlend::BASE;
+
+	FLOAT32 mod1 = 0.0f;
+	FLOAT32 mod2 = 0.0f;
+
+	while ((fioGetLine (blendFileID, buf, 255) != 0))
+	{
+		if (buf[0] == '#' || strlen(buf) < 2)
+			continue;
+
+		// at least use type, modifier is optional
+		if (sscanf(buf, "type %d %f %f", &type, &mod1, &mod2) >= 1)
+			continue;
+
+		if (strncmp(buf, "version 2", 9) == 0)
+		{
+			translateBones = false;
+			continue;
+		}
+
+		if (strncmp(buf, "anim", 4) == 0)
+		{
+			scanReturn = sscanf (buf, "%*s %s %f", tString, &(loadedMasks[numAnimFiles].defaultWeight));
+			if (scanReturn != 2)
+			{
+				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
+				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
+			}
+
+			ptr = strrchr(tString, '.');
+			if (ptr != nullptr)
+			{
+				*ptr = 0;
+			}
+
+
+			// hack for now - ramp
+			if(!strcasecmp(tString, "standaimwalk"))
+				strcpy(tString, "walk");
+
+			snprintf (loadedMasks[numAnimFiles].animationFile, 255, "%s%s%s", TPS_MAIN_DIRECTORY, TPS_ANIMATIONS_DIRECTORY, tString);
+
+			// mark whole track as uninitialized
+			for (int i=0; i< 255; i++)
+			{
+				loadedMasks[numAnimFiles].tracks[i] = UNUSED_TRACK_VALUE;
+			}
+
+			while (1)
+			{
+				int		boneNum;
+				float	boneWeight;
+
+				fioGetLine (blendFileID, buf, 255);
+				if (!(strncmp(buf, "end", 3)))
+				{
+					break;
+				}
+
+				scanReturn = sscanf (buf, "%d %f", &boneNum, &boneWeight);
+				if (scanReturn != 2)
+				{
+					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
+					//piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
+					continue;
+				}
+
+				int convertedBone = (translateBones) ? _translateBoneIndex(boneNum): -1;
+
+				if(convertedBone >= 0)
+					boneNum = convertedBone;
+
+				if (boneWeight != loadedMasks[numAnimFiles].defaultWeight)
+					loadedMasks[numAnimFiles].tracks[boneNum] = boneWeight;
+			}
+			numAnimFiles++;
+		}
+	}
+
+	fioClose (blendFileID);
 
 #ifndef GR2_BLEND_EDITOR
-	if (numAnimFiles < 1) {
-		Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified in blendfile %s", blendfile);
-		piExitProgram(_FL, "gr2LoadBlendedAnimation: No animation files specified");
+	if (numAnimFiles < 1)
+	{
+		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
 	}
-    if (numAnimFiles > GR2_MAX_ANIMS_PER_BLEND) {
-        Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Too many animation files specified in blendfile %s", blendfile);
-        piExitProgram(_FL, "gr2LoadBlendedAnimation: Too many animation files specified");
-    }
 #endif
 
-    const char *filename = strrchr(blendfile, '\\');
-    gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
-    
-    if (!newBlend) {
-        piExitProgram(_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
-    }
-    newBlend->mod1 = mod1;
-    newBlend->mod2 = mod2;
-    newBlend->type = type;
-    newBlend->length = 0;
-    newBlend->numBlends = 0;
-    std::fill_n(&newBlend->animations[0], GR2_MAX_ANIMS_PER_BLEND, nullptr);
+	newBlend = _gr2BlendPool.Pop();
 
-	for (SINT32 i = 0; i < numAnimFiles; i++) {
-        newBlend->animations[i] = gr2LoadAnimation(loadedMasks[i].animationFile, 1/* useCache */);
-		if (!newBlend->animations[i]) {
-			Write_Log(LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", loadedMasks[i].animationFile, blendfile);
+	if (!newBlend)
+	{
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
+	}
+
+	newBlend->mod1 = mod1;
+	newBlend->mod2 = mod2;
+	newBlend->type = type;
+	newBlend->length = 0;
+
+	newBlend->numBlends = 0; //std::min(numAnimFiles, GR2_MAX_ANIMS_PER_BLEND);
+	memset (newBlend->animations, 0, sizeof (gr2Animation*) * GR2_MAX_ANIMS_PER_BLEND);
+
+	for (i = 0; i < numAnimFiles; i++)
+	{
+		const char* animPath = _translateAnimation(loadedMasks[i].animationFile);
+		newBlend->animations[i] = gr2LoadAnimation ((SCHAR*)animPath, 1);
+
+		if (!newBlend->animations[i])
+		{
+			Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", animPath, blendfile);
 			continue;
 		}
-		newBlend->animations[i]->mask = GrannyNewTrackMask(loadedMasks[i].defaultWeight, boneCount);
-		for (SINT32 j = 0; j < boneCount; j++) {
-			if (loadedMasks[i].tracks[j] != UNUSED_TRACK_VALUE) {
-				GrannySetTrackMaskBoneWeight(newBlend->animations[i]->mask, j, loadedMasks[i].tracks[j]);
+
+		newBlend->animations[i]->mask = GrannyNewTrackMask (loadedMasks[i].defaultWeight, boneCount);
+
+		for (j=0; j < boneCount; j++)
+		{
+			if (loadedMasks[i].tracks[j] != UNUSED_TRACK_VALUE)
+			{
+				GrannySetTrackMaskBoneWeight((newBlend->animations[i])->mask, j, loadedMasks[i].tracks[j]);
 			}
 		}
-        ++newBlend->numBlends;
-        if (newBlend->numBlends == 1) {
-            newBlend->animations[i]->animType = GR2_ANIMATION_BASELOOP;
-        }
+
+		// mark the first animation of the blend as the baseloop
+		// NOTE: probably will need some more intelligence here
+		if (i == 0)
+		{
+			newBlend->animations[i]->animType = GR2_ANIMATION_BASELOOP;
+		}
+
+		newBlend->numBlends++;
 	}
-    strsafecpy(newBlend->blendFile, filename ? filename + 1 : blendfile);
+
+	if(newBlend->numBlends > GR2_MAX_ANIMS_PER_BLEND)
+		newBlend->numBlends = GR2_MAX_ANIMS_PER_BLEND;
+
+	const SCHAR* fileName = nullptr;
+	char* slash = strchr(blendfile, '\\');
+
+	while(slash)
+	{
+		fileName = slash + 1;
+		slash = strchr(slash+1, '\\');
+	}
+
+	if(!fileName)
+		fileName = blendfile;
+
+	strncpy (newBlend->blendFile, fileName, MAX_GR2_PATH_SIZE);
+//	newBlend->blendFile = blendfile;
+
 	return newBlend;
 }
+
+/*
+gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount)
+{
+	animSpec	loadedMasks[GR2_MAX_ANIMS_PER_BLEND];
+	SINT32		blendFileID;
+	char		buf[255];
+	char		tString[255];
+	int			scanReturn;
+	int			numAnimFiles = 0;
+	SCHAR*		ptr;
+	SINT32		i, j;
+	gr2AnimationBlend*	newBlend;
+
+	memset (loadedMasks, 0, sizeof (loadedMasks));
+
+	blendFileID = fioOpen(blendfile);
+	if (blendFileID == -1)
+	{
+		return nullptr;
+	}
+
+	while ((fioGetLine (blendFileID, buf, 255) != 0))
+	{
+		if (buf[0] == '#' || strlen(buf) < 2)
+		{
+			continue;
+		}
+
+		if (strncmp(buf, "anim", 4) == 0)
+		{
+			scanReturn = sscanf (buf, "%*s %s %f", tString, &(loadedMasks[numAnimFiles].defaultWeight));
+			if (scanReturn != 2)
+			{
+				Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad anim line in blendfile %s", blendfile);
+				piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad anim line in blendfile");
+			}
+
+			ptr = strrchr(tString, '.');
+			if (ptr != nullptr)
+			{
+				*ptr = 0;
+			}
+
+
+			// hack for now - ramp
+			if(!strcasecmp(tString, "standaimwalk"))
+				strcpy(tString, "walk");
+
+			snprintf (loadedMasks[numAnimFiles].animationFile, 255, "%s%s%s", TPS_MAIN_DIRECTORY, TPS_ANIMATIONS_DIRECTORY, tString);
+
+			// mark whole track as uninitialized
+			for (int i=0; i< 255; i++)
+			{
+				loadedMasks[numAnimFiles].tracks[i] = UNUSED_TRACK_VALUE;
+			}
+
+			while (1)
+			{
+				int		boneNum;
+				float	boneWeight;
+
+				fioGetLine (blendFileID, buf, 255);
+				if (!(strncmp(buf, "end", 3)))
+				{
+					break;
+				}
+
+				scanReturn = sscanf (buf, "%d %f", &boneNum, &boneWeight);
+				if (scanReturn != 2)
+				{
+					Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Bad data line in animation %s", loadedMasks[numAnimFiles].animationFile);
+					piExitProgram (_FL, "gr2LoadBlendedAnimation: Bad data line in animation");
+				}
+
+				if (boneWeight != loadedMasks[numAnimFiles].defaultWeight)
+					loadedMasks[numAnimFiles].tracks[boneNum] = boneWeight;
+			}
+			numAnimFiles++;
+		}
+	}
+
+	fioClose (blendFileID);
+
+	if (numAnimFiles < 1)
+	{
+		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: No animation files specified", loadedMasks[numAnimFiles].animationFile);
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: No animation files specified");
+	}
+
+	newBlend = _gr2BlendPool.Pop();
+
+	if (!newBlend)
+	{
+		piExitProgram (_FL, "gr2LoadBlendedAnimation: failed to allocate memory for newBlend");
+	}
+
+	newBlend->numBlends = std::min(numAnimFiles, GR2_MAX_ANIMS_PER_BLEND);
+	memset (newBlend->animations, 0, sizeof (gr2Animation*) * GR2_MAX_ANIMS_PER_BLEND);
+
+	for (i = 0; i < numAnimFiles; i++)
+	{
+		newBlend->animations[i] = gr2LoadAnimation (loadedMasks[i].animationFile, 1);
+
+		if (!newBlend->animations[i])
+		{
+			Write_Log (LOG_FPS, LOG_INFO, "gr2LoadBlendedAnimation: Failed to load animation %s in blend %s", loadedMasks[i].animationFile, blendfile);
+			continue;
+		}
+
+		newBlend->animations[i]->mask = GrannyNewTrackMask (loadedMasks[i].defaultWeight, boneCount);
+
+		for (j=0; j < boneCount; j++)
+		{
+			if (loadedMasks[i].tracks[j] != UNUSED_TRACK_VALUE)
+			{
+				GrannySetTrackMaskBoneWeight((newBlend->animations[i])->mask, j, loadedMasks[i].tracks[j]);
+			}
+		}
+
+		// mark the first animation of the blend as the baseloop
+		// NOTE: probably will need some more intelligence here
+		if (i == 0)
+		{
+			newBlend->animations[i]->animType = GR2_ANIMATION_BASELOOP;
+		}
+	}
+
+	strncpy (newBlend->blendFile, blendfile, 255);
+//	newBlend->blendFile = blendfile;
+
+	return newBlend;
+}
+*/
 
 #if GR2_USE_XML_BLENDS
 gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount)

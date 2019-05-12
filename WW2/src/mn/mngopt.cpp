@@ -64,8 +64,8 @@ static GVAR vars[] = {
     INT_KEY_DEF("alpha", WantedAlpha),
     LOGICAL_KEY_DEF("hdw", WantedHdw),
     { "stencil", ELOGICAL, { &WantedStencil }, 0 }, // HACK
-    LOGICAL_KEY_DEF("fullscreen", WantedFullscreen),
-    LOGICAL_KEY_DEF("fullscreen", WantedBorderless),
+//    LOGICAL_KEY_DEF("fullscreen", WantedFullscreen),
+//    LOGICAL_KEY_DEF("fullscreen", WantedBorderless),
     LOGICAL_KEY_DEF("window", WantedWindow),
     { "staccato", ELOGICAL, { &UseStaccato }, 0 }, // HACK
     STRING_KEY_DEF("ticket", TicketFile),
@@ -82,6 +82,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("nowor", NoBlitzWorPreload),
     NULL_KEY_DEF("noinf", NoInfPreload),
     NULL_KEY_DEF("build", g_bBuildMDLS),
+//    LOGICAL_KEY_DEF("logg", g_logDebug),
     NULL_KEY_DEF("logcomm", g_log_comm),
     NULL_KEY_DEF("logfps", g_log_fps),
     NULL_KEY_DEF("logweap", g_log_weap),
@@ -94,7 +95,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("altfont", AltFont),
     STRING_KEY_DEF("authserver", gAuthServer),
     STRING_KEY_DEF("authserverport", gAuthServerPort),
-    STRING_KEY_DEF("authrelayurl", gAuthRelayURL),
+//    STRING_KEY_DEF("authrelayurl", gAuthRelayURL),
     STRING_KEY_DEF("arena", gArena),
     STRING_KEY_DEF("clientv", gClientV),
 #if platOS == OS_WIN32

@@ -739,6 +739,9 @@ TOLUA_API int tolua_imap_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"IMAP_JETTISON_ORDNANCE",IMAP_JETTISON_ORDNANCE);
    tolua_constant(tolua_S,"IMAP_HOLD_GUNSIGHT_RANGE_DEC",IMAP_HOLD_GUNSIGHT_RANGE_DEC);
    tolua_constant(tolua_S,"IMAP_HOLD_GUNSIGHT_RANGE_INC",IMAP_HOLD_GUNSIGHT_RANGE_INC);
+   tolua_constant(tolua_S,"IMAP_HOLD_GVALUE_INC",IMAP_HOLD_GVALUE_INC);
+   tolua_constant(tolua_S,"IMAP_HOLD_GVALUE_DEC",IMAP_HOLD_GVALUE_DEC);
+   tolua_constant(tolua_S,"IMAP_TOGGLE1",IMAP_TOGGLE1);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_SPEED_DEC",IMAP_HOLD_BOMBSIGHT_SPEED_DEC);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_SPEED_INC",IMAP_HOLD_BOMBSIGHT_SPEED_INC);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_ALT_DEC",IMAP_HOLD_BOMBSIGHT_ALT_DEC);

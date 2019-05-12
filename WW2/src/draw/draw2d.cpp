@@ -328,7 +328,7 @@ LOGICAL draw2dTexture(SINT32 iTexID,
 
 	if (!piRenderScene(piPT_TRIANGLELIST, piVT_TLVERTEX, Vertices, 6))
 	{
-		Write_Debug("piRenderScene failed in draw2dTexture");
+		WriteDebug("piRenderScene failed in draw2dTexture");
 	}
 
 	piSetRenderStageState(0, piTSS_MINFILTER, TextureMinFilter);
@@ -434,7 +434,7 @@ piTLVERTEX  Vertices[6];
 
 	if (!piRenderScene(piPT_TRIANGLELIST, piVT_TLVERTEX, Vertices, 6))
 	{
-		Write_Debug("piRenderScene failed in draw2dTexture");
+		WriteDebug("piRenderScene failed in draw2dTexture");
 	}
 #endif
 
@@ -558,7 +558,7 @@ piTLVERTEX  Vertices[6];
 
 	if (!piRenderScene(piPT_TRIANGLELIST, piVT_TLVERTEX, Vertices, 6))
 	{
-		Write_Debug("piRenderScene failed in draw2dTexture");
+		WriteDebug("piRenderScene failed in draw2dTexture");
 	}
 
 	piSetRenderStageState(0, piTSS_MINFILTER, TextureMinFilter);
@@ -648,7 +648,7 @@ LOGICAL draw2dByUV(FLOAT32 x,
 
 	if(!piRenderScene(piPT_TRIANGLELIST, piVT_TLVERTEX, Vertices, 6))
 	{
-		Write_Debug("[draw2dByUV] piRenderScene failed");
+		WriteDebug("[draw2dByUV] piRenderScene failed");
 	}
 
     return TRUE;

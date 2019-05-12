@@ -254,5 +254,5 @@ extern LOGICAL sndsGetVolume(snSound* lpSound, SINT32* pVolume);
 //
 // definitions for platform specific functions - description found in the non-platform version unless specified otherwise
 
-// this is for debugging purposes-walks sound list and Write_Debug's the contents
+// this is for debugging purposes-walks sound list and WriteDebug's the contents
 extern void sndsWalkSoundList();

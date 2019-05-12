@@ -41,9 +41,9 @@ static inline SteamLoginResponse _loginResponseFromResultCode(uint32_t resultCod
 static inline std::string _getAuthRelayURL(const std::string &endpoint)
 {
     // Only allow override on Development/Debug builds
-    if (gAuthRelayURL[0] != 0) {
-        return gAuthRelayURL + endpoint;
-    }
+//    if (gAuthRelayURL[0] != 0) {
+//        return gAuthRelayURL + endpoint;
+//    }
 
     return std::string("https://secure.wwiionline.com/relay") + authSteamRESTPrefix + endpoint;
 }

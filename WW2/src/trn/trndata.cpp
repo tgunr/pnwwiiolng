@@ -345,7 +345,7 @@ static void _loadLightData()
 
         if(!root)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
+            WriteLog(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
             return;
         }
 
@@ -382,7 +382,7 @@ static void _loadFogData()
 
         if(!root)
         {
-            Write_Log(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
+            WriteLog(LOG_OLD, LOG_INFO, "*** %s FAILED ***", name);
             return;
         }
 
@@ -461,7 +461,7 @@ void trndataKill()
     _killLight();
     _killFog();
 
-    Write_Log(LOG_OLD, LOG_INFO, "[trndataKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[trndataKill]");
 }
 
 //////////////////////////////////////////////////////////////////////

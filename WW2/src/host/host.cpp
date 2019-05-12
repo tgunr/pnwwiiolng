@@ -72,6 +72,7 @@
 #include "strt/strtUpdaterHostMessages.h"
 #include "strt/strtUpdaterSupportMessages.h"
 #include "teul/teulBlipRepeater.h"
+#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulHousekeeper.h"
@@ -662,7 +663,7 @@ _exitPlayer(Player& player)
 	{
 		dbugLog(_FLA, "t:%d p:%u no player data", teulIndex, player.playerID());
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex);
+			teulClose(teulIndex, Teul::Closing::ExitNoPlayer);
 	}
 	else
 	{
@@ -671,7 +672,7 @@ _exitPlayer(Player& player)
 		player.Release(teulIndex, Server::ReleaseType::EConn);
 
 		if ( teulIndex >= 0 )
-			teulClose(teulIndex);
+			teulClose(teulIndex, Teul::Closing::ExitWithPlayer);
 	}
 }
 
@@ -1349,6 +1350,10 @@ _illegalPacketSequence(SINT32 teulIndex)
 
 	Player* persona = (Player*)ServerInterface::LookupByTeulIndex(teulIndex);
 	if ( persona == nullptr )
+		return;
+
+	// Give them a grace period after reconnecting
+	if ( persona->isInGracePeriod(60) )
 		return;
 
 	dbugLog(_FLW, "t:%d p:%u invalid packet sequence", teulIndex, persona->playerID());
@@ -2617,7 +2622,7 @@ hostSmiteCustomer(const playerid_t playerID)
 
 	if ( player->teulIndex() >= 0 )
 	{
-		teulClose(player->teulIndex());
+		teulClose(player->teulIndex(), Teul::Closing::Smite);
 	}
 }
 

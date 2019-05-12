@@ -352,7 +352,7 @@ void ddpHideCursor(void)
 
 void sysSetMousePosition(int x, int y)
 {
-    dbugLog(_FLD, "Ignoring request to set mouse position to %d, %d", x, y);
+    WriteLog(LOG_UI, LOG_DEBUG, "Ignoring request to set mouse position to %d, %d", x, y);
 }
 
 void sysGetMousePosition(SINT32 *x, SINT32 *y)
@@ -478,7 +478,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
         NSError *error = nil;
 
         if (!screenshotsDir) {
-            dbugLog(_FLW, "Failed to find screenshot directory");
+            WriteLog(LOG_RENDER, LOG_WARN, "Failed to find screenshot directory");
             return;
         }
         // Create the custom subdirectory if it doesn't already exist.
@@ -486,7 +486,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
             // Only error if it's not 'cause the dir already exists. Checking first would be a race condition.
             // No, it's not likely we'll encounter that race condition. That's no reason to write bad code.
             if (![error.domain isEqualToString:NSCocoaErrorDomain] || error.code != NSFileWriteFileExistsError) {
-                dbugLog(_FLW, "Failed to create screenshot directory");
+                WriteLog(LOG_RENDER, LOG_WARN, "Failed to create screenshot directory");
                 return;
             }
         }
@@ -570,14 +570,14 @@ static bool ddcapSaveScreenRegion(GLint x, GLint y, GLsizei w, GLsizei h, NSStri
     ];
 
     if (!imageRep) {
-        dbugLog(_FLW, "Failed to read screenshot data");
+        WriteLog(LOG_RENDER, LOG_WARN, "Failed to read screenshot data");
         return false;
     }
 
     NSData *pngData = [imageRep representationUsingType:NSPNGFileType properties:@{ NSImageInterlaced: @NO, /* do NOT specify a gamma */ }];
 
     if (![pngData writeToURL:screenshotURL options:NSDataWritingWithoutOverwriting error:nullptr]) {
-        dbugLog(_FLW, "Failed to write PNG to %s", screenshotURL.path.UTF8String);
+        WriteLog(LOG_RENDER, LOG_WARN, "Failed to write PNG to %s", screenshotURL.path.UTF8String);
         return false;
     }
     return true;

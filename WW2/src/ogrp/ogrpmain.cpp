@@ -792,7 +792,7 @@ LOGICAL dofValid;
 				ObjectPtr->dof->dofmatrix2 = CumulativeMatrix;
 			}else
 			{
-				Write_Debug("Invalid DOF data for object %s", ObjectPtr->name);
+				WriteDebug("Invalid DOF data for object %s", ObjectPtr->name);
 			}
 
 			if (ObjectPtr->comment != nullptr)
@@ -888,7 +888,7 @@ LOGICAL dofValid;
 					{
 						ObjectPtr->dof->dofmatrix1 = IdentityMatrix;
 						ObjectPtr->dof->dofmatrix2 = IdentityMatrix;
-						Write_Debug("Invalid DOF data for object %s, setting matrices to IdentityMatrix",
+						WriteDebug("Invalid DOF data for object %s, setting matrices to IdentityMatrix",
 										ObjectPtr->name);
 					}
 				}

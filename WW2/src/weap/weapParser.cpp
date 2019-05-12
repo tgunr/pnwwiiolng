@@ -168,7 +168,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 
 		if (_section.spec.isNull())
 		{
-			dbugLog(_FLW, "invlid class name %s",_section.name);
+			WriteLog(LOG_WEAPON, LOG_WARN, "invlid class name %s",_section.name);
 			return false;
 		}
 
@@ -275,13 +275,13 @@ static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
 	UINT32 classIndex = (UINT32)args[0].dvalue;
 	if ( classIndex <= 0 || classIndex >= MAX_WEAP_CLASSES )
 	{
-		dbugLog(_FLA, "invalid weapClass '%s' (%s)", args[0].svalue, args[1].svalue);
+		WriteLog(LOG_WEAPON, LOG_ABORT, "invalid weapClass '%s' (%s)", args[0].svalue, args[1].svalue);
 		return false;
 	}
 
 	if ( weaponClass[classIndex].active )
 	{
-		dbugLog(_FLA, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name.c_str(), args[1].svalue);
+		WriteLog(LOG_WEAPON, LOG_ABORT, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name.c_str(), args[1].svalue);
 		return false;
 	}
 
@@ -374,7 +374,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 				weapon->bias[bIndex].slots = DEFAULT_BIAS_SLOTS;
 
 #ifdef EXTREME_DEBUG
-				dbugLog(_FLN,"loaded bias %s spec->%s for vehicle %s"
+				WriteLog(LOG_WEAPON, LOG_NOTE,"loaded bias %s spec->%s for vehicle %s"
 								,args[i].svalue, _printWeapSpecC(&biasSpec)
 								,weapon->name);
 #endif
@@ -401,7 +401,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 				weapon->bias[bIndex].slots = args[i].dvalue;
 
 #ifdef EXTREME_DEBUG
-				dbugLog(_FLN,"updated min %d for bias %s spec->%s for vechile %s"
+				WriteLog(LOG_WEAPON, LOG_NOTE,"updated min %d for bias %s spec->%s for vechile %s"
 								,args[i].dvalue
 								,args[i-1].svalue, _printWeapSpecC(&biasSpec)
 								,weapon->name);
@@ -415,7 +415,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 #endif //!FRONT_END
 
 #ifdef EXTREME_DEBUG
-		dbugLog(_FLD, "adding " PRF_WEAPON_SPEC " => %p", PRA_WEAPON_SPEC(thisSpec), weapon);
+		WriteLog(LOG_WEAPON, LOG_DEBUG, "adding " PRF_WEAPON_SPEC " => %p", PRA_WEAPON_SPEC(thisSpec), weapon);
 #endif
 		g_weaponList[thisSpec] = weapon;
 
@@ -424,17 +424,17 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	catch ( std::exception& e )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
+		WriteLog(LOG_WEAPON, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #else
-		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
+		WriteLog(LOG_WEAPON, LOG_ABORT, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #endif
 	}
 	catch ( const char* reason )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
+		WriteLog(LOG_WEAPON, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #else
-		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
+		WriteLog(LOG_WEAPON, LOG_ABORT, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #endif
 	}
 
@@ -483,7 +483,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 	catch ( const char* reason )
 	{
 #if platBuild == BUILD_CLIENT
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
+		WriteLog(LOG_WEAPON, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
 		return false;
 #else
 		LogAbort("%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);

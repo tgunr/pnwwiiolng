@@ -867,7 +867,7 @@ void fpTPSDataReadHitLocation (SCHAR* data)
 
 	if ((boneNum < 0) || (boneNum > 38) || (hitLoc < 0) || (hitLoc > 4))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Bad data passed to fpTPSDataReadHitLocation .. >%s<", data);
+		WriteLog (LOG_FPS, LOG_INFO, "Bad data passed to fpTPSDataReadHitLocation .. >%s<", data);
 		return;
 	}
 
@@ -936,7 +936,7 @@ void fpTPSDataReadSurfaceFiles()
 
 		if (currFile == -1)
 		{
-//			Write_Log (LOG_FPS, LOG_INFO, "Surface File %s not found", surfFileName);
+//			WriteLog (LOG_FPS, LOG_INFO, "Surface File %s not found", surfFileName);
 			continue;
 		}
 
@@ -1251,7 +1251,7 @@ fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type)
             break;
 	}
 
-	Write_Log (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);
+	WriteLog (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);
 	//piExitProgram (_FL, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
 
 	//dumb

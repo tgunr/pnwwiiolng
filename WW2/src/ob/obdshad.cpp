@@ -58,7 +58,7 @@ LOGICAL obdshadInit()
 
 void obdshadKill()
 {
-    Write_Log(LOG_OLD, LOG_INFO, "[obdshadKill]");
+    WriteLog(LOG_OLD, LOG_INFO, "[obdshadKill]");
 }
 
 static void GetStep(float dx, float dy, float* ssx, float* ssy, int* count)
@@ -1049,7 +1049,7 @@ LOGICAL obdshadUpdate()
 
 				if (!ComputeShadowOBox(lpgrp->child, lpshad))
 				{
-					Write_Debug("Could not update obox of shadow object");
+					WriteDebug("Could not update obox of shadow object");
 					return(FALSE);
 				}
 
@@ -1064,7 +1064,7 @@ LOGICAL obdshadUpdate()
 
 				if (!obdshadProject(lpgrp))
 				{
-					Write_Debug("Could not update shadow object");
+					WriteDebug("Could not update shadow object");
 					return(FALSE);
 				}
 			}
@@ -1075,7 +1075,7 @@ LOGICAL obdshadUpdate()
     count += GetMicroSeconds() - beginhere;
     if ((number += shadcnt) >= 1000)
     {
-        Write_Debug("Dynamic shadow time: %lu us", count);
+        WriteDebug("Dynamic shadow time: %lu us", count);
         number = 0;
         count = 0;
     }

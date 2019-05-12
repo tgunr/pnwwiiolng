@@ -15,7 +15,6 @@
 #include "auth/authPack.h"
 #include "auth/authClientMessages.h"
 #include "teul/teulAuth.h"
-#include "teul/teulEndpoint.h"
 #include "auth/authConstants.h"
 #include "auth/authTypes.h"
 #include "comm/commPlaygateMessages.h"

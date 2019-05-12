@@ -318,7 +318,7 @@ static SINT32 dot_help(const wchar_t* line)
 
         for(; itr != _dotCommands.end(); ++itr)
         {
-            if(!itr->second.key || (itr->second.key && HasKeyFile))
+            if(!itr->second.key || (itr->second.key && true )) //HasKeyFile))
             {
 				if(cmdlist.empty() == false)
 					cmdlist += L", ";
@@ -2326,15 +2326,25 @@ static SINT32 dot_log(const char* line)
 			else
 				break;
 		}
-	}else if(argc >= 2 && !strcmp(s1, "level")) // level
+	} else if(argc >= 2 && !strcmp(s1, "level")) // level
 	{
-		int level = 0;
+		int level = LOG_NONE;
 
-		if(!strcmp(s2, "warn")) level = 1;
-		else if(!strcmp(s2, "info")) level = 2;
+		if(!strcmp(s2, "fatal")) level = LOG_FATAL;
+        else if(!strcmp(s2, "abort")) level = LOG_ABORT;
+        else if(!strcmp(s2, "recover")) level = LOG_RECOVER;
+        else if(!strcmp(s2, "warn")) level = LOG_WARN;
+        else if(!strcmp(s2, "minor")) level = LOG_MINOR;
+        else if(!strcmp(s2, "note")) level = LOG_NOTE;
+        else if(!strcmp(s2, "info")) level = LOG_INFO;
+        else if(!strcmp(s2, "debug")) level = LOG_DEBUG;
 
 		Set_Log_Level(level);
-	}else if(argc >= 1) // on/off
+    } else if(argc >= 1 && !strcmp(s1, "duplicates")) // level
+    {
+        gLogDuplicates =  !gLogDuplicates;
+        uiChatPrintLine("logging duplicates %s", gLogDuplicates ? "on" : "off");
+    } else if(argc >= 1) // on/off
 	{
 		UINT32 logmask = 0;
 		LOGICAL enable = !strcmp(s2, "on"); // on/off
@@ -3411,6 +3421,15 @@ static int dot_genscenariomap(const char* line)
     SCEN_MGR->PopGlobalFlag(ScenarioManager::GLOBAL_GENERATE_MAP);
 #endif
 
+    return DC_HANDLED;
+}
+
+static int dot_fov(const char * line) {
+    FLOAT32 fov;
+    int argc = sscanf(line, "%*s %f", &fov);
+    
+    if(argc > 0)
+        aimFOVAdjust = fov;
     return DC_HANDLED;
 }
 
@@ -5546,6 +5565,13 @@ static SINT32 TurretTest;
 static SINT32 TurretTestStartTime;
 static phui::Periodical* TurretTestUpdate;
 
+static void TurretTestStop(mlVehicleData *VehicleData, UINT32 Position) {
+    VehicleData->TurretTraverseRate[Position] = 0;
+    disableAxisInput = 0;
+    TurretTest = 0;
+    TurretTestUpdate->StopExecuting();
+}
+
 static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
@@ -5553,10 +5579,8 @@ static void TurretTestCallback(phui::Periodical*, unsigned int, void*)
 
 	if(VehicleData && VehicleData->LastTurretTraverse[Position] < 0 && VehicleData->TurretTraverse[Position] > 0)
 	{
-		VehicleData->TurretTraverseRate[Position] = 0;
-		disableAxisInput = 0;
-		uiChatPrintLine("Turret rotation time: %d secs",  (frametime - TurretTestStartTime)/1000);
-		TurretTestUpdate->StopExecuting();
+        TurretTestStop(VehicleData, Position);
+        uiChatPrintLine("Turret rotation time: %d secs",  (frametime - TurretTestStartTime)/1000);
 	}
 }
 
@@ -5565,23 +5589,26 @@ static SINT32 dot_turrettest(const char*)
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	UINT32 Position = persGetPersonaPosition();
 
-	TurretTest = 1;
-	TurretTestStartTime = frametime;
-	if(VehicleData)
-	{
-		VehicleData->TurretTraverseRate[Position] =  1.0;
-		VehicleData->TurretElevateRate[Position] = 0;
-		VehicleData->TurretTraverse[Position] = 0;
-		VehicleData->LastTurretTraverse[Position] = 0;
-		VehicleData->TurretElevate[Position] = 0;
-		VehicleData->LastTurretElevate[Position] = 0;
-	}
-
-	if(!TurretTestUpdate) TurretTestUpdate = new phui::Periodical(TurretTestCallback);
-	TurretTestUpdate->StartExecuting();
-
-	disableAxisInput = 1;
-
+    if (TurretTest == 1) {
+        TurretTestStop(VehicleData, Position);
+    } else {
+        TurretTest = 1;
+        TurretTestStartTime = frametime;
+        if(VehicleData)
+        {
+            VehicleData->TurretTraverseRate[Position] =  1.0;
+            VehicleData->TurretElevateRate[Position] = 0;
+            VehicleData->TurretTraverse[Position] = 0;
+            VehicleData->LastTurretTraverse[Position] = 0;
+            VehicleData->TurretElevate[Position] = 0;
+            VehicleData->LastTurretElevate[Position] = 0;
+        }
+        
+        if(!TurretTestUpdate) TurretTestUpdate = new phui::Periodical(TurretTestCallback);
+        TurretTestUpdate->StartExecuting();
+        
+        disableAxisInput = 1;
+    }
 	return DC_HANDLED;
 }
 
@@ -5721,6 +5748,52 @@ static SINT32 dot_inflodmod(const char* line)
 
 	return DC_HANDLED;
 }
+
+static int dot_sf(const char* line)
+{
+    FLOAT32 x = 0.0;
+    if (sscanf(line, "%*s %f", &x) > 0) {
+        ScaleFactor = x;
+    } else
+        uiChatPrintLine("Scalefactor: %.2f", ScaleFactor);
+    return DC_HANDLED;
+}
+
+static int dot_gav(const char* line)
+{
+    FLOAT32 x = 0.0, y = 0.0, z = 0.0;
+    if (sscanf(line, "%*s %f %f %f", &x, &y, &z) > 0) {
+               gXValue = x;
+               gYValue = y;
+               gZValue = z;
+    } else
+        uiChatPrintLine("gX: %.2f gY: %.2f gZ: %.2f", gXValue, gYValue, gZValue);
+    return DC_HANDLED;
+}
+
+static int dot_grv(const char* line)
+{
+    FLOAT32 d = 0.0, e = 0.0, h = 0.0;
+    if (sscanf(line, "%*s %f %f %f", &d, &e, &h) > 0) {
+               gDValue = d;
+               gEValue = e;
+               gHValue = h;
+    } else
+        uiChatPrintLine("gD: %.2f gE: %.2f gH: %.2f", gDValue, gEValue, gHValue);
+    return DC_HANDLED;
+}
+
+static int dot_tr(const char* line)
+{
+    if (sscanf(line, "%*s %f", &gTurRate) > 0)
+        uiChatPrintLine("Setting turrate to %.2f%%", gTurRate);
+    else
+        uiChatPrintLine("Set to: %.2f%%", gValue);
+
+    return DC_HANDLED;
+    
+}
+
 #endif
 
 /************************************************************************************************
@@ -6269,7 +6342,7 @@ static SINT32 dot_fog(const char* line)
 	ReloadVehiclesCmd
 *************************************************************************************************/
 
-static SINT32 dot_reloadvehicles(const char*)
+static SINT32 dot_reloadvehicles(const char* line)
 {
 	vehtypeInit();
 	fpFPSDataReadFPSFile();
@@ -6484,6 +6557,9 @@ static int dot_fire(const char* line)
     mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData) return DC_ERROR;
 
+    Write_Log(LOG_WEAPON, LOG_DEBUG, "Vx: %f Vy: %f Vz: %f Ap: %f Ar: %f Ay: %f",
+			VehicleData->VehiclePos.x, VehicleData->VehiclePos.y, VehicleData->VehiclePos.z,
+            VehicleData->VehicleAtt.Pitch, VehicleData->VehicleAtt.Roll, VehicleData->VehicleAtt.Yaw);
 	static char LastAmmoName[64];
 	static FLOAT32 lastX, lastY, lastZ, lasttraverse, lastelevate;
 	char AmmoName[64] = "";
@@ -7550,7 +7626,7 @@ int uiDotCommand(const wchar_t* line)
 		}
 	}
 
-    if(it != _dotCommands.end() && (!it->second.key || (it->second.key && HasKeyFile)))
+    if(it != _dotCommands.end() && (!it->second.key || (it->second.key && true)))
     {
         if(wcsncasecmp(pcmd, L"doover", DOT_COMMAND_SIZE) != 0)
 			wcsncpy(_LastCommand, line, 255);
@@ -7620,7 +7696,7 @@ const wchar_t* uiDotCommandMatch(const wchar_t* search, bool again)
 
 					// only auto-complete debug commands if they have
 					// a keyfile
-					if(it->second.key && !HasKeyFile)
+					if(it->second.key && !true)
 						continue;
 
 					const wchar_t* command = it->first.c_str();
@@ -7859,7 +7935,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(inertia, true);
 	ADD_DOT_COMMAND(exhaust, true);
 	ADD_DOT_COMMAND(reset, true);
-	ADD_DOT_COMMAND(tree, true);
+    ADD_DOT_COMMAND(tree, true);
 	ADD_DOT_COMMAND(die, true);
 	ADD_DOT_COMMAND(texture, true);
 	ADD_DOT_COMMAND(hulkall, true);
@@ -7982,6 +8058,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(inflodmod, false);
 	ADD_DOT_COMMAND(js, false);
     ADD_DOT_COMMAND(genscenariomap, true);
+    ADD_DOT_COMMAND(fov, true);
 #if platOS != OS_MACOS
     ADD_DOT_COMMAND(audiochatlogging, true);
     ADD_DOT_COMMAND(audiowritelog, true);
@@ -8042,6 +8119,11 @@ void uiDotCommandsInit()
     // allows extra info to be sent with these commands
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);
+
+    ADD_DOT_COMMAND(tr, true);
+    ADD_DOT_COMMAND(gav, true);
+    ADD_DOT_COMMAND(grv, true);
+    ADD_DOT_COMMAND(sf, true);
 
 	uiDotCommandsInitLoc();
 }

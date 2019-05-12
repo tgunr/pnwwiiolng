@@ -48,7 +48,7 @@ static size_t _unpackBytes(const size_t offset, UCHAR* const buffer, UCHAR* cons
 	if (significantBytes<1)
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"invalid significantBytes = %zd", significantBytes);
+		WriteLog(LOG_TEUL, LOG_ABORT,"invalid significantBytes = %zd", significantBytes);
 		return  (size_t)-EINVAL;
 	}
 
@@ -71,7 +71,7 @@ SINT32 teulPackVoid(const PackMode mode, UCHAR* const buffer, const SINT32 bitOf
 	if ( bitOffset < 0 )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA, "%s invalid bit offset = %d or totalBits = %d", ((mode==TEUL_PACK)?"PACK":"UNPACK"), bitOffset,totalBits);
+		WriteLog(LOG_TEUL, LOG_ABORT, "%s invalid bit offset = %d or totalBits = %d", ((mode==TEUL_PACK)?"PACK":"UNPACK"), bitOffset,totalBits);
 		return -EINVAL;
 	}
 
@@ -106,7 +106,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	if ( bitOffset < 0 )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA, "invalid bit offset or significantBits = %d",significantBits);
+		WriteLog(LOG_TEUL, LOG_ABORT, "invalid bit offset or significantBits = %d",significantBits);
 		return -EINVAL;
 	}
 
@@ -114,7 +114,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	if (buffer == nullptr || idata == nullptr)
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA, "invalid buffer %p or data %p",(UINT32*) buffer, (UINT32*) idata);
+		WriteLog(LOG_TEUL, LOG_ABORT, "invalid buffer %p or data %p",(UINT32*) buffer, (UINT32*) idata);
 		return -EINVAL;
 	}
 
@@ -459,7 +459,7 @@ teulPackUCHAR(PackMode mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const
 	if ( bitOffset < 0)
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"invalid toatalbits = %d or bitOffset = %d", totalBits, bitOffset);
+		WriteLog(LOG_TEUL, LOG_ABORT,"invalid toatalbits = %d or bitOffset = %d", totalBits, bitOffset);
 		return -EINVAL;
 	}
 

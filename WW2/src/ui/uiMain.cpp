@@ -429,7 +429,7 @@ int uiPostInit()
 
 int uiKill()
 {
-    Write_Debug("[uiKill] Begin");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "[uiKill] Begin");
 
 	_killui = true;
 
@@ -464,7 +464,7 @@ int uiKill()
 	phui::js::Kill();
 #endif
 */
-    Write_Debug("[uiKill] End");
+    WriteLog(LOG_RENDER, LOG_DEBUG, "[uiKill] End");
 
 	return 0;
 }
@@ -2179,9 +2179,10 @@ int uiConsoleprintf(const char* text, ...)
         while (out.size() && out[out.size() - 1] == '\n') {
             out.resize(out.size() - 1);
         }
-		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
+		WriteLog(LOG_CONSOLE, LOG_INFO, out.c_str());
         out += "\n";
-		if(display) display->AddText(out.c_str());
+		if(display)
+            display->AddText(out.c_str());
 		return static_cast<int>(out.size());
 	}
     return 0;

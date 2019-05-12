@@ -28,6 +28,7 @@
 
 #include "pers/persgunsight.h"
 #include "pers/persbombsight.h"
+#include "spt/sptmain.h"
 
 #if USE_STATESET
 #include "ogl/States.h"
@@ -456,6 +457,46 @@ LOGICAL persGunsightUpdate()
 	_LastUpdateTime = frametime;
 
 	return TRUE;
+}
+
+UINT32 persGValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+	OBJECT*	pObjectData = persGetPersonaVehicleObjectDataPtr();
+	if (!pObjectData)
+		return 0;
+
+	gValue = gValue + .25f;
+	return 0;
+}
+
+UINT32 persGValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+	OBJECT*	pObjectData = persGetPersonaVehicleObjectDataPtr();
+	if (!pObjectData)
+		return 0;
+
+    gValue = gValue - .25f;
+    if (gValue <= 0)
+        gValue = 1;
+
+	return 0;
+}
+
+UINT32 persGToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    if (gToggle1 >= 2) {
+        gToggle1 = 0;
+        sptDrawOn(0, false);
+    } else {
+        gToggle1 ++;
+        sptDrawOn(0, true);
+    }
+
+    return 0;
 }
 
 /************************************************************************************************

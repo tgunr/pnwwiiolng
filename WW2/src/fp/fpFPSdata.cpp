@@ -333,9 +333,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 	if (weapDataFile == -1)
 	{
 		// BAD!
-		Write_Log (LOG_FPS, LOG_INFO, "Unable to open weapon file %s for %d", filename, weapon);
+		WriteLog (LOG_FPS, LOG_INFO, "Unable to open weapon file %s for %d", filename, weapon);
 		return;
 	}
+
+	WriteLog (LOG_WEAPON, LOG_DEBUG, "Open weapon file %s for %d", filename, weapon);
 
 	static const size_t BUF_SIZE = 255;
 	static char	buf[BUF_SIZE + 1];
@@ -556,7 +558,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
                  strcasecmp(buf, "convDist7") == 0 || strcasecmp(buf, "convDist8") == 0 ||
                  strcasecmp(buf, "convDist9") == 0 || strcasecmp(buf, "convDist10") == 0) {
             if (!hasWarned) {
-                Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
+                WriteLog(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
                 hasWarned = true;
             }
         }
@@ -570,7 +572,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].placedObject = (LOGICAL) atoi (varData);
 
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "Unidentified key/value pair in weapon file %s .. %s = %s", filename, buf, varData);
+			WriteLog (LOG_FPS, LOG_INFO, "Unidentified key/value pair in weapon file %s .. %s = %s", filename, buf, varData);
 	}
 
 	fioClose (weapDataFile);
@@ -591,7 +593,7 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	if (type == FPS_WEAPONTYPE_NUM_TYPES)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "Unable to find match for weapon type string %s");
+		WriteLog (LOG_FPS, LOG_INFO, "Unable to find match for weapon type string %s");
 		return;
 	}
 
@@ -634,6 +636,7 @@ void fpFPSDataReadFPSFile()
 	UINT64 val5 = fpStringHash("gew43File");
 	*/
 
+	WriteLog(LOG_WEAPON, LOG_INFO, "FPS RELOAD");
 	while (fioGetString(fpsDataFile, (char*)buf, 255) != 0)
 	{
 		if (buf[0] == '#')
@@ -651,6 +654,7 @@ void fpFPSDataReadFPSFile()
 		//	int i = 0;
 
 		UINT64 hash = fpStringHash(buf);
+
 
 		switch (hash)
 		{
@@ -1265,7 +1269,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
+			WriteDebug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 

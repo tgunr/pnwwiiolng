@@ -60,7 +60,7 @@ void fioaKill()
 	{
 		if(fioa.file[i].data)
 		{
-			Write_Debug("File still opened, size: %d", fioa.file[i].datalen);
+			WriteDebug("File still opened, size: %d", fioa.file[i].datalen);
 			fioaClose(i);
 		}
 	}

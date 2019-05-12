@@ -159,7 +159,8 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.macsound",			nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
 	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
-	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true }
+	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true },
+    {"app.aimFOVAdjust",        &aimFOVAdjust,                  cfgPARAM_UINT,  1,      1,  10,  true }
 	// add more vars here
 };
 
@@ -1059,7 +1060,7 @@ void cfgPrefsSetDefaults()
 	gr2DrawFlags = 1;
 #endif
 
-	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "0x0x0");
+	snprintf(WantedVideoResolution, sizeof(WantedVideoResolution), "800x600x32");
 
 	// special processing gets handled by a call to cfgPrefsSyncGlobals() next
 }
@@ -1080,16 +1081,14 @@ void cfgPrefsSetResolution()
 	strncpy(str, WantedVideoResolution, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	if ( WantedWidth == 0 )
-		WantedWidth = atoi(str);
+	WantedWidth = atoi(str);
 
 	// Height
 	Length = strcspn(WantedVideoResolution + Position, "x");
 	strncpy(str, WantedVideoResolution + Position, Length);
 	str[Length] = 0;
 	Position += Length + 1;
-	if ( WantedHeight == 0 )
-		WantedHeight = atoi(str);
+	WantedHeight = atoi(str);
 
 	// Depth
 	Length = strcspn(WantedVideoResolution + Position, "x");

@@ -58,6 +58,8 @@
 #include "teul/raknetConn.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
+#include "teul/raknetConn.h"
+#include "log/log.h"
 
 using namespace ww2;
 
@@ -72,7 +74,7 @@ void clientErrorLog(const char *const fmt, ...)
 	vasprintf(&cbuf, fmt, args);
 	std::unique_ptr<char[], std::function<void(void *)>> buf(cbuf, free);
 
-	Write_Log(LOG_ERROR, LOG_FATAL, "%s", buf.get());
+	Write_Log(LOG_FIO, LOG_FATAL, "%s", buf.get());
 }
 
 // default player info

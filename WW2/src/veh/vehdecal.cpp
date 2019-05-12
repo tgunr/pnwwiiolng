@@ -115,7 +115,7 @@ int vehdecalInit()
 
 	if(!loader.Load(&_decalMap))
 	{
-		Write_Log(LOG_OLD, LOG_INFO, "%s** FAILED** to load", BRIGADE_DECALS_DB);
+		WriteLog(LOG_OLD, LOG_INFO, "%s** FAILED** to load", BRIGADE_DECALS_DB);
 		return 1;
 	}
 

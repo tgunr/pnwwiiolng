@@ -515,6 +515,7 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+//    g_logDebug = true;
     if (!mngoptParse()) {
         [NSApp terminate:self];
         return;
@@ -547,7 +548,7 @@ extern NSString *WebActionOriginalURLKey;
     UserLogEnabled = WantedUserLogEnabled;
     Open_Debug(SYS_TITLE);
     Enable_Log(LOG_ALL, WantedUserLogEnabled);
-    Set_Log_Level(LOG_INFO);
+    Set_Log_Level(LOG_WARN);
 #else
     LogEnabled = FALSE;
     UserLogEnabled = FALSE;
@@ -623,7 +624,7 @@ extern NSString *WebActionOriginalURLKey;
     
     [launcherWindow setIsVisible:true];
     
-#ifdef DEBUG_WW2
+#ifdef DEBUG_WW2e
     dbugInit(LogMode::TO_FILE, nullptr);
 #else
     dbugInit(LogMode::OFF, nullptr);
@@ -866,10 +867,10 @@ extern NSString *WebActionOriginalURLKey;
 {
     @autoreleasepool {
         
-        [self setUserName:@""];
-        [userNameField setStringValue:@""];
-        [self setUserPassword:@""];
-        [passwordField setStringValue:@""];
+        [self setUserName:@"pgunr"];
+        [userNameField setStringValue:@"pgunr"];
+        [self setUserPassword:@"bat1d93k"];
+        [passwordField setStringValue:@"bat1d93k"];
         rememberUserPassword = NO;
         [rememberPasswordCheckbox setState:NSOffState];
         

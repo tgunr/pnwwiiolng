@@ -462,15 +462,15 @@ void GameInfoView::DisplayInfo()
 
 	obcsGetObjectCullStats(&total, &displayed);
 
-	DrawString("OBJECTS: total = %d displayed = %d\n", total, displayed);
-	DrawString("TRIANGLES: %d\n", triangles);
-	DrawString("DRAW CALLS: %.0f\n", GLCounter::instance().getRecentTotal());
-
-	static char txt[150];
-	sptGetStats(txt);
-	DrawString("%s\n", txt);
-	speedgrassGetStats(txt);
-	DrawString("%s\n", txt);
+//	DrawString("OBJECTS: total = %d displayed = %d\n", total, displayed);
+//	DrawString("TRIANGLES: %d\n", triangles);
+//	DrawString("DRAW CALLS: %.0f\n", GLCounter::instance().getRecentTotal());
+//
+//	static char txt[150];
+//	sptGetStats(txt);
+//	DrawString("%s\n", txt);
+//	speedgrassGetStats(txt);
+//	DrawString("%s\n", txt);
 
 #if defined(DEBUG_WW2) // && RELEASE_CLIENT == 0
 	std::vector<std::wstring> nvHistory = updtGetNvHistory();

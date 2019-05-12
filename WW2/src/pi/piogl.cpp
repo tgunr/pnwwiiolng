@@ -106,7 +106,7 @@ void piKill()
 {
 	dimainKill();
 	oglKill();
-	Write_Log(LOG_OLD, LOG_INFO, "[piKill]");
+	WriteLog(LOG_OLD, LOG_INFO, "[piKill]");
 }
 
 LOGICAL piClearTargets(UINT32 targets)
@@ -704,7 +704,7 @@ LOGICAL piLockSurface(void* lpdds, piSURFACEDESC* lppisd)
 
 void piCloseProgram()
 {
-	Write_Debug("piCloseProgram was called");
+	WriteDebug("piCloseProgram was called");
 
 #if platOS == OS_WIN32
 	running = 0;
@@ -754,7 +754,7 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 	oglSetTextureMatrix(newtexmat);
 }
 
-NORETURN_FN
+//NORETURN_FN
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
 #if platOS == OS_WIN32
@@ -774,7 +774,7 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 #endif
 
-	abort(); // Abort raises SIGABRT, which will be trapped by the crash handler
+//    abort(); // Abort raises SIGABRT, which will be trapped by the crash handler
 }
 
 extern SINT32	frametime;

@@ -271,7 +271,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 
 	if (AmmoType == nullptr)
 	{
-		Write_Debug("Unable to find ammo type %s for bombsight",MountName);
+		WriteDebug("Unable to find ammo type %s for bombsight",MountName);
 		return FALSE;
 	}
 
@@ -286,7 +286,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 	ogrpFindSubObjectByDOFVar(&PivotDOF,TempObj1,ML_DOF_BOMBSIGHT_PIVOT);
 	if (PivotDOF == nullptr)
 	{
-		Write_Debug("Unable to find pivot point for bombsight");
+		WriteDebug("Unable to find pivot point for bombsight");
 		return FALSE;
 	}
 	ogrpFindSubObjectByDOFVar(&AltPntDOF,PivotDOF,ML_DOF_GAUGE_BOMBSIGHT_ALT);
@@ -296,22 +296,22 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 
 	if (AltPntDOF == nullptr)
 	{
-		Write_Debug("Unable to find altitude point for bombsight");
+		WriteDebug("Unable to find altitude point for bombsight");
 		return FALSE;
 	}
 	if (SpeedPntDOF == nullptr)
 	{
-		Write_Debug("Unable to find speed point for bombsight");
+		WriteDebug("Unable to find speed point for bombsight");
 		return FALSE;
 	}
 	if (ForeSightDOF == nullptr)
 	{
-		Write_Debug("Unable to find foresight point for bombsight");
+		WriteDebug("Unable to find foresight point for bombsight");
 		return FALSE;
 	}
 	if (BackSightDOF == nullptr)
 	{
-		Write_Debug("Unable to find backsight point for bombsight");
+		WriteDebug("Unable to find backsight point for bombsight");
 		return FALSE;
 	}
 

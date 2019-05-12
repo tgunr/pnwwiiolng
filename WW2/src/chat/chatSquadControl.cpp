@@ -92,7 +92,7 @@ SquadControl::CREATE_packer(PackMode mode, ACTION_OBJECT* a)
 	for ( UINT32 i = 0; i < len; ++i )
 	{
 		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_players[i], 0);
-		dbugLog(_FLI, "squad contains %s", Chat::Name(m_players[i]).c_str());
+		WriteLog(LOG_COMM, LOG_INFO, "squad contains %s", Chat::Name(m_players[i]).c_str());
 	}
 	return a->offset;
 }

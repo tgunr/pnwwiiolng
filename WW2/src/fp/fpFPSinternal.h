@@ -3,14 +3,13 @@
 //
 // externally useable stuff goes in fpFPS.h
 
-// Flags for data testing builds
-//#define NO_GUN_WOBBLE
-//#define NARROW_AIM_FOV
-//#define NO_DISPERSION
-//#define NO_MUZZLE_RISE
-
-//#define TESTING_FPS
-
+// compile flags
+#define	GUN_WOBBLE				1
+#define AIMING_WEAPONS			1
+//#define	TESTING_FPS				1
+#if AIMING_WEAPONS
+#undef GUN_WOBBLE
+#endif
 
 #include "fp/fpFPS.h"
 #include "fp/fpFPSdata.h"

@@ -181,7 +181,7 @@ UINT32 time1,time2;
 
 	if (VehicleData == nullptr)
 	{
-		Write_Debug("No vehicle model data for player");
+		WriteDebug("No vehicle model data for player");
 		return 0;
 	}
 
@@ -229,7 +229,7 @@ UINT32 time1,time2;
 
 	time2 = GetMillisecondTick();
 
-	Write_Debug("Wind tunnel processing time: %0.3lf s, iterations = %d",
+	WriteDebug("Wind tunnel processing time: %0.3lf s, iterations = %d",
 		(FLOAT64)(time2 - time1) / 1000.0,
 		(UINT32)(_iterations));
 	fprintf(TunnelFile,"\nWind tunnel processing time: %0.3lf s, iterations = %d",
@@ -292,7 +292,7 @@ static UINT32 _OutputBasicStats(mlVehicleData * VehicleData)
 				VehicleData->VehicleRotationalInertia.Yaw);
 	fprintf(TunnelFile,"\n");
 
-	Write_Debug("Calculated vehicle mass and center of mass\n");
+	WriteDebug("Calculated vehicle mass and center of mass\n");
 
 	_TunnelTurnEnginesOff(VehicleData);
 
@@ -509,7 +509,7 @@ FILE* ThrustFile;
 	ThrustFile = fopen("thrustfile.bin","rb");
 	if (ThrustFile == nullptr)
 	{
-		Write_Debug("Cannot find thrust file");
+		WriteDebug("Cannot find thrust file");
 		return 1;
 	}
 
@@ -717,7 +717,7 @@ UINT32 Result;
 
 //		T2 = piReadTimeStamp32();
 
-//		Write_Debug("Stall test speed = %lf,time = %d",Speed,T2-T1);
+//		WriteDebug("Stall test speed = %lf,time = %d",Speed,T2-T1);
 	}
 	StallSpeed = Speed;
 
@@ -780,7 +780,7 @@ UINT32 Result;
 		Speed,
 		Speed * 3.6,
 		Speed * 2.237);
-	Write_Debug("Done calculating stall speeds\n");
+	WriteDebug("Done calculating stall speeds\n");
 
 	VehicleData->GearSetting = 0;
 	VehicleData->GearPosition = 0.0;
@@ -830,7 +830,7 @@ FLOAT64 AoA;
 		}
 	}
 
-	Write_Debug("Done calculating top speeds\n");
+	WriteDebug("Done calculating top speeds\n");
 
 	return 0;
 }
@@ -977,7 +977,7 @@ UINT32 FoundStall = 0;
 		}
 
 	}
-	Write_Debug("Calculated climb data\n");
+	WriteDebug("Calculated climb data\n");
 	_NoHorizStab = 0;
 
 	return 0;

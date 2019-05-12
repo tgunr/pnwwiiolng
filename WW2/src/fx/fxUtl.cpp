@@ -76,7 +76,7 @@ LOGICAL fxUtlInit()
 
     if(!_initMaterialSounds())
     {
-        Write_Log(LOG_OLD, LOG_WARN, "[fxUtlInit] **FAILED** to load material file.");
+        WriteLog(LOG_OLD, LOG_WARN, "[fxUtlInit] **FAILED** to load material file.");
         return FALSE;
     }
 

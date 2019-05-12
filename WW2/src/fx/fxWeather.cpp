@@ -105,7 +105,7 @@ static void LogRainTimes()
         auto minute = (time % 3600) / 60;
         auto second = time % 60;
 
-		Write_Debug("Rain Time: %02u:%02u:%02u lasting for %02u minutes and %02u seconds.",
+		WriteLog(LOG_FX, LOG_DEBUG, "Rain Time: %02u:%02u:%02u lasting for %02u minutes and %02u seconds.",
 					hour, minute, second, len / 60, len % 60);
     }
 }
@@ -140,7 +140,7 @@ static void SetTodaysRainTimes(const int seedidx)
 		return;
 	}
 
-    Write_Debug("Rain for index %d", seedidx);
+    WriteLog(LOG_FX, LOG_DEBUG, "Rain for index %d", seedidx);
 
 	// OGS: Since 'seedidx' is coming down from the host,
 	// we need to re-seed the RNG with something after

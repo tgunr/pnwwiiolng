@@ -111,6 +111,10 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"gunsightrangeinc",				IMAP_HOLD_GUNSIGHT_RANGE_INC,				persGunsightRangeInc,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"gunsightrangedec",				IMAP_HOLD_GUNSIGHT_RANGE_DEC,				persGunsightRangeDec,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 
+	{"gvalueinc",						IMAP_HOLD_GVALUE_INC,						persGValueInc,					VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
+	{"gvaluedec",						IMAP_HOLD_GVALUE_DEC,						persGValueDec,					VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
+    {"gtoggle1",                        IMAP_TOGGLE1,                               persGToggle1,                    VEH_CNTRL_ISHOLDDOWN,    VEH_CONTROL_DISABLE, VCEID},
+
 	{"gunsightconvinc",					IMAP_GUNSIGHT_CONVERGENCE_INC,				persGunsightConvergenceInc,		VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"gunsightconvdec",					IMAP_GUNSIGHT_CONVERGENCE_DEC,				persGunsightConvergenceDec,		VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"bombsightspeedinc",				IMAP_HOLD_BOMBSIGHT_SPEED_INC,				persBombsightSpeedInc,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},

@@ -112,7 +112,7 @@ static LOGICAL _ReadAndSetupAutogunTypes()
 	AutoGunFile = fioOpen("vehicles\\autogun.txt");
 	if (AutoGunFile == -1)
 	{
-		Write_Debug("Unable to read in autogun file");
+		WriteDebug("Unable to read in autogun file");
 		return FALSE;
 	}
 
@@ -379,9 +379,9 @@ void trnKillAutogunSystem()
 	// note: if there are any autoguns left to kill, we've got a problem
 	if (_AutoGunHead.next != nullptr)
 	{
-		Write_Debug("******************");
-		Write_Debug("Autoguns remaining after trnldrkill!!!!!");
-		Write_Debug("******************");
+		WriteDebug("******************");
+		WriteDebug("Autoguns remaining after trnldrkill!!!!!");
+		WriteDebug("******************");
 	}
 }
 
@@ -442,7 +442,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	ogrpFindSubObjectByDOFVar(&PlaceObject,TO->TerrainObject,ML_DOF_AG_LOCATE);
 	if (PlaceObject == nullptr)
 	{
-		Write_Debug("Unable to find placement point in base object %s",
+		WriteDebug("Unable to find placement point in base object %s",
 					TO->TerrainMasterObject->name);
 		return FALSE;
 	}
@@ -451,21 +451,21 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	AG = (trnAutoGun*)memAlloc(sizeof(trnAutoGun));
 	if (AG == nullptr)
 	{
-		Write_Debug("Unable to allocate memory for autogun");
+		WriteDebug("Unable to allocate memory for autogun");
 		return FALSE;
 	}
 
 	AG->Weapon = new weapWeapon{};
 	if (AG->Weapon == nullptr)
 	{
-		Write_Debug("Unable to allocate weapon space memory for autogun");
+		WriteDebug("Unable to allocate weapon space memory for autogun");
 		memFree(AG);
 		return FALSE;
 	}
 
 	if (trnFindStratBuildingByTO(&bld, TO) == FALSE)
 	{
-		Write_Debug("Unable to determine autogun type from base object");
+		WriteDebug("Unable to determine autogun type from base object");
 		delete AG->Weapon;
 		memFree(AG);
 		return FALSE;
@@ -540,13 +540,13 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	ogrpFindSubObjectByDOFVar(&(AG->FirePnt),AG->Object,ML_DOF_AG_FIRE);
 	if (AG->FirePnt == nullptr)
 	{
-		Write_Debug("Unable to find fire point in autogun %s",AG->Object->name);
+		WriteDebug("Unable to find fire point in autogun %s",AG->Object->name);
 	}
 	ogrpFindSubObjectByDOFVar(&(AG->ViewPnt),AG->Object,ML_DOF_AG_VIEW);
 
     if (AG->ViewPnt == nullptr)
 	{
-		Write_Debug("[trnAddAutoGun] ** FAILED ** Unable to find view point in autogun %s",AG->Object->name);
+		WriteDebug("[trnAddAutoGun] ** FAILED ** Unable to find view point in autogun %s",AG->Object->name);
 	}
 
 	// ok now set up position of autogun in the world
@@ -1470,7 +1470,7 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 
 							if (pAnimationObject == nullptr)
 							{
-								Write_Debug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
+								WriteDebug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
 								return FALSE;
 							}
 
@@ -1914,7 +1914,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 				pAnimationObject = Vehicle->VehicleObjectData->PlaneObject;
 				if (pAnimationObject == nullptr)
 				{
-					Write_Debug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
+					WriteDebug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
 					return FALSE;
 				}
 			}
@@ -2230,7 +2230,7 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
     {
         // Program should bail during init if there are bad ammo files...
         // but just in case...
-        Write_Debug("[trnautogun] *** AmmoType is nullptr! Need to validate ammo files ***");
+        WriteDebug("[trnautogun] *** AmmoType is nullptr! Need to validate ammo files ***");
         return FALSE;
     }
 

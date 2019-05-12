@@ -80,7 +80,7 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 	{
 		(void)e;
 		///TODO: Handle exception. "e.what()" is a loggable error.
-		Write_Debug("Runtime exception processing Instance::Listing: %s", e.what());
+		WriteDebug("Runtime exception processing Instance::Listing: %s", e.what());
 	}
 
 	if(list.isComplete())

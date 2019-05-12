@@ -43,7 +43,7 @@ int   i;
 		flareid[i] = ldpixLoadImageFileToSurface(texname, colorBLACK, LDPIX_NONE);
 		if (!piIsTexture(flareid[i], 0))
 		{
-			Write_Debug("Flare texture file not found: %s", texname);
+			WriteDebug("Flare texture file not found: %s", texname);
 			flareid[i] = -1;
 			retval = FALSE;
 		}

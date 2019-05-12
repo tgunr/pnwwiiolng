@@ -501,7 +501,7 @@ static int        number=0;
 		if (++number == 4096)
 		{
 			QueryPerformanceFrequency(&count2);
-			Write_Debug("Average rotate raw time: %d us", (DWORD)(count * 1000 / 4096) / (DWORD)(count2.LowPart / 1000));
+			WriteDebug("Average rotate raw time: %d us", (DWORD)(count * 1000 / 4096) / (DWORD)(count2.LowPart / 1000));
 			number = 0;
 			count = 0;
 		}

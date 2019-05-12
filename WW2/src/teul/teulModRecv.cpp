@@ -248,7 +248,6 @@ static ssize_t _acceptConnectTCP(ENDPOINT& endpoint)
         newEndpoint->socket = newSock;
         newEndpoint->fromSockAddress = newFromAddress;
         newEndpoint->localSockAddress = newLocalAddress;
-        newEndpoint->destSockAddress = newEndpoint->fromSockAddress;
         teulConfigureEndpointSocket(*newEndpoint);
 
         newEndpoint->setConnected();
@@ -330,7 +329,7 @@ static ssize_t _startNewTCPPacket(ENDPOINT& endpoint)
 	if (totalRead < Teul::PacketPrefixBytes) {
 		dbugLog(_FLD, "t:%d underrun reading packet prefix, waiting for more data.", endpoint.teulIndex());
 		endpoint.m_readBufferUsed = totalRead;
-		return -PLAT_EAGAIN;
+		return 0;
 	}
 
 	ABORT_IF_EX(partialHeader.packetSizeBytes() > Teul::MaxAllowedPacketSize_bytes, "You done messed up some math somewhere.");
@@ -357,7 +356,7 @@ static ssize_t _continueTCPPacket(ENDPOINT& endpoint)
 	ssize_t readVal = _receiveTCP(endpoint, readBuffer, &readSize);
     
 	if (readVal < 0) {
-		return readVal;
+		return static_cast<SINT32>(readVal);
 	}
 	endpoint.m_readBufferUsed += static_cast<size_t>(readSize);
 	return 0;
@@ -385,7 +384,7 @@ static ssize_t _recvOneFromStream(ENDPOINT& endpoint)
 
 		// Don't progress further until we've read the entire payload.
 		if (endpoint.m_readBufferUsed < datagramSize) {
-			return -PLAT_EAGAIN;
+			return 0;
 		}
 	}
 
@@ -431,7 +430,7 @@ static ssize_t _recvManyFromPacketSource(ENDPOINT& endpoint)
 #endif
         } else {
             dgram->m_size = dgram->contents->packetSizeBytes() + Teul::PacketPrefixBytes;
-            assert(dgram->m_size == static_cast<size_t>(readVal) && "Datagram's calculated size doesn't match amount of data read");
+            assert(dgram->m_size == readVal && "Datagram's calculated size doesn't match amount of data read");
 #ifdef DEBUG_CONNECTIONS
             dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " recvfrom %" PRSsizeT " bytes (dgram %u bytes)", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), readVal, dgram->m_size);
 #endif
@@ -485,6 +484,7 @@ static ssize_t _handleReceive(ENDPOINT& endpoint)
     
     if (result < 0) {
         dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " receive error:%" PRSsizeT, endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), -result);
+        return result;
     }
 
     return result;
@@ -507,10 +507,6 @@ static void _runPollEndpoints(struct pollfd *fdArray, nfds_t maxSlots)
         ~_PollRegenerator() { _pollRegenerateSet(); }
     } _regenerator;
     
-    // poll() may or may not have blocked for a non-trivial duration; re-sync the clock to keep
-    // things sane.
-    teulSyncClock();
-
     for (size_t slot = 0; slot < maxSlots; ++slot) {
 		pollfd& sfd = fdArray[slot];
   
@@ -624,9 +620,9 @@ void teulMRecvAddToPoll(ENDPOINT& endpoint)
         return;
     }
     _pollAddEndpoint(endpoint);
-    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%lu count:%" PRSizeT,
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " adding endpoint state:%d slot:%d count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), endpoint.state(),
-                static_cast<size_t>(endpoint.m_impl->pollSlot()), static_cast<size_t>(pollData.m_count));
+                endpoint.m_impl->pollSlot(), static_cast<size_t>(pollData.m_count));
 }
 
 void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
@@ -648,9 +644,9 @@ void teulMRecvRemoveFromPoll(ENDPOINT& endpoint, bool permitCompaction)
     pollData.fd[slot].fd = INVALID_SOCKET;
     --pollData.m_count;
     
-    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%lu count:%" PRSizeT,
+    dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " removing endpoint state:%d slot:%d count:%" PRSizeT,
                 endpoint.teulIndex(), PRA_SOCKET(endpoint.socket),
-                endpoint.state(), static_cast<unsigned long>(slot), static_cast<size_t>(pollData.m_count));
+                endpoint.state(), slot, static_cast<size_t>(pollData.m_count));
 }
 
 static void _pollRegenerateSet()
@@ -861,10 +857,18 @@ static void _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
         endpoint.m_impl->m_lastPacketTick = header.m_tick;
         endpoint.m_haveTicks = true;
 	}
+
+    // Below logic relies on it being safe to treat the tick values as signed.
+    // Tick values are 64 bits, which in signed form gives 300 million years of
+    // leeway. That might just barely last long enough for this code to actually
+    // get a proper rewrite.
+    assert(endpoint.m_impl->m_lastPacketTick < std::numeric_limits<TeulDeltaMS>::max());
+
+	TeulDeltaMS newTick = static_cast<TeulDeltaMS>(header.m_tick);
+	TeulDeltaMS lastTick = static_cast<TeulDeltaMS>(endpoint.m_impl->m_lastPacketTick);
+    TeulTimeMS delta = static_cast<TeulTimeMS>(std::llabs(newTick - lastTick)); // both values are guaranteed positive; this can not underflow
     
-    // The m_tick counter in packets wraps every 65 seconds or so. By doing this subtraction with
-    // only 16 bits we guarantee that wraparound (where new < old) still gives the correct result.
-    endpoint.m_tickAccumulation += (header.m_tick - endpoint.m_impl->m_lastPacketTick);
+    endpoint.m_tickAccumulation += delta;
 
 	// Save the value.
 	endpoint.m_impl->m_lastPacketTick = header.m_tick;
@@ -875,16 +879,18 @@ static void _processTicks(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 		return;
     }
 
+	teulSyncClock();
+
 	Teul::TickSample sample(endpoint.m_created.elapsed(), endpoint.m_tickAccumulation);
 
 	if (sample.delta > -100) { // In other words, if the client is less than 100ms ahead of the host
 		return;
     }
 
-	FLOAT64 minRatio = static_cast<FLOAT64>(host_config.arena.speedHackRatio);
+	FLOAT64 minRatio = host_config.arena.speedHackRatio;
     
     // All is well if detection is set above 1.0 (off) or the client:host ratio is below the threshold
-	if (minRatio >= 1.0 && sample.ratio < minRatio) {
+	if (minRatio >= 1.0 & sample.ratio < minRatio) {
 		return;
     }
     
