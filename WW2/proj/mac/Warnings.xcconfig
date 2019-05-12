@@ -21,6 +21,7 @@
 //
 // See the comments in Defines.xcconfig for a bit more info.
 
+WW2_WARNINGS_36 = $(WW2_WARNINGS_37) -Wno-nonportable-include-path             // Don't display on case insensitive system (Mac)
 WW2_WARNINGS_35 = $(WW2_WARNINGS_36) -Wno-extra-tokens                          // Can't fix this because a lot of upstream headers do it
 WW2_WARNINGS_34 = $(WW2_WARNINGS_35) -Wno-double-promotion                      // Honestly, I just don't care.
 WW2_WARNINGS_33 = $(WW2_WARNINGS_34) -Wno-cstring-format-directive              // It's okay to use %s with NSString, Apple
@@ -60,7 +61,7 @@ WW2_WARNINGS_01 = $(WW2_WARNINGS_02) -Wno-reserved-id-macro                     
 WW2_WARNINGS    = -Weverything       $(WW2_WARNINGS_01)                         // Turn on EEEEEEEVERYTHING by default
 
 WW2_ENABLE_NONFLAG_WARNINGS_Development     = YES
-WW2_ENABLE_NONFLAG_WARNINGS_Debug           = YES
+WW2_ENABLE_NONFLAG_WARNINGS_Debug           = NO
 WW2_ENABLE_NONFLAG_WARNINGS_Release         = NO
 WW2_ENABLE_NONFLAG_WARNINGS_GM              = NO
 
@@ -125,6 +126,7 @@ GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = $(WW2_ENABLE_NONFLAG_WARNINGS)
 CLANG_WARN_DOCUMENTATION_COMMENTS = NO // Not helpful
 CLANG_WARN_INFINITE_RECURSION = YES // Critical (logic error)
 CLANG_WARN_SUSPICIOUS_MOVE = YES // Critical (performance, correctness)
+CLANG_WARN_ABOUT_NONPORTABLE_PATHS = NO // Mac is case insensitive
 
 // Enable extra analyze modes
 CLANG_ANALYZER_SECURITY_FLOATLOOPCOUNTER = YES
