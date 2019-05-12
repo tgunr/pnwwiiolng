@@ -82,7 +82,7 @@ static GVAR vars[] = {
     NULL_KEY_DEF("nowor", NoBlitzWorPreload),
     NULL_KEY_DEF("noinf", NoInfPreload),
     NULL_KEY_DEF("build", g_bBuildMDLS),
-//    LOGICAL_KEY_DEF("logg", g_logDebug),
+    LOGICAL_KEY_DEF("logg", g_logDebug),
     NULL_KEY_DEF("logcomm", g_log_comm),
     NULL_KEY_DEF("logfps", g_log_fps),
     NULL_KEY_DEF("logweap", g_log_weap),

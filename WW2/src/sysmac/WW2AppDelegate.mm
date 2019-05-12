@@ -515,7 +515,7 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-//    g_logDebug = true;
+    g_logDebug = true;
     if (!mngoptParse()) {
         [NSApp terminate:self];
         return;
@@ -548,7 +548,7 @@ extern NSString *WebActionOriginalURLKey;
     UserLogEnabled = WantedUserLogEnabled;
     Open_Debug(SYS_TITLE);
     Enable_Log(LOG_ALL, WantedUserLogEnabled);
-    Set_Log_Level(LOG_WARN);
+    Set_Log_Level(LOG_INFO);
 #else
     LogEnabled = FALSE;
     UserLogEnabled = FALSE;

@@ -293,7 +293,7 @@ SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta
 SINT8            gClientV[32]; // Version to submit
 
 SINT8            gLogMask[_MAX_PATH];
-SINT32           g_logDebug;
+
 #ifdef DEBUG_WW2
 SINT32           gLogLevel = LOG_DEBUG;
 #else
