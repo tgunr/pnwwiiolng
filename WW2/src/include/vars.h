@@ -116,7 +116,6 @@ extern SINT8			HackID[128];		// used for hacker detection (comes from playgate o
 extern LOGICAL			AltFont;            // testing if true use alternate UI font
 extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
-extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
 extern LOGICAL          LaunchSettingsOnly; // stand-alone settings (for mac initially)
 extern LOGICAL			UseSteamLogin;
@@ -190,7 +189,6 @@ extern LOGICAL			g_enableVSync;	    // Lock the frame rate to refresh rate
 extern SINT32			ShadowSizeSelect;	// A number representing shadow texture size											// (1-8) means "2^n"
 											// (1-8) means "2^n"
 											// 0 means "No Shadows"
-extern SINT8			Playarc[_MAX_PATH]; // path the archiver, usually just "playarc"
 /**/
 
 extern SINT32           nErrorCode;         // Set to any user specified error code
