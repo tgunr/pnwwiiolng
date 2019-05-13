@@ -57,28 +57,43 @@ function winpath2bash {
 }
 
 function bashpath2win {
-	workingBashPath=$1
-	# echo "01 -- Input Path                  : >"$workingBashPath"<"
+    workingBashPath=$1
+    # echo "01 -- Input Path                  : >"$workingBashPath"<"
 
-	workingBashPath=${workingBashPath#/drives/}
-	# echo "02 -- /drives/ removed            : >"$workingBashPath"<"
+    workingBashPath=${workingBashPath#/drives/}
+    # echo "02 -- /drives/ removed            : >"$workingBashPath"<"
 
-	driveLetter=${workingBashPath::1}
-	# echo "03 -- Drive Letter                : >"$driveLetter"<"
-	
-	driveLetter=${driveLetter^^}
-	# echo "04 -- Drive Letter to Upper Case  : >"$driveLetter"<"
-
-	workingBashPath=${workingBashPath:1}
-	# echo "05 -- Drive Letter Removed        : >"$workingBashPath"<"
-
-	workingBashPath=$driveLetter":"$workingBashPath
-	# echo "06 -- Corrected Windows Path      : >"$workingBashPath"<"
-	
-	workingBashPath=$(echo "$workingBashPath" | sed 's.\/.\\.g')
-	# echo "07 -- Corrected Windows Separator : >"$workingBashPath"<"
+    driveLetter=${workingBashPath::1}
+    # echo "03 -- Drive Letter                : >"$driveLetter"<"
     
-	winpath="$workingBashPath"
+    driveLetter=${driveLetter^^}
+    # echo "04 -- Drive Letter to Upper Case  : >"$driveLetter"<"
+
+    workingBashPath=${workingBashPath:1}
+    # echo "05 -- Drive Letter Removed        : >"$workingBashPath"<"
+
+    workingBashPath=$driveLetter":"$workingBashPath
+    # echo "06 -- Corrected Windows Path      : >"$workingBashPath"<"
+    
+    workingBashPath=$(echo "$workingBashPath" | sed 's.\/.\\.g')
+    # echo "07 -- Corrected Windows Separator : >"$workingBashPath"<"
+    
+    winpath="$workingBashPath"
+}
+
+seconds2time ()
+{
+    T=$1
+    D=$((T/60/60/24))
+    H=$((T/60/60%24))
+    M=$((T/60%60))
+    S=$((T%60))
+
+    if [[ ${D} != 0 ]] ; then
+        displayTime=$(printf '%d days %02d:%02d:%02d' $D $H $M $S)
+    else
+        displayTime=$(printf '%02d:%02d:%02d' $H $M $S)
+    fi
 }
 
 trap '
@@ -202,9 +217,9 @@ if [ "$OSTYPE" == "cygwin" ] ; then
     myos="win"
     # INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/oswin/archivefiles"
-	
-	bashpath2win "$WW2MODS"
-	MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $winpath\DATA"
+    
+    bashpath2win "$WW2MODS"
+    MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $winpath\DATA"
 
 elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "Detected OSX"
@@ -214,7 +229,7 @@ elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     myos="osx"
     # INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/osmac/archivefiles"
-	MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
+    MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
 
 else
     exit_msg="Pre-requisites ERROR: Unknown OS, make sure you are running this from a bash shell on the Mac, or Mobaxterm on Windows."
@@ -798,8 +813,8 @@ fi
 bld_config="Debug"
 
 if [ "$skip_step" = false ] ; then
-	echo
-	echo
+    echo
+    echo
     build_step "build" "Building" "debug client for .mdl file creation"
 
     if [ "$myos" == "win" ] ; then
@@ -851,77 +866,77 @@ if [ "$skip_step" = false ] ; then
         find "$WW2MODS" -name "*.mdl" -delete
     fi
 
-	if [ "$myos" == "win" ] ; then
-		# Building New .mdl files - Win
-		cp "$INSTALLER_ROOT/_buildMDLfiles.bat" "$WW2MODS/."
-		chmod 550 "$WW2MODS/_buildMDLfiles.bat"
+    if [ "$myos" == "win" ] ; then
+        # Building New .mdl files - Win
+        cp "$INSTALLER_ROOT/_buildMDLfiles.bat" "$WW2MODS/."
+        chmod 550 "$WW2MODS/_buildMDLfiles.bat"
 
-		echo
-		if [ "$skip_step" = false ]; then
-			build_step "copy" "Copying" "Debug binaries into WW2MODS"
-			for product in $PRODUCTS ; do
-				cp "$DEBUGDIR/$product" "$WW2MODS/$product"
-				chmod 550 "$WW2MODS/$product"
-			done
-		fi
+        echo
+        if [ "$skip_step" = false ]; then
+            build_step "copy" "Copying" "Debug binaries into WW2MODS"
+            for product in $PRODUCTS ; do
+                cp "$DEBUGDIR/$product" "$WW2MODS/$product"
+                chmod 550 "$WW2MODS/$product"
+            done
+        fi
 
-		# Copy 3rd party libraries into WW2MODS
+        # Copy 3rd party libraries into WW2MODS
 
-		echo
-		if [ "$skip_step" = false ] ; then
-			build_step "copy" "Copying" "3rd party libs into WW2MODS (Stram Files)"
-			rsync -au "$WWII_ROOT/ww2assets/steam/" "$WW2MODS/"
-		fi
+        echo
+        if [ "$skip_step" = false ] ; then
+            build_step "copy" "Copying" "3rd party libs into WW2MODS (Stram Files)"
+            rsync -au "$WWII_ROOT/ww2assets/steam/" "$WW2MODS/"
+        fi
 
-		echo
-		if [ "$skip_step" = false ] ; then
-			build_step "build" "Building" "mdl files - Win"
-			echo
+        echo
+        if [ "$skip_step" = false ] ; then
+            build_step "build" "Building" "mdl files - Win"
+            echo
 
-			pushd "$WW2MODS"
-			if [ -f "_buildMDLfiles.bat" ] ; then
-				./_buildMDLfiles.bat /args "$MDL_COMMANDLINE_ARGS"
+            pushd "$WW2MODS"
+            if [ -f "_buildMDLfiles.bat" ] ; then
+                ./_buildMDLfiles.bat /args "$MDL_COMMANDLINE_ARGS"
 
-				ExitStatus=$?
-				if [ "$ExitStatus" != "0" ] ; then
-					exit_msg="Error: _buildMDLfiles.bat returned: "$ExitStatus" Exit Status, build aborted."
-					exit 1
-				fi
+                ExitStatus=$?
+                if [ "$ExitStatus" != "0" ] ; then
+                    exit_msg="Error: _buildMDLfiles.bat returned: "$ExitStatus" Exit Status, build aborted."
+                    exit 1
+                fi
 
-			else
-				exit_msg="Error: Failed to locate: "$WW2MODS"/_buildMDLfiles.bat, build aborted."
+            else
+                exit_msg="Error: Failed to locate: "$WW2MODS"/_buildMDLfiles.bat, build aborted."
 
-				exit 1
-			fi
-			popd
-			echo
-		fi
+                exit 1
+            fi
+            popd
+            echo
+        fi
 
-	else
-		# Building New .mdl files - Mac
+    else
+        # Building New .mdl files - Mac
 
-		echo
-		if [ "$skip_step" = false ] ; then
-			build_step "build" "Building" "mdl files - Mac"
-			echo
-			ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
-			ww2path=$(echo $ww2path | sed 's/\\//g')
+        echo
+        if [ "$skip_step" = false ] ; then
+            build_step "build" "Building" "mdl files - Mac"
+            echo
+            ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
+            ww2path=$(echo $ww2path | sed 's/\\//g')
 
-			open -W "$ww2path" "--args "$MDL_COMMANDLINE_ARGS
-		fi
-	fi
+            open -W "$ww2path" --args $MDL_COMMANDLINE_ARGS
+        fi
+    fi
 
-	mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
+    mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
 
-	if [ ! -n "$mdlfiles" ] ; then
-		exit_msg="Error: Failed to build .mdl files, build aborted."
+    if [ ! -n "$mdlfiles" ] ; then
+        exit_msg="Error: Failed to build .mdl files, build aborted."
 
-		exit 1
+        exit 1
 
-	else
-		echo
-		echo "NOTE: .mdl files build completed."
-	fi
+    else
+        echo
+        echo "NOTE: .mdl files build completed."
+    fi
 fi
 
 ################################################################
@@ -935,7 +950,7 @@ if [ "$skip_step" = false ] ; then
     build_step "build" "Building" "archive (.ww2) files"
     
     if [ "$myos" == "win" ] ; then
-		echo
+        echo
         pushd "$INSTALLER_ROOT"
 
         if [ -f "_PlayArchBuilder.bat" ] ; then
@@ -1044,7 +1059,7 @@ fi
 
 
 # ==========================================================================
-skip_step=false
+# skip_step=false
 # ==========================================================================
 
 
@@ -1053,7 +1068,7 @@ if [ "$myos" == "win" ] ; then
     echo
     if [ "$skip_step" = false ] ; then
         build_step "copy" "Copying" "preparing the installer source directories - Win"
-		echo
+        echo
         pushd "$INSTALLER_ROOT"
 
         if [ -f "_PrepareNewRelease.bat" ] ; then
@@ -1196,7 +1211,7 @@ echo
 
         echo
         echo
-		
+        
         if [ "$skip_step" = false ] ; then
             build_step "build" "Building" "complete running full install scripts: Full Install"
             pushd "$INSTALLER_ROOT"
@@ -1325,7 +1340,12 @@ fi
 
 endTime=$(date +%s)
 durationTime=`expr ${endTime} - ${startTime}`
-displayTime=`date +%H:%M:%S -ud @${durationTime}`
+
+if [ "$myos" == "win" ] ; then
+    displayTime=`date +%H:%M:%S -ud @${durationTime}`
+else
+    seconds2time "$durationTime"
+fi
 
 echo
 echo
