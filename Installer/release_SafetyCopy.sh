@@ -56,6 +56,31 @@ function winpath2bash {
     bashpath="/drives/$bashpath"
 }
 
+function bashpath2win {
+	workingBashPath=$1
+	# echo "01 -- Input Path                  : >"$workingBashPath"<"
+
+	workingBashPath=${workingBashPath#/drives/}
+	# echo "02 -- /drives/ removed            : >"$workingBashPath"<"
+
+	driveLetter=${workingBashPath::1}
+	# echo "03 -- Drive Letter                : >"$driveLetter"<"
+	
+	driveLetter=${driveLetter^^}
+	# echo "04 -- Drive Letter to Upper Case  : >"$driveLetter"<"
+
+	workingBashPath=${workingBashPath:1}
+	# echo "05 -- Drive Letter Removed        : >"$workingBashPath"<"
+
+	workingBashPath=$driveLetter":"$workingBashPath
+	# echo "06 -- Corrected Windows Path      : >"$workingBashPath"<"
+	
+	workingBashPath=$(echo "$workingBashPath" | sed 's.\/.\\.g')
+	# echo "07 -- Corrected Windows Separator : >"$workingBashPath"<"
+    
+	winpath="$workingBashPath"
+}
+
 trap '
 echo    # (optional) move to a new line
 echo $(date +%F_%T)"  >>>>  Exiting . . ."
@@ -86,7 +111,7 @@ ASSETFILES="eula.txt license.rtf readme.rtf wwii1.ico"
 BUILDDIR="$APPDATA"
 BUILDLOG="build_output.log"
 PREV_RELEASE="$PROGRAMFILES\\CRS\\WWIIOnline\\"
-MDL_COMMANDLINE_ARGS="--args -BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
+MDL_COMMANDLINE_ARGS=""
 
 InstallerScriptName="WWIIOL_Installer_Template.iss"
 build_release=""
@@ -119,9 +144,9 @@ build_step "configure" "Configing" "script options"
 echo
 echo
 echo "Installer Build Type."
-echo "Available Options: -- r = Release Candidate - Release EXE Build"
-echo "                   -- a = Alpha Release - BetaRelease EXE Build"
-echo "                   -- b = Beta Release - BetaRelease EXE Build"
+echo "Available Options: -- r = Release Candidate  -  Release EXE Build"
+echo "                   -- a = Alpha Release      -  BetaRelease EXE Build"
+echo "                   -- b = Beta Release       -  BetaRelease EXE Build"
 echo "                   -- e to Exit the script."
 echo    # (optional) move to a new line
 
@@ -168,12 +193,18 @@ found_prereq_errors=false
 exit_msg=""
 
 myos=""
+
+INSTALLER_ROOT="$WWII_ROOT/Installer"
+
 if [ "$OSTYPE" == "cygwin" ] ; then
     echo "Detected Windows under cygwin"
 
     myos="win"
-    INSTALLER_ROOT="$WWII_ROOT/Installer"
+    # INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/oswin/archivefiles"
+	
+	bashpath2win "$WW2MODS"
+	MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $winpath\DATA"
 
 elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "Detected OSX"
@@ -181,9 +212,9 @@ elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "WARNING: DO NOT DO ANYTHING while build is running, especially when DropDMG is running!!!!"
 
     myos="osx"
-    # INSTALLER_ROOT="$WWII_ROOT/WW2/proj/mac/WW2 Release Items/DropDMG"
-    INSTALLER_ROOT="$WWII_ROOT/Installer"
+    # INSTALLER_ROOT="$WWII_ROOT/Installer"
     WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/osmac/archivefiles"
+	MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
 
 else
     exit_msg="Pre-requisites ERROR: Unknown OS, make sure you are running this from a bash shell on the Mac, or Mobaxterm on Windows."
@@ -347,6 +378,7 @@ else
 fi
 
 if [ "$found_prereq_errors" = true ] ; then
+
     exit 1
 fi
 
@@ -573,7 +605,7 @@ echo
 
 echo "To continue with the Options Shown above,"
 echo "please (V)erify to proceed OR (A)bort to exit."
-while read -p "(V)erify  OR  (A)bort ( v|a ) :" -n 1 -r ; do
+while read -p "(V)erify  OR  (A)bort ( v|a ) : " -n 1 -r ; do
     case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
         "v")
             break
@@ -598,7 +630,7 @@ done
 #    Run
 
 ################################################################
-
+startTime=$(date +%s)
 
 # ==========================================================================
 # skip_step=true
@@ -763,28 +795,32 @@ if [ "$myos" == "osx" ] ; then
     echo "Mac app Name: "$mac_app_name
 fi
 
-echo
-echo
 bld_config="Debug"
-build_step "build" "Building" "debug client for .mdl file creation"
 
-if [ "$skip_step" = false ]; then
+if [ "$skip_step" = false ] ; then
+	echo
+	echo
+    build_step "build" "Building" "debug client for .mdl file creation"
+
     if [ "$myos" == "win" ] ; then
         # Building Debug client - Win (.mdl files)
         BUILDFILE="$BUILDDIR\\$bld_config$BUILDLOG"
         winpath2bash "$BUILDFILE"
         rm "$bashpath"
         echo "writing output to: "$BUILDFILE
+
         if [ "$isrelease" = true ] ; then
             echo "Cleaning "$bld_config" first"
             devenv WW2.sln /clean $bld_config
         fi
+
         devenv WW2.sln /build $bld_config /out "$BUILDFILE"
 
         errOutput=`grep ": error|: fatal" "$BUILDFILE"`
         if [ -n "$errOutput" ] ; then
             echo $errOutput
             exit_msg="Error: Build failed, see "$BUILDFILE" for errors."
+            
             exit 1
         fi
 
@@ -808,69 +844,85 @@ fi
 ################################################################
 
 # Removing Old .mdl files from the opt/ww2mods directory
-if [ "$skip_step" = false ]; then
+if [ "$skip_step" = false ] ; then
     if [ "$isrelease" = true ] || [ "$rebuildMDLfiles" = true ] ; then
         echo
         build_step "remove" "Removing" "old .mdl files"
         find "$WW2MODS" -name "*.mdl" -delete
     fi
+
+	if [ "$myos" == "win" ] ; then
+		# Building New .mdl files - Win
+		cp "$INSTALLER_ROOT/_buildMDLfiles.bat" "$WW2MODS/."
+		chmod 550 "$WW2MODS/_buildMDLfiles.bat"
+
+		echo
+		if [ "$skip_step" = false ]; then
+			build_step "copy" "Copying" "Debug binaries into WW2MODS"
+			for product in $PRODUCTS ; do
+				cp "$DEBUGDIR/$product" "$WW2MODS/$product"
+				chmod 550 "$WW2MODS/$product"
+			done
+		fi
+
+		# Copy 3rd party libraries into WW2MODS
+
+		echo
+		if [ "$skip_step" = false ] ; then
+			build_step "copy" "Copying" "3rd party libs into WW2MODS (Stram Files)"
+			rsync -au "$WWII_ROOT/ww2assets/steam/" "$WW2MODS/"
+		fi
+
+		echo
+		if [ "$skip_step" = false ] ; then
+			build_step "build" "Building" "mdl files - Win"
+			echo
+
+			pushd "$WW2MODS"
+			if [ -f "_buildMDLfiles.bat" ] ; then
+				./_buildMDLfiles.bat /args "$MDL_COMMANDLINE_ARGS"
+
+				ExitStatus=$?
+				if [ "$ExitStatus" != "0" ] ; then
+					exit_msg="Error: _buildMDLfiles.bat returned: "$ExitStatus" Exit Status, build aborted."
+					exit 1
+				fi
+
+			else
+				exit_msg="Error: Failed to locate: "$WW2MODS"/_buildMDLfiles.bat, build aborted."
+
+				exit 1
+			fi
+			popd
+			echo
+		fi
+
+	else
+		# Building New .mdl files - Mac
+
+		echo
+		if [ "$skip_step" = false ] ; then
+			build_step "build" "Building" "mdl files - Mac"
+			echo
+			ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
+			ww2path=$(echo $ww2path | sed 's/\\//g')
+
+			open -W "$ww2path" "--args "$MDL_COMMANDLINE_ARGS
+		fi
+	fi
+
+	mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
+
+	if [ ! -n "$mdlfiles" ] ; then
+		exit_msg="Error: Failed to build .mdl files, build aborted."
+
+		exit 1
+
+	else
+		echo
+		echo "NOTE: .mdl files build completed."
+	fi
 fi
-
-if [ "$myos" == "win" ] ; then
-    # Building New .mdl files - Win
-    cp "$WW2MODS/Launch Files/ww2mods.bat" "$WW2MODS/."
-    chmod 550 "$WW2MODS/ww2mods.bat"
-
-    echo
-    build_step "copy" "Copying" "Debug binaries into WW2MODS"
-    if [ "$skip_step" = false ]; then
-        for product in $PRODUCTS ; do
-            cp "$DEBUGDIR/$product" "$WW2MODS/$product"
-            chmod 550 "$WW2MODS/$product"
-        done
-    fi
-
-    # Copy 3rd party libraries into WW2MODS
-
-    echo
-    build_step "copy" "Copying" "3rd party libs into WW2MODS (Stram Files)"
-    if [ "$skip_step" = false ]; then
-        rsync -au "$WWII_ROOT/ww2assets/steam/" "$WW2MODS/"
-    fi
-
-    echo
-    build_step "build" "Building" "mdl files - Win"
-    if [ "$skip_step" = false ]; then
-        pushd "$WW2MODS"
-        ./ww2mods.bat
-        popd
-    fi
-
-else
-    # Building New .mdl files - Mac
-
-    echo
-    build_step "build" "Building" "mdl files - Mac"
-    if [ "$skip_step" = false ]; then
-        ww2path="WW2/proj/mac/build/$bld_config/$mac_app_name"
-        ww2path=$(echo $ww2path | sed 's/\\//g')
-
-        open -W "$ww2path" $MDL_COMMANDLINE_ARGS
-    fi
-fi
-
-mdlfiles=`find opt/ww2mods/DATA -name "*.mdl" -print`
-
-if [ ! -n "$mdlfiles" ] ; then
-    exit_msg="Error: Failed to build .mdl files, build aborted."
-
-    exit 1
-
-else
-    echo
-    echo "NOTE: .mdl files build completed."
-fi
-
 
 ################################################################
 
@@ -879,9 +931,11 @@ fi
 ################################################################
 
 echo
-build_step "build" "Building" "archive (.ww2) files"
-if [ "$skip_step" = false ]; then
+if [ "$skip_step" = false ] ; then
+    build_step "build" "Building" "archive (.ww2) files"
+    
     if [ "$myos" == "win" ] ; then
+		echo
         pushd "$INSTALLER_ROOT"
 
         if [ -f "_PlayArchBuilder.bat" ] ; then
@@ -928,8 +982,8 @@ else
 fi
 
 echo
-build_step "build" "Building" "installer release files"
-if [ "$skip_step" = false ]; then
+if [ "$skip_step" = false ] ; then
+    build_step "build" "Building" "installer release files"
 
     extradefines="$2"
     if [ "$myos" == "win" ] ; then
@@ -947,7 +1001,7 @@ if [ "$skip_step" = false ]; then
         fi
 
         devenv WW2.sln /build $bld_config /out "$BUILDFILE"
-    
+
         errOutput=`grep ": error|: fatal" "$BUILDFILE"`
 
         if [ -n "$errOutput" ] ; then
@@ -990,15 +1044,16 @@ fi
 
 
 # ==========================================================================
-# skip_step=false
+skip_step=false
 # ==========================================================================
 
 
 if [ "$myos" == "win" ] ; then
     echo
     echo
-    build_step "copy" "Copying" "preparing the installer source directories - Win"
-    if [ "$skip_step" = false ]; then
+    if [ "$skip_step" = false ] ; then
+        build_step "copy" "Copying" "preparing the installer source directories - Win"
+		echo
         pushd "$INSTALLER_ROOT"
 
         if [ -f "_PrepareNewRelease.bat" ] ; then
@@ -1026,7 +1081,8 @@ if [ "$myos" == "win" ] ; then
                 echo
                 echo "WARNING: The previous release directory ('$INSTALLER_RELEASE'),"
                 echo "WARNING: does not contain a valid release."
-                echo "WARNING: The Windows Patch Install WILL NOT be built."
+                echo "WARNING:"
+                echo "WARNING: The Windows Patch Installs WILL NOT be built."
                 build_patch=false
             fi
         fi
@@ -1034,9 +1090,10 @@ if [ "$myos" == "win" ] ; then
         if [ "$build_patch" = true ] ; then
             echo
             echo
-            build_step "create" "Creating" "diff files for patcher"
 
-            if [ "$skip_step" = false ]; then
+            if [ "$skip_step" = false ] ; then
+                build_step "create" "Creating" "diff files for patch"
+
                 pushd "$INSTALLER_ROOT"
 
                 if [ -f "_MakeDiffs.bat" ] ; then
@@ -1054,29 +1111,30 @@ if [ "$myos" == "win" ] ; then
                     exit 1
                 fi
                 popd
-            fi
 
-            echo
-            echo
-            build_step "build" "Building" "complete running patch install scripts: Patch"
-            if [ "$skip_step" = false ]; then
-                pushd "$INSTALLER_ROOT"
+                echo
+                echo
+                if [ "$skip_step" = false ] ; then
+                    build_step "build" "Building" "complete running patch install scripts: Patch"
 
-                if [ -f "$InstallerScriptName" ] ; then
-                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=patch
+                    pushd "$INSTALLER_ROOT"
 
-                    ExitStatus=$?
-                    if [ "$ExitStatus" != "0" ] ; then
-                        exit_msg="Error: The Patch Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+                    if [ -f "$InstallerScriptName" ] ; then
+                        iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=patch
+
+                        ExitStatus=$?
+                        if [ "$ExitStatus" != "0" ] ; then
+                            exit_msg="Error: The Patch Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+
+                            exit 1
+                        fi
+                    else
+                        exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Patch Install build aborted."
 
                         exit 1
                     fi
-                else
-                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Patch Install build aborted."
-
-                    exit 1
+                    popd
                 fi
-                popd
             fi
 
 
@@ -1087,81 +1145,84 @@ echo
 
 ################################################################
 
-#            echo
-#            echo
-#            build_step "create" "Creating" "diff files for patcher (rollback)"
-#            if [ "$skip_step" = false ]; then
-#                pushd "$INSTALLER_ROOT"
 
+#            echo
+#            echo
+#            if [ "$skip_step" = false ] ; then
+#                build_step "create" "Creating" "diff files for patcher (rollback)"
+#                pushd "$INSTALLER_ROOT"
+#
 #                if [ -f "_MakeDiffs.bat" ] ; then
 #                    ./_MakeDiffs.bat /$build_release
-
+#
 #                    ExitStatus=$?
 #                    if [ "$ExitStatus" != "0" ] ; then
 #                        exit_msg="Error: _MakeDiffs.bat returned: "$ExitStatus" Exit Status, build aborted."
-
+#
 #                        exit 1
 #                    fi
 #                else
 #                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_MakeDiffs.bat, build aborted."
-
+#
 #                    exit 1
 #                fi
 #                popd
-#            fi
-
-#            echo
-#            echo
-#            build_step "build" "Building" "complete running patch install scripts: Rollback"
-#            if [ "$skip_step" = false ]; then
-#                pushd "$INSTALLER_ROOT"
-
-#                if [ -f "$InstallerScriptName" ] ; then
-#                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=rollback
-
-#                    ExitStatus=$?
-#                    if [ "$ExitStatus" != "0" ] ; then
-#                        exit_msg="Error: The Rollback Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
-
+#
+#                echo
+#                echo
+#                if [ "$skip_step" = false ] ; then
+#                    build_step "build" "Building" "complete running patch install scripts: Rollback"
+#                    pushd "$INSTALLER_ROOT"
+#
+#                    if [ -f "$InstallerScriptName" ] ; then
+#                        iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=rollback
+#
+#                        if [ "$ExitStatus" != "0" ] ; then
+#                            exit_msg="Error: The Rollback Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
+#
+#                            exit 1
+#                        fi
+#                    else
+#                        exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Rollback Install build aborted."
+#
 #                        exit 1
 #                    fi
-#                else
-#                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Rollback Install build aborted."
-
-#                    exit 1
+#                    popd
 #                fi
-#                popd
 #            fi
 
-            echo
-            echo
+            # Build Patch End.
+        fi
+
+        echo
+        echo
+		
+        if [ "$skip_step" = false ] ; then
             build_step "build" "Building" "complete running full install scripts: Full Install"
-            if [ "$skip_step" = false ]; then
-                pushd "$INSTALLER_ROOT"
+            pushd "$INSTALLER_ROOT"
 
-                if [ -f "$InstallerScriptName" ] ; then
-                    iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=full
+            if [ -f "$InstallerScriptName" ] ; then
+                iscc "$InstallerScriptName" /dm_ReleaseType=$build_release /dm_BuildType=full
 
-                    ExitStatus=$?
-                    if [ "$ExitStatus" != "0" ] ; then
-                        exit_msg="Error: The Full Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
-
-                        exit 1
-                    fi
-                else
-                    exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Full Install build aborted."
+                ExitStatus=$?
+                if [ "$ExitStatus" != "0" ] ; then
+                    exit_msg="Error: The Full Inno Installer Script returned: "$ExitStatus" Exit Status, build aborted."
 
                     exit 1
                 fi
-                popd
+            else
+                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/"$InstallerScriptName", Full Install build aborted."
+
+                exit 1
             fi
+            popd
         fi
     fi
 
 else
     echo
-    build_step "create" "Creating" "Mac DMG file"
-    if [ "$skip_step" = false ]; then
+    if [ "$skip_step" = false ] ; then
+        build_step "create" "Creating" "Mac DMG file"
 
         # Cleaned Names - Remove the \ from the names.
         # mac_base_name="World\ War\ II\ Online", mac_product_name=$mac_product_base_name"\ Alpha"
@@ -1244,9 +1305,9 @@ fi
 echo
 echo
 if [ "$build_steam" = true ] ; then
-
-    build_step "deploy" "Deploying" "to Steam"
-    if [ "$skip_step" = false ]; then
+    if [ "$skip_step" = false ] ; then
+        build_step "deploy" "Deploying" "to Steam"
+        
         echo "When prompted to allow steam accesss to the network, enable it please."
 
         if [ "$myos" == "win" ] ; then
@@ -1262,9 +1323,13 @@ if [ "$build_steam" = true ] ; then
     fi
 fi
 
+endTime=$(date +%s)
+durationTime=`expr ${endTime} - ${startTime}`
+displayTime=`date +%H:%M:%S -ud @${durationTime}`
+
 echo
 echo
-echo ">>>>  Release Script completing."
+echo ">>>>  Release Script completing. ( $displayTime )"
 echo
 echo
 
