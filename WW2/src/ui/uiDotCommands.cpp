@@ -2311,7 +2311,10 @@ static SINT32 dot_log(const char* line)
 	char s1[256] ="", s2[256] = "";
 
 	int argc = sscanf(line,"%*s %255s %255s", s1, s2);
-
+    
+    if(argc == 0) {
+        uiChatPrintLine(".log query|level [fatal|abort|recover|warn|minor|note|info|debug|none]|system|all off");
+    }
 	if(argc >= 1 && !strcmp(s1, "query")) // query
 	{
 		UINT32 logmask = Get_Log_Mask();
@@ -2327,7 +2330,7 @@ static SINT32 dot_log(const char* line)
 				break;
 		}
 	} else if(argc >= 2 && !strcmp(s1, "level")) // level
-	{
+    {
 		int level = LOG_NONE;
 
 		if(!strcmp(s2, "fatal")) level = LOG_FATAL;
@@ -2338,6 +2341,7 @@ static SINT32 dot_log(const char* line)
         else if(!strcmp(s2, "note")) level = LOG_NOTE;
         else if(!strcmp(s2, "info")) level = LOG_INFO;
         else if(!strcmp(s2, "debug")) level = LOG_DEBUG;
+        else if(!strcmp(s2, "none")) level = LOG_NONE;
 
 		Set_Log_Level(level);
     } else if(argc >= 1 && !strcmp(s1, "duplicates")) // level
