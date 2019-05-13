@@ -90,6 +90,8 @@ enum _cfgPARAMS
 	cfgVEH_CONV,
 	cfgAIM_SENS,
     cfgAIM_ADJUST,
+    cfgGValue,
+    cfgTurRate,
 	// add more vars here
 	cfgNUM_TOTAL_PARAMS
 };
