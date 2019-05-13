@@ -3972,7 +3972,7 @@ static UINT32 _UpdateCrew(mlComponent * Component,mlVehicleData * VehicleData)
 	UINT32 CrewPosition = Component->CrewPosition;
 	if(CrewPosition >= ML_MAX_CREW_POSITIONS)
 	{
-		Write_Log(LOG_WEAP, LOG_WARN, "_UpdateCrew: Invalid Crew Position! %d", CrewPosition+1);
+		Write_Log(LOG_WEAPON, LOG_WARN, "_UpdateCrew: Invalid Crew Position! %d", CrewPosition+1);
 		return 0;
 	}
 

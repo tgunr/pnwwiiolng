@@ -519,7 +519,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 
 		if (Component->CurrentDamage > Component->DamageLevels[0])
 		{
-			if (Mount->WeaponJammed == 0) Write_Log(LOG_WEAP, LOG_INFO, "Weapon jammed due to damage to weapon");
+			if (Mount->WeaponJammed == 0) Write_Log(LOG_WEAPON, LOG_INFO, "Weapon jammed due to damage to weapon");
 
 			Mount->WeaponJammed = 1;
 		}
@@ -549,7 +549,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 			{
 				if (Mount->WeaponJammed == 0)
 				{
-					Write_Log(LOG_WEAP, LOG_INFO, "Weapon jammed due to damage to ammo");
+					Write_Log(LOG_WEAPON, LOG_INFO, "Weapon jammed due to damage to ammo");
 				}
 				Mount->WeaponJammed = 1;
 			}
@@ -607,7 +607,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 							}
 							if (TempInt1 == 4)
 							{
-								Write_Log(LOG_WEAP, LOG_WARN, "Error! Exploding ammo for weapon that is emtpy(1)!");
+								Write_Log(LOG_WEAPON, LOG_WARN, "Error! Exploding ammo for weapon that is emtpy(1)!");
 								TempInt1 = 0;
 							}
 
@@ -620,7 +620,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 							if (TempInt == 4)
 							{
 								TempInt = 0;
-								Write_Log(LOG_WEAP, LOG_WARN, "Error! Exploding ammo for weapon that is empty(2)!");
+								Write_Log(LOG_WEAPON, LOG_WARN, "Error! Exploding ammo for weapon that is empty(2)!");
 								++Mount->Weapons[TempInt1].NumRoundsAmmoLeft[TempInt];
 							}
 							Ammo = Mount->Weapons[TempInt1].BeltSequence[TempInt][Mount->Weapons[TempInt1].BeltSequencePosition[TempInt]];
@@ -676,7 +676,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 										}
 										else
 										{
-											Write_Log(LOG_WEAP, LOG_WARN,"Attempting to fuel-damage hit location %s, component %s, hit location not found",
+											Write_Log(LOG_WEAPON, LOG_WARN,"Attempting to fuel-damage hit location %s, component %s, hit location not found",
 															Mount->AmmoExplosionDamageComponent[j],
 															Component->ComponentName);
 										}
