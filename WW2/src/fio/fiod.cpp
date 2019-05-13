@@ -174,7 +174,7 @@ bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
 	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, false, path) ) {
-		dbugLog(_FLA, "Unable to stat %" PRpathT, path);
+		Write_Log(LOG_FIO, LOG_WARN,"Unable to stat %" PRpathT, path);
 		return false;
 	}
 
@@ -187,7 +187,7 @@ bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
 	recordRef(path);
 
 	if ( PN_UNLIKELY(fd < 0) ) {
-		dbugLog(_FLA, "Unable to open %" PRpathT, path);
+		Write_Log(LOG_FIO, LOG_WARN,"Unable to open %" PRpathT, path);
 		return false;
 	}
 
@@ -205,7 +205,7 @@ bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize) {
 	OS_CLOSE(fd);
 
 	if ( bytes_read != s.st_size ) {
-		dbugLog(_FLA, "Error reading data from %" PRpathT " (fd:%d, size:%u, read:%d)",
+		Write_Log(LOG_FIO, LOG_RECOVER,"Error reading data from %" PRpathT " (fd:%d, size:%u, read:%d)",
 		        path, fd, (unsigned int)s.st_size, bytes_read);
 		memFree(mem);
 		return false;
@@ -334,18 +334,18 @@ _lookupFileState(int fd)
 // cross-platform 'open' wrapper.
 
 int fiodOpen(const char* filename, bool userdir, int prereadSize) {
-	dbugLog(_FLD, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
+	Write_Log(LOG_FIO, LOG_INFO, "fiodOpen(%s, %d, %d)", filename, userdir, prereadSize);
 
 	fullpath_t path[PN_MAX_PATH];
 	stat_t s;
 	if ( ! GetFileStat(s, filename, userdir, path) ) {
-		dbugLog(_FLW, "Could not open file %s @ %" PRpathT, filename, path);
+		Write_Log(LOG_FIO, LOG_WARN, "Could not open file %s @ %" PRpathT, filename, path);
 		return -1;
 	}
 
 	off_t read_size = s.st_size;
 	if ( prereadSize > 0 && prereadSize > read_size ) {
-		dbugLog(_FLD, "Altering read size to %d", prereadSize);
+		Write_Log(LOG_FIO, LOG_INFO, "Altering read size to %d", prereadSize);
 		read_size = prereadSize;
 	}
 
@@ -365,7 +365,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 #endif
 	} else {
 #if EXTREME_FIOD_LOGGING
-		dbugLog(_FLD, "Alloc size for new file is %" PRSizeT "", alloc_size);
+		Write_Log(LOG_FIO, LOG_DEBUG, "Alloc size for new file is %" PRSizeT "", alloc_size);
 #endif
 	}
 
@@ -382,7 +382,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 		assert ( s_fileMap.find(fd) == s_fileMap.end() );
 
 #if EXTREME_FIOD_LOGGING
-		dbugLog(_FLD, "About to read %" PRSsizeT " bytes from file", (size_t)read_size);
+		Write_Log(LOG_FIO, LOG_DEBUG, "About to read %" PRSsizeT " bytes from file", (size_t)read_size);
 #endif
 		off_t bytes_read = OS_READ(fd, mem, read_size);
 		if ( bytes_read < read_size )
@@ -395,7 +395,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize) {
 
 		return fd;
 	} catch ( const char* cause ) {
-		dbugLog(_FLW, "fiod:%s:%" PRpathT, cause, path);
+		Write_Log(LOG_FIO, LOG_WARN,"fiod:%s:%" PRpathT, cause, path);
 
 		if ( fd >= 0 )
 			OS_CLOSE(fd);
