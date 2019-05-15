@@ -19,7 +19,25 @@
 # This bad behavior forces using sub-optimal approaches
 # occsionally so DON'T change anything unless you throroughly 
 # test it first under Mobaxterm
+
+# Notes for the Mac build:
+# The Mac build rewrites the Xcode project to set the bundle to
+# the desired name. It does so by appending the build to the end
+# of the pre-existing name. This can result in the name having
+# multiple "alpha", "beta" etc tags at its end, resulting in a
+# bundle named such that this script cannot locate to use. To
+# solve this the script saves the current files then restores
+# them later.
+#
+# The backup files are:
+#     WW2OL.xcodeproj -> WW2OL_BUILD_BAK.xcodeproj
+#     Info.plist      -> Info_BUILD_BAK.plist
+#
+# If the script aborts before the files are restored the
+# contaminated files WILL cause issues and should be deleted
+# and the saved files renamed to take their place.
 ################################################################
+
 
 function build_step {
     if [ "$pause_enabled" = true ] ; then

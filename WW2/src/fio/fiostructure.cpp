@@ -29,6 +29,15 @@
 	#include <shlobj.h>
 	#define errno (*_errno())
 	#include <direct.h>  //  for _getcwd.
+
+	bool exeStandard = true;
+	#ifdef GM_RELEASE
+		bool exeStandard = false;
+	#endif
+
+	#if MULTI_CLIENT
+		bool exeStandard = false;
+	#endif
 #endif
 
 LOGICAL				WantedCopyOldSetup = TRUE;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnLine folder.
@@ -79,7 +88,6 @@ LOGICAL fioStructureInit()
     LOGICAL userWorkingPathSet = FALSE;
     
     const wwiiolpath_string WW2filename = L"\\WW2.exe";			// \\WW2.exe
-	const wwiiolpath_string WW2filenameMC = L"\\MultiClient.exe";			// \\MultiClient.exe
     const wwiiolpath_string DirNameBIN = L"\\bin";				//  -> bin
     const wwiiolpath_string DirNameDATA = L"\\data";			//  -> data
     const wwiiolpath_string DirNameDOCS = L"\\docs";			//  -> docs
@@ -94,7 +102,6 @@ LOGICAL fioStructureInit()
 	wwiiolpath_string exeFullPath = L"";
 	wwiiolpath_string exeName = L"";
 	bool  WW2exe_Exists = false;
-	bool  WW2exeMC_Exists = false;
 	struct _stat buf;
 	std::wstring filename = L"";
 
@@ -129,79 +136,50 @@ LOGICAL fioStructureInit()
 	}
 
 	//  Locate WW2.exe.
-	filename = exePath + WW2filename;
-	returnResult = -10;
-	returnResult = _wstat(filename.c_str(), &buf);
-
-	if (returnResult != 0)
+	if (exeStandard = true)
 	{
-		switch (errno)
-		{
-		case ENOENT:
-			//  printf("File %s not found.\n", filename);
-			returnResult = -15;
-            break;
-		case EINVAL:
-			//  printf("Invalid parameter to _stat.\n");
-			returnResult = -20;
-			break;
-		default:
-			//  Should never be reached.
-			//  printf("Unexpected error in _stat.\n");
-			returnResult = -25;
-		}
+		filename = exePath + WW2filename;
+		returnResult = -10;
+		returnResult = _wstat(filename.c_str(), &buf);
 
-        //  Could not locate WW2.exe file within the install folder at its detected location.
-        //  This should NOT happen.
+		if (returnResult != 0)
+		{
+			switch (errno)
+			{
+			case ENOENT:
+				//  printf("File %s not found.\n", filename);
+				returnResult = -15;
+				break;
+			case EINVAL:
+				//  printf("Invalid parameter to _stat.\n");
+				returnResult = -20;
+				break;
+			default:
+				//  Should never be reached.
+				//  printf("Unexpected error in _stat.\n");
+				returnResult = -25;
+			}
+
+			//  Could not locate WW2.exe file within the install folder at its detected location.
+			//  This should NOT happen.
 
 #if EXE_BUILD != BUILD_EXE_SETTINGS
-        dbugLog(_FLA, "&HFFFE - Unable to locate WW2.exe - Aborting %d.", returnResult);
+			dbugLog(_FLA, "&HFFFE - Unable to locate WW2.exe - Aborting %d.", returnResult);
 #endif
-        WW2exe_Exists = false;
+			WW2exe_Exists = false;
+		}
+		else
+		{
+			WW2exe_Exists = true;
+		}
+
 	}
 	else
 	{
 		WW2exe_Exists = true;
 	}
 
-	//  Locate MultiClient.exe.
-	filename = exePath + WW2filenameMC;
-	returnResult = -10;
-	returnResult = _wstat(filename.c_str(), &buf);
-
-	if (returnResult != 0)
-	{
-		switch (errno)
-		{
-		case ENOENT:
-			//  printf("File %s not found.\n", filename);
-			returnResult = -15;
-			break;
-		case EINVAL:
-			//  printf("Invalid parameter to _stat.\n");
-			returnResult = -20;
-			break;
-		default:
-			//  Should never be reached.
-			//  printf("Unexpected error in _stat.\n");
-			returnResult = -25;
-		}
-
-		//  Could not locate WW2.exe file within the install folder at its detected location.
-		//  This should NOT happen.
-
-#if EXE_BUILD != BUILD_EXE_SETTINGS
-		dbugLog(_FLA, "&HFFFE - Unable to locate MultiClient.exe - Aborting %d.", returnResult);
-#endif
-		WW2exeMC_Exists = false;
-	}
-	else
-	{
-		WW2exeMC_Exists = true;
-	}
-
-
-	if (WW2exe_Exists == false && WW2exeMC_Exists == false)
+	if (WW2exe_Exists == false)
 	{
 		wwiiolpath_string tmp = WWIIOnlineDirName + L" - File System."; 
 		MessageBox(nullptr, L"Unable to locate WW2.exe. Aborting.", tmp.c_str(), MB_ICONSTOP | MB_OK);
@@ -210,11 +188,6 @@ LOGICAL fioStructureInit()
 
 		//  NO FALLBACK
 		goto ERR_EXIT_POINT;
-	}
-	else
-	{
-		returnResult = -10;
-		WW2exeMC_Exists = true;
 	}
 	//  exePath: Setup - END.
 
