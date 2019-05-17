@@ -523,12 +523,6 @@ extern NSString *WebActionOriginalURLKey;
 
     //  Setup the data paths
     fioInit();
-    
-    //  Check for the existance of a previous Battleground Europe install for config settings.
-    //  /Users -> "currentuser" -> Documents -> Battleground Europe
-    if (WantedCopyOldSetup == TRUE) {
-        CopyOldSetupFiles_MAC();
-    }
 
     if (!mngoptParse()) {
         [NSApp terminate:self];
@@ -582,7 +576,23 @@ extern NSString *WebActionOriginalURLKey;
         [NSApp terminate:self];
         return;
     }
+
+
+    //  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+    //  This may interrupt the Client Build process.
     
+    if (WantedCopyOldSetup == TRUE)
+    {
+#ifdef DEBUG_WW2
+        if (DebugBuildingMDLFilesOnly == false)
+        {
+            CopyOldSetupFiles_MAC();
+        }
+#else
+        CopyOldSetupFiles_MAC();
+#endif
+    }
+
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     // By the way, the only way to check that is the ticket file itself since that
     // won't have been parsed yet at this point.
