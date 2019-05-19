@@ -59,11 +59,11 @@ struct FXSOUND
     LOGICAL bSoundHasStarted;
     LOGICAL bInUse;
 
-    FLOAT32 originalVolume;
+    FLOAT32 originalVolume = 0.0f;
     FLOAT32 originalPitch;
     FLOAT32 pitch;
     FLOAT32 oldPitch;
-    FLOAT32 volume;
+    FLOAT32 volume = 0.0f;
     FLOAT32 oldVolume;
     FLOAT32 maxDistance;
     FLOAT32 minDistance;

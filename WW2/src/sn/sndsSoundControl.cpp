@@ -647,7 +647,7 @@ LOGICAL sndsApplyDefaultOptions(snSound* whichSound)
 		whichSound->delayTime = 0;
 		whichSound->delay_time = 0;
         whichSound->uCurrentPosition = 0;
-		whichSound->volume = 1.0;
+		whichSound->volume = 0.0;
 		whichSound->freqShift = 1.0;
 		whichSound->volume3D = 1.0;
 		whichSound->freqShift3D = 1.0;

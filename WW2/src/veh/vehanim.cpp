@@ -2423,8 +2423,8 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 				}
 			}
 
-            // If sound has not been loaded...keep trying.
-			if(State == TRUE)
+            // Create and play the engine and Track sounds if it isn't already playing.
+			if(State == TRUE && !Vehicle->StateAnimation.EngineSoundPlaying)
 			{
 				for(int i = 0; i < 4; i++)
 				{
@@ -2476,8 +2476,18 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
                         if(fxSndInitSound(iID))
                         {
 						    Vehicle->StateAnimation.EngineSoundId[StateType->Data-1][i] = iID;
+							Vehicle->StateAnimation.EngineSoundPlaying = true;
                         }
 					}
+				}
+			}
+			else if (State == FALSE && Vehicle->StateAnimation.EngineSoundPlaying)
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					fxSndStopSound(Vehicle->StateAnimation.EngineSoundId[StateType->Data - 1][i]);
+					Vehicle->StateAnimation.EngineSoundId[StateType->Data - 1][i] = 0;
+					Vehicle->StateAnimation.EngineSoundPlaying = false;
 				}
 			}
 
@@ -2493,9 +2503,6 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
                         {
                             vehfxStopSmokeStack(Vehicle->iFXVehicleID);
                         }
-
-        	            fxSndStopSoundDelayed(Vehicle->StateAnimation.EngineSoundId[StateType->Data-1][i], 1);
-						Vehicle->StateAnimation.EngineSoundId[StateType->Data-1][i] = 0;
 					}
 				}
 			}
