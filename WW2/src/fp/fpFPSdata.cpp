@@ -139,8 +139,8 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"lebel",
 	"m1935",
 	"luger",
-	"mills",
-	"mills",
+	"uk_he_nade", // British HE Grenade
+	"fr_he_nade", // French HE Grenade
 	"stigr",
 	"enfmk2",
 	"binocs",
@@ -150,8 +150,8 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"mg34",
 	"fm39",
 	"stigr_smk",	// German Smoke Grenade
-	"smoke",	// British Smoke Grenade
-	"smoke",	// French Smoke Grenade
+	"uk_smoke_nade",	// British Smoke Grenade
+	"fr_smoke_nade",	// French Smoke Grenade
 	"ammocan",
 	"mas36",
 	"mas40",
