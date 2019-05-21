@@ -560,12 +560,25 @@ ChatMission::addWaypoint(Waypoint& waypoint)
 // Remove a waypoint from the mission
 
 bool
-ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer)
+ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer, Player* player)
 {
 	WAYPOINTS::iterator it = m_waypoints.find(handle);
 	if ( it == m_waypoints.end() )
 		return false;
 	Waypoint& waypoint = it->second;
+	
+	std::string playerCallsign = player->callsign();
+	std::string waypointCreator = Chat::Name(waypoint.playerHandle()).c_str();
+
+	// Check to see if the player requesting the waypoint/contact report
+	// removal is either the mission lead or the one that posted it
+	if (byPlayer && !(player->isMissionLeader() || playerCallsign == waypointCreator))
+	{
+		dbugLog(_FLA, "t:%d p:%u c:%s m:%u non-leader or non-owner requesting waypoint removal %" PR64BitUT "[%s]"
+						, player->teulIndex(), player->playerID(), player->callsign()
+						, missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
+		return false;
+	}
 
 	// If this is a player removing a mobile spawn...
 	if ( byPlayer && handle == _getMSPHandle() )
