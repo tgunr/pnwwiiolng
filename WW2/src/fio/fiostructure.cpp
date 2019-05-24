@@ -29,15 +29,14 @@
 	#include <shlobj.h>
 	#define errno (*_errno())
 	#include <direct.h>  //  for _getcwd.
+#endif
 
+#ifdef MULTI_CLIENT
+	bool exeStandard = false;
+#elif GM_RELEASE
+	bool exeStandard = false;
+#else
 	bool exeStandard = true;
-	#ifdef GM_RELEASE
-		bool exeStandard = false;
-	#endif
-
-	#if MULTI_CLIENT
-		bool exeStandard = false;
-	#endif
 #endif
 
 LOGICAL				WantedCopyOldSetup = TRUE;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnLine folder.
