@@ -59,7 +59,7 @@ public:
 
 	//! Remove a waypoint from the list
 	//! Returns true if the waypoint was removed
-	bool removeWaypoint(const ChatHandle handle, bool byPlayer);
+	bool removeWaypoint(const ChatHandle handle, bool byPlayer, Player* player = nullptr);
 
 	//! Send a client their first update
 	void sendFirstUpdate(const Player* player);
