@@ -468,10 +468,8 @@ static SINT32 dot_conv(const wchar_t* line)
 
 	if(argc > 0)
 	{
-		if(range > 800)
-			range = 800;
-		else if(range < 100)
-			range = 100;
+        if(range < 100)
+            range = 100;
 
 		/*
 		dotcom.conv.setto = Convergence set to
@@ -2312,7 +2310,7 @@ static SINT32 dot_log(const char* line)
 
 	int argc = sscanf(line,"%*s %255s %255s", s1, s2);
     
-    if(argc == 0) {
+    if(argc == -1) {
         uiChatPrintLine(".log query|level [fatal|abort|recover|warn|minor|note|info|debug|none]|system|all off");
     }
 	if(argc >= 1 && !strcmp(s1, "query")) // query

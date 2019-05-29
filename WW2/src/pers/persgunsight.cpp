@@ -664,9 +664,7 @@ UINT32 persGunsightCalcTargetSolution(SINT32 Param,UINT32 Id,UINT32 Detach)
 void persGunsightSetConvergenceRange(FLOAT32 Range)
 {
 	// This range check might be redundant since we are now calling from cfgPrefs
-	if(Range > 800)
-		Range = 800;
-	else if(Range < 0)
+    if(Range < 0)
 		Range = 0;
 
 	_ConvergenceRange = Range;
