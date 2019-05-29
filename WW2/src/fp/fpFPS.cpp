@@ -1643,7 +1643,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			}
 			else
 			{
-				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV/aimFOVAdjust;
+				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV/gValue;
 			}
 		}
 		else if (FieldOfView != fpsTrooper.defaultFOV)
