@@ -28,6 +28,7 @@ static SINT32 logLevel = LOG_NONE;
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
 static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker);
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr);
 
 struct {
     const char* prevFile = "";
@@ -35,12 +36,46 @@ struct {
     uint count = 0;
 } prevLog ;
 
-// Write log message with file location and line number according to system and level
+//int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
+// dbugWrite: Same as dbugLog but has its own logging level. Don't know why this exists.
+//SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
+
+//#define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
+//#define dbugWrite(m, fmt, ...) _dbugWrite(m, fmt, ## __VA_ARGS__)
+
+/************************************************************************************************
+	Write_Where
+*************************************************************************************************/
 void Write_Where(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, ...) {
+    const char* pstr;
+    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
+        switch (prevLog.count) {
+            case 0:
+                pstr = str;
+                prevLog.count += 1;
+                va_list marker;
+                va_start(marker, str);
+                logw(file, line, function, system, level, str, marker);
+                va_end(marker);
+                break;
+            case 1:
+                pstr = "REPEATED";
+                prevLog.count += 1;
+                logwstr(file, line, function, system, level, pstr);
+                break;
+            default:
+                prevLog.count += 1;
+                return;
+        }
+    } else {
+        prevLog.count = 1;
         va_list marker;
         va_start(marker, str);
         logw(file, line, function, system, level, str, marker);
         va_end(marker);
+    }
+    prevLog.prevFile = file;
+    prevLog.prevLine = line;
 }
 
 // Write log message according to system and level
@@ -77,6 +112,7 @@ void Set_Log_Level(SINT32 level)
 	std::lock_guard<std::mutex> guard(logLock);
 
 	logLevel = level;
+    dbugSetLogLevel(level);
 }
 
 /************************************************************************************************
@@ -112,7 +148,6 @@ void Set_Log_Mask(const char* system)
 
 void Write_Debug(const char* str, ...)
 {
-    return;
 	va_list marker;
 
 	va_start(marker, str);
@@ -182,6 +217,20 @@ static void logdup(const char *file, int line, const char *function, UINT32 syst
     printf("\n");
 }
 
+
+//static void logww(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+//{
+//    if(gLogLevelOnly && glogMaskOnly) {
+//        if (gLogLevelOnly == level && (system & glogMaskOnly))
+//            logwI(file, line, function, system, level, str, marker);
+//    } else {
+//        if (logLevel < level || !(system & logMask))
+//            return;
+//        else
+//            logwI(file, line, function, system, level, str, marker);
+//    }
+//}
+
 // Do not log if the message is same as previous message as defined by file and line number
 static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
@@ -210,6 +259,25 @@ printLog:
     printf("\n");
     prevLog.prevFile = file;
     prevLog.prevLine = line;
+}
+
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
+{
+    if(gLogLevelOnly && glogMaskOnly) {
+        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+            goto logwhere;
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            goto logwhere;
+    }
+
+logwhere:
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
+    char buf[wheresize + 1]; // note +1 for terminating null byte
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
+    printf("%s\n", buf);
 }
 
 // Log where the log message originated
