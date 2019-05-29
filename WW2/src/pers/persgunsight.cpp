@@ -467,7 +467,7 @@ UINT32 persGValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
 		return 0;
 
 	gValue = gValue + .25f;
-    uiChatPrintLine("Set to: %.2f%%", gValue);
+//    uiChatPrintLine("Set to: %.2f%%", gValue);
 
 	return 0;
 }
@@ -481,7 +481,7 @@ UINT32 persGValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
     gValue = gValue - .25f;
     if (gValue <= 0)
         gValue = 1;
-    uiChatPrintLine("Set to: %.2f%%", gValue);
+//    uiChatPrintLine("Set to: %.2f%%", gValue);
 
 	return 0;
 }

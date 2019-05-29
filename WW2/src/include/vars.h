@@ -282,7 +282,6 @@ extern UINT32			Convergence; // Global (default) Airplane gun convergence settin
 extern UINT32			CurrentConv; // Current airplane gun convergence setting
 
 extern FLOAT32			aimMouse;	// Aiming mouse sensitivity
-extern FLOAT32          aimFOVAdjust;
 
 extern SINT8            gAuthServer[128]; // Authentication server to be used
 extern SINT8            gAuthServerPort[64];
@@ -292,7 +291,7 @@ extern SINT8            gClientV[32]; // Version to submit
 extern SINT8            gLogMask[_MAX_PATH];	// Gobal logmask value to specify subsystem to match.
 extern SINT32           gLogLevel;		// Global log level
 extern LOGICAL 			gLogDuplicates;	// Controls duplicate log messages
-extern FLOAT32          gTurRate; // Rate multiplier
+extern FLOAT32          gRate; // Rate multiplier
 extern FLOAT32          gValue; // Global debug value
 extern FLOAT32          gDValue; // Global debug value
 extern FLOAT32          gEValue; // Global debug value

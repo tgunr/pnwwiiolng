@@ -283,8 +283,6 @@ UINT32			Convergence; // Global (default) Airplane gun convergence setting
 UINT32			CurrentConv; // Current airplane gun convergence setting
 
 FLOAT32			aimMouse;	// Aiming mouse sensitivity
-FLOAT32         gTurRate; // Rate multiplier
-FLOAT32         aimFOVAdjust = 1.0; // Aiming FOV
 
 SINT8            gAuthServer[128]; // Authentication server to be used
 SINT8            gAuthServerPort[64];
@@ -299,7 +297,8 @@ SINT32           gLogLevel = LOG_DEBUG;
 #else
 SINT32           gLogLevel = LOG_RECOVER;
 #endif
-FLOAT32         gValue; // Global debug value
+FLOAT32         gRate;   // Rate multiplier
+FLOAT32         gValue;  // Global debug value
 FLOAT32         gDValue; // Global debug value
 FLOAT32         gEValue; // Global debug value
 FLOAT32         gHValue; // Global debug value

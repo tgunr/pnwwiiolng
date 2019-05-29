@@ -3428,12 +3428,12 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
-static int dot_fov(const char * line) {
-    FLOAT32 fov;
-    int argc = sscanf(line, "%*s %f", &fov);
+static int dot_gv(const char * line) {
+    FLOAT32 gv;
+    int argc = sscanf(line, "%*s %f", &gv);
     
     if(argc > 0)
-        aimFOVAdjust = fov;
+        gValue = gv;
     return DC_HANDLED;
 }
 
@@ -5787,12 +5787,12 @@ static int dot_grv(const char* line)
     return DC_HANDLED;
 }
 
-static int dot_tr(const char* line)
+static int dot_rate(const char* line)
 {
-    if (sscanf(line, "%*s %f", &gTurRate) > 0)
-        uiChatPrintLine("Setting turrate to %.2f%%", gTurRate);
+    if (sscanf(line, "%*s %f", &gRate) > 0)
+        uiChatPrintLine("Setting turrate to %.2f%%", gRate);
     else
-        uiChatPrintLine("Set to: %.2f%%", gValue);
+        uiChatPrintLine("Set to: %.2f%%", gRate);
 
     return DC_HANDLED;
     
@@ -8062,7 +8062,6 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(inflodmod, false);
 	ADD_DOT_COMMAND(js, false);
     ADD_DOT_COMMAND(genscenariomap, true);
-    ADD_DOT_COMMAND(fov, true);
 #if platOS != OS_MACOS
     ADD_DOT_COMMAND(audiochatlogging, true);
     ADD_DOT_COMMAND(audiowritelog, true);
@@ -8124,7 +8123,8 @@ void uiDotCommandsInit()
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);
 
-    ADD_DOT_COMMAND(tr, true);
+    ADD_DOT_COMMAND(rate, true);
+    ADD_DOT_COMMAND(gv, true);
     ADD_DOT_COMMAND(gav, true);
     ADD_DOT_COMMAND(grv, true);
     ADD_DOT_COMMAND(sf, true);
