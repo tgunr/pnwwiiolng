@@ -934,11 +934,11 @@ static void _SetupConvergence(mlWeaponMount * Mount,vehVehicle* Vehicle,FLOAT64 
 	FireDOF = Mount->WeaponFirePoints[0];
 
 	// now determine alignment angle
-	persGunsightAlignDOF(&Mount->ConvergenceMat,FireDOF,ViewDOF,(FLOAT32)ConvergenceRange * 2);
+	persGunsightAlignDOF(&Mount->ConvergenceMat,FireDOF,ViewDOF,(FLOAT32)ConvergenceRange * gValue);
 
 	// finally adjust this alignment for ammunition drop at that range
 	Att.y = Att.z = 0.0f;
-	persGunsightCalcSightAngle(&Att.x,(char*)Mount->Weapons[0].BeltSequence[0][0]->Name,(FLOAT32)ConvergenceRange * 2);
+    persGunsightCalcSightAngle(&Att.x,(char*)Mount->Weapons[0].BeltSequence[0][0]->Name,(FLOAT32)ConvergenceRange * gValue);
 	mathEul_ToMatrix(&TempMat,EulOrdXYZs,&Att);
 
 	math3dMatrixMultiply(&Mount->ConvergenceMat,&TempMat,&Mount->ConvergenceMat);
