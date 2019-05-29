@@ -226,7 +226,7 @@ static const functionEntry functionTable[] =
 	{IMAP_MOM_CANOPYCONTROL,					"canopycontrol",				176,			0,	WW2_FUNC_GROUND | WW2_FUNC_AIR | WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_WEAPON, 1},
 	{IMAP_MOM_HATCHCONTROL,						"hatchcontrol",					175,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_WEAPON, 1},
 	{IMAP_MOM_TOGGLE_TOWBAR,					"toggletowbar",					188,			0,	WW2_FUNC_ATGUN, 0, WW2_FUNC_HEADER_WEAPON, 1},
-	{IMAP_RIDE_TRANSPORT,						"ridetransport",				916,			0,	WW2_FUNC_GROUND,0, WW2_FUNC_HEADER_WEAPON, 1},
+	{IMAP_RIDE_TRANSPORT,						"ridetransport",				916,			0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_WEAPON, 1},
 	{IMAP_MOM_GEARHANDLE,						"gearhandle",					162,			0,	WW2_FUNC_AIR, 0, WW2_FUNC_HEADER_WEAPON, 1},
 	{IMAP_AUTOPILOT,							"autopilot",					921,			0,	WW2_FUNC_AIR, 0, WW2_FUNC_HEADER_WEAPON, 1},
 	{IMAP_MOM_STUKASIREN,						"stukasiren",					192,			0,	WW2_FUNC_AIR, 0, WW2_FUNC_HEADER_WEAPON, -1},
@@ -243,9 +243,6 @@ static const functionEntry functionTable[] =
 	{IMAP_HOLD_GUNSIGHT_RANGE_DEC,				"gunsightrangedec",				833,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA |WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
 	{IMAP_HOLD_GUNSIGHT_RANGE_INC,				"gunsightrangeinc",				834,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA |WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
 	{IMAP_TMP_RANGEFIND,						"rangefind",					835,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_WEAPON, 1},
-	{IMAP_HOLD_GVALUE_INC,						"gvalueinc",					852,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA |WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
-	{IMAP_HOLD_GVALUE_DEC,						"gvaluedec",					853,			0,	WW2_FUNC_GROUND | WW2_FUNC_SEA |WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
-    {IMAP_TOGGLE1,                              "gtoggle1",                     854,            0,  WW2_FUNC_ALL_COMBAT_VEHICLES | WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
 	{IMAP_TARGET_SPEED_INC,						"targetspeedinc",				900,			0,	WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_BOMBSIGHT, 1},
 	{IMAP_TARGET_SPEED_DEC,						"targetspeeddec",				901,			0,	WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_BOMBSIGHT, 1},
 	{IMAP_TARGET_ANGLE_OFF_INC,					"targetangleinc",				902,			0,	WW2_FUNC_SEA, 0, WW2_FUNC_HEADER_BOMBSIGHT, 1},
@@ -276,7 +273,12 @@ static const functionEntry functionTable[] =
 	{IMAP_EZ_PREVPOS,						"ezprevpos",							4008,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 	{IMAP_EZ_ENGINE,						"ezengine",								4009,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 
-	{IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
+    // Experiments
+    {IMAP_HOLD_GVALUE_INC,                        "gvalueinc",                      852,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
+    {IMAP_HOLD_GVALUE_DEC,                        "gvaluedec",                      853,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
+    {IMAP_TOGGLE1,                                "gtoggle1",                       854,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
+
+    {IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
 };
 
 static void (*localized_string) (const char*, int, char*, int) = nullptr;

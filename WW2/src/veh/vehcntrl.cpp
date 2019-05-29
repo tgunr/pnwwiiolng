@@ -110,11 +110,6 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"rangefind",						IMAP_TMP_RANGEFIND,							mlRangeFind,					VEH_CNTRL_ISNOTAXIS,	VEH_CONTROL_DISABLE, VCEID},
 	{"gunsightrangeinc",				IMAP_HOLD_GUNSIGHT_RANGE_INC,				persGunsightRangeInc,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"gunsightrangedec",				IMAP_HOLD_GUNSIGHT_RANGE_DEC,				persGunsightRangeDec,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
-
-	{"gvalueinc",						IMAP_HOLD_GVALUE_INC,						persGValueInc,					VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
-	{"gvaluedec",						IMAP_HOLD_GVALUE_DEC,						persGValueDec,					VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
-    {"gtoggle1",                        IMAP_TOGGLE1,                               persGToggle1,                    VEH_CNTRL_ISHOLDDOWN,    VEH_CONTROL_DISABLE, VCEID},
-
 	{"gunsightconvinc",					IMAP_GUNSIGHT_CONVERGENCE_INC,				persGunsightConvergenceInc,		VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"gunsightconvdec",					IMAP_GUNSIGHT_CONVERGENCE_DEC,				persGunsightConvergenceDec,		VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
 	{"bombsightspeedinc",				IMAP_HOLD_BOMBSIGHT_SPEED_INC,				persBombsightSpeedInc,			VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_DISABLE, VCEID},
@@ -264,6 +259,11 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"eznextpos",						IMAP_EZ_NEXTPOS,							nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"ezprevpos",						IMAP_EZ_PREVPOS,							nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"ezengine",						IMAP_EZ_ENGINE,								nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
+
+    // Experiments
+    {"gvalueinc",                       IMAP_HOLD_GVALUE_INC,                       persGValueInc,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gvaluedec",                       IMAP_HOLD_GVALUE_DEC,                       persGValueDec,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle1",                        IMAP_TOGGLE1,                               persGToggle1,                   VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
 
 	{"",								0,											nullptr,						0,						0, VCEID} // "null-terminated",
 
@@ -666,7 +666,8 @@ vehCntrlCommandListElement* _LookupElement(UINT32 Id)
 
 	for(i = 0; vehCntrlCommandList[i].CommandId != IMAP_NO_FUNCTION; i++)
 	{
-		if(vehCntrlCommandList[i].CommandId == Id) return &vehCntrlCommandList[i];
+		if(vehCntrlCommandList[i].CommandId == Id)
+            return &vehCntrlCommandList[i];
 	}
 	return nullptr;
 }

@@ -161,7 +161,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.conv",				&Convergence,				    cfgPARAM_UINT,		1,		0,  800,    true },
 	{"app.aimScalar",			&aimMouse,					    cfgPARAM_FLOAT,		1,		0,  8,      true },
     {"app.gVaue",               &gValue,                        cfgPARAM_FLOAT,     1,      1,  100,    true },
-    {"app.gRate",             &gRate,                      cfgPARAM_FLOAT,     1,      1,  20,     true }
+    {"app.gRate",               &gRate,                         cfgPARAM_FLOAT,     1,      1,  20,     true }
 	// add more vars here
 };
 
