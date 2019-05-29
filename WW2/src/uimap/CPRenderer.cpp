@@ -1220,12 +1220,14 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				tip += L"\n";
 			}
 
-			if(cpflags & (CP_STAT_ENEMY_ARMOR ||
-						CP_STAT_HEAVY_ENEMY_ARMOR ||
-						CP_STAT_ENEMY_INFANTRY ||
-						CP_STAT_HEAVY_ENEMY_INF ||
-						CP_STAT_ENEMY_SEACRAFT ||
-						CP_STAT_HEAVY_ENEMY_SEA))
+			if(cpflags & (CP_STAT_ENEMY_ARMOR |
+						CP_STAT_HEAVY_ENEMY_ARMOR |
+						CP_STAT_ENEMY_INFANTRY |
+						CP_STAT_HEAVY_ENEMY_INF |
+						CP_STAT_ENEMY_SEACRAFT |
+						CP_STAT_HEAVY_ENEMY_SEA |
+						CP_STAT_ENEMY_AIRCRAFT |
+						CP_STAT_HEAVY_ENEMY_AIR))
 			{
 				tip += _renderer->tooltip("widgets.map.tooltip.enemy");
 				tip += L"\n";
