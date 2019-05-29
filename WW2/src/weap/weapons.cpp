@@ -560,12 +560,12 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
                     mathAddVectors(&V2,&V1,&V2);
                 }
 
-				// adjust firepoint back a little to help stop satchels clipping into vehicles
+				// adjust firepoint back a little
 				piVECTOR dir;
 
 				mathSubVectors(&dir, &V2, &V1);
 				mathReallyFastNormalize(dir);
-				math3dScaleVector(&dir, &dir, .25f);
+				math3dScaleVector(&dir, &dir, .2f);
 				mathSubVectors(&V1, &V1, &dir);
 				// end adjustment
 
