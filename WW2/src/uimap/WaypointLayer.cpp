@@ -102,6 +102,75 @@ void WaypointLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, i
 			wayobj->_remove = false;
 	}
 
+	// add ai waypoints
+	if(setAI)
+	{
+		_aiInit = false;
+
+		// save the new nearest cp
+		memcpy(&nearestCP, &player->ModelData->closestCp, sizeof(FULL_OBJ_ID));
+
+		// look up nearest cp
+		StratDB::StratObject* cp = StratDB::FindStratObject(nearestCP);
+
+		if(cp)
+		{
+			// get the ai list
+			StratDB::StratObjList aiList;
+
+			// look up the new set of ai contacts
+			if(StratDB::FindStratObjects(aiList, SDM_CLASS_BUILDING, SDM_BUILDING_AUTOGUNNER, -1, cp))
+			{
+				char buffer[10+1];
+				int aiCount = 0;
+
+				StratDB::StratObjList::iterator ait = aiList.begin();
+				for(; ait != aiList.end(); ++ait)
+				{
+					StratDB::StratObject* ai = *ait;
+					UINT32 subtype = 0;
+
+					switch(ai->SubType())
+					{
+						case SDM_AUTOGUNNER_MGNEST:
+						case SDM_AUTOGUNNER_RIFLEMAN:
+						case SDM_AUTOGUNNER_RIFLEPIT:
+						case SDM_AUTOGUNNER_MORTARPIT:
+						case SDM_AUTOGUNNER_ARTILLERYLIGHT:
+						case SDM_AUTOGUNNER_ARTILLERYMEDIUM:
+						case SDM_AUTOGUNNER_ARTILLERYHEAVY:
+						case SDM_AUTOGUNNER_COASTDEFENSE:
+						case SDM_AUTOGUNNER_AAALIGHT:
+						case SDM_AUTOGUNNER_AAAMEDIUM:
+						case SDM_AUTOGUNNER_AAAHEAVY:
+						case SDM_AUTOGUNNER_ATLIGHT:
+						case SDM_AUTOGUNNER_ATMEDIUM:
+						case SDM_AUTOGUNNER_ATHEAVY:
+						{
+							subtype = WTP_ENEMY_GUN;
+						}
+						break;
+						default:
+							subtype = WTP_ENEMY_DANGER;
+						break;
+					}
+
+					snprintf(buffer, 10, "AI%d", ++aiCount);
+
+					StratDB::StratObject* parent = StratDB::FindStratObject(ai->ParentId());
+
+					WP_TYPE type = (parent && parent->Side() == player->Side) ? WPT_FAI: WPT_EAI;
+
+					Waypoint wp(true, chatGetHandle(buffer), 0, type, subtype, ai->PosX(), ai->PosY(), 0, "ai gun");
+					wp.setShared(false);
+
+					// add this waypoint
+					PlayerClient()->ProcessWaypoint(wp, WPXT_POST);
+				}
+			}
+		}
+	}
+
 	MapObjects()->Draw(mv);
 }
 

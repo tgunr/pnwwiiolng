@@ -318,7 +318,7 @@ static SINT32 dot_help(const wchar_t* line)
 
         for(; itr != _dotCommands.end(); ++itr)
         {
-            if(!itr->second.key || (itr->second.key && true )) //HasKeyFile))
+            if(!itr->second.key || (itr->second.key && HasKeyFile))
             {
 				if(cmdlist.empty() == false)
 					cmdlist += L", ";
@@ -6782,6 +6782,43 @@ static int dot_aion(const char* line)
     return DC_HANDLED;
 }
 
+static SINT32 dot_view(const char* line)
+{
+    phui::View* canvas = 0;
+    const char *command = "view ";
+    char *view;
+    size_t commandLen = sizeof(command);
+    int rc = strncmp(command, line, commandLen);
+    if (rc == 0) {
+        view = (char *)line + commandLen + 1;
+        canvas = uiViewport()->FindView(view);
+    }
+    
+    if(canvas)
+    {
+        canvas->Close();
+    }
+    else
+    {
+        canvas = uiLoadView(view);
+        
+        if(canvas)
+        {
+            char parent[32] = "";
+            sscanf(line, "%*s %31s", parent);
+            
+            std::string script = "setParent('";
+            script += parent;
+            script += "');";
+            
+            phui::DOM::ElementDOM* viewdom = dynamic_cast<phui::DOM::ElementDOM*>(canvas->UserData(DOM_VIEW_USERDATA));
+            if(viewdom) viewdom->RunScript(script.c_str());
+        }
+    }
+    
+    return DC_HANDLED;
+}
+
 #endif // BETA_RELEASE
 
 #if RELEASE_CLIENT == 0
@@ -6813,7 +6850,6 @@ static SINT32 dot_dev(const char* line)
 	return DC_HANDLED;
 }
 
-#ifdef BETA_RELEASE
 static SINT32 dot_canvas(const char* line)
 {
 	phui::View* canvas = uiViewport()->FindView("canvas");
@@ -6842,9 +6878,8 @@ static SINT32 dot_canvas(const char* line)
 
 	return DC_HANDLED;
 }
-#endif
 
-#endif // _DEBUG
+#endif // RELEASE_CLIENT
 
 #ifdef GR2_BLEND_EDITOR
 static SINT32 dot_blendeditor(const char* line)
@@ -7698,7 +7733,7 @@ const wchar_t* uiDotCommandMatch(const wchar_t* search, bool again)
 
 					// only auto-complete debug commands if they have
 					// a keyfile
-					if(it->second.key && !true)
+					if(it->second.key && !HasKeyFile)
 						continue;
 
 					const wchar_t* command = it->first.c_str();
@@ -7973,7 +8008,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(undeploy, true);
 	ADD_DOT_COMMAND(treaddust, true);
 	ADD_DOT_COMMAND(force, true);
-	ADD_DOT_COMMAND(set, true);
+    ADD_DOT_COMMAND(set, true);
 	ADD_DOT_COMMAND(mvcmp, true);
 	ADD_DOT_COMMAND(frameprof, true);
 	ADD_DOT_COMMAND(televateconv, true);
@@ -7982,7 +8017,7 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(rank, false);
 	ADD_DOT_COMMAND(ride, true);
 	ADD_DOT_COMMAND(reloadclutter, true);
-	ADD_DOT_COMMAND(reloadammo, true);
+    ADD_DOT_COMMAND(reloadammo, true);
 	ADD_DOT_COMMAND(fpsresupply, true);
 	ADD_DOT_COMMAND(turrettest, false);
 	ADD_DOT_COMMAND(speed, false);
@@ -8074,7 +8109,8 @@ void uiDotCommandsInit()
 	ADD_DOT_COMMAND(ortho, true);
 
 	ADD_DOT_COMMAND(alert, false);
-
+    ADD_DOT_COMMAND(view, false);
+    
 #if platOS != OS_MACOS
     ADD_DOT_COMMAND(heightmap, true);
 #endif
