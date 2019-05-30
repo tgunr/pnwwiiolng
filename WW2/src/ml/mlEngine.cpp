@@ -960,7 +960,8 @@ vehVehicle* Vehicle;
 				ComponentData->PropellorMdiv10deg = atof(VarContents);
 			break;
 		case ML_ENGINECOM_VARNAME_PROPELLER_EFFICIENCY:
-				ComponentData->PropellorPowerEfficiency = atof(VarContents);
+            ComponentData->PropellorPowerEfficiency = atof(VarContents);
+            ComponentData->PropellorPowerEfficiency = 95.0; // atof(VarContents);
 			break;
 		case ML_ENGINECOM_VARNAME_TRANSTYPE:
 				mlUtilityFindVarname(&ComponentData->TransmissionType,
