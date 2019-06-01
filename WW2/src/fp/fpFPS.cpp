@@ -2167,7 +2167,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 		// if we're out of ammo, do a reload (which includes an implicit recycle)
 		if (fpsWeapons[currentWeaponModel].clipBullets <= 0)
 		{
-			if (fpsTrooper.autoReload)
+			if (true)
 			{
 				fpFPSForcedReload();
 				return currentFPSstate;
