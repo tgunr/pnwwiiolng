@@ -263,7 +263,7 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
     // Experiments
     {"gvalueinc",                       IMAP_HOLD_GVALUE_INC,                       persGValueInc,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gvaluedec",                       IMAP_HOLD_GVALUE_DEC,                       persGValueDec,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
-    {"gtoggle1",                        IMAP_TOGGLE1,                               persGToggle1,                   VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle1",                        IMAP_TOGGLE1,                               persGValueT,                   VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
 
 	{"",								0,											nullptr,						0,						0, VCEID} // "null-terminated",
 

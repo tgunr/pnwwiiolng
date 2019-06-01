@@ -486,7 +486,7 @@ UINT32 persGValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
 	return 0;
 }
 
-UINT32 persGToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+UINT32 persGValueT(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
     OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
     if (!pObjectData)
