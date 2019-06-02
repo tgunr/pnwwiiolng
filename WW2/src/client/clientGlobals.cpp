@@ -297,15 +297,15 @@ SINT32           gLogLevel = LOG_DEBUG;
 #else
 SINT32           gLogLevel = LOG_RECOVER;
 #endif
-FLOAT32         gRate;   // Rate multiplier
-FLOAT32         gValue;  // Global debug value
-FLOAT32         gDValue; // Global debug value
-FLOAT32         gEValue; // Global debug value
-FLOAT32         gHValue; // Global debug value
-FLOAT32         gXValue; // Global debug value
-FLOAT32         gYValue; // Global debug value
-FLOAT32         gZValue; // Global debug value
-UINT32          gToggle1;
+FLOAT32         gRate   = 1.0; // Rate multiplier
+FLOAT32         gValue  = 1.0; // Global debug value
+FLOAT32         gDValue = 1.0; // Global debug value
+FLOAT32         gEValue = 1.0; // Global debug value
+FLOAT32         gHValue = 1.0; // Global debug value
+FLOAT32         gXValue = 1.0; // Global debug value
+FLOAT32         gYValue = 1.0; // Global debug value
+FLOAT32         gZValue = 1.0; // Global debug value
+LOGICAL         gToggle1 = true;
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;

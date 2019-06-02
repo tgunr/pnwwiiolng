@@ -65,6 +65,7 @@ enum
 	WW2_FUNC_ALL = WW2_FUNC_GENERAL | WW2_FUNC_VIEW | WW2_FUNC_EZ | WW2_FUNC_ALL_PERSONA_TYPES
 };
 
+// See: http://confluence.corneredrats.com:8090/display/DEV/Adding+Experimental+Buttons
 static const functionEntry functionTable[] =
 {
 	{IMAP_TMP_EXIT_VEHICLE,	 					"exitvehicle",					239,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
@@ -276,7 +277,7 @@ static const functionEntry functionTable[] =
     // Experiments
     {IMAP_HOLD_GVALUE_INC,                        "gvalueinc",                      852,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
     {IMAP_HOLD_GVALUE_DEC,                        "gvaluedec",                      853,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
-    {IMAP_TOGGLE1,                                "gtoggle1",                       854,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
+    {IMAP_TOGGLE1,                                "gtogglevalue",                   854,            0,  WW2_FUNC_ALL_PERSONA_TYPES, 0, WW2_FUNC_HEADER_WEAPON, -1},
 
     {IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
 };

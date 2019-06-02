@@ -3426,12 +3426,54 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
+UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gValue = gValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gValue = gValue - .25f;
+    if (gValue <= 1)
+        gValue = 1;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle1 = !gToggle1;
+    sptDrawOn(0, gToggle1);
+    
+    return 0;
+}
+
 static int dot_gv(const char * line) {
     FLOAT32 gv;
     int argc = sscanf(line, "%*s %f", &gv);
-    
+    rnmainListLocText(IDE_LANG_UI, 854);
+
     if(argc > 0)
         gValue = gv;
+    else
+        uiChatPrintLine("gValue: %d", gValue);
+    
     return DC_HANDLED;
 }
 

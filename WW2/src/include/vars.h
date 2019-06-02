@@ -299,7 +299,7 @@ extern FLOAT32          gHValue; // Global debug value
 extern FLOAT32          gXValue; // Global debug value
 extern FLOAT32          gYValue; // Global debug value
 extern FLOAT32          gZValue; // Global debug value
-extern UINT32           gToggle1; // Global debug value
+extern LOGICAL          gToggle1; // Global debug value
 
 #ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;

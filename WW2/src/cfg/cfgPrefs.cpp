@@ -1048,9 +1048,6 @@ void cfgPrefsSetDefaults()
 
 	gTrooperLOD = 1.0f;
 	gTrooperMOD = 1.0f;
-    gRate = 1.0f;
-    gValue = 1.0f;
-    gToggle1 = 1;
     
 	gRagdolls = TRUE;
 	gVCache = 0; // disabled by default

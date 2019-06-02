@@ -261,9 +261,9 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"ezengine",						IMAP_EZ_ENGINE,								nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 
     // Experiments
-    {"gvalueinc",                       IMAP_HOLD_GVALUE_INC,                       persGValueInc,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
-    {"gvaluedec",                       IMAP_HOLD_GVALUE_DEC,                       persGValueDec,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
-    {"gtoggle1",                        IMAP_TOGGLE1,                               persGValueT,                   VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gvalueinc",                       IMAP_HOLD_GVALUE_INC,                       gValueInc,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gvaluedec",                       IMAP_HOLD_GVALUE_DEC,                       gValueDec,                  VEH_CNTRL_ISHOLDDOWN,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle1",                        IMAP_TOGGLE1,                               gValueToggle1,                    VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
 
 	{"",								0,											nullptr,						0,						0, VCEID} // "null-terminated",
 
