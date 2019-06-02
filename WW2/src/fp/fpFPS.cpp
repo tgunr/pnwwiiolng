@@ -12752,7 +12752,7 @@ LOGICAL fpFPSOkToJumpEmote()
 
 void fpFPSToggleAutoReload()
 {
-	fpsTrooper.autoReload = true;
+	fpsTrooper.autoReload = !fpsTrooper.autoReload;
 	if (fpsTrooper.autoReload)
 		uiChatPrintLine ("Infantry autoreload enabled");
 	else

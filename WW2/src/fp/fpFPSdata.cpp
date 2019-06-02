@@ -1341,7 +1341,7 @@ void fpFPSTrooperData::clear()
 	parachuteOpen = 0;
 	parachuteOKToOpen = 0;
 	readingMap = 0;
-	autoReload = 0;
+	autoReload = 1;
 
 	forwardAccel = 0.0f;
 	strafeAccel = 0.0f;
