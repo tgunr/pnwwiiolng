@@ -1,0 +1,7 @@
+apID: 1
+data: Login Accepted
+serverIP: <your server IP>
+port: 27015
+protocol: 2
+OTP: <your OTP>
+bypass: <your bypass>

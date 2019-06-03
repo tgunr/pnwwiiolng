@@ -1,0 +1,9 @@
+apID: 1
+data: Login Accepted
+serverIP: 204.237.246.193
+port: 27015
+protocol: 2
+OTP: 2342426
+bypass: 85000
+#bypass: 84649, 83311 - cannot have comments in the middle of the file
+#serverIP: 209.144.109.103
