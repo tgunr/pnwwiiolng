@@ -552,7 +552,7 @@ public:
 	FLOAT32				leanTime, leanMinSpeed, leanMaxSpeed;
 
 	// bridge specials
-	FLOAT64				bridgeDamageJoules, bridgeRepairJoules;
+	FLOAT64				bridgeDamageJoules, bridgeRepairJoules, fbDamageJoules;
 
 	FLOAT32				redScreenFadeTime;
 	FLOAT32				redScreenMinAlpha;

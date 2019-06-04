@@ -128,6 +128,7 @@ static const UINT64 atpBackwardMinimum_hash = 98078732316ULL;
 static const UINT64 standToCrouchTime_hash = 98729579636ULL;
 static const UINT64 bridgeDamageJoules_hash = 100075173842ULL;
 static const UINT64 bridgeRepairJoules_hash = 100138960850ULL;
+static const UINT64 fbDamageJoules_hash = 368179154ULL;
 static const UINT64 fallWaterHurtSound_hash = 102228914935ULL;
 static const UINT64 parachuteFallSpeed_hash = 276308554259ULL;
 static const UINT64 backwardsCrouchSpeed_hash = 377084138003ULL;

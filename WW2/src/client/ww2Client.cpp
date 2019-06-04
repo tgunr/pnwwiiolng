@@ -1030,7 +1030,7 @@ int Client::RemoveWaypoint(ChatHandle handle)
 				if (it->type() != WPT_ORIGIN && it->type() != WPT_TARGET)
 					_classdata->waypoints.erase(it);
 			}
-			else if (IsMissionLeader())
+			else if (IsMissionLeader() || _classdata->personas.m_callsign == it->playerHandle())
 			{
 				WAYPOINT_CONTROL control(handle, WPCTRL_REMOVE);
 				result = control.send(ChatConnection());
