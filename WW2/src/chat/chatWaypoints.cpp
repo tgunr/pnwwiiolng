@@ -146,14 +146,6 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 	if ( mission == nullptr )
 		return -EINVAL;
 
-	if ( !player->isMissionLeader() )
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %" PR64BitUT "[%s] %u"
-						, player->teulIndex(), player->playerID(), player->callsign()
-						, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
-		return -EACCES;
-	}
-
 	// Mission leader approving/removing a waypoint
 	ChatHandle handle = incoming.key();
 	WPCTRL_TYPE type = (WPCTRL_TYPE)incoming.flags();
@@ -165,7 +157,10 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 	break;
 
 	case WPCTRL_REMOVE:
-		mission->removeWaypoint(handle, true);
+		// If false, that means the player trying to delete the waypoint/contact report
+		// isn't the mission lead or the one that created it
+		if (!mission->removeWaypoint(handle, true, player))
+			return -EACCES;;
 	break;
 
 	default:

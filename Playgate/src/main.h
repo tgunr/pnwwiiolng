@@ -15,7 +15,7 @@
 #define MSG_VERUPDATE      9270
 #define MSG_DOWNLOAD       9271
 
-#define ERROR_REDIRECT "@pgerror/?error="
+#define ERROR_REDIRECT "@support?error="
 
 #define ERR_GAME_FULL		ERROR_REDIRECT "full"
 #define ERR_GAME_NOT_AVAIL	ERROR_REDIRECT "game"

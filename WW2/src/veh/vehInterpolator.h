@@ -41,6 +41,7 @@ public:
 	virtual ~InfantryPredictor() = default;
 
 	void NewPosDataUpdate(Timestamp timestamp, FrameTime frametime);
+	void NewMessageReceived(Timestamp timestamp, FrameTime frametime);
 	const Update& Interpolate(FrameTime frametime);
 
 	void SetCloneFlags(UINT32 flags_);
@@ -48,7 +49,6 @@ public:
 	FLOAT64 LastUpdateYaw(void) const { return _lastUpdateYaw; }
 private:
 	void UpdateTimestamps(Timestamp latest);
-	void NewMessageReceived(Timestamp timestamp, FrameTime frametime);
 	void UpdateInterpolation(void);
 
 	vehVehicle* _vehicle;

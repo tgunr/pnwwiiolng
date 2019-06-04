@@ -1644,7 +1644,7 @@ static SINT32 dot_benchvehicles(const char* line)
       dot_vspawn("vspawn bleni 240 140 80");
       dot_vspawn("vspawn blent 260 140 80");
       dot_vspawn("vspawn bleniv 280 140 80");
-      dot_vspawn("vspawn havoc1 20 160 80");
+      dot_vspawn("vspawn boston1 20 160 80");
       dot_vspawn("vspawn c47 40 160 80");
       dot_vspawn("vspawn fairb 60 160 0");
       dot_vspawn("vspawn uk_z34 80 160 0");

@@ -380,7 +380,7 @@ static void _ReadComponentFiles()
 			{
 				char str[256];
 				snprintf(str, 255, "_ReadComponentFiles: Can't open component file: %s", fileName);
-				WriteDebug(str);
+				Write_Debug(str);
 			}
 
 			continue;
@@ -643,7 +643,7 @@ UINT32 vehCreateNewVehicle(vehVehicle**VehiclePtr, UINT32 HostIndex, SINT32 Vehi
 	vehType const* vehtype = vehtypeGetByIndex(VehicleType);
 	if(vehtype == nullptr)
 	{
-		WriteDebug("Attempted to create a vehicle with invalid id number %d",VehicleType);
+		Write_Debug("Attempted to create a vehicle with invalid id number %d",VehicleType);
 		return 0;
 	}
 
@@ -2719,7 +2719,7 @@ static void _sendSTODamage(vehVehicle*veh, vehDamageQue* que)
 
     if(!sto)
     {
-        WriteLog(LOG_PHYSICS, LOG_INFO, "FAILED to find STO for %d", -veh->VehicleNum);
+        Write_Log(LOG_OLD, LOG_INFO, "[_sendSTODamage] FAILED to find STO for %d", -veh->VehicleNum);
         return;
     }
 
@@ -2753,7 +2753,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 		if (DQ->NumRoundsHit[i] <= 0)
 			continue;
 
-		WriteDebug("WEAP HIT component %s, num individual hits: %d, damage: %f",
+		Write_Debug("WEAP HIT component %s, num individual hits: %d, damage: %f",
 							CurrentVehicle->VehicleType->DamageObjects[i-1],
 							DQ->NumRoundsHit[i],
 							DQ->DamageAccrued[i]);
@@ -2773,7 +2773,7 @@ static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 	if(Count == 0)
 		return 0;
 
-	WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Sending hit packet for vehicle, index = %u, ident = %u, handle = %s, hits = %u",
+	Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Sending hit packet for vehicle, index = %u, ident = %u, handle = %s, hits = %u",
 					CurrentVehicle->VehicleHostIndex,
 					CurrentVehicle->VehicleNum,
 					CurrentVehicle->Handle,
@@ -2817,7 +2817,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 		if ( compID >= VEH_MAX_DAMAGE_OBJECTS )
 		{
-			WriteDebug("Received bad hit damage component number");
+			Write_Debug("Received bad hit damage component number");
 			continue;
 		}
 
@@ -2848,7 +2848,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 	ModelData->NewDamage = 1;
 
-	WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Received hit message from host, vehicle index = %d",
+	Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Received hit message from host, vehicle index = %d",
 				hit.m_target);
 
 	g_MyHitMessages.push_back(hit);
@@ -2859,7 +2859,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 		if (comp.NumHits > 0)
 		{
-			WriteLog(LOG_COMM, LOG_INFO, "WEAP COMM Hit part %s, damage approx %lf/hit, hits = %d",
+			Write_Log(LOG_COMM, LOG_INFO, "WEAP COMM Hit part %s, damage approx %lf/hit, hits = %d",
 						Vehicle->VehicleType->DamageObjects[comp.compID-1],
 						ModelData->DamageAccrued[comp.compID] / comp.NumHits,
 						comp.NumHits);
@@ -2902,7 +2902,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 	}
 	else
 	{
-		WriteDebug("WEAP Hit message DOES NOT applies to player's vehicle (error condition)");
+		Write_Debug("WEAP Hit message DOES NOT applies to player's vehicle (error condition)");
 	}
 
 #ifdef BETA_RELEASE
@@ -3156,7 +3156,7 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 	if ((Joules < DamThreshold) && (Joules>= 0))
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP insufficient energy %.0g J to damage %s, threshold %d J, scx = %d, scy = %d, id = %d",
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP insufficient energy %.0g J to damage %s, threshold %d J, scx = %d, scy = %d, id = %d",
 					Joules, TO->TerrainMasterObject->name, DamThreshold, SuperCellX, SuperCellY, Id);
 		return 0;
 	}
@@ -3180,13 +3180,15 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 				if (energyOverride >= 1.0f )
 				{
 					Energy = energyOverride;
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper bridge damage override from fpsData.txt, damage set to %g", Energy);
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper bridge damage override from fpsData.txt, damage set to %g", Energy);
 				}
 			}
 		}
 	}
 	else
+	{
 		Side = wwiiSide(Country);
+	}
 
 	if (TO->ObjId.objClass == CLASS_BUILDING)// && TO->ObjId.objType == BUILDING_GENERIC)
 	{
@@ -3206,14 +3208,31 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 				}
 			}
 
-			if(bld /*&& bld->pid.objClass == CLASS_BUILDING*/ && bld->pid.objType == FACILITY_FIREBASE)
+			// Special handling for FBs, only infantry and bombers can damage them
+			if(bld && bld->pid.objType == FACILITY_FIREBASE && (ShooterVehicle->VehicleType->Type == VEH_TYPE_AIR || ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON))
 			{
-				if (ShooterVehicle && ShooterVehicle->VehicleType->Type != VEH_TYPE_PERSON)
+				std::string fbObjectName = TO->ObjName();
+
+				// Bombers are only allowed to damage the FB Vehicle Spawn and "other" items at an FB
+				if (ShooterVehicle->VehicleType->Type == VEH_TYPE_AIR && fbObjectName == "infantryfb1c")
 				{
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Bomber damage to the firebase infantry spawn suppressed!");
 					return 0;
 				}
-				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
+
+				// If infantry put satchels on the FB Vehicle Spawn or "other items at the FB, bump up the joules
+				if (ShooterVehicle->VehicleType->Type == VEH_TYPE_PERSON && fbObjectName != "infantryfb1c")
+				{
+					const FLOAT64 energyOverride = fpFPSGetFbDamage();
+
+					if (energyOverride >= 1.0f )
+					{
+						Energy = energyOverride;
+						Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper FB veh spawn damage override from fpsData.txt, damage set to %g", Energy);
+					}
+				}
+
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Bomber or Infantry damage to firebase allowed!");
 			}
 		}
 	}
@@ -3225,10 +3244,10 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 		if (ShooterVehicle && ShooterVehicle->VehicleType->Type != VEH_TYPE_PERSON)
 		{
-			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP Non-trooper damage to firebase suppressed!");
 			return 0;
 		}
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP Trooper damage to firebase allowed!");
 	}
 	else
 	{
@@ -3266,7 +3285,7 @@ UINT32 vehApplyDamageToObject(const FLOAT64& Joules, trnCDTerrainObject* TO, veh
 
 		ShooterVehicle->DamageQue.Damage[SlotNum] += Energy;
 
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %.1f J to %s (%d, %d, %d)",
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %.1f J to %s (%d, %d, %d)",
 					Energy, TO->TerrainMasterObject->name,
 					TO->StratSupercellX, TO->StratSupercellY, TO->StratSupercellX, TO->ObjId.id);
 	}
@@ -3883,7 +3902,7 @@ void VehicleSTO::deactivate()
     }
     else
     {
-        WriteLog(LOG_OLD, LOG_INFO, "[VehicleSTO::deactivate] Unable to free vehicle");
+        Write_Log(LOG_OLD, LOG_INFO, "[VehicleSTO::deactivate] Unable to free vehicle");
     }
 
 	ServerTrackedObject::deactivate();
@@ -4773,13 +4792,13 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 {
 	if ( Vehicle == nullptr)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"nullptr vehicle!!");
+		Write_Log(LOG_WEAP,LOG_WARN,"nullptr vehicle!!");
 		return 0;
 	}
 
 	if (!vehValid(Vehicle) )
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"corrupt vehicle!!");
+		Write_Log(LOG_WEAP,LOG_WARN,"corrupt vehicle!!");
 		return 0;
 	}
 
@@ -4809,14 +4828,14 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 	if (ComponentNum == 0)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"Damaged component zero!!");
+		Write_Log(LOG_WEAP,LOG_WARN,"Damaged component zero!!");
 		return 0;
 	}
 
 	// Cast to UINT32 to ensure it is never negative
 	if ((UINT32)ComponentNum > VEH_MAX_DAMAGE_OBJECTS)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"INVALID Component specified in vehApplyDamageToVehicleComponent! %d", ComponentNum);
+		Write_Log(LOG_WEAP,LOG_WARN,"INVALID Component specified in vehApplyDamageToVehicleComponent! %d", ComponentNum);
 		return 0;
 	}
 
@@ -4844,7 +4863,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 // If we're below the damage threshold, set energy and isImportant to 0.
 	if(Energy < Vehicle->VehicleType->DamageThreshold[ComponentNum-1])
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP insufficient energy %f J to damage %s, threshold %f J",
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP insufficient energy %f J to damage %s, threshold %f J",
 					Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1], Vehicle->VehicleType->DamageThreshold[ComponentNum-1]);
 		Energy = 0;
 		Vehicle->DamageQue.isImportant[ComponentNum]  = 0;
@@ -4872,7 +4891,7 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 
 	if(Energy)
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %f J to %s", Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1]);
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP*** ACTUALLY APPLYING DAMAGE*** %f J to %s", Energy, Vehicle->VehicleType->DamageObjects[ComponentNum-1]);
 
 #if WANT_OFFLINE_RAGDOLL
 		if(!Online && Vehicle != PlayerVehicle && (frametime - Vehicle->VehicleInitTime) > 2000)
@@ -5320,21 +5339,29 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 }
 
 /************************************************************************************************
-	vehmainPPOBuild
+	vehmainPPOBuild:
+		Used to deploy FMS' and PPOs
 *************************************************************************************************/
 
 PlayerPlacedObject* vehmainPPOBuild(void) {
+	
 	// Just in case since this isn't tied with the FPS PPO code yet.
-	if ( activePPOList.size() < (size_t)activePPOIndex + 1 ) activePPOIndex = 0;
-	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr ) return nullptr;
+	if ( activePPOList.size() < (size_t)activePPOIndex + 1 )
+		activePPOIndex = 0;
+	
+	if ( activePPOList.size() == 0 || activePPOList[activePPOIndex] == nullptr )
+		return nullptr;
 
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if ( veh == nullptr ) return nullptr;
+	if ( veh == nullptr )
+		return nullptr;
 
 	// Only the Mission Leader can replace an existing mobile spawn.
 	PPOSpec& spec = *activePPOList[activePPOIndex];
-	if ( spec.spawnable ) {
-		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() ) {
+	if ( spec.spawnable )
+	{
+		if ( PlayerClient()->MobileSpawnMission() && ! PlayerClient()->IsMissionLeader() )
+		{
 			fpPPOAlert("ppos.fru.notleader");
 			return nullptr;
 		}
@@ -5345,6 +5372,8 @@ PlayerPlacedObject* vehmainPPOBuild(void) {
 	// set our callbacks
     if (fru != nullptr)
     {
+		uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("ppos.truck.alert").c_str());
+			
         // do one update to check our current validity
         if(fpPPOUpdate())
         {
@@ -5354,7 +5383,7 @@ PlayerPlacedObject* vehmainPPOBuild(void) {
     }
     else
     {
-        WriteLog(LOG_WEAPON, LOG_WARN, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
+        dbugLog(_FLW, "Failed to create fru - fpPPOCreate for index %d and id %d", activePPOIndex, activePPOList[activePPOIndex]->id);
     }
 
 	return fru;
@@ -5371,9 +5400,13 @@ void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult)
 	bool isError;
 
 	if ( enumResult == MSDR_GRANTED || enumResult == MSDR_UNDEPLOYED )
+	{
 		isError = false;
+	}
 	else
+	{
 		isError = true;
+	}
 
 	uiChatPrintLineFeedback(IDE_LANG_MOBILE, enumResult, isError);
 
@@ -6303,8 +6336,8 @@ UINT32 vehmainDetermineComponentKiller(mlComponent* killedComponent)
 					}
 #endif
 
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Determined KilledBy due to damage to hitmap %d .. shooter = %u", comp.compID, hit.m_shooter);
-					WriteLog(LOG_COMM, LOG_INFO, "COMM Sending KilledBy message to host .. vehicle index = %u", hit.m_shooter);
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Determined KilledBy due to damage to hitmap %d .. shooter = %u", comp.compID, hit.m_shooter);
+					Write_Log(LOG_COMM, LOG_INFO, "COMM Sending KilledBy message to host .. vehicle index = %u", hit.m_shooter);
 
 					return shooter;
 				}
@@ -6336,7 +6369,7 @@ UINT32 vehmainDeterminePlinkKiller()
 			uiChatPrintLine("Plink kill from %u killed us with %d ms into window", lastHit.m_shooter, delta);
 #endif
 
-			WriteLog(LOG_WEAPON, LOG_INFO, "Bailoutkill Determined by last hit from %u %ums ago", lastHit.m_shooter, delta);
+			Write_Log(LOG_WEAP, LOG_INFO, "Bailoutkill Determined by last hit from %u %ums ago", lastHit.m_shooter, delta);
 
 			return lastHit.m_shooter;
 		}
@@ -6955,37 +6988,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 	vehVehicle* myVehicle = persGetPersonaVehiclePtr();
 	mlVehicleData* modelData = persGetPersonaModelDataPtr();
 
-	/*
-	if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
-	{
-		gr2AnimTrooper* anim = myVehicle->VehicleObjectData->PlaneObject->animModel;
-
-		if(anim)
-		{
-			gr2Model* model = anim->skeleton->attachments.at(0);
-			//gr2Model* model = anim->weapons[anim->currentWeapon].GetActive();
-			//const char* path = weapon->GetPath();
-			Matrixf transform;
-			transform.set(model->GetBoneTransform(0));
-			gr2RigidPhysicsModel* o = new gr2RigidPhysicsModel(model->GetPath(), myVehicle, transform, 0);
-			return 0;
-		}
-	}
-	*/
-
-	/*
-	if(vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-	{
-
-	}
-	else
-	{
-
-	}
-
-   char name[64];
-   */
-
 	FLOAT64VECTOR vehpos = {0,0,0};
 	if(modelData) vehpos = modelData->VehiclePos;
 
@@ -7014,7 +7016,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			// setup our name and decal for personalization reasons
 			char handle[11];
 			snprintf((char*)handle, 10, "C%d%d", (int)vehicle->uid(), GetRandom(1000, 1000000));
-			//veh->Chat_Handle = chatGetHandle((const char*)handle);
 
 			vehicle->setIcon(handle);
 #ifdef BETA_RELEASE
@@ -7031,21 +7032,36 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 
             veh->Flags |= VEH_FLAGS_IS_CLONE;
 
-			//veh->StateAnimation = myVehicle->StateAnimation;
-
 			// reset our name so we can easily id which vehicle index we're using
 			snprintf((char*)veh->Handle, 10, "C%d", (int)vehicle->uid());
 			veh->Chat_Handle = chatGetHandle((const char*)veh->Handle);
-
+			
 			// do something for vehicles
-			veh->AnimationBits = myVehicle->AnimationBits;
+			gr2AnimBitPacker bp = gr2AnimBitPacker(myVehicle->AnimationBits);
+			
+			// infantry stuff
+			// override pose with info from model
+			if(myVehicle->VehicleType->Type == VEH_TYPE_PERSON)
+			{
+				bp.pose = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPose;
+				bp.weapon = myVehicle->VehicleObjectData->PlaneObject->animModel->currentWeapon;
+				bp.movement = myVehicle->VehicleObjectData->PlaneObject->animModel->currentMove;
+				bp.point = myVehicle->VehicleObjectData->PlaneObject->animModel->currentPoint;
+			}
+			
+			veh->AnimationBits = bp.pack();
 			veh->PosData = myVehicle->PosData;
+			veh->PosData.animationFlags = veh->AnimationBits;
+			veh->PosData.Pos = myVehicle->PosData.RenderPos;
 			veh->PosData.AttVel.Pitch = veh->PosData.AttVel.Roll = veh->PosData.AttVel.Yaw = 0;
 			veh->PosData.AttVelSum.Pitch = veh->PosData.AttVelSum.Roll = veh->PosData.AttVelSum.Yaw = 0;
 			veh->PosData.LastUpdateAcc.x = veh->PosData.LastUpdateAcc.y = veh->PosData.LastUpdateAcc.z = 0;
 			veh->PosData.Acc.x = veh->PosData.Acc.y = veh->PosData.Acc.z = 0;
 			veh->PosData.LastUpdateAttVel.Pitch = veh->PosData.LastUpdateAttVel.Roll = veh->PosData.LastUpdateAttVel.Yaw = 0;
 			veh->PosData.Vel.x = veh->PosData.Vel.y = veh->PosData.Vel.z = 0;
+
+			veh->PosData.Att = myVehicle->PosData.Att;
+			veh->PosData.RenderAtt = myVehicle->PosData.RenderAtt;
 
 			veh->VehicleObjectData->PlaneObject->mat = myVehicle->VehicleObjectData->PlaneObject->mat;
 			veh->VehicleObjectData->PlaneObject->pos = myVehicle->VehicleObjectData->PlaneObject->pos;
@@ -7070,31 +7086,10 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			COPY_VSMEMBER(DiveBrakeMoveTime);
 
 			COPY_VSARRAY(PropIsDiscSetting,ML_MAX_ENGINES);
-			//COPY_VSARRAY(PropIsDisc,ML_MAX_ENGINES);
 
 			COPY_VSARRAY(RecoilStartTime,VEH_MAX_MOUNTS);
 			COPY_VSARRAY(RecoilPosition,VEH_MAX_MOUNTS);
 			COPY_VSARRAY(RecoilTime,VEH_MAX_MOUNTS);
-
-			//COPY_VSMEMBER(GearPos);
-			//COPY_VSMEMBER(FlapPos);
-
-			//COPY_VSARRAY(CanopyPos,ML_MAX_CREW_POSITIONS);
-			//COPY_VSARRAY(HatchPos,ML_MAX_CREW_POSITIONS);
-
-			//COPY_VSMEMBER(BombBayDoorPos);
-			//COPY_VSMEMBER(DiveBrakePos);
-
-			//COPY_VSARRAY(CanopyDOFVar,ML_MAX_CREW_POSITIONS);
-			//COPY_VSARRAY(HatchDOFVar,ML_MAX_CREW_POSITIONS);
-
-			//COPY_VSMEMBER(GearDOFVar);
-			//COPY_VSMEMBER(FlapDOFVar);
-			//COPY_VSMEMBER(BombBayDoorDOFVar);
-			//COPY_VSMEMBER(DiveBrakeDOFVar);
-
-			//COPY_VSARRAY(PropDiscSpinRpm,ML_MAX_ENGINES);
-			//COPY_VSARRAY(PropSpinPosDOF,ML_MAX_ENGINES);
 
 			COPY_VSMEMBER(UseCalculatedTrackAndWheel);
 			COPY_VSARRAY(TrackPos,2);
@@ -7146,6 +7141,8 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 			veh->StickVehicleToGround = false;
 			veh->RideVehicleHostIndex = 0;
 
+			// one time interpolator update so it doesn't conflict with original info
+			veh->interpolator.NewMessageReceived(veh->LastUpdate, frametime);
             break;
         }
     }
@@ -7204,187 +7201,9 @@ static void _setVehicleState(vehVehicle* v, bool start)
 		v->StateAnimation.EjectRiders = 0;
 		v->StateAnimation.MainGunLastUpdateTime = 0;
 
-		//if(v->StateAnimation.enumDeployedState != IDE_DEPLOYED_NOT_USED)
-		//	v->StateAnimation.enumDeployedState = IDE_VEHICLE_UNDEPLOYED;
-
 		vehAnimUpdateVehicleStateAnimations(v);
 	}
 
-	/*
-	// only vehicles (not troopers) on the same sortie get vcached, so don't bother
-	// doing any of this since all of the states will remain for the current sortie
-	if(!isTrooper)
-		return;
-
-	// reset vehicle generic stuff
-	v->Flags = 0;
-	v->RideSeatNum = 0; // special values VEH_HOIST_RIDE_SEAT, VEH_TROOPER_ON_DECK_RIDE_SEAT, VEH_TOWED_VEHICLE
-	v->InfantryTarget = 0;
-	v->VehicleHasBeenHit = 0;
-	v->VehicleDeadTime = 0;
-	v->AnimationBits = 0;
-
-	if(start)
-	{
-		vehfxAttachVehicle(v, &v->iFXVehicleID);
-		v->interpolator = vehInterpolator(v);
-	}
-	else
-	{
-		vehfxDetachVehicle(v->iFXVehicleID);
-		v->iFXVehicleID = 0;
-
-		memset(&v->DamageQue, 0x0, sizeof(vehDamageQue));
-		memset(&v->MountIsFiring, 0x0, sizeof(v->MountIsFiring));
-		memset(&v->WeaponIsHidden, 0x0, sizeof(v->WeaponIsHidden));
-
-		// reset animation states
-		memset(&v->StateAnimation.FuelFireOn, 0, sizeof(v->StateAnimation.FuelFireOn));
-		memset(&v->StateAnimation.WingtipVortexSmokeOn, 0, sizeof(v->StateAnimation.WingtipVortexSmokeOn));
-		memset(&v->StateAnimation.GlycolLeakSmokeOn, 0, sizeof(v->StateAnimation.GlycolLeakSmokeOn));
-		memset(&v->StateAnimation.OilLeakSmokeOn, 0, sizeof(v->StateAnimation.OilLeakSmokeOn));
-		memset(&v->StateAnimation.ExhaustSmokeOn, 0, sizeof(v->StateAnimation.ExhaustSmokeOn));
-		memset(&v->StateAnimation.FuelLeakSmokeOn, 0, sizeof(v->StateAnimation.FuelLeakSmokeOn));
-		memset(&v->StateAnimation.EngineFireOn, 0, sizeof(v->StateAnimation.EngineFireOn));
-
-		int num = vehAnimFindVehicleStateNumber(v, "tankfire");
-		if(num >= 0) v->PosData.States[num] = 0;
-
-		memset(&v->StateAnimation.TreadDustOn, 0, sizeof(v->StateAnimation.TreadDustOn));
-		memset(&v->StateAnimation.DebrisOn, 0, sizeof(v->StateAnimation.DebrisOn));
-
-		// set all vis damage states
-		for (int i=0;i<VEH_MAX_STATE_BITS;i++)
-			vehAnimChangeVehicleStateByNumber(v, i, FALSE);
-
-		v->StateAnimation.FirstUpdateProcessed = true;
-		v->StateAnimation.bVehicleDestroyed = false;
-		v->StateAnimation.TankOnFire = FALSE;
-		v->StateAnimation.PlayCrash = 0;
-		v->StateAnimation.CrashHasPlayed = 0;
-		v->StateAnimation.EjectRiders = 0;
-		v->StateAnimation.MainGunLastUpdateTime = 0;
-
-		if(v->StateAnimation.enumDeployedState != IDE_DEPLOYED_NOT_USED)
-			v->StateAnimation.enumDeployedState = IDE_VEHICLE_UNDEPLOYED;
-
-		vehAnimUpdateVehicleStateAnimations(v);
-
-		if(v->VehicleType->Type != VEH_TYPE_PERSON)
-		{
-			// temp variable
-			OBJECT* Object = nullptr;
-
-			// remove any crap
-			if(v->ChunksOfCrap)
-				vehVisDamageRemoveAllCrap(v);
-
-			// clear all missing flags
-			obmainClearFlag2InThisTree(v->VehicleObjectData->PlaneObject, OBJECT_MISSING);
-
-			// cleaned up damaged objects
-			obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_VISIBLE);
-			obmainSetFlag2InThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_HIDDEN);
-
-			// fix up hitmap
-			obmainClearFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-			//obmainClearFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_HIDDEN);
-
-			// set dont update for inside and outside
-			//obmainSetFlag2InThisTree(v->VehicleObjectData->HitMap, OBJECT_DONT_UPDATE);
-
-			Object = nullptr;
-			ogrpFindSubObjectByName(&Object,v->VehicleObjectData->PlaneObject,"hulk");
-			if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-
-			if(v->VehicleObjectData->VisDamageCrapGroup)
-				v->VehicleObjectData->VisDamageCrapGroup->flag2 |= OBJECT_DONT_UPDATE;
-
-			// if we're hulked, do a few more things, fix up colliders
-			if(v->isHulked())
-			{
-				if(v->VehicleObjectData->LoadoutLODObject)
-					ogrpHideObjectAndSubtree(v->VehicleObjectData->LoadoutLODObject);
-
-				// disable ode colliders
-				//physicsRecurseAndToggleObjectCollider(v->VehicleObjectData->VisDamageHulkLOD, false);
-
-				// update hulk flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageHulkLOD, OBJECT_DONT_UPDATE);
-				obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageHulkLOD, OBJECT_VISIBLE);
-
-				// update crap flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-				obmainClearFlagsInThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_VISIBLE);
-				//obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageCrapGroup, OBJECT_HIDDEN);
-
-				// update stub flags
-				obmainClearFlag2InThisTree(v->VehicleObjectData->VisDamageStubGroup, OBJECT_DONT_UPDATE);
-
-				if (v->VehicleObjectData->HitMap)
-				{
-					//physicsRecurseAndToggleObjectCollider(v->VehicleObjectData->HitMap, true);
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"inside");
-					v->VehicleObjectData->CollideInternObject = Object;
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"outside");
-					v->VehicleObjectData->CollideExternObject = Object;
-
-					Object = nullptr;
-					ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"walk");
-					v->VehicleObjectData->CollideWalkObject = Object;
-
-					v->VehicleObjectData->Radius = 0;
-
-					mlCalculateObjectTreeRadius(&(v->VehicleObjectData->Radius),v->VehicleObjectData->HitMap,0);
-					v->VehicleObjectData->Radius = (FLOAT32)(sqrt(v->VehicleObjectData->Radius) + 1.0); // margin of error
-				}
-				else
-				{
-					v->VehicleObjectData->CollideInternObject = nullptr;
-					v->VehicleObjectData->CollideExternObject = nullptr;
-					v->VehicleObjectData->Radius = 0.0;
-
-					if (v->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
-						v->VehicleObjectData->Radius = 3.0;
-				}
-			}
-
-			if(v->VehicleObjectData->HitMap)
-			{
-				Object = nullptr;
-				ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"inside");
-				if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-
-				Object = nullptr;
-				ogrpFindSubObjectByName(&Object,v->VehicleObjectData->HitMap,"outside");
-				if(Object) Object->flag2 |= OBJECT_DONT_UPDATE;
-			}
-
-			// now fixup lods
-			for(int i = 0; i < ML_MAX_LODS; ++i)
-			{
-				if(v->VehicleObjectData->LODObjects[i])
-				{
-					OBJECT* lod = v->VehicleObjectData->LODObjects[i];
-
-					//if(i == 0)
-					//	obmainClearFlagsInThisTree(lod, OBJECT_SKIPDRAWING);
-
-					// start updating our objects again
-					obmainClearFlag2InThisTree(lod, OBJECT_DONT_UPDATE|OBJECT_HIDDEN);
-					//obmainClearFlag2InThisTree(lod, OBJECT_HIDDEN);
-
-					// for anything that is an ob, set vis
-					obmainFindCallback(lod, _resetObject, nullptr);
-				}
-			}
-		}
-	}
-	*/
 }
 
 bool _findRTBFRU(ServerTrackedObject& sto, void* cookie)

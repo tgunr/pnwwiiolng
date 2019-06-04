@@ -83,14 +83,6 @@ struct TracerFX
 	FLOAT32 Diameter;
 };
 
-struct shrapTarget
-{
-	FLOAT64VECTOR	targetPos;
-	FLOAT64			radius;
-	void*			target;
-	FLOAT32			maxDist2;
-};
-
 // Ammo variable types
 enum
 {
@@ -105,6 +97,7 @@ enum
 	WEAP_AMMOVAR_OBJECT,
 	WEAP_AMMOVAR_EXPLOSIVEENERGY,
 	WEAP_AMMOVAR_FUZETIME,
+	WEAP_AMMOVAR_ARMINGTIME,
 	WEAP_AMMOVAR_BALLISTICCOEFFICIENT,
 	WEAP_AMMOVAR_LIFETIME,
 	WEAP_AMMOVAR_STRETCHOBJECT,
@@ -183,6 +176,7 @@ static UCHAR _AmmoTypeVarNames[WEAP_AMMOMAXVAR][32] = {
 	"object",
 	"explosive",
 	"fuzetime",
+	"armingtime",
 	"bc",
 	"lifetime",
 	"stretchobject",
@@ -203,7 +197,7 @@ static UCHAR _AmmoTypeVarNames[WEAP_AMMOMAXVAR][32] = {
 	"torpedorundepth",
 	"torpedorunspeed",
 	"fuzetype",
-	"hassmoke",
+	"issmokegrenade",
 	"shrapnelpenetration",
 	"use_new_he",
 	"nhe_diameter",
@@ -322,7 +316,7 @@ UINT32 weapFindAmmoTypeByName(weapAmmoType ** AmmoType,UCHAR * VarContents)
 		}
 	}
 
-	WriteLog(LOG_WEAPON,LOG_WARN,"Cannot find ammo type %s",VarContents);
+	Write_Log(LOG_WEAP,LOG_WARN,"Cannot find ammo type %s",VarContents);
 
 	*AmmoType = nullptr;
 
@@ -355,7 +349,7 @@ logTimerBeginMacro();
 
 	if (AmmoListFile == -1)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"Can't find data/vehicles/ammo.txt file!");
+		Write_Log(LOG_WEAP,LOG_WARN,"Can't find data/vehicles/ammo.txt file!");
 		return (UINT32)-1;
 	}
 
@@ -499,6 +493,9 @@ logTimerBeginMacro();
 					case WEAP_AMMOVAR_FUZETIME:
 						AmmoType->FuzeTime = (FLOAT32)atof((char*)VarContents);
 						break;
+					case WEAP_AMMOVAR_ARMINGTIME:
+						AmmoType->ArmingTime = (FLOAT32)atof((char*)VarContents);
+						break;
 					case WEAP_AMMOVAR_BALLISTICCOEFFICIENT:
 						AmmoType->BallisticCoefficient = (FLOAT32)atof((char*)VarContents);
 						break;
@@ -563,7 +560,7 @@ logTimerBeginMacro();
 						mlUtilityFindVarname((UINT32*)&AmmoType->FuzeType, VarContents,
 												(UCHAR*)&_AmmoFuzeTypeVarNames[0][0], 32, WEAPAMMO_FUZE_MAX);
 						if(AmmoType->FuzeType != WEAPAMMO_FUZE_FIXTIME && AmmoType->FuzeType != WEAPAMMO_FUZE_VARTIME)
-							WriteLog(LOG_WEAPON,LOG_WARN, "fuze type %s not supported yet", VarContents);
+							Write_Log(LOG_WEAP,LOG_WARN, "fuze type %s not supported yet", VarContents);
 					break;
 					case WEAP_AMMOVAR_HAS_SMOKE:
 						AmmoType->HasSmoke = (SINT32)atoi((char*)VarContents);
@@ -666,7 +663,7 @@ logTimerBeginMacro();
 						AmmoType->UseGhostRoundSTO = (LOGICAL)atoi((char*)VarContents);
                     break;
 					default:
-						WriteLog(LOG_WEAPON,LOG_WARN,"Unidentified var %s in file %s",VarName,FileName);
+						Write_Log(LOG_WEAP,LOG_WARN,"Unidentified var %s in file %s",VarName,FileName);
 					break;
 				}
 			}
@@ -710,7 +707,7 @@ static UINT32 _StretchObject(OBJECT * Object,FLOAT32 Stretch);
 static UINT32 _DisplayObject(OBJECT * Object);
 
 // ammo explosion
-static UINT32 _DoSpall(weapAmmo* Ammo, FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed, FASTCOLLIDE* Collide,
+static UINT32 _DoSpall(weapAmmo* Ammo, FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed, double spall_mult, FASTCOLLIDE* Collide,
 						piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags);
 static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo,FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime, bool doshrap=true);
 static UINT32 _DoShapedCharge(weapAmmo * Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime);
@@ -739,7 +736,7 @@ static UINT32 	_CollideRoundWithAutoguns(FASTCOLLIDE ** CollideListPtr,  UINT32 
 static UINT32 _CheckLineSphereCollide(UINT32* Collision, piVECTOR const* SphereCenter, piVECTOR const* UseOldPos, piVECTOR const* UseNewPos, FLOAT32 Radius);
 static LOGICAL _IsWater(OBJECT* lpObj);
 
-static UINT32	_DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime);
+static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos, const FLOAT64VECTOR& vel, FLOAT64 currtime);
 
 // projectile update
 static SINT32	_UpdateProjectile(weapAmmo * Ammo);
@@ -770,7 +767,7 @@ UINT32 weapAmmoInit()
 	{
 		if(!obmgrCreateModelInstance("tracker"))
 		{
-			WriteLog(LOG_WEAPON,LOG_WARN,"Unable to find tracker object!  No weapons-in-flight using objects will be seen");
+			Write_Log(LOG_WEAP,LOG_WARN,"Unable to find tracker object!  No weapons-in-flight using objects will be seen");
 		}
 		else
 		{
@@ -802,7 +799,7 @@ UINT32 weapAmmoInit()
 	_TracerTexId = ldpixLoadImageFileToSurface("tracer1.bmp", colorBLACK, LDPIX_NONE);
 	if (!piIsTexture(_TracerTexId, 0))
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"Unable to load up the tracer texture map!");
+		Write_Log(LOG_WEAP,LOG_WARN,"Unable to load up the tracer texture map!");
 	}
 	piAddTexRef(_TracerTexId);
 
@@ -1689,7 +1686,7 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 					Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 				}
 
-				if(Ammo->AmmoType->HasSmoke != 1)
+				if(Ammo->AmmoType->HasSmoke == 1)
 					return FALSE;
             }
 		}
@@ -1760,7 +1757,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	// calculate round's actual velocity
 	ProjVel.x = ProjVel.z = 0;
 	// vary round's velocity a bit
-	ProjVel.y = InitVelocity * (1.0 + 0.02 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
+	ProjVel.y = InitVelocity * (1.0 + 0.005 * (mathGetFloat32ChaoticNumber() *  mathGetFloat32ChaoticNumber() *  2.0f - 1.0f));
 
 	// add shooter's velocity
 	mathVectorMultiply64(&ProjVel, &ProjVel, FireAtt);
@@ -1872,7 +1869,6 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 
 		Displacement.y = -weapon->Displacement;
 		mathVectorMultiply64(&Displacement, &Displacement, FireAtt);
-        WriteLog(LOG_WEAPON, LOG_DEBUG, "Before displaced AmmoX: %f AmmoY: %f AmmoZ: %f", Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
 		mathAddVectors(&Ammo->Position, &Ammo->Position, &Displacement);
 		Ammo->LastCollidePos = Ammo->Position;
 	}
@@ -1903,7 +1899,6 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 		if(AmmoType->UseGhostRoundSTO)
 			_FireOrdnanceSTO(Ammo);
 	}
-    WriteLog(LOG_WEAPON, LOG_DEBUG, "AmmoX: %f AmmoY: %f AmmoZ: %f", Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
 
 	return 0;
 }
@@ -2380,7 +2375,7 @@ static UINT32 _ReadBallisticChart()
 
 	if (CurrentFile == -1)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"Can't find ballistics chart vehicles\\mcg1.txt");
+		Write_Log(LOG_WEAP,LOG_WARN,"Can't find ballistics chart vehicles\\mcg1.txt");
 		return 0;
 	}
 
@@ -2447,7 +2442,7 @@ weapAmmo * TempPtr1 = nullptr,*TempPtr2 = nullptr;
 
 	if (_AmmoFree.Next == nullptr)
 	{
-		WriteLog(LOG_WEAPON,LOG_WARN,"Ammo free list empty");
+		Write_Log(LOG_WEAP,LOG_WARN,"Ammo free list empty");
 		return 1;
 	}
 
@@ -2798,7 +2793,7 @@ static UINT32 _DisplayObject(OBJECT* Object)
 // don't call this for internal components
 
 static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingSpeed,
-						FASTCOLLIDE* Collide, piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags)
+                       double spall_mult, FASTCOLLIDE* Collide, piVECTOR const* NewPos, piVECTOR const* OldPos, UINT32 Flags)
 {
 	UINT32 i;
 	weapAmmo TempAmmo;
@@ -2832,7 +2827,7 @@ static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingS
 #ifdef BETA_RELEASE
 	if(!SpallEnabled)
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP spalling disabled");
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP spalling disabled");
 		return 0;
 	}
 #endif
@@ -2850,11 +2845,11 @@ static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingS
 
 	Energy = 0.1f * 0.5f * Ammo->AmmoType->ProjectileWeight * (OriginalSpeed * OriginalSpeed - RemainingSpeed * RemainingSpeed);
 
-	NumSpall = (UINT32)(pow(Energy,0.333333f) + 0.5) * 2;
+	NumSpall = (UINT32)((pow(Energy,0.333333f) + 0.5) * 2.0 * spall_mult);
 
 	if (NumSpall == 0) return 0;
 
-	WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) spalling %d pieces of %s",  Ammo->AmmoType->Name, Ammo->Id, NumSpall, Collide->CollideObject->name);
+	Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) spalling %d pieces of %s w/ %f overmatch",  Ammo->AmmoType->Name, Ammo->Id, NumSpall, Collide->CollideObject->name, spall_mult);
 
 	IngressSpallVel = OriginalSpeed - RemainingSpeed;
 	EgressSpallVel = RemainingSpeed;
@@ -2966,9 +2961,9 @@ static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingS
 			TempKE = (FLOAT32)mathExactVectorLength(&TempAmmo.Velocity) *
 						(FLOAT32)mathExactVectorLength(&TempAmmo.Velocity) * 0.5f * TempAmmoType.ProjectileWeight;
 
-			WriteLog(LOG_WEAPON, LOG_INFO,"WEAP %s(%d) reverse spall", TempAmmoType.Name, TempAmmo.Id);
+			Write_Log(LOG_WEAP, LOG_INFO,"WEAP %s(%d) reverse spall", TempAmmoType.Name, TempAmmo.Id);
 			if(_DoProjectileUpdate(&TempAmmo, &PrevPos, 0.01f, CurrentTime) == 0)
-				WriteLog(LOG_WEAPON, LOG_INFO,"WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
+				Write_Log(LOG_WEAP, LOG_INFO,"WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
 
 			TotalKE += TempKE;
 		}
@@ -3040,9 +3035,9 @@ static UINT32 _DoSpall(weapAmmo* Ammo,	FLOAT32 OriginalSpeed, FLOAT32 RemainingS
 			TempKE = (FLOAT32)mathExactVectorLength(&TempAmmo.Velocity) *
 						(FLOAT32)mathExactVectorLength(&TempAmmo.Velocity) * 0.5f * TempAmmoType.ProjectileWeight;
 
-			WriteLog(LOG_WEAPON, LOG_INFO,"WEAP %s(%d) direct spall", TempAmmoType.Name, TempAmmo.Id);
+			Write_Log(LOG_WEAP, LOG_INFO,"WEAP %s(%d) direct spall", TempAmmoType.Name, TempAmmo.Id);
 			if(_DoProjectileUpdate(&TempAmmo, &PrevPos, 0.01f, CurrentTime) == 0)
-				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
 
 			TotalKE += TempKE;
 		}
@@ -3087,7 +3082,7 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 #ifdef BETA_RELEASE
 	if(!ShrapnelEnabled)
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP shrapnel disabled");
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP shrapnel disabled");
 		return 0;
 	}
 #endif
@@ -3098,8 +3093,10 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 	if(!doshrap) return 0;
 
 #ifdef GREN_STAT_MODEL
-	if (Ammo->AmmoType->UseNewHE)
-		return _DoImprovedShrapnel (Ammo, InPos, ProjVel, CurrentTime);
+	if ( Ammo->AmmoType->UseNewHE ) {
+		_DoImprovedShrapnel(*Ammo, *InPos, *ProjVel, CurrentTime);
+		return 0;
+	}
 #endif
 
 	strncpy((char*)TempAmmoType.Name, "shrapnel", 31);
@@ -3122,7 +3119,7 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 
 	if (NumSpall == 0) return 0;
 
-	WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) explodes into %d pieces of shrapnel",  Ammo->AmmoType->Name, Ammo->Id, NumSpall);
+	Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) explodes into %d pieces of shrapnel",  Ammo->AmmoType->Name, Ammo->Id, NumSpall);
 
 	SpallMass = Ammo->AmmoType->TotalShrapnelMass / NumSpall;
 
@@ -3170,7 +3167,7 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 		TempAmmo.Id = i;
 
 		if(_DoProjectileUpdate(&TempAmmo, &PrevPos, 0.03, CurrentTime + 0.03) == 0)
-			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
 
 #ifdef BETA_RELEASE
 		FLOAT64VECTOR CurPos = TempAmmo.Position;
@@ -3191,253 +3188,282 @@ static UINT32 _DoExplosionShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, F
 // throws out shrapnel for explosion
 // as a child of _DoExplosionShrapnel it skips a lot of the error checking
 
-static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT64VECTOR const* ProjVel, FLOAT64 CurrentTime)
-{
-	// linear scale between min and max piece counts
-	UINT32 numPieces = (UINT32) ((Ammo->AmmoType->MinShrapPieces) +
-		((FLOAT32)(Ammo->AmmoType->MaxShrapPieces - Ammo->AmmoType->MinShrapPieces) * mathGetFloat32ChaoticNumber()));
-
-	if (numPieces == 0) return 0;
-
-	UINT32				i = 0;
-	weapAmmo			TempAmmo;
-	weapAmmoType		TempAmmoType;
-	FLOAT32				shrapEnergy = 0;
-	FLOAT32				maxPieceSpeed = 0;
-	FLOAT32				avgMass = 0;
-	FLOAT64VECTOR		PrevPos;
-	FLOAT32				PC = 0;
-	vehVehicle*			CurrentVehicle = nullptr;
-	vehVehicle*			PlayerVehicle = persGetPersonaVehiclePtr();
-	trnAutoGun*			AG = nullptr;
-	UINT32				maxNumShrapnel = 0;
-	shrapTarget			shrapTargetInfo;
-	std::list<shrapTarget>	shrapList;
-	std::list<shrapTarget>::iterator it;
-
-	memset(&TempAmmoType,0,sizeof(weapAmmoType));
-	strncpy((char*)TempAmmoType.Name, "shrapnel", 31);
-
-	// first, calculate a bunch of stuff that is shared by all shrapnel bits for this explosion
-	// second, get target data (vechiles & autogunners)
-	// third, blow shrapnel at each target as appropriate
-
-	TempAmmoType.Diameter = Ammo->AmmoType->ShrapProjDiameter;
-	if(Ammo->AmmoType->ShrapnelPenetrationConstant)
-		TempAmmoType.PenetrationConstant = Ammo->AmmoType->ShrapnelPenetrationConstant;
-	else
-		TempAmmoType.PenetrationConstant = Ammo->AmmoType->PenetrationConstant * 0.1f;
-
-	if (TempAmmoType.PenetrationConstant < Ammo->AmmoType->ShrapProjMinPenConst)
-		TempAmmoType.PenetrationConstant = Ammo->AmmoType->ShrapProjMinPenConst;
-
-	PC = TempAmmoType.PenetrationConstant;
-	TempAmmoType.RichochetAngle = Ammo->AmmoType->ShrapProjRicochetAngle;
-
-	shrapEnergy = Ammo->AmmoType->ExplosiveEnergy * Ammo->AmmoType->ShrapEnergyMult;
-
-	WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) explodes into %d pieces of shrapnel",  Ammo->AmmoType->Name, Ammo->Id, numPieces);
-
-	avgMass = Ammo->AmmoType->TotalShrapnelMass / numPieces;
-
-	maxPieceSpeed = (FLOAT32)sqrt(2 * shrapEnergy / Ammo->AmmoType->TotalShrapnelMass);
-
-	if (Ammo->AmmoType->MaxShrapPerVehicle > 0)
-	{
-		maxNumShrapnel = Ammo->AmmoType->MaxShrapPerVehicle;
-	}
-	else
-		maxNumShrapnel = 75;
-
-	// OGS: The above code reads "if MSPV > 0 then use that value, otherwise use 75"
-	// so the following if is pointless.
-//	if (maxNumShrapnel <= 0) return 0;
-
-	// vehicles are targets
-	vehGetVehicleHead(&CurrentVehicle);
-	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
-	{
-		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
-
-		if (CurrentVehicle == PlayerVehicle && PlayerVehicle->ModelData != nullptr)
-		{
-			shrapTargetInfo.targetPos = CurrentVehicle->ModelData->RenderPos;
-		}
-		else
-		{
-			shrapTargetInfo.targetPos = CurrentVehicle->PosData.RenderPos;
-		}
-
-		shrapTargetInfo.radius = std::max(1.0, CurrentVehicle->VehicleObjectData->Radius - 1.0);
-		shrapTargetInfo.target = (void*)CurrentVehicle;
-		shrapTargetInfo.maxDist2 = 10000.0;
-
-		// infantry center points are at their feet so half of all shrapnel always miss
- 		if(CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON)
-		{
-			shrapTargetInfo.radius = shrapTargetInfo.radius/2;
-			shrapTargetInfo.targetPos.z += shrapTargetInfo.radius;
-		}
-
-		shrapList.push_back(shrapTargetInfo);
-	}
-
-	// so are autogunners..
-	trnGetAutoGunHead(&AG);
-	for(;AG; AG = AG->next)
-	{
-		shrapTargetInfo.targetPos = AG->Pos;
-		// hardcoded, straight out of stuff below
-		shrapTargetInfo.radius = 5.0;
-		shrapTargetInfo.target = (void*)AG;
-		shrapTargetInfo.maxDist2 = 625.0f;
-
-		shrapList.push_back(shrapTargetInfo);
-	}
-
-	// now iterate the target list and blow shrapnel at them
-	it = shrapList.begin();
-	for(; it!= shrapList.end(); ++it)
-	{
-        FLOAT64VECTOR	distVect = {0, 0, 0}, centerVect = {0, 0, 0};
-		FLOAT32			massMultiplier = 1.0;
-		piMATRIX		centerMatrix = IdentityMatrix;
-		piMATRIX		rotYMatrix = IdentityMatrix, rotZMatrix = IdentityMatrix;
-
-		// using radius of vehicle, and distance to vehicle .. use them to figure what % of shrapnel could possibly
-		// hit a sphere of that size at that distance
-		// surf area of sphere = 4 * pi * r2 .. surf area of cutout is 2 * pi * r2 * (1 - cos(theta))
-		// % of surf area of sphere covered by a cutout of angle theta is
-		// cutout area / sphere area
-		// 0.5 * (1-cos(theta))
-
-		mathSubVectors (&distVect, &it->targetPos, InPos);
-		FLOAT64 dist2 = mathExactVectorLength2 (&distVect);
-
-		// quick max distance (squared) check
-		if (dist2 > it->maxDist2)
-			continue;
-
-		FLOAT64 dist = (FLOAT32) sqrt(dist2);
-		FLOAT64 coneAngle = atan2 (it->radius, dist);	// how large is the spray cone for a given target
-        FLOAT64 shrapPercent = 0.5 * (1.0 - cos(coneAngle));
-		UINT32 finalShrapCount = (SINT32) (numPieces * shrapPercent);
-
-		if (finalShrapCount > maxNumShrapnel)
-		{
-			// protected from divide by 0 from earlier check
-			massMultiplier = finalShrapCount / (FLOAT32)maxNumShrapnel;
-			if (massMultiplier > Ammo->AmmoType->MaxMassMultiplier)
-				massMultiplier = Ammo->AmmoType->MaxMassMultiplier;
-
-			WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) too much shrapnel %u, reducing to %u .. using mass multiplier %2.2f out of possible %2.2f",
-				Ammo->AmmoType->Name, Ammo->Id,
-				finalShrapCount, maxNumShrapnel, massMultiplier, (finalShrapCount / (FLOAT32)maxNumShrapnel));
-
-			finalShrapCount = maxNumShrapnel;
-		}
-
-		WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) target dist %f, radius %f, theta %f, percent %2.4f",  Ammo->AmmoType->Name, Ammo->Id, dist, it->radius, (mlRAD_TO_DEG(coneAngle)), shrapPercent*100.0);
-		WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) sends %d pieces of shrapnel at target (max %d)",
-			Ammo->AmmoType->Name, Ammo->Id, finalShrapCount, maxNumShrapnel);
-
-		if (finalShrapCount <= 0) continue;
-
-   		mathScaleVector (&centerVect, &distVect, (1.0/dist));
-
-		// decompose the center direction into euler angles..
-		FLOAT32 rotZ = (FLOAT32) atan2 (centerVect.y, centerVect.x);
-		FLOAT32 rotY = (FLOAT32) atan2 (centerVect.z, sqrt((centerVect.x*centerVect.x)+(centerVect.y*centerVect.y)));
-
-		generateRotationMatrix (AROUND_Z, mlRAD_TO_DEG(rotZ), &rotZMatrix);
-		generateRotationMatrix (AROUND_Y, mlRAD_TO_DEG(rotY), &rotYMatrix);
-
-		math3dMatrixMultiply (&centerMatrix, &rotYMatrix, &rotZMatrix);
-
-		WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) angles %2.4f, %2.4f",  Ammo->AmmoType->Name, Ammo->Id, mlRAD_TO_DEG(rotZ), mlRAD_TO_DEG(rotY));
-
-		for (i=0;i<finalShrapCount;i++)
-		{
-			// start with a unit vector along X .. bend it to be randomized in cone .. then swivel it based on the above matrix
-            piVECTOR		pieceVel = {1, 0, 0};
-			piMATRIX		dispRotXMat = IdentityMatrix;
-            piMATRIX        dispRotYMat = IdentityMatrix;
-            piMATRIX        dispRotMat = IdentityMatrix;
-
-			// now "bend" the velocity based on the a random position inside the cone
-			FLOAT32 dispRotY = mathGetFloat32ChaoticNumber() * (FLOAT32)coneAngle;
-			FLOAT32 dispRotX = (mathGetFloat32ChaoticNumber() * 2.0f - 1.0f) * PI;
-
-			generateRotationMatrix (AROUND_Y, mlRAD_TO_DEG(dispRotY), &dispRotYMat);
-			generateRotationMatrix (AROUND_X, mlRAD_TO_DEG(dispRotX), &dispRotXMat);
-
-			math3dMatrixMultiply (&dispRotMat, &dispRotYMat, &dispRotXMat);
-
-			math3dMultiplyRotation (&pieceVel, &pieceVel, &dispRotMat);
-
-			math3dMultiplyRotation (&pieceVel, &pieceVel, &centerMatrix);
-
-//			startSpeed = (mathGetFloat32ChaoticNumber()) * Ammo->AmmoType->AddedParticleSpeed;
-			FLOAT32 startSpeed = Ammo->AmmoType->AddedParticleSpeed;
-
-			FLOAT32 pieceSpeed = maxPieceSpeed * mathGetFloat32ChaoticNumber();
-
-			// trivial check, see if the particle even has enough speed to reach the target in the time allotted for it
-			if (((startSpeed + pieceSpeed) * Ammo->AmmoType->ParticleTimeout) < dist)
-				continue;
-
-			mathScaleVector (&pieceVel, &pieceVel, (startSpeed + pieceSpeed));
-
-			pieceVel.y = -pieceVel.y;
-			pieceVel.z = -pieceVel.z;
-
-			WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) x = %6.4f y=%6.4f z=%6.4f", Ammo->AmmoType->Name, Ammo->Id, pieceVel.x, pieceVel.y, pieceVel.z);
-
-			TempAmmoType.ProjectileWeight = avgMass * 2.0f * mathGetFloat32ChaoticNumber() * massMultiplier;
-			TempAmmoType.ProjectileWeight = std::max(TempAmmoType.ProjectileWeight, Ammo->AmmoType->ShrapProjWeight);
-
-			if (Ammo->AmmoType->ProjectileWeight > 0.0000001)
-				TempAmmoType.PenetrationConstant = PC * TempAmmoType.ProjectileWeight / Ammo->AmmoType->ProjectileWeight;
-//			else
-//				TempAmmoType.PenetrationConstant = 0.0000000001f;
-
-			memset(&TempAmmo,0,sizeof(weapAmmo));
-			TempAmmo.AmmoType = &TempAmmoType;
-
-			TempAmmo.Velocity.x = pieceVel.x;
-			TempAmmo.Velocity.y = pieceVel.y;
-			TempAmmo.Velocity.z = pieceVel.z;
-
-			PrevPos = *InPos;
-			TempAmmo.Position = PrevPos;
-
-			TempAmmo.Position.x += pieceVel.x * Ammo->AmmoType->ParticleTimeout;
-			TempAmmo.Position.y += pieceVel.y * Ammo->AmmoType->ParticleTimeout;
-			TempAmmo.Position.z += pieceVel.z * Ammo->AmmoType->ParticleTimeout;
-
-			// specific vehicle only so turn off terrain, ground object collisions
-			TempAmmo.Flags = WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_USE_MEDCOLLIDELIST |
-				WEAP_AMMOFLAG_DONTCHECKTERRAIN |
-				WEAP_AMMOFLAG_DAMAGE_SPECIFIC_OBJECT |
-				WEAP_AMMOFLAG_NOFX | WEAP_AMMOFLAG_IS_SHRAPNEL;
-			TempAmmo.Id = i;
-
-			TempAmmo.SpecificDamageObject = it->target;
-
-			if(_DoProjectileUpdate(&TempAmmo, &PrevPos, Ammo->AmmoType->ParticleTimeout, CurrentTime + Ammo->AmmoType->ParticleTimeout) == 0)
-				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) no hit", TempAmmoType.Name, TempAmmo.Id);
+namespace {
+	const unsigned max_shards = 2000; // TODO: Find a proper value.
 
 #ifdef BETA_RELEASE
-			FLOAT64VECTOR CurPos = TempAmmo.Position;
-			char name[32];
-			snprintf(name, 31, "shrap%d\n", i);
-			int id = draw3dSetWorldDebugLine(&PrevPos, &CurPos, name, colorREDALPHA);
+	#define WEAPON_LOGGING
+	#define WEAP_LOG(...) Write_Log(LOG_WEAP, LOG_INFO, __VA_ARGS__)
+#else
+	#define WEAP_LOG(...)
+#endif
+
+//--------------------------------------------------------------------------------------------------
+
+	/// The info needed to define a cone pointing at a target
+	struct ShrapTarget {
+		/// A ray pointing to the target's center
+		FLOAT64VECTOR dir;
+		/// The distance to the target
+		double dist;
+		/// If we pointed a cone at the target, this would be the angle needed to contain it
+		double angle;
+		/// How much of the shrapnel that angle covers.
+		double shrap_pct;
+		/// The actual target.
+		/// We note this so we can allow overlapping cones by ignoring "wrong" hits.
+		void* target;
+#ifdef WEAPON_LOGGING
+		const char* name;
+		FLOAT64VECTOR pos;
+#endif
+	};
+
+	bool GetShrapTarget(const FLOAT64VECTOR& round_pos, const FLOAT64VECTOR& target_pos,
+	                    double radius, void* target, ShrapTarget& target_info) {
+		FLOAT64VECTOR distvect;
+		mathSubVectors(&distvect, &target_pos, &round_pos);
+		double dist2 = mathExactVectorLength2(&distvect);
+		// TODO: Set this in data file for both distance and radius at X meters.
+		if ( dist2 > 10000.0 ) // Too far away, don't bother
+			return false;
+		double dist = sqrt(dist2);
+
+		double angle = atan2(radius, dist);
+		double shrap_pct = (0.5 * (1.0 - cos(angle)));
+
+		FLOAT64VECTOR cone_center;
+		mathScaleVector(&cone_center, &distvect, 1/dist); // equiv. to mathNormalize()
+
+		target_info = {cone_center, dist, angle, shrap_pct, target};
+#ifdef WEAPON_LOGGING
+		target_info.name = nullptr; target_info.pos = target_pos;
+#endif
+		return true;
+	}
+
+	bool GetVehicleTarget(const FLOAT64VECTOR& round_pos, const vehVehicle& veh,
+	                      ShrapTarget& target) {
+		double radius = std::max(1.0, veh.VehicleObjectData->Radius - 1.0);
+
+		FLOAT64VECTOR pos = veh.PosData.RenderPos;
+		if ( &veh == persGetPersonaVehiclePtr() && veh.ModelData != nullptr )
+			pos = veh.ModelData->RenderPos;
+		if ( veh.VehicleType->Type == VEH_TYPE_PERSON ) {
+			// Infantry position is based on their feet, not their center, so we need to
+			// adjust the bounding sphere accordingly.
+			radius /= 2;
+			pos.z += radius;
+		}
+
+		return GetShrapTarget(round_pos, pos, radius, (void*)&veh, target);
+	}
+
+	bool GetAGTarget(const FLOAT64VECTOR& round_pos, const trnAutoGun& ag, ShrapTarget& target) {
+		// HACK: Hard-coded radius
+		return GetShrapTarget(round_pos, ag.Pos, 5.0, (void*)&ag, target);
+	}
+
+	//--------------
+
+	std::list<ShrapTarget> GetShrapTargets(const FLOAT64VECTOR& round_pos, double& pct) {
+		std::list<ShrapTarget> targets;
+		ShrapTarget target;
+
+		vehVehicle* veh;
+		for ( vehGetVehicleHead(&veh) ; veh != nullptr ; veh = veh->getNext() ) {
+			if ( GetVehicleTarget(round_pos, *veh, target) ) {
+#ifdef WEAPON_LOGGING
+				target.name = (const char*)veh->Handle;
+#endif
+				pct += target.shrap_pct;
+				targets.push_back(target);
+			}
+		}
+
+		trnAutoGun* ag;
+		for ( trnGetAutoGunHead(&ag) ; ag != nullptr ; ag = ag->next ) {
+			if ( GetAGTarget(round_pos, *ag, target) ) {
+#ifdef WEAPON_LOGGING
+				target.name = (const char*)ag->Type->ObjectName;
+#endif
+				pct += target.shrap_pct;
+				targets.push_back(target);
+			}
+		}
+
+		// TODO: Buildings?
+
+		return targets;
+	}
+
+//--------------------------------------------------------------------------------------------------
+
+	struct ShrapProps {
+		unsigned total_shards; // The if-we-simulated-everything shard count
+		double mass_mult;
+		double avg_weight;
+		double base_pc;
+	};
+
+	ShrapProps DetermineShrapProps(const weapAmmoType& round_type, double shard_pct) {
+		ShrapProps props;
+
+		unsigned minmax_diff = (round_type.MaxShrapPieces > round_type.MinShrapPieces ? round_type.MaxShrapPieces - round_type.MinShrapPieces : 0);
+		props.total_shards = round_type.MinShrapPieces + (unsigned)(minmax_diff * mathGetFloat32ChaoticNumber());
+		props.mass_mult = 1.0;
+
+		unsigned actual_shards = (unsigned)(props.total_shards* shard_pct);
+		if ( actual_shards > max_shards ) {
+			double shard_scale = (double)actual_shards / max_shards;
+			props.total_shards = (unsigned)(props.total_shards / shard_scale);
+			props.mass_mult = std::min(shard_scale, (double)round_type.MaxMassMultiplier);
+		}
+
+		props.avg_weight = (round_type.TotalShrapnelMass / props.total_shards) * props.mass_mult;
+		props.base_pc = round_type.ShrapnelPenetrationConstant;
+		if ( !props.base_pc )
+			props.base_pc = round_type.PenetrationConstant * 0.1;
+		props.base_pc = std::max(props.base_pc, (double)round_type.ShrapProjMinPenConst);
+
+		return props;
+	}
+
+//--------------------------------------------------------------------------------------------------
+
+	weapAmmoType CreateShrapnelType(const weapAmmoType& round) {
+		weapAmmoType shrap{};
+		strncpy((char*)shrap.Name, "shrapnel", array_size(shrap.Name));
+		shrap.Diameter = round.ShrapProjDiameter;
+		shrap.RichochetAngle = round.ShrapProjRicochetAngle;
+		return shrap;
+	}
+
+	//--------------------------------------------------------------------------------------------------
+
+	double RandomShardSpeed(const weapAmmoType& round_type) {
+		double energy = round_type.ExplosiveEnergy * round_type.ShrapEnergyMult;
+		// TODO: Scale based on the mass_mult?
+		double max_speed = sqrt(2*energy / round_type.TotalShrapnelMass);
+		return round_type.AddedParticleSpeed + max_speed * mathGetFloat32ChaoticNumber();
+	}
+
+	// Gets the matrix that points [1,0,0] toward the target
+	piMATRIX GetTargetTransform(const ShrapTarget& target) {
+		double rotz = atan2(target.dir.y, target.dir.x);
+		double roty = atan2(target.dir.z, sqrt((target.dir.x*target.dir.x) + (target.dir.y*target.dir.y)));
+		piMATRIX rotzmat, rotymat;
+		generateRotationMatrix(AROUND_Z, mlRAD_TO_DEG(rotz), &rotzmat);
+		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(roty), &rotymat);
+		piMATRIX centermat;
+		math3dMatrixMultiply(&centermat, &rotymat, &rotzmat);
+		return centermat;
+	}
+
+	//------
+
+	// Generate a random ray pointing toward the target
+	piVECTOR GetRandomShardVelocity(const ShrapTarget& target, const piMATRIX& centermat, double speed) {
+		// Start with a random point in a cone with the right size
+		double dispy = target.angle * mathGetFloat32ChaoticNumber();
+		double dispx = PI * ((mathGetFloat32ChaoticNumber() * 2.0) - 1.0);
+		piMATRIX dispymat, dispxmat;
+		generateRotationMatrix(AROUND_Y, mlRAD_TO_DEG(dispy), &dispymat);
+		generateRotationMatrix(AROUND_X, mlRAD_TO_DEG(dispx), &dispxmat);
+		piMATRIX disprotmat;
+		math3dMatrixMultiply(&disprotmat, &dispymat, &dispxmat);
+		piVECTOR vel{1,0,0};
+		math3dMultiplyRotation(&vel, &vel, &disprotmat);
+
+		// Point that cone toward the target
+		math3dMultiplyRotation(&vel, &vel, &centermat);
+
+		// Now travel the right speed
+		mathScaleVector(&vel, &vel, (FLOAT32)speed);
+		vel.y = -vel.y;
+		vel.z = -vel.z;
+
+		return vel;
+	}
+
+	void GetRandomShardSize(const weapAmmoType& round_type, const ShrapProps& shard_props, weapAmmoType& shrap_type) {
+		// TODO: ShrapProjWeight is an absolute minimum? Need to talk with prod guys...
+		shrap_type.ProjectileWeight = (FLOAT32)std::max(shard_props.avg_weight * (2.0 * mathGetFloat32ChaoticNumber()),
+		                                                (double)round_type.ShrapProjWeight);
+		// ???
+		shrap_type.PenetrationConstant = (FLOAT32)(shard_props.base_pc * (shrap_type.ProjectileWeight / round_type.ProjectileWeight));
+	}
+
+	weapAmmo CreateShard(const weapAmmoType& round_type, weapAmmoType& shrap_type,
+	                     const FLOAT64VECTOR& pos, const piVECTOR& vel, void* target) {
+		weapAmmo shrap{};
+		shrap.AmmoType = &shrap_type;
+		shrap.Velocity.x = vel.x; shrap.Velocity.y = vel.y; shrap.Velocity.z = vel.z;
+		shrap.Position = pos;
+		shrap.Position.x += vel.x * round_type.ParticleTimeout;
+		shrap.Position.y += vel.y * round_type.ParticleTimeout;
+		shrap.Position.z += vel.z * round_type.ParticleTimeout;
+		shrap.Flags = WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_USE_MEDCOLLIDELIST |
+		              WEAP_AMMOFLAG_DONTCHECKTERRAIN | WEAP_AMMOFLAG_DAMAGE_SPECIFIC_OBJECT |
+		              WEAP_AMMOFLAG_NOFX | WEAP_AMMOFLAG_IS_SHRAPNEL;
+		shrap.Id = 0;
+		shrap.SpecificDamageObject = target;
+		return shrap;
+	}
+}
+
+//--------------------------------------------------------------------------------------------------
+
+static void _DoImprovedShrapnel(const weapAmmo& round, const FLOAT64VECTOR& pos, const FLOAT64VECTOR& vel,
+                                FLOAT64 currtime) {
+	const weapAmmoType& round_type = *round.AmmoType;
+	WEAP_LOG("WEAP %s(%d) explodes at [%f, %f, %f]", round_type.Name, round.Id, pos.x, pos.y, pos.z);
+
+	double shard_pct = 0.0;
+	std::list<ShrapTarget> targets = GetShrapTargets(pos, shard_pct);
+	ShrapProps shrap_props = DetermineShrapProps(round_type, shard_pct);
+
+	// Kept to the side
+	weapAmmoType shrap_type = CreateShrapnelType(round_type);
+	for ( auto& target : targets ) {
+		unsigned shrap_ct = (unsigned)(target.shrap_pct * shrap_props.total_shards);
+#ifdef BETA_RELEASE
+		WEAP_LOG("> Throwing %u shards at %s [%f, %f, %f]", shrap_ct, target.name,
+		         target.pos.x, target.pos.y, target.pos.z);
+#endif
+		if ( shrap_ct == 0 ) continue; // TODO: Maybe send one token shard? :/
+
+		piMATRIX transform = GetTargetTransform(target);
+
+		for ( unsigned i = 0 ; i < shrap_ct ; ++i ) {
+			double speed = RandomShardSpeed(round_type);
+			if ( speed * round_type.ParticleTimeout < target.dist ) {
+				WEAP_LOG(">> %u : <IGNORED : %f m/s too slow to travel %f m in %f seconds>",
+				         i, speed, target.dist, round_type.ParticleTimeout);
+				continue;
+			}
+
+			piVECTOR vel = GetRandomShardVelocity(target, transform, speed);
+			GetRandomShardSize(round_type, shrap_props, shrap_type);
+			weapAmmo shrap = CreateShard(round_type, shrap_type, pos, vel, target.target);
+			shrap.Id = i;
+
+			FLOAT64VECTOR prev_pos = pos;
+#ifdef WEAPON_LOGGING
+			bool hit = 
+#endif
+			_DoProjectileUpdate(&shrap, &prev_pos, round_type.ParticleTimeout, currtime + round_type.ParticleTimeout);
+			WEAP_LOG(">> %u : [%6.4f, %6.4f, %6.4f] > %s", i, vel.x, vel.y, vel.z, hit ? "HIT" : "miss");
+
+#ifdef BETA_RELEASE
+			static unsigned shrap_idx = 0;
+			char name[32]; snprintf(name, array_size(name), "shrap%u\n", shrap_idx++);
+			int id = draw3dSetWorldDebugLine(&prev_pos, &shrap.Position, name, colorREDALPHA);
 			draw3dSetDebugObjectFlipZ(id, TRUE);
 			draw3dSetDebugObjectAlwaysOnTop(id, FALSE);
 #endif
 		}
 	}
-	return 0;
 }
 
 /************************************************************************************************
@@ -3450,7 +3476,7 @@ static UINT32 _DoShapedCharge(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT6
 	weapAmmoType AmmoType;
 	FLOAT32 DeltaTime = 0;
 
-	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) shaped charge with %.2f mm penetration explodes",  Ammo->AmmoType->Name, Ammo->Id, 1000 * Ammo->AmmoType->ShapedChargePen);
+	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) shaped charge with %.2f mm penetration explodes",  Ammo->AmmoType->Name, Ammo->Id, 1000 * Ammo->AmmoType->ShapedChargePen);
 
 	memset(&AmmoType, 0x0, sizeof(weapAmmoType));
 	memset(&ShapeChargeAmmo, 0x0, sizeof(weapAmmo));
@@ -3550,7 +3576,7 @@ static UINT32 _DoShapedCharge(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FLOAT6
 		ShapeChargeAmmo.Id = Ammo->Id;
 
 		if(_DoProjectileUpdate(&ShapeChargeAmmo, InPos, DeltaTime, CurrentTime + DeltaTime) == 0)
-			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) no hit", AmmoType.Name, ShapeChargeAmmo.Id);
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) no hit", AmmoType.Name, ShapeChargeAmmo.Id);
 	}
 
 	return 0;
@@ -3600,7 +3626,7 @@ static UINT32 _TraverseHitTreeAndApplyConcussionDamage(weapAmmo* Ammo, vehVehicl
 
 				if (Damage > 10.0f)
 				{
-					WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s concussion to component %s of %s(%s) at %.1f m",
+					Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s concussion to component %s of %s(%s) at %.1f m",
 								ExplosionInternal ? "internal" : "external", ObjSib->name, CurrentVehicle->VehicleType->Id, CurrentVehicle->Handle, Dist);
 					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, ObjSib->trnum, Damage, Counter);
 				}
@@ -3656,12 +3682,12 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 #ifdef BETA_RELEASE
 	if(!ConcussionEnabled)
 	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP concussion disabled");
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP concussion disabled");
 		return 0;
 	}
 #endif
 
-	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) concussive explosion",  Ammo->AmmoType->Name, Ammo->Id);
+	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) concussive explosion",  Ammo->AmmoType->Name, Ammo->Id);
 
 	// compute threshold, distance at which 10j of energy applied
 	Energy = Ammo->AmmoType->ExplosiveEnergy;
@@ -3719,7 +3745,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 			TempNum -= TO->Radius;
 			if (TempNum < 0.01f) TempNum = 0.01f;
 
-			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP concussion to %s at %.1fm", TO->TerrainMasterObject->name, TempNum);
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP concussion to %s at %.1fm", TO->TerrainMasterObject->name, TempNum);
 
 			TempNum *= 95.0f;
 
@@ -3930,7 +3956,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 				if (Damage > 10.0f)
 				{
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP Concussion to %s(%s) at %.1fm",
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Concussion to %s(%s) at %.1fm",
 								CurrentVehicle->VehicleType->Id, CurrentVehicle->Handle, (FLOAT32)mathExactVectorLength(&TempVec));
 //					for (i=0;i<4;i++)
 //						weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, i+1, Damage, Ammo->Id);
@@ -3974,7 +4000,7 @@ static LOGICAL _ApplyShapedChargeDamage(weapAmmo* Ammo, FASTCOLLIDE* Collision, 
 
 	if(!(Ammo->Flags & WEAP_AMMOFLAG_CANDAMAGE)) return TRUE;
 
-	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP applying shaped charge damage to %s(%d), t = %lf s", Collision->CollideObject->name,
+	Write_Log(LOG_WEAP, LOG_INFO, "WEAP applying shaped charge damage to %s(%d), t = %lf s", Collision->CollideObject->name,
 				Collision->PolyNum, CurrentTime - DeltaTime * (1 - Collision->CollideTime));
 
 	weapAmmoApplyDamageToVehicleComponent(Ammo, (vehVehicle*)Collision->TopLevelObject, compNum, Ammo->AmmoType->ExplosiveEnergy, Ammo->Id);
@@ -4152,7 +4178,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 	if(t != 0 && DeltaTime > 0.0f)
 		t = (DetontateTime - PrevTime) /  DeltaTime;
 
-	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) detonating, t = %lf s", Ammo->AmmoType->Name, Ammo->Id, DetontateTime);
+	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) detonating, t = %lf s", Ammo->AmmoType->Name, Ammo->Id, DetontateTime);
 	Pos.x = (NewPos->x - OldPos->x) * t + OldPos->x;
 	Pos.y = (NewPos->y - OldPos->y) * t + OldPos->y;
 	Pos.z = (NewPos->z - OldPos->z) * t + OldPos->z;
@@ -4178,8 +4204,7 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVECTOR const* OldPos,
 									piVECTOR const* NewPos, FLOAT64 DeltaTime,  FLOAT64 CurrentTime)
 {
-	int isSmoke = Ammo->AmmoType->HasSmoke;
-	if(isSmoke == 1)
+	if(Ammo->AmmoType->HasSmoke == 1) // HACK: 1 is for smoke-only rounds
 		return FALSE;
 
 	if(Collision->Alpha < 0.5)
@@ -4199,7 +4224,8 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	// to FALSE, TRUE and 1 which may have ambiguous effects.
 	LOGICAL AmmoStopped = FALSE;
 	LOGICAL Richocheted = FALSE;
-	LOGICAL DoSpall = TRUE;
+	// Spall only if we're hitting external armor
+	LOGICAL DoSpall = (Collision->Flags & _AMMOCD_FLAG_EXTERNALCOMPONENT) && ! (Collision->Flags & _AMMOCD_FLAG_ISPERSONA);
     piVECTOR DeltaVec = {0, 0, 0};
     FLOAT64 ResidualSpeed = 0;
 	FLOAT64 PenetrationConstant = 0;
@@ -4219,7 +4245,7 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	FLOAT64VECTOR AmmoDir = Ammo->Velocity;
 	AmmoDir.x /= AmmoSpeed; AmmoDir.y /= AmmoSpeed; AmmoDir.z /= AmmoSpeed;
 
-//	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) t = %lf s .. Oldpos (%f, %f, %f)  Newpos (%f, %f, %f)",  Ammo->AmmoType->Name, Ammo->Id,
+//	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) t = %lf s .. Oldpos (%f, %f, %f)  Newpos (%f, %f, %f)",  Ammo->AmmoType->Name, Ammo->Id,
 //								AmmoCollideTime,
 //								OldPos->x, OldPos->y, OldPos->z, NewPos->x, NewPos->y, NewPos->z);
 
@@ -4277,13 +4303,13 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 			if(Ammo->AmmoType->ShapedChargePen > Thickness)
 			{
 				if(!(Collision->Flags & _AMMOCD_FLAG_ISPERSONA))
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) penetrating %s(%d), thickness %.2lf mm at %.0lf deg, t = %lf s", Ammo->AmmoType->Name, Ammo->Id,
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) penetrating %s(%d), thickness %.2lf mm at %.0lf deg, t = %lf s", Ammo->AmmoType->Name, Ammo->Id,
 								Collision->CollideObject->name, Collision->PolyNum, Thickness * 1000.0, mlRAD_TO_DEG(Obliquity), AmmoCollideTime);
 				AmmoStopped = FALSE;
 			}else
 			{
 				if(!(Collision->Flags & _AMMOCD_FLAG_ISPERSONA))
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) stopped in %s(%d), thickness %.2lf mm at %.0lf deg, t = %lf s",  Ammo->AmmoType->Name, Ammo->Id,
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) stopped in %s(%d), thickness %.2lf mm at %.0lf deg, t = %lf s",  Ammo->AmmoType->Name, Ammo->Id,
 								Collision->CollideObject->name, Collision->PolyNum, Thickness * 1000.0, mlRAD_TO_DEG(Obliquity), AmmoCollideTime);
 				AmmoStopped = TRUE;
 			}
@@ -4300,14 +4326,14 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		if(Collision->Flags & _AMMOCD_FLAG_ISPERSONA)
 		{
 			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) striking %s of %s(%s) at %.0lf m/s, KE %.0lf J, t = %lf s",
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) striking %s of %s(%s) at %.0lf m/s, KE %.0lf J, t = %lf s",
 				Ammo->AmmoType->Name, Ammo->Id, Vehicle->VehicleType->DamageObjects[Collision->PolyNum], Vehicle->VehicleType->Id, Vehicle->Handle,
 //				Ammo->AmmoType->Name, Ammo->Id, Vehicle->VehicleType->DamageObjects PERSON_LOCATION[Collision->PolyNum], Vehicle->VehicleType->Id, Vehicle->Handle,
 					AmmoSpeed, KE, AmmoCollideTime);
 		}else
 		{
 			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-				WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) striking %s component %s(%d) of %s(%s) at %.0lf m/s, KE %.0lf J, thickness %.2lf mm at %.0lf deg, t = %lf s",
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) striking %s component %s(%d) of %s(%s) at %.0lf m/s, KE %.0lf J, thickness %.2lf mm at %.0lf deg, t = %lf s",
 					Ammo->AmmoType->Name, Ammo->Id, (Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT) ? "internal" : "external",
 					Collision->CollideObject->name, Collision->PolyNum, Vehicle->VehicleType->Id, Vehicle->Handle,
 					AmmoSpeed, KE, Thickness * 1000.0, mlRAD_TO_DEG(Obliquity), AmmoCollideTime);
@@ -4331,19 +4357,68 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 				KE = RichochetSpeed * RichochetSpeed * 0.5 * Ammo->AmmoType->ProjectileWeight;
 				DoSpall = FALSE;
 				Richocheted = TRUE;
+
+				// TODO: Adjust the round's heading and set AmmoStopped = FALSE;
+			}
+			
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND) && (Ammo->AmmoType->ExplosiveEnergy > 0))
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+			// if the ammo has not exceeded the arming timer, give them a head shake and kill it
+			if(((AmmoCollideTime - Ammo->LaunchTime) < Ammo->AmmoType->ArmingTime) && (Ammo->AmmoType->ExplosiveEnergy > 0)) 
+			{
+				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+					if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+					{
+						persShakeHead("common.headshake.notarmed.bomb");
+					}
+					else
+					{
+						persShakeHead("common.headshake.notarmed");
+					}
+				}
+				// since the ammo isn't going to explode, go ahead and kill it
+				_KillAmmo(Ammo);
+				return FALSE;
 			}
 		}else // penetrated, bleed off energy
 		{
 			ResidualSpeed = sqrt((KE - KELimit) / .5 / Ammo->AmmoType->ProjectileWeight);
 			KE = KELimit;
 
-			// start fuse
-			if( (Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) &&
-				(AmmoSpeed - ResidualSpeed > Ammo->AmmoType->FuseStartSpeedLoss) )
+			// start the fuse after checking to see if the arming timer has expired
+			if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0)
+				&& (AmmoSpeed - ResidualSpeed > Ammo->AmmoType->FuseStartSpeedLoss))
 			{
-				Ammo->FuseStartTime = AmmoCollideTime;
+				// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
 				if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-					WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name, Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+				if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
+				{
+					// only if the ammo has been released/shot with enough time for the arming time to expire
+					Ammo->FuseStartTime = AmmoCollideTime;
+					
+					if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+						Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name,
+								  Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+				}
+				else
+				{
+					if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+						if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+						{
+							persShakeHead("common.headshake.notarmed.bomb");
+						}
+						else
+						{
+							persShakeHead("common.headshake.notarmed");
+						}
+					}
+					// since the ammo isn't going to explode, go ahead and kill it
+					_KillAmmo(Ammo);
+					return FALSE;
+				}
 			}
 		}
 	}
@@ -4411,20 +4486,24 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	}
 #endif
 
-	// note:  may need to supress spall in the specific object case .. don't have to at the moment
-	// because shrapnel uses an ammotype that is guaranteed to not have modelspall set
-	if(	DoSpall && Ammo->AmmoType->ModelSpall &&
-		(Collision->Flags & _AMMOCD_FLAG_EXTERNALCOMPONENT) && !(Collision->Flags & _AMMOCD_FLAG_ISPERSONA) )
-	{
-		if(PenetrationThickness > .9*Thickness)
-			_DoSpall(Ammo, (FLOAT32)AmmoSpeed, (FLOAT32)ResidualSpeed, Collision, NewPos, OldPos, Ammo->Flags);
+	if ( DoSpall && Ammo->AmmoType->ModelSpall ) {
+		// Need to nearly or totally penetrate to generate spall
+		if ( PenetrationThickness > 0.9 * Thickness ) {
+			double spall_mult = 1.0;
+			// Overmatch formula is from US Government testing (via scotsman)
+			if ( AmmoSpeed / ResidualSpeed >= 0.75 && Ammo->AmmoType->Diameter >= 2 * Thickness ) {
+				double diam_mm = Ammo->AmmoType->Diameter * 1000.0;
+				spall_mult = std::max(1.0, 0.1484 + 0.0461329 * diam_mm);
+			}
+			_DoSpall(Ammo, (FLOAT32)AmmoSpeed, (FLOAT32)ResidualSpeed, spall_mult, Collision, NewPos, OldPos, Ammo->Flags);
+		}
 	}
 
 	// logging
 	if(!Richocheted)
 	{
 		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-			WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) %s %s(%d) %.2lf mm, lost %.0lf m/s, speed now %.0lf m/s, t = %lf s",
+			Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) %s %s(%d) %.2lf mm, lost %.0lf m/s, speed now %.0lf m/s, t = %lf s",
 					Ammo->AmmoType->Name, Ammo->Id, (AmmoStopped) ? "stopped in" : "penetrated", Collision->CollideObject->name, Collision->PolyNum,
 					(AmmoStopped) ? PenetrationThickness*1000.0 : Thickness*1000.0,
 					AmmoSpeed - ResidualSpeed, ResidualSpeed, AmmoCollideTime);
@@ -4432,7 +4511,7 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	else
 	{
 		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-			WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) richocheting off %s(%d) with a thickness of %.2lf mm at %.0lf deg, t = %lf s",
+			Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) richocheting off %s(%d) with a thickness of %.2lf mm at %.0lf deg, t = %lf s",
 					Ammo->AmmoType->Name, Ammo->Id, Collision->CollideObject->name, Collision->PolyNum, Thickness * 1000.0, mlRAD_TO_DEG(Obliquity), AmmoCollideTime);
 	}
 
@@ -4479,16 +4558,13 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		CollidePos.z = -CollidePos.z;
 
 		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-			WriteLog(LOG_WEAPON,LOG_INFO,"WEAP %s(%d) fuze detonates", Ammo->AmmoType->Name, Ammo->Id);
+			Write_Log(LOG_WEAP,LOG_INFO,"WEAP %s(%d) fuze detonates", Ammo->AmmoType->Name, Ammo->Id);
 
 		weapfxAmmoExplosion(Ammo, &CollidePos, Collision, (Richocheted) ? 0 : !AmmoStopped);
-		bool doshrap = Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT
-			|| Vehicle->VehicleType->Type == VEH_TYPE_AIR || Vehicle->VehicleType->Type == VEH_TYPE_SEA
-			|| Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_GRENADE;
 
-#ifdef BETA_RELEASE
-		if(weaplogFile) doshrap = true;
-#endif
+		bool doshrap = Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT
+		            || Vehicle->VehicleType->Type == VEH_TYPE_AIR || Vehicle->VehicleType->Type == VEH_TYPE_SEA
+		            || Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_GRENADE;
 		_DoExplosionShrapnel(Ammo, &CollidePos, (AmmoStopped) ? &AmmoDir : &Ammo->Velocity, AmmoCollideTime, doshrap);
 		_DoExplosionConcussion(Ammo, &CollidePos, Collision->Flags & _AMMOCD_FLAG_INTERNALCOMPONENT);
 
@@ -4537,6 +4613,55 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
     mathAddVectors(&CollidePos, &CollidePos, &WorldOriginOffset);
         CollidePos.z = -CollidePos.z;
 
+	AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
+	AmmoCollideTime = CurrentTime - DeltaTime * (1 - Collision->CollideTime);
+
+	if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+	{
+		Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) striking %s(%d) of terrain %s at %.0lf m/s, t = %lf s",
+		Ammo->AmmoType->Name,
+		Ammo->Id,
+		(Collision->CollideObject) ? Collision->CollideObject->name : "null",
+		Collision->PolyNum,
+		TO ? TO->TerrainObject->name : "",
+		AmmoSpeed,
+		AmmoCollideTime);
+	}
+
+	// start the fuze after checking to see if the arming timer has expired
+	if((Ammo->FuseStartTime == 0) && (Ammo->AmmoType->ExplosiveEnergy > 0) && !(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO))
+	{
+		// only if the FuseStartTime hasn't already been started and there is ExplosiveEnergy left
+		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP Flight Time: %lf s, Arming Time: %lf s", AmmoCollideTime - Ammo->LaunchTime, Ammo->AmmoType->ArmingTime);
+
+		if((AmmoCollideTime - Ammo->LaunchTime) >= Ammo->AmmoType->ArmingTime)
+		{
+			// only if the ammo has been released/shot with enough time for the arming time to expire
+			Ammo->FuseStartTime = AmmoCollideTime;
+			
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
+				Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) fuse started, timer = %.4lf s, t = %lf s", Ammo->AmmoType->Name,
+						  Ammo->Id, Ammo->AmmoType->FuzeTime, Ammo->FuseStartTime);
+		}
+		else
+		{
+			if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND)){
+				if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+				{
+					persShakeHead("common.headshake.notarmed.bomb");
+				}
+				else
+				{
+					persShakeHead("common.headshake.notarmed");
+				}
+			}
+			// since the ammo isn't going to explode, go ahead and kill it
+			_KillAmmo(Ammo);
+			return FALSE;
+		}
+	}
+
 	// weapon fx
 	if(!(Ammo->Flags & WEAP_AMMOFLAG_NOFX))
 	{
@@ -4550,22 +4675,7 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 			weapfxAmmoHit(Ammo, Collision, OldPos, NewPos, nullptr, 0, 0);
 		}
 	}
-
-	AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
-	AmmoCollideTime = CurrentTime - DeltaTime * (1 - Collision->CollideTime);
-
-	if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-	{
-		WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) striking %s(%d) of terrain %s at %.0lf m/s, t = %lf s",
-		Ammo->AmmoType->Name,
-		Ammo->Id,
-		(Collision->CollideObject) ? Collision->CollideObject->name : "null",
-		Collision->PolyNum,
-		TO ? TO->TerrainObject->name : "",
-		AmmoSpeed,
-		AmmoCollideTime);
-	}
-
+	
 	// apply the damage
 	if(TO)
 	{
@@ -4607,16 +4717,14 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 					else
 						Ammo->Flags |= WEAP_AMMOFLAG_SPECIALACTIVE;
 
-					if(Ammo->AmmoType->HasSmoke == 2)
-						goto explode;
-                    return FALSE;
+					if(Ammo->AmmoType->HasSmoke == 1)
+						return FALSE;
                 }
 			}
 		}
 
 		if(Ammo->AmmoType->HasSmoke != 1)
 		{
-explode:
 			FLOAT64VECTOR AmmoDir;
 			AmmoSpeed = mathExactVectorLength(&Ammo->Velocity);
 			AmmoDir = Ammo->Velocity;
@@ -4672,7 +4780,7 @@ static UINT32 _GetProjectileCollisions(weapAmmo* Ammo, UINT32 Flags, FASTCOLLIDE
 	UINT32 i = 0;
 	FASTCOLLIDE*  CollideListPtr = nullptr;
 
-//	WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) .. Oldpos (%f, %f, %f)  Newpos (%f, %f, %f)",  Ammo->AmmoType->Name, Ammo->Id,
+//	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) .. Oldpos (%f, %f, %f)  Newpos (%f, %f, %f)",  Ammo->AmmoType->Name, Ammo->Id,
 //								OldPos->x, OldPos->y, OldPos->z, NewPos->x, NewPos->y, NewPos->z);
 //
 	logTimerBeginMacro();
@@ -4991,7 +5099,7 @@ static SINT32 _UpdateProjectile(weapAmmo * Ammo)
 		(CurrentTime > (Ammo->LaunchTime + Ammo->AmmoType->LifeTime) + 2) )
 	{
 		if(!(Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND))
-			WriteLog(LOG_WEAPON, LOG_INFO, "WEAP %s(%d) timed out after %f s", Ammo->AmmoType->Name, Ammo->Id, Ammo->AmmoType->LifeTime);
+			Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) timed out after %f s", Ammo->AmmoType->Name, Ammo->Id, Ammo->AmmoType->LifeTime);
 
 	    KillAmmo = TRUE;
 	}

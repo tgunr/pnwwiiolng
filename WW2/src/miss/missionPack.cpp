@@ -194,6 +194,13 @@ SINT32 missPackMISSION_RESULTS(PackMode mode, UCHAR* packed, SINT32 offset, MISS
 		offset = teulPackUINT16(mode, packed, offset, &(object->hitArray[i].numVehiclesKilled), 12);	// }
 	}
 
+    // Populate the packet with the enemies array
+	for(UINT32 i = 0; i < object->kills; ++i)
+	{
+		offset = wwiiPackWeaponSpec(mode, packed, offset, &object->enemiesArray[i].vehSpec, 0);
+		offset = wwiiPackHandle(mode, packed, offset, &(object->enemiesArray[i].callsignId), 0);
+	}
+
 	offset = teulPackUINT32(mode, packed, offset, (UINT32*)&object->missionSuccess, 1);	// }
 	offset = teulPackUINT32(mode, packed, offset, (UINT32*)&object->promoted, 1);		// }
 	offset = teulPackUINT32(mode, packed, offset, (UINT32*)&object->missionInvalid, 1);	// } 8 bits

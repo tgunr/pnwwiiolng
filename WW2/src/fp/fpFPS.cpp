@@ -1693,7 +1693,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if (currentWeaponModel == BUILD_TOOL)
 				{
-					uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("hud.tut.ppo").c_str());
+					uiGameEvent(GAMEEVENT_ALERT, 1, uiLocString("ppos.infantry.alert").c_str());
 					fpPPOReset();
 				}
 
@@ -12399,6 +12399,12 @@ FLOAT64 fpFPSGetBridgeDamage()
 FLOAT64 fpFPSGetBridgeRepair()
 {
 	return -fpsTrooper.bridgeRepairJoules;
+}
+
+FLOAT64 fpFPSGetFbDamage()
+{
+	// FB veh spawn damage override from fpsData.txt
+	return fpsTrooper.fbDamageJoules;
 }
 
 FLOAT32 fpFPSGetConcussionMod()

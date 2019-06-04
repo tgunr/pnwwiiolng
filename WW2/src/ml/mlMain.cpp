@@ -210,6 +210,7 @@
 #define AUTOPILOT_MAX_ACC2 16.0
 #define AUTOPILOT_MAX_VELZ2 128.0
 #define AUTOPILOT_MAX_ROLL2 ((16*PI/180.0)*(16*PI/180.0))
+#define AUTOPILOT_MIN_SPEED_MS 25.0 // Let's set a minimum speed of 25 m/s (90kph/56mph) in order to engage the autopilot
 
 #define DRAG_DAMAGE 4000.0f
 
@@ -10681,7 +10682,8 @@ LOGICAL mlAutopilotWithinLimits(mlVehicleData* VehicleData)
 
 	if(	acc2 < AUTOPILOT_MAX_ACC2 && attacc2 < AUTOPILOT_MAX_ATTACC2 &&
 	 	VehicleData->VehicleVel.z*VehicleData->VehicleVel.z 		< AUTOPILOT_MAX_VELZ2 &&
-		VehicleData->VehicleAtt.Roll*VehicleData->VehicleAtt.Roll 	< AUTOPILOT_MAX_ROLL2	)
+		VehicleData->VehicleAtt.Roll*VehicleData->VehicleAtt.Roll 	< AUTOPILOT_MAX_ROLL2 &&
+		mathExactVectorLength(&VehicleData->VehicleVel) >= AUTOPILOT_MIN_SPEED_MS)
 	{
 		withinLimits = TRUE;
 	}
