@@ -318,6 +318,17 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), incoming.data().m_brigadeID, incoming.data().m_newCountryId);
 
+	// Add an entry to the wwiionline.move_requests table so that Manually Changed Garrisons can be reviewed/monitored
+	DBThread::Do(DBThread::Default
+				, "INSERT INTO `wwiionline`.`move_requests`"
+					"(recorded, requester, action, unit_id, from_country_id, to_country_id, result)"
+					"VALUES"
+					"(NOW(), '%s', %u, %u, %u, %u, %d)"
+					, requester.c_str(), request.m_actionable, request.m_brigadeID
+					, unit->country(), request.m_newCountryId
+					, request.m_action
+					);
+					
 	if ( !request.m_actionable || request.m_action != GCR_APPROVED )
 	{
 		dbugLog(_FLD, "Calling stratSendGarrisonCountryChange");
