@@ -213,7 +213,10 @@ template<>
 SINT32
 BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 {
+	dbugLog(_FLD, "Received BRIGADE_MOVE_MSG");
+	
 	BrigadeMove& request = incoming.data();
+	
 	if ( incoming.action() != BRIGADE_MOVE_MSG::EXCHANGE || request.m_action != BMR_APPROVED )
 	{
 		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
@@ -238,6 +241,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 					);
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), unit, cp, (bool)incoming.flags());
+	
 	DBThread::Do(DBThread::Default
 				, "INSERT INTO `wwiionline`.`move_requests`"
 					"(recorded, requester, action, unit_id, from_cp_oid, to_cp_oid, result)"
@@ -297,6 +301,7 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG");
 
 	GarrisonCountryChange& request = incoming.data();
+	
 	if ( incoming.action() != GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE || request.m_action != GCR_APPROVED )
 	{
 		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
@@ -338,8 +343,8 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 	{
 		dbugLog(_FLD, "Not actionable or not approved", request.m_actionable, request.m_action);
 	}
+	
 	return 1;
-
 }
 
 // Used by Strat host
