@@ -213,7 +213,10 @@ template<>
 SINT32
 BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 {
+	dbugLog(_FLD, "Received BRIGADE_MOVE_MSG");
+	
 	BrigadeMove& request = incoming.data();
+	
 	if ( incoming.action() != BRIGADE_MOVE_MSG::EXCHANGE || request.m_action != BMR_APPROVED )
 	{
 		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
@@ -238,6 +241,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 					);
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), unit, cp, (bool)incoming.flags());
+	
 	DBThread::Do(DBThread::Default
 				, "INSERT INTO `wwiionline`.`move_requests`"
 					"(recorded, requester, action, unit_id, from_cp_oid, to_cp_oid, result)"
@@ -297,6 +301,7 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG");
 
 	GarrisonCountryChange& request = incoming.data();
+	
 	if ( incoming.action() != GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE || request.m_action != GCR_APPROVED )
 	{
 		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
@@ -318,6 +323,17 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), incoming.data().m_brigadeID, incoming.data().m_newCountryId);
 
+	// Add an entry to the wwiionline.move_requests table so that Manually Changed Garrisons can be reviewed/monitored
+	DBThread::Do(DBThread::Default
+				, "INSERT INTO `wwiionline`.`move_requests`"
+					"(recorded, requester, action, unit_id, from_country_id, to_country_id, result)"
+					"VALUES"
+					"(NOW(), '%s', %u, %u, %u, %u, %d)"
+					, requester.c_str(), request.m_actionable, request.m_brigadeID
+					, unit->country(), request.m_newCountryId
+					, request.m_action
+					);
+					
 	if ( !request.m_actionable || request.m_action != GCR_APPROVED )
 	{
 		dbugLog(_FLD, "Calling stratSendGarrisonCountryChange");
@@ -327,8 +343,8 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 	{
 		dbugLog(_FLD, "Not actionable or not approved", request.m_actionable, request.m_action);
 	}
+	
 	return 1;
-
 }
 
 // Used by Strat host
