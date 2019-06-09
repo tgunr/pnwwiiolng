@@ -1027,6 +1027,21 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
 }
 
 
+void Steam_exeWorkingPath()
+{
+	//  The Steam Installer is unable to create directories at this time (9-June-2019: MJH).
+	//  Reset the Organic WW2_exeWorkingPath to WW2_userWorkingPath for the Steam Client install.
+
+	//  WW2_exeWorkingPath;		Windows - EXE Working folder:  \ProgramData -> WWIIOnLine.
+	//							macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline.
+	//  WW2_userWorkingPath;	Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin.
+	//							macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin.
+	WW2_exeWorkingPath = WW2_userWorkingPath;
+
+	return;
+}
+
+
 LOGICAL fioStructureVerify()
 {
 	LOGICAL fioStructureVerify_Value = FALSE;

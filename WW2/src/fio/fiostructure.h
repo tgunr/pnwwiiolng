@@ -34,6 +34,7 @@ using wwiiolpath_string = std::wstring;
 //  using wwiiolpath_string = std::u16string;
 
 LOGICAL fioStructureInit();
+void Steam_exeWorkingPath();
 LOGICAL fioStructureVerify();
 unsigned long Wstring2Char(wwiiolpath_string sourceString, char *destinationString, const size_t sizeLimit);
 unsigned long Wstring2Char(wwiiolpath_string sourceString, wchar_t *destinationString, const size_t sizeLimit);

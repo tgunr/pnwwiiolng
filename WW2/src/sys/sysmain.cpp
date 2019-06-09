@@ -744,6 +744,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
 	}
 
+	//  Add Steam: ProgramData / Application Support Path Checking/Setup.
+	if (UseSteamLogin == TRUE)
+	{
+		Steam_exeWorkingPath();
+	}
+
 #ifdef ANTIHACK
 	HandleHackID();
 #else
