@@ -10,10 +10,6 @@ extern LOGICAL persGunsightUpdate();
 extern LOGICAL persPrepGunsightDraw();
 extern LOGICAL persGunsightDraw(OBJECT * DOF,UINT32 IsInstrumentView);
 
-extern UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach);
-extern UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach);
-extern UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach);
-
 extern UINT32 persGunsightRangeInc(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persGunsightRangeDec(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persGunsightTargetSpeedInc(SINT32 Param,UINT32 Id,UINT32 Detach);

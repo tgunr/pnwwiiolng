@@ -26,6 +26,7 @@
 #include "gr2/gr2layer.h"
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"
+#include "imaplib/imap.h"
 #include "include/vars.h"
 #include "js/jsContent.h"
 #include "js/jsGame.h"
@@ -2183,6 +2184,19 @@ static SINT32 dot_imapkey(const char* line)
 	return DC_HANDLED;
 }
 
+static SINT32 dot_imapdump(const char* line) {
+    imapDump();
+    uiChatPrintLine("Look in log for results");
+    return DC_HANDLED;
+}
+
+static SINT32 dot_imapinit(const char *line) {
+    uiChatPrintLine("Not ready!");
+    ww2imapKill();
+    ww2imapInit();
+    return DC_HANDLED;
+}
+
 /************************************************************************************************
 	discohostCmd
 *************************************************************************************************/
@@ -3452,6 +3466,90 @@ UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
     return 0;
 }
 
+UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gXValue = gXValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    
+    return 0;
+}
+
+UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gXValue = gXValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    
+    return 0;
+}
+
+UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gYValue = gYValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    
+    return 0;
+}
+
+UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gYValue = gYValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    
+    return 0;
+}
+
+UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gZValue = gZValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gZValue);
+    
+    return 0;
+}
+
+UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gZValue = gZValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle = !gToggle;
+    sptDrawOn(0, gToggle);
+    
+    return 0;
+}
+
 UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
     OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
@@ -3459,7 +3557,28 @@ UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gToggle1 = !gToggle1;
-    sptDrawOn(0, gToggle1);
+    
+    return 0;
+}
+
+UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle2 = !gToggle2;
+    
+    return 0;
+}
+
+UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle3 = !gToggle3;
     
     return 0;
 }
@@ -7992,6 +8111,8 @@ void uiDotCommandsInit()
 #endif
 
 	ADD_DOT_COMMAND(imapkey, false);
+    ADD_DOT_COMMAND(imapdump, false);
+    ADD_DOT_COMMAND(imapinit, false);
     ADD_DOT_COMMAND(fuze, true);
 	ADD_DOT_COMMAND(discohost, false);
 	ADD_DOT_COMMAND(discochat, false);

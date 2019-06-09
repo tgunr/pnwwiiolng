@@ -305,7 +305,10 @@ FLOAT32         gHValue = 1.0; // Global debug value
 FLOAT32         gXValue = 1.0; // Global debug value
 FLOAT32         gYValue = 1.0; // Global debug value
 FLOAT32         gZValue = 1.0; // Global debug value
+LOGICAL         gToggle = true;
 LOGICAL         gToggle1 = true;
+LOGICAL         gToggle2 = true;
+LOGICAL         gToggle3 = true;
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;

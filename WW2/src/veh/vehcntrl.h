@@ -24,3 +24,16 @@ UINT32 vehIkTriggeredFunction(UINT32 Id,UINT32 Time);
 UINT32 vehcntrlDisableAllControls();
 SINT32 vehcntrlGetFunctionIndex(SCHAR* functionName);
 UINT32 vehcntrlBailout();
+
+extern UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach);
+extern UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach);

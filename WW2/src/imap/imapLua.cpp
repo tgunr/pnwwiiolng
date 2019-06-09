@@ -742,6 +742,7 @@ TOLUA_API int tolua_imap_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"IMAP_HOLD_GVALUE_INC",IMAP_HOLD_GVALUE_INC);
    tolua_constant(tolua_S,"IMAP_HOLD_GVALUE_DEC",IMAP_HOLD_GVALUE_DEC);
    tolua_constant(tolua_S,"IMAP_TOGGLE1",IMAP_TOGGLE1);
+   tolua_constant(tolua_S,"IMAP_TOGGLE2",IMAP_TOGGLE2);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_SPEED_DEC",IMAP_HOLD_BOMBSIGHT_SPEED_DEC);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_SPEED_INC",IMAP_HOLD_BOMBSIGHT_SPEED_INC);
    tolua_constant(tolua_S,"IMAP_HOLD_BOMBSIGHT_ALT_DEC",IMAP_HOLD_BOMBSIGHT_ALT_DEC);
@@ -799,6 +800,7 @@ TOLUA_API int tolua_imap_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"IMAP_HEAD_TRANSLATE_X",IMAP_HEAD_TRANSLATE_X);
    tolua_constant(tolua_S,"IMAP_HEAD_TRANSLATE_Y",IMAP_HEAD_TRANSLATE_Y);
    tolua_constant(tolua_S,"IMAP_HEAD_TRANSLATE_Z",IMAP_HEAD_TRANSLATE_Z);
+   tolua_constant(tolua_S,"IMAP_TOGGLE_HEAD_LOOK",IMAP_TOGGLE_HEAD_LOOK);
    tolua_constant(tolua_S,"IMAP_HOLD_FP_SPRINT",IMAP_HOLD_FP_SPRINT);
    tolua_constant(tolua_S,"IMAP_HOLD_FP_AUTORUN",IMAP_HOLD_FP_AUTORUN);
    tolua_constant(tolua_S,"IMAP_HOLD_FP_CROUCH",IMAP_HOLD_FP_CROUCH);
