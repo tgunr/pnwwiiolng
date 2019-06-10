@@ -3432,7 +3432,7 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
 		}
 	}
 
-    uiChatPrintLine("FOV is now %f, Desired is %f", FieldOfView, fpsTrooper.desiredFOV);
+    // uiChatPrintLine("FOV is now %f, Desired is %f", FieldOfView, fpsTrooper.desiredFOV);
 
 	// handle head turn
 	if (1)
