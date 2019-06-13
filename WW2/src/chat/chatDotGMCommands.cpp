@@ -2053,12 +2053,26 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const override
 	{
-		UINT32 axis = 0, allied = 0;
+		UINT32 axis = 0, allied = 0, numAxisSpawn = 0, numAlliesSpawn = 0;
 		char _roster[100+1];		// Place to store rosters we generate
 		if ( arguments == nullptr || strcmp(arguments, "all") == 0 )
 		{
 			axis = _sideCount[AXIS];
 			allied = _sideCount[ALLIED];
+
+			const PLAYERID_HASH allPlayers = ServerInterface::GetOnlinePlayers();
+			
+			// Loop through all of the online players to see how many are spawned in
+			for (const std::pair<const playerid_t, PlayerStatusNode *> &psnp : allPlayers) {
+				playerid_t playerID = psnp.first;
+				const PlayerStatusNode *psn = psnp.second;
+				const Player *player = static_cast<const Player *>(psn->localInfo); // WHY!
+
+				if (!player || !player->isConnected()) { continue; }
+
+				numAxisSpawn += (player->side() == AXIS && player->isSpawned());
+				numAlliesSpawn += (player->side() == ALLIED && player->isSpawned());
+			}
 		}
 		else if ( strncmp(arguments, "camp", 4) == 0 )
 		{
@@ -2072,7 +2086,7 @@ public:
 			return;
 		}
 
-		strprintf(_roster, "Axis: %d. Allied: %d.", axis, allied);
+		strprintf(_roster, "Online - Axis: %d Allied: %d Spawned - Axis: %d Allied: %d", axis, allied, numAxisSpawn, numAlliesSpawn);
 		player.message(LSTR_NONE, LSTR_GENERIC, _roster, nullptr);
 	}
 
