@@ -162,9 +162,10 @@ SINT32 commRecvWorldUpdateData(ACTION_OBJECT* a)
 	//------
 	auto lastPing = a->read<TeulTimeMS>();
 	teulSyncClock();
-	g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
+	g_lastPing = std::max((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
 	pingHistogram.add(g_lastPing);
 	g_averagePing = pingHistogram.average();
+	Write_Debug("Last ping: %d teulClock: %" PR64BitUT "", g_lastPing, teulClock64);
 
 #ifdef VEHICLES_GAME_INFO
 	vehSaveLastWorldUpdate(wu);

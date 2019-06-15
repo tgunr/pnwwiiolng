@@ -1832,6 +1832,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 {
 	std::string response;
 	char buf[128+1];
+	char pingstr[21];
 	buf[0] = '\0';
 
 	if ( player.isPlaynet() )
@@ -1919,7 +1920,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( leadingBrigade() )
 	{
 		char oic[21];
-		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
+		HCUnit *unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
 			strprintf(oic, "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
@@ -1942,6 +1943,8 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		strprintf(permissionsHex, "PM: %016" PRPermMaskT "", permissionMask());
 		_addStr(response, permissionsHex);
 	}
+	strprintf(pingstr, " Ping:%u ", this->m_latestPing);
+	_addStr(response, pingstr);
 
 	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
 

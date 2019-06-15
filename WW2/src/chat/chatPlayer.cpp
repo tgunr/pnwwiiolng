@@ -94,7 +94,7 @@ public:
 		, m_featureLocks()
 		, m_groups()
 		, m_recruiter(0)
-		, m_lastPing(0)
+		, m_latestPing(0)
 		, m_awsSide(WWII_NO_SIDE)
 		, m_awsX(0), m_awsY(0)
 		, m_timers()
@@ -122,7 +122,7 @@ public:
 	UINT32			m_recruiter;
 
 	// Last ping from the cell host
-	UINT32			m_lastPing;
+	UINT32			m_latestPing;
 
 	// AWS Data
 	WWII_SIDE		m_awsSide;
@@ -2017,7 +2017,7 @@ DISABLE_WARNING("-Wfloat-equal")
 		return;
 	}
 
-	m_impl->m_lastPing = lastPing;
+	m_impl->m_latestPing = lastPing;
 	bool capBldgChanged = false;
 	if ( (m_capping == nullptr && inCapBldg == true) || (m_capping != nullptr && inCapBldg == false) )
 	{
@@ -2360,9 +2360,9 @@ Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 		}
 	}
 
-	if ( isSpawned() && m_impl->m_lastPing > 0 )
+	if ( isSpawned() && m_impl->m_latestPing > 0 )
 	{
-		snprintf(tmpbuf, sizeof(tmpbuf), " ping:%ums", m_impl->m_lastPing);
+		snprintf(tmpbuf, sizeof(tmpbuf), " ping:%ums", m_impl->m_latestPing);
 		into.append(tmpbuf);
 	}
 }

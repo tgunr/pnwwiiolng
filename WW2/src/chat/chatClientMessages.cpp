@@ -57,6 +57,8 @@
 #include "uimap/AWSManager.h"
 #include "tut/TutorialManager.h"
 
+extern SINT32 g_lastPing;
+
 const ChatPermissions nullChatPermissions;
 
 static	TEUL_CALLBACK* _SEND_CLIENT_MESSAGE;
@@ -88,6 +90,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 												//	of the transmitting Index
 	outGoingMessage.m_handle = 0;
 	outGoingMessage.m_country = 0;
+	outGoingMessage.g_lastPing = g_lastPing;
 
 	outGoingMessage.m_length = strlen(message);
 
@@ -98,6 +101,8 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 
 	// Let chat know what you targetted last for use with dot commands
 	outGoingMessage.m_uiTarget = _lastTargetFullObjID;
+
+	Write_Debug("Chat sending client message %s with last ping: %d teulClock: %" PR64BitUT "", message, g_lastPing, outGoingMessage.g_lastPing);
 
 	return teulSend(teulIndex, _SEND_CLIENT_MESSAGE, &outGoingMessage);
 }

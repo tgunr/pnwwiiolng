@@ -59,14 +59,14 @@ public:
 public:
 	TeulTimeMS				m_lastTimeRx;			// Timestamp on the player's client as of last rx.
 	TeulTimeMS				m_lastTimeRxed;			// Host timestamp for the rx'ed value.
-	TeulTimeMS m_nextMemReq = 0; // The next time to send out a memory request
+	TeulTimeMS				m_nextMemReq = 0;		// The next time to send out a memory request
 
 	TeulTimeMS				m_hostClientOffset_ms;		// difference between the host and client monotonic clock
 	TeulTimeMS				m_ibdTimeReachedMaxAccumDelay; 	// track how long we are at the max inbound
 	TeulTimeMS				m_obdTimeReachedMaxAccumDelay; 	// track how long we are at the max outbound
 
 	HostVehicle*			vehicle;
-	class SpeedhackCheck* m_antiHack;
+	class SpeedhackCheck*	m_antiHack;
 
 	PERSONA_STATE			state;					// enum of condition at this moment
 	UINT32 					stationID;
@@ -104,6 +104,6 @@ public:
 
 	FULL_OBJ_ID				exitFacility;
 	FULL_OBJ_ID				m_fpsBuildingID;
-	SINT32                          	m_exitTeulIndex;
+	SINT32                  m_exitTeulIndex;
 };
 

@@ -14,9 +14,10 @@
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatCellTypes.h"
 #include "chat/chatChannelList.h"
+#include "chat/chatClientMessages.h"
 #include "chat/chatConstants.h"
-#include "chat/chatData.h"
 #include "chat/chatDB.h"
+#include "chat/chatData.h"
 #include "chat/chatDirectMessage.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatEditStringMsg.h"
@@ -24,8 +25,8 @@
 #include "chat/chatGenericStringMsg.h"
 #include "chat/chatGridTypes.h"
 #include "chat/chatHoldFallVote.h"
-#include "chat/chatHostBrigadeControl.h"
 #include "chat/chatHost.h"
+#include "chat/chatHostBrigadeControl.h"
 #include "chat/chatHostMessage.h"
 #include "chat/chatHostMessages.h"
 #include "chat/chatHostMotds.h"
@@ -36,21 +37,21 @@
 #include "chat/chatLocalizedMessage.h"
 #include "chat/chatMissionInviteMsg.h"
 #include "chat/chatMissionMemberUpdates.h"
-#include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
+#include "chat/chatMissions.h"
 #include "chat/chatModReport.h"
 #include "chat/chatMotds.h"
 #include "chat/chatName.h"
 #include "chat/chatOrdnanceSTO.h"
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatPlayer.h"
+#include "chat/chatSTOJoules.h"
 #include "chat/chatSaveChannels.h"
 #include "chat/chatServerTrackedObjects.h"
 #include "chat/chatSideMessage.h"
 #include "chat/chatSquadControl.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
-#include "chat/chatSTOJoules.h"
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatTypes.h"
 #include "chat/chatUpdateChannel.h"
@@ -58,16 +59,15 @@
 #include "chat/chatWaypointExchg.h"
 #include "chat/chatWaypoints.h"
 #include "chat/chatWhoList.h"
-#include "chat/chatClientMessages.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "inst/instHost.h"
 #include "map/mapConstants.h"
 #include "map/mapHCUnitLocations.h"
 #include "map/mapPersonaUpdate.h"
+#include "miss/missLeaderChange.h"
 #include "miss/missionJoinRequest.h"
 #include "miss/missionMobileSpawnWaypoint.h"
-#include "miss/missLeaderChange.h"
 #include "score/scorePacket.h"
 #include "score/scoreUMSKill.h"
 #include "server/serverInterface.h"
@@ -91,30 +91,30 @@
 #include "wwii/wwiiThreadTextQuery.h"
 
 // Raknet related
-#include "strt/strtUpdates.h"
+#include "chat/chatCellXfer.h"
+#include "chat/chatPreference.h"
+#include "chat/chatRecruiterList.h"
 #include "include/wthrTime.h"
 #include "strt/strtCPFlags.h"
-#include "chat/chatRecruiterList.h"
-#include "chat/chatPreference.h"
-#include "chat/chatCellXfer.h"
+#include "strt/strtUpdates.h"
 
-TEUL_CALLBACK*	CHAT_SEND_MESSAGE;
-TEUL_CALLBACK*	CHAT_XCHG_SERVER_TRACKED_OBJS;
+TEUL_CALLBACK *CHAT_SEND_MESSAGE;
+TEUL_CALLBACK *CHAT_XCHG_SERVER_TRACKED_OBJS;
 
-static TEUL_CALLBACK*	CHAT_SEND_NLA;
+static TEUL_CALLBACK *CHAT_SEND_NLA;
 
-static TEUL_CALLBACK*	CHAT_SVR_TUNE_CHANNEL;
+static TEUL_CALLBACK *CHAT_SVR_TUNE_CHANNEL;
 
 #ifdef SPAWN_RESTRICT
-static TEUL_CALLBACK*	CHAT_SEND_SPAWN_RESTRICTION;
-#endif //SPAWN_RESTRICT
+static TEUL_CALLBACK *CHAT_SEND_SPAWN_RESTRICTION;
+#endif // SPAWN_RESTRICT
 
 // WWIIOL Specific.
-TEUL_CALLBACK*	CHAT_SEND_TUNE_HANDLE_ACK;
-TEUL_CALLBACK*	CHAT_SQUAD_CONTROL;
-static TEUL_CALLBACK*	CHAT_MOTD_REPLY;
+TEUL_CALLBACK *CHAT_SEND_TUNE_HANDLE_ACK;
+TEUL_CALLBACK *CHAT_SQUAD_CONTROL;
+static TEUL_CALLBACK *CHAT_MOTD_REPLY;
 
-///TEMPORARY
+/// TEMPORARY
 #include "map/mapAWS.h"
 
 static UINT32 g_messageID = 1;
@@ -122,62 +122,56 @@ static UINT32 g_messageID = 1;
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendMOTD_REPLY(ACTION_OBJECT* const a)
+static SINT32 _sendMOTD_REPLY(ACTION_OBJECT *const a)
 {
-	MOTD_REPLY* object = (MOTD_REPLY*)(a->localRawData);
+	MOTD_REPLY *object = (MOTD_REPLY *)(a->localRawData);
 	return object->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendSquadControlResult(ACTION_OBJECT* const a)
+static SINT32 _sendSquadControlResult(ACTION_OBJECT *const a)
 {
-	SquadControlResult* message = (SquadControlResult*)(a->localRawData);
+	SquadControlResult *message = (SquadControlResult *)(a->localRawData);
 	return message->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendBrigadeControl(ACTION_OBJECT* const a)
+static SINT32 _sendBrigadeControl(ACTION_OBJECT *const a)
 {
-	BrigadeControlNotice* bcn = (BrigadeControlNotice*)(a->localRawData);
+	BrigadeControlNotice *bcn = (BrigadeControlNotice *)(a->localRawData);
 	return bcn->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendAWS(ACTION_OBJECT* const a)
+static SINT32 _sendAWS(ACTION_OBJECT *const a)
 {
-	AWS::Grid* grid = (AWS::Grid*)a->localRawData;
+	AWS::Grid *grid = (AWS::Grid *)a->localRawData;
 	return grid->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendHoldFallInfo(ACTION_OBJECT* const a)
+static SINT32 _sendHoldFallInfo(ACTION_OBJECT *const a)
 {
-	a->offset = ((HoldFallVote*)(a->localRawData))->packer(TEUL_PACK, a);
+	a->offset = ((HoldFallVote *)(a->localRawData))->packer(TEUL_PACK, a);
 	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendChatMissionStatus(ACTION_OBJECT* const a)
+static SINT32 _sendChatMissionStatus(ACTION_OBJECT *const a)
 {
-	auto data = *(std::pair<Chat::MissionStatus*, TeulTimeMS>*)(a->localRawData);
-	Chat::MissionStatus& cms = *(data.first);
-	const TeulTimeMS& lastPack = data.second;
+	auto data = *(std::pair<Chat::MissionStatus *, TeulTimeMS> *)(a->localRawData);
+	Chat::MissionStatus &cms = *(data.first);
+	const TeulTimeMS &lastPack = data.second;
 	cms.pack(a, lastPack);
 
 	return a->offset;
@@ -186,21 +180,15 @@ _sendChatMissionStatus(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvGCIMessage(ACTION_OBJECT* const a)
+static SINT32 _recvGCIMessage(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr || a->canRead<Chat::GCIMessage>() == false )
+	if (a->m_client != nullptr || a->canRead<Chat::GCIMessage>() == false)
 		return -EINVAL;
-	auto& gciMessage = a->read<Chat::GCIMessage>();
+	auto &gciMessage = a->read<Chat::GCIMessage>();
 
-    if ( g_debugChat )
-        dbugLog(_FLD, "gci:%u side:%u fac:" PRF_FULL_OBJ_ID " cp:" PRF_FULL_OBJ_ID " name:%s"
-                        , gciMessage.gci
-                        , gciMessage.side
-                        , PRA_FULL_OBJ_ID(gciMessage.facility)
-                        , PRA_FULL_OBJ_ID(gciMessage.where)
-                        , gciMessage.name
-                        );
+	if (g_debugChat)
+		dbugLog(_FLD, "gci:%u side:%u fac:" PRF_FULL_OBJ_ID " cp:" PRF_FULL_OBJ_ID " name:%s", gciMessage.gci, gciMessage.side,
+				PRA_FULL_OBJ_ID(gciMessage.facility), PRA_FULL_OBJ_ID(gciMessage.where), gciMessage.name);
 
 	chatRouteGCIMessage(gciMessage, g_messageID++);
 
@@ -210,28 +198,28 @@ _recvGCIMessage(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvSideMessage(ACTION_OBJECT* const a)
+static SINT32 _recvSideMessage(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 		return -EINVAL;
 
 	Chat::SideMessage message(a);
-	if ( a->offset < 0 )
+	if (a->offset < 0)
 	{
 		dbugLog(_FLA, "received garbled side message from %d", a->teulIndex);
 		return a->offset;
 	}
 
-	switch ( message.m_type )
+	switch (message.m_type)
 	{
 		case SM_SIDE:
-			chatRouteSideMessage(message.m_side, message.m_prefix, message.m_message, message.m_objectiveID, message.m_arg1.c_str(), message.m_arg2.c_str());
-		break;
+			chatRouteSideMessage(message.m_side, message.m_prefix, message.m_message, message.m_objectiveID, message.m_arg1.c_str(),
+								 message.m_arg2.c_str());
+			break;
 
 		case SM_HC:
 			chatHCMessage(message.m_side, message.m_message, message.m_arg1.c_str(), message.m_arg2.c_str());
-		break;
+			break;
 
 		default:
 			dbugLog(_FLA, "invalid side_message type %d", message.m_type);
@@ -244,19 +232,18 @@ _recvSideMessage(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvMOTD_REQ(ACTION_OBJECT* const a)
+static SINT32 _recvMOTD_REQ(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA();
 
 	MOTD_REQUEST req(a);
-	if ( req.type >= MOTD::_MAX_TYPES )
+	if (req.type >= MOTD::_MAX_TYPES)
 	{
-		dbugLog(_FLA,"couldnt find motd for groupID %u", req.type);
+		dbugLog(_FLA, "couldnt find motd for groupID %u", req.type);
 		return -EINVAL;
 	}
 
-	MOTD_REPLY& reply = chatGetMotd(req.type);
+	MOTD_REPLY &reply = chatGetMotd(req.type);
 
 	return teulSend(a->teulIndex, CHAT_MOTD_REPLY, &reply);
 }
@@ -264,13 +251,12 @@ _recvMOTD_REQ(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvAWS(ACTION_OBJECT* const a)
+static SINT32 _recvAWS(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	AWS::Request request(a);
 
-	if ( isValidSide(player.side()) == false )
+	if (isValidSide(player.side()) == false)
 	{
 		dbugLog(_FLA, "player has invalid side for AWS request");
 		return -EINVAL;
@@ -284,24 +270,33 @@ _recvAWS(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvJoinMission(ACTION_OBJECT* const a) {
+static SINT32 _recvJoinMission(ACTION_OBJECT *const a)
+{
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	MissionJoinRequest::Request request(a);
 
-	Player* target = PlayerInterface::Lookup(request.player);
-	if ( target == nullptr ) {
+	Player *target = PlayerInterface::Lookup(request.player);
+	if (target == nullptr)
+	{
 		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
-	} else if ( target->playerID() == player.playerID() ) {
+	}
+	else if (target->playerID() == player.playerID())
+	{
 		player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, "/join");
-	} else if ( player.side() != target->side() || target->missionID() == 0 ) {
+	}
+	else if (player.side() != target->side() || target->missionID() == 0)
+	{
 		player.message(LSTR_CAUTION, LSTR_JOINMISSION_PLAYERNOTFOUND);
-	} else if ( target->missionID() == player.missionID() ) {
+	}
+	else if (target->missionID() == player.missionID())
+	{
 		player.message(LSTR_CAUTION, LSTR_JOINMISSION_ALREADYONMISSION);
-	} else {
+	}
+	else
+	{
 		// HACK: Omitting squad to show we aren't related to a recruiter join. Blech.
-		MissionInvite invite(target->missionID(), target->country(), target->branch(),
-		                     target->brigadeID(), target->chatHandle(), target->squadHandle(), false);
+		MissionInvite invite(target->missionID(), target->country(), target->branch(), target->brigadeID(), target->chatHandle(),
+							 target->squadHandle(), false);
 		MISSION_INVITE_MSG outgoing(invite);
 		outgoing.send(player.teulIndex());
 	}
@@ -312,30 +307,25 @@ _recvJoinMission(ACTION_OBJECT* const a) {
 //////////////////////////////////////////////////////////////////////
 //
 
-void
-chatSendMotd(SINT32 teulIndex, MOTD_REPLY& reply)
-{
-	teulSend(teulIndex, CHAT_MOTD_REPLY, &reply);
-}
+void chatSendMotd(SINT32 teulIndex, MOTD_REPLY &reply) { teulSend(teulIndex, CHAT_MOTD_REPLY, &reply); }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvLocality(ACTION_OBJECT* const a)
+static SINT32 _recvLocality(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	// We should only receive these now when the client is trying to tell us
 	// that the player is abusing it.
 	try
 	{
-		Chat::Locality loc(a);			// Use the ChatLocality self-unpacker
-		if ( a->offset <= 0 )
+		Chat::Locality loc(a); // Use the ChatLocality self-unpacker
+		if (a->offset <= 0)
 			throw std::logic_error("Unable to unpack locality");
 
 		player.updateLocality(loc.m_x, loc.m_y, loc.m_z, true, loc.m_nearCP, 0, nullObjID, 0, false, false, nullObjID, -1);
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		dbugLog(_FLA, "t:%d _recvClientLocality: %s", a->teulIndex, e.what());
 	}
@@ -346,19 +336,18 @@ _recvLocality(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvSCMDResult(ACTION_OBJECT* const a)
+static SINT32 _recvSCMDResult(ACTION_OBJECT *const a)
 {
 	try
 	{
 		////FBK: Maybe the constructor should do the whole job. It would be cleaner.
-		StratCommand scmd(a);		// Unpack constructor
-		if ( a->offset <= 0 )
+		StratCommand scmd(a); // Unpack constructor
+		if (a->offset <= 0)
 			throw std::logic_error("Unable to unpack StratCommand");
 
 		scmd.process();
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		dbugLog(_FLA, "t:%d _recvSCMDResult: %s", a->teulIndex, e.what());
 		return -EINVAL;
@@ -370,15 +359,14 @@ _recvSCMDResult(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Mission host telling us a mission has been cancelled
 
-static SINT32
-_recvMissionDeleteNotice(ACTION_OBJECT* const a)
+static SINT32 _recvMissionDeleteNotice(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr || a->canRead<UINT32>() == false )
+	if (a->m_client != nullptr || a->canRead<UINT32>() == false)
 	{
 		return -EINVAL;
 	}
-	auto& missionID = a->read<UINT32>();
-	if ( missionID > 0 )
+	auto &missionID = a->read<UINT32>();
+	if (missionID > 0)
 		chatDeleteMission(missionID);
 
 	return a->offset;
@@ -387,18 +375,17 @@ _recvMissionDeleteNotice(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvSquadControl(ACTION_OBJECT* const a)
+static SINT32 _recvSquadControl(ACTION_OBJECT *const a)
 {
 	SquadControl incoming(a);
 
-	if ( g_debugSquads )
+	if (g_debugSquads)
 		dbugLog(_FLD, "t:%d receiving squad control", a->teulIndex);
 
-	if ( a->offset < 0 )
+	if (a->offset < 0)
 		return a->offset;
 
-	if ( incoming.receive(a->teulIndex) < 0 )
+	if (incoming.receive(a->teulIndex) < 0)
 		return -EINVAL;
 
 	return a->offset;
@@ -407,13 +394,13 @@ _recvSquadControl(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a brigade control from the player
 
-static SINT32
-_recvBrigadeControl(ACTION_OBJECT* const a)
+static SINT32 _recvBrigadeControl(ACTION_OBJECT *const a)
 {
 	BrigadeControlRequest incoming(a);
 
-	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d incoming brigade control action %s", a->teulIndex, BrigadeControl::to_string(incoming.m_action).c_str());
+	if (g_debugPersonas)
+		dbugLog(_FLD, "t:%d incoming brigade control action %s", a->teulIndex,
+				BrigadeControl::to_string(incoming.m_action).c_str());
 
 	incoming.processRequest(a->teulIndex);
 
@@ -423,8 +410,7 @@ _recvBrigadeControl(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a request from a player for a list of recruiters
 
-static SINT32
-_recvRecruiterRequest(ACTION_OBJECT* const a)
+static SINT32 _recvRecruiterRequest(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 
@@ -439,8 +425,7 @@ _recvRecruiterRequest(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Send an out of band data message
 
-void
-OOBMessage::send()
+void OOBMessage::send()
 {
 	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, Chat::Name(m_originatorID).c_str(), m_text);
 
@@ -448,8 +433,7 @@ OOBMessage::send()
 	serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
-bool
-chatSendUMSKill(const Player* player, const UINT32 stoUID)
+bool chatSendUMSKill(const Player *player, const UINT32 stoUID)
 {
 	Scoring::Actor actShooter(player);
 	actShooter.setSortie(player->sortieID(), player->weapon(), false);
@@ -466,16 +450,15 @@ SINT32
 StratCommand::send()
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::EXCHANGE_SCMD_Y), *this);
-    if (serverSendPacketToType(outgoing, STRAT_HOST))
-        return 0;
-    return -EINVAL;
+	if (serverSendPacketToType(outgoing, STRAT_HOST))
+		return 0;
+	return -EINVAL;
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-bool
-chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID cp, WWII_SIDE side)
+bool chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID cp, WWII_SIDE side)
 {
 	try
 	{
@@ -483,7 +466,7 @@ chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID cp, WWII_SIDE s
 		scmd.send();
 		dbugLog(_FLI, "%d send scmd %d for " PRF_FULL_OBJ_ID "", playerID, cmd, PRA_FULL_OBJ_ID(cp));
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		dbugLog(_FLA, "StratCommand send error: %s", e.what());
 		return false;
@@ -499,9 +482,9 @@ SINT32
 chatSendPopulation()
 {
 	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_POPULATION_NOTICE_Y));
-	outgoing.reserve(sizeof(UINT32)* MAX_SIDES);
+	outgoing.reserve(sizeof(UINT32) * MAX_SIDES);
 	UINT32 sideCounts[MAX_SIDES];
-	for ( UINT32 i = 0; i < MAX_SIDES; ++i )
+	for (UINT32 i = 0; i < MAX_SIDES; ++i)
 	{
 		sideCounts[i] = instGetCampaignSideCount(i);
 		outgoing.append(sideCounts[i]);
@@ -511,7 +494,6 @@ chatSendPopulation()
 
 	return serverSendPacketToType(outgoing, STRAT_HOST) ? 0 : -ENOTCONN;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 // Ask the mission host to cancel a particular mission
@@ -530,11 +512,11 @@ chatSendMissionDeleteRequest(UINT32 missionID)
 // Asks the host to validate a brigade move; if you want it to execute
 // the move too, set actionable to true.
 
-void
-chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable)
+void chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, bool isActionable)
 {
-	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
-	if (PN_LIKELY(stratEndpoint != nullptr)) {
+	ENDPOINT *stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
+	if (PN_LIKELY(stratEndpoint != nullptr))
+	{
 		BRIGADE_MOVE_MSG outgoing(byPlayer, isGM, BRIGADE_MOVE_MSG::EXCHANGE);
 
 		outgoing.data().m_action = BMR_APPROVED;
@@ -549,11 +531,10 @@ chatSendBrigadeMove(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, cons
 //////////////////////////////////////////////////////////////////////
 // And the comeback
 
-template<>
-SINT32
-BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
+template <>
+SINT32 BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG &incoming)
 {
-	if ( incoming.action() != EXCHANGE ) // We should only get exchanges
+	if (incoming.action() != EXCHANGE) // We should only get exchanges
 	{
 		dbugLog(_FLA, "Invalid brigade move msg");
 		return -EINVAL;
@@ -568,11 +549,12 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 // Asks the host to validate a brigade move; if you want it to execute
 // the move too, set actionable to true.
 
-void
-chatSendGarrisonChangeCountry(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid, const WWII_COUNTRY country, bool isActionable)
+void chatSendGarrisonChangeCountry(const ChatHandle byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID fid,
+								   const WWII_COUNTRY country, bool isActionable)
 {
-	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
-	if (PN_LIKELY(stratEndpoint != nullptr)) {
+	ENDPOINT *stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
+	if (PN_LIKELY(stratEndpoint != nullptr))
+	{
 		GARRISON_COUNTRY_CHANGE_MSG outgoing(byPlayer, isGM, GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE);
 
 		outgoing.data().m_action = GCR_APPROVED;
@@ -584,9 +566,8 @@ chatSendGarrisonChangeCountry(const ChatHandle byPlayer, bool isGM, UINT32 briga
 	}
 }
 
-template<>
-SINT32
-GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+template <>
+SINT32 GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG &incoming)
 {
 	if (incoming.action() != EXCHANGE) // We should only get exchanges
 	{
@@ -599,33 +580,31 @@ GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHAN
 	return 0;
 }
 
-
-
 //////////////////////////////////////////////////////////////////////
 // Request from the player for a squad info update
 
-template<>
-SINT32
-SQUAD_MSG::receive(SINT32 teulIndex, SQUAD_MSG& incoming)
+template <>
+SINT32 SQUAD_MSG::receive(SINT32 teulIndex, SQUAD_MSG &incoming)
 {
-	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player == nullptr )
+	Player *player = PlayerInterface::Lookup(teulIndex);
+	if (player == nullptr)
 		return -EINVAL;
 
 	try
 	{
-		if ( incoming.action() != STUB_ONLY )
+		if (incoming.action() != STUB_ONLY)
 			throw "Invalid action";
 		player->sendSquadInfo();
 		return 0;
 	}
-	catch (const char* e)
+	catch (const char *e)
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s ac:%d %s", player->teulIndex(), player->playerID(), player->callsign(), incoming.action(), e);
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s ac:%d %s", player->teulIndex(), player->playerID(), player->callsign(), incoming.action(), e.what());
+		dbugLog(_FLA, "t:%d p:%u c:%s ac:%d %s", player->teulIndex(), player->playerID(), player->callsign(), incoming.action(),
+				e.what());
 	}
 	return -EINVAL;
 }
@@ -633,34 +612,33 @@ SQUAD_MSG::receive(SINT32 teulIndex, SQUAD_MSG& incoming)
 //////////////////////////////////////////////////////////////////////
 // Receive a leadership change request message
 
-static SINT32
-_recvLeaderChange(ACTION_OBJECT* const a)
+static SINT32 _recvLeaderChange(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr || a->canRead<LeaderChange>() == false )
+	if (a->m_client != nullptr || a->canRead<LeaderChange>() == false)
 	{
 		dbugLog(_FLA, "t:%d invalid LeaderChange packet", a->teulIndex);
 		return -EINVAL;
 	}
 
-	auto& incoming = a->read<LeaderChange>();
-	if ( incoming.m_result == LeaderChange::_FAIL_IS_LEADER )
+	auto &incoming = a->read<LeaderChange>();
+	if (incoming.m_result == LeaderChange::_FAIL_IS_LEADER)
 		return 0;
 
-	ChatMission* const mission = chatFindMission(incoming.m_missionID);
-	if ( !mission )
+	ChatMission *const mission = chatFindMission(incoming.m_missionID);
+	if (!mission)
 		return 0;
-	if ( incoming.m_result == LeaderChange::_FAIL_NO_MISSION )
+	if (incoming.m_result == LeaderChange::_FAIL_NO_MISSION)
 	{
-		Player* const player = PlayerInterface::Lookup(incoming.m_leaderID);
-		if ( player != nullptr )
+		Player *const player = PlayerInterface::Lookup(incoming.m_leaderID);
+		if (player != nullptr)
 		{
 			mission->SetLeader(incoming.m_leaderHandle);
 			return 0;
 		}
 	}
 
-	Player* const player = PlayerInterface::Lookup(incoming.m_requester);
-	if ( player != nullptr )
+	Player *const player = PlayerInterface::Lookup(incoming.m_requester);
+	if (player != nullptr)
 		player->message(LSTR_CAUTION, LSTR_LEADERCHANGE_FAIL);
 
 	return 0;
@@ -676,8 +654,7 @@ SquadControlResult::send(SINT32 teulIndex)
 	return teulSend(teulIndex, CHAT_SQUAD_CONTROL, this);
 }
 
-void
-SquadList::sendMessage(int prefix, int message, const char* m1, const char* m2)
+void SquadList::sendMessage(int prefix, int message, const char *m1, const char *m2)
 {
 	chatDistributeLocMessage(begin(), end(), prefix, message, m1, m2);
 }
@@ -685,8 +662,7 @@ SquadList::sendMessage(int prefix, int message, const char* m1, const char* m2)
 //////////////////////////////////////////////////////////////////////
 // Notify mmhost of a change of backup leader
 
-void
-chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
+void chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
 	outgoing.construct<LeaderChange>(missionID, playerID, 0, 0, LeaderChange::_SET_BACKUP_LEADER);
@@ -696,8 +672,7 @@ chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 //////////////////////////////////////////////////////////////////////
 // Request a change of leader
 
-void
-chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle handle, const ChatHandle requester)
+void chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle handle, const ChatHandle requester)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
 	outgoing.construct<LeaderChange>(missionID, playerID, handle, requester, LeaderChange::_SUCCESS);
@@ -707,24 +682,23 @@ chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle handle,
 //////////////////////////////////////////////////////////////////////
 //
 
-static void
-_foundUser(Player& player, const CHAT_FOUND_USER& found, const PlayerStatusNode* psn)
+static void _foundUser(Player &player, const CHAT_FOUND_USER &found, const PlayerStatusNode *psn)
 {
-	if ( psn == nullptr )
+	if (psn == nullptr)
 	{
-		player.message(LSTR_SYSTEM, LSTR_GENERIC, "FIND: Internal error" );
+		player.message(LSTR_SYSTEM, LSTR_GENERIC, "FIND: Internal error");
 		return;
 	}
 
-	Player* target = nullptr;
-	target = (Player*)psn->localInfo;
-	if ( target == nullptr )
+	Player *target = nullptr;
+	target = (Player *)psn->localInfo;
+	if (target == nullptr)
 	{
 		player.message(LSTR_SYSTEM, LSTR_PINFO_LOGGING_INOUT, psn->dispatch().m_callsign);
 		return;
 	}
 
-	if ( found.isFound == FALSE )
+	if (found.isFound == FALSE)
 	{
 		player.message(LSTR_CAUTION, LSTR_PINFO_NOT_ON_CELLS, target->callsign());
 		return;
@@ -734,42 +708,38 @@ _foundUser(Player& player, const CHAT_FOUND_USER& found, const PlayerStatusNode*
 }
 
 //////////////////////////////////////////////////////////////////////
-//The send for the tune to Channel
+// The send for the tune to Channel
 
-static SINT32
-_sendTuneToChannel(ACTION_OBJECT* const a)
+static SINT32 _sendTuneToChannel(ACTION_OBJECT *const a)
 {
-	Chat::TuneToChannel* tune = (Chat::TuneToChannel*)(a->localRawData);
+	Chat::TuneToChannel *tune = (Chat::TuneToChannel *)(a->localRawData);
 	return tune->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendMessage(ACTION_OBJECT* const a)
+static SINT32 _sendMessage(ACTION_OBJECT *const a)
 {
-	Chat::HostMessage* message = (Chat::HostMessage*)(a->localRawData);
+	Chat::HostMessage *message = (Chat::HostMessage *)(a->localRawData);
 	return message->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_sendNLA(ACTION_OBJECT* const a)
+static SINT32 _sendNLA(ACTION_OBJECT *const a)
 {
-	Chat::UserNLA* nla = (Chat::UserNLA*)(a->localRawData);
+	Chat::UserNLA *nla = (Chat::UserNLA *)(a->localRawData);
 	return nla->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Send a server tracked object packet (may contain multiple STOs)
 
-static SINT32
-_sendSTO(ACTION_OBJECT* const a)
+static SINT32 _sendSTO(ACTION_OBJECT *const a)
 {
-	STOBatch* batch = (STOBatch*)(a->localRawData);
+	STOBatch *batch = (STOBatch *)(a->localRawData);
 
 	// 1. Send a count
 	SINT32 countOffset = a->offset;
@@ -778,23 +748,23 @@ _sendSTO(ACTION_OBJECT* const a)
 
 	// 2. Send STOs until we're out or full
 	UINT16 removal = ServerTrackedObject::_REMOVAL;
-	ServerTrackedObject* sto;
+	ServerTrackedObject *sto;
 	UINT32 removalID = 0;
 
 	static SINT32 HEADER_SIZE = 1;
-	static SINT32 REM_SIZE_LIMIT = Teul::TCPStdPayload - HEADER_SIZE - 5;	// 5 bytes for a REM
+	static SINT32 REM_SIZE_LIMIT = Teul::TCPStdPayload - HEADER_SIZE - 5; // 5 bytes for a REM
 	static SINT32 ADD_SIZE_LIMIT = Teul::TCPStdPayload - HEADER_SIZE - ServerTrackedObject::_MAX_PACKED_SIZE;
 
-	for (;; )
+	for (;;)
 	{
 		sto = batch->fetch();
-		if ( sto == nullptr )
+		if (sto == nullptr)
 			break;
 
 		// Use the type OR type REMOVAL
-		if ( batch->isRemoval() )
+		if (batch->isRemoval())
 		{
-			if ( a->offset > REM_SIZE_LIMIT )
+			if (a->offset > REM_SIZE_LIMIT)
 				break;
 
 			removalID = sto->uid();
@@ -803,7 +773,7 @@ _sendSTO(ACTION_OBJECT* const a)
 		}
 		else
 		{
-			if ( a->offset > ADD_SIZE_LIMIT )
+			if (a->offset > ADD_SIZE_LIMIT)
 				break;
 
 			a->offset = sto->packer(TEUL_PACK, a);
@@ -827,9 +797,9 @@ STOBatch::send(SINT32 teulIndex)
 {
 	m_sent = 0;
 
-	while ( !completed() )
+	while (!completed())
 	{
-		if ( teulSend(teulIndex, CHAT_XCHG_SERVER_TRACKED_OBJS, this) < 0 )
+		if (teulSend(teulIndex, CHAT_XCHG_SERVER_TRACKED_OBJS, this) < 0)
 			break;
 	}
 
@@ -840,35 +810,36 @@ STOBatch::send(SINT32 teulIndex)
 }
 
 //////////////////////////////////////////////////////////////////////
-//Recv function for when the mmhost sends us player persona updates
+// Recv function for when the mmhost sends us player persona updates
 
-static SINT32
-_recvPersonaUpdate(ACTION_OBJECT* const a)
+static SINT32 _recvPersonaUpdate(ACTION_OBJECT *const a)
 {
 	Chat::PersonaUpdate update(a);
-	if ( a->offset <= 0 )
+	if (a->offset <= 0)
 	{
 		dbugLog(_FLA, "t:%d failed unpacking persona update: %d", a->teulIndex, a->offset);
 		return -EINVAL;
 	}
 
-	if ( update.m_handleID == 0 )
+	if (update.m_handleID == 0)
 	{
 		dbugLog(_FLA, "t:%d received personaUpdate with NULL handle", a->teulIndex);
 		return -EINVAL;
 	}
 
-	Player* player = PlayerInterface::Lookup(update.m_handleID);
-	if ( player == nullptr )
+	Player *player = PlayerInterface::Lookup(update.m_handleID);
+
+	if (player == nullptr)
 	{
 		// This can occur when the player isn't done logging in yet.
-		dbugLog(_FLD, "t:%d Unable to find player %s:%" PR64BitT "", a->teulIndex, Chat::Name(update.m_handleID).c_str(), update.m_handleID);
+		dbugLog(_FLD, "t:%d Unable to find player %s:%" PR64BitT "", a->teulIndex, Chat::Name(update.m_handleID).c_str(),
+				update.m_handleID);
 		return a->offset;
 	}
 
-	if ( g_debugPersonas )
-		dbugLog(_FLD, "p:%u c:%s received persona update with weapon spec %u.%u.%u.%u"
-						, player->playerID(), player->callsign(), update.m_weapon.wCountry, update.m_weapon.wCategory, update.m_weapon.wClass, update.m_weapon.wType);
+	if (g_debugPersonas)
+		dbugLog(_FLD, "p:%u c:%s received persona update with weapon spec %u.%u.%u.%u", player->playerID(), player->callsign(),
+				update.m_weapon.wCountry, update.m_weapon.wCategory, update.m_weapon.wClass, update.m_weapon.wType);
 
 	player->updatePersona(update);
 
@@ -880,59 +851,44 @@ _recvPersonaUpdate(ACTION_OBJECT* const a)
 // are not null before calling us. That's why this has double underscores
 // in its name. It's not only static-local its local to its parent.
 
-static void
-__describePlayer(const Player* player, char* msg, int size)
+static void __describePlayer(const Player *player, char *msg, int size)
 {
-	snprintf(msg, size, "[%s->%s M#%d %d/%d]"
-							, chatPropertyName(player->originCpID())
-							, "?"
-							, player->missionID()
-							, player->playerID()
-							, player->teulIndex()
-							);
+	snprintf(msg, size, "[%s->%s M#%d %d/%d]", chatPropertyName(player->originCpID()), "?", player->missionID(), player->playerID(),
+			 player->teulIndex());
 	msg[size - 1] = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvKickNotice(ACTION_OBJECT* const a)
+static SINT32 _recvKickNotice(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr || a->canRead<Chat::KickNotice>() == false )
+	if (a->m_client != nullptr || a->canRead<Chat::KickNotice>() == false)
 	{
 		dbugLog(_FLW, "t:%d invalid Chat::KickNotice", a->teulIndex);
 		return -EINVAL;
 	}
 
-	auto& incoming = a->read<Chat::KickNotice>();
+	auto &incoming = a->read<Chat::KickNotice>();
 	Chat::Name name(incoming.m_handle);
 
-	dbugLog(_FLI, "t:%d p:%u c:%s kick notice: %s"
-					, a->teulIndex
-					, incoming.m_playerID
-					, name.c_str()
-					, incoming.m_problem
-					);
+	dbugLog(_FLI, "t:%d p:%u c:%s kick notice: %s", a->teulIndex, incoming.m_playerID, name.c_str(), incoming.m_problem);
 
-	SCHAR message[512] = "";	// To build the kick message in.
-	Player* const player = (Player*)ServerInterface::LookupByPlayerID(incoming.m_playerID);
-	if ( player )
+	SCHAR message[512] = ""; // To build the kick message in.
+	Player *const player = (Player *)ServerInterface::LookupByPlayerID(incoming.m_playerID);
+	if (player)
 	{
 		__describePlayer(player, message, sizeof(message));
 	}
 	else
 	{
-		dbugLog(_FLW, "Kick notice for %s[%u]: player not connected to chat"
-						, name.c_str()
-						, incoming.m_playerID
-						);
+		dbugLog(_FLW, "Kick notice for %s[%u]: player not connected to chat", name.c_str(), incoming.m_playerID);
 		strprintf(message, "[id: %u, not connected]", incoming.m_playerID);
 	}
 
 	chatdbRecordEvent("KICK", name.c_str(), "kicked", incoming.m_problem, message);
 
-	if ( incoming.m_problem[0] != '*' )
+	if (incoming.m_problem[0] != '*')
 	{
 		strprintf(message, "KICKED %s: %s", name.c_str(), incoming.m_problem);
 		chatDispatchGMMessage("HOST", message);
@@ -944,29 +900,26 @@ _recvKickNotice(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvFoundUser(ACTION_OBJECT* const a)
+static SINT32 _recvFoundUser(ACTION_OBJECT *const a)
 {
 	CHAT_FOUND_USER found;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &found, sizeof(CHAT_FOUND_USER));
 
-	if ( a->offset <= 0 )
+	if (a->offset <= 0)
 	{
 		dbugLog(_FLA, "unable to unpack found user");
 		return a->offset;
 	}
 
-	///TODO Send the playerID not the teulIndex
-	Player* player = PlayerInterface::Lookup(found.locUser.reqConnection);
-	if ( player != nullptr && player->playerID() == found.locUser.reqPlayer )
+	/// TODO Send the playerID not the teulIndex
+	Player *player = PlayerInterface::Lookup(found.locUser.reqConnection);
+	if (player != nullptr && player->playerID() == found.locUser.reqPlayer)
 		_foundUser(*player, found, ServerInterface::PlayerStatusNodeByPlayerID(found.locUser.playerID));
 	else
 	{
-		dbugLog(_FLW, "Requestor went away [%u req by %d on %d]"
-						, found.locUser.playerID
-						, found.locUser.reqPlayer, found.locUser.reqConnection
-						);
+		dbugLog(_FLW, "Requestor went away [%u req by %d on %d]", found.locUser.playerID, found.locUser.reqPlayer,
+				found.locUser.reqConnection);
 	}
 
 	return a->offset;
@@ -975,14 +928,13 @@ _recvFoundUser(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvMessage(ACTION_OBJECT* const a)
+static SINT32 _recvMessage(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 
 	Chat::ClientMessage message;
 	a->offset = message.packer(TEUL_UNPACK, a);
-	if ( a->offset <= 0 )
+	if (a->offset <= 0)
 	{
 		dbugLog(_FLA, "could not unpack incoming message");
 		return a->offset;
@@ -1005,8 +957,9 @@ _recvMessage(ACTION_OBJECT* const a)
 		// mark start, find end
 		char *start = ++p;
 
-		p = strchr(p, '\x01');// Returns a pointer to the first occurrence of '\x01' in the C string.
-		if (!p) {
+		p = strchr(p, '\x01'); // Returns a pointer to the first occurrence of '\x01' in the C string.
+		if (!p)
+		{
 
 			dbugLog(_FLA, "Client chat packet received with no terminating control character");
 			return a->offset;
@@ -1019,14 +972,14 @@ _recvMessage(ACTION_OBJECT* const a)
 			// decode it
 			message.clientInfo.decode(start);
 
-            // Get the length of the message without the clientInfo.
-            size_t newLengthOfMessage = strlen(p);
+			// Get the length of the message without the clientInfo.
+			size_t newLengthOfMessage = strlen(p);
 
 			// Copy the message without the clientInfo back into the original message
-            // Note that destination and source memory overlaps.
-            memmove(message.m_message, p, MAX_IRC_LEN);
+			// Note that destination and source memory overlaps.
+			memmove(message.m_message, p, MAX_IRC_LEN);
 
-            message.m_length = newLengthOfMessage;
+			message.m_length = newLengthOfMessage;
 		}
 		else
 		{
@@ -1040,13 +993,23 @@ _recvMessage(ACTION_OBJECT* const a)
 		dbugLog(_FLD, "No client header found in chat message: %s length - %d", message.m_message, message.m_length);
 	}
 
-
 	// Prevent them typing carriage returns
-	for ( p = message.m_message; *p != 0; ++p )
+	for (p = message.m_message; *p != 0; ++p)
 	{
-		if ( *p == '\n' || *p == '\r' )
+		if (*p == '\n' || *p == '\r')
 			*p = ' ';
 	}
+
+	if (message.g_latestPing < 0 || message.g_latestPing > 1800)
+	{
+		player.m_latestPing = 1;
+	}
+	else
+	{
+		player.m_latestPing = message.g_latestPing;
+	}
+
+	dbugLog(_FLD, "Set last ping: %d", player.m_latestPing);
 
 	chatRouteMessage(&player, &message, message.m_id, true);
 
@@ -1058,8 +1021,7 @@ _recvMessage(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvTuneToChannel(ACTION_OBJECT* const a)
+static SINT32 _recvTuneToChannel(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 
@@ -1067,10 +1029,9 @@ _recvTuneToChannel(ACTION_OBJECT* const a)
 
 	a->offset = tune.packer(TEUL_UNPACK, a);
 
-	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d p:%u c:%s radio:%d tune to %d"
-						, a->teulIndex, player.playerID(), player.callsign()
-						, tune.m_radioIndex, tune.m_type);
+	if (g_debugRadios)
+		dbugLog(_FLD, "t:%d p:%u c:%s radio:%d tune to %d", a->teulIndex, player.playerID(), player.callsign(), tune.m_radioIndex,
+				tune.m_type);
 
 	player.tuneRadio(tune.m_radioIndex, tune.m_type, tune.m_handle);
 	chatSaveChannels(player);
@@ -1081,14 +1042,13 @@ _recvTuneToChannel(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static SINT32
-_recvUpdateChannel(ACTION_OBJECT* const a)
+static SINT32 _recvUpdateChannel(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	Chat::UpdateChannel update;
 
 	update.packer(TEUL_UNPACK, a);
-	if ( a->offset <= 0 )
+	if (a->offset <= 0)
 		return a->offset;
 
 	player.updateChannelStatus(update);
@@ -1099,35 +1059,35 @@ _recvUpdateChannel(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Incoming response from the cell host to our bandwidth change request
 
-static SINT32
-_recvBandwidthNotice(ACTION_OBJECT* const a)
+static SINT32 _recvBandwidthNotice(ACTION_OBJECT *const a)
 {
 	BANDWIDTH_NOTICE notice;
 
 	try
 	{
 		a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &notice, sizeof(notice));
-		notice.response[sizeof(notice.response)-1] = 0;
+		notice.response[sizeof(notice.response) - 1] = 0;
 
-		if ( a->offset < 0 )
+		if (a->offset < 0)
 			throw std::logic_error("Unable to unpack bandwidth notice");
 
-		if ( notice.playerID <= 1 )
+		if (notice.playerID <= 1)
 			throw std::logic_error("Bandwidth response for invalid player ID");
 
-		Player* player = PlayerInterface::Lookup(notice.playerID);
-		if ( player == nullptr )
+		Player *player = PlayerInterface::Lookup(notice.playerID);
+		if (player == nullptr)
 			throw std::logic_error("Player not connected");
 
 		// For future reference, remember the update mode
-		dbugLog(_FLI, "t:%d p:%u c:%s entered updatemode %d %s", player->teulIndex(), player->playerID(), player->callsign(), notice.mode, notice.response);
+		dbugLog(_FLI, "t:%d p:%u c:%s entered updatemode %d %s", player->teulIndex(), player->playerID(), player->callsign(),
+				notice.mode, notice.response);
 		player->SetPreference(CPR_UPDATE_MODE, notice.mode, false);
-		if ( notice.response[0] && (notice.display || player->isGM()) )
+		if (notice.response[0] && (notice.display || player->isGM()))
 			player->message(LSTR_NOTE, LSTR_GENERIC, notice.response);
-		if ( player->isSpawned() == false )
+		if (player->isSpawned() == false)
 			player->SetSpawned(true);
 	}
-	catch (std::exception& e)
+	catch (std::exception &e)
 	{
 		dbugLog(_FLA, "t:%d %s: %s", a->teulIndex, __FUNCTION__, e.what());
 	}
@@ -1138,8 +1098,7 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a server tracked object request
 
-static SINT32
-_recvSTO(ACTION_OBJECT* const a)
+static SINT32 _recvSTO(ACTION_OBJECT *const a)
 {
 	// Read-ahead the STO type without
 	UINT16 type = 0;
@@ -1153,14 +1112,13 @@ _recvSTO(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a tutorial progress update from a client
 
-static SINT32
-_recvTutProgress(ACTION_OBJECT* const a)
+static SINT32 _recvTutProgress(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
-	if ( g_debugPersonas )
+	if (g_debugPersonas)
 		player.log(_FLD, "t:%d p:%u c:%s receiving tutorial progress", a->teulIndex, player.playerID(), player.callsign());
 
-	while ( a->atEndOfBuffer() == false )
+	while (a->atEndOfBuffer() == false)
 	{
 		Tutorial::GroupProgress incoming(a);
 		incoming.receive(&player);
@@ -1172,12 +1130,12 @@ _recvTutProgress(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Instance the ThreadTextQuery class for aggregating
 
-const char* const _PROGRESS_UPDATE_PREFIX = "REPLACE INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
+const char *const _PROGRESS_UPDATE_PREFIX = "REPLACE INTO `wwii`.`training_progress`(player_id,group_name,progress)VALUES";
 
 static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREFIX, "");
 
 SINT32
-Tutorial::GroupProgress::receive(Player* player) const
+Tutorial::GroupProgress::receive(Player *player) const
 {
 	Chat::Name name(m_groupHandle);
 #ifdef BETA_RELEASE
@@ -1189,8 +1147,7 @@ Tutorial::GroupProgress::receive(Player* player) const
 	return 0;
 }
 
-bool
-Chat::CommitProgressUpdates()
+bool Chat::CommitProgressUpdates()
 {
 	_progressUpdates.commit(1000);
 	return true;
@@ -1200,70 +1157,66 @@ Chat::CommitProgressUpdates()
 // bandwidth mode. Returns 'false' if we can't find the specified
 // player ID or if the player is not on a cell host.
 
-bool
-chatSendBandwidthNotice(const Player& player, UINT32 mode)
+bool chatSendBandwidthNotice(const Player &player, UINT32 mode)
 {
 	auto host = player.getCellHost();
-	if (host == 0) {
+	if (host == 0)
+	{
 		dbugLog(_FLD, "p:%u c:%s %s: not on a cell host", player.playerID(), player.callsign(), __FUNCTION__);
 		return false;
 	}
 	teulindex_t peerIdx = serverGetPeerIndex(host, CELL_HOST);
-	if (peerIdx < 0) {
+	if (peerIdx < 0)
+	{
 		dbugLog(_FLD, "p:%u c:%s %s: not connected to cell %08x", player.playerID(), player.callsign(), __FUNCTION__, host);
 		return false;
 	}
 
-	if (g_debugPersonas) {
+	if (g_debugPersonas)
+	{
 		char hostAddr[64];
 		teulGetAddress(host, hostAddr, sizeof(hostAddr));
-		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
-			, player.playerID(), player.callsign(), hostAddr, mode);
+		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning", player.playerID(), player.callsign(), hostAddr,
+				mode);
 	}
 
-	BANDWIDTH_CHANGE change{ player.playerID(), mode };
+	BANDWIDTH_CHANGE change{player.playerID(), mode};
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y), change);
 	return outgoing.send(peerIdx);
 }
 
-bool 
-chatSendNetcodeNotice(const Player& player, bool netcode)
+bool chatSendNetcodeNotice(const Player &player, bool netcode)
 {
 	auto host = player.getCellHost();
-	if (host == 0) {
+	if (host == 0)
+	{
 		dbugLog(_FLD, "p:%u c:%s %s: not on a cell host", player.playerID(), player.callsign(), __FUNCTION__);
 		return false;
 	}
 	teulindex_t peerIdx = serverGetPeerIndex(host, CELL_HOST);
-	if (peerIdx < 0) {
+	if (peerIdx < 0)
+	{
 		dbugLog(_FLD, "p:%u c:%s %s: not connected to cell %08x", player.playerID(), player.callsign(), __FUNCTION__, host);
 		return false;
 	}
 
-	if (g_debugPersonas) {
+	if (g_debugPersonas)
+	{
 		char hostAddr[64];
 		teulGetAddress(host, hostAddr, sizeof(hostAddr));
-		dbugLog(_FLD, "p:%u c:%s Informing host %s give netcode %u after spawning"
-			, player.playerID(), player.callsign(), hostAddr, netcode);
+		dbugLog(_FLD, "p:%u c:%s Informing host %s give netcode %u after spawning", player.playerID(), player.callsign(), hostAddr,
+				netcode);
 	}
 
-	NETCODE_CHANGE change{ player.playerID(), netcode };
+	NETCODE_CHANGE change{player.playerID(), netcode};
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::NETCODE_NOTICE_Y), change);
 	return outgoing.send(peerIdx);
-
 }
 
-bool
-Chat::TuneToChannel::send(SINT32 connection)
+bool Chat::TuneToChannel::send(SINT32 connection)
 {
-	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d sending tune radio #%u to type %u [%u/%u]"
-						, connection
-						, m_radioIndex
-						, m_type
-						, m_tx
-						, m_rx
-						);
+	if (g_debugRadios)
+		dbugLog(_FLD, "t:%d sending tune radio #%u to type %u [%u/%u]", connection, m_radioIndex, m_type, m_tx, m_rx);
 	return teulSend(connection, CHAT_SVR_TUNE_CHANNEL, this) >= 0;
 }
 
@@ -1275,31 +1228,28 @@ chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle handleID)
 	userNLA.radioIndex = radioIndex;
 	userNLA.handle = handleID;
 
-	if ( g_debugRadios )
+	if (g_debugRadios)
 		dbugLog(_FLD, "t:%d sending NLA on index %d", connection, radioIndex);
 
 	return teulSend(connection, CHAT_SEND_NLA, &userNLA);
 }
 
 UINT32
-nextMessageID()
-{
-	return g_messageID++;
-}
+nextMessageID() { return g_messageID++; }
 
 //////////////////////////////////////////////////////////////////////
 // Send a localized message to an entire channel
 
-bool
-chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
+bool chatMessageChannel(const ChannelID &channelID, LSTRING_ID prefix, LSTRING_ID message, const char *arg1, const char *arg2)
 {
-	Chat::Channel* channel = chatFindChannel(channelID);
+	Chat::Channel *channel = chatFindChannel(channelID);
 
 	// No such channel currently
-	if ( channel == nullptr )
+	if (channel == nullptr)
 	{
-		if ( g_debugChat )
-			dbugLog(_FLD, "cmc: ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " has NULL channel", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
+		if (g_debugChat)
+			dbugLog(_FLD, "cmc: ch:%" PR64BitUT ".%u.%u.%" PR64BitUT " has NULL channel", channelID.InstID(), channelID.Type(),
+					channelID.Side(), channelID.SubID());
 		return false;
 	}
 
@@ -1311,14 +1261,14 @@ chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID mes
 }
 
 //////////////////////////////////////////////////////////////////////
-//Tells an mmhost to smite the user
+// Tells an mmhost to smite the user
 SINT32
-chatSendSmiteUser(UINT32 customerID, const char* handle)
+chatSendSmiteUser(UINT32 customerID, const char *handle)
 {
-	if ( customerID == 0 && handle[0] == 0 )
+	if (customerID == 0 && handle[0] == 0)
 		return 0;
 
-	CHAT_SMITE_USER smite { customerID, chatGetHandle(handle) };
+	CHAT_SMITE_USER smite{customerID, chatGetHandle(handle)};
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::SMITE_USER_Y), smite);
 	return serverSendPacketToPeers(outgoing);
 }
@@ -1329,22 +1279,20 @@ chatSendSmiteUser(UINT32 customerID, const char* handle)
 namespace Chat
 {
 
-bool
-SendPlayerMove(UINT32 cellHost, Chat::PlayerMove& move)
-{
-	dbugLog(_FLD, "sending p:%u moving:%d/%d/%d to cell %u", move.m_playerID, move.m_x, move.m_y, move.m_z, cellHost);
-	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::MovePlayer_Y), move);
-	return outgoing.send(serverGetPeerIndex(cellHost, CELL_HOST));
-}
+	bool SendPlayerMove(UINT32 cellHost, Chat::PlayerMove &move)
+	{
+		dbugLog(_FLD, "sending p:%u moving:%d/%d/%d to cell %u", move.m_playerID, move.m_x, move.m_y, move.m_z, cellHost);
+		Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::MovePlayer_Y), move);
+		return outgoing.send(serverGetPeerIndex(cellHost, CELL_HOST));
+	}
 
-}
+} // namespace Chat
 
 //////////////////////////////////////////////////////////////////////
 // Query the cell host broadcast network for the whereabouts of a
 // player in the game world.
 
-void
-chatSendLocateUser(Player& requester, const playerid_t playerID)
+void chatSendLocateUser(Player &requester, const playerid_t playerID)
 {
 	CHAT_LOC_USER locUser;
 	CHAT_FOUND_USER found;
@@ -1352,10 +1300,10 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 	// who is asking for the info
 	locUser.reqPlayer = requester.playerID();
 	locUser.reqConnection = requester.teulIndex();
-	locUser.playerID = playerID;			// who info is being requested of
+	locUser.playerID = playerID; // who info is being requested of
 
-	const PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
-	const Player* player = psn ? static_cast<const Player*>(psn->localInfo) : nullptr;
+	const PlayerStatusNode *psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
+	const Player *player = psn ? static_cast<const Player *>(psn->localInfo) : nullptr;
 	auto cellHost = player ? player->getCellHost() : 0;
 	if (cellHost)
 	{
@@ -1386,17 +1334,16 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 //////////////////////////////////////////////////////////////////////
 // Tell a cell-host to despawn a player
 
-bool
-chatSendForcedDespawn(Player* player, LSTRING_ID messageID, const char* reason)
+bool chatSendForcedDespawn(Player *player, LSTRING_ID messageID, const char *reason)
 {
-	if ( false == player->isSpawned() )
+	if (false == player->isSpawned())
 		return false;
 
 	const UINT32 cell = player->getCellHost();
-	if ( 0 == cell )
+	if (0 == cell)
 		return false;
 	const SINT32 cellIndex = serverGetPeerIndex(cell, CELL_HOST);
-	if ( cellIndex < 0 )
+	if (cellIndex < 0)
 		return false;
 
 	// Tell them
@@ -1413,10 +1360,10 @@ chatSendForcedDespawn(Player* player, LSTRING_ID messageID, const char* reason)
 // Receive a ModReport
 
 SINT32
-_recvModReport(ACTION_OBJECT* const a)
+_recvModReport(ACTION_OBJECT *const a)
 {
-	Chat::ModReport& report = a->read<Chat::ModReport>();
-	ChatHandle& handle = a->read<ChatHandle>();
+	Chat::ModReport &report = a->read<Chat::ModReport>();
+	ChatHandle &handle = a->read<ChatHandle>();
 	Chat::SendModReport(handle, report);
 	return a->offset;
 }
@@ -1424,18 +1371,17 @@ _recvModReport(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive an edit-string message
 
-template<>
-SINT32
-EDIT_STRING_MSG::receive(SINT32 teulIndex, EDIT_STRING_MSG& incoming)
+template <>
+SINT32 EDIT_STRING_MSG::receive(SINT32 teulIndex, EDIT_STRING_MSG &incoming)
 {
-	if ( incoming.action() != EXCHANGE )
+	if (incoming.action() != EXCHANGE)
 	{
 		dbugLog(_FLA, "t:%d f:%s invalid action %d", teulIndex, __FUNCTION__, incoming.action());
 		return -EINVAL;
 	}
 
 	SINT32 result = incoming.data().receive(teulIndex);
-	if ( result < 0 )
+	if (result < 0)
 	{
 		dbugLog(_FLA, "t:%d f:%s got %d from attempting to edit string", teulIndex, __FUNCTION__, result);
 		return -EINVAL;
@@ -1448,11 +1394,10 @@ EDIT_STRING_MSG::receive(SINT32 teulIndex, EDIT_STRING_MSG& incoming)
 //////////////////////////////////////////////////////////////////////
 // Receive an incoming generic string request
 
-template<>
-SINT32
-GENERIC_STRING_MSG::receive(SINT32 teulIndex, GENERIC_STRING_MSG& incoming)
+template <>
+SINT32 GENERIC_STRING_MSG::receive(SINT32 teulIndex, GENERIC_STRING_MSG &incoming)
 {
-	if ( incoming.action() != EXCHANGE )
+	if (incoming.action() != EXCHANGE)
 	{
 		dbugLog(_FLA, "t:%d f:%s invalid action %d", teulIndex, __FUNCTION__, incoming.action());
 		return -EINVAL;
@@ -1465,24 +1410,24 @@ GENERIC_STRING_MSG::receive(SINT32 teulIndex, GENERIC_STRING_MSG& incoming)
 // Receive a DIRECTMESSAGE structure from one of the hosts
 
 SINT32
-_recvDirectMessage(ACTION_OBJECT* const a)
+_recvDirectMessage(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 	{
 		dbugLog(_FLW, "t:%d client sent direct message", a->teulIndex);
 		return -EINVAL;
 	}
 
-	auto& directMessage = *(Chat::DirectMessage*)(a->packed);
+	auto &directMessage = *(Chat::DirectMessage *)(a->packed);
 	// Forward the message to the player requesting it
-	Player* const player = PlayerInterface::Lookup(directMessage.m_playerID);
-	if ( player == nullptr )
+	Player *const player = PlayerInterface::Lookup(directMessage.m_playerID);
+	if (player == nullptr)
 	{
-		///TODO: Lower to FLD, this is probably a player who has recently disconnected.
+		/// TODO: Lower to FLD, this is probably a player who has recently disconnected.
 		dbugLog(_FLW, "t:%d sent direct message for p:%u [not found]", a->teulIndex, directMessage.m_playerID);
 		return -EINVAL;
 	}
-	if ( player->isConnected() == false )
+	if (player->isConnected() == false)
 		return 0;
 	directMessage.SetPointers();
 	player->message(directMessage);
@@ -1492,20 +1437,19 @@ _recvDirectMessage(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a Chat::SystemMessage structure from one of the hosts
 
-static SINT32
-_recvBroadcastMessage(ACTION_OBJECT* const a)
+static SINT32 _recvBroadcastMessage(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 		return -EINVAL;
-	auto& broadcast = *(Chat::Broadcast*)(a->packed);
+	auto &broadcast = *(Chat::Broadcast *)(a->packed);
 	// Route the system message it contains
 	broadcast.SetPointers();
 	broadcast.route();
 	return a->offset;
 }
 
-void
-chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle squadHandle, bool isDecalUpdate, UINT32 decal)
+void chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle squadHandle,
+							  bool isDecalUpdate, UINT32 decal)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y));
 	outgoing.construct<MapPersonaUpdate>(squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal);
@@ -1516,12 +1460,12 @@ chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID
 // Receive user preferences
 
 SINT32
-_recvChatPreferences(ACTION_OBJECT* const a)
+_recvChatPreferences(ACTION_OBJECT *const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
-	while ( a->atEndOfBuffer() == false )
+	while (a->atEndOfBuffer() == false)
 	{
-		auto& pref = a->read<Chat::Preference>();
+		auto &pref = a->read<Chat::Preference>();
 		player.SetPreference(pref.m_prefID, pref.m_value, true);
 	}
 
@@ -1531,19 +1475,18 @@ _recvChatPreferences(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a Teul::TickSample speed-hack report.
 
-extern void chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample& sample);
+extern void chatHandleTickSample(const UINT32 source, Player &player, const Teul::TickSample &sample);
 
-static SINT32
-_recvTickSample(ACTION_OBJECT* const a)
+static SINT32 _recvTickSample(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 		return -EINVAL;
-	if ( a->canRead<Teul::TickSample>() == false )
+	if (a->canRead<Teul::TickSample>() == false)
 		return -EINVAL;
-	auto& sample = a->read<Teul::TickSample>();
+	auto &sample = a->read<Teul::TickSample>();
 
-	Player* const player = PlayerInterface::Lookup(sample.playerID);
-	if ( player != nullptr )
+	Player *const player = PlayerInterface::Lookup(sample.playerID);
+	if (player != nullptr)
 		chatHandleTickSample(sample.source, *player, sample);
 
 	return a->offset;
@@ -1552,15 +1495,14 @@ _recvTickSample(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a response to an attack order
 
-static SINT32
-_recvAttackOrder(ACTION_OBJECT* const a)
+static SINT32 _recvAttackOrder(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 		return -EINVAL;
-	if ( a->canRead<AttackOrder>() == false )
+	if (a->canRead<AttackOrder>() == false)
 		return -EINVAL;
 	dbugLog(_FLD, "got attack order response from strat host");
-	auto& incoming = a->read<AttackOrder>();
+	auto &incoming = a->read<AttackOrder>();
 	chatBrigadeAttackOrderResponse(incoming);
 	return a->offset;
 }
@@ -1569,12 +1511,12 @@ _recvAttackOrder(ACTION_OBJECT* const a)
 // Recevive a game time update notification
 
 SINT32
-_recvTimeUpdate(ACTION_OBJECT* const a)
+_recvTimeUpdate(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr || a->canRead<Host::TimeUpdate>() == false )
+	if (a->m_client != nullptr || a->canRead<Host::TimeUpdate>() == false)
 		return -EINVAL;
 
-	auto& incoming = a->read<Host::TimeUpdate>();
+	auto &incoming = a->read<Host::TimeUpdate>();
 
 	wthrSetGameTime(incoming.gametime);
 	wthrSetWeatherPattern(incoming.weather);
@@ -1588,34 +1530,26 @@ _recvTimeUpdate(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 // Receive a list of locality updates from the cell hosts
 
-static SINT32
-_recvLocalityUpdates(ACTION_OBJECT* const a)
+static SINT32 _recvLocalityUpdates(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 	{
 		dbugLog(_FLA, "t:%d player sending us locality updates? naughty naughty", a->teulIndex);
 		return -EINVAL;
 	}
 
 	UINT32 updates = 0;
-	while ( a->canRead<LocalityUpdate>() )
+	while (a->canRead<LocalityUpdate>())
 	{
-		auto& update = a->read<LocalityUpdate>();
+		auto &update = a->read<LocalityUpdate>();
 		++updates;
 
-		Player* player = PlayerInterface::Lookup(update.m_playerID);
-		if ( player == nullptr )
+		Player *player = PlayerInterface::Lookup(update.m_playerID);
+		if (player == nullptr)
 			continue;
 
-		player->updateLocality(update.m_x, update.m_y, update.m_z
-								, update.m_cpChanged, update.m_nearCP
-								, update.m_riding, nullObjID
-								, update.m_lastPing
-								, update.m_onAWS
-								, update.m_inCaptureBldg
-								, update.m_captureFac
-								, update.m_progress
-								);
+		player->updateLocality(update.m_x, update.m_y, update.m_z, update.m_cpChanged, update.m_nearCP, update.m_riding, nullObjID,
+							   update.m_lastPing, update.m_onAWS, update.m_inCaptureBldg, update.m_captureFac, update.m_progress);
 	}
 
 	dbugLog(_FLD, "received %u locality updates", updates);
@@ -1625,14 +1559,16 @@ _recvLocalityUpdates(ACTION_OBJECT* const a)
 
 //////////////////////////////////////////////////////////////////////
 
-static SINT32 _recvMemoryRequestResult(ACTION_OBJECT* const a) {
-	if ( a->m_client != nullptr ) {
+static SINT32 _recvMemoryRequestResult(ACTION_OBJECT *const a)
+{
+	if (a->m_client != nullptr)
+	{
 		dbugLog(_FLW, "t:%d Receiving antihack result directly from client?", a->teulIndex);
 		return -EINVAL;
 	}
 
 	auto playerid = a->read<playerid_t>();
-	auto& req = a->read<MemoryRequest>();
+	auto &req = a->read<MemoryRequest>();
 	Chat::SendMemoryRequestResult(playerid, req);
 
 	return a->offset;
@@ -1640,13 +1576,13 @@ static SINT32 _recvMemoryRequestResult(ACTION_OBJECT* const a) {
 
 //////////////////////////////////////////////////////////////////////
 
-static SINT32
-_recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
+static SINT32 _recvCellHostUpdate(ACTION_OBJECT *const a, Chat::CellHostUpdate &msg)
 {
-	if (a->m_client != nullptr)	// host only
+	if (a->m_client != nullptr) // host only
 		return -EINVAL;
-	Player* player = PlayerInterface::Lookup(msg.playerID);
-	if (player == nullptr) {
+	Player *player = PlayerInterface::Lookup(msg.playerID);
+	if (player == nullptr)
+	{
 		dbugLog(_FLW, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
 		return -EINVAL;
 	}
@@ -1658,34 +1594,34 @@ _recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
 //////////////////////////////////////////////////////////////////////
 // Receive updates on CPs/facilities
 
-static SINT32
-_recvStratUpdates(ACTION_OBJECT* const a)
+static SINT32 _recvStratUpdates(ACTION_OBJECT *const a)
 {
-	if ( a->m_client != nullptr )
+	if (a->m_client != nullptr)
 		return -EINVAL;
 
 	UINT32 updates = 0;
 	UINT32 applied = 0;
 
-	for ( ; a->canRead<StratUpdates>() ; ++updates )
+	for (; a->canRead<StratUpdates>(); ++updates)
 	{
-		auto& entry = a->read<StratUpdates>();
-		if ( entry.m_fullObjID.objClass == CLASS_BUILDING )
+		auto &entry = a->read<StratUpdates>();
+		if (entry.m_fullObjID.objClass == CLASS_BUILDING)
 			continue;
 
-		Property* property = chatFindProperty(entry.m_fullObjID);
-		if ( property == nullptr )
+		Property *property = chatFindProperty(entry.m_fullObjID);
+		if (property == nullptr)
 		{
-			dbugLog(_FLA, "%hd.%hd:%hu unrecognized full obj id", entry.m_fullObjID.cell.ox, entry.m_fullObjID.cell.oy, entry.m_fullObjID.id);
+			dbugLog(_FLA, "%hd.%hd:%hu unrecognized full obj id", entry.m_fullObjID.cell.ox, entry.m_fullObjID.cell.oy,
+					entry.m_fullObjID.id);
 			continue;
 		}
 
 		property->m_flags = entry.m_flags;
-		if ( property->m_owner != entry.m_owner )
+		if (property->m_owner != entry.m_owner)
 			dbugLog(_FLD, "%s changed owner from %u to %u", property->m_name.c_str(), property->m_owner, entry.m_owner);
 		property->m_owner = (WWII_COUNTRY)entry.m_owner;
-		if ( property->IsCP() )
-			((PropCP*)property)->m_controller = (WWII_COUNTRY)entry.u_extra.m_controller;
+		if (property->IsCP())
+			((PropCP *)property)->m_controller = (WWII_COUNTRY)entry.u_extra.m_controller;
 
 		++applied;
 	}
@@ -1696,10 +1632,9 @@ _recvStratUpdates(ACTION_OBJECT* const a)
 }
 
 //////////////////////////////////////////////////////////////////////
-//This function installs our callbacks
+// This function installs our callbacks
 
-static SINT32
-_registerMMCallbacks()
+static SINT32 _registerMMCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
 	{
@@ -1710,15 +1645,11 @@ _registerMMCallbacks()
 	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
-static SINT32
-_registerStratCallbacks()
-{
-	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-	{
-		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
-		REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdates);
-	}
-	END_CALLBACK_REGISTRATION(Strat::CallbackX)
+static SINT32 _registerStratCallbacks(){
+	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX){REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
+REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdates);
+}
+END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32
@@ -1744,9 +1675,9 @@ chatInstallHostCallbacks()
 
 #ifdef SPAWN_RESTRICT
 		REGISTER_SENDER(Chat::SPAWN_RESTRICTION_Y, _sendSpawnRestriction, CHAT_SEND_SPAWN_RESTRICTION);
-#endif //SPAWN_RESTRICT
+#endif // SPAWN_RESTRICT
 
-		//Send/Recv a strat command response
+		// Send/Recv a strat command response
 		REGISTER_RECEIVER(Chat::BANDWIDTH_NOTICE_Y, _recvBandwidthNotice);
 
 		REGISTER_MSG_SENDER(Chat::WHO_LIST_Y, CHAT_WHO_LIST);

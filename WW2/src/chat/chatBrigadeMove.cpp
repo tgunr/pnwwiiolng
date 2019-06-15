@@ -232,7 +232,6 @@ void GarrisonCountryChange::process(const ChatHandle byHandle) const
 
 	LSTRING_ID response = LSTR_NONE;
 	const char* text = nullptr;
-	char temp[16];
 
 	dbugLog(_FLD, "Chat server received GarrisonCountryChange related to brigade %d with action %d and actionable is %d", 
 		m_brigadeID, m_action, m_actionable);

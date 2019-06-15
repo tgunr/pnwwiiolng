@@ -829,8 +829,7 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 //////////////////////////////////////////////////////////////////////
 //
 
-static bool
-_forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const char* const source)
+static bool _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const char* const source)
 {
 	const SINT32 cellIndex = serverGetPeerIndex(vehicle.serverAddress, CELL_HOST);
 	if ( cellIndex < 0 )
