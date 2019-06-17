@@ -517,30 +517,10 @@ else
         fi
     fi
 
-    if [ "$noprompt" = false ]; then
-        echo
-        echo
-        echo "At the moment, ALL of the .mdl files will NOT be Rebuilt."
-        while read -p "Do you wish to Rebuild ALL of the .mdl files Now? ( y|n ) : " -n 1 -r ; do
-            case $(echo "$REPLY" |tr [:upper:] [:lower:]) in
-                "y")
-                    rebuildMDLfiles=true
-                    break
-                    ;;
-
-                "n")
-                    rebuildMDLfiles=false
-                    break
-                    ;;
-
-                *)
-                    echo
-                    ;;
-            esac
-        done
-    else
-        rebuildMDLfiles=false
-    fi
+	echo
+	echo
+	echo "Re-generating ALL of the .mdl files."
+	rebuildMDLfiles=true
 fi
 
 echo
@@ -671,7 +651,7 @@ startTime=$(date +%s)
 
 
 if [ "$skip_step" = false ]; then
-    if [ "$clean" = true ] ; then
+    if [ "$clean_repo" = true ] ; then
         echo
         echo
         build_step "clean" "Cleaning" "repositories"
