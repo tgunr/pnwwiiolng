@@ -371,6 +371,7 @@ void StratObject::Init()
 	_linkedDepot = 0;
 	_stratflags = 0;
 	_updatetime = 0;
+	_loaded = false;
 	_vislevel = 0;
 	_index = 0;
 }

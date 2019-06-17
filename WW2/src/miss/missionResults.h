@@ -10,6 +10,7 @@
 
 #include "miss/missionTypes.h"				// MAX_HIT_ARRAY
 #include "miss/missHitArrayNode.h"			// HIT_ARRAY_NODE
+#include "miss/missEnemiesArrayNode.h"		// ENEMIES_ARRAY_NODE
 #include "wwii/wwiiRTBCodes.h"				// For CODE_RTB
 #include "weap/weapSerial.h"				// WEAPON_SERIAL
 #include "chat/chatGroupPermissionTypes.h"	// For ChatPermissions
@@ -25,7 +26,8 @@ struct MISSION_RESULTS
 	UINT16		numHits;					//number of different types of vehicles hit.
 	sortieid_t	sortieID;					// sortie this was for.
 											//the number of elements in the hit Array
-	HIT_ARRAY_NODE	hitArray[MapMiss::MAX_HIT_ARRAY];	//one entry per vehicle type
+	HIT_ARRAY_NODE		hitArray[MapMiss::MAX_HIT_ARRAY];		// One entry per vehicle type
+	ENEMIES_ARRAY_NODE	enemiesArray[MapMiss::MAX_HIT_ARRAY];	// One entry per enemy (veh spec and callsign)
 
 	LOGICAL		missionSuccess;
 	LOGICAL		promoted;					// Got a promotion

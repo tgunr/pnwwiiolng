@@ -16,6 +16,7 @@
 #include "map/mapDB.h"
 #include "map/mapPlayer.h"
 #include "miss/missHitArrayNode.h"
+#include "miss/missEnemiesArrayNode.h"
 #include "miss/missionConstants.h"
 #include "miss/missionDetail.h"
 #include "miss/mission.h"
@@ -169,6 +170,17 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 			results.hitArray[i].vehType = spec;
 			results.hitArray[i].numVehiclesHit = _getInteractionCount(sortie->m_typesHit, *it);
 			results.hitArray[i].numVehiclesKilled = _getInteractionCount(sortie->m_typesKilled, *it);
+		}
+		
+		// Populate the enemies array with the unit and callsign for each enemy
+		auto enemies = sortie->m_sortiesKilled;
+		i = 0;
+		for(auto it = enemies.begin(); it != enemies.end(); ++it, ++i)
+		{
+			Scoring::Sortie* const assistSortie = Scoring::Sortie::Lookup(*it);
+			
+			results.enemiesArray[i].vehSpec = assistSortie->spec();
+			results.enemiesArray[i].callsignId = assistSortie->chatHandle();
 		}
 	}
 

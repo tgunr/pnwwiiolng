@@ -141,8 +141,8 @@ function maxBridgeObjectives (population)
 	-- If population is not specified, use the current chat population
 	if population == nil then population = getPopulation() end
 
-	local minimum = 4
-	local populationPer = 95
+	local minimum = 6
+	local populationPer = 60
 	local extra = math.floor(population / populationPer)
 
 	return minimum + extra
@@ -180,14 +180,14 @@ end
 function maxCaptureObjectives()
    local population = getLowerPopulation()
 
-   if population >= 385 then return 9 + math.floor((population - 330) / 55) end
-   if population >= 330 then return 8 end
-   if population >= 275 then return 7 end
+   if population >= 370 then return 8 + math.floor((population - 290) / 40) end
+   if population >= 290 then return 7 end
    if population >= 220 then return 6 end
-   if population >= 165 then return 5 end
+   if population >= 160 then return 5 end
    if population >= 110 then return 4 end
-   if population >=  55 then return 3 end
-   return 2
+   if population >= 70 then return 3 end
+   if population >= 40 then return 2 end
+   return 1
 end
 
 function countsAsEngagement(target)

@@ -8128,8 +8128,11 @@ void gr2AnimTwist::Update(gr2AnimTrooper* model, bool reset)
 		UpdateYaw(model->myVehicle, delta);
 
 		// update our position variables
-		model->myVehicle->PosData.RenderAtt.Yaw	= vehicleYaw;
-		model->myVehicle->PosData.Att.Yaw		= vehicleYaw;
+		if ( !(model->myVehicle->Flags & VEH_FLAGS_IS_CLONE) )
+		{
+			model->myVehicle->PosData.RenderAtt.Yaw	= vehicleYaw;
+			model->myVehicle->PosData.Att.Yaw		= vehicleYaw;
+		}
 	}
 
 	model->upDownWeightOverride = 0;
