@@ -28,7 +28,8 @@ const char* langNames[MAX_LANGUAGES] = {
 	"french",
 	"german",
 	"spanish",
-	"chinese"
+	"chinese",
+	"russian"
 };
 
 /*------------------------------------------------------------------------
