@@ -985,16 +985,16 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 	CPStruct* closestEnemyCP;
 	CPStruct* closestFriendlyCP;
 	CPStruct* cp;
-
-	// Loop through all of the CPs
-	for(cp = _cpList; cp != nullptr; cp = cp->next)
+	
+	if(side != WWII_NO_SIDE)
 	{
-		// Ignore bridges since they are concidered CPs
-		if(!cp->isCity())
-			continue;
-		
-		if(side != WWII_NO_SIDE)
+		// Loop through all of the CPs
+		for(cp = _cpList; cp != nullptr; cp = cp->next)
 		{
+			// Ignore bridges since they are concidered CPs
+			if(!cp->isCity())
+				continue;
+
 			// Find the closest Enemy town
 			if(cp->side != side)
 			{
@@ -1006,7 +1006,7 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 				UINT64 yEnemyDist = y - cp->m_posY;
 
 				// Get the distance in kilometers
-				UINT64 enemyDistance = (UINT64)sqrtl((double)(xEnemyDist * xEnemyDist) + (double)(yEnemyDist * yEnemyDist)) / 1000;
+                UINT64 enemyDistance = (UINT64)sqrt((double)(xEnemyDist * xEnemyDist) + (double)(yEnemyDist * yEnemyDist)) / 1000;
 
 				if(closestEnemyDist == 0 || closestEnemyDist >= enemyDistance)
 				{
@@ -1022,7 +1022,7 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 				UINT64 yFriendlyDist = y - cp->m_posY;
 
 				// Get the distance in kilometers
-				UINT64 friendlyDistance = (UINT64)sqrtl((double)(xFriendlyDist * xFriendlyDist) + (double)(yFriendlyDist * yFriendlyDist)) / 1000;
+                UINT64 friendlyDistance = (UINT64)sqrt((double)(xFriendlyDist * xFriendlyDist) + (double)(yFriendlyDist * yFriendlyDist)) / 1000;
 
 				if(closestFriendlyDist == 0 || closestFriendlyDist >= friendlyDistance)
 				{

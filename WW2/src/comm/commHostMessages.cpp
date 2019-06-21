@@ -461,8 +461,8 @@ Player::awsCheck()
 	// Don't run the check unless we're over the m_lastAwsCheck time so we don't spam the cell host
 	if(teulTime() >= m_lastAwsCheck)
 	{
-		const FLOAT32 x_m = (FLOAT32)vehicle->x_cm() / 100;
-		const FLOAT32 y_m = (FLOAT32)vehicle->y_cm() / 100;
+		const FLOAT32 x_m = (FLOAT32)vehicle->x_cm() / 100.0;
+		const FLOAT32 y_m = (FLOAT32)vehicle->y_cm() / 100.0;
 		UINT16 closestEnemyDist, closestFriendlyDist;
 
 		// Get both closestEnemyDist and closestFriendlyDist from this player's plane
