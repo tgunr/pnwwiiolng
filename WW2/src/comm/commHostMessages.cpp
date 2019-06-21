@@ -453,14 +453,52 @@ _recordPacketSize(UINT32 size)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check to see if I should appear on AWS
+// Check to see if the player's plane should appear on AWS
 
 void
 Player::awsCheck()
 {
+	// Don't run the check unless we're over the m_lastAwsCheck time so we don't spam the cell host
+	if(teulTime() >= m_lastAwsCheck)
+	{
+		const FLOAT32 x_m = (FLOAT32)vehicle->x_cm() / 100;
+		const FLOAT32 y_m = (FLOAT32)vehicle->y_cm() / 100;
+		UINT16 closestEnemyDist, closestFriendlyDist;
+
+		// Get both closestEnemyDist and closestFriendlyDist from this player's plane
+		vehicle->findClosestCPs(x_m, y_m, vehicle->side(), closestEnemyDist, closestFriendlyDist);
+
+		// Do not show on AWS if the player's plane is not within the set Enemy Distance (default 10km)
+		// and
+		// Do not show on AWS if the player's plane is within the set Friendly Distance (default 10km)
+		// (Meaning, only show on AWS whenever over the front lines, enemy air space or off map)
+		if(closestEnemyDist >= host_config.update.awsEnemyDistance_km && closestFriendlyDist <= host_config.update.awsFriendlyDistance_km)
+		{
+#ifdef BETA_RELEASE
+			char temp[100];
+			temp[0] = '\0';
+			strprintf(temp, "Off AWS (distance) Configured Distances - E: %dkm F: %dkm ... Your Distance fron E: %dkm F: %dkm", 
+						host_config.update.awsEnemyDistance_km, host_config.update.awsFriendlyDistance_km, closestEnemyDist, closestFriendlyDist);
+			message(LSTR_BETA, LSTR_GENERIC, temp);
+#endif
+			m_onAWS = false;
+			m_awsTrigger = 0;
+			
+			// Add 10 seconds before the next check
+			m_lastAwsCheck = teulTime() + 10;
+
+			return;
+		}
+		else
+		{
+			// Add 10 seconds before the next check
+			m_lastAwsCheck = teulTime() + 10;
+		}
+	}
+
 	if ( m_onAWS == true )
 	{
-		// If the vehicle stops moving for 5 seconds,
+		// If the vehicle stops moving for 5 seconds
 		if ( vehicle->isMoving() == false )
 		{
 #ifdef BETA_RELEASE
