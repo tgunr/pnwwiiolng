@@ -406,7 +406,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
 	
 	if(it == _fonts->fontmap.end())
 	{
-        if ( gLanguage != 5 ) // not IDE_LANGUAGE_CHINESE
+        if ( gLanguage != 5 && gLanguage != 6) // not IDE_LANGUAGE_CHINESE and not IDE_LANGUAGE_RUSSIAN
         {
             font = new FTFontWestern();
         }

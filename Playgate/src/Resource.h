@@ -3,12 +3,13 @@
 // Used by Playgate.rc
 //
 #define IDR_LOC_ENGLISH                 0
-#define IDR_LOC_ITALIAN                 1
-#define IDR_LOC_FRENCH                  2
+#define IDR_LOC_ITALIAN 1
+#define IDR_LOC_FRENCH 2
 #define IDR_LOC_GERMAN                  3
 #define IDR_LOC_SPANISH                 4
-#define IDR_LOC_CHINESE                 5
-#define IDP_SOCKETS_INIT_FAILED         103
+#define IDR_LOC_CHINESE 5
+#define IDR_LOC_RUSSIAN 6
+#define IDP_SOCKETS_INIT_FAILED 103
 #define IDR_MAINFRAME                   128
 #define IDD_TERMS_OF_SERVICE            133
 #define IDD_REGION_SELECT               134
