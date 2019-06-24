@@ -395,7 +395,16 @@ GarrisonCountryChange::process(const ChatHandle mover, const char* callsign, UIN
 					cp->changeOwnership(country, true, true);
 
 					// Now that the town has changed owner we need to change the Garrison to match.
-					cp->changeAllGarrisonCountries(country, true);
+					if(cp->m_townstatus == INACTIVE)
+					{
+						// Inactive towns that are changed by the HC do not incur the extended supply timers
+						cp->changeAllGarrisonCountries(country, false);
+					}
+					else
+					{
+						// All others do incur the extended supply timers
+						cp->changeAllGarrisonCountries(country, true);
+					}
 				}
 
                 result = GCR_APPROVED;
