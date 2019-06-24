@@ -378,6 +378,7 @@ protected:
 	TeulTimeMS		m_lastSquadInfo_ms;	// When we last sent squad info
 public:
 	TeulTimeMS		m_lastAWSRequest;
+	SINT32			m_latestPing =0;
 
 protected:
 	// Last known location of the player

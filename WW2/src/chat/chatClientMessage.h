@@ -27,6 +27,7 @@ namespace Chat
 		ChatHandle	m_handle;	// Packed callsign of sender
 		char		m_message[MAX_MESSAGE_LENGTH+1];
 		FULL_OBJ_ID	m_uiTarget;	// CP or Facility targetted in UI
+		SINT32 g_latestPing;
 
 		// Packer
 		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
