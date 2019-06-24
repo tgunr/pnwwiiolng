@@ -90,7 +90,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 												//	of the transmitting Index
 	outGoingMessage.m_handle = 0;
 	outGoingMessage.m_country = 0;
-	outGoingMessage.g_lastPing = g_lastPing;
+	outGoingMessage.g_latestPing = g_lastPing;
 
 	outGoingMessage.m_length = strlen(message);
 
@@ -102,7 +102,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 	// Let chat know what you targetted last for use with dot commands
 	outGoingMessage.m_uiTarget = _lastTargetFullObjID;
 
-	Write_Debug("Chat sending client message %s with last ping: %d teulClock: %" PR64BitUT "", message, g_lastPing, outGoingMessage.g_lastPing);
+	Write_Debug("Chat sending client message %s with last ping: %d teulClock: %" PR64BitUT "", message, g_lastPing, outGoingMessage.g_latestPing);
 
 	return teulSend(teulIndex, _SEND_CLIENT_MESSAGE, &outGoingMessage);
 }
