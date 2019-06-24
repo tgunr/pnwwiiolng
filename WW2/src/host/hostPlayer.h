@@ -79,6 +79,7 @@ public:
 
 	UINT32					m_nextVelocityCheck;
 	UINT32					m_awsTrigger;
+	UINT32					m_lastAwsCheck;
 
 	UINT32					m_expectUpdateNo;
 	UINT32					m_updatePrime;

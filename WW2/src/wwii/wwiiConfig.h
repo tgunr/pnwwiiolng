@@ -210,6 +210,8 @@ struct cfUPDATE
 	UINT16	sampleIgnore;		//!< How many packets to ignore before we commence counting at all
 	UINT16	awsGracePeriod_s;	//!< How long you get from tripping AWS to appearing on it
 	UCHAR	awsHighThreshold;	//!< How many planes present to trip high AWS?
+	UINT16	awsEnemyDistance_km;	//!< How many km from the front lines to trip AWS?
+	UINT16	awsFriendlyDistance_km;	//!< How many km off map to trip AWS?
 };
 
 struct cfWEATHER
