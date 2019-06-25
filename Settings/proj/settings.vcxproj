@@ -265,7 +265,7 @@
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico" />
+    <Image Include="..\..\Installer\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vs2017\glew_static.vcxproj">

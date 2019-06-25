@@ -255,14 +255,14 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\ww2assets\oswin\WWIIOnLine.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="..\ww2assets\oswin\dependencies\playgate\bg.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
     </Image>
     <Image Include="..\ww2assets\oswin\dependencies\playgate\bg-tos.bmp">
       <Filter>Resource Files\Backgrounds</Filter>
+    </Image>
+    <Image Include="..\Installer\ww2assets\oswin\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
 </Project>

@@ -20,17 +20,16 @@
 :: 5 = Invalaid Command Line Switch.
 :: 6 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 25-June-2019.
 
 :: Disable / Enable = DebugBat.
-:: One option MUST be SET.
 SET DebugBat=false
 rem SET DebugBat=true
 
 :: The main release.sh script uses the opt/ww2mods directory within the wwiiolng directory AND NOT a separate ww2mods directory.
 :: SET DevSetupMODS=false = release.sh script use (wwiiolng/opt/ww2mods)
-SET DevSetupMODS=true
 SET DevSetupMODS=false
+rem SET DevSetupMODS=true
 
 :: =====================================================================================================
 
@@ -109,6 +108,8 @@ IF %DevSetupMODS% == false GOTO scriptMODS
 
 IF /I %DebugBat% == true @pause
 
+@echo ====  _PlayArchBuilder.bat: Invalaid DevSetupMODS setting - ABORTING.
+
 EXIT /B 5
 rem ==========
 
@@ -153,17 +154,17 @@ SET Playarc_DATA=%modsRootDIR%\DATA
 
 rem Archive files - Output Store.
 IF /I "%ReleaseVersion%" == "/RC" (
-	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-candidate
+	SET Playarc_Output=%wwiiolngRootDIR%\Installer\ww2assets\oswin\archivefiles\release-candidate
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
-	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-alpha
+	SET Playarc_Output=%wwiiolngRootDIR%\Installer\ww2assets\oswin\archivefiles\release-alpha
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
-	SET Playarc_Output=%wwiiolngRootDIR%\ww2assets\oswin\archivefiles\release-beta
+	SET Playarc_Output=%wwiiolngRootDIR%\Installer\ww2assets\oswin\archivefiles\release-beta
 	GOTO check1
 )
 
@@ -234,14 +235,17 @@ rem   Directory / File Deletion (playarc files).
 
 CD /D "%Playarc_Output%"
 
-rem Delete All files contained within the target directory and sub-directories, with console echo.
+rem Delete All playarc*.* files contained within the target directory and sub-directories, with console echo.
 @echo ====  Deleting Old Playarc Files in %CD%
 
-@echo.
-DEL playarc*.txt /S /Q
+rem @echo.
+rem DEL /S /Q playarc*.txt
 
 @echo.
-DEL playarc*.ww2 /S /Q
+rem DEL /S /Q playarc*.ww2
+DEL /Q playarc*.*
+
+@echo Completed.
 
 CD /D "%LaunchingDir%"
 rem ===================================================================================================

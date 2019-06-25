@@ -25,10 +25,9 @@
 :: 6 = unable to locate the xdelta3.exe file. This file is REQUIRED.
 :: 7 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 25-June-2019.
 
 :: Disable / Enable = DebugBat.
-:: One option MUST be SET.
 SET DebugBat="false"
 rem SET DebugBat="true"
 
@@ -151,7 +150,7 @@ EXIT /B 5
 
 :check1
 
-SET xdelta3path=%wwiiolngRootDIR%\ww2assets\oswin
+SET xdelta3path=%wwiiolngRootDIR%\Installer\ww2assets\oswin
 CD /D "%xdelta3path%"
 
 rem xdelta3.exe is REQUIRED for this process.

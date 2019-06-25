@@ -206,7 +206,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\ww2assets\oswin\WWIIOnLine.ico">
+    <Image Include="..\..\Installer\ww2assets\oswin\WWIIOnLine.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -1,7 +1,7 @@
 ﻿; BOF ========================================================================
 ; File: WWIIOL_Installer_Template.iss
 ; Software: Inno Setup Compiler 5.6.1 (u)
-; Date: April 8, 2018, May 3, 2019
+; Date: April 8, 2018, June 25, 2019
 ; Revision by: Mathew "james10" Hogan - MJH
 
 ; Addresses:
@@ -238,7 +238,8 @@
 
 
 ; ===  Installer Assets Directories.  ========================================
-#define WWIIOnlineAssetsDir "..\.\ww2assets"
+; #define WWIIOnlineAssetsDir "..\.\ww2assets"
+#define WWIIOnlineAssetsDir ".\ww2assets"
 
 
 ; ===  Set - Installer Script Format.
@@ -317,7 +318,7 @@ AppComments=The Virtual Battlefield Does Exist . . . !
 
 ; WWIIOnline Application - Installer Variables.  =============================
 #if ReleaseType == "Alpha" | ReleaseType == "Beta"
-  DefaultDirName={pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}
+  DefaultDirName={commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}
   DefaultGroupName={#InstallerGroupName}\{#WWIIOnlineGroupName}{#WWIIOnlineAppVerName}
 
   #if InstallerBuildType == "installPatcher"
@@ -330,7 +331,7 @@ AppComments=The Virtual Battlefield Does Exist . . . !
 
 #else
   ; ReleaseType == "ReleaseCandidate" - Default
-  DefaultDirName={pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}
+  DefaultDirName={commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}
   DefaultGroupName={#InstallerGroupName}\{#WWIIOnlineGroupName}
 
   #if InstallerBuildType == "installPatcher"
@@ -439,8 +440,8 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalSettings}"; Flags: unchecked; OnlyBelowVersion: 0,6.1
 Name: "DirectXRedist"; Description: "{cm:InstallDx}"; GroupDescription: "{cm:ExtInstallers}"
-; Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"; Check: IsWin64
-Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"
+Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"; Check: IsWin64
+; Name: "VCRedistX64"; Description: "{cm:RunTimeX64}"; GroupDescription: "{cm:ExtInstallers}"
 Name: "VCRedistX86"; Description: "{cm:RunTimeX86}"; GroupDescription: "{cm:ExtInstallers}"
 
 
@@ -489,8 +490,8 @@ Name: "VCRedistX86"; Description: "{cm:RunTimeX86}"; GroupDescription: "{cm:ExtI
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSDirectXSetup}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
 ; VC Runtimes x64 Setup: RUNASADMIN
-; Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Check: IsWin64; Flags: createvalueifdoesntexist uninsdeletevalue
-Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
+Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Check: IsWin64; Flags: createvalueifdoesntexist uninsdeletevalue
+; Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX64}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
 
 ; VC Runtimes x86 Setup: RUNASADMIN
 Root: "HKCU"; Subkey: "SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Layers"; ValueType: string; ValueName: "{app}\{#MSRuntimeLibraryX86}"; ValueData: "RUNASADMIN"; Flags: createvalueifdoesntexist uninsdeletevalue
@@ -538,8 +539,8 @@ Name: "{group}\Practice Offline"; Filename: "{app}\{#WWIIOnlineExe}"; IconFilena
 Name: "{group}\Settings"; Filename: "{app}\{#WWIIOnlineProperties}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolSettings}"
 Name: "{group}\Training"; Filename: "{#InstallerTrainingURL}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolTraining}"
 Name: "{group}\Support Files\DirectX Redistributable Installer"; Filename: "{app}\{#MSDirectXSetup}"; Comment: "{cm:InstallDX}"
-; Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"; Check: IsWin64
-Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"
+Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"; Check: IsWin64
+; Name: "{group}\Support Files\(x64) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX64}"; Comment: "{cm:RunTimeX64}"
 Name: "{group}\Support Files\(x86) Visual C++ Redistributable"; Filename: "{app}\{#MSRuntimeLibraryX86}"; Comment: "{cm:RunTimeX86}"
 Name: "{group}\Support Files\Uninstall World War II Online"; Filename: "{uninstallexe}"; IconFilename: "{app}\{#InstallerIconFileName}"; Comment: "{cm:WWIIolUninstall}"
 
@@ -582,13 +583,28 @@ Name: "{group}\Support Files\Uninstall World War II Online"; Filename: "{uninsta
 
   #endif
   
- #else
+#else
   ; InstallerBuildType == "installFull"
   ; InstallerBuildType == "installRollback"
+  
+  ;  DirectX Runtime
   Filename: "{app}\{#MSDirectXSetup}"; StatusMsg: "Running DirectX Installer"; Tasks: DirectXRedist; Flags: skipifsilent runascurrentuser
-  ; Filename: "{app}\{#MSRuntimeLibraryX64}"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Check: IsWin64; Flags: skipifsilent runascurrentuser
-  Filename: "{app}\{#MSRuntimeLibraryX64}"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Flags: skipifsilent runascurrentuser
-  Filename: "{app}\{#MSRuntimeLibraryX86}"; StatusMsg: "Running VC++ Redistributable Installer x86"; Tasks: VCRedistX86; Flags: skipifsilent runascurrentuser 
+  
+  ;  VC++ 2017 Redistributable x64
+  ;  Passive = Minimal UI, Quiet = No UI.
+  ;  64bit OS Only
+  ; Filename: "{app}\{#MSRuntimeLibraryX64}"; Parameters: "/install /quiet /norestart"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Check: IsWin64; Flags: skipifsilent runascurrentuser
+  Filename: "{app}\{#MSRuntimeLibraryX64}"; Parameters: "/install /passive /norestart"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Check: IsWin64; Flags: skipifsilent runascurrentuser
+  
+  ;  Both 64bit and 32bit OS
+  ; Filename: "{app}\{#MSRuntimeLibraryX64}"; Parameters: "/install /quiet /norestart"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Flags: skipifsilent runascurrentuser
+  ; Filename: "{app}\{#MSRuntimeLibraryX64}"; Parameters: "/install /passive /norestart"; StatusMsg: "Running VC++ Redistributable Installer x64"; Tasks: VCRedistX64; Flags: skipifsilent runascurrentuser
+
+  ;  VC++ 2017 Redistributable x86
+  ; Filename: "{app}\{#MSRuntimeLibraryX86}"; Parameters: "/install /quiet /norestart"; StatusMsg: "Running VC++ Redistributable Installer x86"; Tasks: VCRedistX86; Flags: skipifsilent runascurrentuser
+  Filename: "{app}\{#MSRuntimeLibraryX86}"; Parameters: "/install /passive /norestart"; StatusMsg: "Running VC++ Redistributable Installer x86"; Tasks: VCRedistX86; Flags: skipifsilent runascurrentuser 
+  
+  ;  WWIIOnline Setup program
   Filename: "{app}\{#WWIIOnlineProperties}"; Description: "Launch Settings Program after install completes."; Flags: postinstall skipifsilent runascurrentuser
 
   #if UsePlaygate == "yes"
@@ -601,20 +617,20 @@ Name: "{group}\Support Files\Uninstall World War II Online"; Filename: "{uninsta
 
 
 [Dirs]
-Name: "{pf}\{#InstallerRootPathName}"; Flags: uninsalwaysuninstall
+Name: "{commonpf}\{#InstallerRootPathName}"; Flags: uninsalwaysuninstall
 
 #if ReleaseType == "Alpha" | ReleaseType == "Beta"
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\data"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\docs"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\playarc"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\data"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\docs"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}{#WWIIOnlineAppVerName}\playarc"; Flags: uninsalwaysuninstall
 
 #else
   ; ReleaseType == "ReleaseCandidate" - Default
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\data"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\docs"; Flags: uninsalwaysuninstall
-  Name: "{pf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\playarc"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\data"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\docs"; Flags: uninsalwaysuninstall
+  Name: "{commonpf}\{#InstallerRootPathName}\{#WWIIOnlineDirName}\playarc"; Flags: uninsalwaysuninstall
 
 #endif
 
@@ -627,7 +643,7 @@ Name: "{commonappdata}\{#WWIIOnlineDirName}"; Permissions: everyone-full
 
 [UninstallDelete]
 Type: dirifempty; Name: "{app}"
-Type: dirifempty; Name: "{pf}\{#InstallerRootPathName}"
+Type: dirifempty; Name: "{commonpf}\{#InstallerRootPathName}"
 
 
 ; ============================================================================

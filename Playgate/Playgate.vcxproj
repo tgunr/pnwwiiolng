@@ -423,7 +423,7 @@
   <ItemGroup>
     <Image Include="..\ww2assets\oswin\dependencies\playgate\bg-tos.bmp" />
     <Image Include="..\ww2assets\oswin\dependencies\playgate\bg.bmp" />
-    <Image Include="..\ww2assets\oswin\WWIIOnLine.ico" />
+    <Image Include="..\Installer\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

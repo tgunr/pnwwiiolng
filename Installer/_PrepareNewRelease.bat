@@ -27,9 +27,10 @@
 :: 3 = unable to locate the wwiiolng Root Directory.
 :: 4 = unable to locate the ww2mods Root Directory.
 :: 5 = Invalaid Command Line Switch.
-:: 6 = Completed - With Errors.
+:: 6 = Insufficient Playarc files Present.
+:: 7 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 25-June-2019.
 
 :: Disable / Enable = DebugBat
 SET DebugBat=false
@@ -37,7 +38,7 @@ rem SET DebugBat=true
 
 :: The main release.sh script uses the opt/ww2mods directory within the wwiiolng directory AND NOT a separate ww2mods directory.
 :: SET DevSetupMODS=false = release.sh script use (wwiiolng/opt/ww2mods)
-SET DevSetupMODS=true
+rem SET DevSetupMODS=true
 SET DevSetupMODS=false
 
 :: =====================================================================================================
@@ -112,6 +113,8 @@ CD /D "%LaunchingDir%"
 IF %DevSetupMODS% == true GOTO devMODS
 IF %DevSetupMODS% == false GOTO scriptMODS
 
+@echo ====  _PrepareNewRelease.bat: Invalaid DevSetupMODS setting - ABORTING.
+
 IF /I %DebugBat% == true @pause
 
 EXIT /B 5
@@ -152,7 +155,7 @@ IF /I NOT EXIST "opt\ww2mods\" (
 
 CD /D "%LaunchingDir%"
 
-SET ww2AssetsPath=%wwiiolngRootDIR%\ww2assets
+SET ww2AssetsPath=%wwiiolngRootDIR%\Installer\ww2assets
 
 rem Release EXE versions.
 IF /I "%ReleaseVersion%" == "/RC" (
@@ -206,6 +209,28 @@ rem ==========
 
 :check1
 
+IF /I %DebugBat% == true GOTO bypass1
+
+CD /D "%ww2PlayarcPath%"
+@echo.
+rem set filesCount=0 & for %f in (*) do @(set /a filesCount+=1 > nul)
+rem dir /b *.ww2 /s 2> nul | find "" /v /c > tmp && set /p count=<tmp && del tmp && echo %count%
+dir /b *.ww2 /s 2> nul | find "" /v /c > tmp && set /p count=<tmp && del tmp
+@echo Playarc Files Present: %count% required 10.
+@echo.
+
+IF NOT "%count%" == "10" (
+	@echo Incorrect number of Playarc files present - ABORTING.
+	@echo.
+	IF /I %DebugBat% == true @pause
+
+	EXIT /B 6
+)
+
+CD /D "%LaunchingDir%"
+
+:bypass1
+
 @echo.
 @echo.
 @echo===================================================================================================
@@ -250,7 +275,7 @@ CD /D "%LaunchingDir%"
 CD /D "%ww2ExePath%"
 @echo WW2 EXE Path:  =================  :  %CD%
 
-IF /I %DebugBat% == "true" ( 
+IF /I %DebugBat% == true ( 
 	@echo.
 	@echo Debug:  ========================  :  ON
 )
@@ -292,14 +317,12 @@ rem DEL *.* /S /Q
 
 rem Change to the Pearent Directory
 CD ..
-rem @echo in %CD%
 
 rem Delete / Remove the target directory tree, including any files.
 @echo Deleting Directory Tree.
 RMDIR /S /Q previous
 
 rem Recreate the removed directory.
-rem @echo Recreating the deleted Directory.
 MD previous
 
 rem Make the newly recreated directory the Current Directory and continue.
@@ -335,11 +358,11 @@ rem ============================================================================
 rem   Directory / File Deletion (\diff).
 
 rem Delete All files contained within the target directory and sub-directories, with console echo.
+rem @echo Deleting Files.
 rem DEL *.* /S /Q
 
 rem Change to the Pearent Directory
 CD ..
-rem @echo in %CD%
 
 rem Delete / Remove the target directory tree, including any files.
 @echo Deleting Directory Tree.
@@ -392,11 +415,11 @@ rem ============================================================================
 rem   Directory / File Deletion (\current).
 
 rem Delete All files contained within the target directory and sub-directories, with console echo.
+rem @echo Deleting Files.
 rem DEL *.* /S /Q
 
 rem Change to the Pearent Directory
 CD ..
-rem @echo in %CD%
 
 rem Delete / Remove the target directory tree, including any files.
 @echo Deleting Directory Tree.
@@ -542,7 +565,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 	IF /I %DebugBat% == true @pause
 
-	EXIT /B 6
+	EXIT /B 7
 	
 ) else (
 	@echo ====  Completed.

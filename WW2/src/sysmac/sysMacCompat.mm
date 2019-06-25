@@ -351,12 +351,12 @@ const char* macPlayarcPath()
 
 const char* macWorkingPathAPP()
 {
-    //  /Library -> Application Support -> WWIIOnline
+    //  XXXX - /Library -> Application Support -> WWIIOnline
     //  XXXX - /Library -> Application Support -> com.corneredrats.wwiionline
     //  XXXX - /Users -> Shared -> Library -> Application Support -> WWIIOnline
     //  XXXX - /Users -> Shared -> Library -> Application Support -> com.corneredrats.wwiionline
     //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> WWIIOnline
-    //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline
+    //  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline
 
     static NSURL *targetPathDir = nil;
     static const char *targetPathFSR = nullptr;
@@ -366,12 +366,13 @@ const char* macWorkingPathAPP()
         @autoreleasepool {
             targetPathDir = [[NSFileManager defaultManager]
                              URLForDirectory:NSApplicationSupportDirectory
-                             inDomain:NSLocalDomainMask
-                             //  inDomain:NSUserDomainMask
+                             //  inDomain:NSLocalDomainMask
+                             inDomain:NSUserDomainMask
                              appropriateForURL:nil
                              create:YES
                              error:nullptr];
-            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            //  targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+			targetPathDir = [targetPathDir URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier];
 
             // We're giving the prefs folder the permissions it would otherwise have
             // gotten by default here. Would 0750 or 0700 be a better choice?
@@ -390,7 +391,8 @@ const char* macWorkingPathAPP()
 
 const char* macCrashLogsPath()
 {
-    //  /Library -> Application Support -> WWIIOnline -> CrashLogs
+    //  XXXX - /Library -> Application Support -> WWIIOnline -> CrashLogs
+	//  /Library -> Application Support -> com.corneredrats.wwiionline -> CrashLogs
 
     static NSURL *targetPathDir = nil;
     static const char *targetPathFSR = nullptr;
@@ -400,11 +402,13 @@ const char* macCrashLogsPath()
         @autoreleasepool {
             targetPathDir = [[NSFileManager defaultManager]
                              URLForDirectory:NSApplicationSupportDirectory
-                             inDomain:NSLocalDomainMask
+                             //  inDomain:NSLocalDomainMask
+							 inDomain:NSUserDomainMask
                              appropriateForURL:nil
                              create:YES
                              error:nullptr];
-            targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+            //  targetPathDir = [targetPathDir URLByAppendingPathComponent:WWIIOnlineFolder];
+			targetPathDir = [targetPathDir URLByAppendingPathComponent:NSBundle.mainBundle.bundleIdentifier];
             targetPathDir = [targetPathDir URLByAppendingPathComponent:@"CrashLogs"];
 
             // We're giving the prefs folder the permissions it would otherwise have

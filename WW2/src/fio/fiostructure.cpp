@@ -52,7 +52,7 @@ wwiiolpath_string	WW2_exeDocsPath;			//	Windows - EXE INSTALL ROOT Docs Folder: 
 wwiiolpath_string	WW2_exePlayarcPath;			//	Windows - EXE INSTALL ROOT playarc folder:  \Program * Files -> CRS  -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
 												//	macOS - EXE INSTALL ROOT playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
 wwiiolpath_string	WW2_exeWorkingPath;			//	Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-												//	macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+												//	macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 wwiiolpath_string	WW2_userDocumentsPath;		//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
 												//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
 wwiiolpath_string	WW2_userScreenShotsPath;	//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine -> screenshots == SShot*.bmp.
@@ -66,7 +66,9 @@ fioStructureInit - sets up the data directory structure on clients
 
 LOGICAL fioStructureInit()
 {
-    LOGICAL fioStructureInit_Value = TRUE;
+	//  Returns TRUE if NO errors were encounered.
+	
+	LOGICAL fioStructureInit_Value = TRUE;
 
 	wwiiolpath_string exePath = L"";
 	wwiiolpath_string exeDataPath = L"";
@@ -94,8 +96,6 @@ LOGICAL fioStructureInit()
     const wwiiolpath_string DirNamePLAYARC = L"\\playarc";		//  -> playarc
 
 #if platOS == OS_WIN32
-	//  Returns true if NO errors were encounered.
-
 	wchar_t wBuffer[MAX_PATH + 1];
 	int returnResult = -10;
 	wwiiolpath_string exeFullPath = L"";
@@ -1033,7 +1033,7 @@ void Steam_exeWorkingPath()
 	//  Reset the Organic WW2_exeWorkingPath to WW2_userWorkingPath for the Steam Client install.
 
 	//  WW2_exeWorkingPath;		Windows - EXE Working folder:  \ProgramData -> WWIIOnLine.
-	//							macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline.
+	//							macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline.
 	//  WW2_userWorkingPath;	Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin.
 	//							macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin.
 	WW2_exeWorkingPath = WW2_userWorkingPath;
@@ -1216,7 +1216,7 @@ extern wwiiolpath_string WW2_exeDataPath;		//	exeDataPath - EXE Support Data fol
 extern wwiiolpath_string WW2_exeDocsPath;		//	exeDocsPath - EXE Docs Folder:  \Program * Files -> WWIIOnLine -> docs == eula.txt, license.*, regions.txt, tos.txt.
 extern wwiiolpath_string WW2_exePlayarcPath;	//	exePlayarcPath - EXE playarc folder:  \Program * Files -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
 extern wwiiolpath_string WW2_exeWorkingPath;	//	exeWorkingPath - Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-												//	exeWorkingPath - macOS - EXE Working folder:  /Library/Application Support//WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+												//	exeWorkingPath - macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 extern wwiiolpath_string WW2_userDocumentsPath;	//	userDocumentsPath - Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
 												//	userDocumentsPath - macOS - USER Config ROOT folder:  /Users/"currentuser"/Documents/WWIIOnline == wwiiol.xml, cfml(dir).
 extern wwiiolpath_string WW2_userWorkingPath;	//	userWorkingPath - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin == lg.dat.

@@ -189,7 +189,7 @@ extern wwiiolpath_string	WW2_exeDocsPath;			//	Windows - EXE Docs Folder:  \Prog
 extern wwiiolpath_string	WW2_exePlayarcPath;			//	Windoes - EXE playarc folder:  \Program * Files -> CRS  -> WWIIOnLine -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
 														//	macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
 extern wwiiolpath_string	WW2_exeWorkingPath;			//	Windows - EXE Working folder:  \ProgramData -> WWIIOnLine == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
-														//	macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+														//	macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
 extern wwiiolpath_string	WW2_userDocumentsPath;		//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine == wwiiol.xml, cfml(dir).
 														//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
 extern wwiiolpath_string	WW2_userScreenShotsPath;	//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnLine -> screenshots == SShot*.bmp.

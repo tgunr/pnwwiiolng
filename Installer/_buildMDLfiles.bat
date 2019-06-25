@@ -13,7 +13,7 @@
 :: 2 = unable to locate the _buildMDLfiles.bat (this) file. This file should be located in the Launching Directory.
 :: 3 = Completed - With Errors.
 
-:: Mathew J Hogan (james10) 8-Apr-2018, 3-May-2019.
+:: Mathew J Hogan (james10) 8-Apr-2018, 25-June-2019.
 
 :: Disable / Enable = DebugBat
 SET DebugBat=false
@@ -46,8 +46,8 @@ IF NOT DEFINED LaunchingDir (
 )
 
 CD /D "%LaunchingDir%"
-echo Bat File Launching Directory  :  %CD%
-echo.
+rem echo Bat File Launching Directory  :  %CD%
+rem echo.
 
 SET defaulrCommandLineArg="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir %launchingdir%\DATA"
 

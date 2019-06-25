@@ -36,6 +36,8 @@
 # If the script aborts before the files are restored the
 # contaminated files WILL cause issues and should be deleted
 # and the saved files renamed to take their place.
+#
+# 25-June-2019
 ################################################################
 
 
@@ -170,7 +172,7 @@ echo
 echo "-----------------------------------------------------------------------------------------------------------------------"
 echo $(date +%F_%T)"  >>>>  Release Script Starting."
 echo
-echo "Note: Press Ctrl + C to Exit the script."
+echo "NOTE: Press Ctrl + C to Exit the script."
 echo
 echo
 build_step "configure" "Configing" "script options"
@@ -233,8 +235,7 @@ if [ "$OSTYPE" == "cygwin" ] ; then
     echo "Detected Windows under cygwin"
 
     myos="win"
-    # INSTALLER_ROOT="$WWII_ROOT/Installer"
-    WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/oswin/archivefiles"
+    WW2ARCHIVES_ROOT="$WWII_ROOT/Installer/ww2assets/oswin/archivefiles"
     
     bashpath2win "$WW2MODS"
     MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $winpath\DATA"
@@ -245,8 +246,7 @@ elif [[ "${OSTYPE#*darwin}" != "$OSTYPE" ]] ; then
     echo "WARNING: DO NOT DO ANYTHING while build is running, especially when DropDMG is running!!!!"
 
     myos="osx"
-    # INSTALLER_ROOT="$WWII_ROOT/Installer"
-    WW2ARCHIVES_ROOT="$WWII_ROOT/ww2assets/osmac/archivefiles"
+    WW2ARCHIVES_ROOT="$WWII_ROOT/Installer/ww2assets/osmac/archivefiles"
     MDL_COMMANDLINE_ARGS="-BuildMDLOnly -window 1 -width 1024 -height 768 -data 1 -datadir $WW2MODS/DATA/"
 
 else
@@ -482,7 +482,7 @@ if [[ $REPLY =~ ^[Yy]$ ]] ; then
     echo "Release version is "$releaseversion
 
     isrelease=true
-    rebuildMDLfiles=true
+    # rebuildMDLfiles=true
 
 else
     if [ "$releasetype" == "feature" ] ; then
@@ -516,12 +516,12 @@ else
                 exit 1
         fi
     fi
-
-	echo
-	echo
-	echo "Re-generating ALL of the .mdl files."
-	rebuildMDLfiles=true
 fi
+
+echo
+echo
+echo "NOTE:  Re-generating ALL the .mdl files."
+rebuildMDLfiles=true
 
 echo
 echo
@@ -708,6 +708,7 @@ if [ "$skip_step" = false ]; then
 fi
 
 if [[ $build_steam == true ]] ; then
+    echo
     echo "Preparing Steam build environment."
     echo "NOTE: If this is your first time on this computer you may be asked to enter a confirmation code emailed to you!!"
     echo
@@ -719,6 +720,7 @@ if [[ $build_steam == true ]] ; then
         echo -n "Enter Steam build password: "
         read -s steam_pwd
         echo    # (optional) move to a new line
+        echo
 
         if [ "$myos" == "win" ] ; then
             pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
@@ -883,7 +885,8 @@ if [ "$skip_step" = false ] ; then
         echo
         if [ "$skip_step" = false ] ; then
             build_step "copy" "Copying" "3rd party libs into WW2MODS (Stram Files)"
-            rsync -au "$WWII_ROOT/ww2assets/steam/" "$WW2MODS/"
+            # rsync -au "$WWII_ROOT/Installer/ww2assets/steam/" "$WW2MODS/"
+            rsync -au "$INSTALLER_ROOT/ww2assets/steam/" "$WW2MODS/"
         fi
 
         echo
@@ -980,7 +983,7 @@ fi
 
 ################################################################
 
-# Building the Client files for the Installer (Win and Mac)
+# Building the Game Client files for the Installer (Win and Mac)
 
 ################################################################
 
@@ -1245,7 +1248,7 @@ else
         DMG_WW2_App_Name=`echo "$mac_app_name" | sed 's/\\\//g'`
 
         # Root Directories.
-        DMG_Repo_Root="$WWII_ROOT/WW2/proj/mac/WW2 Release Items/DropDMG"
+        DMG_Repo_Root="$INSTALLER_ROOT/ww2assets/osmac/WW2 Release Items/DropDMG"
         DMG_User_Root="$HOME/Library/Application Support/DropDMG"
         DMG_WW2_App_Source="WW2/proj/mac/build/"$bld_config_dir"/"$DMG_WW2_App_Name
 
@@ -1254,7 +1257,7 @@ else
         DMG_Config_Destination=$DMG_User_Root
 
         # ww2assets Directory.
-        DMG_Assets_Root="$WWII_ROOT/ww2assets"
+        DMG_Assets_Root="$INSTALLER_ROOT/ww2assets"
 
         echo
         if [ -d "$INSTALLER_RELEASE/$DMG_Image_Dir_Name" ] ; then
@@ -1277,6 +1280,13 @@ else
         echo "Create a New DMG Image Directory."
         echo
         cp -rv "$DMG_Repo_Root/World War II Online DropDMG Template/" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+
+#        echo
+#        echo
+#        echo "Create a Symbolic Link to the Library/Application Support directory within the New DMG image directory."
+#        echo
+#        ln -s "/Library/Application Support" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+#        # sudo ln -s "/Library/Application Support" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
 
         echo
         echo
@@ -1321,16 +1331,73 @@ if [ "$build_steam" = true ] ; then
     if [ "$skip_step" = false ] ; then
         build_step "deploy" "Deploying" "to Steam"
         
+        SteamScriptRootPath="../../../../../Installer/steambuild/scripts"
+        SteamBuildScript=""
+        
         echo "When prompted to allow steam accesss to the network, enable it please."
 
         if [ "$myos" == "win" ] ; then
+
+            # Preparing the Steam Source Directories.
+            pushd "$INSTALLER_ROOT"
+
+            if [ -f "_PrepareNewSteamRelease.bat" ] ; then
+                ./_PrepareNewSteamRelease.bat /$build_release
+
+                ExitStatus=$?
+                if [ "$ExitStatus" != "0" ] ; then
+                    exit_msg="Error: _PrepareNewSteamRelease.bat returned: "$ExitStatus" Exit Status, build aborted."
+
+                    exit 1
+                fi
+            else
+                exit_msg="Error: Failed to locate - "$INSTALLER_ROOT"/_PrepareNewSteamRelease.bat, build aborted."
+
+                exit 1
+            fi
+            popd
+
+            # Start the Steam Build  --  Win.
+
             pushd "Libraries/SteamSDK/tools/ContentBuilder/builder"
-            ./steamcmd.exe +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_pc_build_251950.vdf" +quit
+            case $build_release in
+                $Client_release)
+                    SteamBuildScript=$SteamScriptRootPath"/app_win_build_RC_251950.vdf"
+                    ;;
+
+                $Client_alpha)
+                    SteamBuildScript=$SteamScriptRootPath"/app_win_build_Alpha_251950.vdf"
+                    ;;
+
+                $Client_beta)
+                    SteamBuildScript=$SteamScriptRootPath"/app_win_build_Beta_251950.vdf"
+                    ;;
+            esac
+
+            ./steamcmd.exe +login $steam_user $steam_pwd +run_app_build $SteamBuildScript +quit
             popd
 
         else
+
+            # Start the Steam Build  --  Mac.
+
             pushd "Libraries/SteamSDK/tools/ContentBuilder/builder_osx"
-            ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_"$bld_config"_251950.vdf" +quit
+            case $build_release in
+                $Client_release)
+                    SteamBuildScript=$SteamScriptRootPath"/app_mac_build_RC_251950.vdf"
+                    ;;
+
+                $Client_alpha)
+                    SteamBuildScript=$SteamScriptRootPath"/app_mac_build_Alpha_251950.vdf"
+                    ;;
+
+                $Client_beta)
+                    SteamBuildScript=$SteamScriptRootPath"/app_mac_build_Beta_251950.vdf"
+                    ;;
+            esac
+
+            # ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_"$bld_config"_251950.vdf" +quit
+            ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build  $SteamBuildScript +quit
             popd
         fi
     fi
