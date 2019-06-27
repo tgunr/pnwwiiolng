@@ -186,7 +186,6 @@ struct vehanimVehicleStateAnimations
 	LOGICAL MountSoundPlaying[VEH_MAX_MOUNTS];
 	SINT32 MountSoundSemaphore[VEH_MAX_MOUNTS];
 	SINT32 StukaSoundId;
-	bool EngineSoundPlaying = false;
 
 	LOGICAL TankOnFire;
 
