@@ -20,6 +20,7 @@ TOLUA_API int  tolua_ui_open (lua_State* tolua_S);
 #include "ui/uiGameEvents.h"
 #include "phui/View.h"
 #include "ui/uiMain.h"
+#include "ui/uiKeymap.h"
 
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
@@ -1624,6 +1625,39 @@ static int tolua_ui_ui_phui_View_Close00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'Close'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: uiMapToggleIngameKeymapper */
+#ifndef TOLUA_DISABLE_tolua_uimap_map_uiMapToggleIngameKeymapper00
+static int tolua_uimap_map_uiMapToggleIngameKeymapper00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,4,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+   int keyState = ((  int)  tolua_tonumber(tolua_S,1,0));
+  unsigned int functionNum = (( unsigned int)  tolua_tonumber(tolua_S,2,0));
+  unsigned int data = (( unsigned int)  tolua_tonumber(tolua_S,3,0));
+  {
+   unsigned int tolua_ret = ( unsigned int)  uiMapToggleIngameKeymapper(keyState,functionNum,data);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'uiMapToggleIngameKeymapper'.",&tolua_err);
  return 0;
 #endif
 }
