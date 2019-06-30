@@ -36,8 +36,8 @@ rem SET DebugBat=true
 
 :: The main release.sh script uses the opt/ww2mods directory within the wwiiolng directory AND NOT a separate ww2mods directory.
 :: SET DevSetupMODS=false = release.sh script use (wwiiolng/opt/ww2mods)
-rem SET DevSetupMODS=true
 SET DevSetupMODS=false
+rem SET DevSetupMODS=true
 
 :: =====================================================================================================
 

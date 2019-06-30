@@ -80,7 +80,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "$(SRCROOT)/../opt/ww2mods/DATA $(SRCROOT)/../ww2assets/osmac/archivefiles"
+            argument = "$(SRCROOT)/../opt/ww2mods/DATA $(SRCROOT)/../Installer/ww2assets/osmac/archivefiles"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -11,7 +11,7 @@
 			<key>backgroundImageName</key>
 			<string>DropDMG_BG_H.png</string>
 			<key>fontSize</key>
-			<integer>12</integer>
+			<integer>14</integer>
 			<key>iconSize</key>
 			<integer>64</integer>
 			<key>layoutItems</key>
@@ -38,21 +38,11 @@
 				</dict>
 				<dict>
 					<key>identifier</key>
-					<string>LayoutItem.05A5B264-7E18-439F-A65F-E18A7970B430</string>
+					<string>LayoutItem.8BAACC25-A2CA-463E-9628-B7E65131001D</string>
 					<key>name</key>
-					<string>Application Support</string>
+					<string>readme.rtf</string>
 					<key>position</key>
-					<string>{512, 272}</string>
-					<key>type</key>
-					<string>file</string>
-				</dict>
-				<dict>
-					<key>identifier</key>
-					<string>LayoutItem.872C684B-8F6E-485D-AD6E-EFEFB2D58621</string>
-					<key>name</key>
-					<string>WWIIOnline</string>
-					<key>position</key>
-					<string>{288, 272}</string>
+					<string>{400, 288}</string>
 					<key>type</key>
 					<string>file</string>
 				</dict>

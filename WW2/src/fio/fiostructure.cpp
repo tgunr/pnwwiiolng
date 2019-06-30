@@ -1029,15 +1029,18 @@ ERR_EXIT_POINT:    //  ==========    <<--    The goto target is HERE    -->>    
 
 void Steam_exeWorkingPath()
 {
-	//  The Steam Installer is unable to create directories at this time (9-June-2019: MJH).
-	//  Reset the Organic WW2_exeWorkingPath to WW2_userWorkingPath for the Steam Client install.
+	//  The Steam Installer is unable to create directories at this time (27-June-2019: MJH).
+    //  The Mac Client no longer uses a system protected directory for its exeWorkingPath.
 
-	//  WW2_exeWorkingPath;		Windows - EXE Working folder:  \ProgramData -> WWIIOnLine.
-	//							macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline.
-	//  WW2_userWorkingPath;	Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin.
-	//							macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin.
-	WW2_exeWorkingPath = WW2_userWorkingPath;
+#if platOS == OS_WIN32
+    //  The Winows Client STILL uses a system protected directory for its exeWorkingPath.
+    
+	//  Reset the Organic WW2_exeWorkingPath to WW2_userWorkingPath for the Windows Steam Client install ONLY.
+	//  WW2_exeWorkingPath;   Windows - EXE Working folder:  \ProgramData -> WWIIOnLine.
+	//  WW2_userWorkingPath;  Windows - USER Working folder:  \User -> My Documents -> WWIIOnLine -> bin.
 
+    WW2_exeWorkingPath = WW2_userWorkingPath;
+#endif
 	return;
 }
 

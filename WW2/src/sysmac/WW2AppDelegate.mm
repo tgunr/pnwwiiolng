@@ -641,7 +641,7 @@ extern NSString *WebActionOriginalURLKey;
     if (UseSteamLogin) {
 		
 		//  Add Steam: ProgramData / Application Support Path Checking/Setup.
-		Steam_exeWorkingPath();
+		//  Steam_exeWorkingPath();
 	
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];

@@ -1248,7 +1248,7 @@ else
         DMG_WW2_App_Name=`echo "$mac_app_name" | sed 's/\\\//g'`
 
         # Root Directories.
-        DMG_Repo_Root="$INSTALLER_ROOT/ww2assets/osmac/WW2 Release Items/DropDMG"
+        DMG_Repo_Root="$INSTALLER_ROOT/ww2assets/osmac/WW2_Release_Items/DropDMG"
         DMG_User_Root="$HOME/Library/Application Support/DropDMG"
         DMG_WW2_App_Source="WW2/proj/mac/build/"$bld_config_dir"/"$DMG_WW2_App_Name
 
@@ -1260,6 +1260,13 @@ else
         DMG_Assets_Root="$INSTALLER_ROOT/ww2assets"
 
         echo
+        echo "Copy the repository DropDMG config files to the user directory."
+        echo
+        mkdir -p "$DMG_User_Root"{Configurations,Layouts,Licenses}
+        cp -rv "$DMG_Repo_Root/ConfigFiles/" "$DMG_User_Root/"
+        echo
+        echo
+
         if [ -d "$INSTALLER_RELEASE/$DMG_Image_Dir_Name" ] ; then
             echo "Deleting an Old DMG Image Directory: $INSTALLER_RELEASE/$DMG_Image_Dir_Name."
             echo
@@ -1270,7 +1277,7 @@ else
         dmgfiles=`find $INSTALLER_RELEASE -name "*.dmg" -print`
 
         if [ ! -n "$dmg" ] ; then
-            echo "Deleting ALL DMG Disk Image (.dmg) Files in the: $INSTALLER_RELEASE directory."
+            echo "Deleting Old DMG Disk Image (.dmg) Files in the Directory: $INSTALLER_RELEASE"
             echo
             echo
 
@@ -1279,7 +1286,7 @@ else
 
         echo "Create a New DMG Image Directory."
         echo
-        cp -rv "$DMG_Repo_Root/World War II Online DropDMG Template/" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
+        cp -rv "$DMG_Repo_Root/World War II Online DropDMG Template" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
 
 #        echo
 #        echo
@@ -1290,22 +1297,15 @@ else
 
         echo
         echo
-        echo "Update the readme.rtf file -> DMG Image Directory / WWIIOnline."
+        echo "Update the readme.rtf file -> DMG Image Directory."
         echo
-        cp -v "$DMG_Assets_Root/readme.rtf" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name/WWIIOnline/"
+        cp -v "$DMG_Assets_Root/readme.rtf" "$INSTALLER_RELEASE/$DMG_Image_Dir_Name"
 
         echo
         echo
         echo "Update the license.rtf file -> Repo ConfigFiles / Licenses / WW2_Lic."
         echo
         cp -v "$DMG_Assets_Root/docs/license.rtf" "$DMG_Repo_Root/ConfigFiles/Licenses/WW2_Lic/en.rtf"
-
-        echo
-        echo
-        echo "Copy the repository DropDMG config files to the user directory."
-        echo
-        mkdir -p "$DMG_User_Root"{Configurations,Layouts,Licenses}
-        cp -rv "$DMG_Repo_Root/ConfigFiles/" "$DMG_User_Root/"
 
         echo
         echo
@@ -1379,9 +1379,41 @@ if [ "$build_steam" = true ] ; then
 
         else
 
-            # Start the Steam Build  --  Mac.
+            echo
+            echo
+            echo "==================================================================================================="
+            echo
+            echo "       Preparing the Source Directories for a NEW Steam release. Please wait. . ."
+            echo
+            echo "==================================================================================================="
 
+            echo
+            echo
+            echo "Copy the WWIIOL app to the Steam Install Directory."
+            echo
+
+            case $build_release in
+                $Client_release)
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine/"
+                    ;;
+
+                $Client_alpha)
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine_Alpha/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine_Alpha/"
+                    ;;
+
+                $Client_beta)
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine_Beta/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine_Beta/"
+                    ;;
+            esac
+
+            # Start the Steam Build  --  Mac.
             pushd "Libraries/SteamSDK/tools/ContentBuilder/builder_osx"
+            echo
+            echo
+
             case $build_release in
                 $Client_release)
                     SteamBuildScript=$SteamScriptRootPath"/app_mac_build_RC_251950.vdf"
@@ -1396,7 +1428,6 @@ if [ "$build_steam" = true ] ; then
                     ;;
             esac
 
-            # ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build "../../../../../Deployment/steam/scripts/app_mac_build_"$bld_config"_251950.vdf" +quit
             ./steamcmd.sh +login $steam_user $steam_pwd +run_app_build  $SteamBuildScript +quit
             popd
         fi
