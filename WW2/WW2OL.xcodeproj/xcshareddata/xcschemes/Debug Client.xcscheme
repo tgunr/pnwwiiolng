@@ -75,8 +75,8 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-clientv 1.35.18.0"
-            isEnabled = "NO">
+            argument = "-clientv 1.36.1.2"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA"
