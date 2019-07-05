@@ -3447,7 +3447,7 @@ UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gValue = gValue + .25f;
-    uiChatPrintLine("Set to: %.2f%%", gValue);
+//    uiChatPrintLine("Set to: %.2f%%", gValue);
     
     return 0;
 }
@@ -3461,7 +3461,7 @@ UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
     gValue = gValue - .25f;
     if (gValue <= 1)
         gValue = 1;
-    uiChatPrintLine("Set to: %.2f%%", gValue);
+//    uiChatPrintLine("Set to: %.2f%%", gValue);
     
     return 0;
 }
@@ -3473,7 +3473,7 @@ UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gXValue = gXValue + .25f;
-    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    uiChatPrintLine("X Set to: %.2f%%", gXValue);
     
     return 0;
 }
@@ -3485,7 +3485,7 @@ UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gXValue = gXValue - .25f;
-    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    uiChatPrintLine("X Set to: %.2f%%", gXValue);
     
     return 0;
 }
@@ -3497,7 +3497,7 @@ UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gYValue = gYValue + .25f;
-    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    uiChatPrintLine("Y Set to: %.2f%%", gYValue);
     
     return 0;
 }
@@ -3509,7 +3509,7 @@ UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gYValue = gYValue - .25f;
-    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    uiChatPrintLine("Y Set to: %.2f%%", gYValue);
     
     return 0;
 }
@@ -3521,7 +3521,7 @@ UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gZValue = gZValue + .25f;
-    uiChatPrintLine("Set to: %.2f%%", gZValue);
+    uiChatPrintLine("Z Set to: %.2f%%", gZValue);
     
     return 0;
 }
@@ -3533,7 +3533,7 @@ UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gZValue = gZValue - .25f;
-    uiChatPrintLine("Set to: %.2f%%", gValue);
+    uiChatPrintLine("Z Set to: %.2f%%", gZValue);
     
     return 0;
 }
@@ -3557,7 +3557,8 @@ UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gToggle1 = !gToggle1;
-    
+    uiChatPrintLine("gToggle1");
+
     return 0;
 }
 
@@ -3568,7 +3569,8 @@ UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gToggle2 = !gToggle2;
-    
+    uiChatPrintLine("gToggle2");
+
     return 0;
 }
 
@@ -3579,7 +3581,8 @@ UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gToggle3 = !gToggle3;
-    
+    uiChatPrintLine("gToggle3");
+
     return 0;
 }
 
