@@ -278,7 +278,7 @@ static const functionEntry functionTable[] =
     // Experiments
     {IMAP_HOLD_GVALUE_INC,                         "gvalueinc",                     65536,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
     {IMAP_HOLD_GVALUE_DEC,                         "gvaluedec",                     65537,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
-    {IMAP_HOLD_GXVALUE_INC,                        "v",                    65538,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GXVALUE_INC,                        "gxvalueinc",                    65538,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
     {IMAP_HOLD_GXVALUE_DEC,                        "gxvaluedec",                    65539,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
     {IMAP_HOLD_GYVALUE_INC,                        "gyvalueinc",                    65540,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
     {IMAP_HOLD_GYVALUE_DEC,                        "gyvaluedec",                    65541,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
