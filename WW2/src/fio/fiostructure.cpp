@@ -779,11 +779,8 @@ LOGICAL fioStructureInit()
     
     
     //  exeWorkingPath: Setup - START.
-    //  exeWorkingPath - macOS - EXE Working folder:  /Library -> Application Support -> WWIIOnline.
-    //  This folder should be setup by the installer.
-    
-    //  This folder  MUST  be setup by another porcess as the OS prevents axcess.
-    //  The most likley process is the Mac DropDMG installer.
+    //  exeWorkingPath - macOS - EXE Working folder:
+    //  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline.
     
     //  Fallback-1 to userWorkingPath - /Users -> "currentuser" -> Documents -> WWIIOnline -> bin.
     //  Fallback-2 to userDocumentsPath - /Users -> "currentuser" -> Documents -> WWIIOnline.
@@ -798,9 +795,8 @@ LOGICAL fioStructureInit()
     }
     else
     {
-        //  Unable to create WWIIOnLine directory within the; /Library -> Application Support directory.
-        //  This is a Protected System directory. The installer should have created this directory.
-        dbugLog(_FLI, "Unable to create WWIIOnLine directory within the; /Library -> Application Support directory.  This is a Protected System directory.");
+        //  Unable to create WWIIOnLine directory within the; ˜Library -> Application Support directory.
+        dbugLog(_FLI, "Unable to create WWIIOnLine directory within the; ˜Library -> Application Support directory.");
         
         //  Fallback-1 to userWorkingPath - /Users -> "currentuser" -> Documents -> WWIIOnline -> bin.
         if (userWorkingPathSet == TRUE)
@@ -820,7 +816,7 @@ LOGICAL fioStructureInit()
             }
             else
             {
-                dbugLog(_FLA, "&HFFF1 - Unable to create WWIIOnLine directory within the /Library -> Application Support directory. Fallbacks Failed.");
+                dbugLog(_FLA, "&HFFF1 - Unable to create WWIIOnLine directory within the ˜Library -> Application Support directory. Fallbacks Failed.");
                 exeWorkingPath = L"";
                 exeWorkingPathSet = FALSE;
                 fioStructureInit_Value = FALSE;

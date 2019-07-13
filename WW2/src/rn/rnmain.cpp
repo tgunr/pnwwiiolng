@@ -505,7 +505,7 @@ LOGICAL rnmainInit()
         //  so to allow the spalshscreen to be seen rather than blink in and out
         //  on the Mac Client.
         //  1000000us = 1 second.
-        usleep(1000000);
+        usleep(2000000);
 #endif
     
 	rnlogoUpdateStatus("loading.objects");

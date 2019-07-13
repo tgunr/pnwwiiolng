@@ -102,10 +102,13 @@ bool CopyOldSetupFiles_MAC()
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
     NSString *bgePath = [documentsDirectory stringByAppendingPathComponent:BGEFolder];
     NSString *ww2Path = [documentsDirectory stringByAppendingPathComponent:WWIIOnlineFolder];
+    NSString *bgeCfmlPath = [bgePath stringByAppendingPathComponent:@"cfml"];
+    
+    NSString *userLibraryDirectory = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) firstObject];
+    NSString *userPrefsDirectory = [userLibraryDirectory stringByAppendingPathComponent:@"Preferences"];
+    NSString *userCfmlPath = [userPrefsDirectory stringByAppendingPathComponent:@"ww2olcfml"];
     
     NSLog(@"Old Settings\n - Checking for the presence of Old Game Settings.");
-    //  dbugLog(_FLI, "Old Settings - Checking for the presence of Old Game Settings.");
-    //  Write_Debug("Old Settings - Checking for the presence of Old Game Settings.");
     
     
     //  Create a folder copy date/time stamp.  =================================================
@@ -115,7 +118,7 @@ bool CopyOldSetupFiles_MAC()
     time(&rawtime);
     timeinfo = localtime(&rawtime);
     timeStamp[0] = 0;
-    charCount= sprintf(timeStamp, "_Copied_%04d%02d%02d-%02d%02d%02d", (int)timeinfo->tm_year + 1900, (int)timeinfo->tm_mon + 1, (int)timeinfo->tm_mday, (int)timeinfo->tm_hour , (int)timeinfo->tm_min, (int)timeinfo->tm_sec);
+    charCount = sprintf(timeStamp, "_Copied_%04d%02d%02d-%02d%02d%02d", (int)timeinfo->tm_year + 1900, (int)timeinfo->tm_mon + 1, (int)timeinfo->tm_mday, (int)timeinfo->tm_hour , (int)timeinfo->tm_min, (int)timeinfo->tm_sec);
     NSString *folderRename = [NSString stringWithUTF8String:timeStamp];
 
     const char *c_filepath = [bgePath UTF8String];
@@ -127,15 +130,11 @@ bool CopyOldSetupFiles_MAC()
     //  Locate: /Users -> "currentuser" -> Documents -> Battleground Europe
     if (![fileManager fileExistsAtPath:bgePath]) {
         NSLog(@"Old Settings\n - Old Game Settings NOT found.");
-        //  dbugLog(_FLI, "Old Settings - Old Game Settings NOT found.");
-        //  Write_Debug("(Old Settings - Old Game Settings NOT found.");
         return false;
     }
 
     //  Located: /Users -> "currentuser" -> Documents -> Battleground Europe
     NSLog(@"Old Settings\n - Old Game Settings found.");
-    //  dbugLog(_FLI, "Old Settings - Old Game Settings found.");
-    //  Write_Debug("Old Settings - Old Game Settings found.");
 
     
     //  Verify the User wants to copy the old Setup Files.
@@ -149,39 +148,92 @@ bool CopyOldSetupFiles_MAC()
     [alert1 addButtonWithTitle:(@"No")];
     
     if ([alert1 runModal] == NSAlertSecondButtonReturn) {
-         // the User clicked: No.
+         // the User selected: No.
+        
          NSLog(@"Old Settings\n - Old Game Settings found -> the user declined the copy option.");
-         //  dbugLog(_FLW, "Old Settings - Old Game Settings found -> the user declined the copy option.");
-         //  Write_Debug("Old Settings - Old Game Settings found -> the user declined the copy option.");
          copyFiles = false;
 
     } else {
-        //  Copy the ENTIRE Contents of:
+        // the User selected: Yes.
+        
+        NSLog(@"Old Settings\n - Old Game Settings found -> copying files.");
+
+        
+        //  Archive the Game Preference files (Mac) to the Documents -> Battleground Europe folder.  =================================================
+
+        NSString *target = @"";
+        BOOL success = NO;
+        NSError * error = nil;
+
+        NSString *sourcePath = @"";
+        NSString *destPath = @"";
+
+        if (![fileManager fileExistsAtPath:bgeCfmlPath]) {
+            success = [fileManager createDirectoryAtPath:bgeCfmlPath withIntermediateDirectories: true attributes:nil error:&error];
+            if(success != YES) {
+                NSLog(@"Old Settings\n - Error Creating:\n%@,\n", bgeCfmlPath);
+            }
+        }
+
+        //  Copy AND Re-Name the Users Current Preferences (Mac) cfml Directory:
+        //   /Users -> "currentuser" -> Library -> Preferences -> ww2olcfml -> *.*
+        //   TO
+        //   /Users -> "currentuser" -> Documents -> Battleground Europe -> cfml
+        NSDirectoryEnumerator *cfmlDirEnum = [fileManager enumeratorAtPath:userCfmlPath];
+        target = @"";
+        success = NO;
+        error = nil;
+
+        while ((target = [cfmlDirEnum nextObject])) {
+            sourcePath = [userCfmlPath stringByAppendingPathComponent:target];
+            destPath = [bgeCfmlPath stringByAppendingPathComponent:target];
+            
+            success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+            if(success != YES) {
+                NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+            }
+            
+            success = NO;
+            error = nil;
+            sourcePath = @"";
+        }
+        
+        //  Copy AND Re-Name the Users Current Game Preferences (Mac) File:
+        //   /Users -> "currentuser" -> Library -> Preferences -> ww2olwwiiolprefs.xml
+        //   TO
+        //   /Users -> "currentuser" -> Documents -> Battleground Europe -> wwiiol.xml
+        success = NO;
+        error = nil;
+
+        sourcePath = [userPrefsDirectory stringByAppendingPathComponent:@"/ww2olwwiiolprefs.xml"];
+        destPath = [bgePath stringByAppendingPathComponent:@"/wwiiol.xml"];
+        
+        success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+        if(success != YES) {
+            NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+        }
+
+        //  Copy the ENTIRE Contents of (including the re-formatted preference files):
         //   /Users -> "currentuser" -> Documents -> Battleground Europe
         //   TO
         //   /Users -> "currentuser" -> Documents -> WWIIOnline.
-        
-        NSLog(@"Old Settings\n - Old Game Settings found -> copying files.");
-        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying files.");
-        //  Write_Debug("Old Settings - Old Game Settings found -> copying files.");
-        
         NSDirectoryEnumerator *dirEnum = [fileManager enumeratorAtPath:bgePath];
-        NSString *target;
-        BOOL success = NO;
-        NSError * error = nil;
+        success = NO;
+        error = nil;
         
         while ((target = [dirEnum nextObject])) {
-            NSString *targetPath = [bgePath stringByAppendingPathComponent:target];
-            NSString *destPath = [ww2Path stringByAppendingPathComponent:target];
+            sourcePath = [bgePath stringByAppendingPathComponent:target];
+            destPath = [ww2Path stringByAppendingPathComponent:target];
             
-            success = [fileManager copyItemAtPath:targetPath toPath:destPath error:&error];
-            if(success != YES) {
-                NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",targetPath, destPath, error);
-                //  NSLog(@"Old Settings - Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.",targetPath, destPath);
-                //  Write_Debug("Old Settings - Could not copy:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n",targetPath, destPath);
+            if (![fileManager fileExistsAtPath:destPath]) {
+                success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+                if(success != YES) {
+                    NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+                }
             }
+            success = NO;
             error = nil;
-            targetPath = @"";
+            sourcePath = @"";
         }
         
         //  Copy Completed.
@@ -191,22 +243,16 @@ bool CopyOldSetupFiles_MAC()
         //   /Users -> "currentuser" -> Documents -> "Battleground Europe"
         //   TO
         //   /Users -> "currentuser" -> Documents -> "Battleground Europe_Copied".
-
         NSLog(@"Old Settings\n - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
-        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
-        //  Write_Debug("Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
 
         NSURL *oldDir = [NSURL fileURLWithPath:bgePath];
         NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:folderRename]];
         success = [fileManager moveItemAtURL: oldDir toURL: newDir error:&error];
         if(success != YES) {
-            //  NSLog(@"Could not rename:-n\nfrom path:\n%@,\n\nto path:\n%@.\n\nError:\n%@",oldDir, newDir, error);
             NSLog(@"Old Settings\n - Could not rename - from path:\n%@,\n\nto path:\n%@.",oldDir, newDir);
-            //  Write_Debug("Old Settings - Could not rename:-\n\nfrom path:\n%@,\n\nto path:\n%@.\n",oldDir, newDir);
+
         } else {
             NSLog(@"Old Settings\n - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
-            //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
-            //  Write_Debug("Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
         }
         error = nil;
 
@@ -217,6 +263,8 @@ bool CopyOldSetupFiles_MAC()
         alert2.alertStyle = NSAlertStyleInformational;
 
         [alert2 runModal];
+        
+        //  Re-Name Completed.
         copyFiles = true;
     }
     
@@ -255,15 +303,14 @@ int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int AlertNumbe
 
 const char* macPreferencesPath()
 {
-    //  /Users -> "currentuser" -> Library -> Preferences -> ww2ol
-    //  /Users -> "currentuser" -> Library -> Preferences -> ww2olcfml
-    //  /Users -> "currentuser" -> Library -> Preferences -> ww2olwwiiolprefs.xml
+    //  XXXX - /Users -> "currentuser" -> Library -> Preferences -> ww2ol
+    //  XXXX - /Users -> "currentuser" -> Library -> Preferences -> ww2olcfml
+    //  XXXX - /Users -> "currentuser" -> Library -> Preferences -> ww2olwwiiolprefs.xml
     //
     //  NOTICE: This function should no longer be referenced within the New Win Istaller Directory structures.
     //
 
     static NSURL *prefsDir = nil;
-//    static const char *prefsFSR;
     static const char *targetPathFSR;
     static dispatch_once_t predicate = 0;
     
@@ -392,7 +439,12 @@ const char* macWorkingPathAPP()
 const char* macCrashLogsPath()
 {
     //  XXXX - /Library -> Application Support -> WWIIOnline -> CrashLogs
-	//  /Library -> Application Support -> com.corneredrats.wwiionline -> CrashLogs
+	//  XXXX - /Library -> Application Support -> com.corneredrats.wwiionline -> CrashLogs
+    //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> WWIIOnline -> CrashLogs
+    //  XXXX - /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline -> CrashLogs
+    //
+    //  NOTICE: This function is not currently implemented - 13 July 2019.
+    //
 
     static NSURL *targetPathDir = nil;
     static const char *targetPathFSR = nullptr;
