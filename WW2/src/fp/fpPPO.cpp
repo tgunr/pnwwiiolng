@@ -55,6 +55,7 @@ static int _goodMat			= -1;
 static int _offMat			= -1;
 static bool _resetMaterials = true;
 static std::wstring _fail	= L"";
+static double rayLength = 6.0f;
 
 static PlayerPlacedObject* _placedObject = nullptr;
 
@@ -189,7 +190,7 @@ void PlayerPlacedObject::UpdateColliders()
 	if(collider.geoms().empty())
 	{
 		// limit how many contacts we generate
-		collider.setMaxContactsPerHit(2);
+		collider.setMaxContactsPerHit(1);
 
 		dSpaceID space = collider.space();
 
@@ -197,30 +198,9 @@ void PlayerPlacedObject::UpdateColliders()
 		for(int i = 0; i < 6; ++i)
 			collider.addGeom(dCreateRay(space, 12.0f), 0, COLLIDER_HARDTERRAIN_MASK);
 
-		// now create our box collider for avoidance checks
-
-		// our box transform
-		abox = dCreateGeomTransform(space);
-
-		double xLen = fabs(bl.x - tr.x) + (spec->avoidance * 2.0f);
-		double yLen = fabs(bl.y - tr.y) + (spec->avoidance * 2.0f);
-		double zLen = fabs(bl.z - tr.z) + (spec->avoidance * 2.0f);
-
 		// our actual collision box
-		dGeomID box = dCreateBox(0, xLen, yLen, zLen);
-
-		// init our transform geom
-		dGeomTransformSetCleanup(abox, 1);
-		dGeomTransformSetInfo(abox, 1);
-
-		double zOffset = (zLen - spec->avoidance) * .5f;
-
-		// set our offset position
-		dGeomSetPosition(box, 0, 0, zOffset);
-
-		// save our box in the transform geom
-		dGeomTransformSetGeom(abox, box);
-
+		abox = dCreateBox(space, spec->rayAdjust.x * 2.0f, spec->rayAdjust.y * 2.0f, spec->rayAdjust.z);
+		
 		// set what we collide with and add it to our collider query
 		collider.addGeom(abox, 0, spec->avoidFlags);
 	}
@@ -238,7 +218,7 @@ void PlayerPlacedObject::UpdateColliders()
 	dGeomID	 geom				= nullptr;
 	double viewOffset			= (player->VehicleType->Type == VEH_TYPE_PERSON) ? -spec->viewOffset: spec->viewOffset * 2.0f;
 	piVECTOR forward			= {0,(float)viewOffset,0};
-
+	
 	// now orient the vector to our facing
 	math3dMultiplyRotation(&forward, &forward, &player->ModelData->VehicleAttMat);
 
@@ -267,43 +247,101 @@ void PlayerPlacedObject::UpdateColliders()
 		geom = geoms.at(i);
 
 		// set the ray pos
-		switch(i)
+		switch (i)
 		{
-			case 0: rayPos.set(0,0,0);							break; // center
-			case 1: rayPos.set(-adjust.x(), adjust.y(), 0);		break; // front left
-			case 2: rayPos.set(adjust.x(), adjust.y(), 0);		break; // front right
-			case 3: rayPos.set(-adjust.x(), -adjust.y(), 0);	break; // back left
-			case 4: rayPos.set(adjust.x(), -adjust.y(), 0);		break; // back right
-			case 5:
+		case 0:
+			if (spec->useBoundingBox)
 			{
-				// this is our line of sight ray
-				// it has special handling
-				playerPos.z() += 1.0f; // move it up some
-
-				// create our look at pos
-				Vec3d losPos = Vec3d(position.x(), position.y(), position.z() + .5f);
-
-				// calculate our look at direction
-				Vec3d to = losPos - playerPos;
-
-				// set our line of sight length
-				dGeomRaySetLength(geom, to.length());
-
-				// normalize the direction
-				to.normalize();
-
-				// convert to physical coords
-				playerPos = physicsGameToPhysical(playerPos);
-
-				// set our position and direction
-				dGeomRaySet(geom, playerPos.x(), playerPos.y(), playerPos.z(), to.x(), to.y(), to.z());
-
-				// done
-				continue;
+				rayPos.set(bl.x * 0.5f, 0, 0); // center
 			}
+			else
+			{
+				rayPos.set(0, 0, 0);// center
+				rayPos = rayPos + spec->modelOffset;
+			}
+			break;
+		case 1:
+			if (spec->useBoundingBox)
+			{
+				rayPos.set(bl.x - adjust.x(), bl.y + adjust.y(), 0); // front left
+			}
+			else
+			{
+		       rayPos.set(-adjust.x(), adjust.y(), 0);
+			   rayPos = rayPos + spec->modelOffset;
+
+			}
+			break;			
+		case 2:
+			if (spec->useBoundingBox)
+			{
+				rayPos.set(bl.x + adjust.x(), tr.y + adjust.y(), 0); // front right
+			}
+			else
+			{
+				rayPos.set(adjust.x(), adjust.y(), 0);
+				rayPos = rayPos + spec->modelOffset;
+			}
+			break;
+		case 3:
+			if (spec->useBoundingBox)
+			{
+				rayPos.set(tr.x - adjust.x(), bl.y - adjust.y(), 0); // back left
+			}
+			else
+			{
+				rayPos.set(-adjust.x(), -adjust.y(), 0);
+				rayPos = rayPos + spec->modelOffset;
+			}
+			break;			
+		case 4:
+			if (spec->useBoundingBox)
+			{
+				rayPos.set(tr.x + adjust.x(), tr.y - adjust.y(), 0); // back right
+			}
+			else
+			{
+				rayPos.set(adjust.x(), -adjust.y(), 0);
+				rayPos = rayPos + spec->modelOffset;
+			}
+			break;
+		case 5:
+			{
+				rayPos.set(0, 0, 0);//spawn point
+			}
+			break;
+		case 6:
+		{
+			// this is our line of sight ray
+			// it has special handling
+			playerPos.z() += 1.0f; // move it up some
+
+			// create our look at pos
+			Vec3d losPos = Vec3d(position.x(), position.y(), position.z() + .5f);
+
+			// calculate our look at direction
+			Vec3d to = losPos - playerPos;
+
+			// set our line of sight length
+			dGeomRaySetLength(geom, to.length());
+
+			// normalize the direction
+			to.normalize();
+
+			// convert to physical coords
+			playerPos = physicsGameToPhysical(playerPos);
+
+			// set our position and direction
+			dGeomRaySet(geom, playerPos.x(), playerPos.y(), playerPos.z(), to.x(), to.y(), to.z());
+
+			// done
+			continue;
+		}
 		}
 
-		if(i == rayCount - 1)
+
+		// The line of sight ray is updated differently so skip it here.
+		if(i == rayCount)
 			continue;
 
 		// rotate into world orientation
@@ -316,20 +354,7 @@ void PlayerPlacedObject::UpdateColliders()
 		rayPos = physicsGameToPhysical(rayPos);
 
 		// update our ray
-		dGeomRaySet(geom, rayPos.x(), rayPos.y(), rayPos.z() + 6.0f, dir.x(), dir.y(), dir.z());
-
-		// when processing the center ray, update our avoidance box collider
-		//  too since its positioned directly over our position
-		if(i == 0)
-		{
-			geom = abox;
-
-			dMatrix3 dMat;
-			MatrixTodMatrix(attitude, dMat);
-
-			dGeomSetPosition(geom, rayPos.x(), rayPos.y(), rayPos.z());
-			dGeomSetRotation(geom, dMat);
-		}
+		dGeomRaySet(geom, rayPos.x(), rayPos.y(), rayPos.z() + rayLength, dir.x(), dir.y(), dir.z());
 	}
 }
 
@@ -406,6 +431,10 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	valid = true;
 
 	Vec3d worldNormal;
+	Vec3d corner1Normal;
+	Vec3d corner2Normal;
+	Vec3d corner3Normal;
+	Vec3d corner4Normal;
 	FLOAT64 zTotal = 0;
 	UINT32 zCount = 0;
 	dGeomID geom = nullptr;
@@ -415,114 +444,151 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	bool pause = false;
 	Vec3d centerNormal;
 
-	if(collider.findCollisions(true))
+	FLOAT64 centerPosHeight = 0.0f;
+
+	if (collider.findCollisions(true))
 	{
 		collider.sort();
 
 		colliderQuery::dGeomList& geoms = collider.geoms();
 		int rayCount = geoms.size() - 1;
 
-		for(int r = 0; r < rayCount; ++r)
+		for (int r = 0; r <= rayCount; ++r)
 		{
-			//if(r == rayCount - 1) // our line of sight ray
-			//	continue;
-
 			hits.clear();
 
 			geom = collider.geom(r);
 
-			if(collider.getCollisions(geom, hits, false))
+			if (collider.getCollisions(geom, hits, false))
 			{
-				if(r == rayCount - 1 && !valid) // our line of sight ray
+				if (r == rayCount && !valid) // our line of sight ray
 					continue;
 
 				colliderQuery::Collision* hit = nullptr;
+				colliderQuery::Collision* centerHit = nullptr;
 
-				for(unsigned int i = 0; i < hits.size(); ++i)
+				for (unsigned int i = 0; i < hits.size(); ++i)
 				{
 					colliderQuery::Collision& current = hits[i];
 
 					UINT32 cat = dGeomGetCategoryBits(current.g2);
 
-					if(r == rayCount - 1) // our line of sight ray
+					if (r == rayCount) // our line of sight ray
 					{
-						if(colliderIsType(cat, COLLIDER_TILE|COLLIDER_TRN_GROUND))
-							continue;
-
-						SetInvalid("ppos.cantsee");
-						break;
+						if (colliderIsType(cat, COLLIDER_TILE | COLLIDER_TRN_GROUND))
+						{
+							SetInvalid("ppos.cantsee");
+						}
 					}
 
 					OBJECT* o = colliderData<OBJECT>(current.g2);
 
-					if(o)
+					if (o)
 					{
-						if(_foundMaterial(spec->badTextures, o->texname))
+						if (_foundMaterial(spec->badTextures, o->texname))
 							SetInvalid("ppos.badlocation");
-						if(valid && _badSurface(spec->surfaceFlags, o))
+						if (valid && _badSurface(spec->surfaceFlags, o))
 							SetInvalid("ppos.badlocation");
 					}
 
-					//UINT32 diff = (cat ^ spec->buildFlags);
-
-					if(current.normal.z() > 0 && (!hit || current.pos.z() > hit->pos.z()))
+					// Store the center ray hit height and ground normal
+					if (r == 0) {
+						if (centerPosHeight < current.pos.z())
+						{
+							centerPosHeight = current.pos.z();
+							centerNormal = current.normal;
+						}
+					}
+					else if (r == 1)// Ray 1
 					{
-						if(colliderIsType(cat, spec->buildFlags) || _foundMaterial(spec->okTextures, o->texname))
+						corner1Normal = current.normal;
+					}
+					else if (r == 2)// Ray 2
+					{
+						corner2Normal = current.normal;
+					}
+					else if (r == 3)// Ray 3
+					{
+						corner3Normal = current.normal;
+					}
+					else if (r == 4)// Ray 4
+					{
+						corner4Normal = current.normal;
+					}
+					else if (r == 5) { // Make sure the spawn in point isn't below ground level.
+						dVector3 pos, dir;
+						dGeomRayGet(geom, pos, dir);
+
+						if (current.pos.z() > (pos[2] - rayLength))
+							SetInvalid("ppos.badspawnposition");
+						continue;
+					}
+
+					if (current.normal.z() > 0 && (!hit || current.pos.z() > hit->pos.z())
+						&& (r == 1 || r == 2 || r == 3 || r == 4))
+					{
+						if (colliderIsType(cat, spec->buildFlags) || _foundMaterial(spec->okTextures, o->texname))
 							hit = &current;
 					}
 
 					// save everything we hit
 					allHits |= cat;
+
+					// Debug code
+					//piVECTOR mark;
+					//Vec3d mpos = physicsPhysicalToGame(current.pos);
+					//mark.x = (FLOAT32)(mpos.x() - WorldOriginOffset.x);
+					//mark.y = (FLOAT32)(mpos.y() - WorldOriginOffset.y);
+					//mark.z = (FLOAT32)(-mpos.z() - WorldOriginOffset.z);
+					//draw3dDebugMarkPoint(&mark, colorGREENALPHA, .5f);
 				}
 
-				if(hit)
+
+				if (hit)
 				{
-					/*
-					piVECTOR mark;
+					// Debug code
+					//piVECTOR mark;
+					//Vec3d mpos = physicsPhysicalToGame(hit->pos);
+					//mark.x = (FLOAT32)(mpos.x() - WorldOriginOffset.x);
+					//mark.y = (FLOAT32)(mpos.y() - WorldOriginOffset.y);
+					//mark.z = (FLOAT32)(-mpos.z() - WorldOriginOffset.z);
+					//draw3dDebugMarkPoint(&mark, colorGREENALPHA, .5f);
 
-					Vec3d mpos = physicsPhysicalToGame(hit->pos);
 
-					mark.x = (FLOAT32)(mpos.x() - WorldOriginOffset.x);
-					mark.y = (FLOAT32)(mpos.y() - WorldOriginOffset.y);
-					mark.z = (FLOAT32)(-mpos.z() - WorldOriginOffset.z);
-
-					draw3dDebugMarkPoint(&mark, colorGREENALPHA, .5f);
-					*/
-
-					if(spec->rayTolerance)
+					if (spec->rayTolerance)
 					{
-						if(r == 0)
+						if (valid)
 						{
-							centerNormal = hit->normal;
-						}
-						else if(valid)
-						{
-							if(!_okAngle(centerNormal, hit->normal, spec->rayTolerance))
+							if (!_okAngle(centerNormal, hit->normal, spec->rayTolerance))
 								SetInvalid("ppos.badangle");
 						}
 					}
 
-					worldNormal = worldNormal + hit->normal;
-					zTotal += hit->pos.z();
-					++zCount;
+					// Only the corner heights are used to get the ppo placement height
+					if (r == 1 || r == 2 || r == 3 || r == 4)
+					{
+						worldNormal = worldNormal + hit->normal;
+						zTotal += hit->pos.z();
+						++zCount;
+					}
 				}
-				else if(r < rayCount - 1) // don't consider the line of sight ray
-				{
-					// if any ray doesn't hit, we bail on all other rays
-					noAdjust = true;
-					break;
-				}
-			}
-			else if(r < rayCount - 1) // don't consider the line of sight ray
-			{
-				noAdjust = true;
 			}
 		}
 
+
+		// Check to see whether all of the corner ground hit normals face within the tolerance allowed.
+		Vec3d combinedNormal = corner1Normal + corner2Normal + corner3Normal + corner4Normal;
+
+		combinedNormal.normalize();
+		corner1Normal.normalize();
+		if (!_okAngle(combinedNormal, corner1Normal, spec->rayTolerance))
+			SetInvalid("ppos.badangle");
+
+
 		// if we hit anything besides ground, we're not in a valid location
-		if((allHits ^ spec->buildFlags))
+		if ((allHits ^ spec->buildFlags))
 		{
-			if(colliderIsType(allHits, COLLIDER_VEHICLE_MASK))
+			if (colliderIsType(allHits, COLLIDER_VEHICLE_MASK))
 			{
 				SetInvalid("ppos.badvehicle");
 				pause = true;
@@ -532,55 +598,51 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 				SetInvalid("ppos.badlocation");
 			}
 		}
-		else if(valid) // otherwise check the avoidance box
-		{
-			hits.clear();
 
-			if(collider.getCollisions(abox, hits, false))
-			{
-				for(unsigned int i = 0; i < hits.size(); ++i)
-				{
-					UINT32 diff = (dGeomGetCategoryBits(hits[i].g2) ^ spec->buildFlags);
 
-					if(diff)
-					{
-                        /*
-                         TBD - this doesn't actually do anything.  Probably something unfinished?
+		// Debug helper code
+		//hits.clear();
 
-						OBJECT* ohit = colliderData<OBJECT>(hits[0].g2);
-						trnCDTerrainObject* thit = colliderSpaceData<trnCDTerrainObject>(hits[0].g2);
-                         */
+		//if (collider.getCollisions(box, hits, false))
+		//{
+		//	for (unsigned int i = 0; i < hits.size(); ++i)
+		//	{
+		//		colliderQuery::Collision& current = hits[i];
 
-						std::vector<std::string> desc = colliderGetDescription(diff);
+		//		piVECTOR mark;
 
-						SetInvalid("ppos.badavoidance");
-						break;
-					}
-				}
-			}
-		}
+		//		Vec3d mpos = physicsPhysicalToGame(current.pos);
+
+		//		mark.x = (FLOAT32)(mpos.x() - WorldOriginOffset.x);
+		//		mark.y = (FLOAT32)(mpos.y() - WorldOriginOffset.y);
+		//		mark.z = (FLOAT32)(-mpos.z() - WorldOriginOffset.z);
+
+		//		draw3dDebugMarkPoint(&mark, colorREDALPHA, .5f);
+
+		//	}
+		//}
 	}
 
 	// if we have hits, calculate
 	vehVehicle* player = playerGetVehicle();
 
-	if(!player)
+	if (!player)
 	{
 		SetInvalid("ppos.badplayer");
 		return false;
 	}
-	else if(valid && (!zCount || (!spec->allowInterior && player->isInside)))
+	else if (valid && (!zCount || (!spec->allowInterior && player->isInside)))
 	{
 		SetInvalid("ppos.noinside");
 	}
 
-	if(noAdjust)
+	if (noAdjust)
 	{
 		SetInvalid("ppos.badlocation");
 		zCount = 0;
 	}
 
-	if(valid)
+	if (valid)
 	{
 		vehVehicle* current = nullptr;
 		Vec3d currentPos;
@@ -589,16 +651,16 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 		// check for troopers in the way
 		vehGetVehicleHead(&current);
 
-		if(current != nullptr)
+		if (current != nullptr)
 		{
-			for (;current != nullptr; current = current->getNext())
+			for (; current != nullptr; current = current->getNext())
 			{
-				if(current != player && current->VehicleType->Type == VEH_TYPE_PERSON)
+				if (current != player && current->VehicleType->Type == VEH_TYPE_PERSON)
 				{
 					currentPos.set(current->PosData.Pos);
 					diff = finalPos - currentPos;
 
-					if(diff.length2() <= (spec->avoidance * spec->avoidance))
+					if (diff.length2() <= (spec->avoidance * spec->avoidance))
 					{
 						SetInvalid("ppos.badvehicle");
 						pause = true;
@@ -609,11 +671,11 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 		}
 	}
 
-	if(valid && buildAt > 0 && spec->maxSpeed)
+	if (valid && buildAt > 0 && spec->maxSpeed)
 	{
 		FLOAT32 speed2 = (float)mathExactVectorLength2(&player->ModelData->VehicleVel);
 
-		if(speed2 > (spec->maxSpeed * spec->maxSpeed))
+		if (speed2 > (spec->maxSpeed * spec->maxSpeed))
 		{
 			SetInvalid("ppos.badspeed");
 			fpPPOAlert();
@@ -621,11 +683,11 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 		}
 	}
 
-	if(valid && Online)
+	if (valid && Online)
 	{
-		if(spec->targetDistance && !_inTargetFacilityRange((float)spec->targetDistance, player->Side))
+		if (spec->targetDistance && !_inTargetFacilityRange((float)spec->targetDistance, player->Side))
 		{
-			if(spec->targetDistance >= 0)
+			if (spec->targetDistance >= 0)
 				SetInvalid("ppos.badtargetrange.tooclose");
 			else
 				SetInvalid("ppos.badtargetrange.toofar");
@@ -634,55 +696,55 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 		StratDB::StratObject* strat = nullptr;
 
 		// enemy check
-		if(valid)
+		if (valid)
 		{
 			strat = StratDB::FindStratObject((sdm_full_obj_id&)player->ModelData->closestEnemyFAC);
 
-			if(spec->enemyFacDistance && !_checkFacilityRange((float)spec->enemyFacDistance, strat, player->Side, false))
+			if (spec->enemyFacDistance && !_checkFacilityRange((float)spec->enemyFacDistance, strat, player->Side, false))
 			{
-				if(spec->enemyFacDistance >= 0)
+				if (spec->enemyFacDistance >= 0)
 					SetInvalid("ppos.badenemyfac.tooclose");
 				else
 					SetInvalid("ppos.badenemyfac.toofar");
 			}
 
 			// can't place near fbs
-			if(valid && strat && !_fbCheck(player, strat, 20.0f + (float)spec->avoidance))
+			if (valid && spec->minForwardbaseDist && strat && !_fbCheck(player, strat, spec->minForwardbaseDist))
 				SetInvalid("ppos.badlocation");
 		}
 
 		// friendly check
-		if(valid)
+		if (valid)
 		{
 			strat = StratDB::FindStratObject((sdm_full_obj_id&)player->ModelData->closestFriendlyFAC);
 
-			if(spec->friendlyFacDistance && !_checkFacilityRange((float)spec->friendlyFacDistance, strat, player->Side, true))
+			if (spec->friendlyFacDistance && !_checkFacilityRange((float)spec->friendlyFacDistance, strat, player->Side, true))
 			{
-				if(spec->friendlyFacDistance >= 0)
+				if (spec->friendlyFacDistance >= 0)
 					SetInvalid("ppos.badfriendlyfac.tooclose");
 				else
 					SetInvalid("ppos.badfriendlyfac.toofar");
 			}
 
 			// can't place near fbs
-			if(valid && strat && !_fbCheck(player, strat, 20.0f + (float)spec->avoidance))
+			if (valid && spec->minForwardbaseDist && strat && !_fbCheck(player, strat, spec->minForwardbaseDist))
 				SetInvalid("ppos.badlocation");
 		}
 
 
 	}
 
-	double viewOffset			= (player->VehicleType->Type == VEH_TYPE_PERSON) ? -spec->viewOffset: spec->viewOffset * 2.0f;
-
-	FLOAT64VECTOR worldPos		= player->ModelData->VehiclePos;
-	piMATRIX worldAtt			= player->ModelData->VehicleAttMat;
-	piVECTOR forward			= {0,(float)viewOffset,0};
-	Matrixf attitude			= Matrixf(worldAtt);
+	double viewOffset = (player->VehicleType->Type == VEH_TYPE_PERSON) ? -spec->viewOffset : spec->viewOffset * 2.0f;
+	viewOffset += -spec->modelOffset.x;
+	FLOAT64VECTOR worldPos = player->ModelData->VehiclePos;
+	piMATRIX worldAtt = player->ModelData->VehicleAttMat;
+	piVECTOR forward = { 0,(float)viewOffset,0 };
+	Matrixf attitude = Matrixf(worldAtt);
 	Matrixd rotate;
 
-	if(spec->rotation)
+	if (spec->rotation)
 	{
-		double r = (player->VehicleType->Type == VEH_TYPE_PERSON) ? spec->rotation: -spec->rotation;
+		double r = (player->VehicleType->Type == VEH_TYPE_PERSON) ? spec->rotation : -spec->rotation;
 		rotate.makeRotate(mlDEG_TO_RAD(r), 0, 0, 1.0f);
 		attitude = attitude * rotate;
 	}
@@ -695,16 +757,16 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	worldPos.z += forward.z;
 
 	// set our position and averaged z
-	if(zCount)
+	if (zCount)
 	{
 		worldNormal.normalize();
 
 		// check the tilt angle if need be
-		if(valid && spec->tiltTolerance)
+		if (valid && spec->tiltTolerance)
 		{
-			Vec3d up = Vec3d(0,0,1.0f);
+			Vec3d up = Vec3d(0, 0, 1.0f);
 
-			if(!_okAngle(up, worldNormal, spec->tiltTolerance))
+			if (!_okAngle(up, worldNormal, spec->tiltTolerance))
 				SetInvalid("ppos.badangle");
 		}
 
@@ -717,19 +779,26 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	pos.y = (FLOAT32)(worldPos.y - WorldOriginOffset.y);
 	pos.z = (FLOAT32)-(worldPos.z - WorldOriginOffset.z);
 
-	if(valid && spec->treeCheck && sptIsRadiusInTreeBBox(pos, spec->treeCheck))
+	if (valid && spec->treeCheck && sptIsRadiusInTreeBBox(pos, spec->treeCheck))
 		SetInvalid("ppos.badtrees");
 
+	FLOAT64 allowedHeightDifference = 0.2f;
+
+	if ((centerPosHeight - worldPos.z) > allowedHeightDifference)
+	{
+		SetInvalid("ppos.badplacement");
+	}
+
 	// external source might check something else and set the valid flag true or false
-	if(validityCallback)
+	if (validityCallback)
 		valid = validityCallback();
 
-	if(!valid && buildAt && !pauseBuild && pause)
+	if (!valid && buildAt && !pauseBuild && pause)
 		uiGameEvent(GAMEEVENT_PPO, 1, _fail.c_str());
 
 	pauseBuild = pause;
 
-	if(checksOnly)
+	if (checksOnly)
 		return true;
 
 	// for creating rotation matrices
@@ -754,7 +823,7 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	// save our current rotation
 	attitude = rotate;
 
-	if(zCount)
+	if (zCount)
 	{
 		rotate.makeIdentity();
 		rotate.makeRotate(from, worldNormal);
@@ -776,6 +845,38 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 
 	finalPos = worldPos;
 	finalAtt = att;
+
+	// rotate into world orientation
+	Vec3d modelOffset = spec->modelOffset;
+	modelOffset = (modelOffset * attitude) + finalPos;
+
+	// put us into the physical world
+	Vec3d boxPos = physicsGameToPhysical(modelOffset);
+
+	dMatrix3 dMat;
+	MatrixTodMatrix(attitude, dMat);
+
+	dGeomSetPosition(abox, boxPos.x(), boxPos.y(), boxPos.z() + (spec->rayAdjust.z * 0.5f) + 0.2f);
+	dGeomSetRotation(abox, dMat);
+
+	hits.clear();
+
+	if (collider.getCollisions(abox, hits, false))
+	{
+		SetInvalid("ppos.badavoidance");
+
+		// For debug only
+		//for (unsigned int i = 0; i < hits.size(); ++i)
+		//{
+			//colliderQuery::Collision& current = hits[i];
+			//piVECTOR mark;
+			//Vec3d mpos = physicsPhysicalToGame(current.pos);
+			//mark.x = (FLOAT32)(mpos.x() - WorldOriginOffset.x);
+			//mark.y = (FLOAT32)(mpos.y() - WorldOriginOffset.y);
+			//mark.z = (FLOAT32)(-mpos.z() - WorldOriginOffset.z);
+			//draw3dDebugMarkPoint(&mark, colorREDALPHA, .5f);	
+		//}
+	}
 
 	return true;
 }
