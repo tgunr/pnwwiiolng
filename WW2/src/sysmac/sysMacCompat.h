@@ -40,7 +40,7 @@ extern void chAppDir();
 extern const char *macPreferencesPath();
 
 extern bool CopyOldSetupFiles_MAC();
-extern int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int AlertNumber);
+extern int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int alertIcon);
 
 extern const char *macAppPath();
 extern const char *macDataPath();

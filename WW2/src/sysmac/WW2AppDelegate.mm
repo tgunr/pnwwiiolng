@@ -565,22 +565,9 @@ extern NSString *WebActionOriginalURLKey;
         extern void sysmainAddArchives();
         sysmainAddArchives();
     }
-    
-    cfgPrefsLoad();
-    
-    Write_Debug("Command Line:\n'%s'\n", GetCommandLineA());
-    
-    // For complex reasons, we need to call mngoptParse() again here. See the
-    // Windows sysmain.cpp file for details.
-    if (!mngoptParse()) {
-        [NSApp terminate:self];
-        return;
-    }
-
 
     //  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
     //  This may interrupt the Client Build process.
-    
     if (WantedCopyOldSetup == TRUE)
     {
 #ifdef DEBUG_WW2
@@ -593,6 +580,17 @@ extern NSString *WebActionOriginalURLKey;
 #endif
     }
 
+    cfgPrefsLoad();
+    
+    Write_Debug("Command Line:\n'%s'\n", GetCommandLineA());
+    
+    // For complex reasons, we need to call mngoptParse() again here. See the
+    // Windows sysmain.cpp file for details.
+    if (!mngoptParse()) {
+        [NSApp terminate:self];
+        return;
+    }
+    
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     // By the way, the only way to check that is the ticket file itself since that
     // won't have been parsed yet at this point.

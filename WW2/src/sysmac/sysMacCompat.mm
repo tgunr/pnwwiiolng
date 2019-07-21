@@ -74,6 +74,14 @@ char GetOSBuild()
     return 0;
 }
 
+static std::wstring NSStringToWString ( NSString* Str )
+{
+    NSStringEncoding pEncode    =   CFStringConvertEncodingToNSStringEncoding ( kCFStringEncodingUTF32LE );
+    NSData* pSData              =   [ Str dataUsingEncoding : pEncode ];
+    
+    return std::wstring ( (wchar_t*) [ pSData bytes ], [ pSData length] / sizeof ( wchar_t ) );
+}
+
 static NSString* WStringToNSString ( const std::wstring& Str )
 {
     //  Convert std::wstring (wwiiolpath_string) to NSString.
@@ -86,17 +94,19 @@ static NSString* WStringToNSString ( const std::wstring& Str )
 
 bool CopyOldSetupFiles_MAC()
 {
-    bool copyFiles = false;
     char buffer [2048] = "";
     char timeStamp [256] = "";
     int charCount = 0;
     
     if (WantedCopyOldSetup == FALSE) { return FALSE; }
 
+    std::wstring tmpBoxTitle = L"Old Settings - Save";
+    std::wstring tmpBoxMsg = L"";
+    
     const char *title1 = "Old Game settings Located.";
     const char *title2 = "Old Game settings Saved.";
-    const char *message1 = "An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
-    //  Set Later: const char *message2
+    const char *message1 = "An older version of the Game Setting files has been found.\n\nPlease Note:\nRe-using the old files WILL overwrite any new files if you proceed.\n\nDo you wish to re-use them?";
+    //  const char *message2 - Set later
 
     NSFileManager *fileManager = [NSFileManager defaultManager];
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
@@ -108,7 +118,9 @@ bool CopyOldSetupFiles_MAC()
     NSString *userPrefsDirectory = [userLibraryDirectory stringByAppendingPathComponent:@"Preferences"];
     NSString *userCfmlPath = [userPrefsDirectory stringByAppendingPathComponent:@"ww2olcfml"];
     
-    NSLog(@"Old Settings\n - Checking for the presence of Old Game Settings.");
+    //  NSLog(@"Old Settings - Checking for the presence of Old Game Settings.");
+    Write_Debug("Old Settings - Checking for the presence of Old Game Settings.");
+    //  dbugLog(_FLI, "Old Settings - Checking for the presence of Old Game Settings.");
     
     
     //  Create a folder copy date/time stamp.  =================================================
@@ -129,34 +141,42 @@ bool CopyOldSetupFiles_MAC()
     
     //  Locate: /Users -> "currentuser" -> Documents -> Battleground Europe
     if (![fileManager fileExistsAtPath:bgePath]) {
-        NSLog(@"Old Settings\n - Old Game Settings NOT found.");
+        //  NSLog(@"Old Settings - Old Game Settings NOT found.");
+        Write_Debug("Old Settings - Old Game Settings NOT found.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings NOT found.");
         return false;
     }
 
     //  Located: /Users -> "currentuser" -> Documents -> Battleground Europe
-    NSLog(@"Old Settings\n - Old Game Settings found.");
+    //  NSLog(@"Old Settings - Old Game Settings found.");
+    Write_Debug("Old Settings - Old Game Settings found.");
+    //  dbugLog(_FLI, "Old Settings - Old Game Settings found.");
 
     
     //  Verify the User wants to copy the old Setup Files.
-    NSAlert *alert1 = [[NSAlert alloc] init];
+    NSAlert *alertVerify = [[NSAlert alloc] init];
     
-    alert1.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title1] ?: @""); // Force-unwrap those optionals!
-    alert1.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message1] ?: @"");
-    alert1.alertStyle = NSAlertStyleInformational;
+    alertVerify.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title1] ?: @""); // Force-unwrap those optionals!
+    alertVerify.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message1] ?: @"");
+    alertVerify.alertStyle = NSAlertStyleInformational;
     
-    [alert1 addButtonWithTitle:(@"Yes")];
-    [alert1 addButtonWithTitle:(@"No")];
+    [alertVerify addButtonWithTitle:(@"Yes")];
+    [alertVerify addButtonWithTitle:(@"No")];
     
-    if ([alert1 runModal] == NSAlertSecondButtonReturn) {
-         // the User selected: No.
+    if ([alertVerify runModal] == NSAlertSecondButtonReturn) {
+        // the User selected: No.
         
-         NSLog(@"Old Settings\n - Old Game Settings found -> the user declined the copy option.");
-         copyFiles = false;
+        //  NSLog(@"Old Settings - Old Game Settings found -> the user declined the copy option.");
+        Write_Debug("Old Settings - Old Game Settings found -> the user declined the copy option.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> the user declined the copy option.");
+        return false;
 
     } else {
-        // the User selected: Yes.
+        // the User selected: Yes WITH Overwriting.
         
-        NSLog(@"Old Settings\n - Old Game Settings found -> copying files.");
+        //  NSLog(@"Old Settings - Old Game Settings found -> archiving Mac Preference files.");
+        Write_Debug("Old Settings - Old Game Settings found -> archiving Mac Preference files.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> archiving Mac Preference files.");
 
         
         //  Archive the Game Preference files (Mac) to the Documents -> Battleground Europe folder.  =================================================
@@ -171,7 +191,21 @@ bool CopyOldSetupFiles_MAC()
         if (![fileManager fileExistsAtPath:bgeCfmlPath]) {
             success = [fileManager createDirectoryAtPath:bgeCfmlPath withIntermediateDirectories: true attributes:nil error:&error];
             if(success != YES) {
-                NSLog(@"Old Settings\n - Error Creating:\n%@,\n", bgeCfmlPath);
+                char tmpBuffer [2048] = "";
+                tmpBoxMsg = L"";
+            
+                //  NSLog(@"Old Settings - File Error Creating: %@.\n- error: %s\n\nAborting.", bgeCfmlPath, [error localizedDescription]);
+                Write_Debug("Old Settings - File Error Creating: %s.\n- error: %s\n\nAborting.", [bgeCfmlPath UTF8String], [[error localizedDescription] UTF8String]);
+            
+                tmpBuffer[0] = 0;
+                charCount = sprintf (tmpBuffer, "File Error - Could not Create: \n- %s.\n\nError:\n- %s\n\nOld Settings Copy Failed.", [bgeCfmlPath UTF8String], [[error localizedDescription] UTF8String]);
+                Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                
+                MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                
+                tmpBuffer[0] = 0;
+            
+                return false;
             }
         }
 
@@ -188,11 +222,50 @@ bool CopyOldSetupFiles_MAC()
             sourcePath = [userCfmlPath stringByAppendingPathComponent:target];
             destPath = [bgeCfmlPath stringByAppendingPathComponent:target];
             
+            if ([fileManager fileExistsAtPath:destPath]) {
+                success = [fileManager removeItemAtPath:destPath error:&error];
+                if(success != YES) {
+                    char tmpBuffer [2048] = "";
+                    tmpBoxMsg = L"";
+                    
+                    //  NSLog(@"Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.", destPath, error);
+                    Write_Debug("Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.",[destPath UTF8String], [[error localizedDescription] UTF8String]);
+
+                    tmpBuffer[0] = 0;
+                    charCount = sprintf (tmpBuffer, "File Error - Could not delete:\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.", [bgeCfmlPath UTF8String], [[error localizedDescription] UTF8String]);
+                    Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                    
+                    MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                    
+                    tmpBuffer[0] = 0;
+                    
+                    return false;
+                } else {
+                    //  NSLog(@"Old Settings - Existing File Overwritten: %s.", destPath);
+                    Write_Debug("Old Settings - Existing File Overwritten: %s.",[destPath UTF8String]);
+
+                }
+            }
+
             success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
             if(success != YES) {
-                NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+                char tmpBuffer [2048] = "";
+                tmpBoxMsg = L"";
+                
+                //  NSLog(@"Old Settings - Could not copy:\n- from path: %@,\n- to path: %@.\n- error: %@\n\nAborting.",sourcePath, destPath, error);
+                Write_Debug("Old Settings - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\nAborting.", [sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+
+                tmpBuffer[0] = 0;
+                charCount = sprintf (tmpBuffer, "File Error - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.", [sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+                Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                
+                MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                
+                tmpBuffer[0] = 0;
+                
+                return false;
             }
-            
+
             success = NO;
             error = nil;
             sourcePath = @"";
@@ -208,11 +281,56 @@ bool CopyOldSetupFiles_MAC()
         sourcePath = [userPrefsDirectory stringByAppendingPathComponent:@"/ww2olwwiiolprefs.xml"];
         destPath = [bgePath stringByAppendingPathComponent:@"/wwiiol.xml"];
         
-        success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
-        if(success != YES) {
-            NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+        if ([fileManager fileExistsAtPath:destPath]) {
+            success = [fileManager removeItemAtPath:destPath error:&error];
+            if(success != YES) {
+                char tmpBuffer [2048] = "";
+                tmpBoxMsg = L"";
+                
+                //  NSLog(@"Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.", destPath, error);
+                Write_Debug("Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.",[destPath UTF8String], [[error localizedDescription] UTF8String]);
+                
+                tmpBuffer[0] = 0;
+                charCount = sprintf (tmpBuffer, "File Error - Could not delete:\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.", [destPath UTF8String], [[error localizedDescription] UTF8String]);
+                Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                
+                MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                
+                tmpBuffer[0] = 0;
+                
+                return false;
+            } else {
+                //  NSLog(@"Old Settings - Existing File Overwritten: %s.", destPath);
+                Write_Debug("Old Settings - Existing File Overwritten: %s.",[destPath UTF8String]);
+
+            }
         }
 
+        success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+        if(success != YES) {
+            char tmpBuffer [2048] = "";
+            tmpBoxMsg = L"";
+            
+            //  NSLog(@"Old Settings - Could not copy:\n- from path: %@,\n- to path: %@.\n- error: %@\n\nAborting.",sourcePath, destPath, error);
+            Write_Debug("Old Settings - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\nAborting.",[sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+            
+            tmpBuffer[0] = 0;
+            charCount = sprintf (tmpBuffer, "File Error - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.",[sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+            Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+            
+            MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+            
+            tmpBuffer[0] = 0;
+            
+            return false;
+        }
+
+        
+        //  NSLog(@"Old Settings - Old Game Settings found -> copying Battleground Europe files.");
+        Write_Debug("Old Settings - Old Game Settings found -> copying Battleground Europe files.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying Battleground Europe files.");
+
+        
         //  Copy the ENTIRE Contents of (including the re-formatted preference files):
         //   /Users -> "currentuser" -> Documents -> Battleground Europe
         //   TO
@@ -225,12 +343,50 @@ bool CopyOldSetupFiles_MAC()
             sourcePath = [bgePath stringByAppendingPathComponent:target];
             destPath = [ww2Path stringByAppendingPathComponent:target];
             
-            if (![fileManager fileExistsAtPath:destPath]) {
-                success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+            if ([fileManager fileExistsAtPath:destPath]) {
+                success = [fileManager removeItemAtPath:destPath error:&error];
                 if(success != YES) {
-                    NSLog(@"Old Settings\n - Could not copy: from path:\n%@,\n\nto path:\n%@.\n\nError:\n%@\n",sourcePath, destPath, error);
+                    char tmpBuffer [2048] = "";
+                    tmpBoxMsg = L"";
+                    
+                    //  NSLog(@"Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.", destPath, error);
+                    Write_Debug("Old Settings - Could not delete:\n- to path: %s.\n- error: %s\n\nAborting.",[destPath UTF8String], [[error localizedDescription] UTF8String]);
+                    
+                    tmpBuffer[0] = 0;
+                    charCount = sprintf (tmpBuffer, "File Error - Could not delete:\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.", [bgeCfmlPath UTF8String], [[error localizedDescription] UTF8String]);
+                    Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                    
+                    MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                    
+                    tmpBuffer[0] = 0;
+                    
+                    return false;
+                } else {
+                    //  NSLog(@"Old Settings - Existing File Overwritten: %s.", destPath);
+                    Write_Debug("Old Settings - Existing File Overwritten: %s.",[destPath UTF8String]);
+
                 }
             }
+            
+            success = [fileManager copyItemAtPath:sourcePath toPath:destPath error:&error];
+            if(success != YES) {
+                char tmpBuffer [2048] = "";
+                tmpBoxMsg = L"";
+                
+                //  NSLog(@"Old Settings - Could not copy:\n- from path: %@,\n- to path: %@.\n- error: %@\n\nAborting.",sourcePath, destPath, error);
+                Write_Debug("Old Settings - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\nAborting.", [sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+                
+                tmpBuffer[0] = 0;
+                charCount = sprintf (tmpBuffer, "File Error - Could not copy:\n- from path: %s,\n- to path: %s.\n- error: %s\n\n\nOld Settings Copy Failed.", [sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+                Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+                
+                MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+                
+                tmpBuffer[0] = 0;
+                
+                return false;
+            }
+
             success = NO;
             error = nil;
             sourcePath = @"";
@@ -243,60 +399,83 @@ bool CopyOldSetupFiles_MAC()
         //   /Users -> "currentuser" -> Documents -> "Battleground Europe"
         //   TO
         //   /Users -> "currentuser" -> Documents -> "Battleground Europe_Copied".
-        NSLog(@"Old Settings\n - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        //  NSLog(@"Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        Write_Debug("Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+        //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> re-naming the Original Battleground Europe Directory.");
+
 
         NSURL *oldDir = [NSURL fileURLWithPath:bgePath];
         NSURL *newDir = [NSURL fileURLWithPath:[bgePath stringByAppendingString:folderRename]];
         success = [fileManager moveItemAtURL: oldDir toURL: newDir error:&error];
         if(success != YES) {
-            NSLog(@"Old Settings\n - Could not rename - from path:\n%@,\n\nto path:\n%@.",oldDir, newDir);
+            char tmpBuffer [2048] = "";
+            tmpBoxMsg = L"";
+            
+            //  NSLog(@"Old Settings - Could not rename:\nfrom path: %@,\nto path: %@\n- error: %s\n",oldDir, newDir, error);
+            Write_Debug("Old Settings - Could not rename:\nfrom path: %@,\nto path: %@.\n- error: %s\n", oldDir, newDir, [[error localizedDescription] UTF8String]);
+            
+            tmpBuffer[0] = 0;
+            charCount = sprintf (tmpBuffer, "File Error - Could not rename:\n- from path: %s,\n- to path: %s.\n- error: %s\n\nPlease contact Support to resolve this issue.", [sourcePath UTF8String], [destPath UTF8String], [[error localizedDescription] UTF8String]);
+            Char2Wstring(tmpBuffer, tmpBoxMsg, (size_t)charCount);
+            
+            MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+            
+            tmpBuffer[0] = 0;
 
         } else {
-            NSLog(@"Old Settings\n - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            //  NSLog(@"Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            Write_Debug("Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            //  dbugLog(_FLI, "Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
+            
+//            NSString *titleText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title2] ?: @""); // Force-unwrap those optionals!
+//            NSString *messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message2] ?: @"");
+            
+//            tmpBoxTitle = NSStringToWString(titleText);
+//            tmpBoxMsg = NSStringToWString(messageText);
+
+//            MessageBoxMAC(tmpBoxMsg, tmpBoxTitle, 0);
+
+            std::wstring tmp1(&message2[0], &message2[strlen(message2)]);
+            std::wstring tmp2(&title2[0], &title2[strlen(title2)]);
+
+            MessageBoxMAC(tmp1, tmp2, 0);
         }
+
         error = nil;
-
-        NSAlert *alert2 = [[NSAlert alloc] init];
-        
-        alert2.messageText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:title2] ?: @""); // Force-unwrap those optionals!
-        alert2.informativeText = static_cast<NSString * _Nonnull>([NSString stringWithUTF8String:message2] ?: @"");
-        alert2.alertStyle = NSAlertStyleInformational;
-
-        [alert2 runModal];
-        
-        //  Re-Name Completed.
-        copyFiles = true;
+        //  Settings Copy Completed.
     }
     
-    return copyFiles;
+    return true;
 }
 
-int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int AlertNumber = 0)
+int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int alertIcon = 0)
 {
     //  NSAlertStyleWarning = 0,
     //  NSAlertStyleInformational = 1,
     //  NSAlertStyleCritical = 2
     
-    NSAlert *alert = [[NSAlert alloc] init];
+    NSAlert *alertMessageBox = [[NSAlert alloc] init];
     
-    alert.messageText = WStringToNSString(boxTitle);
-    alert.informativeText = WStringToNSString(boxMessage);
+    alertMessageBox.messageText = WStringToNSString(boxTitle);
+    alertMessageBox.informativeText = WStringToNSString(boxMessage);
     
-    switch (AlertNumber)
+    switch (alertIcon)
     {
         case 1:
-            alert.alertStyle = NSAlertStyleInformational;
+            alertMessageBox.alertStyle = NSAlertStyleInformational;
             break;
         case 2:
-            alert.alertStyle = NSAlertStyleCritical;
+            alertMessageBox.alertStyle = NSAlertStyleCritical;
             break;
         default:
             //  case 0
-            alert.alertStyle = NSAlertStyleWarning;
+            alertMessageBox.alertStyle = NSAlertStyleWarning;
             break;
     }
     
-    [alert runModal];
+    [alertMessageBox runModal];
+    
+    alertMessageBox = nil;
     
     return 0;
 }
