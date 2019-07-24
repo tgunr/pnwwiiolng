@@ -610,10 +610,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// setup the data paths
 	fioInit();
 
-	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
-	//  Default override. DEF = TRUE.
-	WantedCopyOldSetup = TRUE;
-
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
@@ -719,6 +715,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// there's a lot else that would have to change anyhow.
 	gLanguage = IDE_LANGUAGE_ENGLISH;
 	gRegion = IDE_LANGUAGE_ENGLISH;
+
+
+	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+	//  This may interrupt the Client Build script.
+	if (WantedCopyOldSetup == TRUE)
+	{
+#ifdef DEBUG_WW2
+		if (DebugBuildingMDLFilesOnly == false)
+		{
+			CopyOldSetupFiles_WIN();
+		}
+#else
+		CopyOldSetupFiles_WIN();
+#endif
+	}
+
 
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
@@ -859,22 +871,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 	}
 #endif	//	EVENT_LOG
-
-
-	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
-	//  This may interrupt the Client Build process.
-
-	if (WantedCopyOldSetup == TRUE)
-	{
-#ifdef DEBUG_WW2
-		if (DebugBuildingMDLFilesOnly == false)
-		{
-			CopyOldSetupFiles_WIN();
-		}
-#else
-		CopyOldSetupFiles_WIN();
-#endif
-	}
 
 	if (!sndsDriverConfig(hInstance))
 	{

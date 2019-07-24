@@ -31,9 +31,7 @@
 	#include <direct.h>  //  for _getcwd.
 #endif
 
-#ifdef MULTI_CLIENT
-	bool exeStandard = false;
-#elif GM_RELEASE
+#if defined(MULTI_CLIENT) || defined(GM_RELEASE)
 	bool exeStandard = false;
 #else
 	bool exeStandard = true;
@@ -1302,7 +1300,7 @@ wwiiolpath_string SQL_DateTimeStamp(bool compact)
 
 bool CopyOldSetupFiles_WIN()
 {	
-	bool copyFiles = false;
+	//  bool copyFiles = false;
 
 	if (WantedCopyOldSetup == FALSE) { return false; }
 
@@ -1319,7 +1317,8 @@ bool CopyOldSetupFiles_WIN()
 	wwiiolpath_string reNamePath = L"";
 	wwiiolpath_string title1 = L"World War II Online - Old Game settings Located.";
 	wwiiolpath_string title2 = L"World War II Online - Old Game settings Saved.";
-	wwiiolpath_string message1 = L"An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
+	//  wwiiolpath_string message1 = L"An older version of the Game Settings has been found.\n\nDo you wish to re-use them?";
+	wwiiolpath_string message1 = L"An older version of the Game Setting files has been found.\n\nPlease Note:\nRe-using the old files WILL overwrite any new files if you proceed.\n\nDo you wish to re-use them?";
 	wwiiolpath_string message2 = L"";  //  To be set later.
 
 #if EXE_BUILD != BUILD_EXE_SETTINGS
@@ -1376,8 +1375,8 @@ bool CopyOldSetupFiles_WIN()
 #if EXE_BUILD != BUILD_EXE_SETTINGS
 		dbugLog(_FLW, "Old Settings - Old Game Settings found -> the user declined the copy option.");
 #endif
-		copyFiles = false;
-	
+
+		return false;
 	}
 	else
 	{
@@ -1387,7 +1386,7 @@ bool CopyOldSetupFiles_WIN()
 		//   \User -> My Documents -> WWIIOnline.
 
 #if EXE_BUILD != BUILD_EXE_SETTINGS
-		dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying files.");
+		dbugLog(_FLI, "Old Settings - Old Game Settings found -> copying Battleground Europe files.");
 #endif
 
 		wwiiolpath_string tmpSource = bgePath + L"\\*.*";
@@ -1415,8 +1414,8 @@ bool CopyOldSetupFiles_WIN()
 #if EXE_BUILD != BUILD_EXE_SETTINGS
 				dbugLog(_FLI, "Old Settings - Old Game Settings found -> Old Game Settings file copy and re-naming completed.");
 #endif
+
 				YN = MessageBox(nullptr, message2.c_str(), title2.c_str(), MB_ICONASTERISK | MB_OK);
-				copyFiles = true;
 			}
 			else
 			{
@@ -1427,9 +1426,10 @@ bool CopyOldSetupFiles_WIN()
 				Wstring2Char(bgePath, source, MAX_PATH);
 				Wstring2Char(reNamePath, destination, MAX_PATH);
 
-				dbugLog(_FLW, "Old Settings - Could not rename:-\n\nfrom path : \n<< %s >>\n\nto path : \n<< %s >>", &source, &destination);
+				dbugLog(_FLW, "File Error - Could not rename:\n - from path : %s, \n - to path : %s.", &source, &destination);
 #endif
-				copyFiles = false;
+
+				return false;
 			}
 		}
 		else
@@ -1441,18 +1441,19 @@ bool CopyOldSetupFiles_WIN()
 			Wstring2Char(bgePath, source, MAX_PATH);
 			Wstring2Char(WW2_userDocumentsPath, destination, MAX_PATH);
 
-			dbugLog(_FLW, "Old Settings - Could not copy:-\n\nfrom path : \n%s,\n\nto path : \n%s.", &source, &destination);
+			dbugLog(_FLW, "File Error - Could not copy:\n- from path: %s,\n- to path: %s.", &source, &destination);
 #endif
-			copyFiles = false;
+
+			return false;
 		}
 	}
 
 #else
-	copyFiles = false;
+	return false;
 
 #endif
 
-	return copyFiles;
+	return true;
 }
 
 
@@ -1462,13 +1463,15 @@ bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinat
 
 #if platOS == OS_WIN32
 
+	const char* FO_Function_List[4] = {"Move","Copy","Delete","ReName"};
+
 #if EXE_BUILD != BUILD_EXE_SETTINGS
 	char source[MAX_PATH] = "";
 	char destination[MAX_PATH] = "";
 	Wstring2Char(sourcePath, source, MAX_PATH);
 	Wstring2Char(destinationPath, destination, MAX_PATH);
 
-	dbugLog(_FLI, "Old Settings - File operations: %d from %s to %s", FO_Function, &source, &destination);
+	dbugLog(_FLI, "Old Settings - File operations: %s from %s to %s", FO_Function_List[FO_Function - 1], &source, &destination);
 #endif
 
 	//  FO_Function defines.
@@ -1485,7 +1488,7 @@ bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinat
 	//  Disable Deletion.
 	if (FO_Function == FO_DELETE) { return false; }
 
-	//  Source Pathe required for Delete and Rename.
+	//  Source Path required for Delete and Rename.
 	if (sourcePath == L"" && (FO_Function == FO_DELETE || FO_Function == FO_RENAME)) { return false; }
 
 	//  No Source and Destination.
@@ -1516,7 +1519,7 @@ bool SHFileFunctions_WC(wwiiolpath_string sourcePath, wwiiolpath_string destinat
 	else
 	{
 #if EXE_BUILD != BUILD_EXE_SETTINGS
-		dbugLog(_FLI, "Old Settings - SHFileOperation return code: 0x%x", result);
+		dbugLog(_FLI, "Old Settings - File operations: SHFileOperation return code: 0x%x", result);
 #endif
 		retValue = false;
 	}

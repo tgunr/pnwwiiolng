@@ -1,7 +1,7 @@
 ﻿; BOF ========================================================================
 ; File: WWIIOL_Installer_Template.iss
 ; Software: Inno Setup Compiler 5.6.1 (u)
-; Date: April 8, 2018, June 25, 2019
+; Date: April 8, 2018, July 25, 2019
 ; Revision by: Mathew "james10" Hogan - MJH
 
 ; Addresses:
@@ -422,7 +422,7 @@ AboutButtonText={#InstallerVersionInfoDescription} - File Information.%n%nSoftwa
 PreviousInstall={#InstallerVersionInfoDescription}. . .  is unable to continue.%n%nPlease Uninstall the crrently installed version,%nthen Re-run this Installer.
 RequireFullInstall={#InstallerVersionInfoDescription}. . .  is unable to continue.%n%nThis Patcher  REQUIRES  an installed version to patch.%n%nPlease download and run the Current Full Installer.
 IncompatablePatch={#InstallerVersionInfoDescription}. . .  is unable to continue.%n%nThis Patcher is incompatable with your installed version.%n%nPlease Uninstall your installed version,%nthen download and run the Current Full Installer.
-SavedSettingsFound=An older version of the Game Settings has been found%n%nDo you wish to re-use them?
+SavedSettingsFound=An older version of the Game Settings has been found%n%nPlease Note:%nRe-using the old files WILL overwrite any new files if you proceed.%n%nDo you wish to re-use them?
 RenamedDIR=The Directory:%n%1 has been re-named to:%n%2_Copied_%3.
 
 [InstallDelete]
@@ -1053,7 +1053,7 @@ begin
   { ... \ User \ My Documents \ WWIIOnline - Folder }
   RootDestiantionPath := Trim( ExpandConstant( '{userdocs}\{#RootNameWWIIOnline}' ));
 
-  { Copy Files }
+  { Copy Files WITH OVERWRITING}
   Log(Format( 'Old Files Copy %s to %s', [ RootSourcepath, RootDestiantionPath ]));
   DirectoryCopy( RootSourcepath, RootDestiantionPath );
 
