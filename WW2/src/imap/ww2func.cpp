@@ -70,6 +70,7 @@ static const functionEntry functionTable[] =
 	{IMAP_TMP_EXIT_VEHICLE,	 					"exitvehicle",					239,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
 	{IMAP_MOM_SHOW_GUI_CURSOR,					"guicursor",					201,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
 	{IMAP_MOM_SHOW_IN_GAME_MAP,					"showingamemap",				731,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
+	{IMAP_MOM_SHOW_IN_GAME_KEYMAPPER,			"showingamekeymapper",			734,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
 	{IMAP_MOM_TOGGLE_HUD,						"changehudmode",				708,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
 	{IMAP_MOM_RESET_HUD,						"resethud",						710,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
 	{IMAP_MOM_TOGGLE_CHATHEIGHT,				"changechatheight",				709,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},

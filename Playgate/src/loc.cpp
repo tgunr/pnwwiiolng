@@ -64,6 +64,8 @@ void LocInit()
 			language = LANGUAGE_SPANISH;
 		else if(lstrcmp(name, _T("Chinese")) == 0)
 			language = LANGUAGE_CHINESE;
+		else if (lstrcmp(name, _T("Russian")) == 0)
+			language = LANGUAGE_RUSSIAN;
 	}
 	
 #ifndef IGNORE_REGISTRY

@@ -4,12 +4,13 @@
 enum
 {
     ENGLISH,
-    ITALIAN,
-    FRENCH,
+	ITALIAN,
+	FRENCH,
     GERMAN,
     SPANISH,
 	CHINESE,
-    MAX_LANGUAGES
+	RUSSIAN,
+	MAX_LANGUAGES
 };
 
 extern const char* langNames[MAX_LANGUAGES];

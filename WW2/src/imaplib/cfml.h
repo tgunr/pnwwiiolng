@@ -46,7 +46,6 @@
 
 #define CFML_ENGLISH_LANGUAGE		"english"
 #define CFML_CODE_IMAP				"imap"
-#define CFML_CODE_PIGLATIN			"piglatin"
 
 /************************************************************************************************
 	imapcfml

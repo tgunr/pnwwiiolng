@@ -308,6 +308,7 @@ void CsettingsDlg::_setLanguage()
 		_language.InsertString(3, getLoc(_curLanguage, "settings.german"));
 		_language.InsertString(4, getLoc(_curLanguage, "settings.spanish"));
 		_language.InsertString(5, getLoc(_curLanguage, "settings.chinese"));
+		_language.InsertString(6, getLoc(_curLanguage, "settings.russian"));
 
 		_language.SetCurSel(_curLanguage);
 	}

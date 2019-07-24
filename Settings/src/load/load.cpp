@@ -544,6 +544,8 @@ int _bestLanguage()
 			language = 4;
 		else if(_wcsicmp(name, L"Chinese") == 0)
 			language = 5;
+		else if (_wcsicmp(name, L"Russian") == 0)
+			language = 6;
 	}
 
 	if(region() == 5 && language != 5)

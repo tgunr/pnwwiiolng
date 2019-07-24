@@ -77,6 +77,7 @@ WWII_CONFIG host_config;
 
 WWII_CONFIG_MAP configMap[] =
 {
+	// name,						type,		data,									max,	defaultValue,	description
 	{ nullptr,	TYPE_UNUSED, nullptr, 0, nullptr, nullptr }
 ,	{ "arena.banCheats",			TYPE_BOOL,	&host_config.arena.banCheats,			0,		"n",	"Ban DamnCheaters detects" }
 ,	{ "arena.checksums",			TYPE_BOOL,	&host_config.arena.checksums,			0,		"n",	"Detect and eject players with modified clients" }
@@ -271,6 +272,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "update.visLimitThrottling",		TYPE_BYTE,	&host_config.update.visLimitThrottling,	255,"0",	"Number of missed updates before limiting player's vis limit" }
 ,	{ "update.awsGracePeriodS",		TYPE_SINT,	&host_config.update.awsGracePeriod_s,	60000,	"90",	"Number of seconds from triggering AWS to appearing on it" }
 ,	{ "update.awsHighThreshold",	TYPE_BYTE,	&host_config.update.awsHighThreshold,	255,	"8",	"Number of planes to trip a 'high' EWS presence" }
+,	{ "update.awsEnemyDistance_km",	TYPE_SINT,	&host_config.update.awsEnemyDistance_km,		500,	"10",	"How many km from the front lines to trip AWS" }
+,	{ "update.awsFriendlyDistance_km",	TYPE_SINT,	&host_config.update.awsFriendlyDistance_km,	500,	"10",	"How many km off map to trip AWS" }
 
 ,	{ "weather.lockToFog",			TYPE_SINT,	&host_config.weather.lockToFog,			99,	"0",	"Lock to a particular fog pattern number (0=unlocked)" }
 ,	{ "weather.lockToPattern",		TYPE_SINT,	&host_config.weather.lockToPattern,		99,	"0",	"Lock to a particular weather pattern number (0=unlocked)" }

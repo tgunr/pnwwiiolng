@@ -1,0 +1,177 @@
+﻿/* NSMenuItem : <title: > (oid:1241) */
+" " = " ";
+
+/* NSTextField ((waiting for download to begin)) : <title:(waiting for download to begin)> (oid:1100) */
+"(waiting for download to begin)" = "(ожидание загрузки, чтобы начаться)";
+
+/* NSMenuItem : <title:About World War ][ Online> (oid:58) */
+"About World War ][ Online" = "О Мировой войне] [Онлайн";
+
+/* NSButton (Accept Terms of Service) : <title:Accept Terms of Service> (oid:1295) */
+"Accept Terms of Service" = "Примите Сроки Обслуживания";
+
+/* NSButton (Back) : <title:Back> (oid:1148) */
+"Back" = "Назад";
+
+/* NSMenuItem : <title:Best> (oid:1185) */
+"Best" = "Лучше всего";
+
+/* NSButton (Bigger) : <title:Bigger> (oid:1150) */
+"Bigger" = "Больше";
+
+/* NSMenuItem : <title:Bring All to Front> (oid:5) */
+"Bring All to Front" = "Принесите Все к Фронту";
+
+/* NSButton (Calibrate) : <title:Calibrate> (oid:1245) */
+"Calibrate" = "Калибровать";
+
+/* NSButton (Cancel) : <title:Cancel> (oid:1223) */
+"Cancel" = "Отменить";
+
+/* NSButton (Clear Password) : <title:Clear Password> (oid:1090) */
+"Clear Password" = "Очистите Пароль";
+
+/* NSTextField (Colors:) : <title:Colors:> (oid:1195) */
+"Colors:" = "Цвета:";
+
+/* NSTextField (Connection:) : <title:Connection:> (oid:1186) */
+"Connection:" = "Связь:";
+
+/* NSMenuItem : <title:English> (oid:1171) */
+"English" = "английский";
+
+/* NSButton (Forward) : <title:Forward> (oid:1149) */
+"Forward" = "Отправить";
+
+/* NSMenuItem : <title:French> (oid:1173) */
+"French" = "Французский";
+
+/* NSMenuItem : <title:German> (oid:1169) */
+"German" = "Немецкий";
+
+/* NSMenuItem : <title:Hide Others> (oid:145) */
+"Hide Others" = "Скройте Другие";
+
+/* NSMenuItem : <title:Hide World War ][ Online> (oid:134) */
+"Hide World War ][ Online" = "Спрятать мировую войну] [Online";
+
+/* NSButton (Home) : <title:Home> (oid:1146) */
+"Home" = "Дом";
+
+/* NSMenuItem : <title:Italian> (oid:1172) */
+"Italian" = "итальянский";
+
+/* NSMenuItem : <title:Russian> (oid:1172) */
+"Russian" = "Русский язык";
+
+/* NSTextField (Joystick 1:) : <title:Joystick 1:> (oid:1226) */
+"Joystick 1:" = "Джойстик 1:";
+
+/* NSTextField (Joystick 2:) : <title:Joystick 2:> (oid:1227) */
+"Joystick 2:" = "Джойстик 2:";
+
+/* NSTextField (Joystick 3:) : <title:Joystick 3:> (oid:1228) */
+"Joystick 3:" = "Джойстик 3:";
+
+/* NSTextField (Joystick 4:) : <title:Joystick 4:> (oid:1229) */
+"Joystick 4:" = "Джойстик 4:";
+
+/* NSTextField (Language:) : <title:Language:> (oid:1174) */
+"Language:" = "Язык:";
+
+/* NSMenu : <title:MainMenu> (oid:29) */
+"MainMenu" = "Главное Меню";
+
+/* NSButton (Manual) : <title:Manual> (oid:1147) */
+"Manual" = "Руководство";
+
+/* NSMenuItem : <title:Millions (32 bit)> (oid:1194) */
+"Millions (32 bit)" = "Миллионы (32 бита)";
+
+/* NSMenuItem : <title:Minimize> (oid:23) */
+"Minimize" = "Снизить до минимума";
+
+/* NSTextField (Monitor:) : <title:Monitor:> (oid:1197) */
+"Monitor:" = "Монитор:";
+
+/* NSButton (OK) : <title:OK> (oid:1222) */
+"OK" = "OK";
+
+/* NSMenu : <title:OtherViews> (oid:1240) */
+"OtherViews" = "Другие Представления";
+
+/* NSTextField (Password:) : <title:Password:> (oid:1307) */
+"Password:" = "Пароль:";
+
+/* NSWindow (Patch Download) : <title:Patch Download> (oid:1095) */
+"Patch Download" = "Загрузка Участка";
+
+/* NSBox (Patch Download Progress) : <title:Patch Download Progress> (oid:1097) */
+"Patch Download Progress" = "Продвижение Загрузки Участка";
+
+/* NSButton (Play Offline) : <title:Play Offline> (oid:1089) */
+"Play Offline" = "Игра Автономно";
+
+/* NSButton (Play Online) : <title:Play Online> (oid:1086) */
+"Play Online" = "Игра Онлайн";
+
+/* NSMenuItem : <title:Preferences...> (oid:129) */
+"Preferences..." = "Предпочтение...";
+
+/* NSMenuItem : <title:Primary> (oid:1183) */
+"Primary" = "Первичный";
+
+/* NSMenuItem : <title:Quit> (oid:136) */
+"Quit" = "Оставленный";
+
+/* NSButton (README) : <title:README> (oid:1135) */
+"README" = "README";
+
+/* NSTextField (Refresh Rate:) : <title:Refresh Rate:> (oid:1196) */
+"Refresh Rate:" = "Частота обновления:";
+
+/* NSButton (Reload) : <title:Reload> (oid:1152) */
+"Reload" = "перезагружать";
+
+/* NSTextField (Resolution:) : <title:Resolution:> (oid:1190) */
+"Resolution:" = "разрешение:";
+
+/* NSButton (Save password) : <title:Save password> (oid:1294) */
+"Save password" = "Сохранить пароль";
+
+/* NSMenuItem : <title:Secondary> (oid:1184) */
+"Secondary" = "второстепенный";
+
+/* NSMenuItem : <title:Services> (oid:131) */
+"Services" = "Сервисы";
+
+/* NSWindow (Settings) : <title:Settings> (oid:1165) */
+"Settings" = "настройки";
+
+/* NSMenuItem : <title:Show All> (oid:150) */
+"Show All" = "Показать все";
+
+/* NSButton (Smaller) : <title:Smaller> (oid:1151) */
+"Smaller" = "Меньшие";
+
+/* NSMenuItem : <title:Spanish> (oid:1170) */
+"Spanish" = "испанский";
+
+/* NSButton (Stop) : <title:Stop> (oid:1153) */
+"Stop" = "Стоп";
+
+/* NSMenuItem : <title:Thousands (16 bit)> (oid:1193) */
+"Thousands (16 bit)" = "Тысячи (16 бит)";
+
+/* NSButton (Training Server) : <title:Training Server> (oid:1094) */
+"Training Server" = "Учебный сервер";
+
+/* NSTextField (User Name: ) : <title:User Name:
+> (oid:1306) */
+"User Name:\n" = "Имя пользователя:\n";
+
+/* NSMenu : <title:Window> (oid:24) */
+"Window" = "Window";
+/* NSWindow (World War ][ Online) : <title:World War ][ Online> (oid:1084) */
+"World War ][ Online" = "Мировая война ][ онлайн";
+

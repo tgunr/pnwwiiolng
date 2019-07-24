@@ -59,6 +59,7 @@ public:
 	bool canSeeHiddenBuzzards() const;
 	void checkCapture();
 	void checkLocality(Teul::Packet&);
+	void findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestEnemyDist, UINT16 &closestFriendlyDist);
 	// Check if the clock sync has expired
 	bool clockExpired() const;
 	class Player* commander() const;

@@ -42,6 +42,8 @@
 
 std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 
+extern CPStruct* _cpList;
+
 //////////////////////////////////////////////////////////////////////
 // Look up a vehicle by it's chat handle.
 
@@ -969,6 +971,70 @@ HostVehicle::message(int prefix, int msgid, const char* const t1, const char* co
 			(*pit)->message(lmsg);
 	}
 	return true;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Look for the closest Enemy (front line) and Friendly towns in order
+// to determine if the player should show up on AWS.
+
+void
+HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestEnemyDist, UINT16 &closestFriendlyDist)
+{
+	closestEnemyDist = 0;
+	closestFriendlyDist = 0;
+	CPStruct* closestEnemyCP;
+	CPStruct* closestFriendlyCP;
+	CPStruct* cp;
+	
+	if(side != WWII_NO_SIDE)
+	{
+		// Loop through all of the CPs
+		for(cp = _cpList; cp != nullptr; cp = cp->next)
+		{
+			// Ignore bridges since they are concidered CPs
+			if(!cp->isCity())
+				continue;
+
+			// Find the closest Enemy town
+			if(cp->side != side)
+			{
+				// Ignore if not a front line town
+				if(!cp->isFrontline())
+					continue;
+
+				UINT64 xEnemyDist = x - cp->m_posX;
+				UINT64 yEnemyDist = y - cp->m_posY;
+
+				// Get the distance in kilometers
+                UINT64 enemyDistance = (UINT64)sqrt((double)(xEnemyDist * xEnemyDist) + (double)(yEnemyDist * yEnemyDist)) / 1000;
+
+				if(closestEnemyDist == 0 || closestEnemyDist >= enemyDistance)
+				{
+					closestEnemyDist = enemyDistance;
+					closestEnemyCP = cp;
+				}
+			}
+			
+			// Find the closest Friendly town
+			if(cp->side == side)
+			{
+				UINT64 xFriendlyDist = x - cp->m_posX;
+				UINT64 yFriendlyDist = y - cp->m_posY;
+
+				// Get the distance in kilometers
+                UINT64 friendlyDistance = (UINT64)sqrt((double)(xFriendlyDist * xFriendlyDist) + (double)(yFriendlyDist * yFriendlyDist)) / 1000;
+
+				if(closestFriendlyDist == 0 || closestFriendlyDist >= friendlyDistance)
+				{
+					closestFriendlyDist = friendlyDistance;
+					closestFriendlyCP = cp;
+				}
+			}
+		}
+	}
+
+	//dbugLog(_FLN, "Closest Enemy Town: %s Distance: %d", closestEnemyCP->name, closestEnemyDist);
+	//dbugLog(_FLN, "Closest Friendly Town: %s Distance: %d", closestFriendlyCP->name, closestFriendlyDist);
 }
 
 namespace Host { namespace Vehicles {
