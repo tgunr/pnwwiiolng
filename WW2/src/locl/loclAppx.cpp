@@ -44,4 +44,5 @@ const SCHAR* g_szLanguages[NUMBER_OF_LANGUAGES] =
     "german", 
 	"spanish", 
 	"chinese", 
-	"russian"}; 
+	"russian"
+}; 

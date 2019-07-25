@@ -251,17 +251,19 @@
     <ResourceCompile Include="settings.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\chinese\settings.dtd" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\settings.dtd" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\settings.dtd" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\settings.dtd" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\settings.dtd" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings" />
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\mainmenu-russian.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\chinese\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\settings.dtd" />
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>

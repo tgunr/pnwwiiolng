@@ -61,6 +61,9 @@
     <Filter Include="WW2 - src\log">
       <UniqueIdentifier>{c8344718-5160-467f-ac04-ceee7e398640}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Location Files\russian">
+      <UniqueIdentifier>{9de8ace5-aa10-44d3-9dbd-12e1c659734a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cfg\cfgData.cpp">
@@ -166,37 +169,43 @@
     <None Include="res\settings.rc2">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\chinese\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\mainmenu-russian.strings">
+      <Filter>Resource Files\Location Files\russian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\settings.dtd">
+      <Filter>Resource Files\Location Files\russian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\chinese\settings.dtd">
       <Filter>Resource Files\Location Files\chinese</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings">
       <Filter>Resource Files\Location Files\english</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\english\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\settings.dtd">
       <Filter>Resource Files\Location Files\english</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings">
       <Filter>Resource Files\Location Files\french</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\french\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\settings.dtd">
       <Filter>Resource Files\Location Files\french</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings">
       <Filter>Resource Files\Location Files\german</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\german\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\settings.dtd">
       <Filter>Resource Files\Location Files\german</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings">
       <Filter>Resource Files\Location Files\italian</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\italian\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\settings.dtd">
       <Filter>Resource Files\Location Files\italian</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings">
       <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
-    <None Include="..\..\ww2assets\oswin\dependencies\loc\spanish\settings.dtd">
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\settings.dtd">
       <Filter>Resource Files\Location Files\spanish</Filter>
     </None>
   </ItemGroup>

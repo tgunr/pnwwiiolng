@@ -31,11 +31,6 @@ static HGLRC _hrc;
 
 static int _curLanguage = 0;
 
-/*  HDPI CheckBox - Disabled; MJH 2019-03-07
-bool _runAsAdmin = false;  //  true = Settings.exe is to run with Administrator Privileges. Set from Regestry settings.
-bool _checkedHiDPI = false;
-*/
-
 CsettingsDlg::CsettingsDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CsettingsDlg::IDD, pParent)
 {
@@ -57,10 +52,8 @@ void CsettingsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COMBO_LANGUAGES, _language);
     DDX_Control(pDX, IDC_COMBO_VIDEO_CARD, _videocard);
     DDX_Control(pDX, IDC_COMBO_RESOLUTION, _resolution);
-//    DDX_Control(pDX, IDC_CHECK_RUN_SSE2, _runsse2);
     DDX_Control(pDX, IDC_COMBO_NETWORK, _network);
     DDX_Control(pDX, IDC_COMBO_SOUND_CARD, _soundcard);
-//	DDX_Control(pDX, IDC_CHECK_HIDPI, _hidpi);  HDPI CheckBox - Disabled; MJH 2019-03-07
 }
 
 BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
@@ -72,10 +65,8 @@ BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
 	ON_CBN_SELCHANGE(IDC_COMBO_VIDEO_CARD, OnCbnSelchangeComboVideoCard)
 	ON_CBN_SELCHANGE(IDC_COMBO_RESOLUTION, OnCbnSelchangeComboResolution)
 	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
-	//ON_BN_CLICKED(IDC_CHECK_RUN_SSE2, OnBnClickedCheckRunSse2)
 	ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
 	ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
-//	ON_BN_CLICKED(IDC_CHECK_HIDPI, OnBnClickedCheckHiDPI)  HDPI CheckBox - Disabled; MJH 2019-03-07
 END_MESSAGE_MAP()
 
 
@@ -220,9 +211,6 @@ BOOL CsettingsDlg::OnInitDialog()
     GetDlgItem(IDC_STATIC_RESOLUTION)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND_CARD)->SetFont(&font);
-//	GetDlgItem(IDC_STATIC_OPTIONS)->SetFont(&font);  HDPI CheckBox - Disabled; MJH 2019-03-07
-//	GetDlgItem(IDC_CHECK_HIDPI)->SetFont(&font);  HDPI CheckBox - Disabled; MJH 2019-03-07
-//    GetDlgItem(IDC_CHECK_RUN_SSE2)->SetFont(&font);
 
 	fileInit();
 
@@ -261,7 +249,7 @@ BOOL CsettingsDlg::OnInitDialog()
     _setDialog();
 
     // wait until here so localizations are loaded
-    SetWindowText(getLoc(_curLanguage, "settings.title"));
+    SetWindowText(getLoc(_curLanguage, "settings.text.title"));
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -297,18 +285,18 @@ void CsettingsDlg::_setLanguage()
 	
 	if(region() == 5)
 	{
-		_language.InsertString(0, getLoc(_curLanguage, "settings.chinese"));
+		_language.InsertString(0, getLoc(_curLanguage, "settings.language.chinese"));
 		_language.SetCurSel(0);
 	}
 	else
 	{
-		_language.InsertString(0, getLoc(_curLanguage, "settings.english"));
-		_language.InsertString(1, getLoc(_curLanguage, "settings.italian"));
-		_language.InsertString(2, getLoc(_curLanguage, "settings.french"));
-		_language.InsertString(3, getLoc(_curLanguage, "settings.german"));
-		_language.InsertString(4, getLoc(_curLanguage, "settings.spanish"));
-		_language.InsertString(5, getLoc(_curLanguage, "settings.chinese"));
-		_language.InsertString(6, getLoc(_curLanguage, "settings.russian"));
+		_language.InsertString(0, getLoc(_curLanguage, "settings.language.english"));
+		_language.InsertString(1, getLoc(_curLanguage, "settings.language.italian"));
+		_language.InsertString(2, getLoc(_curLanguage, "settings.language.french"));
+		_language.InsertString(3, getLoc(_curLanguage, "settings.language.german"));
+		_language.InsertString(4, getLoc(_curLanguage, "settings.language.spanish"));
+		_language.InsertString(5, getLoc(_curLanguage, "settings.language.chinese"));
+		_language.InsertString(6, getLoc(_curLanguage, "settings.language.russian"));
 
 		_language.SetCurSel(_curLanguage);
 	}
@@ -383,9 +371,9 @@ void CsettingsDlg::_setNetwork()
 {
     _network.ResetContent();
 
-    _network.InsertString(0, getLoc(_curLanguage, "settings.usebest"));
-    _network.InsertString(1, getLoc(_curLanguage, "settings.useprimary"));
-    _network.InsertString(2, getLoc(_curLanguage, "settings.usesecondary"));
+    _network.InsertString(0, getLoc(_curLanguage, "settings.net.usebest"));
+    _network.InsertString(1, getLoc(_curLanguage, "settings.net.useprimary"));
+    _network.InsertString(2, getLoc(_curLanguage, "settings.net.usesecondary"));
 
     long value = 0;
     
@@ -436,127 +424,6 @@ void CsettingsDlg::_setSoundCard()
     _soundcard.SetCurSel(cursor);
 }
 
-/*  HDPI CheckBox - Disabled; MJH 2019-03-07
-void CsettingsDlg::_getHiDPI()
-{
-	std::wstring Key = L"";
-	std::wstring ValueName = L"";
-	static TCHAR ValueData[256 + 1];
-	std::wstring testValue = L"";
-	std::wstring test1 = L"";
-	std::wstring test2 = L"";
-	std::wstring test3 = L"";
-
-====  Disabled  --  MJH - Feburary 27, 2018.  ====
-	//  Is Settings.exe running with Administrator Privileges?
-	Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
-	ValueName = WW2_exePath + L"\\Settings.exe";
-	ValueData[0] = 0; 
-	testValue = L"";
-
-	if (registryGetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), ValueData))
-	{
-		testValue = ValueData;
-		ValueData[0] = 0;
-		transform(testValue.begin(), testValue.end(), testValue.begin(), toupper); // tolower for lower case
-
-		test1 = L"RUNASADMIN";
-		test2 = L"~RUNASADMIN";
-		test3 = L"~ RUNASADMIN";
-
-		if (testValue.compare(test1) == 0 || testValue.compare(test2) == 0 || testValue.compare(test3) == 0)
-		{
-			//  Enable the Check Box.
-			_runAsAdmin = true;
-			GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(true);
-		}
-		else
-		{
-			//  Disable the Check Box.
-			_runAsAdmin = false;
-			GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(false);
-		}
-	}
-	else
-	{
-		//  Disable the Check Box.
-		_runAsAdmin = false;
-		GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(false);
-	}
-====  Disabled  --  MJH - Feburary 27, 2018.  ====
-
-	_runAsAdmin = true;
-	GetDlgItem(IDC_CHECK_HIDPI)->EnableWindow(true);
-
-	Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
-	ValueName = WW2_exePath + L"\\WW2.exe";
-	ValueData[0] = 0;
-	testValue = L"";
-
-	if (registryGetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), &ValueData[0]))
-	{
-		testValue = ValueData;
-		ValueData[0] = 0;
-		transform(testValue.begin(), testValue.end(), testValue.begin(), toupper); // tolower for lower case
-
-		test1 = L"HIGHDPIAWARE";
-		test2 = L"~HIGHDPIAWARE";
-		test3 = L"~ HIGHDPIAWARE";
-
-		if (testValue.compare(test1) == 0 || testValue.compare(test2) == 0 || testValue.compare(test3) == 0)
-		{
-			//  Check Box Checked.
-			CheckDlgButton(IDC_CHECK_HIDPI, true);
-			_checkedHiDPI = true;
-		}
-		else
-		{
-			//  Check Box Un-Checked.
-			CheckDlgButton(IDC_CHECK_HIDPI, false);
-			_checkedHiDPI = false;
-		}
-	}
-	else
-	{
-		//  Check Box Un-Checked.
-		CheckDlgButton(IDC_CHECK_HIDPI, false);
-		_checkedHiDPI = false;
-	}
-}
-
-void CsettingsDlg::_setHiDPI()
-{
-	if (_runAsAdmin == false)
-		return;
-
-	std::wstring Key = L"Software\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
-	std::wstring ValueName = WW2_exePath + L"\\WW2.exe";
-	TCHAR valueData[256 + 1];
-	valueData[0] = 0;
-	int currentVersion = getWindowsVersion();
-
-	if (currentVersion > 6002)  //  Windows 8 = 6.2 (6002), Windows 8.1 = 6.3 (6003).
-	{
-		wcsncpy(valueData, L"~ HIGHDPIAWARE", 256 + 1);
-	}
-	else
-	{
-		wcsncpy(valueData, L"HIGHDPIAWARE", 256 + 1);
-	}
-
-	if (_checkedHiDPI)
-	{
-		bool tmp = registrySetKeyVal(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str(), valueData);
-	}
-	else
-	{
-		bool tmp = registryDeleteKeyValue(HKEY_CURRENT_USER, Key.c_str(), ValueName.c_str());
-	}
-
-	return;
-}
-*/
-
 void CsettingsDlg::_setDialog()
 {
 	videoDisplay tmpDisplay;
@@ -573,75 +440,48 @@ void CsettingsDlg::_setDialog()
 		displayList.push_back(tmpDisplay);
     }
 
-//	_runAsAdmin = false;  HDPI CheckBox - Disabled; MJH 2019-03-07
 	_setLanguage();
     _setVideoCard();
     _setResolution();
     _setSoundCard();
     _setNetwork();
-//	_getHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 
     _p_info info;
 
     _cpuid(&info);
 
-	/*
-    if(info.checks & _CPU_FEATURE_SSE2 && info.os_support & _CPU_FEATURE_SSE2)
-    {
-        _runsse2.EnableWindow(1);
-
-        bool check = false;
-
-        getValue("app.wantsse2")->get(check);
-        _runsse2.SetCheck(check);
-    }
-    else
-    {
-        _runsse2.EnableWindow(0);
-        _runsse2.SetCheck(false);
-    }
-	*/
-
-    // Set localized dialog text
+	// Set the Window title
+	SetWindowText(getLoc(_curLanguage, "settings.text.title"));
+	
+	// Set localized dialog text
     CWnd *wnd = NULL;
 
     wnd = GetDlgItem(IDOK);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.save"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.button.save"));
 
     wnd = GetDlgItem(IDCANCEL);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.cancel"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.button.cancel"));
 
     wnd = GetDlgItem(IDC_STATIC_LANGUAGE);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.language"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.language"));
     
     wnd = GetDlgItem(IDC_STATIC_NETWORK);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.connection"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.connection"));
     
     wnd = GetDlgItem(IDC_STATIC_VIDEO);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.video"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.video"));
    
     wnd = GetDlgItem(IDC_STATIC_VIDEO_CARD);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.videocard"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.videocard"));
     
     wnd = GetDlgItem(IDC_STATIC_RESOLUTION);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.resolution"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.resolution"));
     
     wnd = GetDlgItem(IDC_STATIC_SOUND);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.sound"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.sound"));
     
     wnd = GetDlgItem(IDC_STATIC_SOUND_CARD);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.soundcard"));
-
-/*  HDPI CheckBox - Disabled; MJH 2019-03-07
-	wnd = GetDlgItem(IDC_STATIC_OPTIONS);
-	wnd->SetWindowText(getLoc(_curLanguage, "settings.options"));
-
-	wnd = GetDlgItem(IDC_CHECK_HIDPI);
-	wnd->SetWindowText(getLoc(_curLanguage, "settings.options.dpi"));
-*/
-	
-//    wnd = GetDlgItem(IDC_CHECK_RUN_SSE2);
-//    wnd->SetWindowText(getLoc(_curLanguage, "settings.wantsse2"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.soundcard"));
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -705,10 +545,8 @@ void CsettingsDlg::_saveDialogValues()
     OnCbnSelchangeComboLanguages();
     OnCbnSelchangeComboVideoCard();
     OnCbnSelchangeComboResolution();
-//    OnBnClickedCheckRunSse2();
     OnCbnSelchangeComboNetwork();
     OnCbnSelchangeComboSoundCard();
-//	_setHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 }
 
 void CsettingsDlg::OnBnClickedOk()
@@ -759,21 +597,6 @@ void CsettingsDlg::OnBnClickedCancel()
     // TODO: Add your control notification handler code here
     OnCancel();
 }
-
-/*
-void CsettingsDlg::OnBnClickedCheckRunSse2()
-{
-    bool check = _runsse2.GetCheck() ? true : false;
-    getValue("app.wantsse2")->set(check);
-}
-*/
-
-/*  HDPI CheckBox - Disabled; MJH 2019-03-07
-void CsettingsDlg::OnBnClickedCheckHiDPI()
-{
-	_checkedHiDPI = _hidpi.GetCheck() ? true : false;
-}
-*/
 
 void CsettingsDlg::OnCbnSelchangeComboNetwork()
 {  
@@ -830,8 +653,6 @@ int CsettingsDlg::getWindowsVersion()
 		res = RegQueryValueEx(hKey, _T("CurrentVersion"), NULL, &dwType, (LPBYTE)&currentVersion, &len);
 		if (res == ERROR_SUCCESS)
 		{
-			//LPWSTR
-			//WideCharToMultiByte
 			pname = reinterpret_cast<LPWSTR>(currentVersion);
 
 			std::wstringstream wss(pname);

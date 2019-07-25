@@ -1,24 +1,22 @@
-<!ENTITY settings.french "Francese">
-<!ENTITY settings.cancel "Cancella">
-<!ENTITY settings.video "Video">
-<!ENTITY settings.spanish "Spagnolo">
-<!ENTITY settings.resolution "Risoluzione">
-<!ENTITY settings.italian "Italiano">
-<!ENTITY settings.wantsse2 "Esegui file SSE2">
-<!ENTITY settings.connection "Connessione">
-<!ENTITY settings.save "Salva">
-<!ENTITY settings.english "Inglese">
-<!ENTITY settings.useprimary "Usa il primario">
-<!ENTITY settings.video.primary "Driver Video Primario">
-<!ENTITY settings.title "Impostazioni di WWII Online">
-<!ENTITY settings.usebest "Usa il migliore (Raccomandato)">
-<!ENTITY settings.language "Lingua">
-<!ENTITY settings.videocard "Scheda Video">
+<!ENTITY settings.button.cancel "Cancella">
+<!ENTITY settings.button.save "Salva">
+<!ENTITY settings.language.chinese "Cinese">
+<!ENTITY settings.language.english "Inglese">
+<!ENTITY settings.language.french "Francese">
+<!ENTITY settings.language.german "Tedesco">
+<!ENTITY settings.language.italian "Italiano">
+<!ENTITY settings.language.russian "Russo">
+<!ENTITY settings.language.spanish "Spagnolo">
+<!ENTITY settings.net.usebest "Usa il migliore (Raccomandato)">
+<!ENTITY settings.net.useprimary "Usa il primario">
+<!ENTITY settings.net.usesecondary "Usa il secondario">
 <!ENTITY settings.sound.primary "Driver Audio Primario">
-<!ENTITY settings.sound "Audio">
-<!ENTITY settings.chinese "Cinese">
-<!ENTITY settings.soundcard "Scheda Audio">
-<!ENTITY settings.usesecondary "Usa il secondario">
-<!ENTITY settings.german "Tedesco">
-<!ENTITY settings.options "Opzioni">
-<!ENTITY settings.options.dpi "Disattiva il ridimensionamento della visualizzazione con impostazioni DPI elevate">
+<!ENTITY settings.text.connection "Connessione">
+<!ENTITY settings.text.language "Lingua">
+<!ENTITY settings.text.resolution "Risoluzione">
+<!ENTITY settings.text.sound "Audio">
+<!ENTITY settings.text.soundcard "Scheda Audio">
+<!ENTITY settings.text.title "Impostazioni di WWII Online">
+<!ENTITY settings.text.video "Video">
+<!ENTITY settings.text.videocard "Scheda Video">
+<!ENTITY settings.video.primary "Driver Video Primario">
