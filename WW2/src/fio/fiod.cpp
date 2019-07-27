@@ -579,16 +579,16 @@ void fiodSetUserpath(bool userpath) {
 }
 */
 
-bool fiodGetPrepath(char returnPrePath[MAX_PATH + 1])
+bool fiodGetPrepath(char returnPrePath[PN_MAX_PATH + 1])
 {
     if (WantDataDir == TRUE && WantedDataPath != L"")
     {
-        Wstring2Char(WantedDataPath, returnPrePath, MAX_PATH + 1);
+        Wstring2Char(WantedDataPath, returnPrePath, PN_MAX_PATH + 1);
     }
     else
     {
         wwiiolpath_string tepmString =  use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
-        Wstring2Char(tepmString, returnPrePath, MAX_PATH + 1);
+        Wstring2Char(tepmString, returnPrePath, PN_MAX_PATH + 1);
     }
     
     return true;

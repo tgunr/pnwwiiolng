@@ -7,7 +7,7 @@ namespace IO { class MappedFile; }
 
 // TODO: Can be made internal
 extern const fullpath_t* fiodGetPrepath();
-extern bool fiodGetPrepath(char returnPrePath[MAX_PATH + 1]);  //  MJH
+extern bool fiodGetPrepath(char returnPrePath[PN_MAX_PATH + 1]);  //  MJH
 extern bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath);  //  MJH
 extern void fiodSetUserpath(bool userpath);
 
