@@ -14,12 +14,31 @@
 
 bool piinfoGetVideoCards(DeviceList* list)
 {
+	struct videoDisplay {
+		DWORD indexNumber;
+		std::wstring deviceName;
+		std::wstring deviceString;
+		std::wstring displayName;
+	};
+
+	videoDisplay tmpDisplay;
+
 	DISPLAY_DEVICE device; device.cb = sizeof(device);
 	for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &device, 0) != 0 ; ++i ) {
 		DEVMODE dm; dm.dmSize = sizeof(dm);
 		if ( EnumDisplaySettings(device.DeviceName, 0, &dm) ) {
-			std::string name(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(device.DeviceName));
-			list->push_back({name, name});
+			//  std::string name(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(device.DeviceName));
+			// list->push_back({name, name});
+
+			tmpDisplay.indexNumber = i;
+			tmpDisplay.deviceName = device.DeviceName;
+			tmpDisplay.deviceString = device.DeviceString;
+			tmpDisplay.displayName = L"Display " + std::to_wstring(tmpDisplay.indexNumber + 1) + L" - " + tmpDisplay.deviceString;
+
+			std::string deviceName(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(tmpDisplay.deviceName));
+			std::string displayName(std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(tmpDisplay.displayName));
+
+			list->push_back({ displayName, deviceName });
 		}
 	}
 

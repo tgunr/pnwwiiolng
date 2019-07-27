@@ -78,6 +78,8 @@ HANDLE	threadhandle;
 
 // Static
 static void AddArchives();
+static void AddArchives_WC();
+
 
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
@@ -426,7 +428,8 @@ struct LANGANDCODEPAGE
 			break;
 		}
 
-		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs%hs"), filename, pFFI, PN_code_git_commitish_string, PN_data_git_commitish_string);
+		//  usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs\r\nCommit: %hs%hs\n"), filename, pFFI, PN_code_git_commitish_string, PN_data_git_commitish_string);
+		usprintf(txt, 511, _T("Product: %s\r\nVersion: %hs (%hs)\r\nCommit: %hs%hs\n"), filename, PN_product_version_string, PN_build_platform_string, PN_code_git_commitish_string, PN_data_git_commitish_string);
 		Write_Debug(UTF8(txt));
 
 		GlobalMemoryStatus(&memstat);
@@ -604,6 +607,9 @@ char GetOSBuild()
 // This is the actual winmain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	// setup the data paths
+	fioInit();
+
 	// Pull in the commandline arguments early so that builds
 	// which rely upon a DataPath being set will have it for
 	// use in cfgPrefsLoad(), and so OpenConsole is available now
@@ -656,9 +662,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     memset(&IdentityMatrix, 0, sizeof(piMATRIX));
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = 1.0;
 	IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
-
-	// setup the user data path
-	fioInit();
 
 	// delete the log files
 	Fio::DeleteLogFile();
@@ -713,6 +716,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	gLanguage = IDE_LANGUAGE_ENGLISH;
 	gRegion = IDE_LANGUAGE_ENGLISH;
 
+
+	//  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+	//  This may interrupt the Client Build script.
+	if (WantedCopyOldSetup == TRUE)
+	{
+#ifdef DEBUG_WW2
+		if (DebugBuildingMDLFilesOnly == false)
+		{
+			CopyOldSetupFiles_WIN();
+		}
+#else
+		CopyOldSetupFiles_WIN();
+#endif
+	}
+
+
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
 	if(!cfgPrefsLoad())
@@ -737,6 +756,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		strprintf(gAuthServerPort, "%hu", DEFAULT_AUTH_PORT);
 	}
 
+	//  Add Steam: ProgramData / Application Support Path Checking/Setup.
+	if (UseSteamLogin == TRUE)
+	{
+		Steam_exeWorkingPath();
+	}
+
 #ifdef ANTIHACK
 	HandleHackID();
 #else
@@ -753,7 +778,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			((PIMAGE_OPTIONAL_HEADER)OPTHDROFFSET (Imagebase))->SizeOfCode));
 #endif
     fioSet(ISARCHIVE);
-	AddArchives();
+	//  AddArchives();
+	AddArchives_WC();
+
 #else
 
 	if(WantDataDir)
@@ -768,7 +795,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	else
 	{
 		fioSet(ISARCHIVE);
-		AddArchives();
+		//  AddArchives();
+		AddArchives_WC();
 	}
 
 	// key file check
@@ -813,7 +841,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #ifdef EVENT_LOG
 	Enable_Log(LOG_ALL, TRUE); // Always want this stuff logged
 
-	Write_Debug("Command line: %s", GetCommandLine());
+	Write_Debug("Command line:\n%s\n", GetCommandLineA());
 
 	GetWindowsVersion(nullptr, nullptr);
 
@@ -1141,6 +1169,46 @@ static void AddArchives()
 
 		memFree(fileList);
 	}
+
+	if (!foundthem) {
+		LogAbort("Archives not found.");
+	}
+}
+
+
+static void AddArchives_WC()
+{
+	UINT32 numfiles = 0;
+	std::vector<wwiiolpath_string> fileList;
+	wwiiolpath_string testString = L"";
+	bool foundthem = false;
+
+	numfiles = fiodGetDirFileList_WC(WW2_exePlayarcPath, fileList);
+	if (fileList.size() < 1)
+	{
+		//  throw std::runtime_error("Archive directory is wrong");
+		LogAbort("Archive directory path contains no files.");
+	}
+
+	for (std::vector<std::wstring>::iterator it = fileList.begin(); it != fileList.end(); ++it)
+	{
+		testString = *it;
+		std::wstring::size_type found = testString.find(L".ww2");  // NEW ARCHIVES
+		if (found != std::wstring::npos)
+		{
+			if (fioaAddArchive(testString.c_str()) < 0) {
+				LogAbort("Could not access archives.");
+			}
+			foundthem = true;
+		}
+	}
+
+#ifdef ANTIHACK
+	checksum->set(diddle_crc((const unsigned char*)(
+		((PIMAGE_OPTIONAL_HEADER)OPTHDROFFSET(Imagebase))->ImageBase +
+		((PIMAGE_OPTIONAL_HEADER)OPTHDROFFSET(Imagebase))->BaseOfCode),
+		((PIMAGE_OPTIONAL_HEADER)OPTHDROFFSET(Imagebase))->SizeOfCode));
+#endif
 
 	if (!foundthem) {
 		LogAbort("Archives not found.");

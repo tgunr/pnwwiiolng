@@ -1,17 +1,20 @@
 // settingsDlg.cpp : implementation file
 //
+
+#include "syscfg.h" // Path is project specific.
+
 #include "stdafx.h"
 #include "settings.h"
 
 #include <vector>
+#include <sstream>
 #include "settingsDlg.h"
+#include "registry.h"
 
 #include "load.h"
 #include "language.h"
 #include "cpuid.h"
 #include "file.h"
-
-#include ".\settingsdlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,7 +24,7 @@
 #include <GL/gl.h>
 #include "GL/wglew.h"
 
-#define WW2OL_DIR "\\Battleground Europe"
+#include <algorithm>
 
 // CsettingsDlg dialog
 static HGLRC _hrc;
@@ -49,7 +52,6 @@ void CsettingsDlg::DoDataExchange(CDataExchange* pDX)
     DDX_Control(pDX, IDC_COMBO_LANGUAGES, _language);
     DDX_Control(pDX, IDC_COMBO_VIDEO_CARD, _videocard);
     DDX_Control(pDX, IDC_COMBO_RESOLUTION, _resolution);
-//    DDX_Control(pDX, IDC_CHECK_RUN_SSE2, _runsse2);
     DDX_Control(pDX, IDC_COMBO_NETWORK, _network);
     DDX_Control(pDX, IDC_COMBO_SOUND_CARD, _soundcard);
 }
@@ -58,14 +60,13 @@ BEGIN_MESSAGE_MAP(CsettingsDlg, CDialog)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	//}}AFX_MSG_MAP
-    ON_CBN_SELCHANGE(IDC_COMBO_LANGUAGES, OnCbnSelchangeComboLanguages)
-    ON_BN_CLICKED(IDOK, OnBnClickedOk)
-ON_CBN_SELCHANGE(IDC_COMBO_VIDEO_CARD, OnCbnSelchangeComboVideoCard)
-ON_CBN_SELCHANGE(IDC_COMBO_RESOLUTION, OnCbnSelchangeComboResolution)
-ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
-//ON_BN_CLICKED(IDC_CHECK_RUN_SSE2, OnBnClickedCheckRunSse2)
-ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
-ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
+	ON_CBN_SELCHANGE(IDC_COMBO_LANGUAGES, OnCbnSelchangeComboLanguages)
+	ON_BN_CLICKED(IDOK, OnBnClickedOk)
+	ON_CBN_SELCHANGE(IDC_COMBO_VIDEO_CARD, OnCbnSelchangeComboVideoCard)
+	ON_CBN_SELCHANGE(IDC_COMBO_RESOLUTION, OnCbnSelchangeComboResolution)
+	ON_BN_CLICKED(IDCANCEL, OnBnClickedCancel)
+	ON_CBN_SELCHANGE(IDC_COMBO_NETWORK, OnCbnSelchangeComboNetwork)
+	ON_CBN_SELCHANGE(IDC_COMBO_SOUND_CARD, OnCbnSelchangeComboSoundCard)
 END_MESSAGE_MAP()
 
 
@@ -167,6 +168,10 @@ BOOL CsettingsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
+	wwiiolpath_string storedWorkingDir = L"";
+	wchar_t wBuffer[MAX_PATH + 1];
+	char buffer[512 + 1];
+
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
@@ -206,23 +211,28 @@ BOOL CsettingsDlg::OnInitDialog()
     GetDlgItem(IDC_STATIC_RESOLUTION)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND)->SetFont(&font);
     GetDlgItem(IDC_STATIC_SOUND_CARD)->SetFont(&font);
-//    GetDlgItem(IDC_CHECK_RUN_SSE2)->SetFont(&font);
 
 	fileInit();
 
-	char buffer[512+1];
+	wBuffer[0] = 0;
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+	storedWorkingDir = wBuffer;
+
+	SetCurrentDirectory(WW2_exeDataPath.c_str());
 
 	for(int i = 0; i < MAX_LANGUAGES; i++)
 	{
-		sprintf_s(buffer, 512, "data/loc/%s/settings.dtd", langNames[i]);
+		sprintf_s(buffer, 512, "loc/%s/settings.dtd", langNames[i]);
 
 		if(!langInit(i, buffer))
 	    {
             // Default to English
-		    sprintf_s(buffer, 512, "data/loc/%s/settings.dtd", langNames[i]);
+			sprintf_s(buffer, 512, "loc/%s/settings.dtd", langNames[i]);
 			langInit(i, buffer);
 		}
 	}
+
+	SetCurrentDirectory(storedWorkingDir.c_str());
 
     // Not used at the moment
 #if(0)
@@ -239,7 +249,7 @@ BOOL CsettingsDlg::OnInitDialog()
     _setDialog();
 
     // wait until here so localizations are loaded
-    SetWindowText(getLoc(_curLanguage, "settings.title"));
+    SetWindowText(getLoc(_curLanguage, "settings.text.title"));
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -275,18 +285,18 @@ void CsettingsDlg::_setLanguage()
 	
 	if(region() == 5)
 	{
-		_language.InsertString(0, getLoc(_curLanguage, "settings.chinese"));
+		_language.InsertString(0, getLoc(_curLanguage, "settings.language.chinese"));
 		_language.SetCurSel(0);
 	}
 	else
 	{
-		_language.InsertString(0, getLoc(_curLanguage, "settings.english"));
-		_language.InsertString(1, getLoc(_curLanguage, "settings.italian"));
-		_language.InsertString(2, getLoc(_curLanguage, "settings.french"));
-		_language.InsertString(3, getLoc(_curLanguage, "settings.german"));
-		_language.InsertString(4, getLoc(_curLanguage, "settings.spanish"));
-		_language.InsertString(5, getLoc(_curLanguage, "settings.chinese"));
-		_language.InsertString(6, getLoc(_curLanguage, "settings.russian"));
+		_language.InsertString(0, getLoc(_curLanguage, "settings.language.english"));
+		_language.InsertString(1, getLoc(_curLanguage, "settings.language.italian"));
+		_language.InsertString(2, getLoc(_curLanguage, "settings.language.french"));
+		_language.InsertString(3, getLoc(_curLanguage, "settings.language.german"));
+		_language.InsertString(4, getLoc(_curLanguage, "settings.language.spanish"));
+		_language.InsertString(5, getLoc(_curLanguage, "settings.language.chinese"));
+		_language.InsertString(6, getLoc(_curLanguage, "settings.language.russian"));
 
 		_language.SetCurSel(_curLanguage);
 	}
@@ -295,15 +305,16 @@ void CsettingsDlg::_setLanguage()
 void CsettingsDlg::_setVideoCard()
 {
     _videocard.ResetContent();
-    for ( size_t i = 0 ; i < displays.size() ; ++i ) {
-        DEVMODE dm; dm.dmSize = sizeof(dm);
-        if ( EnumDisplaySettings(displays[i].c_str(), 0, &dm) ) {
-            _videocard.InsertString(i, displays[i].c_str());
-            _videocard.SetItemData(i, (DWORD_PTR)displays[i].c_str());
-        }
-    }
 
-    // See if video card is one already in the config file.
+	for (size_t i = 0; i < displayList.size(); ++i) {
+		DEVMODE dm; dm.dmSize = sizeof(dm);
+		if (EnumDisplaySettings(displayList[i].deviceName.c_str(), 0, &dm)) {
+			_videocard.InsertString(i, displayList[i].displayName.c_str());
+			_videocard.SetItemData(i, (DWORD_PTR)displayList[i].deviceName.c_str());
+		}
+	}
+
+	// See if video card is one already in the config file.
     VALUE* value = getValue("app.video");
     
 	std::wstring str;
@@ -312,14 +323,14 @@ void CsettingsDlg::_setVideoCard()
 	
     _videocard.SetCurSel(0);
 
-    for ( size_t i = 0; i < displays.size(); ++i )
-    {
-		if ( ! str.compare(displays[i]) )
-        {
-            _videocard.SetCurSel(i);
-            break;
-        }
-    }
+	for (size_t i = 0; i < displayList.size(); ++i)
+	{
+		if (!str.compare(displayList[i].deviceName))
+		{
+			_videocard.SetCurSel(i);
+			break;
+		}
+	}
 }
 
 void CsettingsDlg::_setResolution()
@@ -340,18 +351,18 @@ void CsettingsDlg::_setResolution()
 
     int cursor = 0;
 
-    DEVMODE dm; dm.dmSize = sizeof(dm);
-    for ( DWORD i = 0 ; EnumDisplaySettings(displays[adapter].c_str(), i, &dm) ; ++i ) {
-        if ( dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && dm.dmBitsPerPel >= 32 ) {
-            wsprintf(buffer, L"%dx%dx%d", dm.dmPelsWidth, dm.dmPelsHeight, dm.dmBitsPerPel);
-            if ( _resolution.FindString(0, buffer) >= 0 )
-                continue;
-            _resolution.InsertString(index, buffer);
-            if ( ! res.compare(buffer) )
-                cursor = index;
-            ++index;
-        }
-    }
+	DEVMODE dm; dm.dmSize = sizeof(dm);
+	for (DWORD i = 0; EnumDisplaySettings(displayList[adapter].deviceName.c_str(), i, &dm); ++i) {
+		if (dm.dmPelsWidth >= 800 && dm.dmPelsHeight >= 600 && dm.dmBitsPerPel >= 32) {
+			wsprintf(buffer, L"%dx%dx%d", dm.dmPelsWidth, dm.dmPelsHeight, dm.dmBitsPerPel);
+			if (_resolution.FindString(0, buffer) >= 0)
+				continue;
+			_resolution.InsertString(index, buffer);
+			if (!res.compare(buffer))
+				cursor = index;
+			++index;
+		}
+	}
 
     _resolution.SetCurSel(cursor);
 }
@@ -360,9 +371,9 @@ void CsettingsDlg::_setNetwork()
 {
     _network.ResetContent();
 
-    _network.InsertString(0, getLoc(_curLanguage, "settings.usebest"));
-    _network.InsertString(1, getLoc(_curLanguage, "settings.useprimary"));
-    _network.InsertString(2, getLoc(_curLanguage, "settings.usesecondary"));
+    _network.InsertString(0, getLoc(_curLanguage, "settings.net.usebest"));
+    _network.InsertString(1, getLoc(_curLanguage, "settings.net.useprimary"));
+    _network.InsertString(2, getLoc(_curLanguage, "settings.net.usesecondary"));
 
     long value = 0;
     
@@ -415,12 +426,21 @@ void CsettingsDlg::_setSoundCard()
 
 void CsettingsDlg::_setDialog()
 {
-    DISPLAY_DEVICE device; device.cb = sizeof(device);
+	videoDisplay tmpDisplay;
+	displayList.clear();
+	
+	DISPLAY_DEVICE device; device.cb = sizeof(device);
     for ( DWORD i = 0 ; EnumDisplayDevices(NULL, i, &device, 0) != 0 ; ++i ) {
-        displays.push_back(device.DeviceName);
+
+		tmpDisplay.indexNumber = i;
+		tmpDisplay.deviceName = device.DeviceName;
+		tmpDisplay.deviceString = device.DeviceString;
+
+		tmpDisplay.displayName = L"Display " + std::to_wstring(tmpDisplay.indexNumber + 1) + L" - " + tmpDisplay.deviceString;
+		displayList.push_back(tmpDisplay);
     }
 
-    _setLanguage();
+	_setLanguage();
     _setVideoCard();
     _setResolution();
     _setSoundCard();
@@ -430,55 +450,38 @@ void CsettingsDlg::_setDialog()
 
     _cpuid(&info);
 
-	/*
-    if(info.checks & _CPU_FEATURE_SSE2 && info.os_support & _CPU_FEATURE_SSE2)
-    {
-        _runsse2.EnableWindow(1);
-
-        bool check = false;
-
-        getValue("app.wantsse2")->get(check);
-        _runsse2.SetCheck(check);
-    }
-    else
-    {
-        _runsse2.EnableWindow(0);
-        _runsse2.SetCheck(false);
-    }
-	*/
-
-    // Set localized dialog text
+	// Set the Window title
+	SetWindowText(getLoc(_curLanguage, "settings.text.title"));
+	
+	// Set localized dialog text
     CWnd *wnd = NULL;
 
     wnd = GetDlgItem(IDOK);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.save"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.button.save"));
 
     wnd = GetDlgItem(IDCANCEL);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.cancel"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.button.cancel"));
 
     wnd = GetDlgItem(IDC_STATIC_LANGUAGE);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.language"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.language"));
     
     wnd = GetDlgItem(IDC_STATIC_NETWORK);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.connection"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.connection"));
     
     wnd = GetDlgItem(IDC_STATIC_VIDEO);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.video"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.video"));
    
     wnd = GetDlgItem(IDC_STATIC_VIDEO_CARD);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.videocard"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.videocard"));
     
     wnd = GetDlgItem(IDC_STATIC_RESOLUTION);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.resolution"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.resolution"));
     
     wnd = GetDlgItem(IDC_STATIC_SOUND);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.sound"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.sound"));
     
     wnd = GetDlgItem(IDC_STATIC_SOUND_CARD);
-    wnd->SetWindowText(getLoc(_curLanguage, "settings.soundcard"));
-    
-//    wnd = GetDlgItem(IDC_CHECK_RUN_SSE2);
-//    wnd->SetWindowText(getLoc(_curLanguage, "settings.wantsse2"));
+    wnd->SetWindowText(getLoc(_curLanguage, "settings.text.soundcard"));
 }
 
 // If you add a minimize button to your dialog, you will need the code below
@@ -542,7 +545,6 @@ void CsettingsDlg::_saveDialogValues()
     OnCbnSelchangeComboLanguages();
     OnCbnSelchangeComboVideoCard();
     OnCbnSelchangeComboResolution();
-//    OnBnClickedCheckRunSse2();
     OnCbnSelchangeComboNetwork();
     OnCbnSelchangeComboSoundCard();
 }
@@ -596,14 +598,6 @@ void CsettingsDlg::OnBnClickedCancel()
     OnCancel();
 }
 
-/*
-void CsettingsDlg::OnBnClickedCheckRunSse2()
-{
-    bool check = _runsse2.GetCheck() ? true : false;
-    getValue("app.wantsse2")->set(check);
-}
-*/
-
 void CsettingsDlg::OnCbnSelchangeComboNetwork()
 {  
     int selection = _network.GetCurSel();
@@ -636,4 +630,55 @@ void CsettingsDlg::OnCbnSelchangeComboSoundCard()
     
     if(value)
         value->set(CW2A(ss));
+}
+
+int CsettingsDlg::getWindowsVersion()
+{
+	int returnValue = 0;
+	HKEY hKey;
+	LONG res;
+
+	int major = 0;
+	int minor = 0;
+	std::wstring pname = L"";
+	std::wstring temp = L"";
+	std::vector<std::wstring> parts;
+
+	res = RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"), 0, KEY_QUERY_VALUE, &hKey);
+	if (res == ERROR_SUCCESS)
+	{
+		DWORD dwType = REG_SZ;
+		char currentVersion[300];
+		DWORD len = 300;
+		res = RegQueryValueEx(hKey, _T("CurrentVersion"), NULL, &dwType, (LPBYTE)&currentVersion, &len);
+		if (res == ERROR_SUCCESS)
+		{
+			pname = reinterpret_cast<LPWSTR>(currentVersion);
+
+			std::wstringstream wss(pname);
+			while (std::getline(wss, temp, L'.'))
+				parts.push_back(temp);
+
+			for (unsigned int it = 0; it <= parts.size(); ++it)
+			{
+				if (it == 0)
+					major = std::stoi(parts[it]); // convert to int
+				if (it == 1)
+					minor = std::stoi(parts[it]); // convert to int
+			}
+
+			returnValue = major * 1000;
+			returnValue = returnValue + minor;
+		}
+		else
+		{
+			returnValue = 0;
+		}
+	}
+	else
+	{
+		returnValue = 0;
+	}
+
+	return returnValue;
 }

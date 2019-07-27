@@ -38,7 +38,20 @@ extern void PostModalErrorDialog(const char *title, const char *message);
 
 extern void chAppDir();
 extern const char *macPreferencesPath();
-extern const char *macDocumentsPath();
+
+extern bool CopyOldSetupFiles_MAC();
+extern int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int alertIcon);
+
+extern const char *macAppPath();
+extern const char *macDataPath();
+extern const char *macDocsPath();
+extern const char *macPlayarcPath();
+extern const char *macWorkingPathAPP();
+extern const char *macCrashLogsPath();
+extern const char *macCrashLogsPath();
+extern const char *macUserDocumentsPath();
+extern const char *macUserScreenShotsPath();
+extern const char *macUserWorkingPath();
 
 extern const char *GetCommandLineA();
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<dict>
+		<key>identifier</key>
+		<string>Configuration.72706CB0-9D16-4933-9723-4E34C978F09F</string>
+		<key>options</key>
+		<dict>
+			<key>appendVersionNumber</key>
+			<true/>
+			<key>customIcon</key>
+			<integer>1</integer>
+			<key>deleteAfterCreating</key>
+			<false/>
+			<key>encryption</key>
+			<integer>0</integer>
+			<key>format</key>
+			<integer>0</integer>
+			<key>internetEnabled</key>
+			<false/>
+			<key>layoutIdentifier</key>
+			<string>Layout.D0326A54-6755-410A-9F45-23C905A8C202</string>
+			<key>licenseIdentifier</key>
+			<string>License.F6D00881-623F-47D9-B4A0-75375E25BD10</string>
+			<key>optimizeForRestores</key>
+			<false/>
+			<key>prompt</key>
+			<false/>
+			<key>promptsForDestinationFolder</key>
+			<false/>
+			<key>sanitizeForServer</key>
+			<true/>
+			<key>segmentSize</key>
+			<integer>100</integer>
+			<key>useSegments</key>
+			<false/>
+		</dict>
+	</dict>
+	<key>documentCreator</key>
+	<string>DropDMG 3.5.5</string>
+	<key>documentType</key>
+	<string>com.c-command.DropDMG.Configuration</string>
+	<key>formatVersion</key>
+	<integer>1</integer>
+</dict>
+</plist>

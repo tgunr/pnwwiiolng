@@ -1,0 +1,22 @@
+<!ENTITY settings.button.cancel "Cancel">
+<!ENTITY settings.button.save "Save">
+<!ENTITY settings.language.chinese "Chinese">
+<!ENTITY settings.language.english "English">
+<!ENTITY settings.language.french "French">
+<!ENTITY settings.language.german "German">
+<!ENTITY settings.language.italian "Italian">
+<!ENTITY settings.language.russian "Russian">
+<!ENTITY settings.language.spanish "Spanish">
+<!ENTITY settings.net.usebest "Use Best (Recommended)">
+<!ENTITY settings.net.useprimary "Use Primary">
+<!ENTITY settings.net.usesecondary "Use Secondary">
+<!ENTITY settings.sound.primary "Primary Sound Driver">
+<!ENTITY settings.text.connection "Connection">
+<!ENTITY settings.text.language "Language">
+<!ENTITY settings.text.resolution "Resolution">
+<!ENTITY settings.text.sound "Sound">
+<!ENTITY settings.text.soundcard "Sound Card">
+<!ENTITY settings.text.title "WWII Online Settings">
+<!ENTITY settings.text.video "Video">
+<!ENTITY settings.text.videocard "Video Card">
+<!ENTITY settings.video.primary "Primary Display Driver">

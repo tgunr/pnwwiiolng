@@ -849,12 +849,13 @@ logTimerEndExtMacro(parseWor);
 
 #ifdef DEBUG_WW2
 	if (DebugBuildingMDLFilesOnly) {
+		Write_Debug("Done building MDL files.Bailing out."); 
 		fprintf(stderr, "Done building MDL files. Bailing out.");
 		exit(0);
 	}
 #endif
 	T2 = timeGetTime();
-	Write_Debug ("*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
+	Write_Debug ("\n\n*****************  Total time loading blitzwor.csv file: %u milliseconds\n\n", T2-T1);
 
 	// Granny2 system (needs materials loaded)
 #if defined(BETA_RELEASE)

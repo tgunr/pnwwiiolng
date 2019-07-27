@@ -77,6 +77,16 @@ namespace {
 		return result;
 	}
 
+#if platOS == OS_WIN32
+	wchar_t* os_file_path(wchar_t* path) {
+		for (wchar_t* s = path; *s; ++s) {
+			if (*s == WRONG_PATHSEP_WC)
+				*s = OS_PATHSEP_WC;
+		}
+		return path;
+	}
+
+#else
 	char* os_file_path(char* path) {
 		for ( char* s = path ; *s; ++s ) {
 			if ( *s == WRONG_PATHSEP_C )
@@ -84,18 +94,13 @@ namespace {
 		}
 		return path;
 	}
+#endif
 
-	wchar_t* os_file_path(wchar_t* path) {
-		for ( wchar_t* s = path ; *s; ++s ) {
-			if ( *s == WRONG_PATHSEP_WC )
-				*s = OS_PATHSEP_WC;
-		}
-		return path;
-	}
 }
 
 //==============================================================================
 
+/*
 namespace {
 	inline UINT32 pathprintf(char* buf, size_t bufsize, const char* lhs, const char* rhs)
 	{ return snprintf(buf, bufsize, "%s" OS_PATHSEP "%s", lhs, rhs); }
@@ -109,7 +114,9 @@ namespace {
 	UINT32 pathprintf(wchar_t(&buf)[bufSize], const wchar_t* lhs, const wchar_t* rhs)
 	{ return swprintf(buf, bufSize - 1, L"%ls" OS_PATHSEP_W L"%ls", lhs, rhs); }
 }
+*/
 
+/*
 UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 	fullpath_t name[PN_MAX_PATH];
 #if platOS == OS_WIN32
@@ -118,7 +125,49 @@ UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname) {
 #else
 	strsafecpy(name, rawname);
 #endif
-	return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
+    //  return pathprintf(path, PN_MAX_PATH, fiodGetPrepath(), os_file_path(name));
+
+    UINT32 retValue = 0;
+    char returnBuffer[MAX_PATH + 1] = "";
+    char *returnValue = returnBuffer;
+    
+    //  retString = fiodGetPrepath();
+    fiodGetPrepath(returnValue);
+    retValue = pathprintf(path, PN_MAX_PATH, returnBuffer, os_file_path(name));
+    return retValue;
+}
+*/
+
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname)
+{
+	fullpath_t name[PN_MAX_PATH];
+	UINT32 retValue = 0;
+
+#if platOS == OS_WIN32
+	WWII::ConvertChars(rawname, name, array_size(name));
+	name[array_size(name) - 1] = L'\0';
+#else
+	strsafecpy(name, rawname);
+#endif
+    
+    wwiiolpath_string returnBuffer = L"";
+	wwiiolpath_string returnPath = L"";
+    wwiiolpath_string tmp = L"";
+    
+#if platOS == OS_WIN32
+	tmp = std::wstring(os_file_path(name));
+#else
+	Char2Wstring(os_file_path(name), tmp, PN_MAX_PATH);
+#endif
+
+	fiodGetPrepath_WC(returnBuffer);
+	returnPath = returnBuffer += OS_PATHSEP_W;
+    returnPath = returnPath += tmp;
+	retValue = returnPath.length();
+
+	Wstring2Char(returnPath, path, PN_MAX_PATH);
+    
+	return retValue;
 }
 
 //==============================================================================
@@ -144,7 +193,7 @@ namespace {
 	bool GetFileStat(stat_t& s, const char* name, bool userdir, fullpath_t* outpath = nullptr) {
 		fullpath_t locpath[PN_MAX_PATH];
 		fullpath_t* path = (outpath ? outpath : locpath);
-
+        ;
 		WITH ( UsingUserdir(userdir) )
 			GetFullPath_unsafe(path, name);
 		int result = GetStat(s, path);
@@ -511,12 +560,66 @@ void fiodSetUserpath(bool userpath) {
 	use_userpath = userpath;
 }
 
-const fullpath_t* fiodGetPrepath()
+/*const fullpath_t* fiodGetPrepath()
 {
-	return use_userpath ? UserDataPath : DataPath;
+    char returnBuffer[MAX_PATH + 1] = "";
+    char *returnValue = returnBuffer;
+    
+	if (WantDataDir == TRUE && WantedDataPath != L"")
+	{
+        Wstring2Char(WantedDataPath, returnBuffer, sizeof(returnBuffer));
+	}
+	else
+	{
+		wwiiolpath_string tepmString =  use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
+        Wstring2Char(tepmString, returnBuffer, sizeof(returnBuffer));
+    }
+    
+    return returnValue;
 }
+*/
+
+bool fiodGetPrepath(char returnPrePath[MAX_PATH + 1])
+{
+    if (WantDataDir == TRUE && WantedDataPath != L"")
+    {
+        Wstring2Char(WantedDataPath, returnPrePath, MAX_PATH + 1);
+    }
+    else
+    {
+        wwiiolpath_string tepmString =  use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
+        Wstring2Char(tepmString, returnPrePath, MAX_PATH + 1);
+    }
+    
+    return true;
+}
+
+bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
+{
+	if (WantDataDir == TRUE && WantedDataPath != L"")
+	{
+		returnPrePath = WantedDataPath;
+	}
+	else
+	{
+		wwiiolpath_string tepmString = use_userpath ? WW2_userDocumentsPath : WW2_exeDataPath;
+		returnPrePath = tepmString;
+	}
+
+	return true;
+}
+
 #else
 void fiodSetUserpath(bool) {}
+
+bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
+	{
+		returnPrePath = fiodGetPrepath();
+
+		if (returnPrePath != L"") { return true; }
+
+		return false;
+	}
 
 const fullpath_t* fiodGetPrepath() {
 #if platOS != OS_WIN32
@@ -538,7 +641,11 @@ void fiodmkdir(const char* path)
 {
 #if platOS == OS_MACOS || platOS == OS_LINUX
 	char fullPath[PN_MAX_PATH];
-	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
+    char prePath[PN_MAX_PATH];
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, PN_MAX_PATH);
+
+    strprintf(fullPath, "%s/%s", prePath, path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
 	wchar_t fullPath[PN_MAX_PATH];
@@ -721,6 +828,87 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	SetCurrentDirectoryA(curWorkingDir);
 }
 
+UINT32
+fiodGetDirFileList_WC(wwiiolpath_string dirToSearch, std::vector<wwiiolpath_string> &fileList)
+{
+	//  Returns the number of files. 0 = no files or error.
+	UINT32 numFiles = 0;
+	UINT32 longestFileName = 0;
+	UINT32 count = 0;
+	wwiiolpath_string curWorkingDir = L"";
+
+	std::vector<wwiiolpath_string> list;
+
+	wwiiolpath_string findAllSearchSpec = L"*.*";
+
+	WIN32_FIND_DATAW findData;
+	HANDLE fileHandle = INVALID_HANDLE_VALUE;
+
+	wchar_t wBuffer[MAX_PATH + 1];
+
+	wBuffer[0] = 0;
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+
+	curWorkingDir = wBuffer;
+
+	wwiiolpath_string searchDir = dirToSearch.c_str() ? dirToSearch.c_str() : L".\\";
+
+	SetCurrentDirectory(searchDir.c_str());
+
+	fileHandle = FindFirstFile(findAllSearchSpec.c_str(), &findData);
+	numFiles = 0;
+	longestFileName = 0;
+
+	if (fileHandle != INVALID_HANDLE_VALUE)
+	{
+		while (FindNextFile(fileHandle, &findData))
+		{
+			if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY |
+				FILE_ATTRIBUTE_HIDDEN |
+				FILE_ATTRIBUTE_SYSTEM |
+				FILE_ATTRIBUTE_OFFLINE |
+				FILE_ATTRIBUTE_TEMPORARY)))
+			{
+				numFiles++;
+
+				if (wcslen(findData.cFileName) > longestFileName)
+				{
+					longestFileName = wcslen(findData.cFileName);
+				}
+			}
+		}
+	}
+
+	if (numFiles < 1)
+	{
+		return 0;
+	}
+
+	fileHandle = FindFirstFile(findAllSearchSpec.c_str(), &findData);
+	numFiles = 0;
+
+	if (fileHandle != INVALID_HANDLE_VALUE)
+	{
+		while (FindNextFile(fileHandle, &findData))
+		{
+			if (!(findData.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY |
+				FILE_ATTRIBUTE_HIDDEN |
+				FILE_ATTRIBUTE_SYSTEM |
+				FILE_ATTRIBUTE_OFFLINE |
+				FILE_ATTRIBUTE_TEMPORARY)))
+			{
+				list.push_back(findData.cFileName);
+				numFiles++;
+			}
+		}
+	}
+
+	fileList = list;
+	SetCurrentDirectory(curWorkingDir.c_str());
+
+	return numFiles;
+}
+
 #else
 
 static int fiodGetDirListFilter(const struct dirent *ent)
@@ -812,7 +1000,11 @@ void fiocfgMkDir(const char* path, bool)
 LOGICAL fiocfgAccess(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    char    prePath[_MAX_PATH];
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
+   
+	strprintf(fullpath,"%s/%s", prePath, filename);
     int fd = -1;
     if (OS_OPEN(&fd, os_file_path(fullpath), O_RDONLY, 0) == 0) { // fix for 1083
         OS_CLOSE(fd);
@@ -824,7 +1016,11 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 {
 	char	fullpath[_MAX_PATH];
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    char    prePath[_MAX_PATH];
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
+    
+	strprintf(fullpath,"%s/%s", prePath, filename);
 
 	struct	stat	buffer;
 	int retval = stat(os_file_path(fullpath), &buffer);
@@ -837,10 +1033,13 @@ LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 size_t fiocfgOpen(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
 	int		hfile = -1;
 	struct stat st;
-
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
+    
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	stat(fullpath, &st);
@@ -852,10 +1051,13 @@ size_t fiocfgOpen(const char* filename, bool)
 
 size_t fiocfgOpenWrite(const char* filename, bool)
 {
-	char  fullpath[_MAX_PATH];
-	int   hfile = -1;
+	char    fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
+	int     hfile = -1;
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
 
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	OS_OPEN(&hfile, fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
@@ -865,11 +1067,14 @@ size_t fiocfgOpenWrite(const char* filename, bool)
 
 SINT32 fiocfgFileSize(const char* filename, bool)
 {
-	char fullpath[_MAX_PATH];
+	char    fullpath[_MAX_PATH];
+    char    prePath[_MAX_PATH];
 	struct	stat	buffer;
-	SINT32 retval;
+	SINT32  retval;
+    
+    Wstring2Char(WW2_userDocumentsPath, prePath, _MAX_PATH);
 
-	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s/%s", prePath, filename);
 	os_file_path(fullpath);
 
 	retval = stat(fullpath, &buffer);

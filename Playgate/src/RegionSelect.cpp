@@ -19,13 +19,13 @@ static const char* asUTF8(const wchar_t* in)
 }
 
 // Regions define the domains we operate within,
-// the default is to assume we are running Battleground Europe
+// the default is to assume we are running World War II Online
 // for playnet.com, but otherwise we obtain the data from
 // the regions.txt file.
 
 typedef std::vector<PNRegion> PN_REGIONS;
 static PN_REGIONS g_regions;
-static const PNRegion g_defaultRegion(L"Playnet", ".playnet.com", ".battlegroundeurope.com");
+static const PNRegion g_defaultRegion(L"Playnet", ".playnet.com", ".wwiionline.com");
 PNRegion g_region;
 
 //////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ CRegionSelect::ReadRegionsFile()
 	g_regions.clear();
 
 	const wchar_t* regionsTxt = L"\\regions.txt";
-	std::wstring filename = g_exePath + regionsTxt;
+	std::wstring filename = WW2_exeDocsPath + regionsTxt;
 	FILE *fp = nullptr;
 	if ( _wfopen_s(&fp, filename.c_str(), L"r, ccs=UTF-8") != 0 || fp == nullptr )
 	{

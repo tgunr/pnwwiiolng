@@ -1,6 +1,12 @@
-#ifndef PN_PROJECT_SYSCFG_H
-#define PN_PROJECT_SYSCFG_H 1
+#ifndef __WW2_SYSCFG_H__
+#define __WW2_SYSCFG_H__ 1
 // Can't use a pragma guard, because there are multiple syscfgs.
+
+//  ============================
+//
+//  WW2.exe - syscfg.h
+//
+//  ============================
 
 #if platOS == OS_WIN32
 
@@ -12,6 +18,7 @@
 #define NO_DEBUG_WRITE
 
 #include "include/platforms.h"
+#include "fio/fiostructure.h"
 
 #include <windows.h>
 #undef PostMessage
@@ -132,4 +139,4 @@ extern UINT64 GetMicroSeconds(void);
 
 #endif
 
-#endif
+#endif // __WW2_SYSCFG_H__

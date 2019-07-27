@@ -63,11 +63,23 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-data 1"
+            argument = "-BuildMDLOnly -window 1 -width 1024 -height 800 -data 1 -datadir $(SRCROOT)/../opt/ww2mods/DATA/"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-log 1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
+            argument = "-data 1 -datadir $(SRCROOT)/../opt/ww2mods/data/"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-data 1 -datadir /Volumes/Disk1/DataMac/Gitrepos/ww2mods/data/"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-data 1 -datadir $(SRCROOT)/../../ww2mods/data/"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

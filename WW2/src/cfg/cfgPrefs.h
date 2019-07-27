@@ -30,15 +30,10 @@
 
 #define PREF_FILE_NAME "wwiiol.xml"
 
-#if platOS == OS_MACOS
-#undef PREF_FILE_NAME
-#define PREF_FILE_NAME "wwiiolprefs.xml"
-#ifdef BETA_RELEASE
-#undef PREF_FILE_NAME
-#define PREF_FILE_NAME "wwiiolbeta.xml"
-#endif
-
-#endif
+//  #ifdef BETA_RELEASE
+//  #undef PREF_FILE_NAME
+//  #define PREF_FILE_NAME "wwiiol_beta.xml"
+//  #endif
 
 bool cfgPrefsLoad(); // loads prefs from disk
 void cfgPrefsSave(); // tolua_export // saves all prefs to disk

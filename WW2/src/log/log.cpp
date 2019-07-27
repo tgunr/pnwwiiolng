@@ -185,7 +185,7 @@ LOGICAL Open_Debug(const char* filename)
             return false;
         }
     }
-    Write_Debug("Debug Message System Open.\n");
+    Write_Debug("Debug Message System Open - %s.\n", filename);
     return true;
 }
 

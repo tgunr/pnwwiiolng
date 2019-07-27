@@ -71,7 +71,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDR_MAINFRAME           ICON                    "..\\res\\Playgate.ico"
+IDR_MAINFRAME           ICON                    "..\\..\\Installer\\ww2assets\\oswin\\WWIIOnLine.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -159,14 +159,14 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "Comments", "http://www.battlegroundeurope.com/"
-            VALUE "CompanyName", "Playnet/Cornered Rat Software"
-            VALUE "FileDescription", "Battleground Europe Launcher"
-            VALUE "FileVersion", "0,1,1,9"
-            VALUE "InternalName", "Playgate.exe"
-            VALUE "LegalCopyright", "Copyright (C) 1999-2016, Playnet Inc"
+            VALUE "Comments", "The Virtual Battlefield Does Exist . . . !"
+            VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC."
+            VALUE "FileDescription", "World War II Online - Launcher"
+            VALUE "FileVersion", "0.1.1.9"
+            VALUE "InternalName", "Playgate"
+            VALUE "LegalCopyright", "Copyright © 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved."
             VALUE "OriginalFilename", "Playgate.exe"
-            VALUE "ProductName", "Playgate: Battleground Europe Launcher"
+            VALUE "ProductName", "Playgate: World War II Online - Launcher"
             VALUE "ProductVersion", "0.1.1.9"
         END
     END
@@ -262,6 +262,11 @@ END
 //
 
 IDD_PLAYGATE_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PLAYER_LOGON AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

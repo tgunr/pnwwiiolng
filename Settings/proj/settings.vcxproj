@@ -62,6 +62,8 @@
     <OutDir>$(BinOutDir)</OutDir>
     <IntDir>$(IntOutDir)</IntDir>
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <SourcePath>D:\GitRepos\GitWWIIOnline\wwiiolng\WW2\src\include;D:\GitRepos\GitWWIIOnline\wwiiolng\WW2\src\fio;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(BinOutDir)</OutDir>
@@ -72,6 +74,7 @@
     <OutDir>$(BinOutDir)</OutDir>
     <IntDir>$(IntOutDir)</IntDir>
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\GitRepos\GitWWIIOnline\wwiiolng\WW2\src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -80,8 +83,8 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_SETTINGS_EXE_;LIBXML_STATIC;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;LIBXML_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -130,8 +133,8 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;LIBXML_STATIC;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;LIBXML_STATIC;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -169,8 +172,8 @@
       <MkTypLibCompatible>false</MkTypLibCompatible>
     </Midl>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;..\include;..\src\cfg;..\src\file;..\src\language;..\src\load;..\src\unicode;..\src\sys;..\proj;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_SETTINGS_EXE_;GLEW_STATIC;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;_UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Settings\proj;$(SolutionDir)\Settings\src\cfg;$(SolutionDir)\Settings\src\d3d;$(SolutionDir)\Settings\src\file;$(SolutionDir)\Settings\src\language;$(SolutionDir)\Settings\src\load;$(SolutionDir)\Settings\src\sys;$(SolutionDir)\Settings\src\unicode;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\fio;$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\src\log;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\libxml2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>platOS=OS_WIN32;EXE_BUILD=BUILD_EXE_SETTINGS;_SETTINGS_EXE_;WIN32;GLEW_STATIC;_WINDOWS;_UNICODE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -205,8 +208,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp" />
     <ClCompile Include="..\src\cfg\cfgData.cpp" />
-    <ClCompile Include="..\src\dx\dx3dinfo.cpp" />
+    <ClCompile Include="..\src\d3d\dx3dinfo.cpp" />
     <ClCompile Include="..\src\file\file.cpp" />
     <ClCompile Include="..\src\language\language.cpp" />
     <ClCompile Include="..\src\load\load.cpp" />
@@ -222,14 +226,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\WW2\src\fio\fio.h" />
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h" />
+    <ClInclude Include="..\..\WW2\src\include\platforms.h" />
+    <ClInclude Include="..\..\WW2\src\include\systypes.h" />
+    <ClInclude Include="..\..\WW2\src\log\log.h" />
     <ClInclude Include="..\src\cfg\cfgCodes.h" />
     <ClInclude Include="..\src\cfg\cfgData.h" />
-    <ClInclude Include="..\src\dx\dx3dinfo.h" />
+    <ClInclude Include="..\src\d3d\dx3dinfo.h" />
+    <ClInclude Include="..\src\d3d\mmeapi.h" />
     <ClInclude Include="..\src\file\file.h" />
     <ClInclude Include="..\src\language\language.h" />
     <ClInclude Include="..\src\load\load.h" />
     <ClInclude Include="..\src\sys\cpuid.h" />
     <ClInclude Include="..\src\sys\registry.h" />
+    <ClInclude Include="..\src\sys\syscfg.h" />
     <ClInclude Include="..\src\unicode\ConvertUTF.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="settings.h" />
@@ -240,13 +251,23 @@
     <ResourceCompile Include="settings.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\mainmenu-russian.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\chinese\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\settings.dtd" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings" />
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\settings.dtd" />
     <None Include="res\settings.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\wwii1.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
+    <Image Include="..\..\Installer\ww2assets\oswin\WWIIOnLine.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\glew\build\vs2017\glew_static.vcxproj">
