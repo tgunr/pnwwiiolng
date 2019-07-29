@@ -98,7 +98,7 @@
 
 ; ===  Game Install Root Names.  =============================================
 #define RootNameBGE "Battleground Europe"
-#define RootNameWWIIOnline "WWIIOnLine"
+#define RootNameWWIIOnline "WWIIOnline"
 
 
 ; ===  Program Variables: Exe Files - World War II Online.  ==================
@@ -131,7 +131,7 @@
 #define InstallerGroupName "Cornered Rat Software"
 #define InstallerRootPathName "CRS"
 #define InstallerBaseFileName "wwiiol_"
-#define InstallerIconFileName "WWIIOnLine.ico"
+#define InstallerIconFileName "WWIIOnline.ico"
 #define InstallerImageFile "WIZMODERNIMAGE.BMP"
 #define InstallerImageFileSmall "WIZMODERNSMALLIMAGE.BMP"
 
@@ -244,7 +244,7 @@
 
 ; ===  Set - Installer Script Format.
 #define WWIIOnlineAppName "World War II Online"
-#define WWIIOnlineDirName "WWIIOnLine"
+#define WWIIOnlineDirName "WWIIOnline"
 #define WWIIOnlineGroupName "World War II Online"
 #define InstallerVersionInfoDescription "World War II Online - Setup"
 

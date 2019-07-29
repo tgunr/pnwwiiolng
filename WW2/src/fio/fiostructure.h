@@ -2,11 +2,11 @@
 //  fiostructure.h.
 //  Date: Feb-27-2018
 //
-//  Copyright (c) 2018 Playnet, Inc., All Rights Reserved.
+//  Copyright (c) 2019 Playnet, Inc., All Rights Reserved.
 //  Not to be distributed in API form except as part of a
 //  compiled library.
 //
-//  MJH - April 8, 2018.
+//  MJH - July 30, 2019.
 
 
 //  ==============================================================================================================

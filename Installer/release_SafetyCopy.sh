@@ -1394,18 +1394,18 @@ if [ "$build_steam" = true ] ; then
 
             case $build_release in
                 $Client_release)
-                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine/*
-                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine/"
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnline/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnline/"
                     ;;
 
                 $Client_alpha)
-                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine_Alpha/*
-                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine_Alpha/"
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnline_Alpha/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnline_Alpha/"
                     ;;
 
                 $Client_beta)
-                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnLine_Beta/*
-                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnLine_Beta/"
+                    rm -r "$INSTALLER_RELEASE"/steam/WWIIOnline_Beta/*
+                    cp -vr "$DMG_WW2_App_Source" "$INSTALLER_RELEASE/steam/WWIIOnline_Beta/"
                     ;;
             esac
 
