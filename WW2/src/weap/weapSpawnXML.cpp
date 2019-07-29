@@ -10,7 +10,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "fio/fiod.h"						// for fiodGetPrepath()
+//  #include "fio/fiod.h"						// for fiodGetPrepath()  --  27-June-2019. No longer required  Seems to only cause build errors in the hosts. MJH.
 #include "weap/weapDefs.h"					// For MAX_WEAP_CLASSES
 #include "weap/weapList.h"					// For weaponClass[]
 #include "weap/weapSpawnXML.h"				// Our header file
