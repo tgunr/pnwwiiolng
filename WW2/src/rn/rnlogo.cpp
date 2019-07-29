@@ -54,12 +54,12 @@ static void _displayLogo();
 static void _playStartupMovie(const char*);
 #endif
 
-//  Win:  WW2_exeDataPath = \Program * Files -> WWIIOnLine -> DATA
+//  Win:  WW2_exeDataPath = \Program * Files -> WWIIOnline -> DATA
 //  Mac:  WW2_exeDataPath = /Applications -> World War II Online.app -> Contents -> Resources
 static const char* _wideSplashScreen = "screens/splashscreen69.bmp";
 static const char* _stdSplashScreen = "screens/splashscreen43.bmp";
 
-//  Win:  WW2_exeDataPath = \Program * Files -> WWIIOnLine -> playarc -> playarc??.ww2 (1 - 10)
+//  Win:  WW2_exeDataPath = \Program * Files -> WWIIOnline -> playarc -> playarc??.ww2 (1 - 10)
 //  Mac:  WW2_exeDataPath = /Applications -> World War II Online.app -> Contents -> Resources -> playarc.ww2
 //  Command Line Setting:  WantedDataDir = WW2_exeDataPath = ... ww2mods -> DATA
 static const char* _wideLoadingScreen = "screens/loadingscreen69.bmp";
