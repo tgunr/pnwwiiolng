@@ -614,7 +614,13 @@ void fiodSetUserpath(bool) {}
 
 bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath)
 	{
+#if platOS == OS_LINUX
+		GetWC(fiodGetPrepath(), returnPrePath);
+
+#else
 		returnPrePath = fiodGetPrepath();
+
+#endif
 
 		if (returnPrePath != L"") { return true; }
 
