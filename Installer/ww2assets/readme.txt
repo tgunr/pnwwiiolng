@@ -1,6 +1,6 @@
 ﻿============================================
 World War II Online
-Version 1.36.2.0 - July 2019
+Version 1.36.2.0 - August 2019
 ============================================
 
 This release is a mix of all three categories for a release and include fixes for a few long standing bugs.
