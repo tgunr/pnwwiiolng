@@ -31,7 +31,7 @@ void fioInit()
     // Default to current directory
 #if platOS == OS_WIN32
     
-    //  \User -> My Documents -> WWIIOnLine
+    //  \User -> My Documents -> WWIIOnline
     //  resultValue = fioStructureInit();
     resultValue = SetCurrentDirectoryW(WW2_userDocumentsPath.c_str());
 

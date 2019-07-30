@@ -483,7 +483,7 @@
 		FA5CDD491CD8BA6D00F93668 /* build_info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA3D8BA81C8BF201002C5119 /* build_info.cpp */; };
 		FA83A97E21696EF90013293C /* omgChat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA83A97A21696EF80013293C /* omgChat.cpp */; };
 		FA83A97F21696EF90013293C /* omgMissionSortieData.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FA83A97D21696EF90013293C /* omgMissionSortieData.cpp */; };
-		FA9E123C1C90CF7A000AF44A /* WWIIOnLine.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */; };
+		FA9E123C1C90CF7A000AF44A /* WWIIOnline.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* WWIIOnline.icns */; };
 		FAD64D501CB8325D00BC8DAF /* playarc.ww2 in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; };
 		FAE0023E1EE7F5660064198F /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA06C3D01EE2660200A9977E /* libphui.a */; };
 		FAF70D9A220FD5720061B74A /* imap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FAF70D96220FD5720061B74A /* imap.cpp */; };
@@ -1443,7 +1443,7 @@
 		E971F7131F1BF61F00B500F1 /* sysAntihack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysAntihack.h; path = src/sys/sysAntihack.h; sourceTree = SOURCE_ROOT; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
-		E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = WWIIOnLine.icns; path = ../Installer/ww2assets/osmac/WWIIOnLine.icns; sourceTree = "<group>"; };
+		E97C76CD1C85AFD800875F44 /* WWIIOnline.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = WWIIOnline.icns; path = ../Installer/ww2assets/osmac/WWIIOnline.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = ../Installer/ww2assets/osmac/archivefiles/playarc.ww2; sourceTree = "<group>"; };
 		E98C647E1E48DF5A00ABE277 /* wwiiBackChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiBackChannel.cpp; sourceTree = "<group>"; };
 		E98C647F1E48DF5A00ABE277 /* wwiiBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiBackChannel.h; sourceTree = "<group>"; };
@@ -3031,7 +3031,7 @@
 				FA37D74D1C937F6E00013187 /* MainMenu.nib */,
 				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
 				E97C76D01C85B15800875F44 /* playarc.ww2 */,
-				E97C76CD1C85AFD800875F44 /* WWIIOnLine.icns */,
+				E97C76CD1C85AFD800875F44 /* WWIIOnline.icns */,
 				FA13BB181C875F6800095818 /* placeholder-background.png */,
 				FA13BB191C875F6800095818 /* placeholder-title.png */,
 				8D0C4E960486CD37000505A6 /* Info.plist */,
@@ -3363,7 +3363,7 @@
 				3162164322666C1B00DA0D09 /* docs in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */,
-				FA9E123C1C90CF7A000AF44A /* WWIIOnLine.icns in Resources */,
+				FA9E123C1C90CF7A000AF44A /* WWIIOnline.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

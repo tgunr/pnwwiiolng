@@ -7,14 +7,14 @@
 :: _PrepareNewSteamRelease.bat [ /rc | /alpha | /beta ]
 
 
-:: Default = /rc  (.\release-candidate\steam\WWIIOnLine -- ww2ExePath=..\.\build\client\Release\bin):
+:: Default = /rc  (.\release-candidate\steam\WWIIOnline -- ww2ExePath=..\.\build\client\Release\bin):
 
 :: Available Options:
-:: /rc     = .\release-candidate\steam\WWIIOnLine    -- ww2ExePath=..\.\build\client\Release\bin       <---
-:: /alpha  = .\release-alpha\steam\WWIIOnLine_Alpha  -- ww2ExePath=..\.\build\client\Debug\bin
+:: /rc     = .\release-candidate\steam\WWIIOnline    -- ww2ExePath=..\.\build\client\Release\bin       <---
+:: /alpha  = .\release-alpha\steam\WWIIOnline_Alpha  -- ww2ExePath=..\.\build\client\Debug\bin
 ::                                                   -- ww2ExePath=..\.\build\client\AlphaRelease\bin
 ::                                                   -- ww2ExePath=..\.\build\client\BetaRelease\bin   <---
-:: /beta   = .\release-beta\steam\WWIIOnLine_Beta    -- ww2ExePath=..\.\build\client\BetaRelease\bin   <---
+:: /beta   = .\release-beta\steam\WWIIOnline_Beta    -- ww2ExePath=..\.\build\client\BetaRelease\bin   <---
 
 :: Launching Directory = The directory where the BAT file is located when it was Launched.
 :: NOTE: ALL of the other paths are relative to this directory within the < wwiiolng > directory tree.
@@ -123,14 +123,14 @@ SET ww2AssetsPath=%installerRootDIR%\ww2assets
 
 rem Release EXE versions.
 IF /I "%ReleaseVersion%" == "/RC" (
-	SET TargetRootPath=%LaunchingDir%\release-candidate\steam\WWIIOnLine
+	SET TargetRootPath=%LaunchingDir%\release-candidate\steam\WWIIOnline
 	SET ww2ExePath=%wwiiolngRootDIR%\build\client\Release\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-candidate
 	GOTO check1
 )
 
 IF /I "%ReleaseVersion%" == "/ALPHA" (
-	SET TargetRootPath=%LaunchingDir%\release-alpha\steam\WWIIOnLine_Alpha
+	SET TargetRootPath=%LaunchingDir%\release-alpha\steam\WWIIOnline_Alpha
 	rem SET ww2ExePath=%wwiiolngRootDIR%\build\client\Debug\bin
 	rem SET ww2ExePath=%wwiiolngRootDIR%\build\client\AlphaRelease\bin
 	SET ww2ExePath=%wwiiolngRootDIR%\build\client\BetaRelease\bin
@@ -139,7 +139,7 @@ IF /I "%ReleaseVersion%" == "/ALPHA" (
 )
 
 IF /I "%ReleaseVersion%" == "/BETA" (
-	SET TargetRootPath=%LaunchingDir%\release-beta\steam\WWIIOnLine_Beta
+	SET TargetRootPath=%LaunchingDir%\release-beta\steam\WWIIOnline_Beta
 	SET ww2ExePath=%wwiiolngRootDIR%\build\client\BetaRelease\bin
 	SET ww2PlayarcPath="%ww2AssetsPath%"\oswin\archivefiles\release-beta
 	GOTO check1
@@ -250,7 +250,7 @@ IF /I NOT EXIST "WW2.exe" (
 
 @echo.
 rem ===================================================================================================
-rem   Directory / File Deletion (\WWIIOnLine - ???).
+rem   Directory / File Deletion (\WWIIOnline - ???).
 
 IF /I "%ReleaseVersion%" == "/RC" (
 	rem Delete All files contained within the target directory and sub-directories, with console echo.
@@ -262,13 +262,13 @@ IF /I "%ReleaseVersion%" == "/RC" (
 
 	rem Delete / Remove the target directory tree, including any files.
 	@echo Deleting Directory Tree - RC.
-	RMDIR /S /Q WWIIOnLine
+	RMDIR /S /Q WWIIOnline
 
 	rem Recreate the removed directory.
-	MD WWIIOnLine
+	MD WWIIOnline
 
 	rem Make the newly recreated directory the Current Directory and continue.
-	CD WWIIOnLine
+	CD WWIIOnline
 
 	GOTO check2
 )
@@ -283,13 +283,13 @@ IF /I "%ReleaseVersion%" == "/ALPHA" (
 
 	rem Delete / Remove the target directory tree, including any files.
 	@echo Deleting Directory Tree - Alpha.
-	RMDIR /S /Q WWIIOnLine_Alpha
+	RMDIR /S /Q WWIIOnline_Alpha
 
 	rem Recreate the removed directory.
-	MD WWIIOnLine_Alpha
+	MD WWIIOnline_Alpha
 
 	rem Make the newly recreated directory the Current Directory and continue.
-	CD WWIIOnLine_Alpha
+	CD WWIIOnline_Alpha
 
 	GOTO check2
 )
@@ -304,13 +304,13 @@ IF /I "%ReleaseVersion%" == "/BETA" (
 
 	rem Delete / Remove the target directory tree, including any files.
 	@echo Deleting Directory Tree - Beta.
-	RMDIR /S /Q WWIIOnLine_Beta
+	RMDIR /S /Q WWIIOnline_Beta
 
 	rem Recreate the removed directory.
-	MD WWIIOnLine_Beta
+	MD WWIIOnline_Beta
 
 	rem Make the newly recreated directory the Current Directory and continue.
-	CD WWIIOnLine_Beta
+	CD WWIIOnline_Beta
 
 	GOTO check2
 )
@@ -421,10 +421,10 @@ XCOPY "%ww2assetspath%\steam\steam_api.dll" "%TargetRootPath%\" /V
 @echo.
 @echo.
 CD /D "%TargetRootPath%"
-@echo ====  Copying the file WWIIOnLine.ico to %CD%
+@echo ====  Copying the file WWIIOnline.ico to %CD%
 CD /D "%LaunchingDir%"
 @echo.
-XCOPY "%ww2assetspath%\oswin\WWIIOnLine.ico" "%TargetRootPath%\" /V
+XCOPY "%ww2assetspath%\oswin\WWIIOnline.ico" "%TargetRootPath%\" /V
 
 @echo off
 

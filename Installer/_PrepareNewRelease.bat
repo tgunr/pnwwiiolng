@@ -543,10 +543,10 @@ XCOPY "%ww2assetspath%\steam\*.*" "%TargetRootPath%\current\" /V
 @echo.
 @echo.
 CD /D "%TargetRootPath%\current"
-@echo ====  Copying the the file WWIIOnLine.ico to %CD%
+@echo ====  Copying the the file WWIIOnline.ico to %CD%
 CD /D "%LaunchingDir%"
 @echo.
-XCOPY "%ww2assetspath%\oswin\WWIIOnLine.ico" "%TargetRootPath%\current\" /V
+XCOPY "%ww2assetspath%\oswin\WWIIOnline.ico" "%TargetRootPath%\current\" /V
 
 @echo off
 

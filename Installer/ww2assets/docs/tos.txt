@@ -477,7 +477,7 @@ Conditions of the End User Licensing Agreement installed during the software app
 War II Online) installation process and are stored in the default location on your computer 
 hard disk drive:
 Windows;
-C:\Program Files (x86)\CRS\WWIIOnLine\docs\tos.txt
+C:\Program Files (x86)\CRS\WWIIOnline\docs\tos.txt
 
 Macintosh;
 /Applications/World War II Online.app -> Contents -> Resources -> docs -> tos.txt

@@ -20,7 +20,7 @@
 #include "sys/sysLaunchUrl.h"
 
 //  Folder constants
-NSString * const WWIIOnlineFolder = @"WWIIOnLine";
+NSString * const WWIIOnlineFolder = @"WWIIOnline";
 NSString * const BGEFolder = @"Battleground Europe";
 //  NSString * const WWIIOnlineFolder = @"com.corneredrats.wwiionline";
 
