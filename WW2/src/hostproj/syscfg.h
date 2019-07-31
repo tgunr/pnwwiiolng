@@ -36,7 +36,7 @@ extern LOGICAL				WantedCopyOldSetup;			//  DEF = TRUE -- Look for and copy the 
 extern wwiiolpath_string	WantedDataPath;				//  DEF = L"" -- SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
 extern wwiiolpath_string	WWIIOnlineDirName;			//  DEF = L"WWIIOnLine" -- The ROOT folder for the game install - .\WWIIOnLine
 
-extern wwiiolpath_string	WW2_exePath;				//	Windows - EXE INSTALL ROOT folder:  \Program * Files -> CRS -> WWIIOnLine == *.exe, WWIIOnLine.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+extern wwiiolpath_string	WW2_exePath;				//	Windows - EXE INSTALL ROOT folder:  \Program * Files -> CRS -> WWIIOnline == *.exe, WWIIOnline.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
 														//	macOS - EXE INSTALL ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
 extern wwiiolpath_string	WW2_exeDataPath;			//	Windows - EXE INSTALL ROOT Support Data folder:  \Program * Files -> CRS  -> WWIIOnLine -> data == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir).
 														//	macOS - EXE INSTALL ROOT Support Data folder:  /Applications -> World War II Online.app -> Contents -> Resources.
