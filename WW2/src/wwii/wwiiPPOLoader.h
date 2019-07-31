@@ -11,13 +11,11 @@ struct PPOSpec
 	SINT32 stotype; // sto type attribute
 
 	std::string modelName; // which visual model to use
-	bool useBoundingBox = false;
 	FLOAT64VECTOR rayAdjust; // how much to adjust the ray colliders by
 	double avoidance; // buffer in meters to add to the avoidance box
 	double rayTolerance; // ray tolerance; angle between corner and center ray normals allowed
 	double tiltTolerance; // tilt tolerance; tilt allowed from straight up
 	double viewOffset; // how far to move the object in front of us for viewing purposes
-	FLOAT64VECTOR modelOffset; // how far the 3d model is offset from zero, used to adjust the ray positions
 	double rotation; // degrees to rotate the object around the z
 	SINT32 coolDown; // how long in milliseconds to cool down after building this object
 	SINT32 coolDownEnd; // stateful frametime end when our current cooldown will be finished (this is a runtime dynamic field)
@@ -30,7 +28,6 @@ struct PPOSpec
 	SINT32 enemyFacDistance; // distance from the nearest enemy facility (positive >= negative <=)
 	SINT32 friendlyFacDistance; // distance from the nearest friendly facility (positive >= negative <=)
 	SINT32 targetDistance;	// distance from the target facility (positive >= negative <=)
-	FLOAT32 minForwardbaseDist; // the minimum distance this can be placed to an FB
 	FLOAT32 maxSpeed;		// threshold in meters per second <=
 	std::vector<std::string> badTextures; // textures we can't build on
 	std::vector<std::string> okTextures; // textures we can build on

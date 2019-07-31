@@ -52,7 +52,6 @@ XML_TAG_HANDLER_IMPL(DoPPO)
 		PPOSpec spec;
 
 		// set our defaults
-		spec.useBoundingBox     = defaults.useBoundingBox;
 		spec.allowInterior		= defaults.allowInterior;
 		spec.avoidance			= defaults.avoidance;
 		spec.surfaceFlags		= defaults.surfaceFlags;
@@ -65,13 +64,11 @@ XML_TAG_HANDLER_IMPL(DoPPO)
 		spec.rayTolerance		= defaults.rayTolerance;
 		spec.rotation			= defaults.rotation;
 		spec.tiltTolerance		= defaults.tiltTolerance;
-		spec.modelOffset        = defaults.modelOffset;
 		spec.viewOffset			= defaults.viewOffset;
 		spec.treeCheck			= defaults.treeCheck;
 		spec.enemyFacDistance		= defaults.enemyFacDistance;
 		spec.friendlyFacDistance	= defaults.friendlyFacDistance;
 		spec.targetDistance		= defaults.targetDistance;
-		spec.minForwardbaseDist = defaults.minForwardbaseDist;
 		spec.maxSpeed			= defaults.maxSpeed;
 		spec.timeout			= defaults.timeout;
 		spec.damageThreshold		= defaults.damageThreshold;
@@ -125,13 +122,6 @@ XML_TAG_HANDLER_IMPL(DoParam)
 		{
 			spec->modelName = value;
 		}
-		else if (!strcasecmp(name.c_str(), "use-bounding-box"))
-		{
-			spec->useBoundingBox = false;
-
-			if (!strcasecmp(value.c_str(), "true"))
-				spec->useBoundingBox = true;
-		}
 		else if(!strcasecmp(name.c_str(), "rayadjust"))
 		{
 			FLOAT32 x, y, z;
@@ -156,25 +146,9 @@ XML_TAG_HANDLER_IMPL(DoParam)
 		{
 			spec->tiltTolerance = atof(value.c_str());
 		}
-		else if (!strcasecmp(name.c_str(), "forwardbase-dist"))
-		{
-			spec->minForwardbaseDist = atof(value.c_str());
-		}
 		else if(!strcasecmp(name.c_str(), "viewoffset"))
 		{
 			spec->viewOffset = atof(value.c_str());
-		}
-		else if (!strcasecmp(name.c_str(), "modeloffset"))
-		{
-			FLOAT32 x, y, z;
-			x = y = z = 0.0f;
-
-			if (sscanf(value.c_str(), "%f,%f,%f", &x, &y, &z) == 3)
-			{
-				spec->modelOffset.x = x;
-				spec->modelOffset.y = y;
-				spec->modelOffset.z = z;
-			}
 		}
 		else if(!strcasecmp(name.c_str(), "rotation"))
 		{
