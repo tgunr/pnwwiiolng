@@ -13,8 +13,6 @@ Bug Fixes
 
 - Updates the Sd. Kfz 232's rear deck upper armor to correspond to proper armor thickness
 
-- The FMS has been updated to better handle situations where it shouldn't be able to be placed
-
 - Traction for the Morris Gun Tractor has been updated to better climb steep hills
 
 - Satchels have been updated to better handle situations where they would clip into a moving tank
@@ -44,7 +42,7 @@ New Content
 
 - Players can now press the "p" key to quickly bring up the keymapper for the specific unit that they are spawned in with
 
-- Allied High Command members can now Manually Change Garrison ownership of Inactive towns, allowing for retreat set up
+- Allied High Command members can now manually change Garrison ownership of Inactive towns, allowing for retreat set up
 
 - The Panzer IV H (Shurtzen) has been added to the game
 
