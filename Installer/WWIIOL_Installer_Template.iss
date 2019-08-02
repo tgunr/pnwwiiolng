@@ -274,7 +274,7 @@
 [Setup]
 #if UseSignTool == "yes"
   SignedUninstaller=yes
-  #SignTool=signtool /fd sha256 /d $qBattleground Europe$q /du $qhttp://www.battlegroundeurope.com$q $f
+  SignTool=signtool /fd sha256 /d $qWorld War II Online$q /du $qhttp://www.wwiionline.com$q $f
 
 #else
   SignedUninstaller=no
