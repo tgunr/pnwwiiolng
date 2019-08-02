@@ -216,10 +216,10 @@
   #endif  
 
   #if InstallerBuildType == "installPatcher"
-    #define WWIIOnlineInstallVersionType " - RC Patch"
+    #define WWIIOnlineInstallVersionType " - Patch"
 
   #else
-    #define WWIIOnlineInstallVersionType " - RC"
+    #define WWIIOnlineInstallVersionType ""
 
   #endif
 
