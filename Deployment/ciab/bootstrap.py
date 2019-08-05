@@ -35,7 +35,7 @@ def generate_tkt_and_bat(cfg, game_name, player_id):
         with open(bat_file, "w") as batfh:
             batfh.write(" ".join([
 					cfg.ww2_path,
-                    "-ticket", tkt_name,
+                    "-ticket %s\%s" % (cfg.scripts_path, tkt_name),
                     "-window", "1",
                     "-width", cfg.client_width,
                     "-height", cfg.client_height,
