@@ -42,6 +42,8 @@
 #define HUD_DEATH_LIFE 50000
 #define HUD_DEATH_HEIGHT 25.0f
 
+extern SINT32 g_lastPing; 
+
 static SINT32 _ReceivedUpdateDeltas[_UPDATE_METER_COUNT];
 
 static bool _hudlock = false;
@@ -444,6 +446,11 @@ void GameInfoView::DisplayInfo()
 	snprintf(modeKey, 24, "hud.gameinfo.icon.%d", vehIconMode());
 
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
+
+	if (g_lastPing<=0)
+		DrawString(L"Ping: N/A");
+	else
+		DrawString(L"%ls: %u\n", strings["connect.ping.stats.brief"].c_str(), g_lastPing);
 
 #ifdef DEBUG_WW2
 	DrawString(L"%ls\n", clientGetNetworkState().c_str());
