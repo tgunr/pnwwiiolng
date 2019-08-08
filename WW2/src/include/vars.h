@@ -292,6 +292,9 @@ extern SINT8            gLogMask[_MAX_PATH];	// Gobal logmask value to specify s
 extern SINT32           gLogLevel;		// Global log level
 extern LOGICAL 			gLogDuplicates;	// Controls duplicate log messages
 extern FLOAT32          gRate; // Rate multiplier
+extern FLOAT32          gXRate; // Rate multiplier
+extern FLOAT32          gYRate; // Rate multiplier
+extern FLOAT32          gZRate; // Rate multiplier
 extern FLOAT32          gValue; // Global debug value
 extern FLOAT32          gDValue; // Global debug value
 extern FLOAT32          gEValue; // Global debug value

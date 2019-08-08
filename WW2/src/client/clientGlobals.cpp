@@ -298,6 +298,9 @@ SINT32           gLogLevel = LOG_DEBUG;
 SINT32           gLogLevel = LOG_RECOVER;
 #endif
 FLOAT32         gRate   = 1.0; // Rate multiplier
+FLOAT32         gXRate  = 0.01; // Rate multiplier
+FLOAT32         gYRate  = 0.01; // Rate multiplier
+FLOAT32         gZRate  = 0.01; // Rate multiplier
 FLOAT32         gValue  = 1.0; // Global debug value
 FLOAT32         gDValue = 1.0; // Global debug value
 FLOAT32         gEValue = 1.0; // Global debug value
