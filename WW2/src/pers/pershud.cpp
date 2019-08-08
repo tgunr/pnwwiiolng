@@ -447,10 +447,14 @@ void GameInfoView::DisplayInfo()
 
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
-	if (g_lastPing<=0)
+	if (g_lastPing <= 0)
+	{
 		DrawString(L"Ping: N/A");
+	}
 	else
+	{
 		DrawString(L"Ping: %u\n", g_lastPing);
+	}
 
 #ifdef DEBUG_WW2
 	DrawString(L"%ls\n", clientGetNetworkState().c_str());
