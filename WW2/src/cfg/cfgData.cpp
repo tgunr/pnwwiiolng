@@ -78,7 +78,8 @@ cfgPARAM_SETUP cfgParameters[cfgNUM_TOTAL_PARAMS] =
 	{"usenetworkroute",     cfgTYPE_INTEGER,                cfgDEFAULT_NETWORK_ROUTE            },
 	{"wantsse2",            cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE                      },
 	{"shadowmaps",          cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE                      },
-	{"wantbloodeffects",    cfgTYPE_TRUE_FALSE,             cfgVALUE_TRUE                       }
+	{"wantbloodeffects",    cfgTYPE_TRUE_FALSE,             cfgVALUE_TRUE                       },
+    {"noobcolor",           cfgTYPE_INTEGER,                cfgDEFAULT_NOOB_COLOR               }
 };
 
 const char* cfgTextureShadeModeValueStrings[cfgNUM_TEXTURE_SHADE_MODE_VALUES] =

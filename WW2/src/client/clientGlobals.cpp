@@ -225,6 +225,7 @@ UINT32			gIconEnemyColor;			// Icon color for enemy players
 UINT32			gIconSquadColor;			// Icon color for squad mates
 UINT32			gIconMissionColor;          // Icon color for mission mates
 UINT32			gIconMissionLeaderColor;    // Icon color for mission leader
+UINT32			gIconNoobColor;             // Icon color for new players
 
 UINT32			gLanguage;					// Language used for localization
 

@@ -177,7 +177,7 @@ UINT32 vehIconColor(vehVehicle* Vehicle)
 			IconColor = gIconFriendlyColor;
 
 		if(Vehicle->Rank == 1)
-			IconColor = colorGREENALPHA;
+			IconColor = gIconNoobColor;
 	}
 
 	return IconColor  | colorALPHA;

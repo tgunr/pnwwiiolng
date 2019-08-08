@@ -84,7 +84,8 @@ cfgPARAM_SETUP cfgParameters[cfgNUM_TOTAL_PARAMS] =
     {"reflectionupdate",    cfgTYPE_INTEGER,                cfgDEFAULT_UPDATE_RATE              },
     {"wantmessagealert",    cfgTYPE_TRUE_FALSE,             cfgVALUE_TRUE                       },
     {"usenetworkroute",     cfgTYPE_INTEGER,                cfgDEFAULT_NETWORK_ROUTE            },
-    {"wantsse2",            cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE                      }
+    {"wantsse2",            cfgTYPE_TRUE_FALSE,             cfgVALUE_FALSE                      },
+    {"noobcolor",           cfgTYPE_INTEGER,                cfgDEFAULT_NOOB_COLOR               }
 };
 
 char *cfgTextureShadeModeValueStrings[cfgNUM_TEXTURE_SHADE_MODE_VALUES] = 
