@@ -450,7 +450,7 @@ void GameInfoView::DisplayInfo()
 	if (g_lastPing<=0)
 		DrawString(L"Ping: N/A");
 	else
-		DrawString(L"%ls: %u\n", strings["connect.ping.stats.brief"].c_str(), g_lastPing);
+		DrawString(L"Ping: %u\n", g_lastPing);
 
 #ifdef DEBUG_WW2
 	DrawString(L"%ls\n", clientGetNetworkState().c_str());
