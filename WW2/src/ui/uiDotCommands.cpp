@@ -3440,152 +3440,6 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
-UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gValue = gValue + gRate;
-    uiChatPrintLine("gValue= %.3f", gValue);
-    
-    return 0;
-}
-
-UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gValue = gValue - gRate;
-    if (gValue <= 1)
-        gValue = 1;
-    uiChatPrintLine("gValue= %.3f", gValue);
-    
-    return 0;
-}
-
-UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gXValue = gXValue + gXRate;
-    uiChatPrintLine("gXValue= %.3f", gXValue);
-    
-    return 0;
-}
-
-UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gXValue = gXValue - gXRate;
-    uiChatPrintLine("gXValue= %.3f", gXValue);
-    
-    return 0;
-}
-
-UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gYValue = gYValue + gYRate;
-    uiChatPrintLine("gYValue= %.3f", gYValue);
-    
-    return 0;
-}
-
-UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gYValue = gYValue - gYRate;
-    uiChatPrintLine("gYValue= %.3f", gYValue);
-    
-    return 0;
-}
-
-UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gZValue = gZValue + (gZRate / 100);
-    uiChatPrintLine("gZValue= %.3f", gZValue);
-    
-    return 0;
-}
-
-UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gZValue = gZValue - (gZRate / 100);
-    uiChatPrintLine("gZValue= %.3f", gZValue);
-    
-    return 0;
-}
-
-UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gToggle = !gToggle;
-    sptDrawOn(0, gToggle);
-    
-    return 0;
-}
-
-UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gToggle1 = !gToggle1;
-    uiChatPrintLine("gToggle1");
-
-    return 0;
-}
-
-UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gToggle2 = !gToggle2;
-    uiChatPrintLine("gToggle2");
-
-    return 0;
-}
-
-UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-    
-    gToggle3 = !gToggle3;
-    uiChatPrintLine("gToggle3");
-
-    return 0;
-}
-
 static int dot_gv(const char * line) {
     FLOAT32 gv;
     int argc = sscanf(line, "%*s %f", &gv);
@@ -3613,7 +3467,7 @@ static int dot_drawsdb(const char* line)
 
     return DC_HANDLED;
 }
-#endif
+#endif // SPATIAL_DB
 
 #ifdef GENICONS
 
@@ -3679,7 +3533,8 @@ static int dot_gentiles(const char* line)
   return DC_HANDLED;
 }
 
-#endif
+#endif // GENICONS
+
 static int dot_getcell(const char* line)
 {
     int sx, sy, r, c;
@@ -4441,7 +4296,7 @@ static SINT32 dot_heightmap(const char* in)
 
     return DC_HANDLED;
 }
-#endif
+#endif // platOS != OS_MACOS
 
 #include "trn/trnScenario.h"
 static int dot_enablemouseclicktodamagebuildings(const char* line)
@@ -5792,7 +5647,151 @@ static SINT32 dot_speed(const char*)
 
 #endif // BETA_RELEASE
 
+UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
 
+    gValue = gValue + gRate;
+    uiChatPrintLine("gValue= %.3f", gValue);
+
+    return 0;
+}
+
+UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gValue = gValue - gRate;
+    if (gValue <= 1)
+        gValue = 1;
+    uiChatPrintLine("gValue= %.3f", gValue);
+
+    return 0;
+}
+
+UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gXValue = gXValue + gXRate;
+    uiChatPrintLine("gXValue= %.3f", gXValue);
+
+    return 0;
+}
+
+UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gXValue = gXValue - gXRate;
+    uiChatPrintLine("gXValue= %.3f", gXValue);
+
+    return 0;
+}
+
+UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gYValue = gYValue + gYRate;
+    uiChatPrintLine("gYValue= %.3f", gYValue);
+
+    return 0;
+}
+
+UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gYValue = gYValue - gYRate;
+    uiChatPrintLine("gYValue= %.3f", gYValue);
+
+    return 0;
+}
+
+UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gZValue = gZValue + (gZRate / 100);
+    uiChatPrintLine("gZValue= %.3f", gZValue);
+
+    return 0;
+}
+
+UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gZValue = gZValue - (gZRate / 100);
+    uiChatPrintLine("gZValue= %.3f", gZValue);
+
+    return 0;
+}
+
+UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle = !gToggle;
+    sptDrawOn(0, gToggle);
+
+    return 0;
+}
+
+UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle1 = !gToggle1;
+    uiChatPrintLine("gToggle1");
+
+    return 0;
+}
+
+UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle2 = !gToggle2;
+    uiChatPrintLine("gToggle2");
+
+    return 0;
+}
+
+UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle3 = !gToggle3;
+    uiChatPrintLine("gToggle3");
+
+    return 0;
+}
 
 #ifdef GM_RELEASE
 
@@ -5977,7 +5976,7 @@ static int dot_rates(const char* line)
 }
 
 
-#endif
+#endif // defined(BETA_RELEASE)
 
 /************************************************************************************************
 	else
@@ -8327,6 +8326,12 @@ void uiDotCommandsInit()
 #if RELEASE_CLIENT == 0
 	//ADD_DOT_COMMAND(font, false);
 	ADD_DOT_COMMAND(canvas, false);
+    ADD_DOT_COMMAND(rate, true);
+    ADD_DOT_COMMAND(rates, true);
+    ADD_DOT_COMMAND(gv, true);
+    ADD_DOT_COMMAND(gav, true);
+    ADD_DOT_COMMAND(grv, true);
+    ADD_DOT_COMMAND(sf, true);
 #endif
 #endif
 
@@ -8340,12 +8345,6 @@ void uiDotCommandsInit()
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);
 
-    ADD_DOT_COMMAND(rate, true);
-    ADD_DOT_COMMAND(rates, true);
-    ADD_DOT_COMMAND(gv, true);
-    ADD_DOT_COMMAND(gav, true);
-    ADD_DOT_COMMAND(grv, true);
-    ADD_DOT_COMMAND(sf, true);
 
 	uiDotCommandsInitLoc();
 }
