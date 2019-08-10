@@ -163,6 +163,7 @@ struct cfSUPPLY
 	UINT16	trickleSlices;		//!< Maximum slices to deliver supply in
 	UINT16	trickleStart_m;		//!< Minutes before trickle begins
 	UINT16	rescueTime_m;		//!< How long should a vehicle take to rescue?
+	UINT32	rescueTomThresoldM_m;	//!< How long can ToM be that ends KIA without enemy inflicted damage and still be rescued?
 	UINT32	resupplyTime_m;		//!< How long should a vehicle take to resupply?
 	UINT32	trickleTime_m;		//!< Minutes that complete trickle should take
 	UINT32	populationAdjust;	//!< Divisor for population-based rate adjustment
