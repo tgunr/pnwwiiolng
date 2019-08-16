@@ -1832,13 +1832,14 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	if (returnable && rtbed == false)
 		returnable = false;
 
-	TELL_TESTER(m_commander, "processing #%u return => %s [%s, %s, %s, %s]"
+	TELL_TESTER(m_commander, "processing #%u return => %s [%s, %s, %s, %s, %s]"
 					, m_weaponSerial.serial
 					, (m_facility) ? m_facility->name : "<nowhere>"
 					, (allowOverstock ? "overstockable" : "norm")
 					, (rtbed ? "rtbing" : "non-rtb")
 					, (rescue ? "rescue" : "non-resc")
 					, (returnable ? "returnable" : "non-returnable")
+					, (hasExceededTomThresold ? "outside ToM thresold for rescue" : "within ToM thresold for rescue")
 				);
 
 	if (returnable == false)
