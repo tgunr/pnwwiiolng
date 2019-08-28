@@ -1797,17 +1797,23 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	bool rescuable = false;
 	bool vehicleDelivered = false;
 
-	// If ToM is greater than rescueTomThresoldM_m on KIA without enemy inflicted damage, then weapon must go through Full RDP return
+	// If ToM is greater than rescueTomThresold_m on KIA without enemy inflicted damage, then weapon must go through Full RDP return
 	UINT32 timeOnMission = teulTime() - m_posted;
-	UINT32 tomThresold = 60 * host_config.supply.rescueTomThresoldM_m;
+	UINT32 tomThresold = 60 * host_config.supply.rescueTomThresold_m;
 	bool hasExceededTomThresold = timeOnMission > tomThresold;
 
 	if (m_playerExitCode == PEXIT_OVER_FRIENDLY_TERRITORY && isDead() == false)
+	{
 		rescuable = true;
+	}
 	else if (m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false)
+	{
 		rescuable = true;
+	}
 	else if (isDead() && !hasBeenHit && !hasExceededTomThresold)
+	{
 		rescuable = true;
+	}
 
 	switch (m_status)
 	{
