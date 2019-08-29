@@ -235,6 +235,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "supply.nomanDepots",			TYPE_BOOL,	&host_config.supply.nomanDepots,		0,		"y",	"Enable spawning at brigade-linked depots in DO towns" }
 ,	{ "supply.populationAdjust",		TYPE_SINT,	&host_config.supply.populationAdjust,100,	"60",	"Divisor in population-based rate adjustment" }
 ,	{ "supply.reserveTimeoutM",		TYPE_SINT,	&host_config.supply.reserveTimeout_m,	0,		"10",	"Time vehicle reservations last (minutes)" }
+,	{ "supply.rescueTomThresoldM",	TYPE_INT,	&host_config.supply.rescueTomThresold_m, 0,	"3",	"Time on mission that ends KIA without enemy inflicted damage and can still be rescued (minutes)" }
 ,	{ "supply.rescueTimeM",			TYPE_SINT,	&host_config.supply.rescueTime_m,		0,		"15",	"Time 'rescue'd vehicles take to to return to supply (minutes)" }
 ,	{ "supply.resupplyTimeM",		TYPE_INT,	&host_config.supply.resupplyTime_m,		0,		"270",	"Baseline time for resupply of spawned vehicles (minutes)" }
 ,	{ "supply.surrenderInf",		TYPE_BYTE,	&host_config.supply.surrenderInf,		100,	"10",	"Percentage infantry must pass below before allowing 'offmap' surrender from a pocket" }

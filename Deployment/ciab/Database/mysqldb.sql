@@ -182413,7 +182413,8 @@ INSERT INTO `wwii_config` (`variableNo`, `variableName`, `value`, `lastModified`
 (369, 'sto.ttrap.deathCooldownS', '120', '2017-11-10 02:46:37', 'Seconds after a tank trap is destroyed before anything else can be placed', 'nobody'),
 (370, 'sto.ttrap.placeCooldownS', '60', '2017-11-10 02:46:37', 'Seconds after placing a tank trap before another PPO can be placed', 'nobody'),
 (391, 'update.avoidRepeats', 'n', '2017-11-10 02:46:37', 'Enable re-sending old update data for a vehicle', 'nobody'),
-(392, 'netcode3Enabled', 'y', '2017-11-18 15:14:07', 'Enable transmission of time-critical client-host data over UDP.', 'nobody');
+(392, 'netcode3Enabled', 'y', '2017-11-18 15:14:07', 'Enable transmission of time-critical client-host data over UDP.', 'nobody'),
+(393, 'supply.rescueTomThresoldM', '3', '2019-08-10 17:17:07', 'Time on mission that ends KIA without enemy inflicted damage and can still be rescued (minutes)', 'nobody');
 
 -- --------------------------------------------------------
 
