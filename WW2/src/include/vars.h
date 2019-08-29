@@ -250,6 +250,7 @@ extern UINT32			gIconEnemyColor;			// Icon color for enemy players
 extern UINT32			gIconSquadColor;			// Icon color for squad mates
 extern UINT32			gIconMissionColor;          // Icon color for mission mates
 extern UINT32			gIconMissionLeaderColor;    // Icon color for mission leader
+extern UINT32			gIconNoobColor;             // Icon color for new players
 
 extern UINT32			gLanguage;					// Language used for localization
 
