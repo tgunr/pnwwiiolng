@@ -51,7 +51,7 @@ static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
 static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
 // Take approx 1078 / sizeof a packed brigade summaries
-static const UINT32 MAX_LISTED_BRIGADES = 500;
+static const UINT32 MAX_LISTED_BRIGADES = 2048;
 
 // The highest population rank a brigade can have - semi arbitrary number,
 // but be mindful the number fits inside the number of bits we pack
