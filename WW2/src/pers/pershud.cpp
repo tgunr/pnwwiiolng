@@ -38,6 +38,10 @@
 
 #define _UPDATE_METER_TIME 15000
 #define HOST_UPDATE_INTERVAL 200
+#define PING_UPDATE_INTERVAL 10000
+#define PING_GOOD_THRESHOLD 200
+#define PING_WARN_THRESHOLD 400
+#define PING_BAD_THRESHOLD 600
 #define _UPDATE_METER_COUNT (_UPDATE_METER_TIME/HOST_UPDATE_INTERVAL)
 #define HUD_DEATH_LIFE 50000
 #define HUD_DEATH_HEIGHT 25.0f
@@ -426,7 +430,7 @@ extern std::vector<std::wstring> updtGetNvHistory();
 void GameInfoView::DisplayInfo()
 {
 	phui::GraphicsContext* ctx = GetGraphicsContext();
-	ctx->SetColor(0xdb/255.0f,0xc5/255.0f,0x00/255.0f);
+	ctx->SetColor(0xff/255.0f,0xff/255.0f,0xff/255.0f);
 
 	UINT32 TOD,Hour,Min;
 	trnTODGetTimeOfDay(&TOD);
@@ -447,13 +451,39 @@ void GameInfoView::DisplayInfo()
 
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
-	if (g_lastPing <= 0)
+	static SINT32 _LastUpdateTime;
+	static SINT32 _LastDisplayedPing;
+
+	if (_LastUpdateTime <= 0)
+		_LastUpdateTime = frametime;
+
+	if (_LastDisplayedPing <= 0)
+		_LastDisplayedPing = g_lastPing;
+
+	if (frametime > _LastUpdateTime + PING_UPDATE_INTERVAL)
 	{
-		DrawString(L"Ping: N/A");
+		_LastDisplayedPing = g_lastPing;
+		_LastUpdateTime = frametime;
+	}
+
+	DrawString(L"Ping: ");
+
+	if (_LastDisplayedPing <= 0)
+	{
+		ctx->SetColor(0x00 / 255.0f, 0xff / 255.0f, 0xff / 255.0f);
+		DrawString(L"N/A\n");
 	}
 	else
 	{
-		DrawString(L"Ping: %u\n", g_lastPing);
+		if (_LastDisplayedPing<=PING_GOOD_THRESHOLD)
+			ctx->SetColor(0x00 / 255.0f, 0xff / 255.0f, 0xff / 255.0f);
+		else
+		if (_LastDisplayedPing <= PING_WARN_THRESHOLD)
+			ctx->SetColor(0xff / 255.0f, 0xff / 255.0f, 0x14 / 255.0f);
+		else
+			ctx->SetColor(0xff / 255.0f, 0x02 / 255.0f, 0x8d / 255.0f);
+
+		DrawString(L"%u\n", _LastDisplayedPing);
 	}
 
 #ifdef DEBUG_WW2
