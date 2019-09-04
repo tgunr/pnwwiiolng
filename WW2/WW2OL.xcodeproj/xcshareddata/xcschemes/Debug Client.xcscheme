@@ -87,7 +87,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-clientv 1.36.1.2"
+            argument = "-clientv 1.36.2.0"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
