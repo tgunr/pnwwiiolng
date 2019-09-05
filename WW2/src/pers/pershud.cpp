@@ -38,10 +38,9 @@
 
 #define _UPDATE_METER_TIME 15000
 #define HOST_UPDATE_INTERVAL 200
-#define PING_UPDATE_INTERVAL 10000
-#define PING_GOOD_THRESHOLD 200
-#define PING_WARN_THRESHOLD 400
-#define PING_BAD_THRESHOLD 600
+#define PING_UPDATE_INTERVAL 1000
+#define PING_GOOD_THRESHOLD 100
+#define PING_WARN_THRESHOLD 200
 #define _UPDATE_METER_COUNT (_UPDATE_METER_TIME/HOST_UPDATE_INTERVAL)
 #define HUD_DEATH_LIFE 50000
 #define HUD_DEATH_HEIGHT 25.0f
@@ -430,7 +429,7 @@ extern std::vector<std::wstring> updtGetNvHistory();
 void GameInfoView::DisplayInfo()
 {
 	phui::GraphicsContext* ctx = GetGraphicsContext();
-	ctx->SetColor(0xff/255.0f,0xff/255.0f,0xff/255.0f);
+	ctx->SetColor(0.85f, 0.77f, 0);
 
 	UINT32 TOD,Hour,Min;
 	trnTODGetTimeOfDay(&TOD);
@@ -470,18 +469,23 @@ void GameInfoView::DisplayInfo()
 
 	if (_LastDisplayedPing <= 0)
 	{
-		ctx->SetColor(0x00 / 255.0f, 0xff / 255.0f, 0xff / 255.0f);
+		ctx->SetColor(0.85f, 0.77f, 0);
 		DrawString(L"N/A\n");
 	}
 	else
 	{
-		if (_LastDisplayedPing<=PING_GOOD_THRESHOLD)
-			ctx->SetColor(0x00 / 255.0f, 0xff / 255.0f, 0xff / 255.0f);
+		if (_LastDisplayedPing <= PING_GOOD_THRESHOLD)
+		{
+			ctx->SetColor(0, 1, 0);
+		}
+		else if (_LastDisplayedPing > PING_GOOD_THRESHOLD && _LastDisplayedPing <= PING_WARN_THRESHOLD)
+		{
+			ctx->SetColor(1, 0.65f, 0);
+		}
 		else
-		if (_LastDisplayedPing <= PING_WARN_THRESHOLD)
-			ctx->SetColor(0xff / 255.0f, 0xff / 255.0f, 0x14 / 255.0f);
-		else
-			ctx->SetColor(0xff / 255.0f, 0x02 / 255.0f, 0x8d / 255.0f);
+		{
+			ctx->SetColor(1, 0, 0);
+		}
 
 		DrawString(L"%u\n", _LastDisplayedPing);
 	}
