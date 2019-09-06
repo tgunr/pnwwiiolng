@@ -2524,6 +2524,7 @@ JSPropertySpec jsBrigade::jsproperties[] =
 	{"activeoic",		jsBrigade::ACTIVEOIC_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"commander",		jsBrigade::COMMANDER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"commanderrank",	jsBrigade::COMMANDERRANK_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"movementtype",	jsBrigade::MOVEMENTTYPE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{0}
 };
 
@@ -3007,6 +3008,9 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 				*val = BOOLEAN_TO_JSVAL(false);
 		}
 		break;
+		case MOVEMENTTYPE_PROP:
+			*val = INT_TO_JSVAL(detail.movementType());
+			break;
 	}
 
 	return JS_TRUE;
