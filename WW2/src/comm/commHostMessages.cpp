@@ -463,7 +463,7 @@ Player::awsCheck()
 	{
 		const FLOAT32 x_m = (FLOAT32)vehicle->x_cm() / 100.0;
 		const FLOAT32 y_m = (FLOAT32)vehicle->y_cm() / 100.0;
-		UINT16 closestEnemyDist, closestFriendlyDist;
+		FLOAT32 closestEnemyDist, closestFriendlyDist;
 
 		// Get both closestEnemyDist and closestFriendlyDist from this player's plane
 		vehicle->findClosestCPs(x_m, y_m, vehicle->side(), closestEnemyDist, closestFriendlyDist);
@@ -475,9 +475,9 @@ Player::awsCheck()
 		if(closestEnemyDist >= host_config.update.awsEnemyDistance_km && closestFriendlyDist <= host_config.update.awsFriendlyDistance_km)
 		{
 #ifdef BETA_RELEASE
-			char temp[100];
+			char temp[128];
 			temp[0] = '\0';
-			strprintf(temp, "Off AWS (distance) Configured Distances - E: %dkm F: %dkm ... Your Distance fron E: %dkm F: %dkm", 
+			strprintf(temp, "Off AWS (distance) Configured Distances - E: %dkm F: %dkm ... Your Distance fron E: %.1fkm F: %.1fkm", 
 						host_config.update.awsEnemyDistance_km, host_config.update.awsFriendlyDistance_km, closestEnemyDist, closestFriendlyDist);
 			message(LSTR_BETA, LSTR_GENERIC, temp);
 #endif

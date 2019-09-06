@@ -978,7 +978,7 @@ HostVehicle::message(int prefix, int msgid, const char* const t1, const char* co
 // to determine if the player should show up on AWS.
 
 void
-HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestEnemyDist, UINT16 &closestFriendlyDist)
+HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, FLOAT32 &closestEnemyDist, FLOAT32 &closestFriendlyDist)
 {
 	closestEnemyDist = 0;
 	closestFriendlyDist = 0;
@@ -1006,7 +1006,7 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 				UINT64 yEnemyDist = y - cp->m_posY;
 
 				// Get the distance in kilometers
-                UINT64 enemyDistance = (UINT64)sqrt((double)(xEnemyDist * xEnemyDist) + (double)(yEnemyDist * yEnemyDist)) / 1000;
+                FLOAT32 enemyDistance = (FLOAT32)sqrt((double)(xEnemyDist * xEnemyDist) + (double)(yEnemyDist * yEnemyDist)) / 1000;
 
 				if(closestEnemyDist == 0 || closestEnemyDist >= enemyDistance)
 				{
@@ -1022,7 +1022,7 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 				UINT64 yFriendlyDist = y - cp->m_posY;
 
 				// Get the distance in kilometers
-                UINT64 friendlyDistance = (UINT64)sqrt((double)(xFriendlyDist * xFriendlyDist) + (double)(yFriendlyDist * yFriendlyDist)) / 1000;
+                FLOAT32 friendlyDistance = (FLOAT32)sqrt((double)(xFriendlyDist * xFriendlyDist) + (double)(yFriendlyDist * yFriendlyDist)) / 1000;
 
 				if(closestFriendlyDist == 0 || closestFriendlyDist >= friendlyDistance)
 				{
@@ -1033,8 +1033,8 @@ HostVehicle::findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestE
 		}
 	}
 
-	//dbugLog(_FLN, "Closest Enemy Town: %s Distance: %d", closestEnemyCP->name, closestEnemyDist);
-	//dbugLog(_FLN, "Closest Friendly Town: %s Distance: %d", closestFriendlyCP->name, closestFriendlyDist);
+	//dbugLog(_FLN, "Closest Enemy Town: %s Distance: %.1f", closestEnemyCP->name, closestEnemyDist);
+	//dbugLog(_FLN, "Closest Friendly Town: %s Distance: %.1f", closestFriendlyCP->name, closestFriendlyDist);
 }
 
 namespace Host { namespace Vehicles {
