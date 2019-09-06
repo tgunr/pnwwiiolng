@@ -16,7 +16,7 @@
 
 static const char* _stratclasses[SDM_MAX_STRAT_CLASSES] = {"none", "cp", "facility", "building", "link", "waypoint"};
 static const char* _cptypes[SDM_MAX_CP_TYPES] = {"none", "generic", "small", "medium", "large", "bridge" };
-static const char* _factypes[SDM_MAX_FACILITY_TYPES] = { "none", "city", "factory", "base", "depot", "omt", "shipyard", "firebase", "airbase", "armybase","navalbase" };
+static const char* _factypes[SDM_MAX_FACILITY_TYPES] = { "none", "city", "factory", "base", "depot", "omt", "shipyard", "firebase", "airbase", "armybase", "navalbase" };
 
 JSClass jsStratObject::jsclass = JS_CLASS_MACRO("stratobject");
 JSFunctionSpec jsStratObject::jsfunctions[] =
