@@ -633,19 +633,19 @@ void oglEnd(void)
 }
 
 //#pragma managed(push, off)
-void	Write_Debug(char *str, ...)
-{
-char		buf[2048];
-va_list		marker;
-
-	if (str == nullptr)
-		return;
-
-	va_start(marker, str);
-	vsprintf_s(buf, str, marker);
-	va_end(marker);
-
-	dbugLog(_FLI,"%s",buf);
-
-}
+//void	Write_Debug(char *str, ...)
+//{
+//char		buf[2048];
+//va_list		marker;
+//
+//	if (str == nullptr)
+//		return;
+//
+//	va_start(marker, str);
+//	vsprintf_s(buf, str, marker);
+//	va_end(marker);
+//
+//	dbugLog(_FLI,"%s",buf);
+//
+//}
 //#pragma managed(pop)
