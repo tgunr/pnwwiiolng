@@ -1,10 +1,10 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include piogl.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include piogl.h in a server build." );
 #endif
 
-#include "gl/glew.h"
+#include "GL/glew.h"
 #include "gl/glplat.h"
 
 #define USE_LINEAR_FOG
@@ -396,8 +396,6 @@ static_assert( platBuild != TEUL_SERVER, "Can't include piogl.h in a server buil
 #define piLIGHT_ACTIVE         1 //D3DLIGHT_ACTIVE
 #define piLIGHT_NO_SPECULAR    2 //D3DLIGHT_NO_SPECULAR
 
-
-
 struct VERTEXSOURCE
 {
 	UINT32 fvf;
@@ -423,13 +421,15 @@ enum TEXTURETYPE
 	MAX_TEXTURE_TYPES
 };
 
+// NOTE: Do not copy this structure.  If you need a copy then create a copy constructor.
 struct TEXTURE
 {
 	SINT8                   name[128];
 
 	LOGICAL					hasalpha;
 	LOGICAL					iswritable;
-
+	std::string				suffix;
+	
 	FLOAT32                 widthfactor[MAXMIPLEVELS];
 	FLOAT32                 heightfactor[MAXMIPLEVELS];
 
@@ -443,11 +443,11 @@ struct TEXTURE
 	SINT32                  multiTextureInfoID;
 	SINT32                  imagewidth[MAXMIPLEVELS];
 	SINT32                  imageheight[MAXMIPLEVELS];
-	SINT32                  imagesize[MAXMIPLEVELS];
+	UINT32                  imagesize[MAXMIPLEVELS];
 	SINT32                  po2width[MAXMIPLEVELS];
 	SINT32                  po2height[MAXMIPLEVELS];
-	SINT32					comp[MAXMIPLEVELS];
-	SINT32					format[MAXMIPLEVELS];
+	UINT32					comp[MAXMIPLEVELS];
+	UINT32					format[MAXMIPLEVELS];
 	SINT32                  miplevels;
 	SINT32                  normalMap;
 	SINT32                  specularMap;
@@ -457,19 +457,30 @@ struct TEXTURE
 	TEXTURETYPE             type;
 
 	void* 					lpsurf[MAXMIPLEVELS];
-
-#ifdef __cplusplus
+	UINT32					flags;
+	UINT32					transparentColor;
+	
 	bool isdds() {return type == TEXTURE_DDS;}
 	bool isbmp() {return type == TEXTURE_BMP;}
 	bool istga() {return type == TEXTURE_TGA;}
-#endif
-
+	
+	std::string getExtension() {
+		if (isdds())
+			return ".dds";
+		else if (istga())
+			return ".tga";
+		else if (isbmp())
+			return ".bmp";
+		else
+			return ".bmp";
+	}
 };
 
 struct TEXTURE3D
 {
 	SINT8                   name[128];
 	LOGICAL					hasalpha;
+	LOGICAL					hasSuffix;
 	LOGICAL					iswritable;
 	UINT32					genlist;
 	SINT32*					texid;
@@ -748,7 +759,7 @@ struct piUNIFIED_VERTEX
 	UINT32		color;
 	FLOAT32		tu, tv;
 };
-typedef struct piUNIFIED_VERTEX piCVERTEX;
+using piCVERTEX = piUNIFIED_VERTEX;
 
 struct piGVERTEX
 {
@@ -934,10 +945,10 @@ struct piSURFACEDESC
 	piPIXELFORMAT	PixelFormat;	// pixel format description of the surface
 };
 
-typedef UINT32 piMATERIALHANDLE;
-typedef UINT32 piTEXTUREHANDLE;
+using piMATERIALHANDLE = UINT32;
+using piTEXTUREHANDLE = UINT32;
 
-typedef UINT32 piCOLOR;
+using piCOLOR = UINT32;
 
 #define piRGBA_GETALPHA(rgb)		(((rgb) >> 24) & 0xff)
 #define piRGBA_GETRED(rgb)			(((rgb) >> 0) & 0xff)
@@ -963,13 +974,9 @@ struct piMATERIAL
 
 };
 
-#if platOS == OS_WIN32
-#pragma pack(push, 1)
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
-#if platOS == OS_MACOS
-#pragma options align=packed
-#endif
 struct piRGBQUAD
 {
 	UCHAR	rgbRed;
@@ -1031,13 +1038,7 @@ struct piBITMAPFILEHEADER
 	#define BI_BITFIELDS 3
 #endif
 
-#if platOS == OS_WIN32
 #pragma pack(pop)
-#endif
-
-#if platOS == OS_MACOS
-#pragma options align=reset
-#endif
 
 struct MATERIAL
 {
@@ -1274,7 +1275,7 @@ enum piRENDERSTATETYPE
 };
 
 
-// these new guys need to be taken care of...
+// these new states need to be taken care of...
 
 enum piRENDERSTATEFOGTYPE
 {
@@ -1302,7 +1303,7 @@ struct piSTRIDEDDATA
 };
 
 
-typedef LOGICAL (*piDRAW_OBJECTS)(void);
+using piDRAW_OBJECTS = LOGICAL(*)();
 
 #define piLIGHTING_DEFAULT			1
 
@@ -1362,79 +1363,41 @@ typedef LOGICAL (*piDRAW_OBJECTS)(void);
 	#define DIError(code)   code
 #endif
 
-#if platOS == OS_WIN32
-inline SINT32 piReadTimeStamp32(void)
-{
-SINT32	value;
-	__asm
-	{
-		push eax
-		push edx
-		rdtsc
-		mov value, eax
-		pop edx
-		pop eax
-	}
-
-	return(value);
-}
-
-inline __int64 piReadTimeStamp64(void)
-{
-__int64		value;
-	__asm
-	{
-		push eax
-		push ebx
-		push edx
-		rdtsc
-		lea ebx, DWORD PTR value
-		mov [ebx], eax
-		mov [ebx+4], edx
-		pop edx
-		pop ebx
-		pop eax
-	}
-
-	return(value);
-}
-#else
 #define piReadTimeStamp32 GetMicroSeconds
 #define piReadTimeStamp64 GetMicroSeconds
-#endif
 
 extern SINT32 piFloatLikeLong(FLOAT32 f);
 extern FLOAT32 piLongLikeFloat(SINT32 l);
 extern SINT32 piFindBitShift(UINT32 Mask);
 extern SINT32 piFindBitCount(UINT32 Mask);
 
-extern LOGICAL	piInit(void);
+extern LOGICAL	piInit();
 extern LOGICAL piClearTargets(UINT32 targets);
 extern LOGICAL piClearPorts(piRECT piRect, UINT32 uTargets);
 extern LOGICAL piIsTexture(SINT32 texid, SINT32 miplevel);
 extern LOGICAL piIsTexture3D(SINT32 texid);
 extern LOGICAL	piTextureHasAlpha(SINT32 texid);
 extern LOGICAL	piAddTexRef(SINT32 texid);
-extern void	piUpdateTextures(void);
+extern void	piUpdateTextures();
 extern LOGICAL piGetTextureMemory(SINT32* total);
-extern LOGICAL	piReleaseTextureHandles(void);
+extern LOGICAL	piReleaseTextureHandles();
 extern LOGICAL piUnlockTextureMemorySurface(SINT32 texid, SINT32 miplevel);
 extern LOGICAL piSetActiveTexture(SINT32 texid, SINT32 miplevel);
-extern LOGICAL piDisableTexture(void);
+extern LOGICAL piDisableTexture();
 extern LOGICAL piEnableTexture();
 extern LOGICAL piIsMaterial(SINT32 matid);
 extern LOGICAL piGetMaterialTexName(SINT32 matid, SINT8* texname);
 extern SINT32 piFindMaterialName(const SINT8* name);
 extern LOGICAL piSetActiveMaterial(SINT32 matid);
-extern LOGICAL piDisableMaterial(void);
+extern LOGICAL piDisableMaterial();
 extern LOGICAL piSetUnscaledViewMatrix(piMATRIX* lpNewView);
 extern LOGICAL	piSetFieldOfView(FLOAT32 fov, FLOAT32 zmin, FLOAT32 zmax);
-extern LOGICAL piBeginScene(void);
-extern LOGICAL piEndScene(void);
+extern LOGICAL piBeginScene();
+extern LOGICAL piEndScene();
 extern void piSetRenderState(int StateType, UINT32 State);
-extern LOGICAL piDisplayRenderStates(void);
+extern LOGICAL piDisplayRenderStates();
 extern LOGICAL piSetLightState(SINT32 lightnum, UINT32 State);
-extern LOGICAL	piFlip(void);
+extern LOGICAL	piFlip();
 extern LOGICAL	piSetDDRender(SYS_DDRENDERFUNC newfunc);
 extern LOGICAL	piSetD3DRender(SYS_D3DRENDERFUNC newfunc);
 extern LOGICAL	piCreateSurface(piSURFACEDESC* lppisd, void** lpdds);
@@ -1457,10 +1420,10 @@ extern LOGICAL	piRenderIndexStridedScene(piPRIMITIVETYPE pipt, piVERTEXTYPE pivt
 extern LOGICAL	piRenderStridedScene(piPRIMITIVETYPE pipt, piVERTEXTYPE pivt, LPVOID lpStridedData, UINT32 VertexCount);
 
 extern SINT32 piGetNewTextureID();
-extern SINT32 piGetTotalPaints(void);
-extern SINT32 piGetHeight(void);
-extern SINT32 piGetWidth(void);
-extern SINT32 piGetNumberVertices(void);
+extern SINT32 piGetTotalPaints();
+extern SINT32 piGetHeight();
+extern SINT32 piGetWidth();
+extern SINT32 piGetNumberVertices();
 extern SINT32 piGetNamedTexture(const char* name);
 extern SINT32 piGetTextureMipmapLevel(SINT32 texid);
 extern LOGICAL piLoadTexture(SINT32 texid, SINT32 miplevel);
@@ -1471,10 +1434,10 @@ extern SINT32 piGetMaterials(MATERIAL** lpmat);
 extern SINT32 piFloatLikeLong(FLOAT32 f);
 extern SINT32 piCreateRawTexture(SINT32 texid, SINT32 miplevel, SINT32 width, SINT32 height, SINT32 bpp, SINT32 alphabits, SINT32 hardware);
 
-extern UINT32 piGetAmbLight(void);
+extern UINT32 piGetAmbLight();
 extern UINT32 piColorToDescColor(piSURFACEDESC* lpddsd, UINT32 color);
 
-extern void piKill(void);
+extern void piKill();
 extern void piSetMinTextureDim(SINT32 mintexdim);
 extern void piUnloadTexture(SINT32 texid, SINT32 miplevel);
 extern void piFreeTexture(SINT32 texid, SINT32 miplevel);
@@ -1482,35 +1445,35 @@ extern void piFreeMipTextures(SINT32 texid);
 extern void piFreeMipTexture3Ds(SINT32 texid);
 extern void piFreeMaterial(SINT32 matid);
 extern void piSetAmbLight(UINT32 color);
-extern void piResetFPS(void);
+extern void piResetFPS();
 extern UINT32 piCapture(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
-extern void piResetRenderStats(void);
-extern void piResetRenderBuckets(void);
-extern void piDisplayRenderBuckets(void);
-extern void piDisplayRenderIndexBuckets(void);
+extern void piResetRenderStats();
+extern void piResetRenderBuckets();
+extern void piDisplayRenderBuckets();
+extern void piDisplayRenderIndexBuckets();
 extern void piGetRenderTypes(UINT32* draw, UINT32* drawindex);
 extern void piGetRenderStats(UINT32* points, UINT32* lines, UINT32* triangles, UINT32* vertices);
-extern void* piGetInstance(void);
+extern void* piGetInstance();
 extern void piPostRenderFilterScene();
 
 extern void piLockState(SINT32 state, LOGICAL lock);
-extern void piLockTextureState(LOGICAL lock);
+extern void piLockTextureState(bool lock);
 extern void piLockMaterialState(LOGICAL lock);
 extern void piLockWorldMatrix(LOGICAL lock);
 extern void piLockViewMatrix(LOGICAL lock);
 extern void piLockProjectionMatrix(LOGICAL lock);
 extern void piLockTextureMatrix(LOGICAL lock);
 
-extern FLOAT32 piGetFPS(void);
+extern FLOAT32 piGetFPS();
 extern FLOAT32 piGetFieldOfViewZMin();
 extern FLOAT32	piGetFieldOfViewZMax();
 extern LOGICAL piGetWorldToScreen(double x, double y, double z, double& sx, double& sy, double& sz);
 
-extern piMATRIX* piGetProjectionMatrix(void);
-extern piMATRIX* piGetWorldMatrix(void);
-extern piMATRIX* piGetViewMatrix(void);
-extern piMATRIX* piGetUnscaledViewMatrix(void);
-extern piMATRIX* piGetCockpitViewMatrix(void);
+extern piMATRIX* piGetProjectionMatrix();
+extern piMATRIX* piGetWorldMatrix();
+extern piMATRIX* piGetViewMatrix();
+extern piMATRIX* piGetUnscaledViewMatrix();
+extern piMATRIX* piGetCockpitViewMatrix();
 
 extern SINT32 piGetTextureHandle(SINT32 texid, SINT32 miplevel);
 extern SINT32 piGetTexture3DHandle(SINT32 texid);
@@ -1519,8 +1482,8 @@ extern TEXTURE* piGetTextureData(SINT32 texid);
 extern TEXTURE* piGetTextureData2(SINT32 texid);
 extern TEXTURE3D* piGetTexture3DData(SINT32 texid);
 
-extern void piCloseProgram(void);
-extern void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
+extern void piCloseProgram();
+NORETURN_FN extern void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
 
 extern piMATRIX* piGetTextureMatrix(int unit = 0);
 
@@ -1534,9 +1497,9 @@ extern LOGICAL piSetVertexSource(SINT32,UINT32,UINT32);
 extern INDEXSOURCE* piGetIndexData(SINT32);
 extern LOGICAL piSetIndexSource(SINT32,UINT32);
 extern LOGICAL piRenderSourceIndexedScene(piPRIMITIVETYPE,UINT32,UINT32,UINT32,UINT32);
-extern void piResetIndexSource(void);
+extern void piResetIndexSource();
 extern LOGICAL piRenderSourceScene(piPRIMITIVETYPE,UINT32,UINT32);
-extern void piResetVertexSource(void);
+extern void piResetVertexSource();
 extern void piDisableRenderStates();
 
 extern void piCreateModelView(piMATRIX* returnMatrix,

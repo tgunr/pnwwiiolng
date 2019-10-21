@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatChannelID.h"
 #include "chat/chatChannelList.h"
@@ -29,16 +27,14 @@
 #include "chat/chatTimeInterval.h"
 #include "chat/chatWaypointExchg.h"
 #include "chat/chatWaypoint.h"
+#include "chat/omgChat.h"
 #include "include/mydbQuery.h"
 #include "miss/missionMobileSpawnWaypoint.h"
-#include "omg/omgChat.hxx"
 #include "server/serverPeers.h"
 #include "str/stringLib.h"
 #include "teul/teulEndpointDefs.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiHash.h"
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
@@ -46,8 +42,8 @@
 // Undefine to have enemy reports remain local to individual missions.
 #define TARGET_SHARE_CONTACTS 1
 
-typedef std::map<UINT32, ChatMission*> CHAT_MISSIONS;
-typedef std::set<UINT32> MISSION_STATUSES;
+using CHAT_MISSIONS = std::map<UINT32, ChatMission*>;
+using MISSION_STATUSES = std::set<UINT32>;
 
 CHAT_MISSIONS g_missions;
 MISSION_STATUSES g_statuses;
@@ -135,7 +131,7 @@ chatShareWaypoint(Waypoint& waypoint, ChatMission* const mission, WWII_SIDE side
 // Tell a mission who's leading it now
 
 void
-chatSetMissionLeader(UINT32 missionID, const ChatHandle& leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective)
+chatSetMissionLeader(UINT32 missionID, const ChatHandle leader, WWII_SIDE side, const UINT64& origin, const UINT64& objective)
 {
 	ChatMission& mission = chatGetMission(missionID);
 
@@ -303,8 +299,7 @@ chatMessageMissionChannel(UINT32 missionID, Chat::LocalizedMessage& lmsg)
 void
 ChatMission::message(LSTRING_ID prefix, LSTRING_ID messageID, const char* arg1/*=NULL*/, const char* arg2/*=NULL*/)
 {
-	if ( g_logDebug )
-		dbugLog(_FLD, "m:%u sending mission channel message %d.%d", missionID(), prefix, messageID);
+    dbugLog(_FLD, "m:%u sending mission channel message %d.%d", missionID(), prefix, messageID);
 
 	Chat::LocalizedMessage loc(prefix, messageID, arg1, arg2);
 	chatBroadcastLocMessage(m_members.begin(), m_members.end(), loc);
@@ -367,7 +362,7 @@ _tellSponsor(UINT32 sponsor, const Player* player, LSTRING_ID messageID, const C
 }
 
 //////////////////////////////////////////////////////////////////////
-// Add a player to a mission, send him all the waypoints
+// Add a player to a mission, send them all the waypoints
 
 void
 chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor)
@@ -382,7 +377,7 @@ chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 
 	_tellSponsor(sponsor, player, LSTR_RECRUIT_JOINED_MISSION, mission);
 
-	betaLog(_FLI, "m:%u p:%u c:%s joining mission [%" PRSizeT " members]", missionID, player->playerID(), player->callsign(), mission.m_members.size());
+	dbugLog(_FLI, "m:%u p:%u c:%s joining mission [%" PRSizeT " members]", missionID, player->playerID(), player->callsign(), mission.m_members.size());
 
 	// And you generate a membership update by joining
 	mission.addMemberUpdate(player);
@@ -419,7 +414,7 @@ chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 	dbugLog(_FLI, "m:%u p:%u c:%s left mission [%" PRSizeT " remaining]", missionID, player->playerID(), player->callsign(), mission->m_members.size());
 	if ( mission->m_members.empty() || mission->m_members.size() == 0 )
 	{
-		dbugLog(_FLNB, " *deleting");
+		dbugLog(_FLN, " *deleting");
 		g_missions.erase(missionID);
 		delete mission;
 		return;
@@ -474,6 +469,9 @@ _getWaypointTypePrefix(char* const p, WP_TYPE type, UINT32 subType)
 	case WPT_PATROL:
 		*(p++) = 'P';
 	break;
+	case WPT_MORTAR:
+		*(p++) = 'M';
+	break;
 	default:
 		*(p++) = 'x';
 	break;
@@ -488,13 +486,13 @@ _getWaypointTypePrefix(char* const p, WP_TYPE type, UINT32 subType)
 static ChatHandle
 _getHandle(ChatMission& mission, const Waypoint& waypoint)
 {
-	char wpname[6] = "\0\0\0\0\0";
+	char wpname[MAX_HANDLE_SIZE] = { 0 };
 	char* p = wpname;
 
 	p = _getWaypointTypePrefix(p, waypoint.type(), (UINT32)waypoint.subType());
 
 	UCHAR& counter = mission.m_waypointNo[waypoint.type()];
-	sprintf(p, "%X", ++counter);
+	strprintf(p, "%X", ++counter);
 	counter %= 31;
 
 	return chatGetHandle(wpname);
@@ -505,14 +503,14 @@ _getHandle(ChatMission& mission, const Waypoint& waypoint)
 // Request a mobile spawn from the MMHost
 
 void
-ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID)
+ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle handle, FLOAT64 x, FLOAT64 y, FLOAT64 z, bool deployed, UINT32 stosUID, SINT32 stoSubType)
 {
-	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, x, y, z);
+	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u stoSubType:%d @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, stoSubType, x, y, z);
 
 	ENDPOINT* const endpoint = serverPeerEndpointByType(MAP_HOST);
 	if ( endpoint != nullptr )
 	{
-		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, 0);
+		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, stoSubType, 0);
 		MOBILE_SPAWN_WAYPOINT packet(wp);
 		packet.send(*endpoint);
 	}
@@ -562,21 +560,37 @@ ChatMission::addWaypoint(Waypoint& waypoint)
 // Remove a waypoint from the mission
 
 bool
-ChatMission::removeWaypoint(const ChatHandle& handle, bool byPlayer)
+ChatMission::removeWaypoint(const ChatHandle handle, bool byPlayer, Player* player)
 {
 	WAYPOINTS::iterator it = m_waypoints.find(handle);
 	if ( it == m_waypoints.end() )
 		return false;
 	Waypoint& waypoint = it->second;
+	
+	if (player != nullptr)
+	{
+		std::string playerCallsign = player->callsign();
+		std::string waypointCreator = Chat::Name(waypoint.playerHandle()).c_str();
+
+		// Check to see if the player requesting the waypoint/contact report
+		// removal is either the mission lead or the one that posted it
+		if (byPlayer && !(player->isMissionLeader() || playerCallsign == waypointCreator))
+		{
+			dbugLog(_FLA, "t:%d p:%u c:%s m:%u non-leader or non-owner requesting waypoint removal %" PR64BitUT "[%s]"
+							, player->teulIndex(), player->playerID(), player->callsign()
+							, missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
+			return false;
+		}
+	}
 
 	// If this is a player removing a mobile spawn...
 	if ( byPlayer && handle == _getMSPHandle() )
 	{
-		betaLog(_FLD, "m:%u removing MSPAWN waypoint", missionID());
-		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0);
+		dbugLog(_FLD, "m:%u removing MSPAWN waypoint", missionID());
+		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0, 0);
 	}
 
-	dbugLog(_FLD, "m:%u removing waypoint %llu[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
+	dbugLog(_FLD, "m:%u removing waypoint %" PR64BitUT "[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
 
 	if ( !m_members.empty() )
 	{
@@ -638,7 +652,7 @@ chatMissionUpdateMember(Player* const player)
 void
 ChatMission::addMemberRemoval(Player* const player)
 {
-	betaLog(_FLD, "m:%u t:%d p:%u c:%s removed"
+	dbugLog(_FLD, "m:%u t:%d p:%u c:%s removed"
 				, missionID()
 				, player->teulIndex()
 				, player->playerID()
@@ -661,7 +675,7 @@ ChatMission::expireWaypoints()
 		Waypoint& wp = it->second;
 		if ( wp.type() == WPT_ENEMY && wp.posted() <= cutoff )
 		{
-			betaLog(_FLI, "m:%u removing waypoint %s", missionID(), Chat::Name(it->first).c_str());
+			dbugLog(_FLI, "m:%u removing waypoint %s", missionID(), Chat::Name(it->first).c_str());
 			removeWaypoint(it->first, false);
 			break;
 		}
@@ -672,7 +686,7 @@ ChatMission::expireWaypoints()
 // Easter eggs for certain mission leaders
 
 static bool LEADER_EGGS_ENABLED = true;
-typedef std::map<ChatHandle, std::string> EGGS;
+using EGGS = std::map<ChatHandle, std::string>;
 static EGGS eggs;
 
 static UINT32 nextEggFetch = 0;
@@ -700,7 +714,7 @@ public:
 			m_result[handle] = row[1];
 		}
 
-		threadLog(_FLN, "Processed %u mission eggs :)", m_result.size());
+		dbugLog(_FLN, "Processed %" PRSizeT " mission eggs :)", m_result.size());
 
 		return true;
 	}
@@ -752,7 +766,7 @@ _egg(Player* const player)
 // Set the mission leader, send messages to players if neccessary
 
 void
-ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
+ChatMission::SetLeader(const ChatHandle newLeaderHandle)
 {
 	static const UINT32 _NUM_TIPS = 6;
 	static const LSTRING_ID tips[_NUM_TIPS] = {
@@ -763,7 +777,7 @@ ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
 	,	LSTR_NEWLEADER_5
 	,	LSTR_NEWLEADER_6
 	};
-	const ChatHandle matchHandle = chatGetLowercaseHandle(newLeaderHandle);
+	ChatHandle matchHandle = chatGetLowercaseHandle(newLeaderHandle);
 
 	// If the new leader is a previously displaced leader,
 	// remove their displacement flags.
@@ -1005,13 +1019,11 @@ ChatMission::sendUpdates()
 	if ( m_removes.empty() && m_updates.empty() )
 		return 0;
 
-#ifdef CLOSED_BETA
 	dbugLog(_FLD, "m:%u members:%" PRSizeT " updates:%" PRSizeT " "
 					, missionID()
 					, m_members.size()
 					, m_updates.size()
 					);
-#endif
 
 	// The greeting list is no-longer valid.
 	m_mmu.clear();
@@ -1027,10 +1039,7 @@ ChatMission::sendUpdates()
 			)
 		{
 			update.m_handle = *it;
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-				dbugLog(_FLDB, "-%s ", Chat::Name(update.m_handle).c_str());
-#endif
+			dbugLog(_FLD, "-%s ", Chat::Name(update.m_handle).c_str());
 			m_mmu.add(update);
 		}
 		m_removes.clear();
@@ -1042,10 +1051,7 @@ ChatMission::sendUpdates()
 		; ++it
 		)
 	{
-#ifdef CLOSED_BETA
-		if ( g_logDebug )
-			dbugLog(_FLDB, "*%s ", Chat::Name(it->first).c_str());
-#endif
+        dbugLog(_FLD, "*%s ", Chat::Name(it->first).c_str());
 
 		Player* const player = it->second;
 		if ( player )
@@ -1070,14 +1076,11 @@ ChatMission::sendUpdates()
 			if ( player == nullptr || player->teulIndex() < 0 )
 				continue;
 
-#ifdef CLOSED_BETA
-			if ( g_logDebug )
-				dbugLog(_FLDB, ">%d:%u:%s "
-								, player->teulIndex()
-								, player->playerID()
-								, player->callsign()
-								);
-#endif
+            dbugLog(_FLD, ">%d:%u:%s "
+                            , player->teulIndex()
+                            , player->playerID()
+                            , player->callsign()
+                            );
 
 			if ( m_mmu.send(player->teulIndex()) >= 0 )
 				++updatesSent;
@@ -1118,9 +1121,9 @@ chatSendMissionUpdates()
 		++it;
 
 		const UINT32 updatesSentThisMission = mission.sendUpdates();
-		if ( updatesSentThisMission && g_logDebug )
+		if ( updatesSentThisMission )
 		{
-			betaLog(_FLD, "m:%u sent %u updates", mission.missionID(), updatesSentThisMission);
+			dbugLog(_FLD, "m:%u sent %u updates", mission.missionID(), updatesSentThisMission);
 		}
 		updatesSent += updatesSentThisMission;
 		lastMission = mission.missionID();
@@ -1139,7 +1142,7 @@ chatSendMissionUpdates()
 }
 
 void
-ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT32 stoId)
+ChatMission::addMSPWaypoint(const ChatHandle ownerCall, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT32 stoId)
 {
 	message(LSTR_MISSION, LSTR_MOBILE_SPAWN_AVAILABLE, Chat::Name(ownerCall).c_str());
 	Waypoint newWP(false, _getMSPHandle(), ownerCall
@@ -1155,7 +1158,12 @@ ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, F
 
 	m_stoUID = stoId;
 
-	setFRUCooldown(host_config.sto.fruPlaceCooldown_s);
+	ServerTrackedObject* sto = ServerTrackedObject::lookup(stoId);
+	if (sto != nullptr)
+	{
+		fru().subtype(sto->subType());
+		setFRUCooldown(host_config.sto.placeCooldown_s[sto->subType()-1]);
+	}
 
 	flagForStatusUpdate();
 }
@@ -1168,6 +1176,7 @@ ChatMission::removeMSPWaypoint(UINT32, bool byPlayer)
 
 	removeSTO();
 
+	fru().subtype(0);
 	fru().active(false);
 	fru().creator(0ULL);
 
@@ -1214,7 +1223,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 /*teulIndex*/, MOBILE_SPAWN_WAYPOINT& inco
 {
 	const MobileSpawnWaypoint& wp = incoming.data();
 
-	betaLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_deployed, wp.m_stoUID);
+	dbugLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_deployed, wp.m_stoUID);
 
 	if ( wp.m_missionID == 0 )
 	{
@@ -1443,7 +1452,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 
 	if ( player.isPlaynet() )
 	{
-		const char* const p = chatMakeTempString("m:%u leader:%s memb:%u wps:%u mu:%u mr:%u"
+		PREP_CHAT_MSG(cmsg, "m:%u leader:%s memb:%" PRSizeT " wps:%" PRSizeT " mu:%" PRSizeT " mr:%" PRSizeT ""
 											, mission->missionID()
 											, Chat::Name(mission->leader()).c_str()
 											, mission->m_members.size()
@@ -1452,7 +1461,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 											, mission->m_removes.size()
 											);
 
-		player.message(LSTR_NOTE, LSTR_GENERIC, p);
+		player.message(LSTR_NOTE, LSTR_GENERIC, cmsg);
 	}
 
 	std::string list = "";
@@ -1489,7 +1498,7 @@ ChatMission::setFRUCooldown(const UINT32 cooldown_s)
 	const TeulTimeMS cooldown_ms = cooldown_s * 1000;
 	fru().nextPlaceAvail(teulClock64 + cooldown_ms);
 
-	dbugLog(_FLD, "m:%u fru cooldown set for %u seconds (%llums)", missionID(), cooldown_s, cooldown_ms);
+	dbugLog(_FLD, "m:%u fru cooldown set for %u seconds (%" PR64BitUT "ms)", missionID(), cooldown_s, cooldown_ms);
 
 	flagForStatusUpdate();
 }

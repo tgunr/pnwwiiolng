@@ -84,7 +84,7 @@ struct STRAT_FACILITY_TABLE
 
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
-extern STRAT_FACILITY_TABLE* sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SINT32 numCPs);
+extern STRAT_FACILITY_TABLE* sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, CP* const cps, const SINT32 numCPs);
 
 // returns the building list fro the given facility id from the facility table
 // null if no found

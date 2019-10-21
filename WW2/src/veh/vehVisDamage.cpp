@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "veh/vehVisDamage.h"
 #include "ogrp/ogrptype.h"
 #include "include/vars.h"
@@ -200,7 +200,7 @@ public:
 	{
 		// set up our initial velocities
 		FLOAT64VECTOR lvel		= (veh->ModelData) ? veh->ModelData->VehicleRealVel : veh->PosData.LastUpdateVel;
-		FLOAT64VECTOR avel	= {0};
+		FLOAT64VECTOR avel	= {0,0,0};
 		FLOAT64VECTOR pos	= EjectPosition();
 		double VehSpeed			= mathExactVectorLength(&lvel);
 
@@ -1274,10 +1274,10 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 
 		/* taking this out unless I see a problem
 		// there is now hulking for hulks sake; ie we do it if we see some significant damage just for pure gameplay fun
-		// so don't kill the guy because we're spicing the game up; this call was simply an insurance call anyway
+		// so don't kill the play because we're spicing the game up; this call was simply an insurance call anyway
 		// root problems for the player not dying ought to be fixed instead
 
-        if(veh->ModelData)  // and make sure the guy freaking dies if he's not already, sure there's plenty of other hoops I'll have to jump through
+        if(veh->ModelData)  // and make sure the player freaking dies if they're not already, sure there's plenty of other hoops I'll have to jump through
         {
 	        veh->ModelData->VehicleIsDead = TRUE;
 	        persKillCrew();
@@ -1445,7 +1445,7 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
     {
         vehAnimChangeVehicleStateByName(veh, (UCHAR*)"crashexplosion", TRUE);
 
-        if(veh->ModelData)  // and make sure the guy freaking dies if he's not already, sure there's plenty of other hoops I'll have to jump through
+        if(veh->ModelData)  // and make sure the player freaking dies if they're not already, sure there's plenty of other hoops I'll have to jump through
         {
 	        veh->ModelData->VehicleIsDead = TRUE;
 	        persKillCrew();
@@ -1872,12 +1872,12 @@ static LOGICAL _CollideOnCallback(OBJECT* obj, UINT32 user)
 	_CreateCrapCallback
 *************************************************************************************************/
 
-typedef struct
+struct crapcallbackdata
 {
 	vehVehicle* veh;
 	LOGICAL Explode;
 	const char* visdamgroup;
-} crapcallbackdata;
+};
 
 static LOGICAL _CreateCrapCallback(OBJECT* obj, UINT32 user)
 {
@@ -2020,9 +2020,9 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 	char MassName[64];
 
 	if(i==0)
-		strncpy(MassName, st->MassObject, 63);
+		strsafecpy(MassName, st->MassObject);
 	else
-		snprintf(MassName, 63, "%s_%d", st->MassObject, i);
+		strprintf(MassName, "%s_%d", st->MassObject, i);
 
 	const vehInertiaComponent* ic = vehFindInertiaComponent(veh->VehicleType, MassName);
 
@@ -2032,8 +2032,8 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 		{
 #ifdef BETA_RELEASE
 			char s[128];
-			snprintf(s, 127, "no inertia component called %s in mass file!", st->MassObject);
-			piExitProgram(__FILE__, __LINE__, s);
+			strprintf(s, "no inertia component called %s in mass file!", st->MassObject);
+			piExitProgram(_FL, s);
 #endif
 		}
 
@@ -2216,7 +2216,7 @@ bool vehVisDamageCamera(piVECTOR* pos, piVECTOR* aim)
 			if(frametime > respawnTime && !uiFindView("despawn"))
 			{
 				SCEN_MGR->SetFlag(ScenarioManager::RESPAWN_ME);
-				vehExitVehicle(1,0,0);
+				vehExitVehicle();
 
 				// make it exit right away
 				v->VehicleDeadTime = frametime - 4000;

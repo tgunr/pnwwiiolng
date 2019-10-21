@@ -21,6 +21,16 @@ _basic = {
  ['short'] = 'number',
  ['long'] = 'number',
  ['unsigned'] = 'number',
+-- Hack to make the C99 explicit-width types work in this broken thing - Gadget 5/4/16
+ ['int8_t'] = 'number',
+ ['uint8_t'] = 'number',
+ ['int16_t'] = 'number',
+ ['uint16_t'] = 'number',
+ ['int32_t'] = 'number',
+ ['uint32_t'] = 'number',
+ ['int64_t'] = 'number',
+ ['uint64_t'] = 'number',
+-- End hack
  ['float'] = 'number',
  ['double'] = 'number',
  ['_cstring'] = 'string',

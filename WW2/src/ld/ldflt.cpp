@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Copyright 2008 Playnet Inc, All rights reserved
 // Not to be distributed in API form except as part of a compiled library
 // under License or NDA
@@ -21,7 +21,6 @@
 #include "ob/obc.h"
 #include "ob/obmain.h"
 #include "str/strpool.h"
-#include "sys/sysWinISO.h"
 #include "ld/lddds.h"
 #include <assert.h>
 #include "sysmain.h"
@@ -51,7 +50,7 @@ struct FLTLoadFailure
     FLTLoadFailure(const char* const problem, const char* const doing)
     : m_problem(problem), m_doing(doing)
     {}
-    
+
     std::string m_problem, m_doing ;
 };
 
@@ -60,7 +59,7 @@ struct FLTChunkFailure : public FLTLoadFailure
     FLTChunkFailure(const char* const chunkType)
     : FLTLoadFailure("Unable to load FLT chunk", chunkType)
     {}
-    
+
 };
 
 struct FLTUnknownTexture : public FLTLoadFailure
@@ -81,7 +80,7 @@ struct FLTItemFileError
     FLTItemFileError(const char* error, const char* item, const char* file)
         : m_error(error), m_item(item), m_file(file)
     {}
-    
+
     std::string m_error, m_item, m_file;
 };
 
@@ -356,7 +355,7 @@ static UINT32 CreateColor(int colorindex)
 	return(rgba);
 }
 
-static bool ReadHeader(void)
+static bool ReadHeader()
 {
 	fltHEADER* header;
 	if ( !localBufferUseObject(header) )
@@ -445,7 +444,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 	return true;
 }
 
-static bool ReadGroup(void)
+static bool ReadGroup()
 {
 	fltGROUP* group;
 	if ( !localBufferUseObject(group) )
@@ -460,7 +459,7 @@ static bool ReadGroup(void)
 		if(s_conversionFile.length() <= 7)
 		{
 			bTopmostObject = false;
-			if (stricmp(group->id, s_conversionFile.c_str()))
+			if (strcasecmp(group->id, s_conversionFile.c_str()))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
 							group->id, s_conversionFile.c_str());
@@ -524,7 +523,7 @@ static bool ReadGroup(void)
 }
 
 
-static bool ReadVertexPalette(void)
+static bool ReadVertexPalette()
 {
 	fltVERTEXPALETTE* vp;
 
@@ -550,18 +549,12 @@ static bool ReadVertexCoordinate(void* pvc, piUNIFIED_VERTEX* vertices)
 	fltVERTEXCOORDINATE vc;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vc.colorname	= ShortEndian(vertcoord->colorname);
 	vc.flags		= ShortEndian(vertcoord->flags);
 	vc.x			= DoubleEndian(vertcoord->x);
 	vc.y			= DoubleEndian(vertcoord->y);
 	vc.z			= DoubleEndian(vertcoord->z);
 	vc.color		= LongEndian(vertcoord->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vc.x;
 	pos.y = (float)vc.y;
@@ -589,9 +582,6 @@ static bool ReadVertexNormal(void* pvn, piUNIFIED_VERTEX* vertices)
 	fltVERTEXNORMAL vn;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vn.colorname	= ShortEndian(vertnorm->colorname);
 	vn.flags		= ShortEndian(vertnorm->flags);
 	vn.x			= DoubleEndian(vertnorm->x);
@@ -601,9 +591,6 @@ static bool ReadVertexNormal(void* pvn, piUNIFIED_VERTEX* vertices)
 	vn.j			= FloatEndian(vertnorm->j);
 	vn.k			= FloatEndian(vertnorm->k);
 	vn.color		= LongEndian(vertnorm->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vn.x;
 	pos.y = (float)vn.y;
@@ -636,10 +623,6 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 	fltVERTEXUV vuv;
 	piVECTOR	pos;
 
-
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 	vuv.colorname	= ShortEndian(vertuv->colorname);
 	vuv.flags		= ShortEndian(vertuv->flags);
 	vuv.x			= DoubleEndian(vertuv->x);
@@ -648,9 +631,6 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 	vuv.u			= FloatEndian(vertuv->u);
 	vuv.v			= FloatEndian(vertuv->v);
 	vuv.color		= LongEndian(vertuv->color);
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vuv.x;
 	pos.y = (float)vuv.y;
@@ -695,10 +675,6 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 	fltVERTEXNORMALUV vnuv;
 	piVECTOR	pos;
 
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
-
 	vnuv.colorname	= ShortEndian(vertnormuv->colorname);
 	vnuv.flags		= ShortEndian(vertnormuv->flags);
 	vnuv.x			= DoubleEndian(vertnormuv->x);
@@ -710,10 +686,6 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 	vnuv.u			= FloatEndian(vertnormuv->u);
 	vnuv.v			= FloatEndian(vertnormuv->v);
 	vnuv.color		= LongEndian(vertnormuv->color);
-
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	pos.x = (float)vnuv.x;
 	pos.y = (float)vnuv.y;
@@ -761,7 +733,6 @@ struct eqstr
 	}
 };
 
-#if platOS == OS_MACOS
 using CharPSet = std::unordered_set<const char*, ConstCharHasher, eqstr>;
 static CharPSet* RoadTextureNames = nullptr;
 
@@ -790,11 +761,9 @@ static void initRoadTextureNames()
 	RoadTextureNames->insert("terrain\\brdg\\tangray1");
 	RoadTextureNames->insert("terrain\\brdg\\urbanroad1");
 }
-#endif
 
 static bool isRoadTexture( int texid )
 {
-#if platOS == OS_MACOS
 	TEXTURE* tp = oglGetTextureData(texid);
 	bool res = tp!=nullptr && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
 	if ( res )
@@ -802,9 +771,6 @@ static bool isRoadTexture( int texid )
 		//printf("%s\n",tp->name);
 	}
 	return res;
-#else
-	return false;
-#endif
 }
 
 #define LOOK_FOR_DEGENERATE_TRIANGLES 0
@@ -813,7 +779,7 @@ static bool isRoadTexture( int texid )
 #include "SuperFastHash.h"
 #endif
 
-static bool ReadVertexList(void)
+static bool ReadVertexList()
 {
 	void*				pdata					= nullptr;
 	fltCHUNK*			pchunk					= nullptr;
@@ -821,12 +787,10 @@ static bool ReadVertexList(void)
 	OBJECT*				lpobj					= nullptr;
 	piUNIFIED_VERTEX*	vertices				= nullptr;
 
-#if platOS == OS_MACOS
 	if ( RoadTextureNames == nullptr )
 	{
 		initRoadTextureNames();
 	}
-#endif
 
 	length = (int)s_chunk->next - 4;
 
@@ -1321,7 +1285,7 @@ static bool ReadVertexList(void)
 }
 
 
-static bool ReadMatrix(void)
+static bool ReadMatrix()
 {
 	if (!localBufferCopyObject(&s_matrixRecord))
 		return false;
@@ -1342,7 +1306,7 @@ static bool ReadMaterialTable(const char* name)
 	s_nummaterials = materialsLen / sizeof(fltMATERIAL);
 	if (s_nummaterials > MAX_FLT_MATERIALS)
 	{
-		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
+		Write_Debug("fltLoad failed at %s:%u", _FL);
 		return false;
 	}
 	if (s_nummaterials * sizeof(fltMATERIAL) != materialsLen)
@@ -1511,7 +1475,7 @@ static bool ReadMaterialPalette(const char* name)
 }
 
 
-static bool ReadColorPalette(void)
+static bool ReadColorPalette()
 {
 	size_t length = s_chunk->next - 4;
 	fltCOLORPALETTE* colorpal;
@@ -1523,7 +1487,7 @@ static bool ReadColorPalette(void)
 	colorstruct* color = &s_colortable.front();
 	for (size_t i=0; i < length; ++i)
 	{
-		for (size_t j=0; j < 128; ++color, ++j)
+		for (UCHAR j=0; j < 128; ++color, ++j)
 		{
 			color->full			=	colorpal->briteRGB[i];
 			color->rgb.red		=	color->rgb.red * j / 127;
@@ -1540,7 +1504,7 @@ static bool ReadColorPalette(void)
 }
 
 
-static bool ReadTextureReference(void)
+static bool ReadTextureReference()
 {
 	char filename[256];
 	filename[0] = '\0';
@@ -1592,27 +1556,20 @@ static bool ReadTextureReference(void)
 	str = filename;
 	str += "_normal.dds";
 
-	if(fioAccess(str.c_str()))
-	{
-		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
-	}
+    int fd = -1;
 
-	// New normal mapping tool outputs _nrm.dds
-	str = filename;
-	str += "_nrm.dds";
-
-	if(fioAccess(str.c_str()))
-	{
+    if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags2[numtexrefs] |= OBJECT_NORMALMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	// Check for specular map
 	str = filename;
 	str += "_spec.dds";
 
-	if(fioAccess(str.c_str()))
-	{
+	if ((fd = fioOpen(str.c_str())) != -1) {
 		_textureflags3[numtexrefs] |= OBJECT_SPECULARMAP;
+		fioClose(fd); // Hacky because this is very bad code design, this is a quick fix
 	}
 
 	str = filename;
@@ -1632,7 +1589,7 @@ static bool ReadTextureReference(void)
 	return true;
 }
 
-static bool ReadFace(void)
+static bool ReadFace()
 {
 	if (!localBufferUseObject(s_face))
 		return false;
@@ -1695,7 +1652,7 @@ static bool ReadFace(void)
 }
 
 
-static bool ReadLOD(void)
+static bool ReadLOD()
 {
 	fltLOD* lod;
 	if (!localBufferUseObject(lod))
@@ -1744,7 +1701,7 @@ static bool ReadLOD(void)
 }
 
 
-static bool ReadObject(void)
+static bool ReadObject()
 {
 	if (!localBufferCopyObject(&object))
 		return false;
@@ -1777,7 +1734,7 @@ static bool ReadObject(void)
 }
 
 
-static bool ReadExtension(void)
+static bool ReadExtension()
 {
 	fltEXTENSION*  ext;
 	if (!localBufferUseObject(ext))
@@ -1794,7 +1751,7 @@ static bool ReadExtension(void)
 	return true;
 }
 
-static bool ReadDOF(void)
+static bool ReadDOF()
 {
 	OBJECT*	lpobj;
 
@@ -1802,10 +1759,6 @@ static bool ReadDOF(void)
 	if (!localBufferUseObject(dofPtr))
 		return false;
 	fltDOF& dof = *dofPtr;
-
-#ifdef DEBUG_FPU
-	SetupFPU(false);
-#endif
 
 	dof.reserved		= LongEndian(dof.reserved);
 	dof.originx			= DoubleEndian(dof.originx);
@@ -1854,10 +1807,6 @@ static bool ReadDOF(void)
 	dof.curxscale		= DoubleEndian(dof.curxscale);
 	dof.incxscale		= DoubleEndian(dof.incxscale);
 	dof.flags			= LongEndian(dof.flags);
-
-#ifdef DEBUG_FPU
-	SetupFPU(true);
-#endif
 
 	if (!CreateLevel(&lpobj))
 	{
@@ -1942,7 +1891,7 @@ static bool ReadDOF(void)
 	return true;
 }
 
-static bool ReadTextComment(void)
+static bool ReadTextComment()
 {
 	char*	thisTextComment = 0;
 	SINT32	len;
@@ -2044,7 +1993,7 @@ static bool ReadTextComment(void)
 	return true;
 }
 
-static bool ReadLongID(void)
+static bool ReadLongID()
 {
 	size_t len = size_t(s_chunk->next - 4);
 	SCHAR	oldname[32];
@@ -2101,7 +2050,7 @@ static bool ReadLongID(void)
 			// Make sure we are staring at the same address for topmost
 			if (lastobject == groups[0])
 			{
-				if (stricmp(lastobject->name, s_conversionFile.c_str()))
+				if (strcasecmp(lastobject->name, s_conversionFile.c_str()))
 				{
 					FLTItemFileError("ReadLongID", lastobject->name, s_conversionFile.c_str());
 					return false;
@@ -2126,7 +2075,7 @@ static bool ReadLongID(void)
 	return true;
 }
 
-static bool ReadPushLevel(void)
+static bool ReadPushLevel()
 {
 	level += 1;
 	if (level >= MAX_LEVELS)
@@ -2143,7 +2092,7 @@ static bool ReadPushLevel(void)
 }
 
 
-static bool ReadPopLevel(void)
+static bool ReadPopLevel()
 {
 	if (vlistlevel == level)
 	{
@@ -2264,7 +2213,7 @@ static bool ReadPopLevel(void)
 }
 
 
-static bool ReadPushSubface(void)
+static bool ReadPushSubface()
 {
 	facelayer += 1;
 
@@ -2274,7 +2223,7 @@ static bool ReadPushSubface(void)
 }
 
 
-static bool ReadPopSubface(void)
+static bool ReadPopSubface()
 {
 	facelayer -= 1;
 
@@ -2284,7 +2233,7 @@ static bool ReadPopSubface(void)
 }
 
 
-static bool ReadPushExtension(void)
+static bool ReadPushExtension()
 {
 	extlevel += 1;
 
@@ -2294,7 +2243,7 @@ static bool ReadPushExtension(void)
 }
 
 
-static bool ReadPopExtension(void)
+static bool ReadPopExtension()
 {
 	extlevel -= 1;
 
@@ -2305,7 +2254,7 @@ static bool ReadPopExtension(void)
 
 #ifdef MAP_MATS
 // this doesn't work
-typedef std::map<std::string,std::string> MaterialMapper;
+using MaterialMapper = std::map<std::string,std::string>;
 extern MaterialMapper materialMap;
 
 static void changeMaterials( OBJECT* obj )
@@ -2332,23 +2281,12 @@ static void changeMaterials( OBJECT* obj )
 }
 #endif
 
-#define xSHOWLDMSGS 1
-#if platOS == OS_MACOS
-#define OutputDebugStringA(x) printf(x)
-//#undef Write_Debug
-//#define Write_Debug DoOutputX
-
-void DoOutputX(const char* str, ...)
-{
-	printf( "%s\n", str);
-}
-
-#endif
+//#define SHOWLDMSGS 1
 
 #ifdef SHOWLDMSGS
-# define LDWrite_Debug(...) WriteToConsole(__VA_ARGS__); Write_Debug(__VA_ARGS__)
+# define LDWrite_Debug(fmt, ...) dbugLog(_FLD, fmt, ## __VA_ARGS__);
 #else
-# define LDWrite_Debug(...)
+# define LDWrite_Debug(fmt, ...)
 #endif
 
 static OBJECT* _fltLoad(const char* const name, const float scale, const int reduce)
@@ -2791,9 +2729,9 @@ OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
     catch (FLTLoadFailure& e)
     {
         char error[1024] ;
-        sprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
+        strprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
         Write_Debug("%s", error) ;
-        piExitProgram(__FILE__, __LINE__, error) ;
+        piExitProgram(_FL, error) ;
         return NULL ;
     }
 }

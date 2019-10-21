@@ -12,7 +12,7 @@
 // Prep and install the Raknet interface and RPCs
 
 // Install all of the teulKit callbacks
-extern SINT32 missionHostInstallCallbacks(void);
+extern SINT32 missionHostInstallCallbacks();
 
 extern SINT32 sendToClientMissionPostReply(MISSION_POST_REPLY reply, SINT32 connection);
 

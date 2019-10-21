@@ -11,6 +11,8 @@
 EXTERN int		WantedWidth;
 EXTERN int		WantedHeight;
 EXTERN int		WantedBpp;
+EXTERN BOOL		WantedFullscreen;
+EXTERN BOOL		WantedBorderless;
 EXTERN BOOL		WantedWindow;
 
 EXTERN int		gOpenGLMajorVersion;

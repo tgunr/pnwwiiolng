@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "teul/teulKit.h"
 #include "wwii/wwiiPack.h"
 #include "chat/chatBrigadeMove.h"
@@ -25,7 +23,7 @@
 #include "chat/chatHostBrigadeControl.h"
 #include "wwii/wwiiConfig.h"
 
-typedef std::map<UINT32,UINT32> LAST_MOVEMENTS;
+using LAST_MOVEMENTS = std::map<UINT32,UINT32>;
 static LAST_MOVEMENTS lastMovements;
 bool g_newLocations = false;
 
@@ -58,7 +56,7 @@ _unitLocationsKeyframe(HC_UNIT_LOCATIONS& hculUpdate)
 
 	if ( hculUpdate.empty() == false )
 	{
-		betaLog(_FLD, "%" PRSizeT " updates in hcul keyframe", hculUpdate.size());
+		dbugLog(_FLD, "%" PRSizeT " updates in hcul keyframe", hculUpdate.size());
 	}
 }
 
@@ -91,7 +89,7 @@ chatUpdateHCUnitLocations()
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
-			betaLog(_FLIB, "<FAIL");
+			dbugLog(_FLI, "<FAIL");
 		}
 	}
 
@@ -103,7 +101,7 @@ chatUpdateHCUnitLocations()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_changeHome(const ChatHandle& handle, const UINT32 brigadeID, const FULL_OBJ_ID& destinationID)
+_changeHome(const ChatHandle handle, const UINT32 brigadeID, const FULL_OBJ_ID destinationID)
 {
 	HCUnit* const unit = HCUnit::Lookup(brigadeID);
 	if ( unit == nullptr )
@@ -116,7 +114,7 @@ _changeHome(const ChatHandle& handle, const UINT32 brigadeID, const FULL_OBJ_ID&
 }
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
+HCUnit::setHomeCPID(const FULL_OBJ_ID destination)
 {
 	m_homeCPID = destination;
 
@@ -130,7 +128,7 @@ HCUnit::setHomeCPID(const FULL_OBJ_ID& destination)
 //////////////////////////////////////////////////////////////////////
 // Process an incoming brigade move message
 void
-BrigadeMove::process(const ChatHandle& byHandle) const
+BrigadeMove::process(const ChatHandle byHandle) const
 {
 	Player* player = PlayerInterface::Lookup(byHandle);
 	Property* destination = chatFindProperty(m_destination);
@@ -142,7 +140,7 @@ BrigadeMove::process(const ChatHandle& byHandle) const
 	switch (m_action)
 	{
 	case BMR_APPROVED:
-		if ( m_actionable )
+		if (m_actionable)
 			_changeHome(byHandle, m_brigadeID, m_destination);
 		else
 			chatBrigadeMoveProposal(m_brigadeID, m_destination, byHandle);
@@ -225,4 +223,83 @@ BrigadeMove::process(const ChatHandle& byHandle) const
 		else if ( text )
 			player->message(LSTR_CAUTION, LSTR_GENERIC, text);
 	}
+}
+
+// Chat host uses this to change the country of an HCUnit.
+void GarrisonCountryChange::process(const ChatHandle byHandle) const
+{
+	Player* player = PlayerInterface::Lookup(byHandle);
+
+	LSTRING_ID response = LSTR_NONE;
+	const char* text = nullptr;
+
+	dbugLog(_FLD, "Chat server received GarrisonCountryChange related to brigade %d with action %d and actionable is %d", 
+		m_brigadeID, m_action, m_actionable);
+
+	HCUnit* hcUnit = HCUnit::Lookup(m_brigadeID);
+	switch (m_action)
+	{
+	case GCR_APPROVED:
+		if (m_actionable)
+		{
+			if (hcUnit != nullptr)
+			{
+				dbugLog(_FLI, "Country changing for garrison %s currently %d", hcUnit->name(), hcUnit->country());
+				WWII_COUNTRY country = GarrisonCountryChangeReq::getReplacementCountry(m_newCountryId, hcUnit);
+				hcUnit->setCountry(country);
+				dbugLog(_FLI, "To %d when requsted was %d", country, m_newCountryId);
+				chatAnnounceCountryChange(*hcUnit, hcUnit->homeCPID(), hcUnit->homeCPID(), byHandle);
+			}
+			else
+			{
+				dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+			}
+		}
+		else
+		{			
+			chatCPCountryChangeProposal(hcUnit->m_homeCPID, m_newCountryId, byHandle);
+		}
+	break;
+	case GCR_FAILED:
+		response = LSTR_CHANGE_COUNTRY_FAILED;
+	break;
+
+	case GCR_FAILED_OWNER_ALREADY:
+		response = LSTR_FAILED_OWNER_ALREADY;
+	break;
+	case GCR_FAILED_TOO_MANY:
+		response = LSTR_FAILED_TOO_MANY;
+	break;
+	case GCR_FAILED_SUPPLY:
+		response = LSTR_FAILED_SUPPLY;
+	break;
+	case GCR_FAILED_WRONG_OWNER:
+		response = LSTR_FAILED_WRONG_OWNER;
+	break;
+	case GCR_FAILED_HAS_OBJECTIVE:
+		response = LSTR_FAILED_HAS_OBJECTIVE;
+	break;
+#ifdef PUBLIC_RELEASE
+	default:
+		response = LSTR_INTERNAL_ERROR;
+#endif
+	}
+
+	if ( player )
+	{
+		dbugLog(_FLD, "Response sent to player %d", response);
+		if ( response != LSTR_NONE )
+			player->message(LSTR_CAUTION, response, text);
+		else if ( text )
+			player->message(LSTR_CAUTION, LSTR_GENERIC, text);
+		else
+		{
+			dbugLog(_FLW, "Nothing sent to player, no error text provided");
+		}
+	}
+	else
+	{
+		dbugLog(_FLW, "Player could not be found from handle");
+	}
+
 }

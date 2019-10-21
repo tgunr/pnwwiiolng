@@ -59,7 +59,7 @@ namespace Instance
 	class ClientStatus;
 };
 
-typedef std::map<UINT32, jsMotd*> MotdList;
+using MotdList = std::map<UINT32, jsMotd*>;
 
 // Samples, Threshold, Penalty
 void setChatRateLimiting();
@@ -70,6 +70,15 @@ public:
 	jsClient(ww2::Client*);
 
 	JS_CLASS_DATA;
+	JS_FUNCTION(createauthhandler);
+	JS_FUNCTION(issteamcopy);
+	JS_FUNCTION(connecttoarena);
+	JS_FUNCTION(startofflinemode);
+	JS_FUNCTION(steamconnect);
+    JS_FUNCTION(getLastUnknownErrorCode);
+	JS_FUNCTION(emailReset);
+    JS_FUNCTION(releasesteamticket);
+	JS_FUNCTION(loadrootwindow);
 	JS_FUNCTION(getmisscountry);
 	JS_FUNCTION(getmissbrigade);
 	JS_FUNCTION(acceptmission);
@@ -125,7 +134,8 @@ public:
 			ISMOBILESPAWN_PROP, CANSTO_PROP, BRIGADENOTICES_PROP, ISHC_PROP, ISOIC_PROP,
 			OICOF_PROP, HAVEBRIGADENOTICES_PROP, RECRUITER_PROP, RECRUITERS_PROP,
 			HAVERECRUITERS_PROP, BRANCHID_PROP, MISSIONINVITE_PROP, NEXTSUPPLY_PROP,
-			INSTANCE_PROP, STATE_PROP, CAPTURESTATE_PROP, INSTANCES_PROP
+			INSTANCE_PROP, STATE_PROP, CAPTURESTATE_PROP, INSTANCES_PROP,
+			MSCHECKBOXINIT_PROP, MSCHECKBOXSTATE_PROP
 	};
 
 	virtual JSBool GetProperty(JSContext* ctx, int propid, jsval* val);
@@ -174,14 +184,17 @@ protected:
 	UINT16 nextsupply;
 	FULL_OBJ_ID lastspawnlistsource;
 
+	bool js_mscheckboxinit = false;  //  UI Mobile Spawn Initialise logic. Added 24-12-2018
+	bool js_mscheckboxstate = true;  //  UI Mobile Spawn Current State. Added 24-12-2018
+
 	~jsClient();
 };
 
 class jsHCUnit : public phui::js::Object
 {
 public:
-	jsHCUnit(HCUnit const*);
-	jsHCUnit(unsigned int unitID);
+	jsHCUnit(HCUnit&);
+	jsHCUnit(UINT32 unitID);
 
 	JS_CLASS_DATA;
 
@@ -192,7 +205,7 @@ public:
 	virtual JSBool SetProperty(JSContext* ctx, int propid, jsval* val);
 
 protected:
-	const HCUnit* unit;
+	UINT32 unitid;
 
 	~jsHCUnit();
 };
@@ -215,7 +228,8 @@ public:
 	enum{ MOTD_PROP, NAME_PROP, ID_PROP, DIVISION_PROP, DIVISION_ID_PROP, MISSIONS_PROP,
 			POPULATION_RANK_PROP, PARENT_PROP, MOTTO_PROP, NICK_PROP, OFFICERS_PROP, HOME_PROP,
 			OWNER_PROP, OWNERRANK_PROP, OBJECTIVE_PROP,
-			MOBILESPAWNS_PROP, ISBRIGADE_PROP, ISSQUADBRIGADE_PROP, CALLSIGN_PROP,
+			MOBILESPAWNS_PROP, ISBRIGADE_PROP, ISGARRISON_PROP, ISFLLINKED_PROP, ISENEMYLINKED_PROP,
+			ISFL_PROP, HASNAVY_PROP, HASAF_PROP, ISSQUADBRIGADE_PROP, CALLSIGN_PROP,
 			OIC_PROP, OICRANK_PROP, CANVOTE_PROP, CANTAKECHARGE_PROP, ACTIVEOIC_PROP,
 			COMMANDER_PROP, COMMANDERRANK_PROP};
 
@@ -226,7 +240,6 @@ public:
 	void SetDetail(BrigadeDetail const& d) {detail = d; UpdateOfficerArrays(); }
 
 protected:
-	HCUnit* unit;
 	BrigadeDetail detail;
 	phui::js::Array* officerranks;
 	phui::js::Array* officernames;

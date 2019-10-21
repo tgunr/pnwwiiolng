@@ -10,8 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include <stack>
 
 #include "include/arenaLockEnums.h"
@@ -35,7 +33,7 @@
 #include "wwii/wwiiConfig.h"
 
 // This is the list of units which are pending resupply
-typedef std::set<StratHCUnit*> CONSUMERS;
+using CONSUMERS = std::set<StratHCUnit*>;
 static CONSUMERS _resupplyConsumers;
 
 struct ResupplyTicketStore
@@ -110,7 +108,7 @@ strtDisableDebugSupply()
 //////////////////////////////////////////////////////////////////////
 // Query supply debugging
 
-LOGICAL
+bool
 strtGetDebugSupply()
 {
 	return _debugSupplyEnabled;
@@ -128,7 +126,7 @@ strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID)
 		return 0;
 
 	const StratHCUnit* brigade = StratHCUnit::Lookup(brigadeID);
-	if ( brigade == nullptr || !brigade->isBrigade() )
+	if ( brigade == nullptr || (!brigade->isBrigade() && !brigade->isGarrison()) )
 	{
 		dbugLog(_FLA, "hcu:%u is not a brigade", brigadeID);
 		return 0;
@@ -212,7 +210,7 @@ StratHCUnit::createResupplyTicket(
 	{
 		if ( homeCP()->isSupplied() == true )
 		{
-			betaLog(_FLD, "hcu:%u(%s) weap:%s immediate delivery", unitID(), callsign(), weapPrintName(&entry.spec()));
+			dbugLog(_FLD, "hcu:%u(%s) weap:%s immediate delivery", unitID(), callsign(), weapPrintName(entry.spec()));
 			entry.setPresent(entry.present() + units);
 		}
 		return nullptr;
@@ -242,7 +240,7 @@ StratHCUnit::createResupplyTicket(
 	dbugLog(_FLD, "hcu:%u(%s) %s scheduled %u %s for %u [%p]"
 					, unitID(), callsign()
 					, (isTransfer ? "supply" : "resupply")
-					, units, weapPrintName(&entry.spec())
+					, units, weapPrintName(entry.spec())
 					, seconds, postedWeapon
 					);
 
@@ -287,11 +285,11 @@ StratHCUnit::fetchResupplyQueue(std::vector<std::string>& result, UINT32 limit, 
 			seconds += (it->first - m_impl.m_nextServing) * m_impl.docketRate_s();
 
 		if ( seconds < 120 )
-			offset = sprintf(buffer, "%u sec: ", seconds);
+			offset = strprintf(buffer, "%u sec: ", seconds);
 		else if ( seconds < 7200 )
-			offset = sprintf(buffer, "%u min: ", seconds / 60);
+			offset = strprintf(buffer, "%u min: ", seconds / 60);
 		else
-			offset = sprintf(buffer, "%u hr: ", seconds / 3600);
+			offset = strprintf(buffer, "%u hr: ", seconds / 3600);
 
 		RESUPPLY_MANIFEST manifest;
 		bool printable = false;
@@ -326,7 +324,7 @@ StratHCUnit::fetchResupplyQueue(std::vector<std::string>& result, UINT32 limit, 
 			}
 			else
 				addComma = true;
-			offset += sprintf(buffer + offset, "%u*%s", order->second, weapPrintName(&order->first));
+			offset += sprintf(buffer + offset, "%u*%s", order->second, weapPrintName(order->first));
 			++listed;
 		}
 		if ( addComma == false )
@@ -514,7 +512,7 @@ StratHCUnit::purgeResupply(bool zeroSupply)
 			it->second.setPresent(0);
 		dbugLog(_FLI, "hcu:%u(%s) purged %s: %u/%u(%u/%u)"
 						, unitID(), callsign()
-						, weapPrintName(&it->second.spec())
+						, weapPrintName(it->second.spec())
 						, it->second.present(), it->second.capacity()
 						, it->second.transfers(), it->second.resupply());
 	}
@@ -547,7 +545,7 @@ const char*
 StratHCUnit::describe() const
 {
 	static char buffer[400];
-	sprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
+	strprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
 					, unitID(), callsign()
 					, toeTemplateHeader() ? toeTemplateHeader()->name().c_str() : "none", m_toe.size()
 					, (m_impl.m_inTransit ? "InTransit" : "Stationed")
@@ -632,20 +630,17 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 	bool trickleEnabled = supplyEnabled && host_config.supply.trickleEnabled;
 	const UINT32 trickleSlices = host_config.supply.trickleSlices;
 
-	if ( g_logDebug )
-	{
-		char buffer[256];
-		sprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
-						, unitID(), callsign()
-						, (isTransfer) ? "transfering" : "restarting"
-						, delay / 60, window / 60
-						, supplyEnabled, trickleEnabled, trickleSlices
-						);
-		dbugLog(_FLD, "%s", buffer);
+    char buffer[256];
+    strprintf(buffer, "hcu:%u(%s) %s supply in %um over %um [supply:%u, trickle:%u, slices:%u]"
+                    , unitID(), callsign()
+                    , (isTransfer) ? "transfering" : "restarting"
+                    , delay / 60, window / 60
+                    , supplyEnabled, trickleEnabled, trickleSlices
+                    );
+    dbugLog(_FLD, "%s", buffer);
 #ifdef BETA_RELEASE
-		chatSendBroadcast(Chat::_HCUNIT, Instance::_CAMPAIGN, unitID(), LSTR_NOTE, LSTR_GENERIC, buffer);
+    chatSendBroadcast(Chat::_HCUNIT, Instance::_CAMPAIGN, unitID(), LSTR_NOTE, LSTR_GENERIC, buffer);
 #endif
-	}
 
 	if ( isTransfer )
 	{
@@ -671,7 +666,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 			// We are transferring vehicles from A->B, take all present units
 			absent = entry.present();
 			entry.setPresent(0);
-			betaLog(_FLI, "hcu:%u(%s) is transfer: %s absent = %u/%u", unitID(), callsign(), weapPrintName(&entry.spec()), absent, entry.capacity());
+			dbugLog(_FLI, "hcu:%u(%s) is transfer: %s absent = %u/%u", unitID(), callsign(), weapPrintName(entry.spec()), absent, entry.capacity());
 		}
 		else
 			absent = shortfall;
@@ -683,7 +678,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 		if ( !trickleEnabled || (delay == 0 && window == 0) )
 		{
 			UINT32 delivery = supplyEnabled ? (entry.present() + absent) : 1;
-			betaLog(_FLI, "hcu:%u(%s) %s instant delivery of %u", unitID(), callsign(), weapPrintName(&entry.spec()), delivery);
+			dbugLog(_FLI, "hcu:%u(%s) %s instant delivery of %u", unitID(), callsign(), weapPrintName(entry.spec()), delivery);
 			entry.setPresent(delivery);
 			continue;
 		}
@@ -695,7 +690,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 		UINT32 intervals = ( trickleSlices > 0 ) ? trickleSlices : target;
 		if ( intervals == 0 || window == 0 )
 		{
-			betaLog(_FLI, "hcu:%u(%s) %s immediate ticket of %u:%u:%u", unitID(), callsign(), weapPrintName(&entry.spec()), isTransfer, delay, absent);
+			dbugLog(_FLI, "hcu:%u(%s) %s immediate ticket of %u:%u:%u", unitID(), callsign(), weapPrintName(entry.spec()), isTransfer, delay, absent);
 			createResupplyTicket(entry, isTransfer, delay, absent);
 			continue;
 		}
@@ -730,7 +725,7 @@ _checkResupplyStatus(bool fullCheck)
 {
 	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
-		if ( it->second->isBrigade() == false && it->second->isDivision() == false )
+		if ( it->second->isBrigade() == false && it->second->isDivision() == false && it->second->isGarrison() == false )
 			continue;
 		if ( it->second->isTrainingUnit() )
 			continue;

@@ -17,7 +17,6 @@
 #include "wwii/wwiiTypes.h"
 
 #if defined(IS_MAP_HOST)
-#include "teul/teulServer.h"
 #include "map/mapDB.h"
 #include "chat/chatConstants.h"
 #include "mm/mmMain.h"
@@ -57,7 +56,7 @@ static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex);
-		teulClose(a->teulIndex, Teul::Closing::AbortedApp);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 
@@ -73,13 +72,15 @@ static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 }
 
 SINT32
-wwiiHostInstallCallbacks(void)
+wwiiHostInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
+	{
 		REGISTER_SENDER(WWII_ACTIVATE_Y, _sendWWII_ACTIVATE, _SEND_ACTIVATE);
 		REGISTER_RECEIVER(WWII_ERROR_INFO_Y, _recvWWII_ERROR_INFO);
 		REGISTER_RECEIVER(WWII_USER_ABORTED_APP_Y, _recvAbortedApp);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(WWII_X)
 }
 
 SINT32 wwiiSendActivate(SINT32 connection, WWII_ACTIVATE* const activate)

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "gr2/gr2anim.h"
 #include "ob/obmain.h"
@@ -84,7 +84,7 @@ UINT32	bitFields[12] =
 // this is the big granddaddy structure to hold all of the state and info needed for a
 // third person model
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 static FLOAT32		LODForceValue;
 #endif
 
@@ -109,11 +109,11 @@ static void _drawfpscollider();
 // gr2AnimTrooper used to be defined here
 // moved it to the header for easier member access
 
-typedef GR2_POOL<gr2AnimTrooper> GR2_TROOPER_POOL;
+using GR2_TROOPER_POOL = GR2_POOL<gr2AnimTrooper>;
 static GR2_TROOPER_POOL _gr2TrooperPool = GR2_TROOPER_POOL(128, 32, GR2_TROOPER_POOL::NEW);
 
 #ifdef USE_CORPSES
-typedef GR2_POOL<Corpse> GR2_CORPSE_POOL;
+using GR2_CORPSE_POOL = GR2_POOL<Corpse>;
 static GR2_CORPSE_POOL _gr2CorpsePool = GR2_CORPSE_POOL(32, 32, GR2_CORPSE_POOL::NEW);
 #endif
 
@@ -192,10 +192,10 @@ struct gr2AnimMotionBase
 	}
 };
 
-typedef GR2_POOL<RayColliders> GR2_RAY_POOL;
+using GR2_RAY_POOL = GR2_POOL<RayColliders>;
 static GR2_RAY_POOL _gr2RayPool = GR2_RAY_POOL(128);
 
-typedef std::map<gr2AnimTrooper*,RayColliders*> GR2RayMap;
+using GR2RayMap = std::map<gr2AnimTrooper*,RayColliders*>;
 
 static void gr2AnimHandleAttack(gr2AnimTrooper* model, int pose, int move, int point, int weapon);
 static void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int point, int weapon);
@@ -456,7 +456,7 @@ static void _addInfantryLODs(gr2AnimTrooper* anim, SINT32 modelIndex, SINT32 fil
 					case TPS_LOD_2: lod->maxVis = 8; break;
 					case TPS_LOD_3: lod->maxVis = 20; break;
 					case TPS_LOD_4: lod->maxVis = 40; break;
-					case TPS_LOD_5: lod->maxVis = 0; lod->minVis = 40; break; // vary low poly; don't let us get to close to him
+					case TPS_LOD_5: lod->maxVis = 0; lod->minVis = 40; break; // vary low poly; don't let us get to close to them
 				}
 
 				gr2Model* model = anim->model.AddModel(modelIndex, lod);
@@ -611,7 +611,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 
 	// Try to avoid malloc when possible.
 	if(PN_UNLIKELY(newModel == nullptr))
-		piExitProgram (__FILE__, __LINE__, "gr2AnimCreateModel: Failed to allocate memory for animModel");
+		piExitProgram (_FL, "gr2AnimCreateModel: Failed to allocate memory for animModel");
 
 	// get everything to a default state
 	newModel->Reset();
@@ -660,6 +660,12 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
 			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[GERMAN_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, nullptr, 1);
 			_addInfantryLODs(newModel, 1, GERMAN_PARA_NOPACK);
+		}
+		break;
+		case AMERICAN_PARA_PACK:
+		{
+			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
+			_addInfantryLODs(newModel, 1, AMERICAN_PARA_NOPACK);
 		}
 		break;
 	}
@@ -836,7 +842,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	//fpTPSLODType lastLOD = model->currentLOD;
 
 	// determine LOD
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 	if (LODForceValue) {
 		gr2AnimUpdateLOD(model, LODForceValue);
 	} else
@@ -1637,7 +1643,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 
 		if(stateTestFlag)// && !pObject->animModel->myVehicle->ModelData) // stateTestFlag &&
 		{
-			sprintf (tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
+			strprintf(tempStr, "TPS STATE: %s, %s, %s, %s, %s, %d, %d", (const char*)pObject->animModel->myVehicle->Handle, fpTPSPoseKeyStrings[pose], fpTPSMoveKeyStrings[move], fpTPSWeaponKeyStrings[tpsWeaponType], fpTPSPointKeyStrings[point], currentWeapon, (changeMask & gr2AnimTrooper::DEAD) ? 1 : 0);
 			rnmainListText (tempStr);
 		}
 	}
@@ -1812,10 +1818,10 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 	return TRUE;
 }
 
-LOGICAL gr2AnimKillObject (OBJECT* pObject)
+void gr2AnimKillObject(OBJECT& pObject)
 {
 	// stop any sounds
-	pObject->animModel->moveSound.Stop();
+	pObject.animModel->moveSound.Stop();
 
 	/*
 #ifdef USE_CORPSES
@@ -1857,10 +1863,8 @@ LOGICAL gr2AnimKillObject (OBJECT* pObject)
 #endif
 	*/
 
-	_freemodel(pObject->animModel);
-    pObject->animModel = nullptr;
-
-	return TRUE;
+	_freemodel(pObject.animModel);
+    pObject.animModel = nullptr;
 }
 
 LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR* endPnt, SINT32* location, piVECTOR* collisionPnt)
@@ -2833,7 +2837,7 @@ SINT32 gr2AnimDeathFlags()
 
 extern void rnlogoUpdateStatus(const char*, ...);
 
-LOGICAL gr2AnimInit (void)
+LOGICAL gr2AnimInit()
 {
 	if(animInited) return TRUE;
 
@@ -2846,7 +2850,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "gr2AnimTrooper is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 
 #ifdef USE_CORPSES
@@ -2855,7 +2859,7 @@ LOGICAL gr2AnimInit (void)
 		if(size % GR2_MEMORY_MULTIPLE > 0)
 		{
 			snprintf(buf, 255, "Corpse is not byte aligned: size(%ld) %% multiple(%d) = %ld bytes leftover", size, GR2_MEMORY_MULTIPLE, (size % GR2_MEMORY_MULTIPLE));
-			piExitProgram(__FILE__, __LINE__, buf);
+			piExitProgram(_FL, buf);
 		}
 #endif // USE_CORPSES
 
@@ -2953,9 +2957,9 @@ LOGICAL gr2AnimInit (void)
 
 #ifdef USE_CORPSES
 	/*
-     
+
      TBD - is this really meant to be implemented?
-     
+
     ARENA_VARS::iterator itr = g_arenaDescription.find("dead_body_delay");
 
     if(itr != g_arenaDescription.end())
@@ -2973,7 +2977,7 @@ LOGICAL gr2AnimInit (void)
     return TRUE;
 }
 
-void gr2AnimKill (void)
+void gr2AnimKill()
 {
 	_gr2TrooperPool.Free();
 
@@ -4362,7 +4366,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 		Write_Log (LOG_FPS, LOG_INFO, "Weapon out of bounds! %d", weapon);
 		// for live this shouldn't be a CTD .. just set to weapon 0 (weapon 0 will always be a valid weapon)
 #ifdef BETA_RELEASE
-		piExitProgram (__FILE__, __LINE__, "Weapon out of bounds in animation flags");
+		piExitProgram (_FL, "Weapon out of bounds in animation flags");
 #else
 		weapon = 0;
 #endif
@@ -4374,7 +4378,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 
 		if (stateTestFlag && !anim->myVehicle->ModelData)
 		{
-			sprintf (tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
+			strprintf(tempStr, "%s, %s, %s, %d, %d, %d, %d", fpTPSPoseTypeStrings[pose], fpTPSMoveTypeStrings[move], fpTPSPointTypeStrings[point], weapon, death, emote, altWeapon);
 //			rnmainListText (tempStr);
 			Write_Log (LOG_FPS, LOG_INFO, tempStr);
 		}
@@ -4476,269 +4480,10 @@ void gr2AnimHandleRecoil(gr2AnimTrooper* model)
 
 void gr2AnimHandleEmotes(gr2AnimTrooper* model)
 {
-	// check for fullbody emotes
-	/*
-	if (emoteID)
-	{
-		if (model->emoteID != emoteID)
-		{
-			gr2AnimationBlend*	emoteAnim;
-
-			if (fpTPSGetEmoteType(emoteID) == (fpTPSBodyEmoteType)TPS_EMOTETYPE_FULLBODY)
-			{
-				gr2RemoveAllBlendedAnimations (model->skeleton, -1);
-
-				emoteAnim = fpTPSBodyEmotes[emoteID-TPS_COMBATEMOTE_NUM_TYPES-1];
-				if (emoteAnim)
-				{
-					if (!gr2PlayBlendedAnimation (model->skeleton, emoteAnim))
-					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to play body emote blend %d (%s)!", emoteID-TPS_COMBATEMOTE_NUM_TYPES-1, fpTPSBodyEmoteFiles[emoteID-TPS_COMBATEMOTE_NUM_TYPES-1]);
-					}
-
-					gr2BlendControlSetEaseInDuration (model->skeleton, emoteAnim, 0.4f);
-					gr2BlendControlSetEaseOutDuration (model->skeleton, emoteAnim, 1.0f);
-					gr2BlendControlSetLoopCount (model->skeleton, emoteAnim, 1);
-				}
-
-				model->SetFlag(gr2AnimTrooper::HIDE_GUN);
-				model->emoteID = emoteID;
-
-				// if we're online, and we're on the same side, play the emote text
-//				if (Online)
-				if (1)
-				{
-					vehVehicle*		playerVehicle = persGetPersonaVehiclePtr();
-					if (!playerVehicle)
-						return TRUE;
-
-					if (!model->myVehicle)
-						return TRUE;
-
-					if (!model->myVehicle->Chat_Handle)
-						return TRUE;
-
-					if (playerVehicle == model->myVehicle)
-						return TRUE;
-
-					// this is really the original enum value of the emote in the FPS system
-					SINT32 emoteNum = emoteID-TPS_COMBATEMOTE_NUM_TYPES-1;
-					WCHAR			prependStr[255];
-
-					if (playerVehicle->Side == model->myVehicle->Side)
-					{
-						FLOAT64VECTOR	posDiff;
-
-						mathSubVectors (&posDiff, &(playerVehicle->PosData.RenderPos), &(model->myVehicle->PosData.Pos));
-
-						if (mathExactVectorLength2(&posDiff) <= (tpsTroopData.emoteCombatMaxDistance * tpsTroopData.emoteCombatMaxDistance))
-						{
-							swprintf (prependStr, 255, L"%ls ", chatGetWideCallsign(model->myVehicle->Chat_Handle));
-							if (emoteNum == TPS_BODYEMOTE_DRESSDOWN)
-							{
-								SCHAR	appendStr[255];
-
-								memset (appendStr, 0, 255);
-
-								if (model->myVehicle->InfantryTarget)
-								{
-									vehVehicle*	targetVehicle;
-
-									targetVehicle = vehFindVehicle (model->myVehicle->InfantryTarget);
-
-									if (targetVehicle && targetVehicle->Handle && targetVehicle->Handle[0])
-									{
-										strncpy (appendStr, (char*)targetVehicle->Handle, 255);
-									}
-								}
-
-								rnmainListEmoteText (IDE_LANG_UI, TPS_BODYEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, appendStr);
-							}
-							else
-							{
-								rnmainListEmoteText (IDE_LANG_UI, TPS_BODYEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, nullptr);
-							}
-						}
-					}
-				}
-				// full body emotes take over, so we're done
-				return TRUE;
-			}
-			else
-			{
-				// combat emotes are mixins, complete when done, short ease in, short ease out, single loop count
-				// first, determine handedness.  then determine pose.  then get the animation pointer, and start it
-				fpTPSHandType			handedness;
-				fpTPSMixinPoseType		mixinPose;
-
-				handedness = tpsWeapons[tpsWeaponType].emoteHand;
-				if ((pose == TPS_POSETYPE_PRONE) || (pose == TPS_POSETYPE_SWIM))
-				{
-					mixinPose = TPS_MIXINPOSE_PRONE;
-				}
-				else
-				{
-					mixinPose = TPS_MIXINPOSE_STAND;
-				}
-
-				emoteAnim = fpTPSCombatEmotes[emoteID-1][handedness][mixinPose];
-
-				if (emoteAnim)
-				{
-					if (!gr2PlayBlendedAnimation (model->skeleton, emoteAnim))
-					{
-						Write_Log (LOG_FPS, LOG_INFO, "Failed to play combat emote blend %d (%s)!", emoteID-1, fpTPSCombatEmoteFiles[emoteID-1][handedness][mixinPose]);
-					}
-					gr2BlendControlSetEaseInDuration (model->skeleton, emoteAnim, 1.0f);
-					gr2BlendControlSetEaseOutDuration (model->skeleton, emoteAnim, 1.0f);
-					gr2BlendControlSetLoopCount (model->skeleton, emoteAnim, 1);
-					gr2BlendControlSetMixin (model->skeleton, emoteAnim);
-					gr2BlendControlRemoveWhenDone (model->skeleton, emoteAnim);
-//					gr2BlendControlSetWeight (model->skeleton, emoteAnim, 10.0);
-				}
-
-				model->emoteID = emoteID;
-
-				// if we're online, and we're on the same side, play the emote text
-//				if (Online)
-				if (1)
-				{
-					vehVehicle*		playerVehicle = persGetPersonaVehiclePtr();
-
-					if (!playerVehicle)
-						return TRUE;
-
-					if (!model->myVehicle)
-						return TRUE;
-
-					if (!model->myVehicle->Chat_Handle)
-						return TRUE;
-
-					if (playerVehicle == model->myVehicle)
-						return TRUE;
-
-					// this is really the original enum value of the emote in the FPS system
-					SINT32			emoteNum = emoteID-1;
-					WCHAR			prependStr[255];
-
-					if (playerVehicle->Side == model->myVehicle->Side)
-					{
-						FLOAT64VECTOR	posDiff;
-
-						mathSubVectors (&posDiff, &(playerVehicle->PosData.RenderPos), &(model->myVehicle->PosData.Pos));
-
-						if (mathExactVectorLength2(&posDiff) <= (tpsTroopData.emoteFullBodyMaxDistance * tpsTroopData.emoteFullBodyMaxDistance))
-						{
-							swprintf (prependStr, 255, L"%ls ", chatGetWideCallsign(model->myVehicle->Chat_Handle));
-							rnmainListEmoteText (IDE_LANG_UI, TPS_COMBATEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, nullptr);
-						}
-
-						// let us handle other's emotes
-						fpFPSProcessTPSEmote(model->myVehicle->Chat_Handle, emoteNum);
-					}
-				}
-			}
-		}
-	}
-	*/
 }
 
 void gr2AnimHandleStowing(gr2AnimTrooper* model)
 {
-	// handle stowed weapons
-	/* none for now
-	if(model->currentWeapon >= 0 && currentWeapon  >= 0 && model->currentWeapon != currentWeapon)
-	{
-		const char* mountPoint = "ftmount2";
-		UINT32 useModels = 1;
-		fpTPSWeaponType weaponType = gr2AnimWeaponNumToTPSType(model, STOWED_WEAPON_POSITION);
-
-		switch (weaponType)
-		{
-			case TPS_WEAPONTYPE_RIFLE:
-				mountPoint = "riflemount";
-			break;
-			case TPS_WEAPONTYPE_SMG:
-				mountPoint = "smgmount";
-			break;
-			case TPS_WEAPONTYPE_GRENADE:
-			case TPS_WEAPONTYPE_KNIFE:
-				mountPoint = "beltmount";
-			break;
-			case TPS_WEAPONTYPE_LTMORTAR:
-				useModels = 2; // use alt models
-			break;
-			default:
-				mountPoint = "ftmount2";
-				useModels = 1;
-			break;
-		}
-
-		if(currentWeapon > 0)
-		{
-			// attach
-			if(!model->stowedWeapon)
-			{
-				GR2_MODEL_LIST weapList	= model->weapons->GetAllModels();
-				const char* attach		= STOWED_WEAPON_ATTACH;
-
-				for(int w = 0; w < weapList.size(); ++w)
-				{
-					gr2Model* weapModel = weapList.at(w);
-
-					if(weapModel->FindBone((SCHAR*)attach))
-					{
-						weapModel->Detach();
-						weapModel->Attach(model->skeleton, (SCHAR*)mountPoint, attach);
-					}
-				}
-
-				for(int i = 0; i < TPS_NUM_LODS; i++)
-				{
-					gr2Model* stowedWeapon = (useModels == 2) ? model->weaponAltModels[STOWED_WEAPON_POSITION][i]:
-																  model->weaponModels[STOWED_WEAPON_POSITION][i];
-
-					const char* attach = STOWED_WEAPON_ATTACH;
-
-					if(gr2ModelHasBone(stowedWeapon, (SCHAR*)attach))
-					{
-						model->stowedWeapon = useModels; // if we attach at least one lod, we've stowed
-						gr2AttachModel(stowedWeapon,
-									   (SCHAR*)attach,
-									   gr2GetWornOnModel(model->model[i]),
-									   (SCHAR*)mountPoint);
-					}
-				}
-			}
-		}
-		else
-		{
-			if(model->stowedWeapon)
-			{
-				// detach
-				for(int i = 0; i < TPS_NUM_LODS; i++)
-				{
-					gr2Model* stowedWeapon = (model->stowedWeapon == 2) ? model->weaponAltModels[STOWED_WEAPON_POSITION][i]:
-																			model->weaponModels[STOWED_WEAPON_POSITION][i];
-
-					// reattach it to the original mount point
-					if(stowedWeapon)
-					{
-						gr2AttachModel(stowedWeapon,
-									   tpsWeapons[weaponType].attachBone,
-									   gr2GetWornOnModel(model->model[i]),
-									   tpsWeapons[weaponType].attachToBone);
-
-						// clear out the offset
-						gr2SetModelRotation(stowedWeapon, &IdentityMatrix);
-					}
-				}
-
-				model->stowedWeapon = 0;
-			}
-		}
-	}
-	*/
 }
 
 void gr2AnimHandleAttack(gr2AnimTrooper* model, int pose, int move, int point, int weapon)
@@ -5102,7 +4847,7 @@ void gr2AnimUpdateSurfaceID(gr2AnimTrooper* model)
 	model->nextSurfaceCheck = frametime + 250;
 }
 
-#ifdef ENABLE_FLOATERS
+#ifdef GM_RELEASE
 void gr2AnimForceLOD (FLOAT32 lodValue)
 {
 	LODForceValue = lodValue;
@@ -5118,9 +4863,11 @@ void gr2AnimUpdateLOD(struct gr2AnimTrooper* model, FLOAT32 distance)
 	bool aiming = (bool)fpFPSIsAim();
 
 	// bring the distance in if we're looking through binocs
+#ifndef BETA_RELEASE
 	if(binocs) distance *= (unsigned int)binocsAdjust;
 	else if(aiming) distance *= (unsigned int)aimAdjust;
-
+#endif
+    
 	// save our calculated distance
 	UINT32 realDistance = (UINT32)distance;
 
@@ -5362,7 +5109,7 @@ void gr2AnimSetWeaponFireTime (OBJECT* pObject, SINT32 time)
 }
 
 #ifdef BETA_RELEASE
-void gr2ToggleStateTest (void)
+void gr2ToggleStateTest()
 {
 	stateTestFlag = !stateTestFlag;
 }
@@ -5690,7 +5437,7 @@ void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const 
 
 SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 {
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	piVECTOR		V1,V2;
 	OBJECT*			pObject;
 	SINT32			surfID;
@@ -5698,18 +5445,18 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	if (!vehicle || !offset)
 		return -1;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	if (vehicle->ModelData)
 	{
-		V1.x = (FLOAT32)(vehicle->ModelData->VehiclePos.x - WorldOriginOffset.x + offset->x);
-		V1.y = (FLOAT32)(vehicle->ModelData->VehiclePos.y - WorldOriginOffset.y + offset->y);
+		V1.x = (FLOAT32)(vehicle->ModelData->VehiclePos.x - worldOriginOffset.x + offset->x);
+		V1.y = (FLOAT32)(vehicle->ModelData->VehiclePos.y - worldOriginOffset.y + offset->y);
 		V1.z = -(FLOAT32)(vehicle->ModelData->VehiclePos.z + offset->z);
 	}
 	else
 	{
-		V1.x = (FLOAT32)(vehicle->PosData.RenderPos.x - WorldOriginOffset.x + offset->x);
-		V1.y = (FLOAT32)(vehicle->PosData.RenderPos.y - WorldOriginOffset.y + offset->y);
+		V1.x = (FLOAT32)(vehicle->PosData.RenderPos.x - worldOriginOffset.x + offset->x);
+		V1.y = (FLOAT32)(vehicle->PosData.RenderPos.y - worldOriginOffset.y + offset->y);
 		V1.z = -(FLOAT32)(vehicle->PosData.RenderPos.z - offset->z);
 	}
 
@@ -5726,10 +5473,10 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	if (++counter > 10)
 		counter = 0;
 
-	sprintf (buf, "inffoot_%d", counter);
+	strprintf(buf, "inffoot_%d", counter);
 
-	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
-	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
+	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &worldOriginOffset);
+	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &worldOriginOffset);
 
 	id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
 	draw3dSetDebugObjectFlipZ(id,FALSE);
@@ -5789,7 +5536,8 @@ SINT32 gr2AnimHitMapLocation(SINT32 boneNum)
 
 FLOAT64 gr2AnimGetLocationThickness(SINT32 boneNum)
 {
-	static FLOAT64 PERSON_THICKNESS[4] = {0.0004, 0.0012, 0.001, 0.001};
+				  //PERSON_LOCATION[4] = {"head", "torso", "arms", "legs"};
+	static FLOAT64 PERSON_THICKNESS[4] = {0.0055, 0.0065, 0.0012, 0.0025};
 
 	return (fpHitMap[boneNum] >= 0 && fpHitMap[boneNum] < FP_HIT_LOCATION_NUM)
 				? (PERSON_THICKNESS[fpHitMap[boneNum]]) : 0;
@@ -6275,7 +6023,7 @@ void gr2AnimDetermineMotionType(gr2AnimTrooper* model, FLOAT64 angle)
 #ifdef DEBUG_MOTION
 	fpTPSMotionType startMotion = model->currentMotion;
 #endif
-    
+
 	if(angle > DMT_FORWARD && angle < DMT_BACKWARD)
 		model->strafe = TPS_MOVETYPE_STRAFE_RIGHT;
 	else if(angle < -DMT_FORWARD && angle > -DMT_BACKWARD)
@@ -7298,7 +7046,7 @@ void gr2AnimUpdate()
 		return;
 
 #ifdef LOD_ANIMATIONS
-	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)WantedWidth, 1.0f);
+	AllowedErrorAtUnitDistance = GrannyFindAllowedLODError(AllowedErrorInPixels, (SINT32)FieldOfView, (FLOAT32)ddpGetWidth(), 1.0f);
 #endif
 
 	static colliderQuery collider = colliderQuery(0, false);
@@ -7762,9 +7510,9 @@ void gr2AnimUpdate()
 
 			// don't allow submarining when crawling off ledges
 			/*
-             
+
             FLOAT64 zLowAdjust = -(worldPos.z() - zLow);
-             
+
 			if(zLowAdjust && model->terrainTargetZ < zLowAdjust)
 			{
 				//uiChatPrintLine("ZLow %.2f < %.2f ... clamping!", zLowAdjust, model->terrainTargetZ);
@@ -8380,8 +8128,11 @@ void gr2AnimTwist::Update(gr2AnimTrooper* model, bool reset)
 		UpdateYaw(model->myVehicle, delta);
 
 		// update our position variables
-		model->myVehicle->PosData.RenderAtt.Yaw	= vehicleYaw;
-		model->myVehicle->PosData.Att.Yaw		= vehicleYaw;
+		if ( !(model->myVehicle->Flags & VEH_FLAGS_IS_CLONE) )
+		{
+			model->myVehicle->PosData.RenderAtt.Yaw	= vehicleYaw;
+			model->myVehicle->PosData.Att.Yaw		= vehicleYaw;
+		}
 	}
 
 	model->upDownWeightOverride = 0;
@@ -9508,9 +9259,6 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 			else if (diff >= 0)
 				diff -= 360.0f;
 		}
-
-		if(diff)
-			bool stop = true;
 
 		absdiff = fabs(diff);
 
@@ -11170,8 +10918,8 @@ void setEditBlendWeapon(int type)
 			{
 				_editWeapon->Update(true, true);
 
-				SINT32 from = _editWeapon->FindBone(tpsWeapons[type].attachBone);
-				SINT32 to = _editModel->skeleton->FindBone(tpsWeapons[type].attachToBone);
+				SINT32 from = _editWeapon->FindBone((SCHAR *)(tpsWeapons[type].attachBone));
+				SINT32 to = _editModel->skeleton->FindBone((SCHAR *)(tpsWeapons[type].attachToBone));
 				_editModel->skeleton->AddAttachment(_editWeapon, from, to, true);
 				_editModel->skeleton->updateAttachment = true;
 				_editWeapon->updateAttachment = true;

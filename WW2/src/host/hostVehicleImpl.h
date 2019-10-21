@@ -21,10 +21,10 @@ class HostVehicle;
 #include <vector>
 #include <map>
 
-typedef std::vector<UINT32> REMOVE_LIST;
+using REMOVE_LIST = std::vector<UINT32>;
 
 // List of callsigns we've resupplied and when we resupplied them.
-typedef std::map<ChatHandle, UINT32> RESUPPLIES;
+using RESUPPLIES = std::map<ChatHandle, UINT32>;
 
 class CPStruct;
 
@@ -47,7 +47,7 @@ class HostVehicleImpl
 
 	// Capture parameters
 	bool			m_captureActive : 1;		// True when we've sent a capture tick.
-	TeulTimeMS		m_nextCaptureTick;
+	TeulTimeMS		m_nextCaptureTick = 0;      // The time to send the next capture update to the client.
 	UINT32			m_lastCaptureFacility;		// uOID if the last facility we were capping
 
 public:

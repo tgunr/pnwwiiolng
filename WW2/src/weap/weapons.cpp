@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 
 #include "ob/stride_ptr.h"
@@ -71,7 +71,7 @@ UINT32 _NumWeaponTypes;
 weaponType * _WeaponList; // the ammo type list
 static std::vector<WEAP_FIRE_CALLBACK> _fireCallbacks; // list of callbacks to fire when a weapon is fire
 
-SINT32 weaponsInit(void)
+SINT32 weaponsInit()
 {
 	int WeaponListFile;
 	int CurrentWeaponFile;
@@ -168,10 +168,10 @@ SINT32 weaponsInit(void)
                             if(WeaponType->GhostAmmoType == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ghostammotype %s not found", VarContents);
+                                strprintf(s, "ghostammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                                piExitProgram(__FILE__, __LINE__, s);
+                                piExitProgram(_FL, s);
 #endif
                             }
 
@@ -191,10 +191,10 @@ SINT32 weaponsInit(void)
                             if(WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1] == nullptr)
                             {
                                 char s[128];
-                                sprintf(s, "ammotype %s not found", VarContents);
+                                strprintf(s, "ammotype %s not found", VarContents);
                                 Write_Debug(s);
 #if defined(BETA_RELEASE) && !defined (_DEBUG) && (platOS == OS_WIN32) // temp define until they fix the data
-                               piExitProgram(__FILE__, __LINE__, s);
+                               piExitProgram(_FL, s);
 #endif
                             }
 
@@ -282,7 +282,7 @@ UINT32 i;
 	return 0;
 }
 
-UINT32 weaponsKill(void)
+UINT32 weaponsKill()
 {
 	if (_WeaponList != nullptr)
 	{
@@ -348,7 +348,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
     piVECTOR		Dispersion = {0, 0, 0};
 	SINT32			AmmoGroup = 0;
 	UINT32			FiredWeapon = 0;
-    FLOAT64VECTOR	WorldOriginOffset = {0, 0, 0};
+    FLOAT64VECTOR	worldOriginOffset = {0, 0, 0};
     piVECTOR		V1 = {0, 0, 0};
     piVECTOR        V2 = {0, 0, 0};
     piVECTOR		origV1 = {0, 0, 0};
@@ -370,7 +370,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 	{
 		vehVehicle* v = (vehVehicle*)FireVehicle;
 
-		if(!Online || !stricmp((const char*)v->Handle, "spamster") || !stricmp((const char*)v->Handle, "agentx"))
+		if(!Online || !strcasecmp((const char*)v->Handle, "spamster") || !strcasecmp((const char*)v->Handle, "agentx"))
 		{
 			vehanimVehicleStateAnimations& anims = v->StateAnimation;
 			FLOAT64ATT& att =  (v->ModelData) ? v->ModelData->VehicleAtt: v->PosData.Att;
@@ -534,12 +534,12 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 			{
 				TempRecoilForce.x = TempRecoilForce.y = TempRecoilForce.z = 0.0;
 
-				trnGetWorldOriginOffset(&WorldOriginOffset);
-				WorldOriginOffset.z = -WorldOriginOffset.z;
+				trnGetWorldOriginOffset(&worldOriginOffset);
+				worldOriginOffset.z = -worldOriginOffset.z;
 
-				V1.x = (FLOAT32)(Pos->x - WorldOriginOffset.x);
-				V1.y = (FLOAT32)(Pos->y - WorldOriginOffset.y);
-				V1.z = -(FLOAT32)(Pos->z - WorldOriginOffset.z);
+				V1.x = (FLOAT32)(Pos->x - worldOriginOffset.x);
+				V1.y = (FLOAT32)(Pos->y - worldOriginOffset.y);
+				V1.z = -(FLOAT32)(Pos->z - worldOriginOffset.z);
 
 				V2.x = V2.z = 0.0f;
 
@@ -560,27 +560,27 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
                     mathAddVectors(&V2,&V1,&V2);
                 }
 
-				// adjust firepoint back a little
+				// adjust firepoint back a little to help stop satchels clipping into vehicles
 				piVECTOR dir;
 
 				mathSubVectors(&dir, &V2, &V1);
 				mathReallyFastNormalize(dir);
-				math3dScaleVector(&dir, &dir, .2f);
+				math3dScaleVector(&dir, &dir, .25f);
 				mathSubVectors(&V1, &V1, &dir);
 				// end adjustment
 
 #if(0)
                 FLOAT64VECTOR v1 =
                 {
-                    V1.x + WorldOriginOffset.x,
-                    V1.y + WorldOriginOffset.y,
+                    V1.x + worldOriginOffset.x,
+                    V1.y + worldOriginOffset.y,
                     V1.z
                 };
 
                 FLOAT64VECTOR v2 =
                 {
-                    V2.x + WorldOriginOffset.x,
-                    V2.y + WorldOriginOffset.y,
+                    V2.x + worldOriginOffset.x,
+                    V2.y + worldOriginOffset.y,
                     V2.z
                 };
 

@@ -20,7 +20,7 @@ namespace Server
 	{
 		public: PersonaMirrorReply(const Transfer& rhs, const SINT32 resultCode_=-EINVAL) : Transfer(rhs), resultCode(resultCode_) {}
 		virtual ~PersonaMirrorReply() {}
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) override
+		public: virtual void packer(PackMode mode, ACTION_OBJECT* const a) override
 		{
 			Transfer::packer(mode, a);
 			a->packer(mode, resultCode);

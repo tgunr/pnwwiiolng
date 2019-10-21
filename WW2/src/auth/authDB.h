@@ -42,7 +42,7 @@ struct APP_LAUNCH;
 struct GAME;
 struct PLAY_COMPUTER_INFO;
 
-void authInitDB(void);
+void authInitDB();
 void authResetConnectInfo(UINT32 gameID);
 
 //Validates a user against the database, and fills out the game cookie
@@ -53,7 +53,7 @@ UINT32 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::D
 // our ftp servers for authenication.
 void authDBInsertOTP(const APP_LAUNCH& launch, const APP_LAUNCH_REQ& request, const char* dir);
 bool authInitGameEntry(GAME& gameEntry);
-void authInitApps(void);
+void authInitApps();
 
 //
 // Search for a match between the encoded 'needle'

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: fxMisc.cpp
 // Description:
@@ -17,7 +17,6 @@
 #include "mem/mem.h"
 #include "ogl/oglGlobalStates.h"
 #include "ogl/States.h"
-#include "draw/sneaky.h"
 
 #if USE_STATESET
 #include "fx/postRender.h"
@@ -106,11 +105,11 @@ static MISCTEXTURE* _miscTexture;
 // Module: _createTexture
 // Description:
 //////////////////////////////////////////////////////////////////////
-static LOGICAL _createTexture(SINT32 width, SINT32 height, GLenum target, GLuint& texid)
+static bool _createTexture(SINT32 width, SINT32 height, GLenum target, GLuint& texid)
 {
     glEnable(target);
 
-    gl_GenTextures(1, &texid);
+    glGenTextures(1, &texid);
 
     // Initialize color texture
     TextureState::Bind(0, texid, target);
@@ -135,13 +134,11 @@ static LOGICAL _createTexture(SINT32 width, SINT32 height, GLenum target, GLuint
                  nullptr);
 
     if(!glIsTexture(texid))
-    {
-        return FALSE;
-    }
+        return false;
 
     TextureState::Disable();
 
-    return TRUE;
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -663,9 +660,7 @@ void fxMiscDrawEffects()
 {
     if(persIsCameraInternalMode())
     {
-        UINT32 position = 0;
-
-        persGetPersonaPosition(&position);
+        UINT32 position = persGetPersonaPosition();
 
         oglSetMatrixMode(GL_MODELVIEW);
         glPushMatrix();
@@ -854,9 +849,7 @@ void fxMiscStartExpConcussion(FLOAT32 rotatevalue, SINT32 timelimit)
         return;
     }
 
-    UINT32 position = 0;
-
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     if(fpFPSIsDead() || persGetCrewIsDead(position))
     {
@@ -878,9 +871,7 @@ void fxMiscStartExpConcussion(FLOAT32 rotatevalue, SINT32 timelimit)
 //////////////////////////////////////////////////////////////////////
 void fxMiscStartHitConcussion(FLOAT32 rotatevalue, SINT32 timelimit)
 {
-    UINT32 position = 0;
-
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     if(fpFPSIsDead() || persGetCrewIsDead(position))
     {

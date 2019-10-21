@@ -1,4 +1,4 @@
-//Microsoft Developer Studio generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -7,20 +7,17 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "windows.h"
 #include "afxres.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -29,7 +26,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WWII_ICON           ICON    DISCARDABLE     "res\\wwii1.ico"
+IDI_WWII_ICON           ICON                    "..\\..\\Installer\\ww2assets\\oswin\\WWIIOnline.ico"
+
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -37,18 +35,18 @@ IDI_WWII_ICON           ICON    DISCARDABLE     "res\\wwii1.ico"
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE DISCARDABLE 
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE DISCARDABLE 
+2 TEXTINCLUDE 
 BEGIN
     "#include ""afxres.h""\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE DISCARDABLE 
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "#include ""res\\WW2.rc2""\r\n"
@@ -57,23 +55,23 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_VIDEO_DEVICE DIALOG DISCARDABLE  0, 0, 229, 63
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+IDD_VIDEO_DEVICE DIALOG 0, 0, 229, 63
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 CAPTION "Video Device Error"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CTEXT           "Unable to find specified video device. Please run configuration utility.",
-                    IDC_STATIC,18,7,195,30
+    CTEXT           "Unable to find specified video device. Please run configuration utility.",IDC_STATIC,18,7,195,30
     DEFPUSHBUTTON   "OK",IDOK,93,41,50,15
 END
 
-IDD_PROPERTYSHEET DIALOG DISCARDABLE  0, 0, 200, 150
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+IDD_PROPERTYSHEET DIALOG 0, 0, 200, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Propertysheet"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -82,33 +80,29 @@ BEGIN
     CONTROL         "Tab1",IDC_TABCONTROL,"SysTabControl32",0x0,7,7,186,114
 END
 
-IDD_AUDIO_DEVICE DIALOG DISCARDABLE  0, 0, 237, 63
-STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
+IDD_AUDIO_DEVICE DIALOG 0, 0, 237, 63
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION
 CAPTION "Audio Error"
 FONT 8, "MS Sans Serif"
 BEGIN
-    CTEXT           "Unable to find specified audio device. Please run configuration utility.",
-                    IDC_STATIC,33,7,160,25
+    CTEXT           "Unable to find specified audio device. Please run configuration utility.",IDC_STATIC,33,7,160,25
     DEFPUSHBUTTON   "OK",IDOK,93,41,50,15
 END
 
-IDD_MESSAGES DIALOG DISCARDABLE  0, 0, 256, 63
-STYLE DS_MODALFRAME | WS_POPUP
+IDD_MESSAGES DIALOG 0, 0, 256, 63
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP
 FONT 8, "MS Sans Serif"
 BEGIN
-    LISTBOX         IDC_MESSAGE_LIST,0,0,255,63,LBS_NOINTEGRALHEIGHT | 
-                    LBS_NOSEL | WS_TABSTOP
+    LISTBOX         IDC_MESSAGE_LIST,0,0,255,63,LBS_NOINTEGRALHEIGHT | LBS_NOSEL | WS_TABSTOP
 END
 
-IDD_VIDEO_MODE DIALOG DISCARDABLE  0, 0, 228, 95
-STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+IDD_VIDEO_MODE DIALOG 0, 0, 228, 95
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Video Mode Selection..."
 FONT 8, "MS Sans Serif"
 BEGIN
-    COMBOBOX        IDC_VIDEO_MODE,7,42,214,49,CBS_DROPDOWNLIST | WS_VSCROLL | 
-                    WS_TABSTOP
-    CTEXT           "Select a video mode for your display.\nThe modes available for your system are listed below.",
-                    IDC_STATIC,7,7,214,30
+    COMBOBOX        IDC_VIDEO_MODE,7,42,214,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CTEXT           "Select a video mode for your display.\nThe modes available for your system are listed below.",IDC_STATIC,7,7,214,30
     DEFPUSHBUTTON   "OK",IDOK,56,73,50,15
     PUSHBUTTON      "Cancel",IDCANCEL,122,73,50,15
 END
@@ -120,7 +114,7 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO DISCARDABLE 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_VIDEO_DEVICE, DIALOG
     BEGIN
@@ -170,19 +164,9 @@ END
 // Cursor
 //
 
-IDC_CURSOR              CURSOR  DISCARDABLE     "res\\cursor.cur"
+IDC_CURSOR              CURSOR                  "..\\..\\Installer\\ww2assets\\oswin\\cursor.cur"
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// String Table
-//
-
-STRINGTABLE DISCARDABLE 
-BEGIN
-    IDS_HELPINFO            "The following command line parameters are allowed:\n\n-width\tThe window width (800)\n-height\tThe window height (600)\n-bpp\tNumber of bits per pixel (16)\n-hdw\tUse hardware acceleration (1)\n-window\tDisplay in a window (0)"
-END
-
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

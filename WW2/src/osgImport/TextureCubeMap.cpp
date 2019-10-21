@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
  * This library is open source and may be redistributed and/or modified under
@@ -364,7 +364,7 @@ void TextureCubeMap::allocateMipmap() const
     }
 }
 
-typedef buffered_value< ref_ptr<TextureCubeMap::Extensions> > BufferedExtensions;
+using BufferedExtensions = buffered_value<ref_ptr<TextureCubeMap::Extensions>>;
 static BufferedExtensions s_extensions;
 
 TextureCubeMap::Extensions* TextureCubeMap::getExtensions(unsigned int contextID,bool createIfNotInitalized)

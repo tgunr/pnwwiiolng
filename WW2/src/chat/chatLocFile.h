@@ -8,7 +8,7 @@
 
 namespace Chat { struct LocalizedMessage; }
 
-typedef std::map<int, std::string> HOSTLOC;
+using HOSTLOC = std::map<int, std::string>;
 
 bool chatReadHostLocFile();
 const char* chatLString(int prefix, int message, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");

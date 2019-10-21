@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*--------------------------------------------------------------------
 Module: trnScenario.cpp
 Description: Module used for testing terrain stuff. Should not be used
@@ -169,19 +169,19 @@ struct ClutterObjects
     }
 };
 
-typedef std::map<std::string, TerrainTile*> TileMap;
+using TileMap = std::map<std::string, TerrainTile*>;
 static TileMap tilemap;
 
-typedef std::map<std::string, GrassObjects*> GrassObjectMap;
+using GrassObjectMap = std::map<std::string, GrassObjects*>;
 static GrassObjectMap grassmap;
 
-typedef std::map<std::string, TreeObjects*> TreeObjectMap;
+using TreeObjectMap = std::map<std::string, TreeObjects*>;
 static TreeObjectMap treemap;
 
-typedef std::map<std::string, ClutterObjects*> ClutterObjectMap;
+using ClutterObjectMap = std::map<std::string, ClutterObjects*>;
 static ClutterObjectMap cluttermap;
 
-typedef std::map<std::string, std::string> LoadedTerrainMap;
+using LoadedTerrainMap = std::map<std::string, std::string>;
 static LoadedTerrainMap loadedmap;
 
 class ExposedLoader : public XMLLoader2<ExposedLoader>
@@ -2108,7 +2108,7 @@ static void HandleClutterObject(const std::vector<Vec2f>& bucket, int color, voi
                          (SINT64)list[i].pos.y() * (SINT64)103515051525LL);
 
         char buff[256];
-        const char* obj;
+		const char *obj = nullptr;
         float rot = 0;
 
         if(color == ScenarioColors::RED)
@@ -2131,7 +2131,7 @@ static void HandleClutterObject(const std::vector<Vec2f>& bucket, int color, voi
 
         if(obj)
         {
-            sprintf(buff, "clutter %s %f %f %f 0 0 %f 0 0 0 0", obj, (float)list[i].pos.x(), (float)list[i].pos.y(), (float)list[i].pos.z(), rot);
+            strprintf(buff, "clutter %s %f %f %f 0 0 %f 0 0 0 0", obj, (float)list[i].pos.x(), (float)list[i].pos.y(), (float)list[i].pos.z(), rot);
             SCEN_MGR->AddContent(buff);
         }
     }
@@ -2510,7 +2510,7 @@ struct AddMultiTexture
             tt = itr->second;
 
             char num[16];
-            sprintf(num, "%d", tt->layercount);
+            strprintf(num, "%d", tt->layercount);
 
             material->SetRenderState(new Program(tt->shader + num));
             std::vector<std::string> textures;
@@ -2613,7 +2613,7 @@ struct AddMultiTexture
             tt = itr->second;
 
             char num[16];
-            sprintf(num, "%d", tt->layercount);
+            strprintf(num, "%d", tt->layercount);
 
             material->SetShader(tt->shader + num);
             std::vector<std::string> textures;
@@ -2742,7 +2742,7 @@ static void damageObject(OBJECT* o)
         {
             for(unsigned int i = 0; i < pm->subModelReferences.size(); i++)
             {
-                sprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
+                strprintf(model, "%s_%d", pm->subModelReferences[i].poolModel->modelname.c_str(), i + 1);
 
                 OBJECT* ooo = obmainFindTopmostObject(model);
 
@@ -2846,6 +2846,7 @@ void TerrainScenario::LoadBuildings()
                     if(damage)
                     {
                         OBJECT* o = obmainFindTopmostObject(name.c_str());
+                        assert(o);
                         damageObject(o);
                     }
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Oct  7 22:26:47 CDT 2008
 //
 // Instancing code/data common between client/host

@@ -7,11 +7,11 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern SINT32 wwiiClientInstallCallbacks(void);
+extern SINT32 wwiiClientInstallCallbacks();
 
 extern SINT32 wwiiSendWWII_ERROR_INFO(SINT32 connection, struct WWII_ERROR_INFO* info);
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 
 extern SINT32 wwiiQueuedSend_WWII_ERROR_INFO(struct WWII_ERROR_INFO*);
 extern SINT32 wwiiServiceQueue_WWII_ERROR_INFO();
@@ -19,10 +19,11 @@ extern SINT32 wwiiServiceQueue_WWII_ERROR_INFO();
 extern SINT32 wwiiLog_WWII_ERR_INFO(struct WWII_ERROR_INFO*);
 extern SINT32 wwiiSendLog_WWII_ERR_INFO();
 
-#endif // FRONT_END
+#endif // platBuild == BUILD_CLIENT
 
 // Used by the covert and locality systems
 extern void wwiiActivateCell(LOGICAL);
 extern UINT32 wwiiGetUpdateNo(bool increment = true);
 extern void wwiiResetUpdateNo();
 extern UINT32 wwiiHitsPrime();
+extern void checkThemeChange(UINT32 theme);

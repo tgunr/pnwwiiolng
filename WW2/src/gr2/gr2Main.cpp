@@ -46,9 +46,9 @@
 
 #define GR2VEHICLE_STAND_EYE_HEIGHT 7.0f // meters
 
-typedef std::vector<gr2Vehicle*> VehicleList;
-typedef std::map<vehVehicle*,gr2Vehicle*> VehicleMap;
-typedef std::map<OBJECT*,gr2Vehicle*> ObjectMap;
+using VehicleList = std::vector<gr2Vehicle*>;
+using VehicleMap = std::map<vehVehicle*,gr2Vehicle*>;
+using ObjectMap = std::map<OBJECT*,gr2Vehicle*>;
 
 // list of active vehicles
 static VehicleList _vehicles;

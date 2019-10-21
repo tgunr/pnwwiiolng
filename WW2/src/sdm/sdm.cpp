@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <string.h>
 #include <ctype.h>
@@ -20,12 +20,12 @@
 
 static void un_rle(SINT16 inlen, SINT16* indata, SINT16* outlen, SINT16* outdata);
 
-typedef size_t (READFN)(int, void*, size_t);
+using READFN = size_t(*)(int, void*, size_t);
 
-static SINT8   readc(int fd, READFN* const);
-static SINT16  reads(int fd, READFN* const);
-static SINT32  readl(int fd, READFN* const);
-static float	readf(int fd, READFN* const);
+static SINT8   readc(int fd, READFN const);
+static SINT16  reads(int fd, READFN const);
+static SINT32  readl(int fd, READFN const);
+static float	readf(int fd, READFN const);
 
 static void normalize_path(char*);
 static void filter_name(char*);
@@ -34,7 +34,7 @@ static void filter_name(char*);
 	read_dtl_data
 *************************************************************************************************/
 
-int sdm_read_dtl_data(int fd, READFN* const readfn, sdm_dtl_data* dtl)
+int sdm_read_dtl_data(int fd, READFN const readfn, sdm_dtl_data* dtl)
 {
 	sdm_header header;
 	int datalen;
@@ -78,7 +78,7 @@ int sdm_read_dtl_data(int fd, READFN* const readfn, sdm_dtl_data* dtl)
 	sdm_read_replacement_data
 *************************************************************************************************/
 
-int sdm_read_replacement_data(int fd, READFN* const readfn, sdm_replacement_octet_data* data)
+int sdm_read_replacement_data(int fd, READFN const readfn, sdm_replacement_octet_data* data)
 {
 	int i;
 	sdm_terrain_info* trninfo;
@@ -130,7 +130,7 @@ int sdm_read_replacement_data(int fd, READFN* const readfn, sdm_replacement_octe
 	sdm_read_strat_data
 *************************************************************************************************/
 
-int sdm_read_strat_data(int fd, READFN* const readfn, sdm_strat_data* strat_data)
+int sdm_read_strat_data(int fd, READFN const readfn, sdm_strat_data* strat_data)
 {
 	int i;
 	sdm_strat_header header;
@@ -342,7 +342,7 @@ static void un_rle(SINT16 inlen, SINT16* indata, SINT16* outlen, SINT16* outdata
 	readc
 *************************************************************************************************/
 
-static SINT8 readc(int fd, READFN* const readfn)
+static SINT8 readc(int fd, READFN const readfn)
 {
 	SINT8 c;
 	readfn(fd, &c, 1);
@@ -353,7 +353,7 @@ static SINT8 readc(int fd, READFN* const readfn)
 	reads
 *************************************************************************************************/
 
-static SINT16 reads(int fd, READFN* const readfn)
+static SINT16 reads(int fd, READFN const readfn)
 {
 	SINT16 s;
 	readfn(fd, &s, 2);
@@ -364,7 +364,7 @@ static SINT16 reads(int fd, READFN* const readfn)
 	readl
 *************************************************************************************************/
 
-static SINT32 readl(int fd, READFN* const readfn)
+static SINT32 readl(int fd, READFN const readfn)
 {
 	SINT32 l;
 	readfn(fd, &l, 4);
@@ -375,7 +375,7 @@ static SINT32 readl(int fd, READFN* const readfn)
 	readf
 *************************************************************************************************/
 
-static float readf(int fd, READFN* const readfn)
+static float readf(int fd, READFN const readfn)
 {
 	float f;
 	readfn(fd, &f, 4);

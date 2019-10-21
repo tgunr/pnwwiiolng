@@ -1,18 +1,19 @@
 #if !defined(GENERATE_TANGENTS_H)
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/generate_tangents.h $
-// $DateTime: 2009/04/21 13:36:27 $
-// $Change: 21418 $
-// $Revision: #1 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 
-bool GenerateTangents(input_file&,
-                      key_value_pair* KeyValues,
-                      granny_int32x NumKeyValues,
-                      granny_memory_arena* Arena);
+granny_file_info*
+GenerateTangents(granny_file_info* Info,
+                 key_value_pair* KeyValues,
+                 granny_int32x NumKeyValues,
+                 granny_memory_arena* Arena);
 
 #define GENERATE_TANGENTS_H
 #endif

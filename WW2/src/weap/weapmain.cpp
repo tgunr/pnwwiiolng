@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 
 #include "weap/weapmain.h"
@@ -6,7 +6,7 @@
 #include "weap/weapons.h"
 
 
-UINT32 weapInit(void)
+UINT32 weapInit()
 {
 
 logTimerBeginExtMacro(weapAmmoInit);
@@ -20,7 +20,7 @@ logTimerEndExtMacro(weaponsInit);
 	return 0;
 }
 
-UINT32 weapKill(void)
+UINT32 weapKill()
 {
 
 	weaponsKill();

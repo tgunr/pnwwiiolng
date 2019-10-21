@@ -74,8 +74,7 @@ public:
 			result.m_squadID = row.NextUInt();
 			result.m_playerID = row.NextUInt();
 			result.m_handle = chatGetHandle(row.NextColumn());
-			strncpy(result.m_days, row.NextColumn(), sizeof(result.m_days) - 1);
-			result.m_days[15] = 0;
+			strsafecpy(result.m_days, row.NextColumn());
 			m_results.push_back(result);
 		}
 
@@ -118,7 +117,7 @@ public:
 				if ( entry )
 				{
 					if ( entry->player() )
-						entry->player()->message(LSTR_SQUAD, LSTR_SQUAD_REMOVED_LAPSED, result.m_days, squadList->squad().shortName());
+						entry->player()->message(LSTR_SQUAD, LSTR_SQUAD_REMOVED_LAPSED, result.m_days, squadList->squad().callsign().c_str());
 					squadList->memberLeave(true, entry, LSTR_SQUAD_RECRUIT_LAPSED, result.m_days);
 					///TODO:127: Should we continue?
 					continue;

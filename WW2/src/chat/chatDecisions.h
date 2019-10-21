@@ -9,11 +9,11 @@
 
 // Vote "hold" on a specified decision
 bool chatVoteHold(class Player* player, const char* id);
-bool chatStartHold(Player* player, const struct FULL_OBJ_ID& target);
+bool chatStartHold(Player* player, const struct FULL_OBJ_ID target);
 
 // Vote "fallback" on a specified decision
 bool chatVoteFallback(Player* player, const char* id);
-bool chatStartFallback(Player* player, const FULL_OBJ_ID& target);
+bool chatStartFallback(Player* player, const FULL_OBJ_ID target);
 
 // Vote "delay" (veto) on a specified decision
 bool chatVetoDecision(Player* player, const char* id);

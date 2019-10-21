@@ -73,10 +73,11 @@ enum BRIGADE_CONTROL_ERROR
 ,	BCERR_OWN_TOWN					// Target invalid because its friendly
 									// (e.g. for attack)
 ,	BCERR_ALREADY_OBJECTIVE			// Target already has an objective
-,	BCERR_NOT_OBJECTIVE				// Not an objective, retard
+,	BCERR_NOT_OBJECTIVE				// Not an objective
 ,	BCERR_CANT_CANX_DEFEND			// Can't cancel defend, tit
 ,	BCERR_NOT_FRONTLINE				// Can't attack non-frontline towns
 ,	BCERR_NOMINEE_CANT_OIC			// The player you tried to nominate doesn't have OIC permission
+,   BCERR_COUNTRY_ALREADY_CHANGED   // The country is already as specified
 ,	MAX_BC_ERRORS
 };
 
@@ -126,11 +127,12 @@ public:
 	,	_REPLACE_PENDING		// OIC is replacing you
 	,	_OFFER_LAPSED			// Offer to a player timed out
 	,	_OBJECTIVE				// Attack/Clear/Defend see action code
+	,   _COUNTRY_CHANGED		// Notice that a unit(s) country has changed (garrisons only)
 	};
 
 public:
 	//// ACTION CODES:
-	enum
+	enum BRIGADE_ACTION_REQ : int
 	{
 		REQ_INVALID				// Uninitialized
 	,	REQ_LIST				// Request a list
@@ -145,11 +147,18 @@ public:
 	,	REQ_REMOVE				// Want to remove an OIC
 	,	REQ_MOVE				// Move a brigade
 	,	REQ_ATTACK				// Attack a target
-	,	REQ_CLEAR				// Clear an dattack or defend objective
+	,	REQ_CLEAR				// Clear an attack or defend objective
 	,	REQ_DEFEND				// Defend a target
+	,   REQ_COUNTRY_CHANGE		// Request a change in country (Garrison Cities only)
 
 	,	MAX_BC_REQ_CODES		// Maximum brigade control request codes
 	};
+    static inline std::string to_string(BRIGADE_ACTION_REQ req) {
+        static const std::vector<std::string> reqs{
+            "INVALID", "LIST", "NOMINATE", "VETO", "VOLUNTEER", "RESIGN", "REPLACE", "REMOVE", "MOVE", "ATTACK", "CLEAR", "DEFEND", "COUNTRY" };
+        auto rawReq = static_cast<std::underlying_type<BRIGADE_ACTION_REQ>::type>(req);
+        return rawReq > 0 && (size_t)rawReq < reqs.size() ? reqs[rawReq] : std::to_string(rawReq);
+    }
 
 public:
 	BrigadeControl()
@@ -157,17 +166,17 @@ public:
 		, m_officer(0), m_sponsor(0)
 		, m_target(nullObjID), m_origin(nullObjID)
 		{}
-	BrigadeControl(UINT32 action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle& officer, const ChatHandle& sponsor, const FULL_OBJ_ID& origin=nullObjID)
+	BrigadeControl(BRIGADE_ACTION_REQ action, UCHAR country, UCHAR branch, UINT32 brigadeID, const ChatHandle officer, const ChatHandle sponsor, const FULL_OBJ_ID origin=nullObjID)
 		: m_action(action), m_country(country), m_branch(branch), m_brigadeID(brigadeID), m_officer(officer), m_sponsor(sponsor), m_origin(origin)
 		{}
-    
+
     BrigadeControl(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
-	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
+	bool isTargettedAction() const { return (m_action == REQ_MOVE || m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND || m_action == REQ_CLEAR); }
 	bool isObjective() const { return (m_action == REQ_ATTACK || m_action == REQ_CLEAR || m_action == REQ_DEFEND); }
 
 public:
-	UINT32		m_action;		// What action you was requested
+	BRIGADE_ACTION_REQ		m_action;		// What action you was requested
 	UCHAR		m_country;		// Country affected
 	UCHAR		m_branch;		// Branch affected
 	UINT32		m_brigadeID;	// Brigade No
@@ -177,7 +186,7 @@ public:
 	FULL_OBJ_ID	m_origin;		// Where its moving from
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	static TEUL_CALLBACK* s_callback;
@@ -210,28 +219,32 @@ public:
 	// H/C: client volunteering for OIC
 	bool volunteerOIC(SINT32 teulIndex, UINT32 brigade);
 	// H/C: client nominating an OIC
-	bool nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& nomineeHandle);
+	bool nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle nomineeHandle);
 	// H/C: client vetoing an OIC
-	bool vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& onHandle);
+	bool vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle onHandle);
 	// H/C: client resigning OIC position of a specified brigade
 	bool resignOIC(SINT32 teulIndex, UINT32 brigade);
 	// H/C: client requesting to replace existing OIC (must be HC)
-	bool replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oldHandle);
+	bool replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oldHandle);
 	// H/C: client wants to remove an existing OIC
-	bool removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oicHandle);
+	bool removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oicHandle);
 	// H/C: Propose a brigade move; must specify the location you think you are
 	// moving it from.
-	bool requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin);
+	bool requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
 	// H/C: Propose to attack a city with this brigade
-	bool requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& destination);
+	bool requestAttack(SINT32 teulIndex, const FULL_OBJ_ID destination);
 	// H/C: Propose the cancellation of an attack; not worried about the origin for this one
-	bool requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& destination);
+	bool requestDefend(SINT32 teulIndex, const FULL_OBJ_ID destination);
 	// H/C: Propose the cancellation of an attack; not worried about the origin for this one
-	bool requestClear(SINT32 teulIndex, const FULL_OBJ_ID& destination);
+	bool requestClear(SINT32 teulIndex, const FULL_OBJ_ID destination);
 	// H/C: Veto a brigade move
-	bool vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin);
+	bool vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin);
 	// H/C: Veto an objective order
-	bool vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& target);
+	bool vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target);
+	// H/C: Propose a CP/garrison country change.
+	bool requestBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country);
+	// H/C: Veto a CP/garrison country change
+	bool vetoBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country);
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -258,7 +271,8 @@ class BrigadeControlNotice : public BrigadeControl
 public:
 	BrigadeControlNotice(UINT32 notice=_ERROR)
 		: BrigadeControl(), m_notice(notice), m_error(0), m_time(0), m_votePermit(VP_NONE), m_received(0) {}
-	BrigadeControlNotice(UINT32 notice, UINT32 error, UINT32 action, VOTE_PERMIT votePermit, class HCUnit const& unit, const ChatHandle& subject, const ChatHandle& actor, UINT32 duration=0);
+	BrigadeControlNotice(UINT32 notice, UINT32 error, BRIGADE_ACTION_REQ action, VOTE_PERMIT votePermit, class HCUnit const& unit, const ChatHandle subject,
+                         const ChatHandle actor, UINT32 duration=0);
 	BrigadeControlNotice(const BrigadeControl& rhs, UINT32 notice, UINT32 error, UINT32 time)
 		: BrigadeControl(rhs), m_notice(notice), m_error(error), m_time(time), m_votePermit(VP_NONE), m_received(0) {}
 	BrigadeControlNotice(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
@@ -298,6 +312,6 @@ public:
 	SINT32		m_received;		// point in time to base m_time off of
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 };
 

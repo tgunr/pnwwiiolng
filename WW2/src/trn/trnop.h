@@ -42,4 +42,4 @@ extern bool trnopDynamicBase(const FLOAT64VECTOR& worldPos,
 										 FLOAT64VECTOR& obPos,
 										 piVECTOR& obAtt);
 
-extern void trnopLoadTrees(LOGICAL bLoad);
+extern void trnopLoadTrees(bool bLoad);

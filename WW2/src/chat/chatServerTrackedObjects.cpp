@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "chat/chatBailSTO.h"
 #include "chat/chatServerTrackedObjects.h"				// Our header file
 #include "wwii/wwiiServerTrackedObject.h"
@@ -29,23 +27,11 @@
 #include "wwii/wwiiConfig.h"
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
-#include "wwii/wwiiThreads.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
-struct PPOConfig
-{
-	PPOConfig(TeulTimeMS _timeout = 0ULL, UINT64 _threshold = 0ULL, UINT64 _capacity = 0ULL)
-		: m_timeout(_timeout)
-		, m_damageThreshold(_threshold)
-		, m_damageCapacity(_capacity)
-		{}
-
-	TeulTimeMS		m_timeout;
-	UINT64			m_damageThreshold;
-	UINT64			m_damageCapacity;
-};
-
-std::vector<PPOConfig> ppoConfigs;
+extern PPOSpecLoader specLoader;
 
 //////////////////////////////////////////////////////////////////////
 // Handle a delete request from a client.
@@ -81,13 +67,13 @@ _processSTOKillRequest(ACTION_OBJECT* const a)
 
 	if ( sto->instanceID() != player->instance().id() )
 	{
-		dbugLog(_FLW, "t:%d p:%u c:%s attempting to delete an STO from another instance. sto:%u pin:%llu sin:%llu"
+		dbugLog(_FLW, "t:%d p:%u c:%s attempting to delete an STO from another instance. sto:%u pin:%" PR64BitUT " sin:%" PR64BitUT ""
 						, a->teulIndex, player->playerID(), player->callsign()
 						, uid, sto->instanceID(), player->instance().id());
 		return;
 	}
 
-	dbugLog(_FLM, "t:%d p:%u c:%s in:%llu sto:%u destroying STO at GM request"
+	dbugLog(_FLM, "t:%d p:%u c:%s in:%" PR64BitUT " sto:%u destroying STO at GM request"
 					, a->teulIndex, player->playerID(), player->callsign()
 					, sto->instanceID(), uid);
 
@@ -108,7 +94,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	case ServerTrackedObject::_REMOVAL:
 		_processSTOKillRequest(a);
 		return;
-	break;
 
 	case ServerTrackedObject::_VEHICLE:
 		sto = new VehicleSTO(a);
@@ -141,7 +126,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	default:
 		dbugLog(_FLW, "t:%d type:%d unhandled sto type", a->teulIndex, type);
 		return;
-	break;
 	}
 
 	if ( sto == nullptr )
@@ -159,7 +143,7 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 							, sto->creatorID(), sto->lifespan(), sto->flags()
 				);
 		return;
-	break;
+
 	case ServerTrackedObject::_ADD_FAIL:
 	case ServerTrackedObject::_ADD_DUPLICATE:
 	default:
@@ -167,14 +151,6 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 		delete sto;
 	break;
 	}
-}
-
-bool
-chatAddServerTrackedObject(ServerTrackedObject* sto)
-{
-	if ( ServerTrackedObject::addToIndex(sto) != ServerTrackedObject::_ADD_SUCCESS )
-		return false;
-	return true;
 }
 
 void
@@ -235,7 +211,7 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 {
 	if ( player->side() == side() )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %lldj damage to same side STO"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %" PR64BitT "j damage to same side STO"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), joules);
 		return false;
@@ -243,7 +219,7 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( damage().isDestroyed() )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %lldj ignored to dead msp"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %" PR64BitT "j ignored to dead msp"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), joules);
 #if defined(BETA_RELEASE)
@@ -254,14 +230,14 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( damage().applyJoules(joules) == false )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %lldj not applied"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %" PR64BitT "j not applied"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules);
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
 		char doneJoules[32];
 		char threshJoules[32];
-		strprintf(doneJoules, "%llu", joules);
-		strprintf(threshJoules, "%llu", damage().threshold());
+		strprintf(doneJoules, "%" PR64BitUT "", joules);
+		strprintf(threshJoules, "%" PR64BitUT "", damage().threshold());
 		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
 #endif
 		return false;
@@ -269,17 +245,18 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( damage().isDestroyed() == false )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s side:%u sto:%u side:%u did %lldj. msp at %lluj/%lluj total"
+		dbugLog(_FLI, "t:%d p:%u c:%s side:%u sto:%u side:%u did %" PR64BitT "j. msp at %" PR64BitUT "j/%" PR64BitUT "j total"
 						, player->teulIndex(), player->playerID(), player->callsign(), player->side()
 						, uid(), side()
 						, joules, damage().accumulated(), damage().capacity());
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
-		player->message(LSTR_BETA, LSTR_GENERIC, chatMakeTempString("%lluj to sto (%llu/%llu)", joules, damage().accumulated(), damage().capacity()));
+		PREP_CHAT_MSG(cmsg, "%" PR64BitUT "j to sto (%" PR64BitUT "/%" PR64BitUT ")", joules, damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
 #endif
 		return false;
 	}
 
-	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u m:%u destroyed [%lldj damage]"
+	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u m:%u destroyed [%" PR64BitT "j damage]"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), missionID(), joules);
 
@@ -289,11 +266,11 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( missionID() > 0 )
 	{
-		betaLog(_FLI, "m:%u sto:%u sending mspw delete", missionID(), uid());
+		dbugLog(_FLI, "m:%u sto:%u sending mspw delete", missionID(), uid());
 		ChatMission* const mission = chatFindMission(missionID());
 		if ( mission )
 		{
-			mission->setFRUCooldown(host_config.sto.fruDeathCooldown_s);
+			mission->setFRUCooldown(host_config.sto.deathCooldown_s[m_subType-1]);
 			mission->removeMSPWaypoint(uid(), true);
 		}
 	}
@@ -323,13 +300,13 @@ HulkSTO::applyJoules(const SINT64& joules, Player* const player)
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
 	if ( joules < (SINT64)damage().threshold() )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %lldj below %lldj threshold"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u %" PR64BitT "j below %" PR64BitT "j threshold"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules, damage().threshold());
 		char doneJoules[32];
 		char threshJoules[32];
-		strprintf(doneJoules, "%llu", joules);
-		strprintf(threshJoules, "%llu", damage().threshold());
+		strprintf(doneJoules, "%" PR64BitUT "", joules);
+		strprintf(threshJoules, "%" PR64BitUT "", damage().threshold());
 		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
 		return false;
 	}
@@ -342,17 +319,18 @@ HulkSTO::applyJoules(const SINT64& joules, Player* const player)
 
 	if ( damage().isDestroyed() == false )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s sto:%u did %lldj damage. %s at %lluj/%lluj total"
+		dbugLog(_FLI, "t:%d p:%u c:%s sto:%u did %" PR64BitT "j damage. %s at %" PR64BitUT "j/%" PR64BitUT "j total"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules, typeName(), damage().accumulated(), damage().capacity());
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
-		player->message(LSTR_BETA, LSTR_GENERIC, chatMakeTempString("%lluj to %s sto (%llu/%llu)", joules, typeName(), damage().accumulated(), damage().capacity()));
+		PREP_CHAT_MSG(cmsg, "%" PR64BitUT "j to %s sto (%" PR64BitUT "/%" PR64BitUT ")", joules, typeName(), damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
 #endif
 		return false;
 	}
 
 	// Finally, it's dead-dead jim.
-	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u %s destroyed [%lldj -> %lluj damage]"
+	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u %s destroyed [%" PR64BitT "j -> %" PR64BitUT "j damage]"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), typeName(), joules, damage().capacity());
 
@@ -374,7 +352,7 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 	// Player leaving a PPO.
 	if ( joules == 0 )
 	{
-		threadLog(_FLD, "t:%d p:%u c:%s sto:%u player leaving sto (0j damage to %s)"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u player leaving sto (0j damage to %s)"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), typeName());
 		extractPlayer(player);
@@ -388,14 +366,14 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 		auto it = std::find(m_occupants.begin(), m_occupants.end(), player);
 		if ( it == m_occupants.end() )
 		{
-			threadLog(_FLD, "t:%d p:%u c:%s sto:%u entered %s [%lld damage]"
+			dbugLog(_FLD, "t:%d p:%u c:%s sto:%u entered %s [%" PR64BitT " damage]"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), typeName(), joules);
 			m_occupants.push_back(player);
 		}
 		else
 		{
-			threadLog(_FLD, "t:%d p:%u c:%s sto:%u got %s entry message [%lld damage]"
+			dbugLog(_FLD, "t:%d p:%u c:%s sto:%u got %s entry message [%" PR64BitT " damage]"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, uid(), typeName(), joules);
 		}
@@ -416,28 +394,45 @@ PPOSTO::applyJoules(const SINT64& joules, class Player* const player)
 
 	if ( joules < (SINT64)damage().threshold() )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage (%lldj) < damage threshold (%lluj), taking no damage"
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage (%" PR64BitT "j) < damage threshold (%" PR64BitUT "j), taking no damage"
 							, player->teulIndex(), player->playerID(), player->callsign()
 							, uid(), joules, damage().threshold());
+#if defined(BETA_RELEASE)
+		player->message(LSTR_BETA, LSTR_MSP_DMG_IGNORED);
+#endif
 		return false;
 	}
 
 	if ( damage().applyJoules(joules) == false )
 	{
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+		char doneJoules[32];
+		char threshJoules[32];
+		strprintf(doneJoules, "%llu", joules);
+		strprintf(threshJoules, "%llu", damage().threshold());
+		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
+#endif
 		return false;
 	}
 
 	if ( damage().isDestroyed() == false )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s sto:%u did %lldj damage. %s at %lluj/%lluj total"
+		dbugLog(_FLI, "t:%d p:%u c:%s sto:%u did %" PR64BitT "j damage. %s at %" PR64BitUT "j/%" PR64BitUT "j total"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, uid(), joules, typeName(), damage().accumulated(), damage().capacity());
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+		PREP_CHAT_MSG(cmsg, "%lluj to sto (%llu/%llu)", joules, damage().accumulated(), damage().capacity());
+		player->message(LSTR_BETA, LSTR_GENERIC, cmsg);
+#endif
 		return false;
 	}
 
-	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u %s destroyed [%lldj -> %lluj damage]"
+	dbugLog(_FLI, "t:%d p:%u c:%s sto:%u %s destroyed [%" PR64BitT "j -> %" PR64BitUT "j damage]"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), typeName(), joules, damage().capacity());
+#if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
+	player->message(LSTR_BETA, LSTR_UMS_KILLED);
+#endif
 
 	wwiiRemoveSTO(uid());
 
@@ -462,7 +457,7 @@ STO_JOULES::receive(SINT32 teulIndex, STO_JOULES& incoming)
 
 	for ( auto it = incoming.data().begin(), end = incoming.data().end(); it != end; ++it )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage:%lld", teulIndex, player->playerID(), player->callsign(), it->m_uid, it->m_joules);
+		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage:%" PR64BitT "", teulIndex, player->playerID(), player->callsign(), it->m_uid, it->m_joules);
 		ServerTrackedObject* const sto = ServerTrackedObject::lookup(it->m_uid);
 		if ( sto == nullptr )
 		{
@@ -503,8 +498,8 @@ void
 ServerSTO::_audit(ServerSTO::EventType eventType)
 {
 	DBThread::Do(DBThread::Audit
-				, "INSERT INTO audit.sto_history"
-					" VALUES (%u,%llu,'%s',%llu,%u,%u,%u,%u,%f,%f,%f,%f,%f,%f,%u,%u)"
+				, "INSERT INTO `audit`.`sto_history`"
+					" VALUES (%u,%" PR64BitUT ",'%s',%" PR64BitUT ",%u,%u,%u,%u,%f,%f,%f,%f,%f,%f,%u,%u)"
 					, (UINT32)uid()
 					, (UINT64)teulClock64
 					, (const char* const)(eventType == Creation ? "Creation" : "Destruction")
@@ -526,12 +521,22 @@ ServerSTO::_audit(ServerSTO::EventType eventType)
 STODamage::STODamage(UINT16 subType)
 	: m_threshold(0ULL), m_capacity(0ULL), m_accumulated(0ULL)
 {
-	if ( subType <= 0 || subType >= ppoConfigs.size() )
-		return;
+	PPOSpec* config = specLoader.ppoGetSpec(subType);
 
-	const PPOConfig& config = ppoConfigs[subType];
-	m_threshold = config.m_damageThreshold;
-	m_capacity = config.m_damageCapacity;
+	// grab damage/capacity first grap from config
+	if (config != nullptr)
+	{
+		if (m_threshold == 0)
+			m_threshold = config->damageThreshold;
+		if (m_capacity == 0)
+			m_capacity = config->damageCapacity;
+	}
+
+	// grab damage/capacity override from host config
+	if (host_config.sto.damageThreshold[subType-1] > 0)
+		m_threshold = host_config.sto.damageThreshold[subType-1];
+	if (host_config.sto.damageCapacity[subType-1] > 0)
+		m_capacity = host_config.sto.damageCapacity[subType - 1];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -576,13 +581,8 @@ UMSSTO::UMSSTO(UINT16 withSubType, const WorldPosition_m& withPosition, const At
 
 UMSSTO::UMSSTO(ACTION_OBJECT* const a)
 	: ServerSTO(a)
-	, m_damage(host_config.sto.damageThreshold, host_config.sto.damageCapacity)
+	, m_damage(m_subType)
 {
-	if ( m_subType > 0 && m_subType < ppoConfigs.size() )
-	{
-		m_damage = STODamage(m_subType);
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -590,7 +590,6 @@ UMSSTO::UMSSTO(ACTION_OBJECT* const a)
 
 PPOSTO::PPOSTO(ACTION_OBJECT* const a)
 	: ServerSTO(a)
-//	, m_damage(host_config.sto.ppoDamageThreshold, host_config.sto.ppoDamageCapacity)
 	, m_damage(m_subType)
 	, m_occupants(8)
 	, m_maxLife(0ULL)
@@ -598,9 +597,16 @@ PPOSTO::PPOSTO(ACTION_OBJECT* const a)
 {
 	m_occupants.clear();
 	m_lifespan = 0;
-	m_maxLife = ppoConfigs[0].m_timeout;
-	if ( m_subType > 0 && m_subType < ppoConfigs.size() )
-		m_maxLife = ppoConfigs[m_subType].m_timeout;
+	PPOSpec* config = specLoader.ppoGetSpec(m_subType);
+	if (config != nullptr)
+	{
+		m_maxLife = config->timeout;
+		dbugLog(_FLW, "PPO max life set to %" PR64BitUT " for subtype %d", m_maxLife, m_subType);
+	}
+	else
+	{
+		dbugLog(_FLW, "PPO Spec not found for subtype %d", m_subType);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -619,7 +625,7 @@ PPOSTO::extractPlayer(const Player* const player)
 
 	m_lastOccupied = teulClock64;
 
-	threadLog(_FLD, "t:%d p:%u c:%s sto:%u left %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s sto:%u left %s"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, uid(), typeName());
 }
@@ -653,7 +659,7 @@ _checkSTO(ServerTrackedObject& sto)
 		{
 #ifdef BETA_RELEASE
 			char buf[128];
-			sprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
+			strprintf(buf, "ums:%u(m:%u) ", umssto.uid(), umssto.missionID());
 			stoList += buf;
 #endif
 
@@ -713,7 +719,7 @@ _dumpSTO(ServerTrackedObject& sto)
 	break;
 	}
 
-	sprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
+	strprintf(buf, "%s:%u(%u.%u,age:%u,ls:%u) "
 					, type, sto.uid(), sto.type(), sto.subType(), age, life);
 
 	stoList += buf;
@@ -734,135 +740,6 @@ public:
 	}
 } dotListSTOs;
 
-//////////////////////////////////////////////////////////////////////
-// PPO.xml parsing/handling.
-
-#include "tinyxml/tinyxml.h"
-
-//////////////////////////////////////////////////////////////////////
-// Get the config parameters we understand.
-
-static PPOConfig
-_getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
-{
-	if ( parent == nullptr )
-		return defaultConfig;
-
-	static const char* const timeoutAttributeName = "timeout-minutes";
-	static const char* const dmgThresholdName = "damage-threshold";
-	static const char* const dmgCapacityName = "damage-capacity";
-
-	PPOConfig config(defaultConfig);
-
-	// Look through the <param>s for <param name='timeout-minutes'/>
-	for ( auto	node = parent->FirstChild("param")
-		;		node != nullptr
-		;		node = node->NextSibling("param")
-		)
-	{
-		auto param = node->ToElement();
-		if ( strcasecmp(param->Attribute("name"), timeoutAttributeName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_timeout = (TeulTimeMS)(strtof(valueStr, nullptr) * 60.0 * 1000.0);
-			}
-		}
-		else if ( strcasecmp(param->Attribute("name"), dmgThresholdName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_damageThreshold = strtoull(valueStr, nullptr, 10);
-			}
-		}
-		else if ( strcasecmp(param->Attribute("name"), dmgCapacityName) == 0 )
-		{
-			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != nullptr && isdigit(*valueStr) )
-			{
-				config.m_damageCapacity = strtoull(valueStr, nullptr, 10);
-			}
-		}
-	}
-
-	return config;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Set up everything we need for STOs.
-
-void
-chatLoadPPOXML()
-{
-	std::string xmlFile = cv_dataDir.GetString();
-	xmlFile += "/ppo.xml";
-
-	try
-	{
-		TiXmlDocument doc(xmlFile.c_str());
-		if ( doc.LoadFile() == false )
-			throw std::runtime_error("Unable to load ppo.xml");
-
-		const TiXmlNode* const root = doc.FirstChild("ppos");
-		if ( root == nullptr )
-			throw std::runtime_error("Unable to find <ppos> container in ppo.xml");
-
-		dbugLog(_FLI, "ppo: reading file %s", xmlFile.c_str());
-
-		// Get the default timeout-minutes value from the <defaults> tag.
-		PPOConfig defaultConfig = _getConfig(root->FirstChild("defaults"), PPOConfig());
-		dbugLog(_FLIB, " defaults timeout:%llums, dmgThresh:%lluj, dmgCap:%lluj", defaultConfig.m_timeout, defaultConfig.m_damageThreshold, defaultConfig.m_damageCapacity);
-
-		ppoConfigs.clear();
-
-		// Make the array 1-based.
-		ppoConfigs.push_back(defaultConfig);
-
-		// Now read through the <ppo> objects in order and determine the timeouts.
-		for ( auto node = root->FirstChild("ppo")
-			; node != nullptr
-			; node = node->NextSibling("ppo")
-			)
-		{
-			PPOConfig config;
-
-			try
-			{
-				auto ppo = node->ToElement();
-
-				const char* const name = ppo->Attribute("name");
-				const char* const desc = ppo->Attribute("description");
-				const char* const type = ppo->Attribute("sto-type");
-
-				UINT32 stoType = strtoul(type, nullptr, 10);
-
-				dbugLog(_FLI, "ppo:%u.%u %s %s [sto-type:%s]", stoType, static_cast<UINT32>(ppoConfigs.size() + 1U), name, desc, type);
-
-				if ( stoType == 0 )
-				{
-					throw std::domain_error("Ignoring type 0");
-				}
-
-				// Look up the <param name='timeout-minutes'/> or use the default
-				config = _getConfig(ppo, defaultConfig);
-				dbugLog(_FLIB, " timeout: %llums dmgThresh:%lluj dmgCap: %lluj", config.m_timeout, config.m_damageThreshold, config.m_damageCapacity);
-		}
-			catch ( std::domain_error& e )
-		{
-				dbugLog(_FLIB, " *%s", e.what());
-		}
-
-			ppoConfigs.push_back(config);
-	}
-	}
-	catch ( std::exception& e )
-	{
-		dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
-	}
-}
-
 class DotLoadPPOXml : public DotCommand
 {
 public:
@@ -878,7 +755,7 @@ public:
 
 	virtual void action(Player& /*player*/, Chat::ClientMessage* /*message*/) const override
 	{
-		chatLoadPPOXML();
+		specLoader.loadSpecMap();
 	}
 } dotLoadPPOXml;
 

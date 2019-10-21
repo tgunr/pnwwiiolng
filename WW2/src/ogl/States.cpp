@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*--------------------------------------------------------------------------------------globalprogram
 Module: States.cpp
 Description:
@@ -140,7 +140,7 @@ void States::InitDefaultAttributes()
     if(GLEW_VERSION_1_4 || GLEW_EXT_blend_color)
         DefaultRenderStates[RS_BLENDCOLOR] = new BlendColor;
 
-    DefaultRenderStates[RS_VIEWPORT] = new Viewport(0, 0, WantedWidth, WantedHeight);
+    DefaultRenderStates[RS_VIEWPORT] = new Viewport(0, 0, ddpGetWidth(), ddpGetHeight());
     DefaultRenderStates[RS_FRAMEBUFFEROBJECT] = new FrameBufferObject;
     DefaultRenderStates[RS_COLOR4F] = new Color4F;
     DefaultRenderStates[RS_DRAWBUFFER] = new DrawBuffer;

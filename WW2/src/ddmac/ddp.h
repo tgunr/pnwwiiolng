@@ -1,7 +1,7 @@
 #pragma once
 
-typedef LOGICAL (*DDWND_DDRENDERFUNC)(void);
-typedef LOGICAL (*DDWND_D3DRENDERFUNC)(void);
+using DDWND_DDRENDERFUNC = LOGICAL(*)();
+using DDWND_D3DRENDERFUNC = LOGICAL(*)();
 
 extern LOGICAL cursorHidden;
 
@@ -20,21 +20,25 @@ LOGICAL	ddpFlip();
 LOGICAL	ddpUpdate();
 LOGICAL	ddpDrawToScreen(LPVOID lpdds);
 LOGICAL	ddpDraw();
-long	ddpGetTotalPaints(void);
+long	ddpGetTotalPaints();
 float	ddpGetFPS();
 void	ddpResetFPS();
 void	ddpCapture();
 int		ddpGetWidth();
 int		ddpGetHeight();
+int     ddpGetCenterX();
+int     ddpGetCenterY();
 UINT32	ddpGetClockTime(UINT32 * Time);
 UINT32	ddpGetTotTime(UINT32 * TotTime);
 
+GLuint ddpDefaultFramebuffer(void);
 void	ddpSetupGL(int w, int h);
-void 	ddpShowCursor(void);
-void 	ddpHideCursor(void);
+void 	ddpShowCursor();
+void 	ddpHideCursor();
 
 void	ddpToggleWindowedMode();
 void	ddpSetFullScreen(LOGICAL);
+void    ddpTemporarilyEscapeFullscreen(bool begin);
 void	ddpHideApplication();
 void	ddpShowApplication();
 

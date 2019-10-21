@@ -30,14 +30,14 @@ namespace Server
 		public:	SINT32			auxSize;
 		public:	void*			auxData;
 
-		virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		virtual void packer(PackMode mode, ACTION_OBJECT* const a)
 		{
 			dispatch.packer(mode, a);
 			a->packer(mode, auxSize);
 			if ( auxSize > 0 )
 			{
 				assert( auxData != nullptr );
-				a->packBytes(mode, auxData, auxSize);
+				a->bytePacker(mode, auxData, auxSize);
 			}
 		}
 	};

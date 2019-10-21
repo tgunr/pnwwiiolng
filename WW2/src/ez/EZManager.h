@@ -3,7 +3,7 @@
 #include "wwii/wwiiHash.h"
 
 #include <map>
-#include "veh/vehMain.h"
+#include "veh/vehmain.h"
 
 // ----------- defines
 #define EZ_MGR EZManager::GetInstance()
@@ -179,15 +179,15 @@ public:
 		SINT32 screenYPos[SCREEN_POS_COUNT];
 	};
 
-	typedef std::vector<EZTurret> TURRET_LIST;
-	typedef std::pair<SINT32,std::string> CONTROL_PAIR;
-	typedef std::vector<CONTROL_PAIR> CONTROL_LIST;
-	typedef std::pair<std::string,std::string> CONFIG_PAIR;
-	typedef std::vector<CONFIG_PAIR> CONFIG_LIST;
+	using TURRET_LIST = std::vector<EZTurret>;
+	using CONTROL_PAIR = std::pair<SINT32,std::string>;
+	using CONTROL_LIST = std::vector<CONTROL_PAIR>;
+	using CONFIG_PAIR = std::pair<std::string,std::string>;
+	using CONFIG_LIST = std::vector<CONFIG_PAIR>;
 
 	struct EZView
 	{
-		typedef std::unordered_map<SINT32,SINT32> INPUT_MAP;
+		using INPUT_MAP = std::unordered_map<SINT32,SINT32>;
 
 		enum EVENT
 		{
@@ -220,7 +220,7 @@ public:
 		EZCamera camera;
 	};
 
-	typedef std::vector<EZView> VIEW_LIST;
+	using VIEW_LIST = std::vector<EZView>;
 
 	struct EZPosition
 	{
@@ -246,7 +246,7 @@ public:
 		VIEW_LIST views;
 	};
 
-	typedef std::vector<EZPosition> POSITION_LIST;
+	using POSITION_LIST = std::vector<EZPosition>;
 
 	EZManager(vehVehicle* v);
 	virtual ~EZManager();

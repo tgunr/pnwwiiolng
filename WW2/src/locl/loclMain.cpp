@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include "fio/fio.h"
 #include "locl/loclMain.h"
@@ -93,7 +93,7 @@ char	FileNameBuffer[MAX_PATH],
 			_MessageTable = (char **)memAlloc((HighestStringNumber + 1) * sizeof(char*));
 		}
 
-		fioSeek(FileID, 0, fioSEEK_SET);
+		fioSeek(FileID, 0, SEEK_SET);
 
 		for(i = 0;; )
 		{
@@ -160,7 +160,7 @@ const WCHAR* loclGetLocalizationStringByID(SINT32 MessageID)
 // loclGetLanguageID
 // This function returns an SINT32 for the currently installed
 // language identifier.
-SINT32 loclGetLanguageID(void)
+SINT32 loclGetLanguageID()
 {
 	return _LanguageInUse;
 }
@@ -168,20 +168,18 @@ SINT32 loclGetLanguageID(void)
 // loclGetLanguageName
 // This function returns an SCHAR* for the currently installed
 // language name.
-SCHAR* loclGetLanguageName(void)
+SCHAR* loclGetLanguageName()
 {
 	return _LanguageName;
 }
 
-LOGICAL locl_Message_Table_Kill(void)
+void locl_Message_Table_Kill()
 {
-SINT32	i;
-
     loclLangKill();
 
 	if(_MessageTable != nullptr)
 	{
-		for(i = 0; i <= HighestStringNumber; i++)
+		for(SINT32 i = 0; i <= HighestStringNumber; i++)
 		{
 			if(_MessageTable[i] != nullptr)
 			{
@@ -193,6 +191,4 @@ SINT32	i;
 		memFree(_MessageTable);
 		_MessageTable = nullptr;
 	}
-
-	return TRUE;
 }

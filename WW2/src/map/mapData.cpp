@@ -27,7 +27,6 @@
 //static INDEX supercellIndex; //, cpIndex, facilityIndex, objectIndex, linkIndex;
 
 //UINT64 _supercellKey(SINT16 x, SINT16 y);
-//LOGICAL _initTheatreMessage(THEATRE_MAP* tm);
 
 void
 mapUpdateCP(CPStruct* cp, WWII_COUNTRY owner, WWII_COUNTRY controller, CP_STATUS_FLAGS flags, const char* from)

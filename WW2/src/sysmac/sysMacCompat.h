@@ -1,21 +1,14 @@
-#ifndef PN_SYSMAC_SYSMACCOMPAT_H
-#define PN_SYSMAC_SYSMACCOMPAT_H 1
+#pragma once
 
 #include <sys/types.h>
 #include <wchar.h>
 
-#include "include/sysTypes.h"
+#include "include/systypes.h"
 
-typedef UINT32 DWORD;
+using DWORD = UINT32;
 
 #define _isnan std::isnan
 #define _finite std::isfinite
-
-// TODO: Why are there so many different names for this?
-#define stricmp strcasecmp
-#define _stricmp strcasecmp
-#define strcmpi strcasecmp
-#define strnicmp strncasecmp
 
 // TODO: REVIEW ALL USES OF THESE VERY UNSAFE FUNCTIONS
 #define lstrcpy strcpy
@@ -35,28 +28,42 @@ typedef UINT32 DWORD;
 #define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
 
-static inline int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n) { return wcsncasecmp(ws1, ws2, n); }
-static inline int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2) { return wcscasecmp(ws1, ws2); }
-
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
 extern void MacVideoInitializationFailed(const char* problem);
+extern void PostModalErrorDialog(const char *title, const char *message);
 
 extern void chAppDir();
 extern const char *macPreferencesPath();
 
-extern void SetCommandLine(int argc, const char** argv);
-extern const char *GetCommandLine();
+extern bool CopyOldSetupFiles_MAC();
+extern int MessageBoxMAC(std::wstring boxMessage, std::wstring boxTitle, int alertIcon);
 
-extern UINT64 GetMicroSeconds(void);
+extern const char *macAppPath();
+extern const char *macDataPath();
+extern const char *macDocsPath();
+extern const char *macPlayarcPath();
+extern const char *macWorkingPathAPP();
+extern const char *macCrashLogsPath();
+extern const char *macCrashLogsPath();
+extern const char *macUserDocumentsPath();
+extern const char *macUserScreenShotsPath();
+extern const char *macUserWorkingPath();
+
+extern const char *GetCommandLineA();
+
+extern UINT64 GetMicroSeconds();
 extern UINT64 GetMillisecondTick();
-extern UINT32 timeGetTime(void);
+extern UINT32 timeGetTime();
+
+extern char GetOSMajorVersion();
+extern char GetOSMinorVersion();
+extern char GetOSRevision();
+extern char GetOSBuild();
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // PN_SYSMAC_SYSMACCOMPAT_H

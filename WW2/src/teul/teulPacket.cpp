@@ -1,4 +1,4 @@
-#include <syscfg.h>	// Path is project dependent.
+#include "syscfg.h"	// Path is project dependent.
 
 #include "mem/mem.h"
 #include "teul/teulCallbackStruct.h"	// For TEUL_CALLBACK details.
@@ -17,8 +17,8 @@ Teul::Packet::Packet(PacketId id)
 	, m_address(0)
 	, m_port(0)
 {
-	header().packetType(Teul::Tokens::Encrypted);
-	header().packetSizeBytes(headerSizeBytes());
+	header().setPacketToken(Teul::PacketToken::Encrypted);
+	header().setPacketSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
 	header().m_callX = id.m_x;
 	header().m_callY = id.m_y;
@@ -29,57 +29,15 @@ Teul::Packet::Packet(PacketId id)
 
 Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
-	, m_packetSizeBytes(DefaultLocalDataSize)
+	, m_packetSizeBytes(0)
 	, m_capacity(DefaultLocalDataSize)
+	, m_sent(0)  // Do not copy m_sent - none of this copy has been sent
+	, m_address(rhs.m_address)
+	, m_port(rhs.m_port)
 {
-	// Steal the size counts.
-	this->m_sent = rhs.m_sent;
-	this->m_address = rhs.m_address;
-	this->m_port = rhs.m_port;
-
 	setPacketSizeBytes(rhs.m_packetSizeBytes);
-
-	memcpy(this->m_data, rhs.m_data, this->m_packetSizeBytes);
+	memcpy(m_data, rhs.m_data, m_packetSizeBytes);
 }
-
-//////////////////////////////////////////////////////////////////////
-// Move constructor
-
-/*
-	The downside to having a move constructor is that we can't resend
-	a packet multiple times. Until we have a mechanism that allows us
-	to specify whether a packet is copyable or not, I guess we'll have
-	to pay the hit.
-*/
-#ifdef ALLOW_TEUL_PACKET_MOVE
-Teul::Packet::Packet(Teul::Packet&& rhs)
-{
-	if (PN_UNLIKELY(&rhs == this))
-		return;
-
-	this->m_data = rhs.m_data;		// Take possession of the data,
-	
-	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
-
-	// If the source is using it's local data buffer, just copy the data over
-	if (this->m_data == rhs.m_localData) {
-		// Data fits within the local data, so just copy that.
-		this->m_data = this->m_localData;
-		memcpy(this->m_localData, rhs.m_localData, rhs.m_packetSizeBytes);
-	}
-
-	// Steal the size counts.
-	this->m_packetSizeBytes = rhs.m_packetSizeBytes;
-	this->m_capacity = rhs.m_capacity;
-	this->m_sent = rhs.m_sent;
-	this->m_address = rhs.m_address;
-	this->m_port = rhs.m_port;
-
-	rhs.m_packetSizeBytes = 0;
-	rhs.m_capacity = 0;
-	rhs.m_sent = 0;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Copy operator.
@@ -112,19 +70,6 @@ Teul::Packet::~Packet()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Clear out contents of a packet.
-
-void
-Teul::Packet::reset()
-{
-	header().m_tag = 0;
-	m_packetSizeBytes = headerSizeBytes();
-	m_address = 0;
-	m_port = 0;
-	m_sent = 0;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Grow packet to accommodate and copy additional bytes.
 
 void Teul::Packet::append(const void* const src_, const UINT32 bytes_)
@@ -132,29 +77,6 @@ void Teul::Packet::append(const void* const src_, const UINT32 bytes_)
 	setPacketCapacityBytes(packetSizeBytes() + bytes_);
 	memcpy(m_data + packetSizeBytes(), src_, bytes_);
 	m_packetSizeBytes += bytes_;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Return the size of the packet header.
-
-UINT32
-Teul::Packet::headerSizeBytes()
-{
-	return sizeof(Teul::PacketHeader);
-}
-
-//////////////////////////////////////////////////////////////////////
-// Adjust the current size of the packet (and so the write position
-// if we are writing).
-
-void
-Teul::Packet::setPacketSizeBytes(const UINT32 sizeBytes_)
-{
-	if ( sizeBytes_ > m_capacity )
-	{
-		setPacketCapacityBytes(sizeBytes_);
-	}	
-	m_packetSizeBytes = sizeBytes_;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -200,13 +122,13 @@ Teul::Packet::setPacketCapacityBytes(const UINT32 newCapacityBytes_)
 // Send ready-to-go data to a given teulIndex (looks up endpoint).
 
 SINT32
-Teul::Packet::send(const SINT32 teulIndex_)
+Teul::Packet::send(const SINT32 teulIndex_, const UCHAR protocolPreference)
 {
 	ENDPOINT* endpoint = teulGetEndpoint(teulIndex_);
 	if ( PN_UNLIKELY(endpoint == nullptr) )
 		return -EINVAL;
 
-	return send(*endpoint);
+	return send(*endpoint, protocolPreference);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -250,7 +172,7 @@ Teul::Packet::sendTo(ENDPOINT& endpoint_, const UINT32 destAddress_, const UINT1
 SINT32
 Teul::Packet::receive(ENDPOINT& endpoint_)
 {
-	if ( PN_UNLIKELY(header().packetType() != Teul::Tokens::Encrypted && header().packetType() != Teul::Tokens::Unencrypted) )
+	if ( PN_UNLIKELY(header().packetToken() != Teul::PacketToken::Encrypted && header().packetToken() != Teul::PacketToken::Unencrypted) )
 	{
 		dbugLog(_FLW, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
 		return -EINVAL;
@@ -295,18 +217,18 @@ Teul::PacketHeader::maskSizeValue(UINT32 cryptVersion, const UINT64& seed, UINT3
 // Disable encryption on a packet.
 
 void
-Teul::Packet::setUnencrypted()
+Teul::Packet::setUnencrypted() noexcept
 {
-	header().packetType(Teul::Tokens::Unencrypted);
+	header().setPacketToken(Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Tell me if this packet will be using encryption or not.
 
 bool
-Teul::Packet::wantsEncryption()
+Teul::Packet::wantsEncryption() const noexcept
 {
-	return (header().packetType() != Teul::Tokens::Unencrypted);
+	return (header().packetToken() != Teul::PacketToken::Unencrypted);
 }
 
 //////////////////////////////////////////////////////////////////////

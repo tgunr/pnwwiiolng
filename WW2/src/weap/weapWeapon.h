@@ -25,20 +25,19 @@ struct WEAPON
 {
 	WEAPON() : m_spec(NULL_WEAP_SPEC), m_modified(false) { name[0] = fullName[0] = 0; }
 //tolua_end
-	WEAPON(const WEAPON_SPEC& spec, const char* Name, const char* access
-				, UINT16 count, UINT32 lod, UINT32 AlertDist, UINT32 Speed, UINT32 CVCValue
+	WEAPON(const WEAPON_SPEC spec, const char* Name, const char* FullName, const char* access
+				, UINT32 lod, UINT32 AlertDist, UINT32 CVCValue
 				);
 //tolua_begin
 	~WEAPON();
 
 public:
 	UINT16 access() const { return m_access; }
-	UINT16 count() const { return m_count; }
 	UINT16 initialAccess() const { return m_initialAccess; }
 	UINT32 localIndex() const { return m_localIndex; }
 	UINT16 nextAccess() const { return m_nextAccess; }
-	const WEAPON_SPEC& spec() const { return m_spec; }
-	WEAPON_SPEC& spec() { return m_spec; }
+	WEAPON_SPEC spec() const { return m_spec; }
+	//WEAPON_SPEC& spec() { return m_spec; }
 
 public:
 	// HOST: Determine if a particular permission mask allows
@@ -65,7 +64,6 @@ public:
 	UINT16			m_access;		// 0 indicates general (associate with Rank)
 	UINT16			m_initialAccess;	// Value we read from th_blitz
 	UINT16			m_nextAccess;	// Value next rdp cycle
-	UINT16			m_count;		// number of units available
 
 	WEAP_BIAS		bias[MAX_BIAS_INDEX];		// Vis bias, allocated as loaded
 
@@ -74,7 +72,6 @@ public:
 
 	UINT32			m_localIndex;	// local association for FRONT_END (set on fe only) to vehicle
 	UINT32			LOD;			// max dispaly distance in cm
-	UINT32			speed;		// speed...
 	UINT32			value;
 	UINT32			alertDist;	// distance at which we alert an enemy facility that we are there
 	UINT64			maxLod_cm2;	// max vis distance squared
@@ -90,24 +87,20 @@ public:
 extern WEAPON* weapLookupWeaponByName(const char* weaponName);
 
 // Lookup the weapon with the fast index
-extern WEAPON* weapLookup(const WEAPON_SPEC& spec);
+extern WEAPON* weapLookup(const WEAPON_SPEC spec);
 
 // Look up the weapon by the local index
 extern WEAPON* weapLookupWeaponByIndex(UINT32 localIndex);
 
-static inline const char* weapPrintName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->name;
 }
 
-static inline const char* weapPrintFullName(const WEAPON_SPEC* spec)
+static inline const char* weapPrintFullName(const WEAPON_SPEC spec)
 {
-	if ( spec == nullptr )
-		return "<null>";
-	WEAPON* weap = weapLookup(*spec);
+	const WEAPON* weap = weapLookup(spec);
 	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->fullName;
 }
 

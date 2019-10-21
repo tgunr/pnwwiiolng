@@ -8,6 +8,8 @@
 #include "fio/fio.h"
 #include "str/stringLib.h"
 
+void fioXmlRegisterInputCallbacks();
+
 /************************************************************************************************
 	XMLLoader2
 *************************************************************************************************/
@@ -142,7 +144,7 @@ from within one of YourSubClassedXMLLoader's functions
 /********* defines **********/
 
 #define XML_DEFAULT_FLAGS XML_PARSE_DTDLOAD | XML_PARSE_RECOVER
-#define XML_IS_NODETYPE(n, t) (!stricmp((const char*)(n)->name, t))
+#define XML_IS_NODETYPE(n, t) (!strcasecmp((const char*)(n)->name, t))
 #define XML_DEFAULT_HANDLER "_DEFAULT_"
 #define MAX_XML_TRIM_SIZE 1024
 #define XML_TAG_HANDLER(handler) bool handler(xmlNode* node, bool first = true, void* userData = nullptr)
@@ -187,12 +189,12 @@ private:
 
 public:
 
-	typedef std::map<std::string, TAG_HANDLER<T> > xmlTagHandlerMap;
+	using xmlTagHandlerMap = std::map<std::string, TAG_HANDLER<T>>;
 
 	XMLLoader2();
 	XMLLoader2(const char* path, int flags = XML_DEFAULT_FLAGS, bool uiFio = false);
 	virtual ~XMLLoader2();
-    
+
     XMLLoader2<T>(const XMLLoader2<T> &obj) {
         _flags = obj._flags;
         _complete = obj._complete;
@@ -285,9 +287,11 @@ XMLLoader2<T>::XMLLoader2(const char* path, int flags, bool uiFio) :
     _path(path),
     _handlerReturnScope(NODE)
 {
+#if platBuild != BUILD_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
+#endif
 		fioXmlRegisterInputCallbacks();
 }
 
@@ -444,9 +448,11 @@ void XMLLoader2<T>::Reset()
 	Finish();
 
 	// re-init the io callbacks
+#if platBuild != BUILD_SERVER
 	if(_uiFio)
 		xmlRegisterUIFIO();
 	else
+#endif
 		fioXmlRegisterInputCallbacks();
 
 	// reset the private data

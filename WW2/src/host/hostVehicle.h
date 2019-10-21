@@ -22,7 +22,7 @@ public:
 };
 
 class Viewing;
-typedef std::vector<Viewing> Viewings;
+using Viewings = std::vector<Viewing>;
 
 class HostVehicleImpl;
 struct WEAPON;
@@ -30,7 +30,7 @@ struct WEAPON;
 namespace Grid { class Cell; }
 namespace Teul { class Packet; }
 
-extern const char* chatGetCallsign(const ChatHandle& handle);
+extern const char* chatGetCallsign(const ChatHandle handle);
 
 /// @class	HostVehicle
 /// @brief	Describes an avatar (infantry, vehicle, etc) in the game world.
@@ -40,16 +40,15 @@ extern const char* chatGetCallsign(const ChatHandle& handle);
 class HostVehicle
 {
 public:
-	static HostVehicle* Lookup(const ChatHandle& handle);
+	static HostVehicle* Lookup(const ChatHandle handle);
 
 public:
 	void initialize(struct VEHICLE_HOLDER* _holder, class HostVehicleImpl* impl, UINT32 index, const struct WEAPON_SERIAL& ws, const struct WEAPON* weapon);
 
-	void acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, HostVehicle* fromVehicle, const UINT32 fromCellIP);
+	void acceptResupply(UINT32 fromSerial, const ChatHandle fromHandle, HostVehicle* fromVehicle, const UINT32 fromCellIP);
 	class Player* activeCommander() const;
 //	void addVisListRemove(struct GRID_HOLDER* const);
 
-	void applyHit(HostVehicle* shooter, struct VEH_HIT* hits, UINT32* personas);
 	void attachControllingPlayer(const Player& player);
 
 	void interruptCapture();
@@ -60,6 +59,7 @@ public:
 	bool canSeeHiddenBuzzards() const;
 	void checkCapture();
 	void checkLocality(Teul::Packet&);
+	void findClosestCPs(SINT32 x, SINT32 y, WWII_SIDE side, UINT16 &closestEnemyDist, UINT16 &closestFriendlyDist);
 	// Check if the clock sync has expired
 	bool clockExpired() const;
 	class Player* commander() const;
@@ -80,6 +80,8 @@ public:
 	bool shouldBeReallyActive() const { return spawnedTime() > ACTIVE_TO_REALLY_ACTIVE_TIME_S; }
 	bool isRemote() const { return m_isRemote; }
 	bool isVehicleToast();
+	bool hasBeenNotifiedOfVehicleDeath() { return m_deathNoticeNeeded; }
+	void setVehicleNeedsDeathNotice( bool notice ) { m_deathNoticeNeeded = notice; }
 
 	UINT32 killedBySortieID() const { return m_killedBySortieID; }
 
@@ -88,11 +90,11 @@ public:
 	MissionPacket& missionPacket() { return m_missionPacket; }
 	const MissionPacket& missionPacket() const { return m_missionPacket; }
 //	void removeVehicleFromVisList(HostVehicle* vehicle);
-	void scoreResupply(const ChatHandle& ofHandle);
+	void scoreResupply(const ChatHandle ofHandle);
 	void selectBestFramingMode();
 	void sendCaptureContribution(Player* player, UINT32 status);
 	void sendCaptureState(const class CaptureState& capState);
-	void setInBuilding(const FULL_OBJ_ID& newBuilding);
+	void setInBuilding(FULL_OBJ_ID newBuilding);
 	void setInCaptureBuilding(bool newValue);
 	void setNextUpdate(UINT32 delay) { m_nextUpdateClock = teulClock64 + delay; }
 	UINT32 getOneTimeBitsFor(const HostVehicle* rhs) const;
@@ -104,7 +106,7 @@ public:
 	WEAPON_SERIAL& serial() { return vehicleData.wSerial; }
 	WWII_SIDE side() const { return m_side; }
 	UINT32 sortieID() const { return index; }	// For now ...
-	const WEAPON_SPEC& spec() const { return serial().spec; }
+	WEAPON_SPEC spec() const { return serial().spec; }
 	UINT32 spawnedTime() const { return ( m_spawnTime > 0 ) ? teulTime() - m_spawnTime : m_spawnTime; }
 	UINT32 squadID() const { return vehicleData.squad; }
 	void updateStrat(bool forceFullUpdate);
@@ -112,7 +114,7 @@ public:
 	const PLAYER_LIST& players() const;
 	PLAYER_LIST& players();
 
-	SINT32 packFirstTime(LOGICAL mode, UCHAR* data, SINT32 offset);
+	SINT32 packFirstTime(PackMode mode, UCHAR* data, SINT32 offset);
 
 	//! Send the specified packet to ALL players attached to me,
 	//! with protection against them CTHLing midway.
@@ -128,11 +130,11 @@ public:
 	bool updateGrid();
 	void removeFromGrid();
 
-	void removeFromVisList(Viewings::iterator& it);
+	Viewings::iterator removeFromVisList(Viewings::iterator& it);
 
 public:
 	// Interface functions
-	const ChatHandle& chatHandle() const { return vehicleData.packedCallsign; }
+	ChatHandle chatHandle() const { return vehicleData.packedCallsign; }
 
 public:
 	void setActive(bool newState) { m_isActive = newState; }
@@ -145,7 +147,7 @@ public:
 
 	// Presence functions.
 public:
-	const instanceid_t& instID() const { return m_instance.id(); }
+	instanceid_t instID() const { return m_instance.id(); }
 	SINT32 x_cm() const { return vehicleData.position.x(); }
 	SINT32 y_cm() const { return vehicleData.position.y(); }
 	SINT32 z_cm() const { return vehicleData.position.z(); }
@@ -154,14 +156,18 @@ public:
 	UINT32				index; 	// index is a copy of weapon.serial
 
 	// Booleans
-	bool				m_isRemote : 1;
-	bool				m_isActive : 1;
-	bool				m_isReallyActive : 1;
-	bool				m_isFighter : 1;
-	bool				m_despawnTimerActive : 1;
-	bool				m_isBuzzard : 1;
-	bool				m_hasBeenKilled : 1;
-	bool				m_isInCaptureBuilding : 1;	// True when we're in a capture building.
+	bool				m_isRemote;
+	bool				m_isActive;
+	bool				m_isReallyActive;
+	bool				m_isFighter;
+	bool				m_despawnTimerActive;
+	bool				m_isBuzzard;
+	bool				m_hasBeenKilled;
+	bool				m_isInCaptureBuilding;	// True when we're in a capture building.
+	bool				m_deathNoticeNeeded;
+
+	bool				wasCapPendingLastTick = false; // These 2 are used to stop the capture-
+	UINT16				previousCaptureTimeRemaining = 0; // timer getting stuck at 1 second.
 
 	HostVehicleImpl*	m_impl;
 	Grid::Cell*			m_cell;

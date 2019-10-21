@@ -6,15 +6,10 @@
 	obpool
 *************************************************************************************************/
 // I can't believe that this wasn't in here already
-#if platOS == OS_MACOS
-	#pragma options align=packed
-#elif platOS == OS_WIN32
-	#pragma pack(push, 1)
-#else
-	#error No packing specified
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
-#define MINPOOLOBJS 110000
+#define MINPOOLOBJS 150000
 
 #define QUEUE_TEXTURE_LOADING
 #undef QUEUE_TEXTURE_LOADING	// Disable to avoid heap fragmentation
@@ -123,16 +118,10 @@ struct DOF
 
 };
 
-
-
-#if platOS == OS_MACOS
-	#pragma options align=reset
-#elif platOS == OS_WIN32
-	#pragma pack(pop)
-#endif
+#pragma pack(pop)
 
 extern LOGICAL	obpoolInit(const SINT8* name);
-extern void 	obpoolKill(void);
+extern void 	obpoolKill();
 extern void obpoolUpdate();
 extern void obpoolFreeObjectFinish();
 
@@ -144,7 +133,7 @@ extern LOGICAL	obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent
 extern SINT32	obpoolGetObjects(POOLOBJ* *lpobj);
 extern LOGICAL	obpoolGetObjectSize(int* objsize, OBJECT* lpobj);
 
-extern POOLOBJHDR* obpoolGetNewObject(void);
+extern POOLOBJHDR* obpoolGetNewObject();
 extern POOLOBJHDR* obpoolFindNamedObject(SINT8* name);
 extern POOLOBJHDR* obpoolCopyObject(POOLOBJ* lpcopy);
 extern POOLOBJHDR* obpoolCopyNamedObject(SINT8* name);

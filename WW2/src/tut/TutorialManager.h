@@ -112,7 +112,7 @@ struct TutorialHandler
 
 	struct HandlerLocation
 	{
-		typedef std::vector<Vec3d> COORDINATES;
+		using COORDINATES = std::vector<Vec3d>;
 
 		COORDINATES coords; // our world positions
 		float d;			// location radius or buffer
@@ -150,10 +150,10 @@ struct TutorialHandler
 	HandlerData data;
 }; // tolua_export
 
-typedef std::map<std::string,TutorialHandler> TutorialHandlerMap;
-typedef std::map<std::string,int> TutorialTimerMap;
-typedef std::map<std::string,UINT64> TutorialCompletionMap;
-typedef std::vector<std::string> TutorialHandlerGarbage;
+using TutorialHandlerMap = std::map<std::string,TutorialHandler>;
+using TutorialTimerMap = std::map<std::string,int>;
+using TutorialCompletionMap = std::map<std::string,UINT64>;
+using TutorialHandlerGarbage = std::vector<std::string>;
 
 /************************************************************************************************
 	TutorialManager
@@ -246,6 +246,9 @@ public:
 	// gets the master instance of the manager
 	static TutorialManager* GetInstance(); // tolua_export
 
+	// Get whether we are spawned into the tutorial game world.
+	bool getAreSpawnedIn() const { return m_areSpawnedIn; }
+
 	// tutorial specific input handling
 	static unsigned int Input(int param, unsigned int functionCode, unsigned int unused);
 
@@ -289,6 +292,13 @@ private:
 
 	// prepath
 	std::string _prePath;
+
+	// used to keep track of whether a FMS has been placed into the world.
+	bool m_fmsBuilt;
+
+	// Keep track of whether we are spawned into the tutorial world.
+	private:
+	bool m_areSpawnedIn = false;
 
 }; // tolua_export
 

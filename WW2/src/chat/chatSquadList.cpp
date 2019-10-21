@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include <mutex>
 
 #include "wwii/wwiiHash.h"
@@ -19,8 +17,6 @@
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulEndpointDefs.h"
-#include "chat/chatdbSquadXchg.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatWhoList.h"
 #include "chat/chatData.h"
@@ -44,10 +40,10 @@
 
 static const UINT32 SQUAD_UPDATE_INTERVAL_MS = 5 * 1000;
 
-typedef std::unordered_map<UINT32,SquadList> SQUAD_LISTS;
-typedef std::unordered_map<ChatHandle,ChatHandle> SQUAD_NAMES;
+using SQUAD_LISTS = std::unordered_map<UINT32,SquadList>;
+using SQUAD_NAMES = std::unordered_map<ChatHandle,ChatHandle>;
 
-typedef std::set<const Player*> RECRUITERS;
+using RECRUITERS = std::set<const Player*>;
 static RECRUITERS g_recruiters;
 
 static SQUAD_LISTS g_squads;
@@ -55,8 +51,7 @@ static SQUAD_LISTS g_squads;
 static SQUAD_NAMES g_squadNames;
 static std::mutex _namesMutex;
 
-extern const char* chatMakeTempString(const char* fmt, ...);
-extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle);
+extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle handle);
 
 //////////////////////////////////////////////////////////////////////
 // Fetch the list of members of a squad
@@ -91,123 +86,155 @@ public:
 
 	std::vector<Result> m_results;
 
-	virtual bool Process(const size_t numRows) override
-	{
-		if ( numRows <= 0 )
-			return true;
+	virtual bool Process(const size_t numRows) override;
 
-		threadLog(_FLI, "squad list process: sq:%u rows:%u", m_squadID, numRows);
-
-		Result result;
-		while ( Query()->FetchRow() )
-		{
-			DBRow& row = Query()->Row();
-
-			result.m_handle = chatGetHandle(row.NextString());
-			result.m_playerID = row.NextUInt();
-			result.m_rank = row.NextUInt();
-			result.m_joined = row.NextUInt();
-			m_results.push_back(result);
-		}
-
-		return true;
-	}
-
-	virtual void Success() override
-	{
-		SquadList* list = chatFindSquadList(m_squadID);
-		if ( list == nullptr )
-		{
-			dbugLog(_FLI, "sq:%u list went away while querying members", m_squadID);
-			Failure();
-			return;
-		}
-
-		if ( g_debugSquads )
-			dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
-						, m_squadID, list->squad().shortName(), m_results.size(), list->members().size());
-
-		// In order that we can tell who is no-longer in the squad according
-		// to the database, we erase all member's joined dates. Then as members
-		// are read back from the database, we set the joined dates to the
-		// values we read from the database.
-		SQUAD_MEMBERS::iterator mit;
-		for ( mit = list->begin(); mit != list->end(); ++mit )
-		{
-			mit->second.m_joined = 0;
-		}
-
-		// See who was listed.
-		Player* player;
-		for ( size_t i = 0; i < m_results.size(); ++i )
-		{
-			const Result& result = m_results[i];
-			const ChatHandle& handle = result.m_handle;
-			const UINT32& playerID = result.m_playerID;
-			const UINT32& rank = result.m_rank;
-			UINT32 joined = result.m_joined;
-
-			if ( rank <= 0 )
-			{
-				// A rank of zero means they've been removed externally.
-				mit = list->m_members.find(handle);
-				if ( mit != list->m_members.end() )
-					list->memberLeave(true, &mit->second, LSTR_SQUAD_LEAVER, "removed");
-				else
-					list->removeMember(handle);
-			}
-
-			if ( joined == 0 )
-			{
-				dbugLog(_FLA, "sq:%u p:%u c:%s has squad id but null squad_joined"
-								, m_squadID, playerID, Chat::Name(handle).c_str());
-				joined = teulTime();
-				DBThread::Do(DBThread::Default
-								, "UPDATE LOW_PRIORITY wwii_player"
-								   " SET squad_joined=NOW()"
-					 			" WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
-									, playerID, m_squadID
-					);
-			}
-
-			mit = list->m_members.find(handle);
-			// Check for an existing entry with no change
-			if ( mit != list->end() && mit->second.squadRank() == rank )
-			{
-				mit->second.m_joined = joined;
-				continue;
-			}
-
-			player = PlayerInterface::Lookup(handle);
-			const bool announce = (list->squad().callsign() != host_config.squad.defaultSquad);
-			list->memberJoin(player, handle, rank, joined, nullptr, announce);
-		}
-
-		// Anyone who still has a zero joined data must no-longer be
-		// in the squad according to the database, so eliminate them.
-		for ( mit = list->begin(); mit != list->end();  )
-		{
-			std::pair<const ChatHandle, SquadMemberEntry>& entry = *(mit++);
-			if ( entry.second.joined() == 0 )
-			{
-				dbugLog(_FLD, "sq:%u player %s no-longer in member list", m_squadID, Chat::Name(entry.first).c_str());
-				list->memberLeave(true, &entry.second, LSTR_SQUAD_LEAVER, "missing");
-			}
-		}
-
-		list->announce();
-	}
-
-	virtual void Failure() override
-	{
-		dbugLog(_FLW, "sq:%u error reading squad list", m_squadID);
-	}
+	virtual void Success() override;
+	virtual void Failure() override;
+    
+    // This complete rigamarole avoids having to refactor other things because
+    // they all assume this threaded query is the only way to do things.
+    static void SetSquadMemberEntryJoined(SquadMemberEntry *entry, UINT32 value) { entry->m_joined = value; }
+    static SQUAD_MEMBERS &GetSquadListMembers(SquadList *list) { return list->m_members; }
 };
 
-void
-chatRequestSquadMemberList(const UINT32 squadID)
+static void _preprocessSquadMemberListResults(UINT32 squadID, DBQuery *q, std::vector<SquadMemberQuery::Result> &results)
+{
+    if ( q->Rows() <= 0 )
+        return;
+
+    dbugLog(_FLI, "squad list process: sq:%u rows:%u", squadID, q->Rows());
+
+    SquadMemberQuery::Result result;
+    while ( q->FetchRow() )
+    {
+        DBRow& row = q->Row();
+
+        result.m_handle = chatGetHandle(row.NextString());
+        result.m_playerID = row.NextUInt();
+        result.m_rank = row.NextUInt();
+        result.m_joined = row.NextUInt();
+        results.push_back(result);
+    }
+}
+
+static void _handleSquadMemberListFailure(UINT32 squadID)
+{
+    dbugLog(_FLW, "sq:%u error reading squad list", squadID);
+}
+
+static void _handleSquadMemberListResults(UINT32 squadID, const std::vector<SquadMemberQuery::Result> &results)
+{
+    SquadList* list = chatFindSquadList(squadID);
+    if ( list == nullptr )
+    {
+        dbugLog(_FLI, "sq:%u list went away while querying members", squadID);
+        _handleSquadMemberListFailure(squadID);
+        return;
+    }
+
+    if ( g_debugSquads )
+        dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
+                    , squadID, list->squad().callsign().c_str(), results.size(), list->members().size());
+
+    // In order that we can tell who is no-longer in the squad according
+    // to the database, we erase all member's joined dates. Then as members
+    // are read back from the database, we set the joined dates to the
+    // values we read from the database.
+    SQUAD_MEMBERS::iterator mit;
+    for ( mit = list->begin(); mit != list->end(); ++mit )
+    {
+        SquadMemberQuery::SetSquadMemberEntryJoined(&mit->second, 0);
+    }
+
+    // See who was listed.
+    Player* player;
+    for ( size_t i = 0; i < results.size(); ++i )
+    {
+        const SquadMemberQuery::Result& result = results[i];
+        ChatHandle handle = result.m_handle;
+        const UINT32 playerID = result.m_playerID;
+        const UINT32 rank = result.m_rank;
+        UINT32 joined = result.m_joined;
+
+        if ( rank <= 0 )
+        {
+            // A rank of zero means they've been removed externally.
+            mit = SquadMemberQuery::GetSquadListMembers(list).find(handle);
+            if ( mit != SquadMemberQuery::GetSquadListMembers(list).end() )
+                list->memberLeave(true, &mit->second, LSTR_SQUAD_LEAVER, "removed");
+            else
+                list->removeMember(handle);
+        }
+
+        if ( joined == 0 )
+        {
+            dbugLog(_FLA, "sq:%u p:%u c:%s has squad id but null squad_joined"
+                            , squadID, playerID, Chat::Name(handle).c_str());
+            joined = teulTime();
+            DBThread::Do(DBThread::Default
+                            , "UPDATE wwii_player"
+                               " SET squad_joined=NOW()"
+                            " WHERE playerID=%u AND squadid=%u AND squad_joined is NULL"
+                                , playerID, squadID
+                );
+        }
+
+        mit = SquadMemberQuery::GetSquadListMembers(list).find(handle);
+        // Check for an existing entry with no change
+        if ( mit != list->end() && mit->second.squadRank() == rank )
+        {
+            SquadMemberQuery::SetSquadMemberEntryJoined(&mit->second, joined);
+            continue;
+        }
+
+        player = PlayerInterface::Lookup(handle);
+        const bool announce = (list->squad().callsign() != host_config.squad.defaultSquad);
+        list->memberJoin(player, handle, rank, joined, nullptr, announce);
+    }
+
+    // Anyone who still has a zero joined data must no-longer be
+    // in the squad according to the database, so eliminate them.
+    for ( mit = list->begin(); mit != list->end();  )
+    {
+        std::pair<const ChatHandle, SquadMemberEntry>& entry = *(mit++);
+        if ( entry.second.joined() == 0 )
+        {
+            dbugLog(_FLD, "sq:%u player %s no-longer in member list", squadID, Chat::Name(entry.first).c_str());
+            list->memberLeave(true, &entry.second, LSTR_SQUAD_LEAVER, "missing");
+        }
+    }
+
+    list->announce();
+}
+
+bool SquadMemberQuery::Process(const size_t numRows)
+{
+    _preprocessSquadMemberListResults(m_squadID, Query(), m_results);
+    return true;
+}
+
+void SquadMemberQuery::Success()
+{
+    _handleSquadMemberListResults(m_squadID, m_results);
+}
+
+void SquadMemberQuery::Failure()
+{
+    _handleSquadMemberListFailure(m_squadID);
+}
+
+void chatRequestSquadMemberList(UINT32 squadID)
 {
 	(new SquadMemberQuery(squadID))->Queue();
+}
+
+void chatRequestSquadMemberListImmediate(UINT32 squadID)
+{
+    DBQuery q(dbh, QRY_SQUAD_MEMBERS, squadID);
+    std::vector<SquadMemberQuery::Result> results;
+    
+    _preprocessSquadMemberListResults(squadID, &q, results);
+    _handleSquadMemberListResults(squadID, results);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -218,7 +245,7 @@ static bool
 _requestPending(UINT32 squadID)
 {
 	static const UINT32 PENDING_DURATION_S = 15;
-	typedef std::vector< std::pair<UINT32,UINT32> > GUARD;
+	using GUARD = std::vector<std::pair<UINT32, UINT32>>;
 	static GUARD guard;
 	GUARD::iterator it;
 
@@ -271,7 +298,7 @@ SquadList::SquadList(const Squad& withSquad)
 // SquadList internal function: add a member and update if necessary
 
 void
-SquadList::_addMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined)
+SquadList::_addMember(const ChatHandle handle, RANK_NO squadRank, Player* player, UINT32 joined)
 {
 	// You're not online until you've initialized
 	Player* usePlayer = (player && player->initialized() && player->teulIndex() >= 0) ? player : nullptr;
@@ -353,7 +380,7 @@ SquadList::created()
 	if ( !m_newSquad )
 		return;
 
-	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().shortName());
+	dbugLog(_FLI, "sq:%u %s creation completed", squad().squadID(), squad().callsign().c_str());
 	m_newSquad = false;
 
 	SQUAD_MEMBERS::iterator it;
@@ -371,7 +398,7 @@ SquadList::created()
 // determined based on whether Player is NULL or not.
 
 void
-SquadList::updateMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined)
+SquadList::updateMember(const ChatHandle handle, RANK_NO squadRank, Player* player, UINT32 joined)
 {
 	SQUAD_MEMBERS::iterator it = m_members.find(handle);
 
@@ -390,7 +417,7 @@ SquadList::updateMember(const ChatHandle& handle, RANK_NO squadRank, Player* pla
 // Toggle the recruiting status of a member
 
 void
-SquadList::updateRecruiter(const ChatHandle& handle, bool isRecruiting)
+SquadList::updateRecruiter(const ChatHandle handle, bool isRecruiting)
 {
 	SquadMemberEntry* member = find(handle);
 	if ( member == nullptr || member->recruiting() == isRecruiting )
@@ -424,8 +451,8 @@ SquadList::removeMember(ChatHandle handle)
 
 	if ( subject )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
-						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().shortName());
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u removing player from %s"
+						, subject->teulIndex(), subject->playerID(), subject->callsign(), squad().squadID(), squad().callsign().c_str());
 		_updateOnline(-1);
 		subject->SetSquad(0, Squad::NOT_IN_SQUAD, 0LL);
 		subject->sendSquadInfo(nullptr);
@@ -463,8 +490,13 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	{
 		if ( g_debugSquads )
 			dbugLog(_FLI, "sq:%u requesting info", squadID);
-		chatdbRequestSquad(squadID);
-		return;
+        chatdbSquadInfo(0, squadID, false);
+        // No need to return here, since squad info is now synchronous
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
 	}
 
 	if ( player == nullptr )
@@ -474,16 +506,27 @@ chatRequestSquad(UINT32 squadID, Player* player)
 	SquadList& list = it->second;
 	SquadMemberEntry* entry = list.find(player->chatHandle());
 	if ( entry == nullptr ) entry = list.find(player->matchHandle());
-	if ( entry == nullptr )
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in his squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
-		// Squad may not have finished loading yet.
-		return;
+	if (entry == nullptr && list.squad().callsign() == host_config.squad.defaultSquad) {
+        // Default squad needs to be reloaded so new players will be noticed, pull it in immediate mode
+        chatdbSquadInfo(0, squadID, true);
+        it = g_squads.find(squadID);
+        if (it == g_squads.end()) {
+            dbugLog(_FLW, "sq:%u no such squad!", squadID);
+            return;
+        }
+        list = it->second;
+        entry = list.find(player->chatHandle());
+        if (entry == nullptr) { entry = list.find(player->matchHandle()); }
+    }
+    if (entry == nullptr) {
+        // Squad may not have finished loading yet.
+        dbugLog(_FLA, "t:%d p:%u c:%s sq:%u unable to find this player in their squad", player->teulIndex(), player->playerID(), player->callsign(), squadID);
+        return;
 	}
 
 	if ( g_debugSquads )
 	{
-		betaLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
+		dbugLog(_FLI, "t:%d p:%u c:%s sq:%u changing member entry at t:%u", player->teulIndex(), player->playerID(), player->callsign(), squadID, teulTime());
 	}
 
 	list.changeMemberEntry(*entry, entry->squadRank(), player);
@@ -518,7 +561,7 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 		return -EINVAL;
 	}
 
-	if ( g_logDebug & g_debugSquads )
+	if ( g_debugSquads )
 	{
 		Chat::Name co(squad.coHandle()), creator(squad.creatorHandle());
 		dbugLog(_FLD, "sq:%u received info short:%s name:%s co:%s creator:%s", squad.squadID(), squad.callsign().c_str(), squad.name().c_str(), co.c_str(), creator.c_str());
@@ -537,9 +580,6 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 
 	// No existing entry so lets grease this pig
 	g_squads[squad.squadID()] = SquadList(squad);
-	list = chatFindSquadList(squad.squadID());
-
-	chatRequestSquadMemberList(squad.squadID());
 
 	return 0;
 }
@@ -670,7 +710,7 @@ _autoUpdateSquadlist(SquadList& list)
 		if ( player->lastSquadInfoMS() >= list.updated() ) continue;
 		if ( player->lastSquadInfoMS() >= cutoff_ms )
 		{
-			// Lets not spam this guy
+			// Lets not spam this player
 			outOfSync = true;
 			continue;
 		}
@@ -678,8 +718,8 @@ _autoUpdateSquadlist(SquadList& list)
 		++synced;
 	}
 
-	if ( g_logDebug && g_debugSquads )
-		dbugLog(_FLDB, ", %u synced", synced);
+	if ( g_debugSquads )
+		dbugLog(_FLD, ", %u synced", synced);
 
 	// If nobody got missed, then we can forget these updates
 	if ( !outOfSync )
@@ -826,7 +866,7 @@ _sendWhoList(const Player* player, const SquadList* list, TeulTimeMS lastInfo)
 // Helper for the invite functions
 
 static void
-_invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle& from, RANK_NO rank)
+_invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle from, RANK_NO rank)
 {
 	SQUAD_MSG invite(squad);
 	invite.data().setInviter(from);
@@ -840,12 +880,12 @@ _invite(Player* player, UINT32 squadID, const Squad& squad, const ChatHandle& fr
 // Send a player their latest squad info
 
 bool
-Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle& from)
+Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle from)
 {
 	SquadList* squadList = chatFindSquadList(forSquadID);
 	if ( !squadList )
 	{
-		betaLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
+		dbugLog(_FLA, "NO SQUAD LIST FOR SQUAD INVITE");
 		return false;
 	}
 
@@ -859,7 +899,7 @@ Player::sendSquadInvite(UINT32 forSquadID, const ChatHandle& from)
 ///NOTE: This is currently /requested/ by the client periodically
 
 void
-Player::sendSquadCreateInvite(const ChatHandle& handle, const std::string& name, const ChatHandle& from, RANK_NO withRank)
+Player::sendSquadCreateInvite(const ChatHandle handle, const std::string& name, const ChatHandle from, RANK_NO withRank)
 {
 	Squad squad(0, handle, name);
 	_invite(this, 0, squad, from, withRank);
@@ -917,7 +957,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 		sendWhoList = true;
 	}
 	if ( g_debugSquads )
-		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%llu mod:%llu mmod:%llu lsi:%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s sq:%u sending squad update %u%s time:%" PR64BitUT " mod:%" PR64BitUT " mmod:%" PR64BitUT " lsi:%" PR64BitUT ""
 						, teulIndex(), playerID(), callsign(), squadID()
 						, msg.status(), ((sendWhoList) ? "+who" : "")
 						, teulClock64, squadList->msstamp(), squadList->lastMemberMod(), lastSquadInfoMS());
@@ -933,7 +973,7 @@ Player::sendSquadInfo(SquadList* squadList/*=NULL*/)
 // Promote a squad member to the rank of CO, deposing any existing CO
 
 void
-SquadList::appointNewCO(const ChatHandle& newCO, Player* player)
+SquadList::appointNewCO(const ChatHandle newCO, Player* player)
 {
 	ChatHandle oldCO = squad().coHandle();
 	chatSendCOAppointment(squad().squadID(), newCO);
@@ -963,7 +1003,7 @@ SquadList::electNewCO()
 	if ( vote == nullptr || vote->m_started == 0 || vote->m_closedUntil != 0 )
 		return;
 
-	const ChatHandle& winner = vote->winner(this);
+	ChatHandle winner = vote->winner(this);
 	if ( winner == 0LL )
 	{
 		if ( vote->expires() == 0 )
@@ -1003,14 +1043,13 @@ SquadList::electNewCO()
 // Update all the necessary squad data after a renaming
 
 void
-SquadList::renamed(const ChatHandle& newHandle)
+SquadList::renamed(const ChatHandle newHandle)
 {
-	const std::string oldCallsign = squad().m_callsign;
+	const std::string oldCallsign = squad().callsign();
 	const Chat::Name newCallsign(newHandle);
-	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().m_callsign.c_str(), newCallsign.c_str());
+	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().callsign().c_str(), newCallsign.c_str());
 	// Mark the squad as needing its details resent
 	squad().m_shortHandle = newHandle;
-	squad().m_callsign = newCallsign.c_str();
 	setUpdated();
 
 	SQUAD_MEMBERS::iterator it;
@@ -1113,8 +1152,8 @@ SquadList::setRecruiting(bool newFlag, Player* player)
 	if ( newFlag == m_squad.m_recruiting )
 		return;
 	dbugLog(_FLD, "t:%d p:%u c:%s sq:%u(%s) recruiting %s"
-					, player->teulIndex(), player->playerID(), player->callsign()
-					, squad().squadID(), squad().shortName()
+					, player ? player->teulIndex() : 0, player ? player->playerID() : 0, player ? player->callsign() : "API"
+					, squad().squadID(), squad().callsign().c_str()
 					, ((newFlag) ? "enabled" : "disabled"));
 	m_squad.m_recruiting = newFlag;
 	setUpdated();
@@ -1169,7 +1208,7 @@ SquadMemberEntry::teulIndex() const
 static bool
 _exclusiveSquadFetch(UINT32 squadID)
 {
-	typedef std::vector< std::pair<UINT32,UINT32> > _FETCHES;
+	using _FETCHES = std::vector<std::pair<UINT32,UINT32>>;
 	_FETCHES fetches;
 	_FETCHES::iterator it;
 
@@ -1246,7 +1285,7 @@ chatFetchSquadInfo(UINT32 squadID)
 class SquadNamesQuery : public DBThreadQuery
 {
 public:
-	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads", DBThreadQuery::_IMMEDIATE) {}
+	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads WHERE disbanded = 0", DBThreadQuery::_IMMEDIATE) {}
 
 protected:
 	virtual void Success() override;
@@ -1271,7 +1310,7 @@ SquadNamesQuery::Success()
 		}
 		catch (std::exception& e)
 		{
-			threadLog(_FLW, "SquadNames: %s", e.what());
+			dbugLog(_FLW, "SquadNames: %s", e.what());
 			g_squadNames.clear();
 		}
 	}
@@ -1299,7 +1338,7 @@ chatAddSquadName(const char* name)
 }
 
 void
-chatAddSquadName(const ChatHandle& handle)
+chatAddSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	g_squadNames[chatGetLowercaseHandle(handle)] = handle;
@@ -1315,7 +1354,7 @@ chatCheckForSquadName(const char* name)
 }
 
 bool
-chatCheckForSquadName(const ChatHandle& handle)
+chatCheckForSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	const bool exists = (g_squadNames.find(chatGetLowercaseHandle(handle)) != g_squadNames.end());
@@ -1332,7 +1371,7 @@ chatRemoveSquadName(const char* name)
 }
 
 void
-chatRemoveSquadName(const ChatHandle& handle)
+chatRemoveSquadName(const ChatHandle handle)
 {
 	std::lock_guard<std::mutex> lock(_namesMutex);
 	SQUAD_NAMES::iterator it = g_squadNames.find(chatGetLowercaseHandle(handle));
@@ -1372,9 +1411,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		if ( !list->squad().recruiting() )
 			throw "Squad has recruiting disabled";
 
-		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
-							, player->teulIndex(), player->playerID(), player->callsign());
+        dbugLog(_FLD, "t:%d p:%u c:%s adding to recruiter list"
+                        , player->teulIndex(), player->playerID(), player->callsign());
 
 		g_recruiters.insert(player);
 	}
@@ -1383,9 +1421,8 @@ chatUpdateRecruiterList(const Player* player, bool recruiting, SquadList* list)
 		RECRUITERS::iterator it = g_recruiters.find(player);
 		if ( it != g_recruiters.end() )
 		{
-			if ( g_logDebug )
-				dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
-								, player->teulIndex(), player->playerID(), player->callsign(), e);
+            dbugLog(_FLD, "t:%d p:%u c:%s removing from recruiter list: %s"
+                            , player->teulIndex(), player->playerID(), player->callsign(), e);
 			g_recruiters.erase(it);
 		}
 	}
@@ -1420,7 +1457,7 @@ chatRequestRecruiter(Player* player, UCHAR language)
 	RECRUITER_LIST outgoing;
 	RECRUITERS::const_iterator it;
 
-	typedef std::multimap<UINT32, Recruiter> RECRUITER_WEIGHTING;
+	using RECRUITER_WEIGHTING = std::multimap<UINT32, Recruiter>;
 	RECRUITER_WEIGHTING dupes, spares;
 	std::set<UINT32> listedSquads;
 
@@ -1451,7 +1488,7 @@ chatRequestRecruiter(Player* player, UCHAR language)
 		// So far so good, now perform cream-of-the-crop filtering
 		if ( weight == 0 )
 		{
-			// Guys with recruits or who's squads have already been
+			// Players with recruits or whose squads have already been
 			// listed move down the list
 			weight += chatGetNumberOfRecruits(recruiter->playerID());
 			if ( listedSquads.find(recruiter->squadID()) != listedSquads.end() )
@@ -1475,13 +1512,13 @@ chatRequestRecruiter(Player* player, UCHAR language)
 
 	RECRUITER_WEIGHTING::iterator rit;
 
-	// Do we have room for guys who weren't ideal?
+	// Do we have room for recruiters who weren't ideal?
 	for ( rit = dupes.begin(); outgoing.size() < host_config.squad.recruiterListMax && rit != dupes.end(); ++rit )
 	{
 		outgoing.add(rit->second);
 	}
 
-	// If we didn't reach the minimum list length yet, fill the list out with a bunch more guys.
+	// If we didn't reach the minimum list length yet, fill the list out with a bunch more recruiters.
 	if ( outgoing.size() < host_config.squad.recruiterListMin )
 	{
 		for ( rit = spares.begin(); outgoing.size() < host_config.squad.recruiterListMax && rit != spares.end(); ++rit )

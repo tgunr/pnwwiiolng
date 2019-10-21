@@ -13,16 +13,16 @@
 
 class Matrixf;
 
-typedef LOGICAL (*USERDRAWFUNC)(LOGICAL IsBeforeStage);
+using USERDRAWFUNC = LOGICAL(*)(LOGICAL IsBeforeStage);
 
 extern void obdrawWireframeObject(OBJECT* lpobj, UINT32 color);
 extern void obdrawObjectBoundingBox(OBJECT* lpobj, UINT32 color);
 extern LOGICAL obdrawDrawSingleObject(OBJECT* lpobj);
-extern LOGICAL obdrawInit(void);
-extern void obdrawKill(void);
+extern LOGICAL obdrawInit();
+extern void obdrawKill();
 extern void obdrawObjects();
 extern LOGICAL obdrawObjectsDeprecated();
-extern LOGICAL obdrawUpdateObjectLOD(void);
+extern LOGICAL obdrawUpdateObjectLOD();
 extern LOGICAL obdrawStraightAhead(piVECTOR* pos, piVECTOR* rot, float dist, UINT32 color);
 extern LOGICAL obdrawProcessLODCallback(OBJECT* lplod, UINT32 user,piVECTOR* InPos,
 								 LOGICAL ReLight,FLOAT32 Radius,LOGICAL * LODChanged);
@@ -44,7 +44,6 @@ extern void obdrawDrawWaterRefraction();
 
 extern void obdrawDrawObject(const OBJECT* o, int units = 0);
 extern void obdrawDrawObjectInstanced(const OBJECT* o, int units = 0, int primcount = 1);
-extern void obdrawDrawAdvertisements();
 extern void obdrawDrawUnsorted();
 extern void obdrawDrawSorted();
 extern void obdrawDrawSortedCockpit();
@@ -118,3 +117,5 @@ extern int obdrawGetMultiTextureID(int offset);
 extern void obdrawCull();
 extern void obdrawDrawShadowCasters();
 extern void obdrawGetMultiTextureMatrix(int offset, Matrixf& matrix);
+
+extern float GetDistance(OBJECT * lplod, bool multiply);

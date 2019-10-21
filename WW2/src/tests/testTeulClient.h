@@ -9,6 +9,16 @@
 static std::vector<SINT32> g_bulkConnections;
 static bool g_inBulkTest = false;
 
+namespace Teul
+{
+    inline ENDPOINT *GetEndpointIfConnected(const SINT32 teulIndex)
+    {
+        ENDPOINT *ep = teulGetEndpoint(teulIndex);
+        
+        return ep && ep->state() == IS_OPEN && !ep->m_closed && ep->m_connected ? ep : nullptr;
+    }
+}
+
 struct ClientRole : public Role
 {
 	public:
@@ -92,6 +102,7 @@ struct ClientRole : public Role
 	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
+		{
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
 
 			REGISTER_RECVSEND(Role::HelloRel_Y, recvHello, sendHello, s_cbRelHello);
@@ -109,8 +120,8 @@ struct ClientRole : public Role
 			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
 
 			REGISTER_RECEIVER(Role::LargePacketAck_Y, recvLargePacketAck);
-
-		END_CALLBACK_REGISTRATION
+		}
+		END_CALLBACK_REGISTRATION(Role::Test_X)
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -140,7 +151,7 @@ struct ClientRole : public Role
 			return;
 
 		const TeulTimeMS delay = (2 * Config::ConnectTimeoutMS) + 500ULL;
-		Dprintf("Keepalive check: %llu delay.\n", delay);
+		Dprintf("Keepalive check: %" PR64BitUT " delay.\n", delay);
 		teulUpdateTransport(delay);
 	}
 
@@ -182,14 +193,15 @@ struct ClientRole : public Role
 		outgoing.m_type = type;
 		outgoing.m_size = rand();
 		outgoing.m_count = 64 + rand() % 64;
+		memset(outgoing.m_data, 0, sizeof(outgoing.m_data));
 
 		if ( (EchoPacketHeader::s_requested % 1000) == 0 )
 		{
-			Iprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Iprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		else
 		{
-			Dprintf("Echo request #%llu type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
+			Dprintf("Echo request #%" PR64BitUT " type %u count %u\n", EchoPacketHeader::s_requested, outgoing.m_type, outgoing.m_count);
 		}
 		teulSend(teulIndex, s_cbEcho, &outgoing);
 	}
@@ -248,7 +260,7 @@ struct ClientRole : public Role
 
 		catchupEchoPackets();
 
-		Iprintf("%llu echo packets sent and acked\n", EchoPacketHeader::s_requested);
+		Iprintf("%" PR64BitUT " echo packets sent and acked\n", EchoPacketHeader::s_requested);
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -323,9 +335,9 @@ struct ClientRole : public Role
 				{
 	loop:
 					teulUpdateTransport(0);
-					if ( Teul::GetConnectedEndpoint(0) == nullptr )
+					if ( Teul::GetEndpointIfConnected(0) == nullptr )
 						throw Teul::Error("Connection 0 closed unexpectedly.", 0);
-					if ( Teul::GetConnectedEndpoint(1) == nullptr )
+					if ( Teul::GetEndpointIfConnected(1) == nullptr )
 						throw Teul::Error("Connection 1 closed unexpectedly.", 1);
 
 					if ( g_bulkConnections.size() < expectedIndexes.size() )
@@ -369,7 +381,7 @@ struct ClientRole : public Role
 
 		const TeulTimeMS totalElapsedMS = endTimeMS - startTimeMS;
 		const TeulTimeMS avgBatchMS = totalOpenTimesMS / (ConnectionsToTest / ConnectionsAtATime);
-		Iprintf("Done [total: %llums, avg batch time: %llums]!\n", totalElapsedMS, avgBatchMS);
+		Iprintf("Done [total: %" PR64BitUT "ms, avg batch time: %" PR64BitUT "ms]!\n", totalElapsedMS, avgBatchMS);
 	}
 
 	private:
@@ -404,7 +416,7 @@ struct ClientRole : public Role
 		Iprintf("Sending [%u] %s\n", randomNo, detail);
 		SINT32 result = teulSend(teulIndex, callback, &randomNo);
 		if ( result < 0 )
-			throw Teul::Error("SendRandom failed", result);
+			throw Teul::IndexError(teulIndex, "SendRandom failed", result);
 
 		WaitForHelloReply();
 
@@ -452,13 +464,13 @@ struct ClientRole : public Role
 				// Check the endpoints, see where they are at.
 				ENDPOINT* endpoint;
 
-				endpoint = Teul::GetConnectedEndpoint(0);
+				endpoint = Teul::GetEndpointIfConnected(0);
 				if ( (endpoint != nullptr) != firstConnIsOpen )
 					throw Teul::IterationError(i, "First connection in wrong state", 0);
 				if (!firstConnIsOpen)
 					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 0);
 
-				endpoint = Teul::GetConnectedEndpoint(1);
+				endpoint = Teul::GetEndpointIfConnected(1);
 				if ( (endpoint != nullptr) != secondConnIsOpen )
 					throw Teul::IterationError(i, "Second connection in wrong state", 0);
 				if (!secondConnIsOpen)
@@ -627,7 +639,7 @@ struct ClientRole : public Role
 	}
 
 	public:
-	void TestVaryingPacketSizes(const SINT32 teulIndex) 
+	void TestVaryingPacketSizes(const SINT32 teulIndex)
 	{
 		if (tSendVariety.isEnabled() == false)
 			return;
@@ -636,7 +648,7 @@ struct ClientRole : public Role
 		size_t msgSizes[] = {256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
 		size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
 
-		Iprintf("sending %u messages for each varing size\n", numMsgs);
+		Iprintf("sending %" PRSizeT " messages for each varing size\n", numMsgs);
 
 		uint8_t nextChar = static_cast<uint8_t>('A');
 		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
@@ -651,7 +663,7 @@ struct ClientRole : public Role
 				nextChar = static_cast<uint8_t>('A');
 			}
 
-			Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
+			Iprintf("sending %" PRSizeT " messages for packet size %" PRSizeT "\n", numMsgs, msgSizes[i]);
 			for (size_t j = 0; j < numMsgs; ++j)
 			{
 				outgoing.send(teulIndex);
@@ -776,10 +788,10 @@ struct ClientRole : public Role
 		SendRandom(m_teulIndex, s_cbHello, "final via unrel");
 		SendRandom(m_teulIndex, s_cbRelHello, "final via rel");
 
-		if ( Teul::GetConnectedEndpoint(1) != nullptr )
-			throw Teul::Error("Second endpoint is still showing 'connected' after close", 0);
-		if ( Teul::GetConnectedEndpoint(0) == nullptr )
-			throw Teul::Error("We lost the primary endpoint", 0);
+		if ( Teul::GetEndpointIfConnected(1) != nullptr )
+			throw Teul::IndexError(1, "Second endpoint is still showing 'connected' after close", 0);
+		if ( Teul::GetEndpointIfConnected(0) == nullptr )
+			throw Teul::IndexError(0, "We lost the primary endpoint", 0);
 
 		// If the "killserver" test is enabled, we send the "shutdown" callback.
 		if ( tKillServer.isEnabled() )
@@ -819,9 +831,12 @@ struct ClientRole : public Role
 	{
 		GetHostAddress();
 		// Now attempt to open a connection to the server.
-		const SINT32 teulIndex = teulOpenSend(hostAddress, Config::TestPort, connectFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+		const SINT32 teulIndex = teulOpenSend(hostAddress, Config::TestPort, Config::protocol == PROTOCOL_UDB ? nullptr : connectFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpen failed", teulIndex);
+        if (Config::protocol == PROTOCOL_UDB) {
+            Connected();
+        }
 
 		m_teulIndex = teulIndex;
 		Dprintf("teulOpenSend() index %d\n", m_teulIndex);
@@ -837,7 +852,7 @@ struct ClientRole : public Role
 		const TeulTimeMS startTime = teulClock64;
 		const TeulTimeMS cutoff = teulClock64 + Config::ConnectTimeoutMS + 100;
 
-		while ( s_lastError == 0 && Teul::GetConnectedEndpoint(teulIndex) == nullptr && teulClock64 <= cutoff )
+		while ( s_lastError == 0 && Teul::GetEndpointIfConnected(teulIndex) == nullptr && teulClock64 <= cutoff )
 		{
 			// Loiter for 100ms letting teulKit do it's thing.
 			teulUpdateTransport(5);
@@ -851,7 +866,7 @@ struct ClientRole : public Role
 			throw Teul::Error("Connection timed out", (SINT32)delta);
 		}
 
-		Dprintf("t:%d Getting connected took %llums.\n", teulIndex, delta);
+		Dprintf("t:%d Getting connected took %" PR64BitUT "ms.\n", teulIndex, delta);
 	}
 
 	// Track whether we are currently connected to our primary connection or not.

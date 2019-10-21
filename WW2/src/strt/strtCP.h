@@ -18,7 +18,6 @@ class FacilityStruct;
 class ObjectStruct;
 struct CONVOYSTRUCT;
 struct WEAPON_SERIAL;
-struct FULL_OBJ_ID;
 class HCUnit;
 
 //This function initializes all the bases: ARMY, AIR, and NAVAL
@@ -31,17 +30,17 @@ extern bool strtInitBases(CPStruct* cpList);
 //	distribution sequences on one CP.  It takes care of producing
 //	resources, doing repairs, and storing the leftovers (if any)
 //	in the depots of a CP
-extern LOGICAL strtRunCP(CPStruct& cp);
+extern void strtRunCP(CPStruct& cp);
 
 //This function allows the Strat System to accept a convoy into its
 //	depot
 extern void strtAcceptConvoy(CONVOYSTRUCT& convoy);
 
 //This function damages an object referenced by fullID with damageJoules
-extern void strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID);
+extern void strtDamage(const FULL_OBJ_ID fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID);
 
 // Capture a facility and report it.
-extern void strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds);
+extern void strtCaptureAndLog(FacilityStruct* facility, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID, const HCUnit* unit, UINT32 seconds);
 
 // Force an initial-timer based redraw of capture table for a facility
 extern bool strtCaptureFacility(FacilityStruct& facility, WWII_COUNTRY taker, WWII_COUNTRY holder, bool force=false, bool quietly=false);

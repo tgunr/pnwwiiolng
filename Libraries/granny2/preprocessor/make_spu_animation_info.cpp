@@ -1,15 +1,15 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/make_spu_animation_info.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #16 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <granny.h>
 #include <stdio.h>
-#include <assert.h>
+#include <string.h>
 #include <vector>
 #include <algorithm>
 #include <functional>
@@ -75,8 +75,8 @@ bool ConvertTrack(granny_uint8** TrackMemory,
                   track_type TrackType,
                   granny_memory_arena* Arena)
 {
-    assert(TrackMemory);
-    assert(TrackMemorySize);
+    pp_assert(TrackMemory);
+    pp_assert(TrackMemorySize);
 
     granny_data_type_definition const* CurveType =
         GrannyCurveGetDataTypeDefinition(&OldCurve);
@@ -99,7 +99,7 @@ bool ConvertTrack(granny_uint8** TrackMemory,
 
     if (Success)
     {
-        assert((CurveBuffer.size() % 16) == 0);
+        pp_assert((CurveBuffer.size() % 16) == 0);
         *TrackMemorySize = (granny_int32)CurveBuffer.size();
         *TrackMemory = PushArray(Arena, *TrackMemorySize, granny_uint8);
         memcpy(*TrackMemory, &CurveBuffer[0], *TrackMemorySize);
@@ -191,7 +191,6 @@ granny_spu_animation* ConvertAnim(granny_animation* Anim,
 
             CurrTrack.FromNameIndex = SortedTracks[TTrack].OriginalIndex;
             CurrTrack.Flags         = SortedTracks[TTrack].Track->Flags;
-            CurrTrack.Reserved      = 0;
             CurrTrack.AnimLODValue  = SortedTracks[TTrack].LODValue;
             GrannySampleTrackUUULocalAtTime0(SortedTracks[TTrack].Track,
                                              &CurrTrack.LODTransform);
@@ -253,13 +252,6 @@ granny_spu_animation* ConvertAnim(granny_animation* Anim,
             }
         }}
 
-        if (AllCurveBytes.size() > GrannyMaxSPUCurveSize)
-        {
-            fprintf(stderr, "MakeSPUAnimation: MaxCurve size: %d, failed with size: %d\n",
-                    GrannyMaxSPUCurveSize, AllCurveBytes.size());
-            return 0;
-        }
-
         // Put the bytes into the track_group
         Group->CurveByteCount = (granny_int32)AllCurveBytes.size();
         if (Group->CurveByteCount)
@@ -271,6 +263,25 @@ granny_spu_animation* ConvertAnim(granny_animation* Anim,
         {
             Group->CurveByteCount = 0;
             Group->CurveBytes = 0;
+        }
+
+        // Recompute the RequiredCurveBytes, and check that all the tracks are in-bounds
+        GrannyRecomputeSPUTrackRequiredBytes(Group);
+        {
+            bool AllInbounds = true;
+            {for (int Idx = 0; Idx < Group->TransformTrackCount; ++Idx)
+            {
+                if (Group->TransformTracks[Idx].BytesRequiredToSample > GrannyMaxSPUTransformTrackSize)
+                {
+                    fprintf(stderr, "MakeSPUAnimation: Track: %s is larger than allowed: (%d bytes, max: %d)\n",
+                            Group->TrackNames[Group->TransformTracks[Idx].FromNameIndex],
+                            Group->TransformTracks[Idx].BytesRequiredToSample,
+                            GrannyMaxSPUTransformTrackSize);
+                    AllInbounds = false;
+                }
+            }}
+            if (!AllInbounds)
+                return 0;
         }
     }}
 
@@ -284,8 +295,7 @@ bool MakeSPUAnimation(input_file&     InputFile,
 {
     RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
 
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
+    granny_file_info* Info = ExtractFileInfo(InputFile);
     if (Info == 0)
     {
         ErrOut("unable to obtain a granny_file_info from the input file\n");
@@ -331,7 +341,7 @@ bool MakeSPUAnimation(input_file&     InputFile,
     granny_int32x FinalSectionCount = GrannyStandardSectionCount;
     granny_file_builder *Builder = GrannyBeginFile(FinalSectionCount,
                                                    GrannyCurrentGRNStandardTag,
-                                                   GrannyGRNFileMV_ThisPlatform,
+                                                   GrannyGRNFileMV_32Bit_BigEndian,  // just put it in ps3 format right away
                                                    GrannyGetTemporaryDirectory(),
                                                    "Prefix");
     granny_file_data_tree_writer *Writer =
@@ -357,9 +367,9 @@ bool MakeSPUAnimation(input_file&     InputFile,
     GrannyEndFileDataTreeWriting(Writer);
 
     char const* OutputFile = FindFirstValueForKey(KeyValues, NumKeyValues, "output");
-	assert(OutputFile);
+    pp_assert(OutputFile);
 
-	bool success = GrannyEndFile(Builder, OutputFile);
+    bool success = GrannyEndFile(Builder, OutputFile);
     if (!success)
     {
         ErrOut("failed to write to %s\n", OutputFile);
@@ -480,7 +490,7 @@ bool Convert16BitLinearCurve(int                         CurveDegree,
         }}
 
         CopyFrom = RealKnots+1;
-        assert(RealKnots[0] == 0);
+        pp_assert(RealKnots[0] == 0);
         CopyTo   = RealKnots + KnotCount;
         {for(int Idx = 0; Idx < CurveDegree; ++Idx)
         {
@@ -578,7 +588,7 @@ bool Convert8BitLinearCurve(int                         CurveDegree,
         }}
 
         CopyFrom = RealKnots+1;
-        assert(RealKnots[0] == 0);
+        pp_assert(RealKnots[0] == 0);
         CopyTo   = RealKnots + KnotCount;
         {for(int Idx = 0; Idx < CurveDegree; ++Idx)
         {
@@ -621,12 +631,12 @@ bool ConvertD4nk8u(granny_curve2& OldCurve,
                    track_type TrackType,
                    vector<granny_uint8>& CurveBuffer)
 {
-    assert(TrackType == Orientation);
+    pp_assert(TrackType == Orientation);
 
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 4);
+    pp_assert(CurveDimension == 4);
 
     granny_curve_data_d4n_k8u_c7u const* CurveObject =
         (granny_curve_data_d4n_k8u_c7u*)OldCurve.CurveData.Object;
@@ -681,7 +691,7 @@ bool ConvertD4nk8u(granny_curve2& OldCurve,
         }}
 
         CopyFrom = RealKnots+1;
-        assert(RealKnots[0] == 0);
+        pp_assert(RealKnots[0] == 0);
         CopyTo   = RealKnots + CurveKnotCount;
         {for(int Idx = 0; Idx < CurveDegree; ++Idx)
         {
@@ -722,12 +732,12 @@ bool ConvertD4nk16u(granny_curve2& OldCurve,
                     track_type TrackType,
                     vector<granny_uint8>& CurveBuffer)
 {
-    assert(TrackType == Orientation);
+    pp_assert(TrackType == Orientation);
 
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 4);
+    pp_assert(CurveDimension == 4);
 
     granny_curve_data_d4n_k16u_c15u const* CurveObject =
         (granny_curve_data_d4n_k16u_c15u*)OldCurve.CurveData.Object;
@@ -784,7 +794,7 @@ bool ConvertD4nk16u(granny_curve2& OldCurve,
         }}
 
         CopyFrom = RealKnots+1;
-        assert(RealKnots[0] == 0);
+        pp_assert(RealKnots[0] == 0);
         CopyTo   = RealKnots + CurveKnotCount;
         {for(int Idx = 0; Idx < CurveDegree; ++Idx)
         {
@@ -844,22 +854,22 @@ bool ConvertDak16u(granny_curve2& OldCurve,
     switch (TrackType)
     {
         case Position:
-            assert(CurveDimension == 3);
+            pp_assert(CurveDimension == 3);
             ReplType = GrannySPUReplicationRaw;
             break;
 
         case Orientation:
-            assert(CurveDimension == 4);
+            pp_assert(CurveDimension == 4);
             ReplType = GrannySPUReplicationNormOri;
             break;
 
         case ScaleShear:
-            assert(CurveDimension == 9);
+            pp_assert(CurveDimension == 9);
             ReplType = GrannySPUReplicationRaw;
             break;
 
         default:
-            assert(false);
+            pp_assert(false);
             return false;
     }
 
@@ -882,7 +892,7 @@ bool ConvertD3k16u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 3);
+    pp_assert(CurveDimension == 3);
 
     granny_curve_data_d3_k16u_c16u const* CurveObject =
         (granny_curve_data_d3_k16u_c16u*)OldCurve.CurveData.Object;
@@ -900,7 +910,7 @@ bool ConvertD3k16u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == Position);
+    pp_assert(TrackType == Position);
     granny_spu_replication_type ReplType = GrannySPUReplicationRaw;
 
     return Convert16BitLinearCurve(CurveDegree,
@@ -923,7 +933,8 @@ bool ConvertD3I1k16u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 3);
+    pp_assert(CurveDimension == 3);
+	pp_unused(CurveDimension);
 
     granny_curve_data_d3i1_k16u_c16u const* CurveObject =
         (granny_curve_data_d3i1_k16u_c16u*)OldCurve.CurveData.Object;
@@ -941,7 +952,7 @@ bool ConvertD3I1k16u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == Position);
+    pp_assert(TrackType == Position);
     granny_spu_replication_type ReplType = GrannySPUReplicationRaw;
 
     return Convert16BitLinearCurve(CurveDegree,
@@ -963,7 +974,8 @@ bool ConvertD9I3k16u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 9);
+    pp_assert(CurveDimension == 9);
+	pp_unused(CurveDimension);
 
     granny_curve_data_d9i3_k16u_c16u const* CurveObject =
         (granny_curve_data_d9i3_k16u_c16u*)OldCurve.CurveData.Object;
@@ -981,7 +993,7 @@ bool ConvertD9I3k16u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == ScaleShear);
+    pp_assert(TrackType == ScaleShear);
     granny_spu_replication_type ReplType = GrannySPUReplicationDiagonalSS;
 
     return Convert16BitLinearCurve(CurveDegree,
@@ -1019,22 +1031,22 @@ bool ConvertDak8u(granny_curve2& OldCurve,
     switch (TrackType)
     {
         case Position:
-            assert(CurveDimension == 3);
+            pp_assert(CurveDimension == 3);
             ReplType = GrannySPUReplicationRaw;
             break;
 
         case Orientation:
-            assert(CurveDimension == 4);
+            pp_assert(CurveDimension == 4);
             ReplType = GrannySPUReplicationNormOri;
             break;
 
         case ScaleShear:
-            assert(CurveDimension == 9);
+            pp_assert(CurveDimension == 9);
             ReplType = GrannySPUReplicationRaw;
             break;
 
         default:
-            assert(false);
+            pp_assert(false);
             return false;
     }
 
@@ -1057,7 +1069,7 @@ bool ConvertD3k8u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 3);
+    pp_assert(CurveDimension == 3);
 
     granny_curve_data_d3_k8u_c8u const* CurveObject =
         (granny_curve_data_d3_k8u_c8u*)OldCurve.CurveData.Object;
@@ -1075,7 +1087,7 @@ bool ConvertD3k8u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == Position);
+    pp_assert(TrackType == Position);
     granny_spu_replication_type ReplType = GrannySPUReplicationRaw;
 
     return Convert8BitLinearCurve(CurveDegree,
@@ -1098,7 +1110,8 @@ bool ConvertD3I1k8u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 3);
+    pp_assert(CurveDimension == 3);
+	pp_unused(CurveDimension);
 
     granny_curve_data_d3i1_k8u_c8u const* CurveObject =
         (granny_curve_data_d3i1_k8u_c8u*)OldCurve.CurveData.Object;
@@ -1116,7 +1129,7 @@ bool ConvertD3I1k8u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == Position);
+    pp_assert(TrackType == Position);
     granny_spu_replication_type ReplType = GrannySPUReplicationRaw;
 
     return Convert8BitLinearCurve(CurveDegree,
@@ -1138,7 +1151,8 @@ bool ConvertD9I3k8u(granny_curve2& OldCurve,
     int CurveDegree    = GrannyCurveGetDegree(&OldCurve);
     int CurveDimension = GrannyCurveGetDimension(&OldCurve);
     int CurveKnotCount = GrannyCurveGetKnotCount(&OldCurve);
-    assert(CurveDimension == 9);
+    pp_assert(CurveDimension == 9);
+	pp_unused(CurveDimension);
 
     granny_curve_data_d9i3_k8u_c8u const* CurveObject =
         (granny_curve_data_d9i3_k8u_c8u*)OldCurve.CurveData.Object;
@@ -1156,7 +1170,7 @@ bool ConvertD9I3k8u(granny_curve2& OldCurve,
     ExtractTruncatedOneOverKnotScale(&OneOverKnotScale,
                                      CurveObject->OneOverKnotScaleTrunc);
 
-    assert(TrackType == ScaleShear);
+    pp_assert(TrackType == ScaleShear);
     granny_spu_replication_type ReplType = GrannySPUReplicationDiagonalSS;
 
     return Convert8BitLinearCurve(CurveDegree,
@@ -1292,7 +1306,7 @@ bool ConvertDak32f(granny_curve2& OldCurve,
             ReplicationType = GrannySPUReplicationRaw;
             break;
 
-        default: assert(false);
+        default: pp_assert(false);
             return false;
     }
 
@@ -1313,7 +1327,7 @@ bool ConvertD3I1k32f(granny_curve2& OldCurve,
                      track_type TrackType,
                      vector<granny_uint8>& CurveBuffer)
 {
-    assert(TrackType == Position);
+    pp_assert(TrackType == Position);
 
     granny_curve_data_d3i1_k32f_c32f* CurveData =
         (granny_curve_data_d3i1_k32f_c32f*)OldCurve.CurveData.Object;
@@ -1335,9 +1349,17 @@ bool ConvertD3I1k32f(granny_curve2& OldCurve,
                                    GrannySPUReplicationRaw, CurveBuffer);
 }
 
+static const char* HelpString =
+    (" MakeSPUAnimation converts a normal Granny animation into an\n"
+     " efficient layout for DMA transfer to the SPUs on the PS3 platform.\n"
+     " Mail us at granny3@rad for more details.\n"
+     "\n"
+     "    preprocessor MakeSPUAnimation anim.gr2 -output anim_spu.gr2\n");
+
 
 static CommandRegistrar RegMakeSPUAnimation(eSingleFile_NoMultiRun,
                                             MakeSPUAnimation,
                                             "MakeSPUAnimation",
-                                            "Convert a normal Granny animation into an animation that SPUs can sample.");
+                                            "Convert a normal Granny animation into an animation that SPUs can sample.",
+                                            HelpString);
 

@@ -64,8 +64,11 @@ void LocInit()
 			language = LANGUAGE_SPANISH;
 		else if(lstrcmp(name, _T("Chinese")) == 0)
 			language = LANGUAGE_CHINESE;
+		else if (lstrcmp(name, _T("Russian")) == 0)
+			language = LANGUAGE_RUSSIAN;
 	}
 	
+#ifndef IGNORE_REGISTRY
 	char buffer[MAX_PARAM+1];
 	buffer[0] = 0;
 	if(!registryGetVal(g_registryKey, "Region", (LPBYTE)buffer) || buffer[0] == 0)
@@ -73,4 +76,5 @@ void LocInit()
 
 	if ( _stricmp(buffer, "china") == 0 || _stricmp(buffer, "cn") == 0 || _stricmp(buffer, "zh") == 0 )
 		language = LANGUAGE_CHINESE;
+#endif
 }

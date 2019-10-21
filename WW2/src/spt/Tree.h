@@ -47,7 +47,6 @@
 #include <string>
 
 #define MAX_LODS    4
-#define CHRISTMAS   0
 
 class oglMaterial;
 
@@ -394,10 +393,8 @@ public:
 
     std::vector<Matrixf> euler;
 
-#if CHRISTMAS
-    bool christmas;
-#endif
-
+	bool christmas;
+	
 protected:
     bool leafRockingState;
     bool hasHorizBillboardGeom;

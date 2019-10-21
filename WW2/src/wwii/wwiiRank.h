@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::vector<const char*> RANK_NAMES;
+using RANK_NAMES = std::vector<std::string>;
 extern RANK_NAMES rankNames;
 
 class Rank
@@ -18,7 +18,7 @@ public:
 
 // Static members
 private:
-	typedef std::vector<Rank> RANKS;
+	using RANKS = std::vector<Rank>;
 	static RANKS s_ranks;					// Index of ranks
 	static UINT32 s_max;					// Highest rank
 
@@ -51,6 +51,4 @@ public:
 	UINT8			m_type;
 };
 
-extern void wwiiReadRanks(class DBHANDLE& dbh);
-extern void wwiiFreeRanks();
-
+extern void wwiiReadRanks();

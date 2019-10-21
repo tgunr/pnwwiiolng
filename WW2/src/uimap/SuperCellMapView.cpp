@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <algorithm>
 #include <map>
 #include <list>
@@ -59,7 +59,7 @@ public:
 	SuperCellMapView::Renderer* _renderer;
 	bool _done;
 
-	typedef std::vector<SuperCell*> SuperCellList;
+	using SuperCellList = std::vector<SuperCell*>;
 	SuperCellList _cells;
 };
 
@@ -87,6 +87,10 @@ SuperCellMapView::SuperCellMapView() : View(),
 	_pandirx(0),
 	_pandiry(0),
 	_panscale(0),
+	_minPanX(-25.0f),
+	_minPanY(210.0f),
+	_maxPanX(51.0f),// How far East
+	_maxPanY(283.0f),// How far North
 	_startpanscale(0),
 	_stoppanscale(0),
     _panlength(0),
@@ -132,7 +136,7 @@ SuperCellMapView::~SuperCellMapView()
 
 #define ZOOM_SCALE 100.0f
 
-void SuperCellMapView::DrawSelf(void)
+void SuperCellMapView::DrawSelf()
 {
 	if(_autoscale && frametime >= _autoscaletime)
 	{
@@ -489,6 +493,16 @@ bool SuperCellMapView::MouseDrag (float x, float y, int button, bool start)
 	scx = _dragscx - (x - _dragx) / Width()  * _scacross;
 	scy = _dragscy - (y - _dragy) / Height() * _scacross;
 
+	// Make sure that we don't pan the map too far.
+	if (scx < _minPanX)
+		scx = _minPanX;
+	if (scx > _maxPanX)
+		scx = _maxPanX;
+	if (scy < _minPanY)
+		scy = _minPanY;
+	if (scy > _maxPanY)
+		scy = _maxPanY;
+
 	SetPositionSuperCell(scx, scy);
 
 	int type = TUT_MAP_DRAG;
@@ -528,9 +542,6 @@ void SuperCellMapView::SetPositionXY(float x, float y, bool recalcPan)
 	_posx = x;
 	_posy = y;
 
-	//if(!_posx || !_posy)
-	//	bool stop = true;
-
 	if(recalcPan && (_panx || _pany))
 		SetPanPositionXY(_panx, _pany, _stoppanscale);
 }
@@ -566,9 +577,6 @@ void SuperCellMapView::SetPanPositionXY(float x, float y, float s)
 
 	if(_scacross != _panscale)
 	{
-		//if(_panscale < _scacross)
-		//	bool stop = true;
-
 		_panstop = _pantime + PAN_TIME_HEIGHT;
 	}
 	else
@@ -816,7 +824,17 @@ SuperCellMapView::Renderer::Renderer() : enabled(true), minscale(.1f), maxscale(
 	{
 		_loadthread = new LoadThread(this);
 		_loadthread->start();
-		while(!_loadthread->isRunning()){}
+		while(!_loadthread->isRunning()){
+#if platOS == OS_WIN32
+            SwitchToThread();
+#elif platOS == OS_MACOS
+            pthread_yield_np();
+#elif platOS == OS_LINUX
+            pthread_yield();
+#else
+#error "Oops"
+#endif
+		}
 	}
 
 	_loadthread->Acquire();
@@ -849,9 +867,12 @@ void SuperCellMapView::Renderer::RenderSuperCells(SuperCellMapView* mv, int scx1
 
 			if(sc)
 			{
-				if(!sc->loaded && !sc->loading)
-					_loadthread->LoadSuperCell(sc);
-				else if(sc->loaded)
+				if (!sc->loaded && !sc->loading) {
+					sc->loading = true;
+					sc->Load();
+					//_loadthread->LoadSuperCell(sc);
+				}
+				if(sc->loaded)
 					sc->Draw(mv->GetGraphicsContext());
 			}
 		}
@@ -893,7 +914,6 @@ SuperCellMapView::Renderer::LoadThread::~LoadThread()
 		_doLoad.notify_all();
 	}
     join();
-	while(GameInProgress && isRunning()) {}
 }
 
 void SuperCellMapView::Renderer::LoadThread::LoadSuperCell(SuperCell* sc)
@@ -910,17 +930,7 @@ void SuperCellMapView::Renderer::LoadThread::RemoveRendererSuperCells(SuperCellM
 	std::lock_guard<std::mutex> lock(_queueMutex);
 	if ( _cells.empty() == true )
 		return;
-	SuperCellList::iterator it = _cells.begin();
-	while ( it != _cells.end() )
-	{
-		if( (*it)->renderer == r)
-		{
-			*it = _cells.back();
-			_cells.pop_back();
-		}
-		else
-			++it;
-	}
+	_cells.erase(std::remove_if(_cells.begin(), _cells.end(), [=] (SuperCell *c) { return c->renderer == r; }), _cells.end());
 }
 
 void SuperCellMapView::Renderer::LoadThread::run()

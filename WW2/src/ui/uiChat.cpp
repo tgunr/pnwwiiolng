@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <stdarg.h>
 #include <math.h>
 #include <deque>
@@ -54,13 +54,16 @@
 #define MAX_CHAT_LINES 256
 #define MAGIC_DOT_R_COUNTRY 15
 
+// previous text limit was 250, account for encoded size and header/trailer characters
+#define MAX_REPORT_LEN (250 - INFO_MAX_ENCODE_SIZE - 2)
+
 /******** OBCENITY FILTER TYPES ********/
 
 // Structure that houses an obscenity filter rule.
-typedef RENS::wregex OBSCENITY_RULE;
+using OBSCENITY_RULE = RENS::wregex;
 
 // Vector of rules forms a filter.
-typedef std::vector<OBSCENITY_RULE> OBSCENITY_FILTER;
+using OBSCENITY_FILTER = std::vector<OBSCENITY_RULE>;
 
 // word filter loader
 class BadWordLoader : public XMLLoader2<BadWordLoader>
@@ -233,7 +236,34 @@ int uiChatPrintLine(const wchar_t* format, ...)
 
 *************************************************************************************************/
 
-void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const char* key, ...)
+std::wstring uivChatAssembleUILoc(const char* key, int argc, ...) {
+	int index = -1;
+
+	std::wstring format = uiLocString(key);
+
+	va_list marker;
+	va_start( marker, argc );
+
+	for ( int p = 1; p < argc+1; ++p ) { // loc vars are 1 based
+		wchar_t* arg = va_arg(marker, wchar_t*);
+
+		if ( arg ) {
+			wchar_t placeHolder[4] = {0,0,0,0};
+			swprintf(placeHolder, 4, L"{%d}", p);
+
+			int index;
+			while ( (index = format.find(placeHolder)) >= 0 )
+				format.replace(index, 3, arg);
+		} else {
+			break;
+		}
+	}
+	va_end(marker);
+
+	return std::wstring(format);
+}
+
+void uivChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const char* key, int argc, ...)
 {
  	if(!_chatview) return;
 
@@ -250,9 +280,9 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 	// we'll search for up to 6 dynamic variables in the localized message
 
 	va_list marker;
-	va_start( marker, key ); /* Initialize variable arguments. */
+	va_start( marker, argc ); /* Initialize variable arguments. */
 
-	for(int p = 1; p < 7; ++p) // loc vars are 1 based
+	for(int p = 1; p < argc+1; ++p) // loc vars are 1 based
 	{
 		arg = va_arg( marker, wchar_t*);
 
@@ -268,7 +298,7 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 			break; // reached null
 	}
 
-	va_start( marker, key ); /* Initialize variable arguments. */
+	va_start( marker, argc ); /* Initialize variable arguments. */
 	uiChatPrintLinev(icons, color, format.c_str(), marker);
 	va_end( marker ); /* Reset variable arguments. */
 }
@@ -426,9 +456,6 @@ static void _buzzer()
 void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 								, const wchar_t* const arg1, const wchar_t* const arg2, const wchar_t* const arg3, const wchar_t* const arg4, const wchar_t* const arg5, const wchar_t* const arg6)
 {
-	if(prefix == LSTR_BETA && gRegion == 5) // no beta messages for chinese, requested by peter
-		return;
-
 	unsigned int color = colorGREENALPHA;	// Default color
 	int side = 0;
 	int icons[CHATICON_MAX] = {-1,-1,-1};
@@ -1223,7 +1250,7 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 				if ( size == ruleSize || (rule.isPrefix && size >= ruleSize) )
 				{
 					// Does as much of the cuss as we have match?
-					if ( wstrncasecmp(sourcePtr, rule.text.c_str(), ruleSize) == 0 )
+					if ( wcsncasecmp(sourcePtr, rule.text.c_str(), ruleSize) == 0 )
 					{
 						// Found a cuss, replace it with characters from "replacements".
 						for ( UINT32 i = 0; i < ruleSize; ++i )
@@ -1298,7 +1325,7 @@ void uiChatHostMessage(Chat::HostMessage const& message)
 		{
 			lastplayerhandle = callsign;
 			char script[80];
-			sprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime());
+			strprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime());
 			c->jsclient->RunScript(script);
 		}
 	}else
@@ -1475,6 +1502,11 @@ bool ChatInput::KeyDown(int keycode, unsigned short unicode)
 		text += L" ";
 		SetValue(text.c_str());
 	}
+    else if (text.substr(0,5) == L".bug " || text.substr(0,5) == L"/bug " || text.substr(0,8) == L".report " || text.substr(0,8) == L"/report " )
+    {
+        if (text.length() > MAX_REPORT_LEN)
+            SetValue(text.substr(0, MAX_REPORT_LEN).c_str());
+    }
 	else
 	{
 		/*

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "phui/GraphicsContext.h"
 #include "phui/Util.h"
 #include "phui/UIMessages.h"
@@ -28,6 +28,7 @@
 
 WaypointLayer::WaypointLayer():
 	_waypointtexid(-1),
+	_mortartexid(-1),
 	_contacttexid(-1),
 	_markertexid(-1),
 	_aiCount(0),
@@ -59,7 +60,7 @@ void WaypointLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, i
 		std::vector<Waypoint> aiwps = PlayerClient()->Waypoints();
 
 		// remove all ai waypoints
-		for(int i = 0; i < (int)aiwps.size(); i++)
+		for(size_t i = 0; i < aiwps.size(); i++)
 		{
 			Waypoint& wp = aiwps.at(i);
 
@@ -99,75 +100,6 @@ void WaypointLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, i
 
 		if(wayobj)
 			wayobj->_remove = false;
-	}
-
-	// add ai waypoints
-	if(false && setAI)
-	{
-		_aiInit = false;
-
-		// save the new nearest cp
-		memcpy(&nearestCP, &player->ModelData->closestCp, sizeof(FULL_OBJ_ID));
-
-		// look up nearest cp
-		StratDB::StratObject* cp = StratDB::FindStratObject(nearestCP);
-
-		if(cp)
-		{
-			// get the ai list
-			StratDB::StratObjList aiList;
-
-			// look up the new set of ai contacts
-			if(StratDB::FindStratObjects(aiList, SDM_CLASS_BUILDING, SDM_BUILDING_AUTOGUNNER, -1, cp))
-			{
-				char buffer[10+1];
-				int aiCount = 0;
-
-				StratDB::StratObjList::iterator ait = aiList.begin();
-				for(; ait != aiList.end(); ++ait)
-				{
-					StratDB::StratObject* ai = *ait;
-					UINT32 subtype = 0;
-
-					switch(ai->SubType())
-					{
-						case SDM_AUTOGUNNER_MGNEST:
-						case SDM_AUTOGUNNER_RIFLEMAN:
-						case SDM_AUTOGUNNER_RIFLEPIT:
-						case SDM_AUTOGUNNER_MORTARPIT:
-						case SDM_AUTOGUNNER_ARTILLERYLIGHT:
-						case SDM_AUTOGUNNER_ARTILLERYMEDIUM:
-						case SDM_AUTOGUNNER_ARTILLERYHEAVY:
-						case SDM_AUTOGUNNER_COASTDEFENSE:
-						case SDM_AUTOGUNNER_AAALIGHT:
-						case SDM_AUTOGUNNER_AAAMEDIUM:
-						case SDM_AUTOGUNNER_AAAHEAVY:
-						case SDM_AUTOGUNNER_ATLIGHT:
-						case SDM_AUTOGUNNER_ATMEDIUM:
-						case SDM_AUTOGUNNER_ATHEAVY:
-						{
-							subtype = WTP_ENEMY_GUN;
-						}
-						break;
-						default:
-							subtype = WTP_ENEMY_DANGER;
-						break;
-					}
-
-					snprintf(buffer, 10, "AI%d", ++aiCount);
-
-					StratDB::StratObject* parent = StratDB::FindStratObject(ai->ParentId());
-
-					WP_TYPE type = (parent && parent->Side() == player->Side) ? WPT_FAI: WPT_EAI;
-
-					Waypoint wp(true, chatGetHandle(buffer), 0, type, subtype, ai->PosX(), ai->PosY(), 0, "ai gun");
-					wp.setShared(false);
-
-					// add this waypoint
-					PlayerClient()->ProcessWaypoint(wp, WPXT_POST);
-				}
-			}
-		}
 	}
 
 	MapObjects()->Draw(mv);
@@ -265,16 +197,18 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 	phui::GraphicsContext* ctx = mv->GetGraphicsContext();
 
 	float* uv = 0;
-	float full[8]		= {0,0,1,0,1,1,0,1};
-	float air[8]		= {0,.75, .25,.75, .25,1,  0,1};
-	float sea[8]		= {.25,.75, .5,.75, .5,1,  .25,1};
-	float ground[8]		= {0,.5, .25,.5, .25,.75,  0,.75};
-	float inf[8]		= {.25,.5, .5,.5, .5,.75,  .25,.75};
-	float gun[8]		= {.5,.75, .75,.75, .75,1,  .5,1};
-	float truck[8]		= {.5,.5, .75,.5, .75,.75,  .5,.75};
-	float danger[8]		= {.75,.75, 1,.75, 1,1,  .75,1};
-	float unknown[8]	= {.75,.5, 1,.5, 1,.75,  .75,.75};
-	float mortar[8]		= {0,.25, .25,.25, .25,.5,  0,.5};
+    // order:               left,bottom   right,bottom right,top left,top
+	float full[8]		=   {0,   0,      1,  0,      1,  1,      0,  1};
+	float air[8]		=   {0,   .75,    .25,.75,    .25,1,      0,  1};
+	float sea[8]		=   {.25, .75,    .5, .75,    .5, 1,      .25,1};
+    float gun[8]		=   {.5,  .75,    .75,.75,    .75,1,      .5, 1};
+    float danger[8]		=   {.75, .75,    1,  .75,    1,  1,      .75,1};
+	float ground[8]		=   {0,   .5,     .25,.5,     .25,.75,    0,  .75};
+	float inf[8]		=   {.25, .5,     .5, .5,     .5, .75,    .25,.75};
+	float truck[8]		=   {.5,  .5,     .75,.5,     .75,.75,    .5, .75};
+    float unknown[8]	=   {.75, .5,     1,  .5,     1,  .75,    .75,.75};
+    float mortar[8]		=   {0,   .25,    .25,.25,    .25,.5,     0,  .5};
+    float ppo[8]		=   {.25, .25,    .5, .25,    .5, .5,     .25,.5};
 
 	phui::BoxVerts box;
 	phui::box_verts_with_pos(box, iconx, icony, iconsize, iconsize);
@@ -304,10 +238,10 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			texid = _waypointlayer->_waypointtexid;
 			uv = full;
 		break;
-		case WPT_MORTAR:
-			ctx->SetColor(1,0,0);
-			texid = _waypointlayer->_contacttexid;
-			uv = mortar;
+		case WPT_BOMB:
+			ctx->SetColor(1,1,1);
+			texid = _waypointlayer->_mortartexid;
+			uv = full;
 		break;
 		case WPT_ENEMY:
 		case WPT_EAI:
@@ -341,6 +275,8 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 					uv = gun;
 				else if(_waypoint.subType() == WTP_ENEMY_TRUCK)
 					uv = truck;
+                else if(_waypoint.subType() == WTP_ENEMY_PPO)
+                    uv = ppo;
 				else if(_waypoint.subType() == WTP_ENEMY_DANGER)
 					uv = danger;
 				else if(_waypoint.subType() == WTP_ENEMY_UNKNOWN)
@@ -369,20 +305,6 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			drawName = false;
 		}
 		break;
-		/*
-		case WPT_MARKER:
-			{
-				float radius	= iconsize/2.0f;;
-				float cx		= iconx + radius;
-				float cy		= icony + radius;
-
-				ctx->SetColor(0,1,0,1);
-				ctx->MovePenPosition(cx, cy);
-				ctx->DrawCircle(radius, true);
-				ctx->MovePenPosition(-cx, -cy);
-			}
-		break;
-		*/
         default:
             // Invalid type, nothing to draw
             break;
@@ -503,7 +425,7 @@ void WaypointMapObject::Over(SuperCellMapView* mv, int state)
 	#if platOS == OS_MACOS
 				{
 					char abuffer[16];
-					sprintf( abuffer, "%d", (int)dist );
+					strprintf( abuffer, "%d", (int)dist );
 					tip += uiUTF8toUTF16(abuffer);
 				}
 	#else

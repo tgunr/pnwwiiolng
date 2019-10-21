@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <iostream>
 #include <sstream>
 
@@ -13,8 +13,6 @@
 #include "trn/trnmain.h"
 #include "client/clientStrtQueue.h"
 #include "ui/uiChat.h"
-
-#include "sys/sysWinISO.h"
 
 using namespace StratDB;
 
@@ -32,9 +30,9 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 	return a.id < b.id;
 }
 
-typedef std::pair<int,int> supercell_id;
-typedef std::map<sdm_lookup_id, StratObject*> StratObjectMap;
-typedef std::vector<StratObject*> BuildingList;
+using supercell_id = std::pair<int,int>;
+using StratObjectMap = std::map<sdm_lookup_id, StratObject*>;
+using BuildingList = std::vector<StratObject*>;
 
 struct supercell
 {
@@ -63,12 +61,12 @@ protected:
 	std::vector<StratObject*> _buildings;
 };
 
-typedef std::map<supercell_id, supercell> SuperCellMap;
-typedef std::map<sdm_lookup_id, StratObject::ChildList> ChildMap;
-typedef std::map<sdm_lookup_id, sdm_depot> LinkMap;
-typedef std::map<supercell_id, StratDB::StratObjList> StratObjListMap;
-typedef std::map<std::string, std::wstring> DisplayNameMap;
-typedef std::vector<CPListItem*> CPNameList;
+using SuperCellMap = std::map<supercell_id, supercell>;
+using ChildMap = std::map<sdm_lookup_id, StratObject::ChildList>;
+using LinkMap = std::map<sdm_lookup_id, sdm_depot>;
+using StratObjListMap = std::map<supercell_id, StratDB::StratObjList>;
+using DisplayNameMap = std::map<std::string, std::wstring>;
+using CPNameList = std::vector<CPListItem*>;
 
 static int (*_get_strat_data)(int scx, int scy, sdm_strat_data*);
 
@@ -319,13 +317,7 @@ void StratDB::InitDisplayNames()
 	_nameMap.clear();
     _cpnameList.clear();
 
-	// if chinese, use chinese, otherwise use english (for now)
-	int use = (gLanguage == 5) ? 5: 0;
-
-	std::string path = "languages/";
-	path += g_szLanguages[use];
-	path += "/strat.xml";
-
+	std::string path = std::string("languages/") + g_szLanguages[0] + "/strat.xml";
 	DisplayNameLoader loader(path.c_str());
 	loader.Load();
 
@@ -379,6 +371,7 @@ void StratObject::Init()
 	_linkedDepot = 0;
 	_stratflags = 0;
 	_updatetime = 0;
+	_loaded = false;
 	_vislevel = 0;
 	_index = 0;
 }
@@ -431,8 +424,8 @@ void StratObject::Set(sdm_cp const& cp)
 	_name = (const char*)cp.name;
 	_filename = (const char*)cp.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = cp.oid.id;
 	_fullid.objClass = cp.oid.objClass;
 	_fullid.objType = cp.oid.objType;
@@ -463,8 +456,8 @@ void StratObject::Set(sdm_facility const& fac)
 	_name = (const char*)fac.name;
 	_filename = (const char*)fac.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = fac.oid.id;
 	_fullid.objClass = fac.oid.objClass;
 	_fullid.objType = fac.oid.objType;
@@ -500,8 +493,8 @@ void StratObject::Set(sdm_building const& bld)
 	_name = (const char*)bld.name;
 	_filename = (const char*)bld.fileName;
 
-	_fullid.cell.ox = _sx << 4;
-	_fullid.cell.oy = _sy << 4;
+	_fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(_sx) << 4);
+	_fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(_sy) << 4);
 	_fullid.id = bld.oid.id;
 	_fullid.objClass = bld.oid.objClass;
 	_fullid.objType = bld.oid.objType;
@@ -584,7 +577,7 @@ StratObject::ChildList StratObject::ChildStratObjects() const
 	FindBestUnit
 *************************************************************************************************/
 
-unsigned int StratObject::FindBestUnit(int s, int c, int b) const
+unsigned int StratObject::FindBestUnit(int s, int c, int b, bool ignoreGarrisons) const
 {
 	HCUnit* best = nullptr;
 	HCUnit* unit = nullptr;
@@ -593,7 +586,7 @@ unsigned int StratObject::FindBestUnit(int s, int c, int b) const
 	{
 		unit = HCUnit::Lookup(_units[i]);
 
-		if(unit && !unit->isTrainingUnit())
+		if(unit && !unit->isTrainingUnit() && !(unit->isGarrison() && ignoreGarrisons))
 		{
 			if(!best)
 				best = unit;
@@ -774,7 +767,7 @@ bool StratObject::IsDeepWaterPort() const
 					StratDB::StratObject* building = *bit;
 
 					// look for the ship spawner
-					if(stricmp(building->Filename(), "svz34_spawn1c") == 0)
+					if(strcasecmp(building->Filename(), "svz34_spawn1c") == 0)
 						return true;
 				}
 			}
@@ -784,7 +777,7 @@ bool StratObject::IsDeepWaterPort() const
 	return false;
 }
 
-bool StratObject::IsRelated(const FULL_OBJ_ID& id) const
+bool StratObject::IsRelated(const FULL_OBJ_ID id) const
 {
 	return IsRelated(StratDB::FindStratObject(id));
 }
@@ -940,9 +933,9 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 	return it->second;
 }
 
-StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)
+StratObject* StratDB::FindStratObject(const FULL_OBJ_ID fullobjid)
 {
-	return FindStratObject(*(sdm_full_obj_id*)&fullobjid);
+	return FindStratObject(sdm_full_obj_id::from_foi(fullobjid));
 }
 
 StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
@@ -955,7 +948,7 @@ StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
 	StratObjList::iterator cit = list.begin();
 	for(; cit != list.end(); cit++)
 	{
-		if(!stricmp((*cit)->Name(), cp))
+		if(!strcasecmp((*cit)->Name(), cp))
 		{
 			if(fac && *fac)
 			{
@@ -963,7 +956,7 @@ StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
 				StratObject::ChildList::iterator fit = children.begin();
 				for(; fit != children.end(); fit++)
 				{
-					if(!stricmp((*fit)->Name(), fac))
+					if(!strcasecmp((*fit)->Name(), fac))
 					{
 						found = *fit;
 						break;
@@ -1030,7 +1023,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 {
 	_loaded = true;
 
-	sdm_lookup_id id = { (SINT16)(_sx << 4), (SINT16)(_sy << 4), 0 };
+	sdm_lookup_id id = { static_cast<SINT16>(static_cast<UINT16>(_sx) << 4), static_cast<SINT16>(static_cast<UINT16>(_sy) << 4), 0 };
 	StratObject* stratobj;
 
 	for(int i = 0; i < strat->numcps; i++)

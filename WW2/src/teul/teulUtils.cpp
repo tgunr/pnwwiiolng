@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides support utilities used in
 // the teul API. The end-user developer
 // should not need the functions provided here.
@@ -25,82 +25,64 @@
 #include <signal.h>
 #endif
 
-#if platOS == OS_LINUX
-#include <sys/time.h>
-#include <sys/times.h>
-#endif
-
-#if platOS == OS_MACOS
-#include <Carbon/Carbon.h>
-#include <unistd.h>
-#endif
-
 #if platOS == OS_WIN32
 #include <mmsystem.h>
 #include <sys/timeb.h>
+#else
+#include <sys/time.h>
+#include <sys/times.h>
+#include <unistd.h>
+#endif
+
+#if platOS == OS_MACOS
+#include <mach/clock.h>
+#include <mach/mach.h>
 #endif
 
 #include <atomic>
+#include <chrono>
 
+///TODO: We need these to be atomic or thread local or something.
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
 
+//
+// Establish the difference between the monotonic system clock and
+// current zulu time when establishing teulClockTime.  It will get
+// added so teulTime() continues to serve effectively as a wall-clock.
+//
+
+UINT32 teulClockMonoAdjust;
+
 // 	----- teulClock
+
+// This avoids the need for a std::call_once() sequence in teulSyncClock(),
+// which is an extreme hotspot for performance.
+void teulInitClock()
+{
+    teulSyncClock();
+    teulClockMonoAdjust = time(nullptr) - teulClockTime;
+    teulClockTime += teulClockMonoAdjust;
+}
 
 //////////////////////////////////////////////////////////////////////
 // Flush the time cache and update teulClock64 and teulTime (since
 // teulTime is just teulClock64 / 1000)
-
-void
-teulSyncClock(void)
+void teulSyncClock()
 {
-#if platOS == OS_LINUX
-	struct timeval tv;
-	gettimeofday(&tv, nullptr);
-	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-	if ( PN_LIKELY(newTimeMS > teulClock64) )
-	{
-		teulClock64 = newTimeMS;
-		teulClockTime = (UINT32)tv.tv_sec;
-	}
-	else if (PN_UNLIKELY(newTimeMS < teulClock64))
-	{
-		teulClock64++;
-		teulClockTime = teulClock64 / 1000ULL;
-	}
-#elif platOS == OS_WIN32
-	static const DWORD  BaseClockTime = timeGetTime();
-	static const TeulTimeMS BaseClock64 = time(nullptr) * 1000ULL + BaseClockTime % 1000ULL;
-
-	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
-	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-#elif platOS == OS_MACOS
-	UnsignedWide microTickCount;
-	Microseconds(&microTickCount);
-	teulClock64 = UnsignedWideToUInt64(microTickCount) / 1000;
-	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-#else
-#pragma error("No teulSyncClock implementation for this platform")
-#endif
+    using namespace std::chrono;
+    auto now = steady_clock::now();
+    TeulTimeMS newTimeMS = static_cast<TeulTimeMS>(duration_cast<milliseconds>(now.time_since_epoch()).count());
+    
+    // monotonic clocks should not be going backwards
+    ABORT_IF_EX(newTimeMS < teulClock64, "Monotonic time went backwards!");
+    
+    // avoid calculations when called many times a millisecond
+    if ( newTimeMS > teulClock64 ) {
+        teulClock64 = newTimeMS;
+        teulClockTime = teulClockMonoAdjust + static_cast<UINT32>(newTimeMS / 1000ULL);
+    }
 }
-
-#if platOS == OS_LINUX
-void testMonotonicClock()
-{
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	static uint32_t clockBase = 0;
-	static uint64_t clockBase64 = 0;
-	if (PN_UNLIKELY(clockBase == 0)) {
-		struct timeval tv;
-		gettimeofday(&tv, nullptr);
-		clockBase = tv.tv_sec - ts.tv_sec;
-		clockBase64 = uint64_t(clockBase) * 1000ULL;
-	}
-	teulClockTime = uint32_t(ts.tv_sec) + clockBase;
-	teulClock64 = clockBase64 + uint64_t(ts.tv_sec) * 1000ULL + uint64_t(ts.tv_nsec / 1000000ULL);
-}
-#endif
 
 // wrapper for inet_ntoa.
 // converts UINT32. to doted quad string.
@@ -136,7 +118,7 @@ const char*
 teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
 	const char* p = teulGetAddress(host);
-	strncpy(buffer, p, bufferSize);
+	strsafecpy(buffer, p, bufferSize);
 	return buffer;
 }
 #endif

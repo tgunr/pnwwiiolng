@@ -95,7 +95,7 @@ enum
 
 struct ModeStack
 {
-    typedef std::vector<unsigned int> ValueVec;
+    using ValueVec = std::vector<unsigned int>;
 
     ModeStack() :
         valid(true),
@@ -115,7 +115,7 @@ struct ModeStack
     ValueVec valueVec;
 };
 
-typedef std::map<GLenum, ModeStack> ModeMap;
+using ModeMap = std::map<GLenum, ModeStack>;
 
 namespace States
 {
@@ -238,7 +238,7 @@ public:
         InPool = f;
     }
 
-    typedef std::map<GLenum, int> ModeList;
+    using ModeList = std::map<GLenum, int>;
 
     ModeList& GetModes() {return modes;}
 
@@ -1728,7 +1728,7 @@ public:
 class Viewport : public RenderState
 {
 public:
-    typedef float value_type;
+    using value_type = float;
 
     Viewport();
 

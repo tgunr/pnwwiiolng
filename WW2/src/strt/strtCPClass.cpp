@@ -10,8 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Patrick "thunder" Magruder
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcast.h"
 #include "chat/chatDefines.h"			// For GCI_...
 #include "chat/chatGCIMessage.h"
@@ -37,8 +35,10 @@
 #include "strt/strtSupplyPropagator.h"
 #include "strt/strtTypes.h"
 #include "teul/teulTime.h"
+#include "strt/strtTOE.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 static CPSET g_objectives[MAX_SIDES];
 ObjectiveStats g_objectiveStats;
@@ -224,7 +224,7 @@ ObjectiveStats::checkLimits(UINT32 currentTime)
 	calculate();
 
 	// Step #1 - save the damn things :)
-#if !defined(TRAINING_SERVER) && !defined(FRES)
+#if !defined(TRAINING_SERVER)
 	save();
 
 	// Now check the stats of both sides to see if they're valid
@@ -273,7 +273,7 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 			{
 				///LOCALIZE
 				char buf[128];
-				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
+				strprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
 				chatSendHCMessage(forSide, LSTR_GENERIC, buf);
 			}
 #endif
@@ -530,50 +530,182 @@ CPStruct::announceObjectiveWithdrawl() const
 //////////////////////////////////////////////////////////////////////
 // Change the ownership of an entire CP
 
-bool
-CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+bool CPStruct::changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly)
 {
-	if ( toCountry >= MAX_COUNTRIES )
-	{
-		dbugLog(_FLW, "Tried to change ownership of %s to %d (>= %d)"
-						, name
-						, toCountry
-						, MAX_COUNTRIES
-						);
-		return false;
-	}
-
-	// If the ownership already matches, we fail unless force is true
-	if ( !force && !isContested() && wwiiSide(toCountry) == wwiiSide(country) )
-	{
-		dbugLog(_FLI, "%s.changeOwnership(%s) uneccessary - skipping"
-						, name
-						, _countryName[toCountry]
-						);
-		return false;
-	}
-
-	dbugLog(_FLI, "%s %s %s change of ownership to %s"
-					, ((quietly) ? "quietly" : "visibly")
-					, ((force) ? "forcing" : "setting")
-					, name
-					, _countryName[toCountry]
-					);
+	dbugLog(_FLI, "%s %s %s change of ownership triggered to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
+			name, _countryName[toCountry]);
 
 	// Firstly change standard facilities
-	FacilityStruct* facility;
-	for ( facility = facilityList; facility != nullptr; facility = facility->next )
+	FacilityStruct *facility;
+	for (facility = facilityList; facility != nullptr; facility = facility->next)
 	{
-		if ( facility->type == FACILITY_FIREBASE )
+		if (facility->type == FACILITY_FIREBASE)
 			continue;
-		if ( force || facility->country != toCountry )
+		if (force || facility->country != toCountry)
 			strtConvertFacility(*facility, toCountry, force, quietly);
 	}
 
 	// Clear out the routeing
-	resetRouteing();
+//	resetRouteing();
 
 	return true;
+}
+
+bool
+CPStruct::canChangeOwnership(WWII_COUNTRY toCountry, bool force)
+{
+	if (toCountry >= MAX_COUNTRIES)
+	{
+		dbugLog(_FLW, "Tried to change ownership of %s to %d (>= %d)", name, toCountry, MAX_COUNTRIES);
+		return false;
+	}
+
+	// If the ownership already matches, we fail unless force is true
+	if (!force && !isContested() && wwiiSide(toCountry) == wwiiSide(country))
+	{
+		dbugLog(_FLI, "%s.changeOwnership(%s) uneccessary - skipping", name, _countryName[toCountry]);
+		return false;
+	}
+
+	return true;
+}
+
+bool
+CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
+{
+	bool retVal = false;
+
+	if (canChangeOwnership(toCountry, force))
+	{
+		dbugLog(_FLI, "%s %s %s change of ownership to %s", ((quietly) ? "quietly" : "visibly"), ((force) ? "forcing" : "setting"),
+				name, _countryName[toCountry]);
+
+		// Firstly change standard facilities
+		FacilityStruct *facility;
+		for (facility = facilityList; facility != nullptr; facility = facility->next)
+		{
+			if (facility->type == FACILITY_FIREBASE)
+				continue;
+			if ( force || facility->country != toCountry )
+				strtConvertFacility(*facility, toCountry, force, quietly);
+		}
+
+		bool justCaptured = true; // This is needed to trigger town status check because town status may not have changed as a result of capture
+		checkTownStatus(this, justCaptured, 0);
+
+		// Clear out the routeing
+		resetRouteing();
+		retVal = true;
+	}
+
+	return retVal;
+}
+
+void CPStruct::changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly)
+{
+	if (changeOwnership(toCountry, force, quietly))
+	{
+		changeAllGarrisonCountries(toCountry, false);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Check the status of cp and update all linked cps recursively.
+
+void
+CPStruct::checkTownStatus(CPStruct *cp, bool justCaptured, int recurseLevel)
+{
+	TOWN_STATUS oldStatus = cp->m_townstatus;
+	TOWN_STATUS newStatus = INACTIVE;
+
+	dbugLog(_FLN, "1: Level %d Town status check started for %s. Current town status: %d.", recurseLevel, cp->name, oldStatus);
+
+	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) // Iterate though linked towns list
+	{
+		LinkStruct* outLink = *it;
+		if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+			continue;
+
+		CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
+		dbugLog(_FLN, "2: Level %d %s is outgoing linked to %s", recurseLevel, cp->name, otherCP->name);
+
+		if ((otherCP->side != cp->side) && (isValidSide(otherCP->side) && otherCP->country != WWII_CHINA)) //Check for enemy link
+		{
+			//Linked town is enemy
+			newStatus = FRONT_LINE;
+		}
+		else if (otherCP->m_townstatus == FRONT_LINE)
+		{
+			if (newStatus != FRONT_LINE) //Dont change to lower status if higher status has been detected
+			{
+				newStatus = BACK_LINE;
+			}
+		}
+		else if (otherCP->m_townstatus == BACK_LINE)
+		{
+			if (newStatus != FRONT_LINE && newStatus != BACK_LINE) //Dont change to lower status if higher status has been detected
+			{
+				newStatus = RESERVE;
+			}
+		}
+	}
+
+	if (newStatus == RESERVE) //Set to INACTIVE if no airfield or naval base
+	{
+		newStatus = INACTIVE;
+
+		if ((cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr) || (cp->facilityTypeIndex[FACILITY_NAVALBASE] != nullptr))
+		{
+			newStatus = RESERVE;
+		}
+	}
+
+	cp->m_townstatus = newStatus;
+	switch (cp->m_townstatus)
+	{
+	case FRONT_LINE:
+		strtFrontline(*cp, true);
+		strtFrontlineLink(*cp, false);
+		break;
+	case BACK_LINE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, true);
+		break;
+	case RESERVE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	case INACTIVE:
+		strtFrontline(*cp, false);
+		strtFrontlineLink(*cp, false);
+		break;
+	}
+
+	if (newStatus != oldStatus || justCaptured) //Capture or change of town status must trigger check of linked towns
+	{
+		//	Refresh Town Garrison Display mikemudd - Haven't considered this yet
+		justCaptured = false;
+
+		for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it)
+		{
+			LinkStruct* outLink = *it;
+			if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+				continue;
+
+			CPStruct* otherCP = outLink->endDepot->cp; //This will point to the linked town
+			dbugLog(_FLN, "3: Level %d About to do town status check for %s.", recurseLevel, otherCP->name);
+			checkTownStatus(otherCP, justCaptured, ++recurseLevel);
+
+		}
+
+		strtQueueCPStatus(cp);
+
+		dbugLog(_FLN, "4: Level %d Town status check complete for %s. Old town status: %d New town status: %d.", recurseLevel, cp->name, oldStatus, newStatus);
+	}
+	else
+	{
+		dbugLog(_FLN, "3: Level %d No status change detected for %s. Status is %d", recurseLevel, cp->name, cp->m_townstatus);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -587,13 +719,14 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 	// Ensure we rout parents first.
 	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
-	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	dbugLog(_FLI, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
+	
 	if ( unit->canDeployTo(cp) )
-		dbugLog(_FLIB, "ok ");
+		dbugLog(_FLI, "ok ");
 	else if ( !unit->rout() )
-		dbugLog(_FLIB, "FAILED ");
+		dbugLog(_FLI, "FAILED ");
 	else
-		dbugLog(_FLIB, "routed ");
+		dbugLog(_FLI, "routed ");
 }
 
 void
@@ -607,21 +740,26 @@ CPStruct::checkHCUnits()
 	{
 		_checkUnit((StratHCUnit*)it->second, this);
 	}
-	dbugLog(_FLIB, "End");
+	dbugLog(_FLI, "End");
+}
+
+void CPStruct::setLastCaptureTime(UINT32 time) 
+{
+	m_lastCaptureTime = time;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Check whether the flags say we're under attack or not
 
 CPStruct*
-CPStruct::checkForUnderAttack(void)
+CPStruct::checkForUnderAttack()
 {
 	///TODO: Differentiate between "people here" and "under attack"
 	if ( flags & CP_EWS_FLAG_MASK )
 	{
 		if ( !isUnderAttack )
 		{
-			betaLog(_FLI, "ews: marking %s as under attack", name);
+			dbugLog(_FLI, "ews: marking %s as under attack", name);
 		}
 		isUnderAttack = true;
 	}
@@ -629,7 +767,7 @@ CPStruct::checkForUnderAttack(void)
 	{
 		if ( isUnderAttack )
 		{
-			betaLog(_FLI, "ews: removing %s under attack flag", name);
+			dbugLog(_FLI, "ews: removing %s under attack flag", name);
 		}
 		isUnderAttack = false;
 	}
@@ -839,6 +977,10 @@ CPStruct::executeFallback()
 SCMD_RESULT
 CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 {
+    //HACK: DEV-824 - .hold command temporary disabled
+    return SCMD_ERROR;
+
+#ifdef ENABLE_HOLD
 	if ( side != issuer )
 		return SCMD_WRONG_SIDE;
 
@@ -864,6 +1006,7 @@ CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 		return SCMD_SUCCESS;
 
 	return SCMD_ERROR;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1297,13 +1440,13 @@ CPStruct::setTableStates(bool isNewObjective)
 		if ( !isObjective() )
 		{
 			// No objective, no tables
-			betaLog(_FLD, "NORB hiding %s non-obj table", fac->name);
+			dbugLog(_FLD, "NORB hiding %s non-obj table", fac->name);
 			fac->setCaptureDisabled();
 
 			// If the facility is spawnable and closed, time to wake it up
 			if ( fac->m_spawnable && !fac->isOpen() )
 			{
-				betaLog(_FLI, "opening %s since no objective", fac->name);
+				dbugLog(_FLI, "opening %s since no objective", fac->name);
 				strtOpenBase(*fac);
 			}
 			continue;
@@ -1315,18 +1458,18 @@ CPStruct::setTableStates(bool isNewObjective)
 			// entered contention, they should redraw soon
 			if ( isContested() )
 			{
-				betaLog(_FLD, "RB-MF table %s", fac->name);
+				dbugLog(_FLD, "RB-MF table %s", fac->name);
 				fac->setCapturePending();
 			}
 			else
 			{
-				betaLog(_FLD, "NORB-MF hiding %s", fac->name);
+				dbugLog(_FLD, "NORB-MF hiding %s", fac->name);
 				fac->setCaptureDisabled();
 			}
 		}
 		else if ( isNewObjective )
 		{
-			betaLog(_FLD, "RB show %s table no radio", fac->name);
+			dbugLog(_FLD, "RB show %s table no radio", fac->name);
 			fac->setCapturePending();
 		}
 	}
@@ -1349,7 +1492,7 @@ CPStruct::startObjectiveExpiry(WWII_SIDE forSide, UINT32 delay)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Iterate across the supply centers and propogate supply links outward
+// Iterate across the supply centers and propagate supply links outward
 // from them to all same-side CPs within reach
 
 bool
@@ -1373,7 +1516,7 @@ strtBuildSupplyChains(bool force)
 
 	teulSyncClock();
 	const TeulTimeMS applyEnded = teulClock64;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
+	dbugLog(_FLI, "sup: supply routeing took %" PR64BitUT "ms [%" PR64BitUT " run, %" PR64BitUT " apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
 	return true;
 }
@@ -1432,7 +1575,7 @@ _updateFirebases(const HCUnit& unit, CPStruct* cp)
 {
 	if ( cp == nullptr )
 		return false;
-	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && unit.isBrigade() == true )
+	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && (unit.isBrigade() == true || unit.isGarrison() == true) )
 		return true;
 	if ( cp->isEnemyLinked() && cp->m_units.empty() == true )
 		return true;
@@ -1522,4 +1665,142 @@ CPStruct::setRouteing(bool isConnected)
 #ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this);
 #endif
+}
+
+
+void CPStruct::removeAllGarrisonsSupply()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit->isGarrison())
+		{
+			unit->purgeResupply(true);
+			unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
+		}
+	}
+}
+
+
+void CPStruct::changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange)
+{
+
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				std::string toeTemplateHeaderName = unit->getToeTemplateHeaderName();
+				unit->m_countryID = GarrisonCountryChangeReq::getReplacementCountry(countryID, unit);
+
+				std::string countryPrefix;
+
+				if (unit->m_countryID == WWII_ENGLAND)
+				{
+					countryPrefix = "uk";
+				}
+				else if (unit->m_countryID == WWII_USA)
+				{
+					countryPrefix = "us";
+				}
+				else if (unit->m_countryID == WWII_FRANCE)
+				{
+					countryPrefix = "fr";
+				}
+				else if (unit->m_countryID == WWII_GERMANY)
+				{
+					countryPrefix = "de";
+				}
+
+				// Replace the first 2 letters in order to change the country.
+				toeTemplateHeaderName.replace(0, 2, countryPrefix);
+
+				// Get the new toeTemplate for the unit and assign it.
+				TOE_::TemplateHeader* toeTemplate(TOE_::TemplateHeader::Lookup(toeTemplateHeaderName.c_str()));
+
+				if (toeTemplate)
+				{
+					strtClearTOESaveList(*unit);
+                    // Clear all supply.
+                    //unit->purgeResupply(true);
+					// Remove the old toe template
+					unit->toeTemplateHeader()->unsubscribe(unit, unit->toe());
+					// Set the new countries toe template
+					unit->setToeTemplateHeader(toeTemplate);
+					// Subscribe to the template and have it populate our vehicle list
+					// Note: This gives us "default" equipment levels (i.e. full)
+					toeTemplate->subscribe(unit, unit->toe());
+					// Clear all supply.
+					//unit->purgeResupply(true);
+					// Reset supply and announce the country change to map, chat and clients.
+					unit->announceGarrisonCountryChange();
+					// Restart supply with trickle timer.
+					unit->restartGarrisonSupply(manualChange);
+				}
+
+				unit->save();
+			}
+		}
+	}
+
+}
+
+StratHCUnit * CPStruct::getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM movementType)
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit->branch() == branchID && unit->movementType() == movementType && unit->isGarrison())
+		{
+			return unit;
+		}
+	}
+	return nullptr;
+}
+
+void CPStruct::disableAllGarrisons()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				unit->setDisabled(true);
+				dbugLog(_FLW, "Garrison %s has been disabled"
+					, unit->name());
+			}
+		}
+	}
+}
+
+
+void CPStruct::enableAllGarrisons()
+{
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for (it = unitList.begin(); it != unitList.end(); ++it)
+	{
+		StratHCUnit* unit = (StratHCUnit*)it->second;
+		if (unit != nullptr)
+		{
+			if (unit->isGarrison())
+			{
+				unit->setDisabled(false);
+				dbugLog(_FLW, "Garrison %s has been enabled"
+					, unit->name());
+			}
+		}
+	}
 }

@@ -1,10 +1,10 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "scen/scenMain.h"
 #include "scen/ScenarioManager.h"
 #include "xml/XMLLoader2.h"
 
 // types
-typedef std::map<std::string,Scenario*> SCENARIO_MAP;
+using SCENARIO_MAP = std::map<std::string,Scenario*>;
 
 // local variables
 static SCENARIO_MAP _cache;
@@ -131,9 +131,9 @@ public:
 
 			const char* type = xmlGetStringFromNode(node, "type");
 
-			if(!stricmp(type, "emitter"))
+			if(!strcasecmp(type, "emitter"))
 				effect.type = ScenarioObject::EMITTER;
-			else if(!stricmp(type, "sound"))
+			else if(!strcasecmp(type, "sound"))
 				effect.type = ScenarioObject::SOUND;
 
 			// get our spawn position
@@ -192,13 +192,13 @@ public:
 			TUT_EVENT_TYPE type = TUT_EVENT_GENERAL;
 
 			// what kind command is this
-			if(!stricmp((const char*)node->name, "onstart"))
+			if(!strcasecmp((const char*)node->name, "onstart"))
 				type = TUT_EVENT_START;
-			else if(!stricmp((const char*)node->name, "onstop"))
+			else if(!strcasecmp((const char*)node->name, "onstop"))
 				type = TUT_EVENT_STOP;
-			else if(!stricmp((const char*)node->name, "onspawn"))
+			else if(!strcasecmp((const char*)node->name, "onspawn"))
 				type = TUT_EVENT_SPAWN;
-			else if(!stricmp((const char*)node->name, "ondespawn"))
+			else if(!strcasecmp((const char*)node->name, "ondespawn"))
 				type = TUT_EVENT_DESPAWN;
 
 			if(type != TUT_EVENT_GENERAL)

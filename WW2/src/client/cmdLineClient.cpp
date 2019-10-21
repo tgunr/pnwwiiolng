@@ -19,13 +19,13 @@
 #define DEFAULT_HOST			"192.168.0.83"
 #define DEG_TO_RAD(x) ((x) * M_PI / 180.0)
 
-typedef int (*interp_cmd)(int argc, char* argv[]);
+iusing interp_cmd = int (*)(int argc, char* argv[]);
 struct interp_cmd_lookup
 {
 	const char* name;
 	interp_cmd cmd;
 	const char* help;
-} ;
+};
 
 static int spawn_cmd	(int argc, char* argv[]);
 static int despawn_cmd	(int argc, char* argv[]);
@@ -143,7 +143,7 @@ protected:
 
 CmdLineClient* get_client(int i);
 
-typedef std::map<int, CmdLineClient*> ClientMap;
+using ClientMap = std::map<int, CmdLineClient*>;
 static ClientMap clients;
 
 /************************************************************************************************

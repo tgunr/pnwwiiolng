@@ -1,11 +1,12 @@
 #pragma once
 
-#if platBuild == TEUL_SERVER
-static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build." );
+#if platBuild == BUILD_SERVER
+static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server build." );
 #else
 
 #include "pi/pi.h"
 #include "include/defs.h"
+#include "fio/fiostructure.h"
 
 // These are configuration variables that are filled
 // from the .CFG file. Corresponding information
@@ -87,7 +88,6 @@ extern UINT32			MaxUserClipPlanes;
 extern UINT32			MaxTextureWidth;
 extern UINT32			MaxTextureHeight;
 
-extern LOGICAL          WantedHelp;			// asked for commandline help
 extern UINT32			WindowAdapter;		// desired adapter
 extern UINT32			WindowDeviceType;	// desired device type
 extern UINT32			WindowRefreshRate;	// desired refresh rate
@@ -103,6 +103,8 @@ extern SINT32          	WantedRefreshRate;
 extern SINT32           WantedAlpha;		// desired/actual alpha
 extern LOGICAL          WantedHdw;			// desired/actual hardware
 extern SINT32           WantedStencil;		// desired/actual hardware
+extern LOGICAL          WantedFullscreen;	// desired/actual window
+extern LOGICAL          WantedBorderless;	// desired/actual window
 extern LOGICAL          WantedWindow;		// desired/actual window
 extern SINT32			WantedMode;			// desired/actual mode
 extern SINT32           WantedSide;         // User selected side from webpage.
@@ -115,10 +117,11 @@ extern SINT8			HackID[128];		// used for hacker detection (comes from playgate o
 extern LOGICAL			AltFont;            // testing if true use alternate UI font
 extern SINT8			ServerApID[64];		// program apId
 extern SINT8			ServerData[64];		// data passed from auth server
-extern SINT8			ServerProtocol[64]; // connection protocol
 extern SINT8			BypassString[64];
+extern LOGICAL          LaunchSettingsOnly; // stand-alone settings (for mac initially)
+extern LOGICAL			UseSteamLogin;
 extern LOGICAL			WantedUserLogEnabled;	// If the user wants the log enabled
-extern SCHAR			WantedVideoCard[64];// desired video card name
+extern SCHAR			WantedDisplayDevice[64];// desired video card name
 extern SCHAR			WantedVideoResolution[32];// desired video resolution
 extern SCHAR			WantedSoundCard[64];// desired sound card name
 
@@ -160,8 +163,9 @@ extern LOGICAL          WantCombatSmoke;    // emersive smoke from damaged build
 extern SINT32           g_updateReflectionRate; // 0 - 5 seconds
 extern SINT32           g_iNumBullets;      // Limit to number of displayable bullets.
 extern SINT32           g_iAmbLevel;        // Frequent = 1; Infrequent = 2; Never = 0;
-extern SINT32           g_iVisiblePlayerLimit; // 1 = low 2 = medium 3 = high
+extern SINT32           g_iVisiblePlayerLimit; // 0 = very low, 1 = low, 2 = medium, 3 = high, 4 = very high
 extern SINT32           g_useNetworkRoute;    // 0, 1, 2 (auto/primary/secondary)
+extern LOGICAL          g_wantNetcode;        // true = netcode X enabled
 
 extern SINT32			g_iFSSASamples; 	// 0 = off, 2,4,6,8 (Mac OS X only currently)
 extern LOGICAL			g_bFSSAHighQuality; // enable high quality FSAA hinting (Mac OS X only currently) XXXX
@@ -172,8 +176,27 @@ extern LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when
 
 extern LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-extern SINT8			DataPath[_MAX_PATH];//=PREPATH;
-extern SINT8			UserDataPath[_MAX_PATH];
+//  MJH =====
+extern LOGICAL				WantedCopyOldSetup;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnline folder.
+extern wwiiolpath_string	WantedDataPath;				//  DEF = L"" -- SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
+extern wwiiolpath_string	WWIIOnlineDirName;			//  DEF = L"WWIIOnline" -- The ROOT folder for the game install - .\WWIIOnline
+
+extern wwiiolpath_string	WW2_exePath;				//	Windows - EXE ROOT folder:  \Program * Files -> CRS -> WWIIOnline == *.exe, WWIIOnline.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+														//	macOS - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
+extern wwiiolpath_string	WW2_exeDataPath;			//	EXE Support Data folder:  \Program * Files -> CRS  -> WWIIOnline -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
+extern wwiiolpath_string	WW2_exeDocsPath;			//	Windows - EXE Docs Folder:  \Program * Files -> CRS  -> WWIIOnline -> docs == eula.txt, license.*, regions.txt, tos.txt.
+														//	macOS - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
+extern wwiiolpath_string	WW2_exePlayarcPath;			//	Windoes - EXE playarc folder:  \Program * Files -> CRS  -> WWIIOnline -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
+														//	macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
+extern wwiiolpath_string	WW2_exeWorkingPath;			//	Windows - EXE Working folder:  \ProgramData -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+														//	macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+extern wwiiolpath_string	WW2_userDocumentsPath;		//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+														//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+extern wwiiolpath_string	WW2_userScreenShotsPath;	//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnline -> screenshots == SShot*.bmp.
+														//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> screenshots == SShot*.bmp.
+extern wwiiolpath_string	WW2_userWorkingPath;		//	Windows - USER Working folder:  \User -> My Documents -> WWIIOnline -> bin == lg.dat.
+														//	macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
+//  =========
 
 extern FLOAT32			FieldOfView;		// FOV in degrees
 extern FLOAT32			HorizontalFieldOfView;
@@ -186,15 +209,12 @@ extern LOGICAL			g_enableVSync;	    // Lock the frame rate to refresh rate
 extern SINT32			ShadowSizeSelect;	// A number representing shadow texture size											// (1-8) means "2^n"
 											// (1-8) means "2^n"
 											// 0 means "No Shadows"
-extern SINT8			Playarc[_MAX_PATH]; // path the archiver, usually just "playarc"
 /**/
 
 extern SINT32           nErrorCode;         // Set to any user specified error code
 
 extern SINT32			TexBpp;
 extern SINT32			TexAlpha;
-
-extern LOGICAL			TextureReduction;	// force texture reduction
 
 extern UINT32			DamageLevel;
 
@@ -252,6 +272,7 @@ extern LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
 extern LOGICAL			NoInfPreload;				// don't preload infantry
 extern LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 extern LOGICAL          g_buildTerrain;             // Build SDMs for archives.
+extern LOGICAL          WantRequiredTraining;		// Want The Basic Tutorials to be Required - MJH (DEV-1999: Remove basic graduation tutorial restriction.)
 
 extern LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 extern LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
@@ -277,33 +298,35 @@ extern LOGICAL          EnableMouseClickToDamageBuildings;
 extern FLOAT32			gTrooperMOD; // LOD scaler mod from preferences
 extern LOGICAL          gCustomTerrain;
 extern UINT32			gEZMode;
-extern UINT32			GameInProgress; // 0 = not running, 1 = running, 2 = quitting
 
 extern UINT32			Convergence; // Global (default) Airplane gun convergence setting
 extern UINT32			CurrentConv; // Current airplane gun convergence setting
 
 extern FLOAT32			aimMouse;	// Aiming mouse sensitivity
 extern SINT8            gAuthServer[128]; // Authentication server to be used
+extern SINT8            gAuthServerPort[64];
+extern char             gAuthRelayURL[128]; // Auth relay URL override
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
 
-#ifdef DEBUG
+#ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;
+extern LOGICAL          gDisableMouseClipping; // No ClipCursor() on Windows. Mac doesn't do this.
+extern LOGICAL          gDisableMouseHiding; // Don't hide the mouse while the game is frontmost. Mac doesn't need this (LLDB is smarter than VS)
+extern LOGICAL          gDisableGameTopmost; // Use HWND_TOP instead of HWND_TOPMOST in SetWindowPos() on Windows. On by default when debugging.
+#endif
+
+#if platOS == OS_MACOS
+extern LOGICAL          MacNoKeychainUsage;
 #endif
 
 #ifdef BETA_RELEASE
-	extern LOGICAL			gCheckPlanarPlacement;
-	extern UINT32			gPersDecalOverride;
-	extern UINT32			gUnitDecalOverride;
-	extern UINT32			gr2DrawFlags;
+extern LOGICAL			gCheckPlanarPlacement;
+extern UINT32			gPersDecalOverride;
+extern UINT32			gUnitDecalOverride;
+extern UINT32			gr2DrawFlags;
 #endif	// #ifdef BETA_RELEASE
 
 static inline bool IN_COMBAT(SINT32 t) { return (frametime - combattime) <= t; }
-
-namespace WWII
-{
-	extern const unsigned int gitCommitNo;
-	extern const char* const gitCommitStr;
-}
 
 #endif

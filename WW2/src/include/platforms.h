@@ -4,9 +4,59 @@
 
 #include "compiler_check.h"
 
+//////////////////////////////////////////////////////////////////////////////
+// Check baseline environment
+#if defined(__BIG_ENDIAN__)
+#error This is a big endian platform and is unsupported.
+#endif
+
+// Known operating systems
+#define OS_WIN32    1
+#define OS_MACOS    2
+#define OS_LINUX    3
+#define OS_MAX_PLAT 4
+
+// Used by platBuild
+#define BUILD_CLIENT 0
+#define BUILD_SERVER 1
+
+#if !defined(platOS) || platOS >= OS_MAX_PLAT || platOS < 1
+# error "No platform defined by compiler"
+#endif
+
+#if !defined(platBuild) || platBuild > BUILD_SERVER
+# error "No build defined by compiler"
+#endif
+
+// Helper macros for cleaning up all the client/server ifdefs.
+#if platBuild == BUILD_SERVER
+# define ON_SERVER(...) __VA_ARGS__
+# define ON_CLIENT(...)
+#elif platBuild == BUILD_CLIENT
+# define ON_SERVER(...)
+# define ON_CLIENT(...) __VA_ARGS__
+#endif
+
+// Helpers for conditionalizing on debug more cleanly as well.
+#if defined(DEBUG) && !defined(NDEBUG)
+# define DEBUG_ONLY(...) __VA_ARGS__
+# define RELEASE_ONLY(...)
+#elif !defined(DEBUG) && defined(NDEBUG)
+# define DEBUG_ONLY(...)
+# define RELEASE_ONLY(...) __VA_ARGS__
+#else
+# error "One and only one of DEBUG or NDEBUG must be defined by compiler"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
 // Check actual compiler - Clang 3.6, GCC 4.8, or VS2015
 #if !__check_Clang_version(3,6) && !__check_GCC_version(4,8) && !__check_MSVC_version(19)
 # error "Clang 3.6 or newer, GCC 4.8 or newer, or VS2015 or newer is required."
+#endif
+
+// Provide this for all compilers
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
 #endif
 
 #if __is_Clang()
@@ -14,18 +64,60 @@
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
-#define FORMAT_FUN(n,m) [[gnu::format(printf,n,m)]]
+#define PRSsizeT "zd"
+#define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN [[noreturn]]
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("clang diagnostic push"); \
+    _DISABLE_WARNING(clang diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("clang diagnostic pop");
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH [[clang::fallthrough]]
+#endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
+#endif
 
 #elif __is_GCC()
+
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#endif
 
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
-#define FORMAT_FUN(n,m) __attribute__((format(printf,n,m)))
+#define PRSsizeT "zd"
+#define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
+#if __has_cpp_attribute(noreturn)
+#define NORETURN_FN [[noreturn]]
+#else
 #define NORETURN_FN __attribute__ ((noreturn))
+#endif
+#define _DISABLE_WARNING(pragma) _Pragma(#pragma)
+#define DISABLE_WARNING(warning) \
+    _Pragma("GCC diagnostic push") \
+    _DISABLE_WARNING(GCC diagnostic ignored warning);
+#define POP_WARNINGS() \
+    _Pragma("GCC diagnostic pop")
+#if __has_cpp_attribute(fallthrough)
+#define FALLTHROUGH [[fallthrough]]
+#else
+#define FALLTHROUGH
+#endif
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL __attribute__((unused))
+#endif
 
 #else
 
@@ -35,10 +127,19 @@
 #define PN_UNLIKELY(p) (p)
 // MSVC also flouts the standard with size_t format specifiers.
 #define PRSizeT "Iu"
+#define PRSsizeT "Id"
 // And finally, it ALSO doesn't implement compiler-checked format strings like everyone else!
-#define FORMAT_FUN(n,m)
+#define FORMAT_FN(n,m)
 #define FORMAT_ARG(n)   _Printf_format_string_params_(n)
 #define NORETURN_FN [[noreturn]]
+#define DISABLE_WARNING(warning)
+#define POP_WARNINGS()
+#define FALLTHROUGH __fallthrough
+#if __has_cpp_attribute(maybe_unused)
+#define UNUSED_DECL [[maybe_unused]]
+#else
+#define UNUSED_DECL // __pragma(warning(suppress:4100)) - unsuitable because it applies globally, not to the single decl
+#endif
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
@@ -46,64 +147,199 @@
 #pragma warning( 1 : 4102 )	// unreferenced local label
 #pragma warning( 1 : 4121 )	// packing caution
 
-#endif
-
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
-
-#if defined(HAVE_SYS_PARAM_H)
-#include <sys/param.h>
-#endif
-
-#ifndef platOS
-# error "No platform defined by compiler"
-#endif
-
-#if defined(__BIG_ENDIAN__)
-#error This is a big endian platform and is unsupported.
-#endif
-
-// Known operating systems
-#define	OS_WIN32	1
-#define	OS_MACOS	2
-#define	OS_LINUX	3
-#define OS_MAX_PLAT	4
-
-// Used by platBuild
-#define TEUL_CLIENT		0
-#define	TEUL_SERVER		1
-
-#if defined(WIN32) || defined(WIN64)
-
 #ifndef NOMINMAX
-# define NOMINMAX 1	//@ for windows.
+#define NOMINMAX 1
 #endif
+
+#define _CRT_RAND_S
+
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+#if defined(_WIN64) || defined(__x86_64__) || defined(__arm64__)
+# define BUILD_64
+// LP64 vs. ILP64 (MSVC vs. not)
+# if defined(__LP64__)
+#  define PR64BitT "lld"
+#  define PR64BitUT "llu"
+#  define PRPermMaskT "llx"
+# else
+#  define PR64BitT "ld"
+#  define PR64BitUT "lu"
+#  define PRPermMaskT "lx"
+# endif
+#else
+# define BUILD_32
+# define PR64BitT "lld"
+# define PR64BitUT "llu"
+# define PRPermMaskT "llx"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// Overall inclusions
+#include "include/precompile_includes.h"
+
+//////////////////////////////////////////////////////////////////////////////
+// Windows-specific things
+#if platOS == OS_WIN32
 
 #include <io.h>
 #include <time.h>
-static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_s(b, t); return b; }
+#include <direct.h>
+#include <winsock2.h>
+#include <WinInet.h>
+#include <Winineti.h>
+#include <WinIoCtl.h>
+#include <Ws2tcpip.h>
+#include <iphlpapi.h>
+
+#ifndef strlwr
+# define strlwr(x) _strlwr(x)
+#endif
+#ifndef strupr
+# define strupr(x) _strupr(x)
+#endif
+#define swprintf swprintf_s
+#define	vswprintf vswprintf_s
+
+using ssize_t = intptr_t;
+
+static inline struct tm *localtime_r(const time_t *t, struct tm *b) {
+    localtime_s(b, t);
+    return b;
+}
+
+static inline long random() {
+    unsigned int value;
+    rand_s(&value);
+    return value; // Win32 is ILP64 means this returns enough entropy for a long
+}
+
+
+using fullpath_t = wchar_t;
+#define PRpathT "ls"
+#define PATHLit(s) L##s
+
+#define OS_PATHSEP "\\"
+#define OS_PATHSEP_C '\\'
+#define OS_PATHSEP_W L"\\"
+#define OS_PATHSEP_WC L'\\'
+
+#define WRONG_PATHSEP "/"
+#define WRONG_PATHSEP_C '/'
+#define WRONG_PATHSEP_W L"/"
+#define WRONG_PATHSEP_WC L'/'
+
+using nfds_t = UINT32; // values of this type are not actually used on Windows but we don't want to ifdef the declarations
+using socklen_t = SINT32;
+
+// Unfortunately, RakNet thinks it's clever and owns the universe and can do
+// whatever it pleases. It's quite wrong about this. We thus use this horrible
+// workaround to change INVALID_SOCKET and SOCKET_ERROR from a macro to a
+// constant (as we've made it on macOS/Linux builds), so our other workaround
+// for RakNet's pointless horsing around will work properly.
+#undef INVALID_SOCKET
+#undef SOCKET_ERROR
+constexpr const SOCKET INVALID_SOCKET = static_cast<SOCKET>(~0);
+constexpr const int SOCKET_ERROR = -1;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
+
+static inline int OS_OPEN(int *fdp, const wchar_t *path, int oflag, int cmode) {
+    return _wsopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
+}
+static inline int OS_OPEN(int *fdp, const char *path, int oflag, int cmode) {
+	return _sopen_s(fdp, path, oflag, _SH_DENYRW, cmode);
+}
+
+static inline void OS_CLOSE(int fd) { _close(fd); }
+#define OS_WOPEN(...) _wopen(__VA_ARGS__)
+#define OS_READ(...) _read(__VA_ARGS__)
+#define OS_WRITE(...) _write(__VA_ARGS__)
+#define OS_LSEEK(...) _lseek(__VA_ARGS__)
+#define OS_MKDIR(_dir_, ...) _mkdir(_dir_)
+#define OS_WMKDIR(_dir_, ...) _wmkdir(_dir_)
+#define OS_CREAT(...) _creat(__VA_ARGS__)
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { closesocket(sock); } sock = INVALID_SOCKET; }
+
+//////////////////////////////////////////////////////////////////////////////
+// Equivalents for macOS/Linux
+#elif platOS == OS_MACOS || platOS == OS_LINUX
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/tcp.h>
+#include <arpa/inet.h>
+#include <sys/un.h>
+#include <sys/ioctl.h>
+#include <fcntl.h>
+#include <poll.h>
+#include <ifaddrs.h>
+
+using fullpath_t = char;
+#define PATHLit(s) s
+#define PRpathT "s"
+
+#define OS_PATHSEP "/"
+#define OS_PATHSEP_C '/'
+#define OS_PATHSEP_W L"/"
+#define OS_PATHSEP_WC L'/'
+
+#define WRONG_PATHSEP "\\"
+#define WRONG_PATHSEP_C '\\'
+#define WRONG_PATHSEP_W L"\\"
+#define WRONG_PATHSEP_WC L'\\'
+
+using SOCKET = int;
+constexpr const SOCKET INVALID_SOCKET = -1;
+constexpr const int SOCKET_ERROR = -1;
+
+#define PRF_SOCKET "%d"
+#define PRA_SOCKET(s) (static_cast<int>(s))
+
+static inline int OS_OPEN(int *fdp, const fullpath_t *path, int oflag, int cmode) {
+    *fdp = open(path, oflag, cmode);
+    return (*fdp == -1 ? 1 : 0);
+}
+static inline void OS_CLOSE(int fd) { close(fd); }
+#define OS_WOPEN(...) wopen(__VA_ARGS__)
+#define OS_READ(...) ::read(__VA_ARGS__)
+#define OS_WRITE(...) ::write(__VA_ARGS__)
+#define OS_LSEEK(...) ::lseek(__VA_ARGS__)
+#define OS_MKDIR(...) mkdir(__VA_ARGS__)
+#define OS_WMKDIR(...) wmkdir(__VA_ARGS__)
+#define OS_CREAT(f,p) ::creat(f,p)
+static inline void OS_CLOSESOCKET(SOCKET &sock) { if (sock != INVALID_SOCKET) { close(sock); } sock = INVALID_SOCKET; }
+
+#else
+
+#error Unknown platform
+
 #endif
 
-#include "include/precompile_includes.h"
-#include "sys/sysWinISO.h"
-
-// snprintf wrapper
-template<size_t bufSize, typename... Args>
-UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
-{
-    return static_cast<UINT32>(snprintf(buf, bufSize, fmt, std::forward<Args>(args)...));
-}
-
-// Cross-platform path builder.
-template<size_t bufSize>
-UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
-{
-	return strprintf<bufSize>(buf, "%s/%s", lhs, rhs);
-}
-
-#if defined(AS_SERVER)
 #ifndef PATH_MAX
 #define PATH_MAX 256
 #endif
+
+#if platOS == OS_WIN32
+#define PLAT_EWOULDBLOCK WSAEWOULDBLOCK
+#define PLAT_EINTR WSAEINTR
+#define PLAT_EAGAIN EAGAIN
+#define PLAT_EINPROGRESS WSAEINPROGRESS
+#define PLAT_ECONNREFUSED WSAECONNREFUSED
+#define PLAT_ECONNABORTED WSAECONNRESET
+#define PLAT_EPFNOSUPPORT WSAEPFNOSUPPORT
+#define PLAT_ESHUTDOWN WSAESHUTDOWN
+#define PLAT_EHOSTDOWN WSAEHOSTDOWN
+#else
+#define PLAT_EWOULDBLOCK EWOULDBLOCK
+#define PLAT_EINTR EINTR
+#define PLAT_EAGAIN EAGAIN
+#define PLAT_EINPROGRESS EINPROGRESS
+#define PLAT_ECONNREFUSED ECONNREFUSED
+#define PLAT_ECONNABORTED ECONNABORTED
+#define PLAT_EPFNOSUPPORT EPFNOSUPPORT
+#define PLAT_ESHUTDOWN ESHUTDOWN
+#define PLAT_EHOSTDOWN EHOSTDOWN
 #endif

@@ -9,18 +9,17 @@
 #define HIRES_TURRETS
 
 #if defined(ULTRA_HIRES_TURRETS)
-	typedef float turret_t;
+	using turret_t = float;
 # if defined(TURRET_GRANULARITY)
 #  undef TURRET_GRANULARITY
 # endif
 #elif defined(HIRES_TURRETS)
-	typedef UINT16 turret_t;
-    typedef UINT16 TURRET_TYPE;
+	using turret_t = UINT16;
+    using TURRET_TYPE = UINT16;
 	#define TURRET_GRANULARITY 64800.0f		// 360 * 90 * 2 (i.e. 180th degree precision)
 #else
-	typedef UCHAR turret_t;
-    typedef UCHAR TURRET_TYPE;
+	using turret_t = UCHAR;
+    using TURRET_TYPE = UCHAR;
 	#define TURRET_GRANULARITY 255.0f
 #endif
-
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Feb 20 10:40:54 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -11,13 +11,14 @@
 #include <array>
 
 #include "mem/mem.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDTL.h"
 #include "sdm/sdmHash.h"
 
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
 STRAT_FACILITY_TABLE*
-sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SINT32 numCPs)
+sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, CP* const cps, const SINT32 numCPs)
 {
 	// Bridges get fake facilities, so we have to look at CPs.
 	const size_t potentialFacs = numFacilities + numCPs;
@@ -37,13 +38,20 @@ sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SI
 	UCHAR* bidList = (base + HeaderNodeSize + FacilityNodeListSize);
 
 	table->facility = facility;
-	table->numFacilities = numFacilities;
+	table->numFacilities = numFacilities + numCPs;
 
-	for ( SINT32 i = 0; i < numFacilities; ++i )
-	{
-		facility[i].id = fac[i].oid.id;
+	for ( SINT32 i = 0; i < numCPs; ++i ) {
+		facility[i].id = cps[i].oid.id;
 		facility[i].bidList.bid = (SINT16*)bidList;
 		facility[i].bidList.numBuildings = 0;
+
+		bidList += BuildingTableSize;
+	}
+
+	for ( SINT32 i = 0, j = numCPs; i < numFacilities; ++i, ++j ) {
+		facility[j].id = fac[i].oid.id;
+		facility[j].bidList.bid = (SINT16*)bidList;
+		facility[j].bidList.numBuildings = 0;
 
 		bidList += BuildingTableSize;
 	}
@@ -110,6 +118,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 #endif
 
 	// TODO: Is there any reason this isn't a vector?
+	// kfsone: It's sparse because of the terrain editor
 	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
 	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
@@ -125,7 +134,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	{
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			const BUILDING& building = bd[i];
 			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else
@@ -178,7 +187,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
 				dst.numBuildings = src.size();
-				const size_t dataSize = sizeof(dst.bid) * dst.numBuildings;
+				const size_t dataSize = sizeof(*dst.bid) * dst.numBuildings;
 				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
 				memcpy(dst.bid, src.data(), dataSize);
 			}
@@ -189,12 +198,12 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
 		bldHash->maxBldID = maxBldgId;
-		
+
 		delete[] bldHash->building;
 		bldHash->building = new STRAT_BUILDING[maxBldgId];
 
 		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it ) {
-			assert ( 0 < it->first && it->first < maxBldgId );
+			assert ( 0 < it->first && (size_t)it->first < (size_t)maxBldgId );
 			bldHash->building[it->first] = it->second;
 		}
 	}

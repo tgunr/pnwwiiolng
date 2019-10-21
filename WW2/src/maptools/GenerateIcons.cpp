@@ -12,7 +12,7 @@
 #include "osgImport/ref_ptr.h"
 #include "ui/uiChat.h"
 #include "ui/uiDotCommands.h"
-#include "ww2func.h"
+#include "imap/ww2func.h"
 #include "ob/obplyr.h"
 #include "math/math3d.h"
 #include "trn/trncd.h"
@@ -261,10 +261,10 @@ void GenerateIcons::MakeAtlas()
     r = (W+curW) / 2048.0f;
     t = (0+curH) / 2048.0f;
     b = (H+curH) / 2048.0f;
-    sprintf(s, "%s_icon %.6f %.6f %.6f %.6f\n", it->name.c_str(), l, t, r, b );
+    strprintf(s, "%s_icon %.6f %.6f %.6f %.6f\n", it->name.c_str(), l, t, r, b );
     atlasInfo.append(s);
 
-    sprintf(s, "%s_icon %d %d %.6f\n", it->name.c_str(), int(it->minx), int(it->miny), it->drawMpp );
+    strprintf(s, "%s_icon %d %d %.6f\n", it->name.c_str(), int(it->minx), int(it->miny), it->drawMpp );
     xyInfo.append(s);
 
     curW += W+2;
@@ -330,7 +330,7 @@ void GenerateIcons::MakeAtlas()
   }
 
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+  glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, ddpDefaultFramebuffer());
   free(background);
 
 }
@@ -502,8 +502,8 @@ void GenerateIcons::Capture()
 
   float w = (float)(maxx-minx);
   float h = (float)(maxy-miny);
-  unsigned int sx = WantedWidth / 2 - (unsigned int)(w / 2);
-  unsigned int sy = WantedHeight / 2 - (unsigned int)(h / 2);
+  unsigned int sx = ddpGetWidth() / 2 - (unsigned int)(w / 2);
+  unsigned int sy = ddpGetHeight() / 2 - (unsigned int)(h / 2);
 
   if ( sx >= 0 && sy >= 0 && w > 1 && h > 1 )
   {
@@ -563,8 +563,12 @@ void GenerateIcons::SaveToTexture(const char*name, int x, int y, int w, int h, d
       }
     }
 
-    char s[256]; sprintf(s, "%s/%s-%dx%d.raw", GEN_DIR"tmp", _poolitr->first.c_str(),w, h );
-    FILE*	cf = fopen(s, "wb+");
+    char filename[256];
+	strprintf(filename, "%s/%s-%dx%d.raw", GEN_DIR"tmp", _poolitr->first.c_str(),w, h );
+    FILE* cf = fopen(filename, "wb+");
+	if ( !cf ) {
+		LogAbort("Couldn't save texture file %s", filename);
+	}
     fwrite(bitmapA, 1, w * h * 4 * sizeof(unsigned char), cf);
     fclose(cf);
   }
@@ -575,7 +579,7 @@ void GenerateIcons::SaveToTexture(const char*name, int x, int y, int w, int h, d
 
 }
 
-typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
+using mapOBJList = std::map<OBJECT*, trnCDTerrainObject *>;
 extern  mapOBJList mapOBJ; // All objects associated with a TO
 
 bool GenerateIcons::wantModel(UINT32 mt)
@@ -806,7 +810,7 @@ void GenerateScenarioMap::EndRenderDefaults()
     oglSetLight(0, sun);
 
     oglLockViewport(false);
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     positionindex = 0;
     listindex = 0;
@@ -961,7 +965,7 @@ void GenerateScenarioMap::ScreenCapture()
     srcimg->allocateImage(destw, desth, 1, GL_RGB, GL_UNSIGNED_BYTE);
 
     char buf[256];
-    sprintf(buf, "%s_%s%d.bmp", SCEN_MGR->MapName(), list[listindex - 1]->name.c_str(), positionindex);
+    strprintf(buf, "%s_%s%d.bmp", SCEN_MGR->MapName(), list[listindex - 1]->name.c_str(), positionindex);
 
     srcimg->setFileName(buf);
     srcimg->ref();

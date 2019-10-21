@@ -573,7 +573,7 @@ static int libirc_new_dcc_session (irc_session_t * session, unsigned long ip, un
 
 		memset (&dcc->remote_addr, 0, sizeof(dcc->remote_addr));
 		dcc->remote_addr.sin_family = AF_INET;
-		dcc->remote_addr.sin_addr.s_addr = htonl (ip); // what idiot came up with idea to send IP address in host-byteorder?
+		dcc->remote_addr.sin_addr.s_addr = htonl (ip); // what intellect came up with idea to send IP address in host-byteorder?
         dcc->remote_addr.sin_port = htons(port);
 
 		dcc->state = LIBIRC_STATE_INIT;

@@ -12,27 +12,32 @@ namespace Host
 {
 struct TimeUpdate
 {
-	TimeUpdate(UINT32 _gametime, UINT32 _factor, UINT32 _weather, UINT32 _rain)
+	// TODO: Added explicit reduction in integer sizing to hilight the issue that we need to stop doing this in the future.
+	// We should be either sending the entire value or we should ensure that the values are always defined from the start as UINT8.
+	TimeUpdate(UINT32 _gametime, UINT32 _factor, UINT32 _weather, UINT32 _rain, UINT32 _theme)
 		: gametime(_gametime)
-		, factor(_factor)
-		, weather(_weather)
-		, rain(_rain)
+		, factor(static_cast<UINT8>(_factor))
+		, weather(static_cast<UINT8>(_weather))
+		, rain(static_cast<UINT8>(_rain))
+		, theme(static_cast<UINT8>(_theme))
 		{}
-	TimeUpdate() : gametime(0), factor(0), weather(0), rain(0) {}
+	TimeUpdate() : gametime(0), factor(0), weather(0), rain(0), theme(0) {}
 	TimeUpdate(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, gametime);
 		a->packer(mode, factor);
 		a->packer(mode, weather);
 		a->packer(mode, rain);
+		a->packer(mode, theme);
 	}
 
-	UINT16	gametime;
+	UINT32	gametime;
 	UINT8	factor;
 	UINT8	weather;
 	UINT8	rain;
+	UINT8	theme;
 
 	static TEUL_CALLBACK* Callback;
 	static SINT32 SendFunction(ACTION_OBJECT* const a);

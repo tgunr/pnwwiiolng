@@ -263,6 +263,12 @@ static void weaponParseAmmoNode(xmlNode* ammoNode)
 		ammoType->FuzeTime = (float)atof((char*)xmlstr);
 		xmlFree(xmlstr);
 	}
+	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"armingtime");
+	if(xmlstr)
+	{
+		ammoType->ArmingTime = (float)atof((char*)xmlstr);
+		xmlFree(xmlstr);
+	}
 	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"bc");
 	if(xmlstr)
 	{
@@ -389,10 +395,10 @@ static void weaponParseAmmoNode(xmlNode* ammoNode)
 		// fix me
 		xmlFree(xmlstr);
 	}
-	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"issmokegrenade");
+	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"hassmoke");
 	if(xmlstr)
 	{
-		ammoType->IsSmokeGrenade = atoi((char*)xmlstr);
+		ammoType->HasSmoke = atoi((char*)xmlstr);
 		xmlFree(xmlstr);
 	}
 	xmlstr = xmlGetProp(ammoNode, (xmlChar*)"muzzleflash");

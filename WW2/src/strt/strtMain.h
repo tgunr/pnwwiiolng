@@ -19,17 +19,17 @@ class Supercell;
 
 // The main Strat Call that the Convoy System makes.  This is the
 // procedure that actually runs a certain amount of CPs before returning.
-extern LOGICAL strtMain(UINT32 currentTime);
+extern bool strtMain(UINT32 currentTime);
 
 //tolua_begin
 
 extern const char* HostLanguage;
 
 //Broadcasts the CP_STATUS messages for every cp to everybody
-extern LOGICAL strtBroadcastCPs(void);
+extern void strtBroadcastCPs();
 
-extern CPStruct* strtGetCPList(void);
-extern Supercell* strtGetCellList(void);
+extern CPStruct* strtGetCPList();
+extern Supercell* strtGetCellList();
 
 extern FULL_OBJ_ID g_fullObjID;
 
@@ -39,4 +39,4 @@ extern bool strtIsStratInitialized();
 
 extern void strtInitializeStratSystem();
 extern void strtShutdownStratSystem();
-
+extern void strtProcessGarrisons();

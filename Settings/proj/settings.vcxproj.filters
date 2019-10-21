@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Settings Files">
+      <UniqueIdentifier>{8ae54364-4051-44b9-84d2-7b8acdd1a8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\sys">
+      <UniqueIdentifier>{b0374caa-1599-49c4-b10f-ae14fe13b176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\unicode">
+      <UniqueIdentifier>{66005743-7816-4821-8a40-f0cbd9111a6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\load">
+      <UniqueIdentifier>{0423f220-5ef1-40cd-a55f-455310962a02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\language">
+      <UniqueIdentifier>{b50b97c1-7247-4782-908c-f592c71d66c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\file">
+      <UniqueIdentifier>{0582f771-c36e-4621-9f99-d2d7d9c37467}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\cfg">
+      <UniqueIdentifier>{9a9a92b7-95b1-40d8-91f9-ffffafcd26b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Settings Files\d3d">
+      <UniqueIdentifier>{29a14d49-0a4a-41f0-9e50-35d114f8df36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{ac85e990-9984-4c4d-b5da-1bd70b32ee90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files">
+      <UniqueIdentifier>{56846703-f820-4e2b-ae42-50c165787c7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\chinese">
+      <UniqueIdentifier>{6e7d9fa5-bbff-41ca-847a-112d1ca8a898}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\english">
+      <UniqueIdentifier>{27f9f0aa-de7c-416f-8ef3-595044372705}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\french">
+      <UniqueIdentifier>{40316bc0-364f-4bb7-96c2-9da7f10dc03c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\german">
+      <UniqueIdentifier>{653d911f-9e8d-40ba-bc03-951a6bb5fa06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\italian">
+      <UniqueIdentifier>{b5c627e0-f870-4ccd-848d-412c7af2a4d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\spanish">
+      <UniqueIdentifier>{9dd4db96-c983-42fe-aa40-5a9b159538b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src">
+      <UniqueIdentifier>{838c7c68-a1df-4b67-8490-f094090e0285}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\fio">
+      <UniqueIdentifier>{80b2670b-6d57-4955-895f-30c9d61c809a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\include">
+      <UniqueIdentifier>{47f6d4af-fbae-4ab8-929b-e2380fd59acc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WW2 - src\log">
+      <UniqueIdentifier>{c8344718-5160-467f-ac04-ceee7e398640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Location Files\russian">
+      <UniqueIdentifier>{9de8ace5-aa10-44d3-9dbd-12e1c659734a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\cfg\cfgData.cpp">
+      <Filter>Settings Files\cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\language\language.cpp">
+      <Filter>Settings Files\language</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\file\file.cpp">
+      <Filter>Settings Files\file</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\unicode\ConvertUTF.c">
+      <Filter>Settings Files\unicode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sys\cpuid.c">
+      <Filter>Settings Files\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sys\registry.cpp">
+      <Filter>Settings Files\sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\load\load.cpp">
+      <Filter>Settings Files\load</Filter>
+    </ClCompile>
+    <ClCompile Include="settings.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settingsDlg.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Settings Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\WW2\src\fio\fiostructure.cpp">
+      <Filter>WW2 - src\fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\d3d\dx3dinfo.cpp">
+      <Filter>Settings Files\d3d</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\cfg\cfgCodes.h">
+      <Filter>Settings Files\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\cfg\cfgData.h">
+      <Filter>Settings Files\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\language\language.h">
+      <Filter>Settings Files\language</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\file\file.h">
+      <Filter>Settings Files\file</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\unicode\ConvertUTF.h">
+      <Filter>Settings Files\unicode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\cpuid.h">
+      <Filter>Settings Files\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\registry.h">
+      <Filter>Settings Files\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\load\load.h">
+      <Filter>Settings Files\load</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="settingsDlg.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Settings Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\fio\fiostructure.h">
+      <Filter>WW2 - src\fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\d3d\dx3dinfo.h">
+      <Filter>Settings Files\d3d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\include\platforms.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\include\systypes.h">
+      <Filter>WW2 - src\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sys\syscfg.h">
+      <Filter>Settings Files\sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\log\log.h">
+      <Filter>WW2 - src\log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\WW2\src\fio\fio.h">
+      <Filter>WW2 - src\fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\d3d\mmeapi.h">
+      <Filter>Settings Files\d3d</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\settings.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\mainmenu-russian.strings">
+      <Filter>Resource Files\Location Files\russian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\russian\settings.dtd">
+      <Filter>Resource Files\Location Files\russian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\chinese\settings.dtd">
+      <Filter>Resource Files\Location Files\chinese</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\mainmenu-english.strings">
+      <Filter>Resource Files\Location Files\english</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\english\settings.dtd">
+      <Filter>Resource Files\Location Files\english</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\mainmenu-french.strings">
+      <Filter>Resource Files\Location Files\french</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\french\settings.dtd">
+      <Filter>Resource Files\Location Files\french</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\mainmenu-german.strings">
+      <Filter>Resource Files\Location Files\german</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\german\settings.dtd">
+      <Filter>Resource Files\Location Files\german</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\mainmenu-italian.strings">
+      <Filter>Resource Files\Location Files\italian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\italian\settings.dtd">
+      <Filter>Resource Files\Location Files\italian</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\mainmenu-spanish.strings">
+      <Filter>Resource Files\Location Files\spanish</Filter>
+    </None>
+    <None Include="..\..\Installer\ww2assets\oswin\dependencies\loc\spanish\settings.dtd">
+      <Filter>Resource Files\Location Files\spanish</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="settings.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Installer\ww2assets\oswin\WWIIOnLine.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

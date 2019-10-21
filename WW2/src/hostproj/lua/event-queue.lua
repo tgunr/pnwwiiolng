@@ -182,10 +182,12 @@ function LuaEvent.ProcessQueue()
 	for i in pairs(recurring)
 	do
 		if recurring[i] then
-			if recurring[i].cancel == false and recurring[i].due <= teulClockTime then
+			-- for one second interval events or less, don't rely on the clock time)
+			if recurring[i].cancel == false and (recurring[i].due <= teulClockTime or recurring[i].interval <= 1) then
+				recurring[i].due = recurring[i].due + recurring[i].interval
+				print("event tick: " .. recurring[i].eventId)
 				local status, msg = pcall(recurring[i].handler, recurring[i].data, recurring[i])
 				if status ~= true then log('A', 'eventq', msg) end
-				recurring[i].due = teulClockTime + recurring[i].interval
 			end
 			if recurring[i].cancel == false then
 				table.insert(newRecurring, recurring[i])

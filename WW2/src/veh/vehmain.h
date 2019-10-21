@@ -15,9 +15,8 @@
 #include "wwii/wwiiTypes.h" 			// For REL_OBJ_ID
 #include "updt/updtTypes.h" 			// For turret_t
 #include "include/mobileSpawnEnums.h"	// For MSPAWN_RESULT
-#include "draw/sneaky.h"
 
-#include "physics/physicsMain.h"
+#include "physics/physicsmain.h"
 #include "veh/vehInterpolator.h"
 /************************************************************************************************
 	vehmain
@@ -322,7 +321,7 @@ struct vehVehicle
 	mlObjectData* 	VehicleObjectData; 	// 3d object data
 
 	VisualDamageBody* ChunksOfCrap;
-	AltPointer<struct vehVehicle> xNext;
+	struct vehVehicle *xNext = nullptr;
 // FPS and vehicle riding
 	UINT32	RideSeatNum; // special values VEH_HOIST_RIDE_SEAT, VEH_TROOPER_ON_DECK_RIDE_SEAT, VEH_TOWED_VEHICLE
 	UINT32	RideVehicleHostIndex;
@@ -424,8 +423,8 @@ struct vehVehicle
 	void clear();
 	bool isHulked();
 
-	struct vehVehicle* getNext() { return xNext.get(); }
-	void setNext(struct vehVehicle*x) { xNext.set(x); }
+	struct vehVehicle* getNext() { return xNext; }
+	void setNext(struct vehVehicle*x) { xNext = x; }
 
 	LOGICAL isSTO() {return (SINT32)VehicleHostIndex < 0;}
 
@@ -490,8 +489,8 @@ private:
 	vehmain
 *************************************************************************************************/
 
-UINT32 	vehInit(void);
-UINT32 	vehKill(void);
+UINT32 	vehInit();
+UINT32 	vehKill();
 
 //void vehmainInitModelInstance(OBJECT* root);
 
@@ -506,14 +505,14 @@ UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentN
 UINT32	vehGetHitmapComponentThickness(FLOAT64* Thickness,vehVehicle* Vehicle, UINT32 PartNum);
 UINT32	vehFindHitmapObjectNumByName(UINT32* ComponentNum, UCHAR* ComponentName, UINT32 VehicleNum);
 
-UINT32	vehUpdate(void);
+UINT32	vehUpdate();
 namespace Vehicle { struct Hit; }
 UINT32 	vehProcessVehicleHit(const Vehicle::Hit&);
-UINT32 	vehAdjustAnimationTime(void);
+UINT32 	vehAdjustAnimationTime();
 
 UINT32 		vehGetVehicleHead(vehVehicle**);
 vehVehicle*	vehFindVehicle(UINT32 HostIndex);
-vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle& chathandle);
+vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle chathandle);
 LOGICAL vehValid(vehVehicle*);
 LOGICAL vehVehicleInList(vehVehicle*);
 int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers = true); // how many of this vehicle type is spawned
@@ -524,7 +523,7 @@ vehanimVehicleStateType const* vehFindStateByName(vehType*, const char* name);
 // shouldn't be here
 UINT32 vehApplyDamageToObject(const FLOAT64& Energy, struct trnCDTerrainObject*, vehVehicle* InShooterVehicle, struct weapAmmo* Ammo);
 
-UINT32 	vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach);
+UINT32 	vehExitVehicle(unsigned int exitCode = PEXIT_DEAD);
 UINT32 	vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach);
 
 SINT32 	vehAttachToRidePoint(vehVehicle*);
@@ -532,7 +531,7 @@ vehVehicle*	vehFindRidingVehicle(UINT32 RideVehicleHostIndex, UINT32 RideSeatNum
 
 // Infantry resupply point
 //bool vehmainDropInfantryResupplyPoint();
-PlayerPlacedObject* vehmainFRUBuild();
+PlayerPlacedObject* vehmainPPOBuild();
 //bool vehmainIRPCheck();
 bool vehmainFRUExecute();
 

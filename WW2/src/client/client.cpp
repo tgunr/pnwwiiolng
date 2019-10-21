@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "client/ww2Client.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapMissionList.h"
@@ -16,7 +16,7 @@
 #include "wwii/wwiiOpinionPoll.h"
 #include "fio/fio.h"
 
-#include "client_revision.h"
+#include "build_info.hpp"
 
 // WWIIOL-specific.
 #include "wwii/wwiiHCUnits.h"
@@ -28,9 +28,6 @@
 #include "map/mapSwingMeter.h"
 #include "chat/chatRecruiterList.h"
 #include "chat/chatMissionInviteMsg.h"
-
-const unsigned int WWII::gitCommitNo = GIT_COMMIT_NO;
-const char* const WWII::gitCommitStr = GIT_COMMIT_STR;
 
 namespace Chat
 {
@@ -355,6 +352,28 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 
 	for ( UINT32 i = 0; i < incoming.size(); ++i )
 		client->ProcessHCUnitLocation(incoming.data(i));
+
+	incoming.clear();
+
+	return 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Receive a map HCUnit Country Change message
+
+template<>
+SINT32 HC_UNIT_COUNTRY_CHANGES::receive(SINT32 teulIndex, HC_UNIT_COUNTRY_CHANGES& incoming)
+{
+	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
+	if (!client)
+	{
+		return 0;
+	}
+
+	clientErrorLog("Receiving %u incoming unit country change", incoming.size());
+
+	for (UINT32 i = 0; i < incoming.size(); ++i)
+		client->ProcessHCUnitCountryChange(incoming.data(i));
 
 	incoming.clear();
 

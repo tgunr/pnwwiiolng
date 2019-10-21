@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // components module
 
 #include "ml/mlCompon.h"
@@ -195,7 +195,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 	UINT32 VarNum;
 	UCHAR * VarName;
 	UCHAR * VarContents;
-	mlComponent * CurrentComponent;
+	mlComponent * CurrentComponent = nullptr;
 
 	while (fioGetLine(ComponentListFile, (char*)Buffer, 255) != 0)
 	{
@@ -321,20 +321,17 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 							{
 								case ML_COMPONENT_AIRFOIL:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlAirfoilComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlAirfoilComponentData));
 									break;
 
 								case ML_COMPONENT_ENGINE:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlEngineComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlEngineComponentData));
 									break;
 
 								case ML_COMPONENT_GEAR:
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlGearComponentData));
-										memset(CurrentComponent->SpecialData, 0, sizeof(mlGearComponentData));
 									break;
 								case ML_COMPONENT_WEAPONMOUNT:
-										CurrentComponent->SpecialData = new mlWeaponMount;//memAlloc(sizeof(mlWeaponMount));
+										CurrentComponent->SpecialData = new mlWeaponMount{};//memAlloc(sizeof(mlWeaponMount));
 //										memset(CurrentComponent->SpecialData, 0, sizeof(mlWeaponMount));
 										((mlWeaponMount*)CurrentComponent->SpecialData)->MinConvergence = 50.0f;
 //										hackAddProtectedBlock(CurrentComponent->SpecialData,
@@ -534,14 +531,14 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 					{
 						if(!CurrentComponent->VisDamage[i][0])
 						{
-							strncpy(CurrentComponent->VisDamage[i], (char*)VarContents, 31);
+							strsafecpy(CurrentComponent->VisDamage[i], (char*)VarContents);
 							break;
 						}
 					}
 				}
 				break;
 				case ML_COMPONENT_VARNAME_VISDAMAGE_PARENT:
-					strncpy(CurrentComponent->VisDamageParent, (char*)VarContents, 31);
+					strsafecpy(CurrentComponent->VisDamageParent, (char*)VarContents);
 				break;
 				case ML_COMPONENT_VARNAME_DAMAGELEVELFAIL:
 					CurrentComponent->DamageLevelFail = atof((char*)VarContents);
@@ -576,7 +573,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 			{
 				char str[64];
 				snprintf(str, 63, "Component %s has rotational inertia but no mass!", CurrentComponent->ComponentName);
-				piExitProgram(__FILE__,__LINE__,str);
+				piExitProgram(_FL,str);
 			}
 		}
 	}
@@ -672,6 +669,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 	mlComponent * CurrentComponent;
 
 	*ComponentList = nullptr;
+	CurrentComponent = nullptr;
 	if(ComponentListFilename == nullptr || *ComponentListFilename == '\0')
 		return 1;
 
@@ -742,7 +740,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == nullptr || VarContents == nullptr)
+			if (VarName == nullptr || VarContents == nullptr || CurrentComponent == nullptr)
 				continue;
 
 			mlUtilityFindVarname(&VarNum, VarName,

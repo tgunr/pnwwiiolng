@@ -11,7 +11,7 @@
 // Originating Programmer: Eric "Meat" Hall
 
 extern SINT32 mapInitMapData();
-extern class CPStruct* mapGetStratSystem(void);
+extern class CPStruct* mapGetStratSystem();
 
 extern void mapUpdateCP(class CPStruct* cp, WWII_COUNTRY owner, WWII_COUNTRY controller, UINT32 flags, const char* from);
 

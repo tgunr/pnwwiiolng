@@ -9,8 +9,9 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "hostproj/hostversion.h"
-
+#include <json.hpp>
+#include <mysql.h>
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
 #include "chat/chatBroadcast.h"
@@ -22,7 +23,6 @@
 #include "chat/chatChannelNumber.h"
 #include "chat/chatConstants.h"
 #include "chat/chatData.h"
-#include "chat/chatdbClientMessages.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
 #include "chat/chatDotCommand.h"
@@ -51,17 +51,19 @@
 #include "chat/chatSay.h"
 #include "chat/chatServerTrackedObjects.h"
 #include "chat/chatSpamCan.h"
+#include "chat/chatSquadControl.h"
 #include "chat/chatSquadCreate.h"
 #include "chat/chatSquadInvite.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListPurge.h"
 #include "chat/chatSquadListTypes.h"
+#include "chat/chatSquadMemberUpdates.h"
 #include "chat/chatSquadVote.h"
 #include "chat/chatThreads.h"
 #include "chat/chatTimeInterval.h"
 #include "chat/chatTuneToChannel.h"
 #include "chat/chatUnitMotds.h"
-#include "dbse/dbseClient.h"
+#include "chat/chatClientMessages.h"
 #include "inst/instHostInstance.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
@@ -70,23 +72,29 @@
 #include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
+#include "server/serverPersonaExit.h"
 #include "server/serverPersonaLogin.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
+#include "strt/strtChatSupportMessages.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
-#include "versionNo.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiServerTypeEnums.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
 extern UINT32 serverGetAuthIP();
 
@@ -104,28 +112,24 @@ extern void chatRegisterDotCommands();
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR? look at the logs
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
 #endif
 
-typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
-#elif defined(CLOSED_BETA)
-# define DEFAULT_SYS_MOTD		"MOTD: WWII Online Closed Beta"
 #elif defined(BETA_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online Beta Release"
 #elif defined(TEST_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: WWII Online BETA Release-Candidate"
-#elif defined(FRES)
-# define DEFAULT_SYS_MOTD		"MOTD: Battleground Europe (FRES/ULTRA)"
 #elif defined(TRAINING_SERVER)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Training Server"
-#else
+#elif defined(PUBLIC_RELEASE)
 # define DEFAULT_SYS_MOTD		"MOTD: Welcome to the Virtual Battlefield"
+#else
+# error No build type
 #endif
 
 #define DEFAULT_ALLIED_HC_MOTD	"MOTD: Welcome to the Allied High Command"
@@ -157,10 +161,17 @@ const char* const channelTypeName[] = {
 
 static bool _running = true;
 
+#ifndef NDEBUG
+bool g_debugRadios = true;
+bool g_debugSquads = true;
+bool g_debugPersonas = true;
+bool g_debugChat = true;
+#else
 bool g_debugRadios = false;
 bool g_debugSquads = false;
 bool g_debugPersonas = false;
 bool g_debugChat = false;
+#endif
 
 const char* const chanTypeName[MAX_CHANNEL_TYPES] =
 {
@@ -184,7 +195,7 @@ static UINT32	_stratHost = 0;
 static UINT16	_stratPort = 0;
 //static UINT32	_chatHost = 0;
 
-// This is getting ugly. Repeat after me: I will rewrite the chat-shite.
+// This is getting ugly. Repeat after me: I will rewrite the chat garbage.
 
 // Convert commonly used callsigns into 64bit handles
 ChatHandle alliedHandleID = chatGetHandle("ALLIED");
@@ -204,6 +215,8 @@ FLOAT32 _avgMessageLength=0;
 // Commonly used channels so we don't have to keep finding them
 Chat::Channel* adminChannel = nullptr;
 
+PPOSpecLoader specLoader;
+
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;
 static Chat::Name g_shutdownRequestedBy;
@@ -212,38 +225,36 @@ static UINT32 g_finalShutdownTime = 0;
 
 // Dot command list at end of file to avoid prototyping
 
-static bool _tuneHQ(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneHQ(Player& player, UCHAR index);
+static bool _tuneOrigin(Player& player, UCHAR index);
+static bool _tuneGM(Player& player, UCHAR index);
 extern bool chatUpdateHCUnitLocations();
 
 struct TUNE_COMMAND
 {
-	const SCHAR*	string;
-	ChatHandle	matchHandle;
-	UINT32		length;
-	UINT32		index;
-	TUNE_COMMAND_CALLBACK* callback;
-	PermissionMask	perm;
+	using Callback = bool(*)(Player& player, UCHAR index);
+
+	ChatHandle			matchHandle_;
+	Callback			callback_;
+	PermissionMask		perms_;
+
+	TUNE_COMMAND(const char* name, Callback callback, PermissionMask perms=0ULL)
+		: matchHandle_(chatGetLowercaseHandle(name))
+		, callback_(callback)
+		, perms_(perms)
+	{}
 };
 
-static TUNE_COMMAND _tuneCommand[] = {
-								 {"hq",0,0,0,_tuneHQ,0}
-								 ,{"origin",0,0,0,_tuneOrigin,0}
-								 ,{"gm",0,0,0,_tuneGM,GAME_MANAGER}
-								};
-
-static const UINT32 NUM_TUNE_COMMANDS = sizeof(_tuneCommand) / sizeof(TUNE_COMMAND);
+static std::vector<TUNE_COMMAND> _tuneCommands = {
+	TUNE_COMMAND("hq", _tuneHQ),
+	TUNE_COMMAND("origin", _tuneOrigin),
+	TUNE_COMMAND("gm", _tuneGM, GAME_MANAGER)
+};
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 // Chat Host
 //////////////////////////////////////////////////////////////////////
-
-struct CampaignFilterFn : public FilterFn
-{
-	bool operator()(const wwiiPlayer* player) const { return player->instance().isCampaign(); }
-};
 
 //////////////////////////////////////////////////////////////////////
 // Send a message to a user connected through the IRC interface.
@@ -253,7 +264,7 @@ IRCPlayer::message(int prefix, int messageID
 					, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5) const
 {
 	char text[MAX_MESSAGE_LENGTH+1];
-	strcpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
+	strsafecpy(text, chatLString((LSTRING_ID)prefix, (LSTRING_ID)messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5));
 
 	char* p = text;
 	do
@@ -286,32 +297,6 @@ IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64&
 	}
 
 	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
-}
-
-//////////////////////////////////////////////////////////////////////
-// Build a temporary string, basically a wrapper for sprintf that
-// helps us avoid having to continually allocate new buffers
-
-const char*
-chatMakeTempString(const char* fmt, ...)
-{
-	va_list args;
-
-	static int bufNo = 0;
-	static char buffer[4][MAX_MESSAGE_LENGTH + 1];
-
-	if (bufNo > 3)
-		bufNo = 0;
-
-	buffer[bufNo][0] = 0;
-
-	if (fmt != nullptr) {
-		va_start(args, fmt);
-		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
-		va_end(args);
-	}
-
-	return buffer[bufNo++];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -372,7 +357,7 @@ chatSetShutdownTime(UINT32 forTime, const char* caller)
 // Helper function that returns a property's name or prints the ox/oy/id
 
 const char*
-chatPropertyName(const FULL_OBJ_ID& id)
+chatPropertyName(const FULL_OBJ_ID id)
 {
 	Property* property = chatFindProperty(id);
 	if ( property != nullptr )
@@ -386,7 +371,7 @@ chatPropertyName(const FULL_OBJ_ID& id)
 
 // Variant for when you want the pointer yourself
 const char*
-chatPropertyName(const Property* property, const FULL_OBJ_ID& id)
+chatPropertyName(const Property* property, const FULL_OBJ_ID id)
 {
 	if ( property != nullptr )
 		return property->Name();
@@ -410,7 +395,7 @@ chatSystemMessage(LSTRING_ID messageID, const char* const ptr0, const char* cons
 //////////////////////////////////////////////////////////////////////
 // Implementation for HCUnitBroadcast...
 
-typedef std::vector<UINT32> SUBORDINATES;
+using SUBORDINATES = std::vector<UINT32>;
 static SUBORDINATES _currentUnits;
 
 //////////////////////////////////////////////////////////////////////
@@ -546,7 +531,7 @@ chatSideMessage(WWII_SIDE side, LSTRING_ID messageID, const char* const ptr0, co
 	if ( sidePlayers[side].empty() == false )
 	{
 		Chat::LocalizedMessage message(prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
-		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, CampaignFilterFn());
+		chatBroadcastLocMessage(sidePlayers[side].begin(), sidePlayers[side].end(), message, [] (const wwiiPlayer *player) { return player->instance().isCampaign(); });
 	}
 
 	return true;
@@ -571,7 +556,7 @@ private:
 	}
 
 public:
-	Ban(const ChatHandle& handle_, UINT32 days_, bool kick_)
+	Ban(const ChatHandle handle_, UINT32 days_, bool kick_)
 		: m_handle(handle_)
 		, m_days(days_)
 		, m_start(teulTime() + _randomBanDelay())
@@ -584,7 +569,7 @@ public:
 	UINT32			m_kickTime;
 };
 
-typedef std::vector<Ban> DELAYED_BANS;
+using DELAYED_BANS = std::vector<Ban>;
 static DELAYED_BANS _delayedBans;
 
 static void
@@ -606,9 +591,9 @@ _processDelayedBan()
 		if ( (ban.m_start > 0) & (ban.m_start <= teulTime()) )
 		{
 			if ( ban.m_days <= 90 )
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Contact agm@playnet.com.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Due to unusual activity, your account is being suspended pending review. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 			else
-				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Contact agm@playnet.com assistance.", SYSTEM_PLAYER_ID, systemHandleID);
+				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Email agm@corneredrats.com for assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 
 			Chat::Name name(ban.m_handle);
 			strprintf(days, "%u days", ban.m_days);
@@ -653,7 +638,7 @@ _processDelayedBan()
 }
 
 static void
-_delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
+_delayedBan(const ChatHandle handle, UINT32 days, bool kick=true)
 {
 	Ban ban(handle, days, kick);
 	dbugLog(_FLD, "c:%s will be banned for %u days in %u seconds.", Chat::Name(handle).c_str(), ban.m_days, ban.m_start - teulTime());
@@ -665,7 +650,7 @@ _delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
 // Check if a player is online and if they have the CAN_BE_EJECTED flag
 
 static bool
-_isBanable(const ChatHandle& handle)
+_isBanable(const ChatHandle handle)
 {
 	const Player* player = PlayerInterface::Lookup(handle);
 	return ( player && player->permissions(CAN_BE_EJECTED) );
@@ -682,7 +667,7 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
-		ARGV args;
+		Chat::ARGV args;
 		if ( vectorize(arguments, args, 2) < 1 )
 		{
 			help(player);
@@ -704,7 +689,7 @@ static DotDetectMe detectMe;
 #endif
 
 void
-Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
+Chat::SendModReport(const ChatHandle handle, const Chat::ModReport modType)
 {
 	Chat::Name callsign(handle);
 	const char* type = nullptr;
@@ -727,7 +712,6 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 		return;
 //		ban = _isBanable(handle);
 //		type = "injection";
-	break;
 	case Chat::ModDamned:
 		// Only ban detects one time in 5.
 		if ( ((rand() % 5) == 1 && host_config.arena.banCheats > 0) || _isBanable(handle) )
@@ -742,7 +726,8 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 	break;
 	}
 
-	chatDispatchGMMessage("HOST", chatMakeTempString("%s %s client-mod detected", callsign.c_str(), type));
+	PREP_CHAT_MSG(message, "%s %s client-mod detected", callsign.c_str(), type);
+	chatDispatchGMMessage("HOST", message);
 
 	dbugLog(_FLN, "!HACK:%s:%s", callsign.c_str(), type);
 	chatdbRecordEvent("HACK", callsign.c_str(), type, "", "");
@@ -752,6 +737,48 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 #if defined(KICK_BANS)
 		_delayedBan(handle, days);
 #endif
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void Chat::SendMemoryRequestResult(playerid_t playerid, MemoryRequest& req) {
+	Player* player = PlayerInterface::Lookup(playerid);
+	if ( player == nullptr ) {
+		dbugLog(_FLW, "Ignoring memory request result for unknown playerid %u", playerid);
+		return;
+	}
+
+	// Can't trust data from the client
+	// TODO: Verify that these are valid to check for tampering
+	req.lib[array_size(req.lib)-1] = '\0';
+	req.fun[array_size(req.fun)-1] = '\0';
+
+	auto func = std::pair<std::string, std::string>(req.lib, req.fun);
+	if ( player->tampered_funcs.find(func) != player->tampered_funcs.end() )
+		return; // Already marked as tampered with, nothing else to do for now
+
+	auto it = player->func_hashes.find(func);
+	if ( it != player->func_hashes.end() ) {
+		bool modified = (memcmp(it->second.md5, req.md5, MemoryRequest::md5_len) != 0);
+		if ( modified ) {
+			player->tampered_funcs.insert(func);
+
+			// TODO: Use ModReport above?
+			dbugLog(_FLN, "!HACK:%s: [%s / %s]", player->callsign(), req.lib, req.fun);
+			PREP_CHAT_MSG(gmmsg, "%s potential code tampering detected", player->callsign());
+			chatDispatchGMMessage("HOST", gmmsg);
+
+			PREP_CHAT_MSG(crsmsg, "%s code tampering detected in [%s : %s]", player->callsign(), req.lib, req.fun);
+			chatDispatchCRSMessage("HOST", crsmsg);
+
+			// TODO: Put these in their own table
+			chatdbRecordEvent("HACK", player->callsign(), "memmod", req.lib, req.fun);
+		}
+	} else {
+		Player::FunctionMd5 md5;
+		memcpy(md5.md5, req.md5, MemoryRequest::md5_len);
+		player->func_hashes.insert(std::make_pair(func, md5));
 	}
 }
 
@@ -789,7 +816,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 // Send an "all" message.
 
 void
-chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 messageID)
+chatSendAllMessage(const ChatHandle handle, const char* message, UINT32 messageID)
 {
 	Chat::HostMessage& msg = chatBuildHostMessage(handle, messageID, LOBBY_CHAN_ICON, message);
 	chatBroadcastHostMessage(playerIndex.begin(), playerIndex.end(), msg);
@@ -860,7 +887,8 @@ _snoop(const char* type, Player* player, Player* snooper, const char* to, const 
 	if ( snooper == nullptr || player == nullptr || snooper == player )
 		return;
 
-	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, chatMakeTempString("%s->%s", player->callsign(), to), text);
+	PREP_CHAT_MSG(msg, "%s->%s", player->callsign(), to)
+	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, msg, text);
 	chatdbRecordEvent(type, player->callsign(), "(snoop)", to, text);
 }
 
@@ -920,7 +948,7 @@ _distributeSquelched(Player& player, Chat::HostMessage* hostMessage)
 	// Log all grab conversations
 	dbugLog(_FLI, "!GM:%s:GRAB:%s:%s"
 					, player.callsign(), recipient->callsign(), hostMessage->msg);
-	chatdbRecordEvent("GM", "GRAB", player.callsign(), recipient->callsign(), hostMessage->msg);
+	chatdbRecordEvent("GM", player.callsign(), "GRAB", recipient->callsign(), hostMessage->msg);
 
 	hostMessage->icon = _getChanIconFromType(PRIVATE_CHANNEL);
 
@@ -968,8 +996,7 @@ _distributeChannelMessage(Chat::HostMessage& message, Chat::Channel& channel, Pl
 		}
 	}
 
-	if ( g_logDebug )
-		dbugLog(_FLDB, " [%" PRSizeT " recipients]", indexes.size());
+    dbugLog(_FLD, " [%" PRSizeT " recipients]", indexes.size());
 
 	chatBroadcastHostMessage(indexes.begin(), indexes.end(), message);
 }
@@ -1029,6 +1056,7 @@ chatReportPlaceHolder(Player* player, CHANNEL_TYPE type)
 bool
 _dotCommand(Player& player, Chat::ClientMessage* message)
 {
+	dbugLog(_FLD, "Is this a dot command?");
 	if ( message->m_message[0] != '.' && message->m_message[0] != '/' )
 		return false;
 	if ( message->m_message[0] == message->m_message[1] )
@@ -1037,6 +1065,8 @@ _dotCommand(Player& player, Chat::ClientMessage* message)
 		return false;
 	if ( message->m_message[0] == '/' && message->m_message[1] && message->m_message[2] == '!' )
 		return false;
+
+	dbugLog(_FLD, "Yes, dot command - convert to slash and go look it up");
 
 	if ( message->m_message[0] != '/' )
 		message->m_message[0] = '/';
@@ -1136,10 +1166,10 @@ _injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UI
 		{
 			if ( unit->parent() )
 			{
-				unitName += unit->parent()->shortName();
+				unitName += unit->parent()->name();
 				unitName += "/";
 			}
-			unitName += unit->shortName();
+			unitName += unit->name();
 		}
 	}
 
@@ -1250,7 +1280,7 @@ _processDollars(const Player* player, const char* base, char* start)
 		{
 			if ( player->originCpID().id != 0 )
 			{
-				buffer.replace(pos, _TAG_LEN, player->objectiveCP());
+				buffer.replace(pos, _TAG_LEN, player->originCP());
 				translations = true;
 			}
 		}
@@ -1404,7 +1434,8 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		std::string msgText = inMessage->m_message;
-		wwiiEscapeString(msgText);
+		DBThread::EscapeString(msgText);
+
 		DBThread::Do(DBThread::Audit, "INSERT INTO `audit`.`chat_messages` (player_id, message) VALUES (%u, '%s')", player->playerID(), msgText.c_str());
 
 		_radioSnoop(player, inMessage);
@@ -1542,7 +1573,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 // bells, whistles and trimmings
 
 Chat::HostMessage&
-chatBuildHostMessage(const ChatHandle& senderID
+chatBuildHostMessage(const ChatHandle senderID
 					, UINT32 msgID
 					, UINT8 chanIcon
 					, const char* text
@@ -1579,7 +1610,7 @@ struct IsRat : public FilterFn
 ChatHandle IsRat::excludeID = 0LL;
 
 void
-chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_CRS_MSG, source, text);
 
@@ -1600,7 +1631,7 @@ struct IsGM : public FilterFn
 ChatHandle IsGM::excludeID = 0LL;
 
 void
-chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID)
+chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle excludeID)
 {
 	Chat::LocalizedMessage lmsg(LSTR_NONE, LSTR_GM_MSG, source, text);
 
@@ -1626,8 +1657,8 @@ chatDispatchHCText(WWII_SIDE side, const SCHAR* source, const SCHAR* text)
 struct IsActiveCommander : public FilterFn
 {
 	WWII_SIDE m_side;
-	const ChatHandle& m_exclude;
-	IsActiveCommander(WWII_SIDE side, const ChatHandle& exclude)
+	ChatHandle m_exclude;
+	IsActiveCommander(WWII_SIDE side, ChatHandle exclude)
 		: m_side(side), m_exclude(exclude) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
@@ -1644,7 +1675,7 @@ chatHCMessage(WWII_SIDE side, LSTRING_ID message, const char* const ptr0, const 
 }
 
 bool
-chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle& exclude)
+chatHCMessage(WWII_SIDE side, Chat::LocalizedMessage& lmsg, const ChatHandle exclude)
 {
 	const char* channel;
 	if ( side == ALLIED )
@@ -1805,14 +1836,14 @@ _getChannel(const ChannelID& id)
 	//If not, create it, and use it
 	if ( id.Type() == NUMBERED_CHANNEL )
 	{
-		sprintf(channelName, "%llu", id.SubID());
-		const ChatHandle handle = chatGetHandle(channelName);
-		sprintf(channelName, "%llu", id.SubID());
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
+		ChatHandle handle = chatGetHandle(channelName);
+		strprintf(channelName, "%" PR64BitUT "", id.SubID());
 		return chatCreateChannel(id, channelName, handle);
 	}
 	else
 	{
-		sprintf(channelName, "Channel %llu.%u.%u.%llu", id.InstID(), id.Type(), id.Side(), id.SubID());
+		strprintf(channelName, "Channel %" PR64BitUT ".%u.%u.%" PR64BitUT "", id.InstID(), id.Type(), id.Side(), id.SubID());
 		return chatCreateChannel(id, channelName, 0ULL);
 	}
 }
@@ -1820,7 +1851,7 @@ _getChannel(const ChannelID& id)
 //////////////////////////////////////////////////////////////////////
 
 bool
-Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
+Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle handleID)
 {
 	ChannelID channelID((CHANNEL_TYPE)0);
 	Chat::Channel* tuneChannel = nullptr;
@@ -1834,12 +1865,10 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 		case NO_CHANNEL:
 			detuneRadio(index);
 			return true;
-		break;
 
 		case PRIVATE_CHANNEL:
 		case NUMBERED_CHANNEL:
 			return tuneRadioToHandle(index, handleID);
-		break;
 
 		case SQUAD_CHANNEL:
 			if ( squadID() )
@@ -1904,7 +1933,7 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 	if ( channelID.IsPlaceHolder() )
 	{
 		if ( g_debugRadios )
-			dbugLog(_FLDB, " [placeholder]");
+			dbugLog(_FLD, " [placeholder]");
 		tunePlaceHolder(index, type);
 		return true;
 	}
@@ -1938,30 +1967,30 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 
 //Look for an hq tune
 //This temporary measure allows someone to tune to the hq channel
-static bool _tuneHQ(Player* player, UCHAR /*index*/, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneHQ(Player& player, UCHAR /*index*/)
 {
-	player->SetHqOff(false);
+	player.SetHqOff(false);
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneOrigin(Player& player, UCHAR index)
 {
 	// Remove any pre-existing origin tune
-	player->detuneChannelsByType(ORIGIN_CP_CHANNEL);
+	player.detuneChannelsByType(ORIGIN_CP_CHANNEL);
 	// And now tune this one
-	return player->tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
+	return player.tuneRadio(index, ORIGIN_CP_CHANNEL, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneGM(Player& player, UCHAR index)
 {
-	if ( !player->isGM() )
+	if ( !player.isGM() )
 		return false;
 
-	dbugLog(_FLI, "tuning %s to GM channel", player->callsign());
+	dbugLog(_FLI, "tuning %s to GM channel", player.callsign());
 
 	if ( adminChannel == nullptr )
 	{
@@ -1969,14 +1998,14 @@ static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32
 		return false;
 	}
 
-	return player->tuneRadioToChannel(index, adminChannel, adminChannel->type());
+	return player.tuneRadioToChannel(index, adminChannel, adminChannel->type());
 }
 
 //////////////////////////////////////////////////////////////////////
 // Send a tune acknowledgment to the player
 
 bool
-Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
+Player::ackTuneHandle(UCHAR index, const ChatHandle handleID)
 {
 	Chat::TuneToChannel tune(index, PRIVATE_CHANNEL, handleID, true, false);
 	if ( tune.send(teulIndex()) == false )
@@ -1990,20 +2019,6 @@ Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
 }
 
 //////////////////////////////////////////////////////////////////////
-
-static inline TUNE_COMMAND*
-_getTuneByName(const char* name)
-{
-	ChatHandle handle = chatGetLowercaseHandle(name);
-	for ( UINT32 i = 0; i < NUM_TUNE_COMMANDS; ++i )
-	{
-		if ( _tuneCommand[i].matchHandle == handle )
-			return &_tuneCommand[i];
-	}
-	return nullptr;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Determine whether a named channel exists with the given name
 // and whether the player has permissions to tune it
 
@@ -2013,24 +2028,25 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 	if ( channelName == nullptr )
 		return false;
 
-	TUNE_COMMAND* const tuneCommand = _getTuneByName(channelName);
-	if ( ! tuneCommand )
+	auto channelHandle = chatGetLowercaseHandle(channelName);
+	auto it = std::find_if(_tuneCommands.begin(), _tuneCommands.end(),
+			[=](const auto& cmd) { return cmd.matchHandle_ == channelHandle; });
+	if ( it == _tuneCommands.end() )
 		return false;
+
+	const auto& tuneCommand = *it;
 
 	detuneRadio(index);
 
-	if ( !isPlaynet()
-		&& tuneCommand->perm != 0
-		&& (permissions(tuneCommand->perm)) == 0
-		)
+	if ( !isPlaynet() && tuneCommand.perms_ && !permissions(tuneCommand.perms_) )
 	{
 		dbugLog(_FLW, "%s does not have permission to tune to %s"
 						, callsign()
-						, tuneCommand->string);
+						, channelName);
 		return false;
 	}
 
-	return tuneCommand->callback(this, index, channelName, tuneCommand->index);
+	return tuneCommand.callback_(*this, index);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2044,7 +2060,7 @@ Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 static inline bool _isANumber(const char* text) { while (isdigit(*text)) ++text; return (*text == 0); }
 
 bool
-Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
+Player::tuneRadioToHandle(UCHAR index, const ChatHandle handleID)
 {
 	if ( handleID == 0 )
 	{
@@ -2071,7 +2087,7 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 	Chat::Name chanName(chatGetLowercaseHandle(handleID));
 
 	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%llx)"
+		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%" PR64BitUT ")"
 						, teulIndex(), playerID(), callsign()
 						, index
 						, chanName.c_str(), handleID
@@ -2228,8 +2244,8 @@ Chat::Broadcast::route()
 
 struct ObjectiveFilterFn : public FilterFn
 {
-	const FULL_OBJ_ID& m_objective;
-	ObjectiveFilterFn(const FULL_OBJ_ID& objective) : m_objective(objective) {}
+	const FULL_OBJ_ID m_objective;
+	ObjectiveFilterFn(const FULL_OBJ_ID objective) : m_objective(objective) {}
 	bool operator()(const wwiiPlayer* wwiiPlayer) const
 	{
 		const Player* player = static_cast<const Player*>(wwiiPlayer);
@@ -2246,7 +2262,7 @@ bool
 chatRouteSideMessage(WWII_SIDE toSide
 					, LSTRING_ID prefix
 					, LSTRING_ID message
-					, const FULL_OBJ_ID& objectiveID
+					, const FULL_OBJ_ID objectiveID
 					, const char* const arg1
 					, const char* const arg2
 					)
@@ -2282,32 +2298,28 @@ chatRouteSideMessage(WWII_SIDE toSide
 void
 chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample& sample)
 {
-	// TEMP/HACK: This message is occurring far too often, and it's a little
-	// too late to fix it properly. For now, we're just going to ignore it.
-	return;
 
 	static std::map<playerid_t, std::pair<UINT32, TeulDeltaMS>> reports;
 	auto it = reports.find(player.playerID());
 	const UINT32 lastReport = (it != reports.end()) ? it->second.first : 0;
 	const TeulDeltaMS lastDelta = (it != reports.end()) ? it->second.second : 0;
 
-	if ( lastReport > teulTime() - 60 && abs(sample.delta - lastDelta) <= 120 )
+	if ( lastReport > teulTime() - 60 && std::abs(sample.delta - lastDelta) <= 120 )
 		return;
 
 	/* According to new types list: CONTROLLER_HOST = 0U, AUTH_HOST, DBD_HOST, STRAT_HOST, CHAT_HOST, MAP_HOST, CELL_HOST  */
-	static const char* const hostNames[] = { "controller", "auth", "dbd", "strat", "chat", "map", "cell", "exit", "unknown" };
 	char hostname[64];
 	char report[256];
 
-	strprintf(hostname, "%shost:%s", hostNames[source], player.callsign());
-	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
+	strprintf(hostname, "%shost:%s", g_serverTypes[source], player.callsign());
+	strprintf(report, "Client clock anomaly: delta of %" PR64BitT "ms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
 
-	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
+	player.log(_FLW, "%s, host:%" PR64BitUT ", client:%" PR64BitUT "", report, sample.host_ms, sample.client_ms);
 
-	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
-	          hostNames[source],
+	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%" PR64BitUT ",\"client\":%" PR64BitUT "},\"delta\":%" PR64BitUT ",\"ratio\",\"%0.8g\"}",
+	          g_serverTypes[source],
 	          sample.host_ms, sample.client_ms,
 	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
@@ -2329,7 +2341,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 		else
-			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 
 		return;
 	}
@@ -2379,7 +2391,6 @@ void
 _acceptPlayerConnection(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN, "t:%d player connection from %s:%hu", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
-	endpoint.setNagleEnabled(true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2433,7 +2444,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
-			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
 	}
@@ -2454,9 +2465,9 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 	}
 
 	if ( g_debugPersonas )
-		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %d"
+		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %s"
 						, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-						, static_cast<int>(login.reason())
+						, Server::Transfer::to_string(login.reason()).c_str()
 						);
 
 	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);
@@ -2482,11 +2493,11 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType rel
 
 	if ( psn->localInfo != nullptr )
 	{
-		dbugLog(_FLNB, " *freeing");
+		dbugLog(_FLN, " *freeing");
 		chatFreePlayer((Player*)psn->localInfo);
 	}
 	else
-		dbugLog(_FLNB, " no player to free");
+		dbugLog(_FLN, " no player to free");
 
 	return 0;
 
@@ -2525,7 +2536,7 @@ _personaActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 static SINT32
 _personaExit(SINT32 teulIndex, PlayerStatusNode* psn, Server::PersonaExit& persExit)
 {
-	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign);
+	dbugLog(_FLN, "t:%d p:%u c:%s _personaExit (%p)", teulIndex, persExit.dispatch().m_customerID, persExit.dispatch().m_callsign, psn);
 	return 0;
 }
 
@@ -2541,16 +2552,9 @@ _personaErrorFunction (SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*s
 //Initializes all the global data structures, etc.
 
 static void
-_dataInit(void)
+_dataInit()
 {
 	chatInitPlayerLists();
-
-	for ( size_t i = 0; i < (size_t)NUM_TUNE_COMMANDS; i++)
-	{
-		_tuneCommand[i].length = (UINT32)strlen(_tuneCommand[i].string);
-		_tuneCommand[i].index = i;
-		_tuneCommand[i].matchHandle = chatGetLowercaseHandle(_tuneCommand[i].string);
-	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2651,7 +2655,7 @@ static void _countUserSides()
 
 	if ( (UINT32)std::abs((SINT32)(newCount - lastCount)) >= gap && lastNotice <= teulTime() - 300 )
 	{
-		const char* update = chatMakeTempString("Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
+		PREP_CHAT_MSG(update, "Update: %u players [%u allied, %u axis]", newCount, _sideCount[ALLIED], _sideCount[AXIS]);
 		wwiiIRCChannelMessage("-sys", update);
 		lastNotice = teulTime();
 		lastCount = newCount;
@@ -2728,8 +2732,7 @@ _refreshDefaultSquad()
 	}
 	else
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, ": not loaded.");
+		dbugLog(_FLD, ": not loaded.");
 	}
 }
 
@@ -2747,8 +2750,6 @@ _lowFrequencyHouseKeeping()
 
 	// Less frequent activities
 	++tickCount;
-	if ( (tickCount % 10) == 0 )
-		wwiiPlayer::logStats();
 
 	bool reset = true;
 	if ( (tickCount & 3) == 0 )
@@ -2793,12 +2794,11 @@ _houseKeeping()
 		return false;
 
 	// nullptr TERMINATED List of functions to call
-	typedef bool (HOUSEKEEPING)(void);
-	HOUSEKEEPING* housekeeping[] =
+	using HOUSEKEEPING = bool(*)();
+	static HOUSEKEEPING housekeeping[] =
 	{
 		chatSaveLogRecords
 	,	Chat::CommitProgressUpdates
-	,	Chat::CommitDecalUpdates
 	,	chatHousekeepGroupPermissions
 	,	chatProcessPlayerGroups
 	,	chatCheckDecisionQueues
@@ -2812,6 +2812,12 @@ _houseKeeping()
 	,	_lowFrequencyHouseKeeping
 	,	nullptr
 	};
+
+	// keep DB connection alive
+	if (mysql_ping(dbh) != 0) {
+		dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+		threadsDBReconnect(dbh);
+	}
 
 	if ( housekeeping[step] == nullptr )
 	{
@@ -2851,8 +2857,6 @@ _startShutdown()
 		chatSmitePlayer(target->playerID());
 		target->Release(target->teulIndex(), Server::ReleaseType::Exit);
 	}
-
-	threadsLogging();
 
 	serverBroadcastClusterShutdown();
 
@@ -3109,7 +3113,7 @@ _extractUserName(const char* ircName, std::string& name)
 //////////////////////////////////////////////////////////////////////
 // Manage the list of IRC Players.
 
-typedef std::map<ChatHandle, IRCPlayer*> IRC_PLAYERS;
+using IRC_PLAYERS = std::map<ChatHandle, IRCPlayer*>;
 static IRC_PLAYERS ircPlayers;
 
 static IRCPlayer*
@@ -3415,7 +3419,6 @@ _ircNumericMessages(irc_session_t * session, unsigned int event, const char* ori
 		if ( count > 3 && strcmp(params[1], "=") == 0 )
 			_registerUsers(params[2], params[3]);
 		return;
-	break;
 
 	default:
 	break;
@@ -3525,12 +3528,11 @@ _runHost()
 	{
 		// Process network updates.
 		teulUpdateTransport(25);
-
+        
 		threadsCallNextCallback();
-		threadsLogging();
 
 		// Catch up on housekeeping.
-		while ( _houseKeeping() ) 
+		while ( _houseKeeping() )
 			;
 
 		chatSendMissionUpdates();
@@ -3555,6 +3557,22 @@ _runHost()
 		if ( _running && _checkForShutdown() )
 			_running = false;
 	}
+}
+
+UINT32 serverStartTime;
+
+UINT32 serverUpTimeMinutes()
+{
+        UINT32 secs = teulTime() - serverStartTime;
+        return secs / 60;
+}
+
+//////////////////////////////////////////////////////////////////////
+static void _v1APIHandler(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response);
+
+static void _initializeHTTPEndpoints()
+{
+    Teul::uWeb::s_debugServer.addVirtualPrefix("V1 REST API", "/v1", _v1APIHandler);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -3606,19 +3624,13 @@ main(int argc, const char* argv[])
 	wwiiIRCRegisterCommand("who", _ircdotPassthru);
 	wwiiIRCRegisterCommand("wtf", _ircdotPassthru);
 
-	threadsReadDBEnvironment();
 	chatThreadsSetup();
-
-	// Initialize dbse callbacks
-	chatdbInstallClientCallbacks();
-	if ( !dbseInit() )
-		return FALSE;
 
 	// Connect to the database
 	chatInitDB();
 
-	chatGetWWIIConfig();
-	chatLoadPPOXML();
+	dbGetWWIIConfig();
+	specLoader.loadSpecMap();
 
 	chatSetUnitMotd(SYSTEM_MOTD_UNIT, DEFAULT_SYS_MOTD);
 	chatSetUnitMotd(ALLIED, DEFAULT_ALLIED_HC_MOTD);
@@ -3638,7 +3650,7 @@ main(int argc, const char* argv[])
 
 	Server::myServerInfo.stats.port = WWII::Net::Ports::ChatHost;
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, CHAT_HOST, CHAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
@@ -3655,6 +3667,7 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallHostCallbacks() < 0);
 	ABORT_IF(chatInstallHostManagementCallbacks() < 0);
+	ABORT_IF(strtChatSupportInstallCallbacks() < 0);
 
 	//End broadcast configuration
 
@@ -3669,6 +3682,9 @@ main(int argc, const char* argv[])
 	ABORT_IF(managementListenInterface < 0);
 
 	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);
+    
+    _initializeHTTPEndpoints();
+    dbugLog(_FLN, "Listening for management commands on HTTP microserver (port %u)", WWII::Net::Ports::DebugWebServer);
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
@@ -3679,6 +3695,8 @@ main(int argc, const char* argv[])
 	teulSyncClock();
 
 	nextSpamTime = teulClock64 + 1000;
+
+	serverStartTime = teulTime();
 
 	// Load the MOTDs in
 	chatLoadMotds();
@@ -3700,6 +3718,7 @@ main(int argc, const char* argv[])
 		index.addAlias("m", "tell");
 		index.addAlias("m", "t");
 		index.addAlias("m", "r");
+		index.addAlias("trainers", "tr");
 
 		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size());
 
@@ -3710,7 +3729,7 @@ main(int argc, const char* argv[])
 		dbugLog(_FLA, "failed registering dot commands: %s", e.what());
 		exit(0);
 	}
-
+    
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
 	_runHost();
@@ -3723,3 +3742,531 @@ main(int argc, const char* argv[])
 
 	teulCloseTransport();
 }
+
+//////////////////////////////////////////////////////////////////////
+using namespace Teul::uWeb;
+
+// This struct is the absolute minimum we must know about a player to perform
+// operations on them, whether online or offline.
+struct PlayerControlMinimumData {
+    playerid_t playerID;
+    Player *realPlayerObject;
+    Chat::Name matchHandle;
+    uint32_t squadID;
+    RANK_NO squadRank;
+    
+    ChatHandle handle() const { return matchHandle.LowercaseHandle(); }
+    const char *callsign() const { return matchHandle.c_str(); }
+};
+
+static bool _lookupMinimalDataFromPlayerID(playerid_t playerID, PlayerControlMinimumData &result)
+{
+    Player *realPlayer = PlayerInterface::Lookup(playerID);
+    
+    if (realPlayer) {
+        result.playerID = playerID;
+        result.realPlayerObject = realPlayer;
+        result.matchHandle = realPlayer->matchHandle();
+        result.squadID = realPlayer->squadID();
+        result.squadRank = realPlayer->squadRank();
+    } else {
+        // We need to look up the player info manually
+        // Oops, prepared statements are too common sense and reasonable to be
+        // available to this API. Time for some trivial SQL injection vulns!
+        //DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=?");
+        DBQuery q(dbh, "SELECT playerid, callsign, squadid, squad_rank FROM wwii_player WHERE playerid=%u", playerID);
+        
+        if (!q.HasRows() || !q.FetchRow()) {
+            return false;
+        }
+        result.playerID = q.Row().NextUInt();
+        result.realPlayerObject = nullptr;
+        result.matchHandle = q.Row().NextString();
+        result.squadID = q.Row().NextUInt();
+        result.squadRank = q.Row().NextUInt();
+    }
+    return true;
+}
+
+#ifndef NDEBUG
+#define status_if(cond, stat, ...) do { \
+    if ((cond)) { \
+        return HTTPResponseBuilder(request) \
+            .status(stat, ## __VA_ARGS__) \
+            .header("Connection", "close") \
+            .content("<h1>" #stat " " __VA_ARGS__ "</h1>") \
+            .build(response); \
+    } \
+} while(0)
+#else
+#define status_if(cond, stat, ...) do { if ((cond)) { return HTTPResponseBuilder(request).status(stat).header("Connection", "close").build(response); } } while(0)
+#endif
+
+static inline playerid_t get_as_playerid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("playerid only recognizes string and number");
+    }
+}
+
+static inline uint64_t get_as_squadid(const nlohmann::json &value) {
+    if (value.is_string()) {
+        return std::stoull(value.get<std::string>());
+    } else if (value.is_number_integer()) {
+        return value;
+    } else {
+        throw std::domain_error("squadid only recognizes string and number");
+    }
+}
+
+static void _playerControlAPIPromote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank + 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank > Squad::CO || newRank > originator.squadRank, 403, "Can't go that high"); // New rank is too high
+    status_if(originator.squadRank <= Squad::CO && newRank > Squad::XO, 403, "Can't just make a CO"); // Only GM can promote to CO
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_PROMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_PROMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_PROMO_TO_XO; break;
+        case Squad::CO:         promoteMessage = LSTR_PROMO_TO_CO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_PROMOTE, originator.callsign(), target.callsign(),
+        newRank, newRank - 1);
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIDemote(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    RANK_NO newRank = target.squadRank - 1; // Might be meaningless if some of the following checks fail
+    
+    status_if(target.matchHandle == originator.matchHandle, 403, "Can't promote yourself"); // Promoting self
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not a staffer"); // Originator is not staffer or higher
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    status_if(newRank < Squad::MEMBER || newRank >= Squad::CO, 403, "Can't go that low"); // New rank is too low
+    status_if(newRank == Squad::CO && squadList->squad().coHandle() != 0, 403, "CO not available"); // CO position isn't open
+    status_if(newRank == Squad::CO && originatorSquadEntry->squadRank() == Squad::CO, 403, "CO not available"); // CO position REALLY isn't open...
+    
+    DBQuery q(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND playerid=%u AND squad_rank=%u", newRank, target.squadID, target.playerID, target.squadRank);
+    status_if(!q.HasRows(), 500, "DB query 'sploded"); // something went horribly wrong!
+    
+    if (targetSquadEntry->squadRank() == Squad::CO || newRank == Squad::CO) { chatdbSquadInfo(0, target.squadID, false); } // Refresh whole squad if CO changed
+    if (targetSquadEntry->player() && newRank < Squad::STAFFER) { targetSquadEntry->player()->stopRecruiting(); }
+    squadList->updateMember(target.matchHandle, newRank, targetSquadEntry->player());
+    
+    LSTRING_ID promoteMessage = LSTR_NONE;
+    switch (newRank) {
+        case Squad::MEMBER:     promoteMessage = LSTR_DEMO_TO_MEMBER; break;
+        case Squad::STAFFER:    promoteMessage = LSTR_DEMO_TO_STAFFER; break;
+        case Squad::XO:         promoteMessage = LSTR_DEMO_TO_XO; break;
+        default: break;
+    }
+    if (promoteMessage != LSTR_NONE) {
+        squadList->sendMessage(LSTR_SQUAD, promoteMessage, originator.callsign(), target.callsign());
+    }
+    if (targetSquadEntry->player()) { targetSquadEntry->player()->unrecruit(); } // why twice?
+    squadList->setUpdated();
+    DBThread::Do(DBThread::Default, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
+        " VALUES (%u, %u, NOW(), '%s', '%s', %u, %u, 0, '')",
+        squadList->squad().squadID(), SquadMemberUpdate::_DEMOTE, originator.callsign(), target.callsign(),
+        newRank, newRank + 1);
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squad_rank", newRank } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIRemove(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("player_id") == params.end(), 500, "player id missing?");
+    status_if(params.find("requester_id") == params.end(), 422, "requester id required");
+    
+    playerid_t targetPlayerID = get_as_playerid(params.at("player_id"));
+    playerid_t originatorPlayerID = get_as_playerid(params.at("requester_id"));
+    PlayerControlMinimumData originator, target;
+    
+    status_if(!_lookupMinimalDataFromPlayerID(originatorPlayerID, originator), 422, "no originator data");
+    status_if(!_lookupMinimalDataFromPlayerID(targetPlayerID, target), 422, "no target data");
+    
+	dbugLog(_FLI, "p:%u c:%s sq:%d attempting to remove %u[%s]", originator.playerID, originator.callsign(), originator.squadID, target.playerID, target.callsign());
+
+    SquadList *squadList = nullptr;
+    SquadMemberEntry *originatorSquadEntry = nullptr;
+    SquadMemberEntry *targetSquadEntry = nullptr;
+    
+    status_if(originator.squadID == 0, 403, "You're not in a squad"); // Originator not in any squad
+    status_if(originator.squadRank < Squad::STAFFER, 403, "You're not staffer or better"); // Originator is not staffer
+    status_if(target.squadID != originator.squadID, 403, "You're not in the same squad"); // Originator and target in different squads
+    if (!target.realPlayerObject && !originator.realPlayerObject) { chatdbSquadInfo(0, target.squadID, true); } // If both are offline, load their squad
+    status_if((squadList = chatFindSquadList(originator.squadID)) == nullptr, 403, "Missing squad list"); // The squad list couldn't be looked up
+    status_if((originatorSquadEntry = squadList->find(originator.matchHandle)) == nullptr, 403, "No originator squad entry"); // Originator not in squad???
+    status_if((targetSquadEntry = squadList->find(target.matchHandle)) == nullptr, 403, "Target not in squad"); // Target not in squad
+    status_if(targetSquadEntry->squadRank() > originator.squadRank, 403, "Target outranks you"); // Target outranks originator
+    
+    if (targetSquadEntry->player()) {
+        SquadControlResult(SQR_KICKED, SquadControl::_KICK, targetSquadEntry->player()->chatHandle()).send(targetSquadEntry->player()->teulIndex());
+        targetSquadEntry->player()->unrecruit();
+        targetSquadEntry->player()->stopRecruiting();
+    }
+    DBThread::Do(DBThread::Default,
+        "UPDATE wwii_player SET squadid=0, squad_rank=0, squad_joined=NOW(), squad_time_played=0 WHERE playerid=%u AND squadid=%u", target.playerID, target.squadID);
+    squadList->removeMember(target.matchHandle);
+    squadList->sendMessage(LSTR_SQUAD, LSTR_SQUAD_KICK, target.callsign(), originator.callsign());
+    
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(nlohmann::json({ { "playerid", target.playerID }, { "squadid", 0 }, { "squad_rank", 0 } }).dump())
+        .build(response);
+}
+
+static void _playerControlAPIList(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(request.requestData.length() > 0, 400, "No request content expected in GET");
+    
+    const PLAYERID_HASH allPlayers = ServerInterface::GetOnlinePlayers();
+    nlohmann::json result;
+    uint64_t totalOnline = 0;
+    uint64_t numAxis = 0, numAxisSpawn = 0, numAllies = 0, numAlliesSpawn = 0;
+    uint64_t numGM = 0, numGMSpawn = 0, numGMBuzz = 0, numRats = 0, numRatsSpawn = 0, numRatBuzz = 0;
+    
+    // TODO: Move this part to another thread
+    result["players"] = nlohmann::json::array();
+    for (const std::pair<const playerid_t, PlayerStatusNode *> &psnp : allPlayers) {
+        playerid_t playerID = psnp.first;
+        const PlayerStatusNode *psn = psnp.second;
+        const Player *player = static_cast<const Player *>(psn->localInfo); // WHY!
+        nlohmann::json entry;
+        
+        if (!player || !player->isConnected()) { continue; }
+        entry["id"] = playerID;
+        entry["callsign"] = player->callsign();
+        entry["persona"] = player->noSide() ? "none" : (player->side() == ALLIED ? "allies" : (player->side() == AXIS ? "axis" : "INVALID"));
+        entry["spawned"] = player->isSpawned();
+        entry["isGM"] = player->isEffectiveGM() && !player->isPlaynet();
+        entry["isPlaynet"] = player->isPlaynet();
+        if (player->isEffectiveGM() ||  player->isPlaynet()) {
+            entry["usingBuzzard"] = player->isBuzzard();
+        }
+        result["players"].push_back(entry);
+        ++totalOnline;
+        numAxis += player->side() == AXIS;
+        numAxisSpawn += (player->side() == AXIS && player->isSpawned());
+        numAllies += player->side() == ALLIED;
+        numAlliesSpawn += (player->side() == ALLIED && player->isSpawned());
+        numGM += player->isEffectiveGM() && !player->isPlaynet();
+        numGMSpawn += (player->isEffectiveGM() && !player->isPlaynet() && player->isSpawned());
+        numGMBuzz += (player->isEffectiveGM() && !player->isPlaynet() && player->isBuzzard());
+        numRats += player->isPlaynet();
+        numRatsSpawn += (player->isPlaynet() && player->isSpawned());
+        numRatBuzz += (player->isPlaynet() && player->isBuzzard());
+    }
+    result["numOnline"] = totalOnline;
+    result["numAxisOnline"] = numAxis;
+    result["numAxisSpawned"] = numAxisSpawn;
+    result["numAlliesOnline"] = numAllies;
+    result["numAlliesSpawned"] = numAlliesSpawn;
+    result["numGMOnline"] = numGM;
+    result["numGMSpawned"] = numGMSpawn;
+    result["numGMBuzzards"] = numGMBuzz;
+    result["numPlaynetOnline"] = numRats;
+    result["numPlaynetSpawned"] = numRatsSpawn;
+    result["numPlaynetBuzzards"] = numRatBuzz;
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
+}
+
+static void _squadControlAPIPlayersInternal(const HTTPRequest &request, HTTPResponse &response, uint64_t squad_id, bool onlineOnly)
+{
+    SquadList *squad = chatFindSquadList(squad_id);
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    
+    nlohmann::json result = nlohmann::json::array();
+
+    for (auto &kv : squad->members()) {
+        const SquadMemberEntry &player = kv.second;
+        
+        if (onlineOnly && player.player() == nullptr) {
+            continue;
+        }
+        
+        nlohmann::json entry = nlohmann::json::object();
+        
+        entry["callsign"] = Chat::Name(player.handle()).c_str();
+        entry["rank"] = player.squadRank();
+        result.push_back(entry);
+    }
+    return HTTPResponseBuilder(request)
+        .status(200)
+        .JSON(result.dump())
+        .build(response);
+}
+
+static void _squadControlAPIPlayers(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), false);
+}
+
+static void _squadControlAPIPlayersOnline(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    return _squadControlAPIPlayersInternal(request, response, get_as_squadid(params.at("squad_id")), true);
+}
+
+static inline std::string _trim(const std::string &text)
+{
+    std::string result = text;
+    std::string::size_type locstart = text.find_first_not_of(" \t\v\n\r");
+    
+    if (locstart == std::string::npos) {
+        result = "";
+    } else {
+        result = result.substr(locstart);
+    }
+    return result.substr(0, result.find_last_not_of(" \t\v\n\r") + 1); // npos + 1 == 0 (hack, but it works)
+}
+
+static void _squadControlAPIPatch(const HTTPRequest &request, HTTPResponse &response, const RESTAPIParams &params)
+{
+    status_if(params.find("requester_id") == params.end(), 422, "requester ID is required");
+
+    playerid_t requester_id = get_as_playerid(params.at("requester_id"));
+    uint64_t squad_id = get_as_squadid(params.at("squad_id"));
+    SquadList *squad = chatFindSquadList(squad_id);
+    PlayerControlMinimumData requester;
+    SquadMemberEntry *requesterMember = nullptr;
+    
+    if (!squad) {
+        // Not already in memory, load it, with immediate member list retrieval
+        chatdbSquadInfo(0, squad_id, true);
+        squad = chatFindSquadList(squad_id);
+    }
+    status_if(!squad, 404, "No such squad"); // Still nothing? No such squad, then.
+    status_if(!_lookupMinimalDataFromPlayerID(requester_id, requester), 422, "no requester data");
+    status_if((requesterMember = squad->find(requester.handle())) == nullptr, 403, "requester not member of squad");
+    status_if(requesterMember->squadRank() < Squad::STAFFER, 403, "requester must be staffer or higher");
+    
+    std::vector<std::function<void()>> operations;
+    
+    if (params.find("name") != params.end()) {
+        std::string name = params.at("name");
+        std::string trimmedName = _trim(name);
+        
+        status_if(trimmedName.length() < 4, 422, "requested squad name too short (4)");
+        status_if(trimmedName.length() > Squad::NAME_LENGTH, 422, "requested squad name too long (40)");
+        operations.push_back([trimmedName, &squad] () mutable {
+            squad->setFullName(trimmedName);
+            DBThread::EscapeString(trimmedName); // Eww eww eww eww eww eww
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET name='%s' WHERE squadid=%u", trimmedName.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("description") != params.end()) {
+        std::string desc = params.at("description");
+        
+        status_if(desc.length() < 3, 422, "requested squad description too short (3)");
+        status_if(desc.length() > Squad::DESCRIPTION_LENGTH, 422, "requested squad description too long (255)");
+        operations.push_back([desc, &squad] () mutable {
+            squad->setDescription(desc);
+            DBThread::EscapeString(desc);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET description='%s' WHERE squadid=%u", desc.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("homepage") != params.end()) {
+        std::string homepage = params.at("homepage");
+        
+        status_if(homepage.length() > Squad::HOMEPAGE_LENGTH, 422, "requested squad homepage too long");
+        operations.push_back([homepage, &squad] () mutable {
+            squad->setHomepage(homepage);
+            DBThread::EscapeString(homepage);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET homepage='%s' WHERE squadid=%u", homepage.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("motd") != params.end()) {
+        std::string motd = params.at("motd");
+        
+        status_if(motd.length() > Squad::MOTD_LENGTH, 422, "requested MOTD too long");
+        operations.push_back([motd, &squad] () mutable {
+            squad->setMOTD(motd);
+            DBThread::EscapeString(motd);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET motd='%s' WHERE squadid=%u", motd.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("slogan") != params.end()) {
+        std::string slogan = params.at("slogan");
+        std::string trimmedSlogan = _trim(slogan);
+        
+        status_if(trimmedSlogan.length() > 0 && trimmedSlogan.length() < 16, 422, "requested squad slogan too short (16)");
+        status_if(trimmedSlogan.length() > Squad::SLOGAN_LENGTH, 422, "requested squad slogan too long");
+        operations.push_back([trimmedSlogan, &squad] () mutable {
+            squad->setSlogan(trimmedSlogan);
+            DBThread::EscapeString(trimmedSlogan);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET slogan='%s' WHERE squadid=%u", trimmedSlogan.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("squad_night") != params.end()) {
+        nlohmann::json night = params.at("squad_night");
+        
+        status_if(night.find("hour") == night.end(), 422, "night must have hour");
+        status_if(night.find("day") == night.end(), 422, "night must have day");
+        status_if(night.find("timezone") == night.end(), 422, "night must have timezone");
+        
+        uint32_t hour = night.at("hour");
+        uint32_t day = night.at("day");
+        std::string ntimezone = night.at("timezone");
+        
+        status_if(hour > 23, 422, "hour is out of range");
+        status_if(day > 6, 422, "day is out of range");
+        status_if(ntimezone.length() != 6 || (ntimezone[0] != '+' && ntimezone[0] != '-') || ntimezone[3] != ':', 422, "timezone is badly formatted");
+        status_if(!isdigit(ntimezone[1]) || !isdigit(ntimezone[2]) || !isdigit(ntimezone[4]) || !isdigit(ntimezone[5]), 422, "timezone is badly formatted");
+        int64_t adjustedTimezone = std::stoll(ntimezone.substr(0, 3));
+        status_if(adjustedTimezone < -23 || adjustedTimezone > 24, 422, "adjusted timezone is out of range (-23..23)");
+        
+        std::string formattedNight = std::to_string(day) + "," + std::to_string(hour) + "," + std::to_string(adjustedTimezone);
+
+        operations.push_back([formattedNight, &squad] () mutable {
+            squad->setSquadNight(formattedNight);
+            DBThread::EscapeString(formattedNight); // I mean seriously.
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET squad_night='%s' WHERE squadid=%u", formattedNight.c_str(), squad->squad().squadID());
+        });
+    }
+    if (params.find("pri_language") != params.end()) {
+        uint64_t pri_language = params.at("pri_language");
+
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set language");
+        status_if(pri_language > 5, 422, "requested language is invalid");
+        operations.push_back([pri_language, &squad] {
+            squad->setLanguage(pri_language);
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET pri_language=%llu WHERE squadid=%u", pri_language, squad->squad().squadID());
+        });
+    }
+    if (params.find("recruiting") != params.end()) {
+        bool recruiting = params.at("recruiting");
+        
+        operations.push_back([recruiting, &squad, &requesterMember] {
+            squad->setRecruiting(recruiting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET recruiting=%u WHERE squadid=%u", recruiting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    if (params.find("voting") != params.end()) {
+        bool voting = params.at("voting");
+        
+        status_if(requesterMember->squadRank() < Squad::XO, 403, "requester must be XO or higher to set voting flag");
+        operations.push_back([voting, &squad, &requesterMember] {
+            squad->setVoting(voting, requesterMember->player());
+            DBThread::Do(DBThread::Default, "UPDATE wwii_squads SET voting=%u WHERE squadid=%u", voting ? 1 : 0, squad->squad().squadID());
+        });
+    }
+    
+    status_if(operations.size() < 1, 422, "No changes requested");
+    for (const std::function<void()> &op : operations) {
+        op();
+    }
+    if (requesterMember->player()) {
+        requesterMember->player()->sendSquadInfo();
+    }
+    
+    nlohmann::json results = params;
+    
+    results.erase("requester_id");
+    results.erase("squad_id");
+    return HTTPResponseBuilder()
+        .status(200)
+        .JSON(results.dump())
+        .build(response);
+}
+
+static inline RESTAPIHandler RESTThreadCallback(RESTAPIHandler handler)
+{
+    return [handler] (const HTTPRequest &req, HTTPResponse &res, const RESTAPIParams &params) {
+        threadCallbackSync<void>([&] { handler(req, res, params); });
+    };
+}
+
+static void _v1APIHandler(const HTTPRequest &request, HTTPResponse &response)
+{
+    static const RESTAPIRouteList routes = {
+        { { "PATCH" }, "/player/{player_id}/squad/promote", RESTThreadCallback(_playerControlAPIPromote) },
+        { { "PATCH" }, "/player/{player_id}/squad/demote", RESTThreadCallback(_playerControlAPIDemote) },
+        { { "PATCH" }, "/player/{player_id}/squad/remove", RESTThreadCallback(_playerControlAPIRemove) },
+        { { "GET"   }, "/player/online", RESTThreadCallback(_playerControlAPIList) },
+        { { "GET"   }, "/player/list", RESTThreadCallback(_playerControlAPIList) }, // legacy alias
+        { { "GET"   }, "/squad/{squad_id}/player", RESTThreadCallback(_squadControlAPIPlayers) },
+        { { "GET"   }, "/squad/{squad_id}/player/online", RESTThreadCallback(_squadControlAPIPlayersOnline) },
+        { { "PATCH" }, "/squad/{squad_id}", RESTThreadCallback(_squadControlAPIPatch) },
+    };
+
+    Teul::uWeb::RESTRouter(request, response, routes);
+}
+#undef status_if

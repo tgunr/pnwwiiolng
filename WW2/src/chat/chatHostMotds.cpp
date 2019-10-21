@@ -11,6 +11,7 @@
 #include "chat/chatHandle.h"
 #include "chat/chatHostMotds.h"
 #include "chat/chatMotds.h"
+#include "chat/chatName.h"
 #include "teul/teulTime.h"
 
 static MOTD_REPLY _motds[MOTD::_MAX_TYPES];
@@ -30,7 +31,7 @@ chatGetMotd(UINT32 type)
 // Update an MOTD
 
 bool
-chatSetMotd(UINT32 type, const ChatHandle& submitter, const std::string& text)
+chatSetMotd(UINT32 type, const ChatHandle submitter, const std::string& text)
 {
 	if ( type >= MOTD::_MAX_TYPES )
 	{

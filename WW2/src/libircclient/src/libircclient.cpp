@@ -12,6 +12,12 @@
  * License for more details.
  */
 
+#if defined(__clang_major__)
+_Pragma("clang diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
+#elif defined(__GNUC__)
+_Pragma("GCC diagnostic ignored \"-Wzero-as-null-pointer-constant\"")
+#endif
+
 #define IS_DEBUG_ENABLED(s)	((s)->options & LIBIRC_OPTION_DEBUG)
 
 #include "portable.c"
@@ -831,8 +837,8 @@ int irc_process_select_descriptors (irc_session_t * session, fd_set *in_set, fd_
 		session->state = LIBIRC_STATE_CONNECTED;
 
 		// Get the hostname
-    	if ( gethostname (hname, sizeof(hname)) < 0 )
-    		strcpy (hname, "unknown");
+		if ( gethostname (hname, sizeof(hname)) < 0 )
+			strcpy (hname, "unknown");
 
 		// Prepare the data, which should be sent to the server
 		if ( session->server_password )

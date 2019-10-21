@@ -15,6 +15,7 @@ _Type inline round(const _Type& x) { return floor(x + (_Type)0.5); }
 #else
 #include <OpenGL/gl.h>
 #include "macgl.h"
+typedef uint32_t UINT32;
 #endif
 
 #include "phui/FTFontReplacement.h"
@@ -294,9 +295,6 @@ void GLGraphicsContext::DrawString(unsigned int i, const char* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32_NVIDIA_WORKAROUND
-		font->Render(""); // stupid nVidia workaround
-#endif
 		font->Render(str);
 		MovePenPosition(0, font->Descender());
 	}
@@ -312,9 +310,6 @@ void GLGraphicsContext::DrawString(unsigned int i, const wchar_t* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32_NVIDIA_WORKAROUND
-		font->Render(""); // stupid nVidia workaround
-#endif
 		font->Render(str);
 		MovePenPosition(0, font->Descender());
 	}
@@ -411,7 +406,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
 	
 	if(it == _fonts->fontmap.end())
 	{
-        if ( gLanguage != 5 ) // not IDE_LANGUAGE_CHINESE
+        if ( gLanguage != 5 && gLanguage != 6) // not IDE_LANGUAGE_CHINESE and not IDE_LANGUAGE_RUSSIAN
         {
             font = new FTFontWestern();
         }

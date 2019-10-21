@@ -5,7 +5,7 @@
 #include "BDialog.h"
 #include "Playgate.h"
 #include "../res/locIDs.h"
-#include "../ww2/proj/versionNo.h"
+#include "build_info.hpp"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -37,7 +37,7 @@ void CBDialog::Localize(UINT itemId, UINT locID) const
 		else
 		{
 			wchar_t versionNo[81];
-			swprintf(versionNo, 80, L"%s", STRVER);
+			swprintf(versionNo, 80, L"%hs", PN_product_version_string);
 			item->SetWindowText(versionNo);
 		}
 	}

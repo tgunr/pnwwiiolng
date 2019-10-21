@@ -59,7 +59,7 @@ public:
 		UINT16			m_size;							// Size including null bytes
 
 		// Member function for packing
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 		void Populate(int prefixID, int messageID
 						, const char* const ptr0="", const char* const ptr1="", const char* const ptr2="", const char* const ptr3="", const char* const ptr4="", const char* const ptr5="")

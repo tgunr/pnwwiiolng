@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Mon Mar 21 12:48:09 CST 2005
 //
 // Wrapper for simplifying the process of creating teulCallbacks
@@ -12,17 +12,10 @@
 
 Teul::CallbackInit CallbackRegister::sm_ci;
 
-void
-CallbackRegister::_error(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
-{
-	dbugLog(_FLA, "t:%d error %d in teulCallback %p data %p size %d", teulIndex, error, static_cast<const void*>(object), data, size);
-}
-
 CallbackRegister::CallbackRegister(UCHAR x, const char * const name)
 {
 	sm_ci.callX = x;
 	sm_ci.callXName = name;
-	sm_ci.error = CallbackRegister::_error;
 }
 
 TEUL_CALLBACK*

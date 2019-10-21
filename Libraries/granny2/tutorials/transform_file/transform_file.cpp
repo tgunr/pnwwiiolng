@@ -44,11 +44,6 @@ int main(int, char const*[])
         return EXIT_FAILURE;
     }
 
-#ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
-#endif
-
     // Load the test file
     granny_file* TestFile = NULL;
     granny_file_info* TestFileInfo = NULL;
@@ -145,9 +140,9 @@ bool LoadTestFile(granny_file** OutputFile,
     assert(OutputFile && OutputFileInfo);
 
 #ifdef _MACOSX
-    const char* TestFilename = "../../../media/pixo_run.gr2";
+    const char* TestFilename = "../../media/pixo_run.gr2";
 #else
-    const char* TestFilename = "../media/pixo_run.gr2";
+    const char* TestFilename = "media/pixo_run.gr2";
 #endif
 
     *OutputFile = GrannyReadEntireFile(TestFilename);

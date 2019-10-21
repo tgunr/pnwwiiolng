@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::set<UINT32> TRAINERS;
+using TRAINERS = std::set<UINT32>;
 
 void chatUpdateTrainerStatus(const playerid_t playerID, bool isTrainer);
 

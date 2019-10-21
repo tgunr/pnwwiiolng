@@ -64,6 +64,8 @@ class CaptureState;
 struct ClientData;
 struct ClientClassData;
 struct ChatServerInfo;
+class HCUnitCountryChange;
+class CPCountryChangeNotice;
 
 namespace Chat
 {
@@ -127,8 +129,8 @@ public:
 	virtual ~Client();
 
 	// Login throws ClientNetError if there's a problem
-	int Login(const char* hostname, short port=0, bool wantchat=false);
-	int Login(unsigned int host, short port=0, bool wantchat=false);
+	int Login(const char* hostname, UINT16 port=0, bool wantchat=false);
+	int Login(unsigned int host, UINT16 port=0, bool wantchat=false);
 
 	int Logout();
 
@@ -149,7 +151,7 @@ public:
 
 	// set our host connection player login info; if you don't call this
 	// the client gets inited with whats in _defaultPlayerIdent
-	void SetPlayerIdent(int playerID, int otp, unsigned int appVersion);
+	void SetPlayerIdent(playerid_t playerID, UINT32 otp, unsigned int appVersion);
 	void SetCellIdent(int hostIP, int port);
 
 	// updates
@@ -166,7 +168,7 @@ public:
 
 	virtual int RequestPersonaSummaries();
 	virtual int RequestMissionWeapList(FULL_OBJ_ID const&,  bool allweapons, bool isrefresh);
-	virtual int RequestMissionWeapPost(FULL_OBJ_ID const&, const WEAPON_SPEC&, bool immediatespawn);
+	virtual int RequestMissionWeapPost(FULL_OBJ_ID const&, const WEAPON_SPEC, bool immediatespawn);
 	virtual int RequestMissionDetail(int missionID, bool join);
 	virtual int RequestMissionLookup(int missionID); // isn't necessarily a mission in your brigade
 	virtual int RequestClientSpawn(WEAPON_SERIAL const&, bool wantMobileSpawn);
@@ -201,7 +203,7 @@ public:
 	virtual int SetWaypoint(Waypoint const&);
 	virtual int RemoveWaypoint(unsigned long long handle);
 	virtual void SetActiveWaypoint(unsigned long long handle = 0);
-	virtual const ChatHandle& ActiveWaypointHandle() const;
+	virtual ChatHandle ActiveWaypointHandle() const;
 	virtual	Waypoint ActiveWaypoint() const;
 	virtual bool IsMissionLeader() const;
 
@@ -273,6 +275,7 @@ public:
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice);
 	virtual void ProcessMissionInvite(const MissionInvite& invite);
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc){}
+	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc){}
 	virtual void ProcessInstanceResult(const Instance::Result& result);
 	virtual void ProcessInstanceList(const Instance::ClientListing* list);
 	virtual void ProcessTutorialFlags(ChatHandle group, UINT64 flags);
@@ -362,6 +365,11 @@ public:
 	void SavePersona(int type = -1); // -1 == save all attributes
 	const PersonaSummary* GetPersona(int country = -1, int branch = -1) const;
 	const PersonaSummary* GetSavedPersona() const;
+	void SetSelectedPersonaCountry(WWII_COUNTRY newCountry);
+
+	//  Checks each of the Players other personas brigade to ensure it is valid following a Garrison Change.
+	//  Retrurns the number of Player personas changed. It "Should" only be 1 at most.
+	int ValidatePersonasBrigade(UINT32 unitID);
 
 	void SetSpawnOverride(double x, double y, double z);
 	void SetPosition(double x, double y, double z);
@@ -387,7 +395,8 @@ public:
 	void SetHitsPrime(UINT32 hp);
 
 	static Client* FromTeulIndex(int teulIndex);
-	static int Init(int playerID = 0, int otp = 0, unsigned int appVersion = 0);
+	static bool InitTeul(void);
+	static int Init(playerid_t playerID = 0, UINT32 otp = 0, unsigned int appVersion = 0);
 	static void Kill();
 	static void NetUpdate(int wait=0);
 	static unsigned int NetTime();
@@ -417,9 +426,9 @@ enum MSG_WAIT
 ,	CHAT_CONNECTION_WAIT
 ,	CELL_CONNECTION_WAIT
 
-// ^-- Insert stuff up here, idiot --^
+// ^-- Insert stuff up here --^
 ,	MAX_MSG_WAIT
-// X-- No, don't insert stuff down here, Salad. --X //
+// X-- No, don't insert stuff down here. --X //
 };
 
 	int WaitForMessage(MSG_WAIT msg, int timeout);

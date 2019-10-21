@@ -25,7 +25,7 @@ class Quat
 {
     public:
 
-        typedef double value_type;
+        using value_type = double;
 
         value_type  _v[4];    // a four-vector
 
@@ -79,7 +79,7 @@ class Quat
         }
 
         inline Quat& operator = (const Quat& v) { _v[0]=v._v[0];  _v[1]=v._v[1]; _v[2]=v._v[2]; _v[3]=v._v[3]; return *this; }
-    
+
         inline Quat( const Quat& v ) {  _v[0]=v._v[0];  _v[1]=v._v[1]; _v[2]=v._v[2]; _v[3]=v._v[3]; }
 
         inline bool operator == (const Quat& v) const { return _v[0]==v._v[0] && _v[1]==v._v[1] && _v[2]==v._v[2] && _v[3]==v._v[3]; }

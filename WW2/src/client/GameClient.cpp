@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "phui/MessageLoop.h"
 #include "phui/Message.h"
 
@@ -60,13 +60,18 @@
 #include "client/clientStrtQueue.h"
 #include "uimap/CPRenderer.h"
 #include "strt/strtClientMessages.h"
+#include "chat/chatMissionInvite.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatBrigadeControl.h"
+#include "chat/omgChat.h"
 #include "client/clientBrigadeControlDescriptors.h"
 #include "map/mapHCUnitLocations.h"
-#include "omg/omgChat.hxx"
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
+#include "wwii/wwiiServerTrackedObject.h"
+#include "wwii/wwiiThemes.h"
+#include "spt/sptmain.h"
+#include "wwii/wwiiClientMessages.h"
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
 
@@ -74,19 +79,25 @@ using namespace ww2;
 
 static GameClient* _playerclient;
 
+extern PPOSpecLoader specLoader;
+extern SINT32 globalMSCoolDownEnd;
+
+/************************************************************************************************/
+
+bool GameClientInitTeul(void) {
+	return Client::InitTeul();
+}
+
 /************************************************************************************************
 	GameClientLogin
 	throws ClientNetError
 *************************************************************************************************/
 
-int GameClientLogin(unsigned int host, int playerID, int otp,
-							unsigned int appVersion, short port)
+int GameClientLogin(unsigned int host, playerid_t playerID, UINT32 otp,
+							unsigned int appVersion, UINT16 port)
 {
-#if platOS == OS_MACOS
-	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
-#else
 	Client::Init(playerID, otp, appVersion);
-#endif
+
 	try
 	{
 		if(PlayerClient()->Login(host, port, true) != 0)
@@ -265,7 +276,7 @@ void GameClient::ProcessCrewPostExpired(FE_POST_EXPIRED const& crewexpired)
 void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 {
 	Client::ProcessForcedCellExit(exitCode);
-	vehExitVehicle(1, 0, 0);
+	vehExitVehicle(exitCode);
 }
 
 /************************************************************************************************
@@ -279,6 +290,8 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 	// scenarios have custom time of day and weather
 	if(!SCEN_MGR->IsActive())
 	{
+		checkThemeChange(static_cast<UINT32>(update.theme));
+
 		trnTODSetTimeOfDay(update.gametime);
 		trnTODSetTimeMultiplier((FLOAT32)update.factor);
 
@@ -569,7 +582,7 @@ void GameClient::ProcessPostDeny(FE_POST_DENY const& postDeny)
 	Client::ProcessPostDeny(postDeny);
 
 	static char callback[128];
-	sprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
+	strprintf(callback, "onspawnerror(%u)", postDeny.reasonCode);
 	jsclient->RunScript(callback);
 }
 
@@ -705,7 +718,6 @@ void GameClient::ActivateMap()
 
 		if(spawnStatus == SPAWN_PENDING)
 		{
-#pragma message ("TBD: do something here?")
 			jsclient->RunScript("onspawnerror()");
 		}
 	}
@@ -869,7 +881,11 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 		const Strat::Event& entry = packet[i];
 
 		StratDB::StratObject* const stratobj = StratDB::FindStratObject(entry.fid());
-		if(!stratobj) return;
+		if(!stratobj) 
+		{
+			Write_Debug("Strat object has no match on client for %d.%d.%u", PRA_FULL_OBJ_ID(entry.fid()));
+			continue; // We can't go trashing the whole packet because of one bad ID
+		}
 
 		switch(stratobj->StratClass())
 		{
@@ -887,8 +903,9 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 				{
 					trnUpdateObjectStatus(stratobj->SupercellX(), stratobj->SupercellY(), stratobj->Id(), entry.ownership(), -1);
 				}
-				else if (stratobj->StratClass() == SDM_CLASS_CP && (entry.flags() & CP_STAT_CONTENTION) == 0)
+				else if (stratobj->StratClass() == SDM_CLASS_CP && (!stratobj->IsLoaded() || (entry.flags() & CP_STAT_CONTENTION) == 0))
 				{
+					stratobj->SetLoaded(true);
 					_setFacilityOwnershipsToMatchCP(stratobj, data);
 				}
 			}
@@ -1079,8 +1096,10 @@ void GameClient::ProcessBrigadeControlNotice(const BrigadeControlNotice* const n
 
 	BrigadeControlDescriptor bcd = notice->getDescription();
 
-	// print out the line
-	uiChatPrintUILocLine(icons, color, bcd.label.c_str(), bcd.arg1.c_str(), bcd.arg2.c_str(), bcd.arg3.c_str(), bcd.arg4.c_str());
+	std::wstring text = uiChatAssembleUILoc(bcd.label.c_str(), bcd.arg1.c_str(), bcd.arg2.c_str(), bcd.arg3.c_str(), bcd.arg4.c_str());
+	if ( bcd.major_broadcast )
+		uiGameEvent(GAMEEVENT_ALERT, 1, text.c_str());
+	uiChatPrintLineIcon(icons, color, L"%ls", text.c_str());
 }
 
 void GameClient::ProcessHCUnitLocation(const HCUnitLocation& unitloc)
@@ -1143,23 +1162,18 @@ void GameClient::ProcessMissionStatus(const Chat::MissionStatus* ms)
 
 	SINT32 remaining = SINT32(ms->fru().cooldownRemaining());
 
-	PPOSpec* fruSpec = fpPPOGetSpec(FRU_INDEX);
-	if(!fruSpec) return;
-
 	if(remaining > 0)
 	{
-		fruSpec->coolDownEnd = frametime + remaining;
-
 		// now see if we are currently building an fru
 		// interrupt if we are because there was a mission state change
-		PlayerPlacedObject* ppo = fpPPOGet();
-
-		if(ppo && ppo->spec->id == FRU_INDEX)
+        PPOSpec *spec = specLoader.ppoGetSpec(ms->fru().subtype.get());
+		if(spec && spec->stotype == ServerTrackedObject::_UMS)
 		{
-			if(ppo->buildAt > 0)
-				ppo->Interrupt();
+            globalMSCoolDownEnd = frametime + remaining;
 
-			uiGameEvent(GAMEEVENT_PPO, 1, "ppos.fru.built");
+            PlayerPlacedObject* ppo = fpPPOGet();
+			if(ppo && ppo->buildAt > 0)
+				ppo->Interrupt();
 		}
 	}
 }
@@ -1490,7 +1504,7 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		}
 		if ( who.extendedInfo() && who.spawned() )
 		{
-			StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)who.nearCP());
+			StratDB::StratObject* so = StratDB::FindStratObject(who.nearCP());
 			if ( so != nullptr )
 			{
 				description += L" ";
@@ -1619,7 +1633,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 
 				uiChatPrintLine(locmsg.c_str()
 							, chatGetWideCallsign(msg.inviter())
-							, uiUTF8toUTF16(msg.squad().shortName())
+							, uiUTF8toUTF16(msg.squad().callsign().c_str())
 							, uiUTF8toUTF16(msg.squad().name().c_str())
 							, SquadControl::CREATE_PLAYERS_REQUIRED+1
 					);
@@ -1638,7 +1652,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 			const std::wstring& locmsg = uiLocString("squad.control.joininvite");
 			uiChatPrintLine(locmsg.c_str()
 				, chatGetWideCallsign(msg.inviter())
-				, uiUTF8toUTF16(msg.squad().shortName())
+				, uiUTF8toUTF16(msg.squad().callsign().c_str())
 				, uiUTF8toUTF16(msg.squad().name().c_str()));
 		}
 
@@ -1741,9 +1755,10 @@ void GameClient::ProcessMissionInvite(const MissionInvite& invite)
 {
 	Client::ProcessMissionInvite(invite);
 
-	// eventually we'll use this to let the host send down
-	// player or squad invites; not used for now
-	//jsclient->RunScript("game.onmissioninvite()");
+	// HACK: Squad recruiter invites are mandatory and use a different
+	// path because derp.
+	if ( invite.m_isDirective == 0 )
+		jsclient->RunScript("game.onmissioninvite()");
 }
 
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags)
@@ -1787,9 +1802,9 @@ bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
 
 static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 {
-    /* 
+    /*
      TBD - I expect something was intended here, but nothing is done currently.
-     
+
 	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : nullptr;
 	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : nullptr;
 
@@ -1810,7 +1825,7 @@ void GameClient::Edit(const char* type, const char* title, const char* value)
 //////////////////////////////////////////////////////////////////////
 // Deploy a HCUnit to a CP
 
-void HCUnit::setHomeCPID(const FULL_OBJ_ID& newHomeID)
+void HCUnit::setHomeCPID(const FULL_OBJ_ID newHomeID)
 {
 	// Is this actually a change?
 	if ( m_homeCPID == newHomeID)
@@ -1831,6 +1846,128 @@ void HCUnit::setHomeCPID(const FULL_OBJ_ID& newHomeID)
 	{
 		to->AddUnit(m_unitID);
 		to->SetUpdateTime(frametime);
+	}
+}
+
+void GameClient::ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc)
+{
+	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
+	HCUnit* replacementUnit = HCUnit::Lookup(unitloc.m_replacementUnitID);
+
+	const PersonaSummary *current = nullptr; 
+	const PersonaSummary *originalPersona = nullptr;
+	const PersonaSummary *replacementPersona = nullptr;
+
+	if (unit != nullptr)
+	{
+		if (unit->isGarrison() && unitloc.m_country != WWII_NO_COUNTRY)
+		{		
+			//  Change the Country of the Garrison Unit
+			unit->setCountry(unitloc.m_country);
+				
+			if (Client::BrigadeSelected().m_detail.brigadeID() == unitloc.m_unitID)
+			{
+				//  Cancel Spawn Reservation
+				if (WeaponSerial().serial != 0)
+					RequestMissionWeapCancel();
+
+				//  Exit Mission
+				if (SelectedMission().m_brigadeID == unitloc.m_unitID)
+					ExitMission();
+
+				//  Clear Current Mission Data
+				ResetMissionData();
+			}
+
+			if (unitloc.m_action != CHANGE_NOTHING)
+			{
+				originalPersona = GetPersona();  //  Gets the Curent Persona
+													 
+				//  Set the Original Personas BrigadeID to the Appropriate Training Unit.
+				HCUnit * trainingUnit = HCUnit::GetTrainingUnit(originalPersona->m_countryID, originalPersona->m_branchID);
+
+				if (trainingUnit != nullptr)
+				{
+					//  clientErrorLog("Original Persona's BrigadeID set to: %s (%d)", trainingUnit->m_name, trainingUnit->m_unitID);
+					SelectBrigade(trainingUnit->unitID(), true, true);
+
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					// update the jsclient
+					jsclient->UpdatePersonas();
+				}
+				replacementPersona = GetPersona(replacementUnit->m_countryID, replacementUnit->m_branchID);
+
+				PersonaSummary tempPersona = *replacementPersona;
+
+				// try to select it
+				RequestPersonaSelection(tempPersona);
+
+				if (WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 10) == 0)
+				{
+					current = GetPersona();
+				}
+
+				ResetMissionData();
+
+				if (current && *current == tempPersona)
+				{
+					SavePersona(SAVE_PERSONA);
+					SavePersona(SAVE_BRIGADE);
+
+					clientErrorLog("Replacement BrigadeID set to: %s (%d)", replacementUnit->m_name, replacementUnit->m_unitID);
+					SelectBrigade(unitloc.m_replacementUnitID, true, true);
+				}
+
+				// update the jsclient
+				jsclient->UpdatePersonas();
+
+				//  ui.dtd Entries:
+				//  <!ENTITY persona.serverselected "SYSTEM Selected Unit Replacement - The Garrison Changed {1}.">
+				//  <!ENTITY persona.serverselected.branch "Branch">
+				//  <!ENTITY persona.serverselected.country "Country">
+				//  <!ENTITY persona.serverselected.countrybranch "Country and Branch">
+				//  <!ENTITY persona.serverselected.sides "Sides">
+
+				std::wstring messageText = L"";
+
+				switch (unitloc.m_action)
+				{
+				case CHANGE_COUNTRY:
+					messageText = uiLocString("persona.serverselected.country");
+					break;
+
+				case CHANGE_SIDE:
+					messageText = uiLocString("persona.serverselected.sides");
+					break;
+
+				case CHANGE_BRANCH:
+					messageText = uiLocString("persona.serverselected.branch");
+					break;
+
+				case CHANGE_COUNTRY_BRANCH:
+					messageText = uiLocString("persona.serverselected.countrybranch");
+					break;
+
+				default:
+					//  Should NOT end up here.
+					messageText = L"";
+					break;
+				}
+
+				if (messageText != L"")
+				{
+					int icons[CHATICON_MAX] = {-1,-1,IDE_ICON_NOTE};
+					uiChatPrintUILocLine(icons, colorYELLOWALPHA, "persona.serverselected", messageText.c_str());
+				}
+				
+			}
+		}
+	}
+	else
+	{
+		clientErrorLog("Unit Invalid in country change.");
 	}
 }
 

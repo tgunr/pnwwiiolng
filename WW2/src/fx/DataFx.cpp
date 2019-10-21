@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*-----------------------------------------------------------------------
 Module: osgfxdata.cpp
 Description:
@@ -409,7 +409,7 @@ void ParseParticleElements(xmlNodePtr root, ParticleEffect* fx)
 
                 if(itr == uvStringToId.end())
                 {
-                    piExitProgram(__FILE__, __LINE__, "Bad Texture Name");
+                    piExitProgram(_FL, "Bad Texture Name");
                 }
 
                 fx->texture.push_back(itr->second);

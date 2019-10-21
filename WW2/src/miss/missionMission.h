@@ -64,7 +64,7 @@ struct MISSION_C_STRUCTURE	// The "c" components of the mission structure that c
 class Mission : public MISSION_C_STRUCTURE
 {
 public:
-	Mission(const instanceid_t& instanceID, const MISSION_SUMMARY& withSummary); // Constructor
+	Mission(const instanceid_t instanceID, const MISSION_SUMMARY& withSummary); // Constructor
 	~Mission();
 
 	// Query operators
@@ -73,7 +73,7 @@ public:
 	MSPAWN_RESULT getMobileSpawnPermission() const;
 	bool isMobileSpawnAvailable() const { return m_summary.mobileSpawnAvailable && spawner().m_active; }
 
-	bool activateMobileSpawn(Player* player, UINT32 stoUID, FLOAT64 x, FLOAT64 y, FLOAT64 z);
+	bool activateMobileSpawn(Player* player, UINT32 stoUID, SINT32 stoSubType, FLOAT64 x, FLOAT64 y, FLOAT64 z);
 
 	// Tell me whether or not this is accessible to the player
 	bool accessible(Player* player) const { return (accessibility(player) == MC_JOIN); }
@@ -82,7 +82,6 @@ public:
 	// Flag a mission as being takeable/listed because the mission leader has joined it
 	void activate();
 
-//	bool activateMobileSpawn(const MMMobileSpawnUpdate& mmsu, UINT32 cellhost, UINT16 port, UINT32 stoUID);
 	void announceMobileSpawnSTO() const;
 
 	bool addPlayer(Player* player);
@@ -143,7 +142,7 @@ public:
 	FacilityStruct* originFac() { return m_originFac; }
 	bool ongoing() const { return m_isOngoing; }
 	playerid_t playerID() const { return m_playerID; }
-	const ChatHandle& posterHandle() const { return m_poster; }
+	ChatHandle posterHandle() const { return m_poster; }
 	WWII_SIDE side() const { return (WWII_SIDE)m_side; }
 	MobileSpawn& spawner() { return m_spawner; }
 	const MobileSpawn& spawner() const { return m_spawner; }
@@ -160,5 +159,5 @@ public:
 	MobileSpawn			m_spawner;
 };
 
-typedef Mission MISSION;
+using MISSION = Mission;
 

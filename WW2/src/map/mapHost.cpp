@@ -21,12 +21,20 @@
 #include "miss/missionServerTypes.h"
 #include "miss/missionTypes.h"
 #include "mm/mmdbPersonaSelections.h"
+#include "mm/mmdbLazyFetchPersona.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtCPStruct.h"
+#include "mm/mmQueries.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiOwnershipEnums.h"
+#include "wwii/wwiiConfig.h"
 
 #include "chat/chatSupportRPCMessages.h"
+
+const int GROUP_SIZE_LIMIT=100;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -78,14 +86,10 @@ PersonaSelection::_create(Player* const player)
 		return _sendResult(player->teulIndex(), PSS_SUBSCRIPTION_LIMIT, player->accountGoodUntil());
 	}
 
-	m_personaID = player->createPersonaRecord(m_countryID, m_branchID);
-	if ( m_personaID == 0 )
-	{
-		player->debug("Persona creation failed", "Could not create new persona");
-		return _sendResult(player->teulIndex(), PSS_ERROR);
-	}
+	(new CreatePersonaQuery(*this, player))->Queue();
 
-	return _select(player);
+	// return value is ignored by the caller
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -122,30 +126,9 @@ PersonaSelection::_select(Player* const player)
 	}
 
 	// Ok - so the data looks valid
-	const PERSONA_LOAD_STATUS pls = player->selectPersona(m_personaID, m_countryID, m_branchID);
-	switch (pls)
-	{
-		case PLS_LOADED:
-			dbugLog(_FLI, "t:%d p:%u c:%s loaded persona %d ctry:%d br:%d rk:%u er:%u prog:%u", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID, player->realRank(), player->effectiveRank(), player->progress());
-			player->checksum(m_checksum);
-			player->m_hasSelectedPersonaOnce = true;
-			return _sendResult(player->teulIndex(), PSS_SELECT, player->effectiveRank(), player->progress(), player->chatPermissions(), player->accountGoodUntil());
-		break;
-		case PLS_LOCKED:
-			player->debug("Persona select refused", "side locked");
-			dbugLog(_FLN, "t:%d p:%u c:%s persona %d locked", player->teulIndex(), player->playerID(), player->callsign(), m_personaID);
-			return _sendResult(player->teulIndex(), PSS_PERSONA_LOCKED);
-		break;
-		case PLS_MISSING:
-			player->debug("Persona select refused", "missing persona");
-			dbugLog(_FLW, "t:%d p:%u c:%s no such persona %d:%d/%d", player->teulIndex(), player->playerID(), player->callsign(), m_personaID, m_countryID, m_branchID);
-			return _sendResult(player->teulIndex(), PSS_MISSING);
-		break;
-		default:
-			player->debug("Persona select refused", "internal error");
-			dbugLog(_FLW, "t:%d p:%u c:%s unknown error %d loading persona", player->teulIndex(), player->playerID(), player->callsign(), pls);
-			return _sendResult(player->teulIndex(), PSS_ERROR);
-	}
+	(new SelectPersonaQuery(*this, player))->Queue();
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -186,40 +169,41 @@ PersonaSelection::receive(SINT32 teulIndex)
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _create(player);
-		break;
+		return _create(player);
+
 		case PSS_SELECT:
 			dbugLog(_FLI, "t:%d p:%u c:%s persona selection request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _select(player);
-		break;
+		return _select(player);
+
 		case PSS_DELETE:
 			dbugLog(_FLI, "t:%d p:%u c:%s persona delete request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							);
-			return _delete(player);
-		break;
+		return _delete(player);
+
 		default:
 			dbugLog(_FLW, "t:%d p:%u c:%s invalid request type: %d", teulIndex, player->playerID(), player->callsign(), m_status);
-			return _sendResult(teulIndex, PSS_ERROR);
+		return _sendResult(teulIndex, PSS_ERROR);
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-void
-BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* const player)
+int
+BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* const player, int groupOffset)
 {
+
 	m_error = false;
 	m_count = 0;
 
-	if ( g_brigades[country][branch].empty() )
-		return;
+	if ( g_brigades[country][branch].empty() ) {
+		dbugLog(_FLN, "No brigades for this country/branch");
+		return m_count;
+	}
 
 	// Count up the players in all brigades for this country
 	BRIGADES::iterator it;
@@ -235,10 +219,15 @@ BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* con
 		}
 	}
 
+	int offset = 0;
 	BRIGADES& brigades = g_brigades[country][branch];
-	for ( it = brigades.begin(); it != brigades.end(); ++it )
+	for ( it = brigades.begin(); (it != brigades.end()) && (m_count < GROUP_SIZE_LIMIT); ++it, offset++ )
 	{
+		if (offset < groupOffset) 
+			continue;
+
 		Brigade& brigade = *(*it);
+
 		BrigadeSummary& summary = m_summaries[m_count];
 
 		summary = brigade;
@@ -253,11 +242,14 @@ BrigadeSummaries::populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* con
 
 		m_count++;
 	}
+
+	return m_count;
 }
 
 SINT32
 BrigadeSummaries::receive(SINT32 teulIndex)
 {
+
 	Player* const player = PlayerInterface::Lookup(teulIndex);
 	if ( player == nullptr )
 	{
@@ -267,29 +259,37 @@ BrigadeSummaries::receive(SINT32 teulIndex)
 
 	try
 	{
-		// -- Check that they have a persona selected
-		if ( player->personaID() == 0 )
-			throw std::logic_error("brigade request with no persona selected");
+		m_group = 0;
+		int offset = 0;
+		do {
+			// -- Check that they have a persona selected
+			if ( player->personaID() == 0 )
+				throw std::logic_error("brigade request with no persona selected");
+	
+			// -- And check that we have a valid country/side from the persona
+			WWII_COUNTRY country = player->country();
+			if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
+				throw std::logic_error("persona selected with invalid country set");
+			if ( !activeCountries[country] )
+				throw std::logic_error("persona selected with inactive country");
+	
+			BRANCH_ENUM branch = player->branch();
+			if ( branch == BRANCH_NOT_USED || branch >= MAX_BRANCHES )
+				throw std::logic_error("persona selected with invalid branch set");
+	
+			// Populate the entry
+			int groupsAdded = populate(country, branch, player, offset);
+			offset += groupsAdded;	
+			
+			m_lastGroup = (groupsAdded < GROUP_SIZE_LIMIT);
 
-		// -- And check that we have a valid country/side from the persona
-		WWII_COUNTRY country = player->country();
-		if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-			throw std::logic_error("persona selected with invalid country set");
-		if ( !activeCountries[country] )
-			throw std::logic_error("persona selected with inactive country");
-
-		BRANCH_ENUM branch = player->branch();
-		if ( branch == BRANCH_NOT_USED || branch >= MAX_BRANCHES )
-			throw std::logic_error("persona selected with invalid branch set");
-
-		// Populate the entry
-		populate(country, branch, player);
-
-		send(teulIndex);
+			send(teulIndex);
+			m_group++;
+		} while (!m_lastGroup);
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what());
+		dbugLog(_FLA, "Error sending summaries t:%d p:%u c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what());
 
 		m_error = true;
 		m_count = 0;
@@ -300,11 +300,44 @@ BrigadeSummaries::receive(SINT32 teulIndex)
 	return 0;
 }
 
+bool
+BrigadeSelection::_autoSelectCheck(Player* player, Brigade* brigade)
+{
+	bool retVal = false;
+	// if there is no brigade selected or the selected brigade belongs to the wrong side
+	// the server should choose
+	if ( brigade == nullptr || (brigade->side() != player->side()))
+	{
+		dbugLog(_FLN, "Server automatically selecting brigade for player %d", player->playerID());
+
+		// Select the training brigade for the country/branch we started
+		WWII_COUNTRY country = (brigade != nullptr)?brigade->m_countryID:player->country();
+		BRANCH_ENUM branch = (brigade != nullptr)?brigade->m_branchID:player->branch();
+		brigade = (Brigade *)HCUnit::GetTrainingUnit(country, branch);
+		if (brigade == nullptr)
+		{
+			dbugLog(_FLW, "No training unit found for country %d, branch %d", country, branch);
+			m_detail.m_unitID = 0;
+		}
+		else
+		{
+			dbugLog(_FLN, "Unit ID %d selected for player %d", brigade->m_unitID, player->playerID());
+		}
+		m_detail = *brigade;
+		mmdbSavePersonaSelection(player);
+		retVal = true;
+	}
+	return retVal;
+}
+
 SINT32
 BrigadeSelection::_query(Player* const player, const Brigade* const brigade)
 {
 	///TODO: Determine if they have permission to see this brigade
 	m_detail = *brigade;
+
+	// in case the brigade is no longer valid ...
+	_autoSelectCheck(player, (Brigade *)&m_detail);
 
 	return _sendResult(player->teulIndex(), BRIG_DETAIL);
 }
@@ -312,6 +345,9 @@ BrigadeSelection::_query(Player* const player, const Brigade* const brigade)
 SINT32
 BrigadeSelection::_select(Player* player, Brigade* brigade)
 {
+	if (_autoSelectCheck(player, brigade))
+		return _sendResult(player->teulIndex(), BRIG_SELECT);
+
 	if ( !player->SelectBrigade(brigade) )
 		return _sendResult(player->teulIndex(), BRIG_RESTRICTED);
 
@@ -332,7 +368,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 		return _sendResult(teulIndex, BRIG_ERROR);
 	}
 
-	if ( m_detail.brigadeID() == 0 )
+	if (m_detail.brigadeID() == 0 && m_status != BRIG_SELECT)
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_ID0);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with brigade id 0"
@@ -348,7 +384,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	}
 
 	Brigade* const brigade = mapFindBrigade(m_detail.brigadeID());
-	if ( brigade == nullptr )
+	if (brigade == nullptr && m_status != BRIG_SELECT)
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_NONE, LSTR_BDESEL_REFUSED_BDE);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request for non-existant brigade %d"
@@ -360,19 +396,17 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	{
 		case BRIG_DETAIL:
 			return _query(player, brigade);
-		break;
+			break;
 
 		case BRIG_SELECT:
 			return _select(player, brigade);
-		break;
+			break;
 
 		default:
 			dbugLog(_FLW, "t:%d p:%u c:%s invalid selection.m_status: %d"
 							, teulIndex, player->playerID(), player->callsign(), m_status);
-		return _sendResult(teulIndex, BRIG_ERROR);
+			return _sendResult(teulIndex, BRIG_ERROR);
 	}
-
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -497,56 +531,62 @@ MissionList::receive(SINT32 teulIndex) {
 		std::multimap<int, const Mission*> missions;
 		UINT32 highestCount = 0;
 
-		auto add_missions = 
-		[&] (WWII_COUNTRY country, BRANCH_ENUM branch) {
-			for ( BRIGADES::const_iterator brig = g_brigades[country][branch].begin();
-			      brig != g_brigades[(size_t)country][(size_t)branch].end() ; ++brig ) {
-				for ( BrigadeMissions::const_iterator miss = (*brig)->m_missionList.begin();
-				      miss != (*brig)->m_missionList.end() ; ++miss ) {
-					const Mission* mission = *miss;
+		auto add_missions =
+		[&] (BRANCH_ENUM branch) {
 
-					// If we can't spawn, don't bother.
-					if ( ! mission->accessible(player) && mission->accessibility(player) != MC_BRIGADE )
+			// NEW: iterate through all countries since since garrisons can now change allegiences
+			for ( size_t countryCheck = 0 ; countryCheck < MAX_COUNTRIES ; ++countryCheck ) {
+				BRIGADES nextList = g_brigades[countryCheck][(size_t)branch];
+
+				for ( BRIGADES::const_iterator brig = nextList.begin(); brig != nextList.end() ; ++brig ) {
+
+					// NEW: make sure the brigade's country really is of the requesting side first
+					if ( wwiiSide((*brig)->country()) != player->side() )
 						continue;
-					if ( mission->missionType() == RECON || mission->missionType() == RESUPPLY )
-						continue;
 
-					float value = static_cast<float>(mission->numTakers()) ;
-					// TODO: Move to script to be configured by producers.
-					{
-						const CPStruct* target = mission->targetCP();
+					for ( BrigadeMissions::const_iterator miss = (*brig)->m_missionList.begin();
+					      miss != (*brig)->m_missionList.end() ; ++miss ) {
+						const Mission* mission = *miss;
 
-						// NOTE: May make FB attacks work wrong? They're probably poor
-						// choices for new players anyway...
-						if ( mission->side() != target->ControllingSide() ) {
-							// Attacking mission.
-							if ( mission->isMobileSpawnAvailable() )
-								value *= 2.0f;
-						} else {
-							value *= 1.25f; // Slight preference for defense.
+						// If we can't spawn, don't bother.
+						if ( ! mission->accessible(player) && mission->accessibility(player) != MC_BRIGADE )
+							continue;
+						if ( mission->missionType() == RECON || mission->missionType() == RESUPPLY )
+							continue;
 
-							if ( target->isContested() )
-								value *= 2.5f;
+						float value = static_cast<float>(mission->numTakers()) ;
+						// TODO: Move to script to be configured by producers.
+						{
+							const CPStruct* target = mission->targetCP();
+
+							// NOTE: May make FB attacks work wrong? They're probably poor
+							// choices for new players anyway...
+							if ( mission->side() != target->ControllingSide() ) {
+								// Attacking mission.
+								if ( mission->isMobileSpawnAvailable() )
+									value *= 2.0f;
+							} else {
+								value *= 1.25f; // Slight preference for defense.
+
+								if ( target->isContested() )
+									value *= 2.5f;
+							}
+
+							if ( ! target->hasHeavyInfantryEWS() )
+								value *= 0.25f;
+
+							// TODO: Big boost for missions with squadmates.
 						}
 
-						if ( ! target->hasHeavyInfantryEWS() )
-							value *= 0.25f;
-
-						// TODO: Big boost for missions with squadmates.
+						missions.insert(std::make_pair((int)value, mission)) ;
+						if ( mission->numTakers() > highestCount )
+							highestCount = mission->numTakers();
 					}
-
-					missions.insert(std::make_pair((int)value, mission)) ;
-					if ( mission->numTakers() > highestCount )
-						highestCount = mission->numTakers();
 				}
 			}
 		} ;
 
-		for ( int country = 0 ; country < MAX_COUNTRIES ; ++country ) {
-			if ( wwiiSide(country) != player->side() )
-				continue;
-			add_missions((WWII_COUNTRY)country, player->branch());
-		}
+		add_missions(player->branch());
 
 		//------
 
@@ -602,5 +642,173 @@ ActiveMission::populate(const Mission* const mission)
 	m_countryID = mission->country();
 	m_branchID = mission->branch();
 	m_brigadeID = mission->brigade()->brigadeID();
+}
+
+//  #include <list>
+//  #include <vector>
+#include "strt/strtLinkStruct.h"
+#include "strt/strtData.h"
+
+//////////////////////////////////////////////////////////////////////
+//  Moved from strtCaptureAction.cpp and revised
+//  Return a list of Garrison Units in the Target CP (FULL_OBJ_ID).
+
+void BrigadeSelection::GetGarrisonUnits(std::vector<HCUnit> &unitsList, FULL_OBJ_ID cpObjID)
+{
+	unitsList.clear();
+
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID() == cpObjID)
+			{
+				unitsList.push_back(*it->second);
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Get a Favoured Garrison Unit adjacent (linked) to the Target CP (FULL_OBJ_ID).
+
+HCUnit *BrigadeSelection::GetReplacementGarrison(UINT32 originalGarrisonID, WWII_COUNTRY originalCountry)
+{
+	//  Returns:  a pointer to the Selected Replacement HCUnit  OR  nullptr.
+	
+	HCUnit*	targrHCUnit = HCUnit::Lookup(originalGarrisonID);
+	if (targrHCUnit == nullptr) { return nullptr; }
+
+	return GetReplacementGarrison(targrHCUnit->homeCPID(), originalCountry);
+}
+
+HCUnit *BrigadeSelection::GetReplacementGarrison(FULL_OBJ_ID cpObjID, WWII_COUNTRY originalCountry)
+{
+	//  Returns:  a pointer to the Selected Replacement HCUnit  OR  nullptr.
+
+	HCUnit* retHCUnit = nullptr;
+
+	std::vector<UINT32> sameCountry;	//  Land Garrisons - Same Country
+	std::vector<UINT32> sameSide;		//  Land Garrisons - Same Side
+	std::vector<UINT32> otherUnits;		//  Other Garrison Units present
+
+	UINT32 selectedUnitID = 0;
+	bool unitSelected = false;
+
+	CPStruct *cp = strtGetCP(cpObjID);
+	if (cp == nullptr) { return nullptr; }
+
+	//  TODO: Add Checking of the Origin CP (cpObjID) for other (different Branch) suitable units.
+
+	for (auto it = cp->m_links.begin(), end = cp->m_links.end(); it != end; ++it) //  Iterate though linked towns list
+	{
+		LinkStruct *outLink = *it;
+		if (PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr))
+			continue;
+
+		const CPStruct *const otherCP = outLink->endDepot->cp;
+
+		//  Only look at Friendly Towns
+		if (otherCP->side == wwiiSide(originalCountry))
+		{
+			std::vector<HCUnit> garrisonList;
+
+			//  Get the Garrison Units within the Linked Town
+			GetGarrisonUnits(garrisonList, otherCP->fullObjID);
+
+			for (auto it = garrisonList.begin(), end = garrisonList.end(); it != end; ++it)
+			{
+				//  Place each unit into the apprioriate list
+				if (it->branch() == BRANCH_LAND)
+				{
+					//  Land Branch
+					if (it->country() == originalCountry)
+					{
+						//  Land Garrisons - Same Country
+						sameCountry.push_back(it->unitID());
+					}
+					else
+					{
+						//  Land Garrisons - Same Side
+						sameSide.push_back(it->unitID());
+					}
+				}
+				else
+				{
+					//  Other Garrison Units present
+					otherUnits.push_back(it->unitID());
+				}
+			}
+		}
+	}
+
+	//  Select the Garrison Unit
+	unitSelected = false;
+
+	if (!sameCountry.empty()) //  First Choice Units:  Land Garrisons - Same Country
+	{
+		int pickMe = 0;
+
+		if (sameCountry.size() > (size_t)1)
+		{
+			srand((unsigned int)time(NULL));
+			pickMe = (rand() % (unsigned int)sameCountry.size());
+		}
+
+		//  Pick One
+		selectedUnitID = sameCountry[pickMe];
+		unitSelected = true;
+	}
+
+	if (unitSelected == false)
+	{
+		if (!sameSide.empty()) //  Second Choice Units: Land Garrisons - Same Side
+		{
+			int pickMe = 0;
+
+			if (sameSide.size() > (size_t)1)
+			{
+				srand((unsigned int)time(NULL));
+				pickMe = (rand() % (unsigned int)sameSide.size());
+			}
+
+			//  Pick One
+			selectedUnitID = sameSide[pickMe];
+			unitSelected = true;
+		}
+
+		if (!otherUnits.empty() && unitSelected == false) //  Third Choice Units: Other Garrison Units present
+		{
+			int pickMe = 0;
+
+			if (otherUnits.size() > (size_t)1)
+			{
+				srand((unsigned int)time(NULL));
+				pickMe = (rand() % (unsigned int)otherUnits.size());
+			}
+
+			//  Pick One
+			selectedUnitID = otherUnits[pickMe];
+			unitSelected = true;
+		}
+	}
+
+	sameCountry.clear();
+	sameSide.clear();
+	otherUnits.clear();
+
+	if (unitSelected == true)
+	{
+		//  Unit Selected
+		HCUNIT_INDEX::iterator it = hcUnits.find(selectedUnitID);
+		retHCUnit = (it != hcUnits.end()) ? it->second : nullptr;
+	}
+	else
+	{
+		//  No Unit Selected OR None Available
+		retHCUnit = nullptr;
+	}
+
+	return retHCUnit;
 }
 

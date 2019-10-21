@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Mon Jan 22 10:21:14 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -24,7 +24,7 @@ static const SINT32 WEAP_SPAWNABLE_BITS = 3;
 #define WEAP_COUNT_MAX_XMIT 999
 //(2^(WEAP_COUNT_BITS-1))
 
-static inline SINT32 missPackWeaponCounter(LOGICAL mode, UCHAR* data, SINT32 offset, WeaponCounter* object, SINT32 /*size*/)
+static inline SINT32 missPackWeaponCounter(PackMode mode, UCHAR* data, SINT32 offset, WeaponCounter* object, SINT32 /*size*/)
 {
 	if (mode == TEUL_PACK)
 	{
@@ -54,7 +54,7 @@ static inline SINT32 missPackWeaponCounter(LOGICAL mode, UCHAR* data, SINT32 off
 }
 
 SINT32
-FacilityWeaponList::packer(LOGICAL mode, ACTION_OBJECT* a)
+FacilityWeaponList::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&(m_status), 8);
 	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_fullObjID, 0);
@@ -81,7 +81,7 @@ FacilityWeaponList::packer(LOGICAL mode, ACTION_OBJECT* a)
 	return a->offset;
 }
 
-SINT32 missPackMISSION_POST_REPLY(LOGICAL mode, UCHAR* data,
+SINT32 missPackMISSION_POST_REPLY(PackMode mode, UCHAR* data,
 					SINT32 offset , MISSION_POST_REPLY* object,
 					SINT32 /*size*/)
 {
@@ -106,7 +106,7 @@ SINT32 missPackMISSION_POST_REPLY(LOGICAL mode, UCHAR* data,
 // actually passed a MISSION_SUMMARY, but we only pack the minimum number of
 // items in it, to save bandwidth, mostly so we can get as many chars as
 // possible for the desc.
-SINT32 missPackMISSION_POST_REQ(LOGICAL mode, UCHAR* data,
+SINT32 missPackMISSION_POST_REQ(PackMode mode, UCHAR* data,
 					SINT32 offset , MISSION_POST_REQ* object,
 					SINT32 /*size*/)
 {
@@ -128,7 +128,7 @@ SINT32 missPackMISSION_POST_REQ(LOGICAL mode, UCHAR* data,
 	return offset;
 }
 
-SINT32 missPackWEP_LIST_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, WEP_LIST_REQ* object, SINT32 /*size*/)
+SINT32 missPackWEP_LIST_REQ(PackMode mode, UCHAR* data, SINT32 offset, WEP_LIST_REQ* object, SINT32 /*size*/)
 {
 	if (object == nullptr)
 	{
@@ -143,7 +143,7 @@ SINT32 missPackWEP_LIST_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, WEP_LIST_R
 }
 
 SINT32
-missPackMISSION_SUMMARY(LOGICAL mode, UCHAR* data, SINT32 offset, MISSION_SUMMARY* object, SINT32 /*size*/)
+missPackMISSION_SUMMARY(PackMode mode, UCHAR* data, SINT32 offset, MISSION_SUMMARY* object, SINT32 /*size*/)
 {
 	if (object == nullptr)
 	{
@@ -172,7 +172,7 @@ missPackMISSION_SUMMARY(LOGICAL mode, UCHAR* data, SINT32 offset, MISSION_SUMMAR
 }
 
 //MISSION RESULTS are only sent to the FRONT_END
-SINT32 missPackMISSION_RESULTS(LOGICAL mode, UCHAR* packed, SINT32 offset, MISSION_RESULTS* object, SINT32 /*size*/)
+SINT32 missPackMISSION_RESULTS(PackMode mode, UCHAR* packed, SINT32 offset, MISSION_RESULTS* object, SINT32 /*size*/)
 {
 	if (object == nullptr)
 	{
@@ -192,6 +192,13 @@ SINT32 missPackMISSION_RESULTS(LOGICAL mode, UCHAR* packed, SINT32 offset, MISSI
 		offset = wwiiPackWeaponSpec(mode, packed, offset, &object->hitArray[i].vehType, 0);
 		offset = teulPackUINT16(mode, packed, offset, &(object->hitArray[i].numVehiclesHit), 12);	// } 24 bit alignment
 		offset = teulPackUINT16(mode, packed, offset, &(object->hitArray[i].numVehiclesKilled), 12);	// }
+	}
+
+    // Populate the packet with the enemies array
+	for(UINT32 i = 0; i < object->kills; ++i)
+	{
+		offset = wwiiPackWeaponSpec(mode, packed, offset, &object->enemiesArray[i].vehSpec, 0);
+		offset = wwiiPackHandle(mode, packed, offset, &(object->enemiesArray[i].callsignId), 0);
 	}
 
 	offset = teulPackUINT32(mode, packed, offset, (UINT32*)&object->missionSuccess, 1);	// }
@@ -261,7 +268,7 @@ SINT32 missPackMISSION_RESULTS(LOGICAL mode, UCHAR* packed, SINT32 offset, MISSI
 }
 
 SINT32
-RoomListEntry::packer(LOGICAL mode, ACTION_OBJECT* a)
+RoomListEntry::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 3);	//} 8 bits
 	a->offset = teulPackUINT16(mode, a->packed, a->offset, (UINT16*)&m_flags, 5);		//}
@@ -277,7 +284,7 @@ RoomListEntry::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-RoomList::packer(LOGICAL mode, ACTION_OBJECT* a)
+RoomList::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->packer(mode, m_numEntries, 8);
 
@@ -290,7 +297,7 @@ RoomList::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-missPackMISS_LAUNCH_UPDATE(LOGICAL mode, UCHAR* data, SINT32 offset, MISS_LAUNCH_UPDATE* const object, SINT32 /*size*/)
+missPackMISS_LAUNCH_UPDATE(PackMode mode, UCHAR* data, SINT32 offset, MISS_LAUNCH_UPDATE* const object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &(object->missionID), 0);
 

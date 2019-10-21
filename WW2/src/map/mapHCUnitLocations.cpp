@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Date: Tue Nov 29 17:20:56 CST 2005
 //
@@ -14,10 +14,19 @@
 #include "wwii/wwiiPack.h"
 
 SINT32
-HCUnitLocation::packer(LOGICAL mode, ACTION_OBJECT* a)
+HCUnitLocation::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID, 0);
 	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_homeCPID, 0);
 	return a->offset;
 }
 
+SINT32
+HCUnitCountryChange::packer(PackMode mode, ACTION_OBJECT* a)
+{
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_country, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_replacementUnitID, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_action, 0);
+	return a->offset;
+}

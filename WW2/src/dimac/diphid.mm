@@ -95,7 +95,7 @@ const KEYCODE_MAP_ELEM KEYCODE_MAP[] =
 	{']',				DIK_RBRACKET,		IAC_RIGHTBRACKET,		kHIDUsage_KeyboardCloseBracket},			
 	{'O',				DIK_O,				IAC_O,					kHIDUsage_KeyboardO},						
 	{'U',				DIK_U,				IAC_U,					kHIDUsage_KeyboardU},						
-	{'[',				DIK_LBRACKET,		IAC_LEFTBRACKET,		kHIDUsage_KeyboardOpenBracket},				
+	{'[',				DIK_LBRACKET,		IAC_LEFTBRACKET,		kHIDUsage_KeyboardOpenBracket},
 	{'I',				DIK_I,				IAC_I,					kHIDUsage_KeyboardI},						
 	{'P',				DIK_P,				IAC_P,					kHIDUsage_KeyboardP},						
 	{0,					DIK_Return,			IAC_ENTER,				kHIDUsage_KeyboardReturnOrEnter},			
@@ -232,7 +232,6 @@ static void 	_SortDeviceList(pRecDevice*, UINT32 numDevices);
 static void 	_AssignDeviceNumbers(pRecDevice*, UINT32 numDevices, UINT32* ids, UINT32 numIDs);
 static void 	_LoadAxisCalibration(HID_ELEMENT*, int pos);
 static void 	_LoadJoystickIDs(UINT32* ids);
-static UINT32 	_vcodeToIAC(UINT32 vcode);
 
 static const KEYCODE_MAP_ELEM* _lookupElemByASCII(UINT32 ascii);
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik);
@@ -271,6 +270,23 @@ LOGICAL dipInit(void)
 	
 	return TRUE;
 }
+
+LOGICAL dimainInitJoysticks()
+{
+
+    return dipSetupJoystick();
+}
+
+void dimainKillJoysticks()
+{
+    // no need to kill anything on mac side, just re-init
+}
+
+void dimainInitTrackIR()
+{
+    // TODO: no support yet for trackIR
+}
+
 
 LOGICAL dipSetupKeyboard(void)
 {	
@@ -483,6 +499,7 @@ LOGICAL dipSetupJoystick(void)
                             _StickElements[i].iac = IAC_JOYSTICK_ROTX[idx];
                             break;
                         case kHIDUsage_GD_Ry:
+                        case kHIDUsage_GD_Dial:
                             _StickElements[i].type = HID_AXIS;
                             _StickElements[i].iac = IAC_JOYSTICK_ROTY[idx];
                             break;
@@ -496,6 +513,8 @@ LOGICAL dipSetupJoystick(void)
                                 _StickElements[i].iac = IAC_JOYSTICK_POV_N[idx][povnum];
                                 povnum++;
                             }
+                            break;
+                        default:
                             break;
                     }
 					// calibrate
@@ -539,11 +558,13 @@ LOGICAL dipSetupMouse(void)
 
 void checkIfInFront()
 {
-    pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
-    pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
-    appHidden = !NSApp.active || (runningApp != activeWW2Id);
-    if (appHidden) {
-        lastmouseinit = FALSE;
+    @autoreleasepool {
+        pid_t runningApp = [[[NSWorkspace sharedWorkspace] frontmostApplication] processIdentifier];
+        pid_t activeWW2Id = [[NSProcessInfo processInfo] processIdentifier];
+        appHidden = !NSApp.active || (runningApp != activeWW2Id);
+        if (appHidden) {
+            lastmouseinit = FALSE;
+        }
     }
 }
 
@@ -610,7 +631,10 @@ static void realDipSendCocoaKeyboardMouseEvents()
 
         if (cursorHidden && ((mousex < 100 || mousex > (ddpGetWidth() - 100)) || (mousey < 100 || mousey > (ddpGetHeight() - 100))))
         {
-            CGPoint c = { static_cast<CGFloat>(ddpGetWidth() / 2), static_cast<CGFloat>(ddpGetHeight() / 2) };
+            
+            CGPoint c = {
+                static_cast<CGFloat>(ddpGetCenterX()),
+                static_cast<CGFloat>(ddpGetCenterY()) };
             
             CGAssociateMouseAndMouseCursorPosition(false);
             /* Why is this here? We aren't posting a synthetic event, that's in
@@ -626,8 +650,8 @@ static void realDipSendCocoaKeyboardMouseEvents()
             //);
             CGWarpMouseCursorPosition(c);
             CGAssociateMouseAndMouseCursorPosition(true); 
-            lastmousex = ddpGetWidth() / 2;
-            lastmousey = ddpGetHeight() / 2;
+            lastmousex = static_cast<int>(c.x);
+            lastmousey = static_cast<int>(c.y);
         }
         else
         {
@@ -946,7 +970,7 @@ int dipHasKeyboard()
 
 int dipHasMouse()
 {
-	// Because 'false' would mean you are a fucktard.
+	// We don't support lacking a mouse.
 	return 1 ;
 }
 
@@ -1174,34 +1198,6 @@ void _LoadJoystickIDs(UINT32* ids)
 		ids[i] = [[NSUserDefaults standardUserDefaults]	
               integerForKey:[NSString stringWithFormat:@"joy%d", i+1]];
 	}
-}
-
-static UINT32 _vcodeToIAC(UINT32 vcode)
-{
-	static UINT32 state = 0;
-	static 	void* kptr = NULL;
-  
-	UINT32 iac, keytrans;
-	UCHAR c;
-	
-	iac = 0;
-	
-	if(!kptr)
-		kptr  = (void*)GetScriptManagerVariable(smKCHRCache);
-  
-	if(_DIKtoASCII[vcode]) // NOTE: this assumes that all ASCII keys are always grouped in the same spot on the keyboard
-	{
-		keytrans = KeyTranslate(kptr, vcode, (unsigned long*)&state);
-		c = ((UCHAR*)&keytrans)[3];
-		
-		if(isascii(c) && c < MAX_KEYS)
-			iac = _ASCIItoIAC[c];
-	}
-  
-	if(iac == 0)
-		iac  = _DIKtoIAC[vcode];
-  
-	return iac;	
 }
 
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik)

@@ -32,6 +32,10 @@ enum fpsInfantryTypes
 	GERMAN_ML,
 	FRENCH_ML,
 	AMERICAN_INFANTRY,
+	ITALIAN_INFANTRY,
+	AMERICAN_PARA_PACK,
+	AMERICAN_PARA_NOPACK,
+	AMERICAN_PARA_PACK_SELF,
 	NUM_INFANTRY_TYPES
 };
 
@@ -110,6 +114,8 @@ enum fpsWeaponTypes
 	M3A1,
 	MP34,
 	FG42G,
+	CARCANO,
+	BERETTA38,
 	NUM_WEAPONS
 };
 // tolua_end
@@ -198,7 +204,7 @@ enum fpFPSIconType
 };
 
 // tolua_begin
-enum fpFPSPositions
+enum fpFPSPositions : int
 {
 	FPS_POSITION_STAND,
 	FPS_POSITION_CROUCH,
@@ -546,7 +552,7 @@ public:
 	FLOAT32				leanTime, leanMinSpeed, leanMaxSpeed;
 
 	// bridge specials
-	FLOAT64				bridgeDamageJoules, bridgeRepairJoules;
+	FLOAT64				bridgeDamageJoules, bridgeRepairJoules, fbDamageJoules;
 
 	FLOAT32				redScreenFadeTime;
 	FLOAT32				redScreenMinAlpha;

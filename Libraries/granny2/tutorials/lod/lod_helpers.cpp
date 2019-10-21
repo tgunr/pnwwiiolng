@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/lod/lod_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "lod.h"
 
@@ -84,68 +84,8 @@ bool InitializeD3D()
         return false;
     }
 
-
-    ID3DXBuffer* ErrorBuffer = NULL;
-    if (D3DXCreateEffectFromFile(g_pD3DDevice,
-                                        ShaderFile,
-                                        NULL,
-                                        NULL,
-#if !defined(DEBUG_VS)
-                                        0,
-#else
-                                        D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION,
-#endif
-                                        NULL,
-                                        &g_pEffect, &ErrorBuffer) != S_OK)
-    {
-        OutputDebugString((char*)ErrorBuffer->GetBufferPointer());
-        CHECKED_RELEASE(ErrorBuffer);
+    if (!InitSimpleModelHelper(g_pD3DDevice))
         return false;
-    }
-
-    g_hMatObj2World     = g_pEffect->GetParameterByName ( NULL, "ObjToWorld" );
-    g_hMatWorld2View    = g_pEffect->GetParameterByName ( NULL, "WorldToView" );
-    g_hMatView2Clip     = g_pEffect->GetParameterByName ( NULL, "ViewToClip" );
-    g_hDirFromLight     = g_pEffect->GetParameterByName ( NULL, "DirFromLight" );
-    g_hLightColor       = g_pEffect->GetParameterByName ( NULL, "LightColour" );
-    g_hAmbientColor     = g_pEffect->GetParameterByName ( NULL, "AmbientColour" );
-    g_hSkinningMatrices = g_pEffect->GetParameterByName ( NULL, "BoneMatrices" );
-    g_hDiffuseTexture   = g_pEffect->GetParameterByName ( NULL, "diffuse_texture" );
-
-    g_SkinnedTechnique = g_pEffect->GetTechniqueByName ( "Skinned" );
-    if (FAILED(g_pEffect->ValidateTechnique(g_SkinnedTechnique)))
-        return false;
-
-    g_RigidTechnique = g_pEffect->GetTechniqueByName ( "Rigid" );
-    if (FAILED(g_pEffect->ValidateTechnique(g_RigidTechnique)))
-        return false;
-
-
-    // Create the rigid and skinned vertex declarations
-    {
-        D3DVERTEXELEMENT9 VertexElementsRigid[] = {
-            { 0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
-            { 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,   0 },
-            { 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
-            D3DDECL_END()
-        };
-
-        // Note the position[1-3] elements are pulled from vertex
-        // stream 1, rather than 0.  We'll be binding stream 1 to our
-        // matrix palette.  Essentially we're hijacking those vertex
-        // semantics to represent a set of 4x3 matrices.
-        const D3DVERTEXELEMENT9 VertexElementsSkinned[] = {
-            { 0,  0, D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION,     0 },
-            { 0, 12, D3DDECLTYPE_UBYTE4N, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT,  0 },
-            { 0, 16, D3DDECLTYPE_UBYTE4,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES, 0 },
-            { 0, 20, D3DDECLTYPE_FLOAT3,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL,       0 },
-            { 0, 32, D3DDECLTYPE_FLOAT2,  D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD,     0 },
-            D3DDECL_END()
-        };
-
-        g_pD3DDevice->CreateVertexDeclaration( VertexElementsRigid,   &g_pVertexDecl_Rigid   );
-        g_pD3DDevice->CreateVertexDeclaration( VertexElementsSkinned, &g_pVertexDecl_Skinned );
-    }
 
     return true;
 }
@@ -153,36 +93,10 @@ bool InitializeD3D()
 
 void CleanupD3D()
 {
-    CHECKED_RELEASE(g_pEffect);
-    CHECKED_RELEASE(g_pVertexDecl_Skinned);
-    CHECKED_RELEASE(g_pVertexDecl_Rigid);
+    CleanupSimpleModelHelper();
     CHECKED_RELEASE(g_pD3DDevice);
     CHECKED_RELEASE(g_pD3D);
 }
-
-
-void TransposedMatrix4x4(granny_real32 *Matrix)
-{
-    granny_real32 TMatrix[16];
-    static const int remaps[16] = {
-        0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15
-    };
-
-    for (int i = 0; i < 16; i++)
-        TMatrix[i] = Matrix[remaps[i]];
-    memcpy(Matrix, TMatrix, sizeof(TMatrix));
-}
-
-void SetTransposedMatrix4x4(D3DXHANDLE ShaderConstant,
-                            float const *Matrix )
-{
-    float TMatrix[16];
-    memcpy(TMatrix, Matrix, sizeof(TMatrix));
-    TransposedMatrix4x4(TMatrix);
-
-    g_pEffect->SetMatrix(ShaderConstant, (D3DXMATRIX const*)Matrix);
-}
-
 
 
 //-------------------------------------------------------------------------------------
@@ -231,7 +145,7 @@ MainWindowCallback(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
             };
 
             extern DemoScene GlobalScene;
-			GlobalScene.LODNotch += Incr;
+            GlobalScene.LODNotch += Incr;
             if (GlobalScene.LODNotch < 0) GlobalScene.LODNotch = 0;
         } break;
 
@@ -247,71 +161,6 @@ MainWindowCallback(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
     }
 
     return(Result);
-}
-
-
-DemoTexture::DemoTexture()
-  : Name(NULL),
-    TextureBuffer(NULL)
-{
-
-}
-
-DemoTexture::~DemoTexture()
-{
-    delete [] Name;
-    Name = NULL;
-
-    CHECKED_RELEASE(TextureBuffer);
-}
-
-DemoMesh::DemoMesh()
-  : Mesh(NULL),
-    MeshBinding(NULL),
-    IndexBuffer(NULL),
-    VertexBuffer(NULL)
-{
-
-}
-
-DemoMesh::~DemoMesh()
-{
-    // We don't own these
-    Mesh = NULL;
-    MaterialBindings.clear();
-
-    // We do own these
-    if (MeshBinding)
-    {
-        GrannyFreeMeshBinding(MeshBinding);
-        MeshBinding = NULL;
-    }
-
-    CHECKED_RELEASE(IndexBuffer);
-    CHECKED_RELEASE(VertexBuffer);
-}
-
-DemoModel::DemoModel()
-  : ModelInstance(NULL)
-{
-
-}
-
-DemoModel::~DemoModel()
-{
-    if (ModelInstance)
-    {
-        GrannyFreeModelInstance(ModelInstance);
-        ModelInstance = NULL;
-    }
-
-    {for(granny_uint32x i = 0; i < BoundMeshes.size(); ++i)
-    {
-        delete BoundMeshes[i];
-        BoundMeshes[i] = NULL;
-    }}
-
-    BoundMeshes.clear();
 }
 
 DemoScene::DemoScene()

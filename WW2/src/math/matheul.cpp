@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /**** Euler.c - Convert Euler angles to/from matrix or quat ****/
 /* Ken Shoemake, 1993 */
 

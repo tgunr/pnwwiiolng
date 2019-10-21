@@ -112,6 +112,10 @@ struct mlPositionData
 	SINT8 HatchSound[ML_MAX_CREW_POSITIONS][32];
 	SINT8 CanopyCloseSound[ML_MAX_CREW_POSITIONS][32];
 	SINT8 HatchCloseSound[ML_MAX_CREW_POSITIONS][32];
+	SINT8 DeploySound[ML_MAX_CREW_POSITIONS][32];
+	SINT8 UndeploySound[ML_MAX_CREW_POSITIONS][32];
+	FLOAT32 DeploySoundVolume[ML_MAX_CREW_POSITIONS];
+	FLOAT32 UndeploySoundVolume[ML_MAX_CREW_POSITIONS];
 
 	UINT32 NumberOfSecondaryWeapons[ML_MAX_CREW_POSITIONS]; // number of secondary weapon groups available, minus 1
 	SINT8 SecondaryWeaponMsg[ML_MAX_CREW_POSITIONS][ML_MAX_WEAPON_GROUPINGS][32]; // what message to display when selecting this weapon group
@@ -139,7 +143,7 @@ struct mlBuoyancyData
 
 struct fpPersonData;
 
-typedef struct mlVehicleData
+struct mlVehicleData
 {
 	UCHAR 	VehicleName[80];
 	UCHAR 	VehicleObjectName[80];
@@ -416,6 +420,7 @@ typedef struct mlVehicleData
     SINT32  bombbayDoorSoundId;
     SINT32  gearJamSoundId;
     SINT32  canopySoundId[ML_MAX_CREW_POSITIONS];
+    SINT32  deploySoundId; // Note: Not per-position since deployment is currently per-vehicle.
 
 // Collision
 	trnCDTerrainObject* 	MedTrnList[ML_NUM_MED_LIST_ELEMENTS+1]; // anything within 2km of vehicle
@@ -490,11 +495,11 @@ typedef struct mlVehicleData
 	FLOAT32 StaticFrictionMod;
 	FLOAT32 DynamicFrictionMod;
 
-} *mlVehicleRef;
+};
 
-extern UINT32 mlInit(void);
+extern UINT32 mlInit();
 extern UINT32 mlUpdate(mlVehicleData * VehicleData,OBJECT * VehicleObject);
-extern UINT32 mlKill(void);
+extern UINT32 mlKill();
 
 extern UINT32 mlInitVehicleData(mlVehicleData * VehicleData);
 extern UINT32 mlKillVehicleData(mlVehicleData * VehicleData);
@@ -592,8 +597,8 @@ extern UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 Detach); // n
 
 extern UINT32 mlGetStarterOnInfo(mlVehicleData*, UINT32 * StarterOn,UINT32 EngineNumber);
 
-extern UINT32 mlResetPositionState(void);
-extern UINT32 mlResetControlStuff(void);
+extern void mlResetPositionState();
+extern void mlResetControlStuff();
 
 extern UINT32 mlResetVehiclePos(mlVehicleData * VehicleData);
 extern UINT32 mlLeftBrakeFunction(SINT32 Param, UINT32 Id,UINT32 Detach);
@@ -601,7 +606,7 @@ extern UINT32 mlRightBrakeFunction(SINT32 Param, UINT32 Id,UINT32 Detach);
 
 extern UINT32 mlToggleTailWheelLock(SINT32 Param, UINT32 Id, UINT32 Detach);
 
-extern UINT32 mlIsTailWheelLocked(void);
+extern UINT32 mlIsTailWheelLocked();
 
 extern UINT32 mlGetRandomHitSound(const char ** HitSoundName,
 								   FLOAT32 * MinVolume,
@@ -613,8 +618,8 @@ extern UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 											   FLOAT32 * DynamicFriction,
 											   FLOAT32 * RollCoefficientMult,
 											   SINT32 * InfSurfaceID,
-											   OBJECT * Object,
-											   LOGICAL FrictionMods = FALSE);
+											   const OBJECT * Object,
+											   bool FrictionMods = FALSE);
 extern UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,SINT32* Sprite2,SINT32* Sprite3, const SINT8 * TextureName);
 extern UINT32 mlGetGroundClutterStuff(SINT32* ClutterType1,
 									   SINT32* ClutterType2,
@@ -669,10 +674,10 @@ extern LOGICAL mlIsFPSOnWater(mlVehicleData * VehicleData, LOGICAL* onWater);
 extern UINT32 mlCheckForCollisionListUpdate(bool force = false);
 extern UINT32 mlCheckRemovedObjectOnCollisionList(trnCDTerrainObject * TO);
 
-extern LOGICAL mlGetPrimaryPickleSetting(SINT32 * Pickle);
-extern LOGICAL mlGetSecondaryPickleSetting(SINT32 * Pickle);
-extern LOGICAL mlResetPrimaryPickleSetting(void);
-extern LOGICAL mlResetSecondaryPickleSetting(void);
+extern SINT32 mlGetPrimaryPickleSetting();
+extern SINT32 mlGetSecondaryPickleSetting();
+extern void mlResetPrimaryPickleSetting();
+extern void mlResetSecondaryPickleSetting();
 extern LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total);
 
 #ifdef VEHICLE_OBJECT_ANALYSIS
@@ -704,19 +709,19 @@ extern void mlCalcObjectRotationalInertia(OBJECT* obj, FLOAT64 mass, FLOAT64 I[3
 // mlReadout
 extern LOGICAL mlSetTorpedoReadout(FLOAT32 relBearing, FLOAT32 angleOff, FLOAT32 range, FLOAT32 speed, FLOAT32 depth,
 							FLOAT32 fireAngle, FLOAT32 leadAngle, FLOAT32 travelTime, LOGICAL ConvertToEnglishUnits);
-extern SINT32 mlSetNormalReadout(void);
+extern SINT32 mlSetNormalReadout();
 extern SINT32 mlSetRangeReadout(FLOAT32 Range);
 extern SINT32 mlSetBombsightReadoutEnglish(FLOAT32 Alt, FLOAT32 TAS);
 extern SINT32 mlSetBombsightReadoutMKS(FLOAT32 Alt, FLOAT32 TAS);
 
-extern SINT32 mlVehicleAddImpulse(mlVehicleRef, FLOAT64VECTOR const* Pos, FLOAT64VECTOR const* Impulse);
+extern SINT32 mlVehicleAddImpulse(mlVehicleData*, FLOAT64VECTOR const* Pos, FLOAT64VECTOR const* Impulse);
 
 extern UINT32 mlToggleHoist(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 mlRideTransport(SINT32 Param,UINT32 Id,UINT32 Detach);
 
-extern SINT32 mlVehicleToggleHoist(mlVehicleRef);
-extern SINT32 mlVehicleRideTransport(mlVehicleRef);
+extern SINT32 mlVehicleToggleHoist(mlVehicleData*);
+extern SINT32 mlVehicleRideTransport(mlVehicleData*);
 
 extern void mlRemoveComponent(mlVehicleData*, mlComponent*, LOGICAL ParentRemoved);
 
@@ -730,7 +735,7 @@ extern UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 extern UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime);
 extern SINT32 mlInfantryInsideVehicleCheck (mlVehicleData* pVehicleData, piVECTOR* eyePoint);
 
-extern SINT32 mlVehicleUpdate(mlVehicleRef vehRef);
+extern SINT32 mlVehicleUpdate(mlVehicleData* vehRef);
 
 struct ptkQuaternion;
 extern SINT32 mlQuaternionToVehAttMat(struct ptkQuaternion const*, FLOAT64ATT*,piMATRIX*);
@@ -748,7 +753,5 @@ extern void mlSetStickYPos(FLOAT64);
 extern void mlSetRudderPosition(FLOAT64);
 extern void mlSetThrottlePosition(FLOAT64);
 extern void mlSetReportRangeAndTime(FLOAT32, SINT32);
-
-extern void mlSetProfileFlight();
 
 extern BumpAndFrictionData* mlGetScenarioBumpinessAndFriction(double x, double y, int id);

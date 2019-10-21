@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string>
 
 
@@ -283,7 +283,7 @@ void ReadoutView::DisplayGroundReadout()
 	}
 	else
 	{
-		swprintf(gearNum, sizeof(gearNum) - 1, L"%d", (SINT32)(TempNum + 0.5f));
+		swprintf(gearNum, (sizeof(gearNum) / sizeof(gearNum[0])) - 1, L"%d", (SINT32)(TempNum + 0.5f));
 		gear = gearNum;
 	}
 
@@ -358,6 +358,9 @@ void ReadoutView::DisplayAircraftReadout()
 	const wchar_t* flapstate	= nullptr;
 
 	// Localized Strings for use in displaying trim settings
+    const wchar_t* gs       = uiLocString("hud.readout.gforce").c_str();
+    const wchar_t* aoa      = uiLocString("hud.readout.aoa").c_str();
+    const wchar_t* slip     = uiLocString("hud.readout.slip").c_str();
 	const wchar_t* left		= uiLocString("hud.readout.left").c_str();
 	const wchar_t* right	= uiLocString("hud.readout.right").c_str();
 	const wchar_t* up		= uiLocString("hud.readout.up").c_str();
@@ -391,13 +394,8 @@ void ReadoutView::DisplayAircraftReadout()
 	else if((_VehicleData->FlapSetting >= -1.0) && (_VehicleData->FlapSetting <= 1.0))
 	{
 		int fsi = (int)((_VehicleData->FlapSetting) * 100);
-#if platOS == OS_MACOS
         char fss[16];
-        sprintf( fss, "%d", fsi );
-#else
-        char fss[16];
-		_itoa(fsi, fss, 10);
-#endif
+        strprintf( fss, "%d", fsi );
 		flapstate = UTF16(fss);
 	}
 	// Somehow we have a flap setting that doesn't make sense:
@@ -406,28 +404,28 @@ void ReadoutView::DisplayAircraftReadout()
 
 
 	ctx->SetColor(1,1,0);
-	DrawString(L"%ls: %6.1f    ", strings["hud.readout.gforce"].c_str(), VehicleG);
+	DrawString(L"%ls: %6.1f    ", gs, VehicleG);
 
 	if (Speed > 20.0f)
 	{
 		ctx->SetColor(1,1,0);
-		DrawString(L"%ls: %5.1f%c    ", strings["hud.readout.aoa"].c_str(), AoA, 0x00B0);
+		DrawString(L"%ls: %5.1f%lc    ", aoa, AoA, 0x00B0);
 	}
 	else
 	{
 		ctx->SetColor(1,1,0);
-		DrawString(L"%ls: 0.0%c    ", strings["hud.readout.aoa"].c_str(), 0x00B0);
+		DrawString(L"%ls: 0.0%lc    ", aoa, 0x00B0);
 	}
 
 	if (Speed > 20.0f)
 	{
 		ctx->SetColor(1,1,0);
-		DrawString(L"%ls: %5.1f%c  \n", strings["hud.readout.slip"].c_str(), SideSlip, 0x00B0);
+		DrawString(L"%ls: %5.1f%lc  \n", slip, SideSlip, 0x00B0);
 	}
 	else
 	{
 		ctx->SetColor(1,1,0);
-		DrawString(L"%ls: 0.0%c  \n", strings["hud.readout.slip"].c_str(), 0x00B0);
+		DrawString(L"%ls: 0.0%lc  \n", slip, 0x00B0);
 	}
 
 	// Display Trim tab settings as percentage (-100% to +100%)
@@ -577,7 +575,7 @@ void ReadoutView::DisplayRiding()
 	if(PlayerVehicle->RideVehicleHostIndex)
 		DisplayRidee(PlayerVehicle);
 
-	// display guys riding on you
+	// display players riding on you
 	DisplayVehiclesRiding(PlayerVehicle, PlayerVehicle->VehicleHostIndex);
 	DisplayInfantryRiding(PlayerVehicle, PlayerVehicle->VehicleHostIndex);
 
@@ -854,7 +852,7 @@ void ReadoutView::DrawRankIcon(SINT32 Rank)
 	mlSetNormalReadout
 *************************************************************************************************/
 
-SINT32 mlSetNormalReadout(void)
+SINT32 mlSetNormalReadout()
 {
 	_ReadoutType = _READOUT_NORMAL;
 	return 0;

@@ -11,6 +11,10 @@
 
 #include "wwii/wwiiServerTypeEnums.h"		// For SERVER_TYPE enum
 
+#include "cat/crypt/tunnel/EasyHandshake.hpp"
+
+class EasyHandshake;
+
 struct WWII_ACTIVATE
 {
 	WWII_ACTIVATE()
@@ -21,6 +25,7 @@ struct WWII_ACTIVATE
 		, teulIndex(-1)
 		, playerID(0)
 		, otp(0)
+		, theme(0)
 	{
 		pkey[0] = 0;
 	}
@@ -29,12 +34,13 @@ struct WWII_ACTIVATE
 	UINT16		port;
 	UINT32		hostIP;
 	UINT32		hostTime;
-	UINT16		teulIndex;
+	SINT32		teulIndex;
 	playerid_t	playerID;
 	UINT32		otp;
-	UCHAR		pkey[80];
+	UINT32		theme;
+	UCHAR		pkey[cat::EasyHandshake::PUBLIC_KEY_BYTES];
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a)
 	{
 		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)(&serverType), 8);
 		a->packer(mode, port);
@@ -43,7 +49,8 @@ struct WWII_ACTIVATE
 		a->packer(mode, teulIndex);
 		a->packer(mode, playerID);
 		a->packer(mode, otp);
-
+		a->packer(mode, theme);
+		
 		if ( teulIndex != 0 && playerID != 0 )
 			a->offset = teulPackVoid(mode, a->packed, a->offset, pkey, sizeof(pkey));
 

@@ -43,16 +43,16 @@ namespace ModelTypes
 
 namespace	ogl{class StaticBuffer;}
 
-typedef std::vector<MATERIAL> MODELMATERIALS;
+using MODELMATERIALS = std::vector<MATERIAL>;
 inline bool operator == (const MATERIAL &a, const MATERIAL &b) { return !memcmp(&a, &b, sizeof(MATERIAL)); }
 
-typedef std::map<std::string, PoolModel*> PoolMap;
-typedef struct
+using PoolMap = std::map<std::string, PoolModel*>;
+struct SubModelReference
 {
 	PoolModel*	poolModel;
 	piMATRIX	transform;
 	bool		placeOntoMasterObject;
-}SubModelReference;
+};
 
 struct PoolNode;
 struct POOLOBJHDR;
@@ -63,28 +63,28 @@ class physicsNodeCollider;
 // the "pool object"
 struct PoolNode
 {
-	PoolNode* parent;
-	PoolNode* sibling;
-	PoolNode* child;
-	PoolNode* attached;
+	PoolNode* parent { nullptr };
+	PoolNode* sibling { nullptr };
+	PoolNode* child { nullptr };
+	PoolNode* attached { nullptr };
 
-	char name[32];
-	UINT32 flags;
-	UINT32 flag2;
-    UINT32 flag3;
+	char name[32] { 0 };
+	UINT32 flags { 0 };
+	UINT32 flag2 { 0 };
+    UINT32 flag3 { 0 };
 
-	POOLOBJDATA* objdata;
-	piUNIFIED_VERTEX* vertices;
-	piINDICES* indices;
-	piVECTOR* faceNormals;
-	piVECTOR* collisionNormals;
-	DOF* dof;
-	char* comment;
+	POOLOBJDATA* objdata { nullptr };
+	piUNIFIED_VERTEX* vertices { nullptr };
+	piINDICES* indices { nullptr };
+	piVECTOR* faceNormals { nullptr };
+	piVECTOR* collisionNormals { nullptr };
+	DOF* dof { nullptr };
+	char* comment { nullptr };
 //	void* spare;
 
-    int vboid;
+	int vboid = -1;
 
-	int texid, matid;
+	int texid = -1, matid = -1;
 
 #if USE_STATESET
     ref_ptr<RenderStateSet> material;
@@ -96,8 +96,8 @@ struct PoolNode
 
     physicsNodeCollider* collider;
 
-	PoolNode();
-	~PoolNode();
+	PoolNode() = default;
+	~PoolNode() noexcept;
 
 	void load(PoolModel*, int fd); // load file from disk
 	OBJECT* createPoolInstance(ModelInstance* modelInstance, const piMATRIX& matrix); // create an instance of the model
@@ -109,7 +109,7 @@ struct PoolNode
 
 class oglVertexBuffer;
 
-typedef std::set<std::string> TextureRefSet;
+using TextureRefSet = std::set<std::string>;
 
 // the "pool model object"
 struct PoolModel

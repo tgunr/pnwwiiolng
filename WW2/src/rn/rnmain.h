@@ -4,7 +4,7 @@
 
 	extern void rnmainRotatePlayer(piVECTOR* rot);
 	extern void rnmainMovePlayer(piVECTOR* pos);
-	extern void rnmainResetPlayer(void);
+	extern void rnmainResetPlayer();
 	extern void rnmainSetPlayerInfo(piVECTOR* pos, piVECTOR* rot);
     extern void rnmainSetViewMatrix(piVECTOR* pos, piVECTOR* att);
     extern void rnmainSetViewMatrix2(piMATRIX* view);
@@ -16,14 +16,14 @@
     extern FLOAT32 rnmainGetDefaultFogEnd();
     extern float rnmainGetZBufferNearVal();
 
-	extern LOGICAL rnmainSetDefaultRenderStates(void);
-	extern LOGICAL rnmainInit(void);
-	extern LOGICAL rnmainKill(void);
-	extern LOGICAL rnmainFOVChange(void);
+	extern LOGICAL rnmainSetDefaultRenderStates();
+	extern LOGICAL rnmainInit();
+	extern void rnmainKill();
+	extern LOGICAL rnmainFOVChange();
 	extern LOGICAL rnmainListText(const char* text, ...);
 	extern LOGICAL rnmainListText(const wchar_t* text, ...);
 	extern LOGICAL rnmainSetFogAttributes();
-	extern void  rnUpdateView(void);
+	extern void  rnUpdateView();
 	extern LOGICAL rnmainAdjustFogAttributes(UINT32 FogColor,FLOAT32 FogStartFloat,FLOAT32 FogEndFloat);
 	extern LOGICAL rnmainGetDefaultFogAttributes(UINT32 * OutFogColor, FLOAT32 * OutFogStart, FLOAT32 * OutFogEnd);
 	extern LOGICAL rnmainMoveView(FLOAT64 PosX, FLOAT64 PosY);
@@ -39,4 +39,11 @@
 	extern LOGICAL rnmainListLocColorText(SINT32 category, SINT32 locID, UINT32 uColor);
 	extern LOGICAL rnmainListEmoteText(SINT32 category, SINT32 locID, UINT32 uColor, const WCHAR* prepend, const WCHAR* append);
 
-    extern bool rnmainGetOnlineSetting();
+	extern void rncheckPlaygateParams(void);
+	extern void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp);
+	extern bool rnhasServerInfo(void);
+	extern void rnconnectToServer(void);
+	extern void rnstartOfflineMode(void);
+	// Sends us to the starting GUI screen based on the server we are/aren't connected to.
+
+	extern void rnloadRootWindow(void);

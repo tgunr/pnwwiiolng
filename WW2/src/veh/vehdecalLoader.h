@@ -24,7 +24,7 @@ struct BRIGADE_DECAL_SPEC
 	std::vector<DECAL_SPEC> decals;
 };
 
-typedef std::map<std::string, BRIGADE_DECAL_SPEC> BrigadeDecalMap;
+using BrigadeDecalMap = std::map<std::string, BRIGADE_DECAL_SPEC>;
 
 class BrigadeDecalLoader : public XMLLoader2<BrigadeDecalLoader>
 {
@@ -89,19 +89,19 @@ public:
 			xmlGetNodeValue(node, XML_DATA_SINT, &decal.col, "col");
 
 			// determine the category
-			if(!stricmp(category.c_str(), "ground"))
+			if(!strcasecmp(category.c_str(), "ground"))
             {
                 decal.category = weapFindCategory("gv_").wCategory;
             }
-			else if(!stricmp(category.c_str(), "air"))
+			else if(!strcasecmp(category.c_str(), "air"))
             {
                 decal.category = weapFindCategory("ac_").wCategory;
             }
-			else if(!stricmp(category.c_str(), "sea"))
+			else if(!strcasecmp(category.c_str(), "sea"))
             {
                 decal.category = weapFindCategory("sv_").wCategory;
             }
-			else if(!stricmp(category.c_str(), "troop"))
+			else if(!strcasecmp(category.c_str(), "troop"))
             {
                 decal.category = weapFindCategory("in_").wCategory;
             }

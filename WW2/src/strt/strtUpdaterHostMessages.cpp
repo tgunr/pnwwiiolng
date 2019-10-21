@@ -21,7 +21,6 @@
 #include "strt/strtUpdater.h"
 #include "strt/strtUpdaterHostMessages.h"
 #include "strt/strtUpdaterPack.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiNetPorts.h"
 
@@ -67,7 +66,7 @@ _handleHitList(SINT32 teulIndex, CP_HIT_HEADER& hitHeader)
 	// 4. Accumulate the damage packets to reduce traffic
 	for ( int i = 0; i < hitHeader.numHits; ++i )
 	{
-		dbugLog(_FLD, "t:%d p:%u v:%u damaged " PRF_FULL_OBJ_ID " with %lld joules"
+		dbugLog(_FLD, "t:%d p:%u v:%u damaged " PRF_FULL_OBJ_ID " with %" PR64BitT " joules"
 				, teulIndex
 				, player->playerID()
 				, player->vehicle->index
@@ -109,20 +108,24 @@ static SINT32
 _registerClientXCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
+	{
 		REGISTER_RECEIVER(DAMAGE_LIST_Y, _recvHitList);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 
 static SINT32
 _registerStrtUpdaterXCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_DAMAGE_Y, _recvHitList);
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 
 SINT32
-strtUpdateHostInstallCallbacks(void)
+strtUpdateHostInstallCallbacks()
 {
 	if ( _registerClientXCallbacks() < 0 )
 		return -EINVAL;

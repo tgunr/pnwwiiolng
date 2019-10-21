@@ -373,46 +373,6 @@ void IMMClient::InputChange(bool alertUI)
 	if(ImmGetConversionStatus(context, &conversion, &sentence))
 	{
 		native = (conversion & IME_CMODE_NATIVE);
-/*
-		if(sentence & IME_SMODE_AUTOMATIC)
-			bool stop = true;
-
-		if(sentence & IME_SMODE_NONE)
-			bool stop = true;
-
-		if(sentence & IME_SMODE_PHRASEPREDICT)
-			bool stop = true;
-
-		if(sentence & IME_SMODE_PLAURALCLAUSE)
-			bool stop = true;
-
-		if(sentence & IME_SMODE_SINGLECONVERT)
-			bool stop = true;
-
-		if(sentence & IME_SMODE_CONVERSATION)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_CHARCODE)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_EUDC)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_FIXED)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_NATIVE)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_ROMAN)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_SOFTKBD)
-			bool stop = true;
-
-		if(conversion & IME_CMODE_SYMBOL)
-			bool stop = true;
-*/
 	}
 
 	DWORD dsize = ImmGetDescription(currentLocale, NULL, 0);

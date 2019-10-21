@@ -2,7 +2,6 @@
 
 #if platOS == OS_MACOS
 #include "sn/SoundBuffer.h"
-#elif platOS == OS_WIN32
 #endif
 
 #include "pi/pi.h"		// For piVector.
@@ -11,6 +10,13 @@
 
 #if XAUDIO
 #include <xaudio2.h>
+
+// Not the world's most reliable test but straws are all we are given in this case.
+#if defined(XAUDIO2_DLL)
+#error Looks like either the DirectX SDK (Jun 2010) is not installed, or the compiler is seeing the Windows SDK before DirectX.
+#pragma message( See https://www.microsoft.com/en-us/download/details.aspx?id=6812 )
+#endif
+
 #include <xaudio2fx.h>
 #include <x3daudio.h>
 #endif

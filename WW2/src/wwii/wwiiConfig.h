@@ -7,6 +7,8 @@
 //	------------------------------	Exposed entities
 //tolua_begin
 
+#define MAX_PPOS 20
+
 // Intermission statuses
 enum
 {
@@ -37,6 +39,8 @@ struct cfARENA
 	FLOAT32	speedHackRatio;			//!< Maximum drift tolerance.
 	UINT16	despawnTime_s;			//!< Seconds to wait before despawning
 	char	mobileSpawnWaypoint[MAX_HANDLE_SIZE];
+	UCHAR	allowDirectSpawn;		//!< Should we allow direct spawning (Multi-Client)
+	UINT16  theme;					//!< Non-zero applies client themes like: Christmas, Veterens, Halloween, etc.
 };
 
 struct cfBALANCE
@@ -97,6 +101,7 @@ struct cfOIC
 	UINT16		removalVoteTime_s;
 	UINT16		replaceDelay_s;
 	UINT16		moveVoteTime_s;
+	UINT16		changeCountryVoteTime_s;
 	UINT16		attackVoteTime_s;
 	UINT16		withdrawVoteTime_s;
 };
@@ -110,6 +115,14 @@ struct cfSCORE
 	UINT16		stratDmgInterval_s;		//!< Number of seconds between strat damages to get score.
 	UINT16		maxGlobalSharedRank;	//!< Cross-side rank sharing.
 	UINT16		maxSideSharedRank;		//!< Cross-country rank sharing within a side.
+	UINT16		destroyAI;		//!< Points awarded for destroying an AI
+	UINT16		infResupplier;		//!< Points awarded for resupplying another player
+	UINT16		resupply;		//!< Points awarded for resupplying equipment while on a resupply mission
+	UINT16		destroyFMS;		//!< Points awarded for destroying an FMS
+	UINT16		repairBridge;		//!< Points awarded for repairing a bridge
+	UINT16		damageBridge;		//!< Points awarded for damaging a bridge
+	UINT16		damageFactory;		//!< Points awarded for damaging a factory
+	UINT16		damageFB;		//!< Points awarded for damaging an FB
 };
 
 struct cfSQUAD
@@ -124,10 +137,10 @@ struct cfSQUAD
 
 struct cfSTO
 {
-	UINT32	damageThreshold;	//!< UMS Damage threshold and capacity
-	UINT32	damageCapacity;		//!< UMS Damage capacity
-	UINT32	fruPlaceCooldown_s; //!< Cooldown from placing one FRU to the next.
-	UINT32	fruDeathCooldown_s; //!< Cooldown on replacing a destroyed FRU.
+	UINT32	damageThreshold[MAX_PPOS];	//!< PPO Damage threshold
+	UINT32	damageCapacity[MAX_PPOS];	//!< PPO Damage capacity
+	UINT32	placeCooldown_s[MAX_PPOS];	//!< Cooldown from placing one PPO to the next
+	UINT32	deathCooldown_s[MAX_PPOS];	//!< Cooldown on replacing a destroyed PPO
 	UINT16	hulkLifetime_m;		//!< Hulk lifetime and population limits
 	UINT16	hulkLimitPerCell; 	//!< Max hulks per grid cell
 	UINT16	hulkLimitPerArea;	//!< Max hulks per group of grid cells
@@ -154,6 +167,11 @@ struct cfSUPPLY
 	UINT32	trickleTime_m;		//!< Minutes that complete trickle should take
 	UINT32	populationAdjust;	//!< Divisor for population-based rate adjustment
 	UCHAR	nomanDepots;		//!< Enable spawning at depots in adjacent friendly towns with a DO
+	UINT32	garrisonTrickleTime_m;	//!< Minutes that complete trickle should take
+	UINT32	garrisonInactiveTime_m;	//!< Minutes until a Garrison becomes active 
+	UINT32	mGarrisonTrickleTime_m;	//!< Minutes that complete trickle should take after the garrison country is manually changed
+	UINT32	mGarrisonInactiveTime_m; //!< Minutes until a Garrison becomes active after the garrison country is manually changed
+	UINT32  noPenaltySwitchPeriod_m; //!< Minutes that HC has to switch garrison ownership without a trickle penalty
 };
 
 struct cfTHROTTLE
@@ -169,6 +187,8 @@ struct cfUPDATE
 	UCHAR	avoidRepeats;		//!< Try to avoid sending vehicles we haven't received updates for.
 	UCHAR	countingEnabled;	//!< Enable packing counting
 	UCHAR	starvationLimit_s;	//!< Seconds without updates before we kick them
+	UINT16	accumDelayLimit_ms;	//!< Maxium Accumulated Delay allowed before considering a player kick
+	UINT16	timeAtLimitBeforeKick_s;//!< Number of seconds accumulated delay must remain at maximum before player is kicked
 	UCHAR	errorThrottling;	//!< Throttle updates on errors/lag
 	UCHAR	visLimitThrottling;	//!< Whether or not to enable vis limit throttling
 	UCHAR	defaultUM;			//!< Which update framing mode to use by default
@@ -190,6 +210,8 @@ struct cfUPDATE
 	UINT16	sampleIgnore;		//!< How many packets to ignore before we commence counting at all
 	UINT16	awsGracePeriod_s;	//!< How long you get from tripping AWS to appearing on it
 	UCHAR	awsHighThreshold;	//!< How many planes present to trip high AWS?
+	UINT16	awsEnemyDistance_km;	//!< How many km from the front lines to trip AWS?
+	UINT16	awsFriendlyDistance_km;	//!< How many km off map to trip AWS?
 };
 
 struct cfWEATHER
@@ -249,8 +271,9 @@ struct	WWII_CONFIG
 	cfSUPPLY	supply;
 	cfTHROTTLE	throttle;
 	cfUPDATE	update;
-
 	cfWEATHER	weather;
+
+	UCHAR       netcode3Enabled;
 };
 #pragma pack(pop)
 

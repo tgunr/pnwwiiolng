@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Wed Nov 1 16:55:26 2000
 //
 //	This is where all declarations for commPack routines for universal
@@ -12,8 +12,8 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
+#include <random>
 #include "include/clustercfg.h"
 #endif
 
@@ -21,9 +21,11 @@
 #include "teul/teulEndpointDefs.h"
 #include "updt/updtPackers.h"
 #include "updt/updtTypes.h"
+#include "wwii/wwiiAntihack.h"
 #include "wwii/wwiiPack.h"
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
+#include "chat/chatModReport.h"
 #include "host/host.h"
 #include "host/hostGridTypes.h"
 #include "host/hostPlayer.h"
@@ -39,26 +41,44 @@
 #include "wwii/wwiiThreads.h"
 #include "teul/teulPacket.h"
 #else	// g++ under fedora doesn't like #else if ...
-# if !defined(CMDLINE_CLIENT)
-#  include "include/vars.h"
-#  include "client/GameClient.h"
-#  include "client/ClientSquad.h"
-# endif
-# include "client/ww2HostState.h"
+#include "include/vars.h"
+#include "client/GameClient.h"
+#include "client/ClientSquad.h"
+#include "client/ww2HostState.h"
+#include "sys/sysAntihack.h"
 #endif
 #include "wwii/wwiiPackBool.h"
 #include "include/wthrTimeFactors.h"
 
-#include "host/hostTiming.h"
-
-// Helper macros for cleaning up all the client/server ifdefs.
-#if platBuild == TEUL_SERVER
-# define ON_SERVER( _expr_ ) _expr_
-# define ON_CLIENT( _expr_ )
-#else
-# define ON_SERVER( _expr_ )
-# define ON_CLIENT( _expr_ ) _expr_
+#if platBuild == BUILD_SERVER
+// TEMP/HACK: Hardcoded libs to occasionally send memory requests for
+namespace {
+	const std::pair<std::string, std::string> memhash_reqs[] = {
+		// ESP hack
+		{"opengl32.dll", "glBegin"},
+		{"opengl32.dll", "glEnd"},
+		{"opengl32.dll", "glDepthFunc"},
+		{"opengl32.dll", "glDrawElements"},
+		{"opengl32.dll", "glBindTexture"},
+		{"opengl32.dll", "glGenTextures"},
+		{"opengl32.dll", "glEnable"},
+		{"opengl32.dll", "glDisable"},
+		{"opengl32.dll", "glColor4f"},
+		{"opengl32.dll", "glDepthRange"},
+		{"opengl32.dll", "glGetFloatv"},
+		{"opengl32.dll", "glGetIntegerv"},
+		{"opengl32.dll", "glDrawArrays"},
+		{"opengl32.dll", "glDrawBuffer"},
+		{"opengl32.dll", "glArrayElement"},
+		{"opengl32.dll", "glVertexPointer"},
+		{"opengl32.dll", "glHint"},
+		{"opengl32.dll", "glVertex3f"},
+		// CheatEngine Speedhack
+		{"kernel32.dll", "GetTickCount64"},
+	};
+}
 #endif
+
 
 #define P2_BASE			10000	// Fast X/Y is position expressed in 100ms.
 
@@ -66,35 +86,31 @@
 
 #define FE_REMOVE_TIMEOUT	20000
 
+#define MAX_UDP_DATA   1400
+
 #undef DEBUG_UPDATE_PACK
 
-/* 8 Updates a second
-UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
-{
-	{ 28, false, { 4, 4, 4 }, { 4, 8, 16 }, "28 vis, 12 per, 0 r/o" }
-, 	{ 45, true, { 5, 6, 7 }, { 5, 12, 28 }, "45 vis, 18 per, 0 r/o" }
-, 	{ 92, true, { 6, 12, 14 }, { 6, 30, 56 }, "92 vis, 32 per, 4 r/o" }
-, 	{ 178, true, { 6, 12, 14 }, { 8, 72, 98 }, "178 vis, 32 per, lots of r/o" }
-};
-OLD:
-UPDATE_FRAMING framings[NUM_FRAMING_MODES] =
-{
-	{ 28, false, { 4, 4, 4 }, { 4, 8, 16 }, "28 vis, 12 per, 0 r/o" }
-, 	{ 42, true, { 6, 8, 8 }, { 6, 20, 16 }, "42 vis, 22 per, 0 r/o" }
-, 	{ 74, true, { 4, 10, 11 }, { 6, 20, 48 }, "74 vis, 25 per, 4 r/o" }
-, 	{ 128, true, { 5, 12, 10 }, { 10, 48, 70 }, "128 vis, 27 per, lots of r/o" }
-};
-*/
+// The host update rate should be tied closely to the client's update rate,
+// where host/client here is the sender.
+//
+// "MaxU" is a "best case" value; the actual number sent may be significantly
+// smaller depending on space available in the world update buffer/packet.
+//
+// See updtEnums.h::FE_UPDATE_INTERVAL
 UpdateFraming framings[UpdateFraming::_MODES] =
 {
-	{ 56,	UpdateFraming::_LARGE,	125, 10, "um:0 Low Vis/Laggy" }
-,	{ 72,	UpdateFraming::_LARGE,	125, 16, "um:1 Med Vis 56Kbps" }
-, 	{ 88,	UpdateFraming::_LARGE,	100, 20, "um:2 High Vis 72Kbps" }
-, 	{ 112,	UpdateFraming::_LARGE,	100, 28, "um:3 Extreme Vis 89Kbps" }
-, 	{ 127,	UpdateFraming::_LARGE,	125, 32, "um:4 GM Vis 100Kbps" }
+    // MaxV                         Intvl   MaxU
+    //   |                             |     ^--   Max vehicles per update
+    //   |                             ^-----|--   Interval between updates in ms
+    //   ^-----------------------------|-----|--   Max vehicles to track
+	{    88,   UpdateFraming::_LARGE, 100,    20, "um:0 88 Limit 20/Update 100ms" }
+,	{   112,   UpdateFraming::_LARGE, 100,    28, "um:1 112 Limit 28/Update 100ms" }
+, 	{   128,   UpdateFraming::_LARGE, 100,    32, "um:2 128 Limit 32/Update 100ms" }
+, 	{   146,   UpdateFraming::_LARGE, 100,    36, "um:3 146 Limit 36/Update 100ms" }
+, 	{   184,   UpdateFraming::_LARGE, 100,    48, "um:4 184 Limit 48/Update 100ms" }
 };
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 UINT32 g_framingMode;
 UINT32 g_hostUpdateInterval;
 #endif
@@ -102,7 +118,7 @@ UINT32 g_hostUpdateInterval;
 //////////////////////////////////////////////////////////////////////
 // Initialization for the update packing system.
 
-SINT32	updtPackInit(void)
+SINT32	updtPackInit()
 {
 	return 0;
 }
@@ -110,7 +126,7 @@ SINT32	updtPackInit(void)
 //////////////////////////////////////////////////////////////////////
 // Pack a turret.
 
-static SINT32 _packTurret(LOGICAL mode, UCHAR* const data, SINT32 offset, TURRET_POS* tp, SINT32 size)
+static SINT32 _packTurret(PackMode mode, UCHAR* const data, SINT32 offset, TURRET_POS* tp, SINT32 size)
 {
 	return teulPackVoid(mode, data, offset, tp, sizeof(*tp));
 }
@@ -118,7 +134,7 @@ static SINT32 _packTurret(LOGICAL mode, UCHAR* const data, SINT32 offset, TURRET
 //////////////////////////////////////////////////////////////////////
 // Pack a vehicle's X/Y/Z position.
 
-static SINT32 _packVehiclePosition(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_POSITION* const vp, SINT32 size)
+static SINT32 _packVehiclePosition(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_POSITION* const vp, SINT32 size)
 {
 	offset = teulPackSINT32(mode, data, offset, &vp->m_x, 24);
 	offset = teulPackSINT32(mode, data, offset, &vp->m_y, 24);
@@ -129,7 +145,7 @@ static SINT32 _packVehiclePosition(LOGICAL mode, UCHAR* const data, SINT32 offse
 //////////////////////////////////////////////////////////////////////
 // Pack common components. OGS: No idea why this is separated out.
 
-static SINT32 _packVehicleCommon(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, const UINT32 present)
+static SINT32 _packVehicleCommon(PackMode mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, const UINT32 present)
 {
 	if (present & PR_RIDING)
 	{
@@ -155,13 +171,7 @@ static SINT32 _packVehicleCommon(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	return offset;
 }
 
-#if platBuild == TEUL_CLIENT && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-# define UPDATE_HISTORY_DEBUG
-#else
-# undef UPDATE_HISTORY_DEBUG
-#endif
-
-#if defined(UPDATE_HISTORY_DEBUG)
+#if platBuild == BUILD_CLIENT && defined(DEBUG_WW2) // && !defined(RELEASE_CLIENT)
 struct NewVehicleHistory
 {
 	TeulTimeMS	receivedAt;
@@ -195,7 +205,7 @@ std::vector<std::wstring> updtGetNvHistory()
 	wchar_t buffer[128];
 	for ( auto it = nvHistory.begin(), end = nvHistory.end(); it != end; ++it )
 	{
-		swprintf(buffer, sizeof(buffer) - 1, L"[%08u] ", teulClock64 - it->receivedAt);
+		swprintf(buffer, (sizeof(buffer) / sizeof(buffer[0])) - 1, L"[%08llu] ", teulClock64 - it->receivedAt);
 		result = buffer;
 		result += it->description;
 		results.push_back(result);
@@ -205,7 +215,7 @@ std::vector<std::wstring> updtGetNvHistory()
 }
 
 static void
-_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle& packedCallsign)
+_recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandle packedCallsign)
 {
 	NewVehicleHistory entry;
 	entry.receivedAt = teulClock64;
@@ -249,10 +259,9 @@ _recordNewHistoryEntry(const SHARED_VEHICLE_INFO* const vehInfo, const ChatHandl
 //////////////////////////////////////////////////////////////////////
 // Pack first time header ("one time") data for a vehicle.
 
-static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32 size, const WORLD_UPDATE* const wu)
+static SINT32 _packONE_TIME_INFO(PackMode mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32 size, const WORLD_UPDATE* const wu)
 {
-//static SINT32 count = 0;
-	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->spec(), 0);
+	offset = wwiiPackWeaponSpec(mode, data, offset, &vehInfo->wSerial.spec, 0);
 	if ( mode == TEUL_UNPACK )
 	{
 		vehInfo->country = vehInfo->spec().wCountry;
@@ -265,7 +274,7 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	bool packSquadName = false;
 	static const SINT32 numOneTimeBits = 8;
 	UINT16 oneTimeBits = 0;
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	if ( mode == TEUL_PACK )
 	{
 		HostVehicle* viewer = wu ? wu->myVehicle : vehInfo->m_vehicle;
@@ -291,7 +300,7 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	else
 		packedCallsign = 0LL;
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 	if ( mode == TEUL_UNPACK )
 	{
 		if(oneTimeBits & OTB_IN_SQUAD)
@@ -304,7 +313,7 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	// Pack the callsign chat-style to save 2 bytes
 	if ( mode == TEUL_PACK )
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		if ( vehInfo->m_hideCallsign == true )
 		{
 			static const ChatHandle gmHandle = chatGetHandle("GameMgr");
@@ -324,7 +333,7 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	if ( mode == TEUL_UNPACK )
 	{
 		chatGetCallsign(vehInfo->callsign, packedCallsign);
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		vehInfo->packedCallsign = packedCallsign;
 #endif
 	}
@@ -337,11 +346,9 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 
 	offset = wwiiPackBrigadeID(mode, data, offset, vehInfo->brigadeID, 0);
 
-#if defined(UPDATE_HISTORY_DEBUG)
+#if platBuild == BUILD_CLIENT && defined(DEBUG_WW2) // && !defined(RELEASE_CLIENT)
 	_recordNewHistoryEntry(vehInfo, packedCallsign);
 #endif
-
-//	dbugWrite(_FLASB, "\n%d:****ONE_TIME callsign: %s\n", count++, vehInfo->callsign);
 
 	return offset;
 }
@@ -349,11 +356,11 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 //////////////////////////////////////////////////////////////////////
 // Pack the header information for a vehicle.
 
-static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_UPDATE_HEADER* const vupHeader, SINT32 presentSize, const WORLD_UPDATE* const wu)
+static SINT32 _packVehicleHead(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_UPDATE_HEADER* const vupHeader, SINT32 presentSize, const WORLD_UPDATE* const wu)
 {
 	UINT16 localTimeStamp;  // local meaning just limited scope
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	SHARED_VEHICLE_INFO*	vehInfo = vupHeader->vehInfo;
 	if (mode == TEUL_UNPACK)
 	{
@@ -366,12 +373,8 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		HostVehicle* const vehicle = hostFindVehicleLocal(myIndex);
 		if (vehicle == nullptr)
 		{
-#ifdef BETA_RELEASE
-			LogAbort("BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
-#else
-			dbugLog(_FLA, "Invalid vehicle index: %u", myIndex);
+			dbugLog(_FLA, "BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
 			return -EINVAL;
-#endif
 		}
 		else
 			vehInfo = vupHeader->vehInfo = &vehicle->vehicleData;
@@ -390,7 +393,7 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 
 	if (mode == TEUL_PACK)
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		// if packing, only ever pack the commander's time
 		localTimeStamp = vehInfo->cmdrTimeStamp;
 #else
@@ -404,7 +407,7 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 	// if unpacking, deal with timestamp properly
 	if (mode == TEUL_UNPACK)
 	{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		// make sure this timestamp reflects last time vehicle was updated by either party
 		vehInfo->timeStamp = localTimeStamp;
 
@@ -415,7 +418,7 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		if (vupHeader != nullptr && vupHeader->player != nullptr && vupHeader->player->station != UPDT_OTHER)
 		{
 			vehInfo->cmdrTimeStamp = localTimeStamp;
-		} 
+		}
 
 #else
 		// restore timestamp for client and update position if included
@@ -452,7 +455,7 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 //////////////////////////////////////////////////////////////////////
 // Pack turrets for a vehicle.
 
-static SINT32 _packVehicleTurrets(LOGICAL mode, UCHAR* const data, SINT32 offset, TURRET_HEADER* const turretHeader, SINT32 size)
+static SINT32 _packVehicleTurrets(PackMode mode, UCHAR* const data, SINT32 offset, TURRET_HEADER* const turretHeader, SINT32 size)
 {
 	TURRET_STRUCT* turret = &(turretHeader->vehInfo->turret);
 	UINT16 count = 0;
@@ -466,10 +469,10 @@ static SINT32 _packVehicleTurrets(LOGICAL mode, UCHAR* const data, SINT32 offset
 		{
 			offset = _packTurret(mode, data, offset, &turret->pos[i], 0);
 
-//			dbugWrite(_FLAS, "turret:%s %d, x%x y:%x", (mode== TEUL_UNPACK)?"U":"P", i, turret->pos[i].x, turret->pos[i].y);
+//			dbugWrite(_FLA, "turret:%s %d, x%x y:%x", (mode== TEUL_UNPACK)?"U":"P", i, turret->pos[i].x, turret->pos[i].y);
 
 			count++;
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			if (mode == TEUL_UNPACK)
 			{
 				turret->clock64[i] = teulClock64;
@@ -486,25 +489,25 @@ static SINT32 _packVehicleTurrets(LOGICAL mode, UCHAR* const data, SINT32 offset
 }
 
 //////////////////////////////////////////////////////////////////////
-static SINT32 _packVEHICLE_VEL_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_VEL_HIGH* const vv, SINT32 /*size*/)
+static SINT32 _packVEHICLE_VEL_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_VEL_HIGH* const vv, SINT32 /*size*/)
 {
 	return teulPackVoid(mode, data, offset, vv, sizeof(*vv));
 }
 
 //////////////////////////////////////////////////////////////////////
-static SINT32 _packVEHICLE_ATTVEL_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_ATTVEL_HIGH* const vv, SINT32)
+static SINT32 _packVEHICLE_ATTVEL_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_ATTVEL_HIGH* const vv, SINT32)
 {
 	return teulPackVoid(mode, data, offset, vv, sizeof(*vv));
 }
 
 //////////////////////////////////////////////////////////////////////
-static SINT32 _packVEHICLE_ACCEL_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_ACCEL_HIGH* const va, SINT32)
+static SINT32 _packVEHICLE_ACCEL_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_ACCEL_HIGH* const va, SINT32)
 {
 	return teulPackVoid(mode, data, offset, va, sizeof(*va));
 }
 
 //////////////////////////////////////////////////////////////////////
-static SINT32 _packVEHICLE_ATT_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_ATT_HIGH* const vt, SINT32)
+static SINT32 _packVEHICLE_ATT_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_ATT_HIGH* const vt, SINT32)
 {
 	return teulPackVoid(mode, data, offset, vt, sizeof(*vt));
 }
@@ -512,7 +515,7 @@ static SINT32 _packVEHICLE_ATT_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offs
 //////////////////////////////////////////////////////////////////////
 // Pack vehicle 'auxilliary' information: velocity, accel, etc.
 
-static SINT32 _packVEHICLE_AUX_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32)
+static SINT32 _packVEHICLE_AUX_INFO(PackMode mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const vehInfo, SINT32)
 {
 	offset = _packVEHICLE_VEL_HIGH(mode, data, offset, &vehInfo->velocity, 0);
 	offset = _packVEHICLE_ACCEL_HIGH(mode, data, offset, &vehInfo->acceleration, 0);
@@ -522,7 +525,7 @@ static SINT32 _packVEHICLE_AUX_INFO(LOGICAL mode, UCHAR* const data, SINT32 offs
 	return offset;
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 // Translate the vehicle's actual position into an update-centered offset.
 static void
 _translatePositionToOffset(const VEHICLE_POSITION& position, const WORLD_UPDATE& wu, VEHICLE_POSITION& offset)
@@ -541,14 +544,14 @@ _translateOffsetToPosition(VEHICLE_POSITION& offset, const WORLD_UPDATE& wu, VEH
 }
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 static SINT32 _validateTurrets(Viewing& viewing, VEHICLE_UPDATE_HEADER* const vupHeader, const bool updtIsNew)
 {
 	struct TURRET_STRUCT* turret;
 
 	vupHeader->vt.numTurrets = 0;
 
-# if platBuild == TEUL_SERVER // Not much use given we know we are teul server from above?
+# if platBuild == BUILD_SERVER // Not much use given we know we are teul server from above?
 		turret =  &(vupHeader->vehInfo->turret);
 # else
 		turret =  &(vupHeader->vehInfo.turret);
@@ -637,7 +640,7 @@ static void _initVehicleHeader(VEHICLE_UPDATE_HEADER* const vupHeader, Viewing& 
 					// overide the fire bit and set the xmit flag
 					vupHeader->fireMask |= mask;
 #ifdef HEAVY_DEBUG
-					dbugLog(_FLD, "used fire bit overide %d set at %llus for update last sent %llus", t, vehInfo->fire.clock64[t], viewing.m_lastSent);
+					dbugLog(_FLD, "used fire bit overide %d set at %" PR64BitUT "s for update last sent %" PR64BitUT "s", t, vehInfo->fire.clock64[t], viewing.m_lastSent);
 #endif
 				}
 			}
@@ -702,39 +705,83 @@ static void _initVehicleHeader(VEHICLE_UPDATE_HEADER* const vupHeader, Viewing& 
 #endif
 
 SINT32
-updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDATE* const wu, SINT32 /*size*/)
+updtPackWORLD_UPDATE(const PackMode mode, UCHAR* data, SINT32 offset, WORLD_UPDATE* const wu, SINT32 /*size*/)
 {
-	TIMER_USE_HERE
+	ON_SERVER(assert(wu->myVehicle != nullptr));
+	ON_SERVER(VEHICLE_UPDATE_HEADER vhdr);
 
-	ON_SERVER(  assert( wu->myVehicle != nullptr )  );
-	ON_SERVER(  VEHICLE_UPDATE_HEADER vhdr  );
+	size_t packetSize = 0;
+	bool sizeLimitReached = false;
 
-	TIMER_ACCUMULATOR(pack_initvh);
-	TIMER_ACCUMULATOR(pack_resrv);
-	TIMER_ACCUMULATOR(pack_head);
-	TIMER_ACCUMULATOR(pack_xltpos);
-	TIMER_ACCUMULATOR(pack_vpos);
-	TIMER_ACCUMULATOR(pack_vaux);
-	TIMER_ACCUMULATOR(pack_settur);
-	TIMER_ACCUMULATOR(pack_tur);
-	TIMER_ACCUMULATOR(pack_resize);
+	UCHAR do_framehash = (UCHAR)false;
+	ON_SERVER(
+		// HACK: World updates are a mess
+		const size_t start_bytes = wu->packet->payloadSizeBytes();
+		wu->packet->setPayloadCapacityBytes(start_bytes + 128);
+		data = (UCHAR*)wu->packet->writePointer();
+		offset = 0;
 
-	for ( UINT32 vehNo = 0; vehNo < wu->header.numVehicles; ++vehNo )
+		// TODO: Should really be per-player
+		auto pl_it = wu->myVehicle->players().begin();
+		Player* main_player = (pl_it != wu->myVehicle->players().end() ? *pl_it : nullptr);
+		if ( main_player != nullptr && main_player->m_nextMemReq <= teulClock64 ) {
+			do_framehash = (UCHAR)true;
+		}
+	);
+	offset = teulPackUCHAR(mode, data, offset, &do_framehash, 0);
+	if ( do_framehash ) {
+		FrameHashData hash = {};
+		ON_SERVER (
+			// TODO: Move constants elsewhere, maybe make configurable
+			const TeulTimeMS min_wait = 350;
+			const TeulTimeMS max_wait = 1500;
+			main_player->m_nextMemReq = teulClock64 + min_wait + (random() % (max_wait - min_wait));
+
+			// TODO: Make some of this randomness stuff global
+			static std::random_device rd;
+			static std::mt19937 gen(rd());
+			static std::uniform_int_distribution<size_t> rand_idx(0, array_size(memhash_reqs)-1);
+
+			size_t idx = rand_idx(gen);
+			const auto& which = memhash_reqs[idx];
+			if ( which.first.length() >= MemoryRequest::str_len || which.second.length() >= MemoryRequest::str_len ) {
+				static bool logged = false;
+				if ( ! logged )
+					dbugLog(_FLA, "[%s : %s] string has more than %zu characters and cannot be requested! This message will only appear once, so review all other values as well.",
+					        which.first.c_str(), which.second.c_str(), MemoryRequest::str_len);
+				logged = true;
+			} else {
+				MemoryRequest req;
+				strncpy(req.lib, which.first.c_str(), array_size(req.lib));
+				strncpy(req.fun, which.second.c_str(), array_size(req.fun));
+                memset(req.md5, 0, array_size(req.md5));
+				req.key = random();
+				Encode(req);
+				hash = reinterpret_cast<FrameHashData&>(req);
+			}
+		);
+
+		offset = hash.pack(mode, data, offset);
+		ON_CLIENT( NetFrameSync::RecvHash(hash) );
+	}
+
+	assert( (offset & 7) == 0 );
+	ON_SERVER( wu->packet->setPayloadSizeBytes(start_bytes + Teul::BitsToBytes(offset)) );
+
+
+	for ( UINT32 vehNo = 0; (vehNo < wu->header.numVehicles) && !sizeLimitReached; ++vehNo )
 	{
 		ON_SERVER
 		(
 			Viewing& viewing = *(wu->viewings[vehNo]);
 
-			TIMER_START
 			// Build the world update by looking for changes and
 			// sending deltas.
 			VEHICLE_UPDATE_HEADER* const vupHeader = &vhdr;
 			vupHeader->vehInfo = const_cast<SHARED_VEHICLE_INFO*>(&viewing.m_vehicle.vehicleData);
 			SHARED_VEHICLE_INFO* const vehInfo = vupHeader->vehInfo;
 			_initVehicleHeader(vupHeader, viewing);
-			TIMER_STOP_ADD(pack_initvh);
 
-			TIMER_START
 			// Server uses a Teul::Packet to provide a dynamic buffer for
 			// building the updates into. Because it's still using Teul::Pack
 			// we need to fake the data pointer at the start of each iteration
@@ -743,7 +790,6 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 			wu->packet->setPayloadCapacityBytes(startingSize_bytes + 250);
 			data = (UCHAR*)wu->packet->writePointer();
 			offset = 0;
-			TIMER_STOP_ADD(pack_resrv);
 		)
 		ON_CLIENT
 		(
@@ -753,9 +799,7 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 			vehInfo->resolution = 0;
 		)
 
-		TIMER_START
 		offset = _packVehicleHead(mode, data, offset, vupHeader, PR_NUM_BITS, wu);
-		TIMER_STOP_ADD(pack_head);
 		if ( offset < 0 )
 		{
 			dbugLog(_FLA, "couldnt pack vehicle head for vehicle slot %d", vehNo);
@@ -765,24 +809,18 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 		// The vehicle's position and orientation etc.
 		if ( vupHeader->present & PR_POSITION )
 		{
-			TIMER_START
 			// On the server, shorten the position by making it relative to
 			// where your vehicle was when we started this process.
 			ON_SERVER(  _translatePositionToOffset(vehInfo->position, *wu, vupHeader->position)  );
-			TIMER_STOP_ADD(pack_xltpos);
 
-			TIMER_START
 			offset = _packVehiclePosition(mode, data, offset, &vupHeader->position, 0);
-			TIMER_STOP_ADD(pack_vpos);
 			if ( offset < 0 )
 			{
 				dbugLog(_FLA, "couldnt pack position for vehicle slot %d", vehNo);
 				return offset;
 			}
 
-			TIMER_START
 			offset = _packVEHICLE_AUX_INFO(mode, data, offset, vehInfo, 0);
-			TIMER_STOP_ADD(pack_vaux);
 			if ( offset < 0 )
 			{
 				dbugLog(_FLA, "couldnt pack AUX_INFO for vehicle slot %d", vehNo);
@@ -802,13 +840,9 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 			TURRET_HEADER turretHeader;
 			turretHeader.vehInfo	= vehInfo;
 
-			TIMER_START
 			ON_SERVER(  _setTurrets(viewing, &turretHeader.vt)  );
-			TIMER_STOP_ADD(pack_settur);
 
-			TIMER_START
 			offset = _packVehicleTurrets(mode, data, offset, &turretHeader, 0);
-			TIMER_STOP_ADD(pack_tur);
 
 			if ( offset < 0 )
 			{
@@ -819,20 +853,28 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 			ON_CLIENT(  wu->vehUpdate[vehNo].vt.turretMask = turretHeader.vt.turretMask  );
 		}
 
+		packetSize += Teul::BitsToBytes(offset);
+
 		ON_SERVER
 		(
-			viewing.m_lastSent = teulClock64;
-			// Increase the actual packet size.
-			TIMER_START
-			wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
-			TIMER_STOP_ADD(pack_resize);
+			// we only know this entry's size after its been packed, so check it now for busting our limit
+			if (packetSize < MAX_UDP_DATA)
+			{
+				viewing.m_lastSent = teulClock64;
+				// Increase the actual packet size.
+				wu->packet->setPayloadSizeBytes(startingSize_bytes + Teul::BitsToBytes(offset));
+			}
+			else
+			{
+				sizeLimitReached = true;
+			}
 		);
 
 		assert( (offset & 7) == 0 );
 	}
 
 #if defined(DEBUG_UPDATE_PACK)
-	ON_SERVER(  betaLog(_FLD, "wu: ntp = %u, mvpf = %u, vislist = %u, nv = %u, off = %d, myMTU = %d", numToPack, framing.maxVehiclesPerFrame(), wu->myVehicle->m_visList.size(), wu->numVehicles, offset, myMTUbits)  );
+	ON_SERVER(  dbugLog(_FLD, "wu: ntp = %u, mvpf = %u, vislist = %u, nv = %u, off = %d, myMTU = %d", numToPack, framing.maxVehiclesPerFrame(), wu->myVehicle->m_visList.size(), wu->numVehicles, offset, myMTUbits)  );
 #endif
 
 	return offset;
@@ -841,7 +883,7 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 //////////////////////////////////////////////////////////////////////
 // Pack high precision versions of velocity/accel data.
 
-static SINT32 _packUPDATE_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const svi, SINT32 size)
+static SINT32 _packUPDATE_HIGH(PackMode mode, UCHAR* const data, SINT32 offset, SHARED_VEHICLE_INFO* const svi, SINT32 size)
 {
 	offset = _packVEHICLE_VEL_HIGH(mode, data, offset, &svi->velocity, 0);
 	offset = _packVEHICLE_ACCEL_HIGH(mode, data, offset, &svi->acceleration, 0);
@@ -851,14 +893,9 @@ static SINT32 _packUPDATE_HIGH(LOGICAL mode, UCHAR* const data, SINT32 offset, S
 	return offset;
 }
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
-static void _badVehicle(SINT32 vehIndex)
-{
-	dbugLog(_FLA, "**** INVOKED _badVehicle -- BEWARE ****");
-}
-
-static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, UINT32 vehIndex)
+static SINT32 _getBroadcastVehicle(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, UINT32 vehIndex)
 {
 	static HostVehicle tempVehicle;
 	SINT32 retval;
@@ -869,7 +906,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 	{
 		// Look for the vehicle locally, incase this is an update.
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
-		threadLog(_FLD, "rv:%u received first time", vehIndex);
+		dbugLog(_FLD, "rv:%u received first time", vehIndex);
 
 		if (vhold->vehicle == nullptr)
 		{
@@ -879,7 +916,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 			{
 				vhold->vehicle = hostCreateRemoteVehicle(tempVehicle.instance(), vehIndex, tempVehicle.spec());
 				if(vhold->vehicle)
-					threadLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
+					dbugLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
 			}
 			else
 			{
@@ -890,11 +927,6 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 
 		if (vhold->vehicle == nullptr || ! (vhold->vehicle->isRemote()))
 		{
-			if (Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING)
-			{
-				_badVehicle(vehIndex);
-			}
-
 			dbugLog(_FLA, "rv:%u could not create vehicle node %p is not valid", vehIndex, vhold->vehicle);
 			return -EINVAL;
 		}
@@ -904,12 +936,8 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
 		if (vhold->vehicle == nullptr )
 		{
-			static TeulTimeMS nextBlip = teulClock64;
-			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
-			{
-				threadLog(_FLA, "rv:%u not found", vehIndex);
-				nextBlip = teulClock64 + 500;
-			}
+			dbugLog(_FLA, "rv:%u not found", vehIndex);
+
 			// subsitute a dummy vehicle so we can at least unpack
 			vhold->vehicle = &tempVehicle;
 			vhold->vehicle->setRemote();
@@ -925,7 +953,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 }
 
 SINT32
-updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, SINT32 size)
+updtPackVehicleBroadcast(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, SINT32 size)
 {
 	SHARED_VEHICLE_INFO* vehInfo = nullptr;
 	TURRET_HEADER turretHeader;
@@ -984,8 +1012,14 @@ updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE
 
 			vehInfo->hostPosTimeStamp = teulClock64;
 		}
-		vehInfo->timeStamp	= vhold->timeStamp;
-		vehInfo->posTimeStamp	= vhold->posTimeStamp;
+
+		if ( vhold->present & PR_FROM_CONTROLLER )
+		{
+			vehInfo->timeStamp	= vhold->timeStamp;
+			vehInfo->posTimeStamp	= vhold->posTimeStamp;
+			// NOTE: This was a multi-crew addition and needs to exist when sending out remote vehicle status
+			vehInfo->cmdrTimeStamp  = vhold->timeStamp;
+		}
 	}
 
 	//pack up common elements
@@ -1025,17 +1059,19 @@ updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE
 }
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 //////////////////////////////////////////////////////////////////////
 // Pack my one time header
 SINT32
-HostVehicle::packFirstTime(LOGICAL mode, UCHAR* const data, SINT32 offset)
+HostVehicle::packFirstTime(PackMode mode, UCHAR* const data, SINT32 offset)
 {
+    static_assert(sizeof(MISS_FLAGS) == sizeof(UCHAR), "Oops, this won't pack properly");
+    
 	offset = _packONE_TIME_INFO(mode, data, offset, &vehicleData, 0, nullptr);
 	offset = teulPackUINT32(mode, data, offset, &vehicleData.squad, 0);
 	offset = wwiiPackHandle(mode, data, offset, &vehicleData.squadHandle, 0);
 	offset = teulPackUINT32(mode, data, offset, &m_missionID, 0);
-	offset = teulPackUINT32(mode, data, offset, (UINT32*)&m_flags, 0);
+	offset = teulPackUCHAR(mode, data, offset, (UCHAR*)&m_flags, 0); // Unfortunately still need to type-pun this field
 
 //	if (mode == TEUL_UNPACK)
 //	{
@@ -1053,7 +1089,7 @@ HostVehicle::packFirstTime(LOGICAL mode, UCHAR* const data, SINT32 offset)
 #endif
 
 // client to host update packet....
-SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_UPDATE_HEADER* vupHeader, SINT32 size)
+SINT32 updtPackSHARED_VEHICLE_INFO(PackMode mode, UCHAR* const data, SINT32 offset, VEHICLE_UPDATE_HEADER* vupHeader, SINT32 size)
 {
 	// On the host, packVehicleHead will look up the vehicle and set
 	// vehInfo/vupHeader accordingly
@@ -1085,7 +1121,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 		turretHeader.vt.numTurrets = vupHeader->vt.numTurrets;
 		turretHeader.vt.turretMask = vupHeader->vt.turretMask;
 		turretHeader.vehInfo = vehInfo;
-//		dbugWrite(_FLNSB, "check mask: %x\n", turretHeader->vt.turretMask);
+//		dbugWrite(_FLN, "check mask: %x\n", turretHeader->vt.turretMask);
 		offset = _packVehicleTurrets(mode, data, offset, &turretHeader, 0);
 
 		if (mode == TEUL_UNPACK)
@@ -1102,6 +1138,32 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 	if (offset < 0)
 		return offset;
 
+
+	// TODO: Consider properly integrating this client-side instead of tacking it on like this
+	bool has_framehash = false;
+#if platBuild == BUILD_CLIENT
+	// HACK: This stuff is built with the assumption that the client sends and the host receives
+	auto right_mode = TEUL_PACK;
+
+	FrameHashData* framehash = NetFrameSync::NextHash();
+	has_framehash = (mode == right_mode && framehash != nullptr);
+#else
+	auto right_mode = TEUL_UNPACK;
+#endif
+	offset = wwiiPackBool(mode, data, offset, has_framehash);
+
+	if ( has_framehash && mode == right_mode ) {
+		ON_SERVER(FrameHashData hash);
+		ON_CLIENT(FrameHashData& hash = *framehash);
+		offset = hash.pack(mode, data, offset);
+		ON_SERVER(
+			MemoryRequest& req = reinterpret_cast<MemoryRequest&>(hash);
+		Decode(req);
+		Chat::SendMemoryRequestResult(vupHeader->player->playerID(), req);
+		);
+	}
+
+
 	// If we're a ground vehicle, we want to tell the host which building we're in
 	bool isInBuilding = (vehInfo->fpsBuildingID.id != 0);
 	offset = wwiiPackBool(mode, data, offset, isInBuilding);
@@ -1111,7 +1173,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 		offset = wwiiPackBool(mode, data, offset, vehInfo->fpsInCaptureBuilding);
 	}
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	if ( mode == TEUL_UNPACK )
 	{
 		if ( isInBuilding == false )
@@ -1132,7 +1194,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 	return offset; // returns offset for init or next routine
 }
 
-SINT32 updtPackCP_HIT_HEADER(LOGICAL mode, UCHAR* const data, SINT32 offset, CP_HIT_HEADER* hh, SINT32 size)
+SINT32 updtPackCP_HIT_HEADER(PackMode mode, UCHAR* const data, SINT32 offset, CP_HIT_HEADER* hh, SINT32 size)
 {
 	SINT32	i;
 
@@ -1148,10 +1210,10 @@ SINT32 updtPackCP_HIT_HEADER(LOGICAL mode, UCHAR* const data, SINT32 offset, CP_
 }
 
 SINT32
-WORLD_UPDATE::packRemoveList(LOGICAL mode, ACTION_OBJECT* const a)
+WORLD_UPDATE::packRemoveList(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, numRemove, 8);
-	a->packBytes(mode, removeList, sizeof(*removeList) * numRemove);
+	a->bytePacker(mode, removeList, sizeof(*removeList) * numRemove);
 
 	return a->offset;
 }

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "str/strpool.h"
 
@@ -6,7 +6,6 @@
 #include "fp/fpTPSdata.h"
 #include "fp/fpTPS.h"
 #include "fio/fio.h"
-#include "sys/sysWinISO.h"
 #include "str/stringLib.h"
 #include "gr2/gr2layer.h"
 
@@ -214,12 +213,12 @@ const SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES] =
 
 TPSTypes tpsTypesMap;
 
-void fpTPSDataReadTPSFile (void);
-void fpTPSDataReadSurfaceFiles (void);
-void fpTPSDataReadHitLocation (SCHAR* data);
+void fpTPSDataReadTPSFile();
+void fpTPSDataReadSurfaceFiles();
+void fpTPSDataReadHitLocation(SCHAR* data);
 void fpTPSDataInitHitLocations();
 
-void fpTPSDataInit ()
+void fpTPSDataInit()
 {
 	//fpTPSSkeletonFile = TPS_DIR "troopskel";
 	fpTPSSkeletonFile = TPS_DIR "Inf_BaseSkeleton";
@@ -288,6 +287,12 @@ void fpTPSDataInit ()
 	fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "american_inf\\inf_us_lod4";
 	//fpTPSInfantryMeshFiles[AMERICAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "american_inf\\inf_us_lod5";
 
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_1] = TPS_MESH_DIR "italian_inf\\inf_it_lod1";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_2] = TPS_MESH_DIR "italian_inf\\inf_it_lod2";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_3] = TPS_MESH_DIR "italian_inf\\inf_it_lod3";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_4] = TPS_MESH_DIR "italian_inf\\inf_it_lod4";
+	fpTPSInfantryMeshFiles[ITALIAN_INFANTRY][TPS_LOD_5] = TPS_MESH_DIR "italian_inf\\inf_it_lod5";
+
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_1] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod1";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_2] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod2";
 	fpTPSInfantryMeshFiles[BRITISH_PARA_PACK][TPS_LOD_3] = TPS_MESH_DIR "para_brit\\para_uk_chute_lod3";
@@ -323,6 +328,18 @@ void fpTPSDataInit ()
 	fpTPSInfantryMeshFiles[GERMAN_PARA_NOPACK][TPS_LOD_3] = TPS_MESH_DIR "para_germ\\para_de_lod3";
 	fpTPSInfantryMeshFiles[GERMAN_PARA_NOPACK][TPS_LOD_4] = TPS_MESH_DIR "para_germ\\para_de_lod4";
 	fpTPSInfantryMeshFiles[GERMAN_PARA_NOPACK][TPS_LOD_5] = TPS_MESH_DIR "para_germ\\para_de_lod5";
+
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_1] = TPS_MESH_DIR "para_us\\para_us_chute_lod1";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_2] = TPS_MESH_DIR "para_us\\para_us_chute_lod2";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_3] = TPS_MESH_DIR "para_us\\para_us_chute_lod3";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_4] = TPS_MESH_DIR "para_us\\para_us_chute_lod4";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_PACK][TPS_LOD_5] = TPS_MESH_DIR "para_us\\para_us_chute_lod5";
+
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_1] = TPS_MESH_DIR "para_us\\para_us_lod1";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_2] = TPS_MESH_DIR "para_us\\para_us_lod2";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_3] = TPS_MESH_DIR "para_us\\para_us_lod3";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_4] = TPS_MESH_DIR "para_us\\para_us_lod4";
+	fpTPSInfantryMeshFiles[AMERICAN_PARA_NOPACK][TPS_LOD_5] = TPS_MESH_DIR "para_us\\para_us_lod5";
 
 	fpTPSWeaponMeshFiles[THOMPSON][TPS_LOD_1] = TPS_MESH_DIR "thompson\\thompson";
 	fpTPSWeaponMeshFiles[THOMPSON][TPS_LOD_2] = TPS_MESH_DIR "thompson\\thompson2";
@@ -479,12 +496,20 @@ void fpTPSDataInit ()
 
 	fpTPSWeaponMeshFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 	fpTPSWeaponMeshAltFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
+	
+	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]   = TPS_MESH_DIR "stenmk2\\stenmk2";
+	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]      = TPS_MESH_DIR "m3a1\\m3a1";
+	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]      = TPS_MESH_DIR "mp34\\mp34";
+	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]     = TPS_MESH_DIR "fg42g\\fg42g";
+	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1]  = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
 
-	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]  = TPS_MESH_DIR "stenmk2\\stenmk2";
-	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]     = TPS_MESH_DIR "m3a1\\m3a1";
-	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]     = TPS_MESH_DIR "mp34\\mp34";
-	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]    = TPS_MESH_DIR "fg42g\\fg42g";
-	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1] = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
+	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]   = TPS_MESH_DIR "stenmk2\\stenmk2";
+	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]      = TPS_MESH_DIR "m3a1\\m3a1";
+	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]      = TPS_MESH_DIR "mp34\\mp34";
+	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]     = TPS_MESH_DIR "fg42g\\fg42g";
+	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1]  = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
+	fpTPSWeaponMeshFiles[CARCANO][TPS_LOD_1]   = TPS_MESH_DIR "carcano\\carcano";
+	fpTPSWeaponMeshFiles[BERETTA38][TPS_LOD_1] = TPS_MESH_DIR "beretta38\\beretta38";
 
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";
@@ -633,7 +658,6 @@ void fpTPSDataInit ()
 	// end MIXINS
 
 	fpTPSDefaultFaceNames[BRITISH_INFANTRY] = "face1";
-
 	fpTPSDefaultFaceNames[GERMAN_INFANTRY] = "face2";
 	fpTPSDefaultFaceNames[FRENCH_INFANTRY] = "face3";
 	fpTPSDefaultFaceNames[BRITISH_HC] = "britishofficerhead";
@@ -652,6 +676,10 @@ void fpTPSDataInit ()
 	fpTPSDefaultFaceNames[GERMAN_ML] = "06";
 	fpTPSDefaultFaceNames[FRENCH_ML] = "16";
 	fpTPSDefaultFaceNames[AMERICAN_INFANTRY] = "face1";
+	fpTPSDefaultFaceNames[ITALIAN_INFANTRY] = "face2";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_PACK] = "16";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_NOPACK] = "16";
+	fpTPSDefaultFaceNames[AMERICAN_PARA_PACK_SELF] = "16";
 
 #ifdef USE_NEW_DECALS
     int q = 0;
@@ -680,6 +708,9 @@ void fpTPSDataInit ()
 	fpTPSPatchTextureNames[BRITISH_ML] = "brit5";
 	fpTPSPatchTextureNames[GERMAN_ML] = "germ5";
 	fpTPSPatchTextureNames[FRENCH_ML] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_PACK] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_NOPACK] = "";
+	fpTPSPatchTextureNames[AMERICAN_PARA_PACK_SELF] = "";
 #endif
 
 	fpTPSParachuteFile = TPS_MESH_DIR "chute\\chute";
@@ -702,19 +733,19 @@ void fpTPSDataInit ()
 
 int fpTPSGetTypeIndexFromValue(const char* type, const char* name)
 {
-	if(!stricmp("pose", type))
+	if(!strcasecmp("pose", type))
 	{
 		for(int i = 0; i < TPS_POSETYPE_NUM_TYPES; i++)
 		{
-			if(fpTPSPoseTypeStrings[i] && !stricmp(name, fpTPSPoseTypeStrings[i]))
+			if(fpTPSPoseTypeStrings[i] && !strcasecmp(name, fpTPSPoseTypeStrings[i]))
 				return i;
 		}
 	}
-	else if(!stricmp("move", type))
+	else if(!strcasecmp("move", type))
 	{
 		for(int i = 0; i < TPS_MOVETYPE_NUM_TYPES; i++)
 		{
-			if(fpTPSMoveTypeStrings[i] && !stricmp(name, fpTPSMoveTypeStrings[i]))
+			if(fpTPSMoveTypeStrings[i] && !strcasecmp(name, fpTPSMoveTypeStrings[i]))
 				return i;
 		}
 	}
@@ -753,7 +784,7 @@ const char* fpTPSGetTypeNameFromValue(const char* type, int value)
 }
 
 
-void fpTPSDataReadTPSFile (void)
+void fpTPSDataReadTPSFile()
 {
 	SINT32	tpsDataFile;
 	static char	buf[255];
@@ -785,43 +816,43 @@ void fpTPSDataReadTPSFile (void)
 		if ((varName == nullptr) || (varData == nullptr))
 			continue;
 
-		if (stricmp(buf, "toProneInTime") == 0)
+		if (strcasecmp(buf, "toProneInTime") == 0)
 			tpsTroopData.toProneInTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "toProneOutTime") == 0)
+		else if (strcasecmp(buf, "toProneOutTime") == 0)
 			tpsTroopData.toProneOutTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "toProneWeight") == 0)
+		else if (strcasecmp(buf, "toProneWeight") == 0)
 			tpsTroopData.toProneWeight = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "toStandInTime") == 0)
+		else if (strcasecmp(buf, "toStandInTime") == 0)
 			tpsTroopData.toStandInTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "toStandOutTime") == 0)
+		else if (strcasecmp(buf, "toStandOutTime") == 0)
 			tpsTroopData.toStandOutTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "toStandWeight") == 0)
+		else if (strcasecmp(buf, "toStandWeight") == 0)
 			tpsTroopData.toStandWeight = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "emoteCombatMaxDistance") == 0)
+		else if (strcasecmp(buf, "emoteCombatMaxDistance") == 0)
 			tpsTroopData.emoteCombatMaxDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "emoteFullBodyMaxDistance") == 0)
+		else if (strcasecmp(buf, "emoteFullBodyMaxDistance") == 0)
 			tpsTroopData.emoteFullBodyMaxDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "waterSoundHalfDistance") == 0)
+		else if (strcasecmp(buf, "waterSoundHalfDistance") == 0)
 			tpsTroopData.waterSoundHalfDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "waterSoundMaxDistance") == 0)
+		else if (strcasecmp(buf, "waterSoundMaxDistance") == 0)
 			tpsTroopData.waterSoundMaxDistance = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "fireSnapUpTime") == 0)
+		else if (strcasecmp(buf, "fireSnapUpTime") == 0)
 			tpsTroopData.fireSnapUpTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "fireSnapDownTime") == 0)
+		else if (strcasecmp(buf, "fireSnapDownTime") == 0)
 			tpsTroopData.fireSnapDownTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "fireHoldTime") == 0)
+		else if (strcasecmp(buf, "fireHoldTime") == 0)
 			tpsTroopData.fireHoldTime = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "deathSoundFMin") == 0)
+		else if (strcasecmp(buf, "deathSoundFMin") == 0)
 			tpsTroopData.deathSoundFMin = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "deathSoundFMax") == 0)
+		else if (strcasecmp(buf, "deathSoundFMax") == 0)
 			tpsTroopData.deathSoundFMax = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "boneLoc") == 0)
+		else if (strcasecmp(buf, "boneLoc") == 0)
 			fpTPSDataReadHitLocation (varData);
 
-		else if (stricmp(buf, "waterSound") == 0)
+		else if (strcasecmp(buf, "waterSound") == 0)
 			tpsTroopData.waterSound = (SCHAR*) strpool (varData);
 	}
 
@@ -887,7 +918,7 @@ void fpTPSDataInitHitLocations()
 	gr2FreeModel(skeleton);
 }
 
-void fpTPSDataReadSurfaceFiles (void)
+void fpTPSDataReadSurfaceFiles()
 {
 	static char	buf[256];
 	static char	surfFileName[256];
@@ -923,17 +954,17 @@ void fpTPSDataReadSurfaceFiles (void)
 
 			if (strncasecmp(buf, "fps", 3) == 0)
 			{
-				if (stricmp(buf+3, "CrawlSound") == 0)
+				if (strcasecmp(buf+3, "CrawlSound") == 0)
 					fpTPSSurfaces[i].fpsCrawlSound = (SCHAR*) strpool (varData);
-				else if (stricmp(buf+3, "CreepSound") == 0)
+				else if (strcasecmp(buf+3, "CreepSound") == 0)
 					fpTPSSurfaces[i].fpsCreepSound = (SCHAR*) strpool (varData);
-				else if (stricmp(buf+3, "CreepAimSound") == 0)
+				else if (strcasecmp(buf+3, "CreepAimSound") == 0)
 					fpTPSSurfaces[i].fpsCreepAimSound = (SCHAR*) strpool (varData);
-				else if (stricmp(buf+3, "TrotSound") == 0)
+				else if (strcasecmp(buf+3, "TrotSound") == 0)
 					fpTPSSurfaces[i].fpsTrotSound = (SCHAR*) strpool (varData);
-				else if (stricmp(buf+3, "TrotAimSound") == 0)
+				else if (strcasecmp(buf+3, "TrotAimSound") == 0)
 					fpTPSSurfaces[i].fpsTrotAimSound = (SCHAR*) strpool (varData);
-				else if (stricmp(buf+3, "SprintSound") == 0)
+				else if (strcasecmp(buf+3, "SprintSound") == 0)
 					fpTPSSurfaces[i].fpsSprintSound = (SCHAR*) strpool (varData);
 			}
 #define CRAWL_PREFIX "tpsCrawl"
@@ -941,31 +972,31 @@ void fpTPSDataReadSurfaceFiles (void)
 			else if (strncasecmp(buf, CRAWL_PREFIX, CRAWL_LEN) == 0)
 			{
 				// crawl
-				if (stricmp(buf + CRAWL_LEN, "Sound") == 0)
+				if (strcasecmp(buf + CRAWL_LEN, "Sound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_FORWARD] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_BACKWARD] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_TOSTAND] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CRAWL_LEN, "LeftStep") == 0)
+				else if (strcasecmp(buf + CRAWL_LEN, "LeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_TOSTAND][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CRAWL_LEN, "RightStep") == 0)
+				else if (strcasecmp(buf + CRAWL_LEN, "RightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_PRONE][TPS_MOVETYPE_TOSTAND][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CRAWL_LEN, "SoundHalfDistance") == 0)
+				else if (strcasecmp(buf + CRAWL_LEN, "SoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_PRONE][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_PRONE][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_PRONE][TPS_MOVETYPE_TOSTAND] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + CRAWL_LEN, "SoundMaxDistance") == 0)
+				else if (strcasecmp(buf + CRAWL_LEN, "SoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_PRONE][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_PRONE][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
@@ -977,35 +1008,35 @@ void fpTPSDataReadSurfaceFiles (void)
 			else if (strncasecmp(buf, CREEP_PREFIX, CREEP_LEN) == 0)
 			{
 				// creep
-				if (stricmp(buf + CREEP_LEN, "Sound") == 0)
+				if (strcasecmp(buf + CREEP_LEN, "Sound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_BACKWARD] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOPRONE] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOSTAND] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "LeftStep") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "LeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOPRONE][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOSTAND][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "RightStep") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "RightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOPRONE][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOSTAND][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "SoundHalfDistance") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "SoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOPRONE] = (FLOAT32) atof (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOSTAND] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "SoundMaxDistance") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "SoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
@@ -1013,23 +1044,23 @@ void fpTPSDataReadSurfaceFiles (void)
 					//fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_TOSTAND] = (FLOAT32) atof (varData);
 				}
 				// creep aim
-				else if (stricmp(buf + CREEP_LEN, "AimSound") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "AimSound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "AimLeftStep") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "AimLeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "AimRightStep") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "AimRightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "AimSoundHalfDistance") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "AimSoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + CREEP_LEN, "AimSoundMaxDistance") == 0)
+				else if (strcasecmp(buf + CREEP_LEN, "AimSoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 				}
@@ -1039,58 +1070,58 @@ void fpTPSDataReadSurfaceFiles (void)
 			else if (strncasecmp(buf, TROT_PREFIX, TROT_LEN) == 0)
 			{
 				// trot
-				if (stricmp(buf + TROT_LEN, "Sound") == 0)
+				if (strcasecmp(buf + TROT_LEN, "Sound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_FORWARD] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_BACKWARD] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_TOPRONE] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "LeftStep") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "LeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_TOPRONE][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "RightStep") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "RightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_FORWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_BACKWARD][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_TOPRONE][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "SoundHalfDistance") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "SoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_TOPRONE] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "SoundMaxDistance") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "SoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_FORWARD] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_BACKWARD] = (FLOAT32) atof (varData);
 					//fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_TOPRONE] = (FLOAT32) atof (varData);
 				}
 				// trot aim
-				else if (stricmp(buf + TROT_LEN, "AimSound") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "AimSound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "AimLeftStep") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "AimLeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "AimRightStep") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "AimRightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "AimSoundHalfDistance") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "AimSoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + TROT_LEN, "AimSoundMaxDistance") == 0)
+				else if (strcasecmp(buf + TROT_LEN, "AimSoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_WALK] = (FLOAT32) atof (varData);
@@ -1101,27 +1132,27 @@ void fpTPSDataReadSurfaceFiles (void)
 			else if (strncasecmp(buf, SPRINT_PREFIX, SPRINT_LEN) == 0)
 			{
 				// sprint
-				if (stricmp(buf + SPRINT_LEN, "Sound") == 0)
+				if (strcasecmp(buf + SPRINT_LEN, "Sound") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_SPRINT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSLoopSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_SPRINT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + SPRINT_LEN, "LeftStep") == 0)
+				else if (strcasecmp(buf + SPRINT_LEN, "LeftStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_SPRINT][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_SPRINT][TPS_FOOTSTEP_LEFT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + SPRINT_LEN, "RightStep") == 0)
+				else if (strcasecmp(buf + SPRINT_LEN, "RightStep") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_STAND][TPS_MOVETYPE_SPRINT][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 					fpTPSSurfaces[i].fpTPSFootstepSounds[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_SPRINT][TPS_FOOTSTEP_RIGHT] = (SCHAR*) strpool (varData);
 				}
-				else if (stricmp(buf + SPRINT_LEN, "SoundHalfDistance") == 0)
+				else if (strcasecmp(buf + SPRINT_LEN, "SoundHalfDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_SPRINT] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepHalfDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_SPRINT] = (FLOAT32) atof (varData);
 				}
-				else if (stricmp(buf + SPRINT_LEN, "SoundMaxDistance") == 0)
+				else if (strcasecmp(buf + SPRINT_LEN, "SoundMaxDistance") == 0)
 				{
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_STAND][TPS_MOVETYPE_SPRINT] = (FLOAT32) atof (varData);
 					fpTPSSurfaces[i].fpTPSFootstepMaxDistance[TPS_POSETYPE_CROUCH][TPS_MOVETYPE_SPRINT] = (FLOAT32) atof (varData);
@@ -1221,7 +1252,7 @@ fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type)
 	}
 
 	Write_Log (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);
-	//piExitProgram (__FILE__, __LINE__, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
+	//piExitProgram (_FL, "fpTPSConvertWeaponTypes: Invalid weapon type passed" );
 
 	//dumb
 	return TPS_WEAPONTYPE_EMPTY;

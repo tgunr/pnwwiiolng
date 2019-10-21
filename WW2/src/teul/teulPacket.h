@@ -4,10 +4,10 @@
 //
 // Teul::Packet class.
 
+#include "teul/teulPacketHeader.h"
+
 namespace Teul
 {
-
-struct PacketHeader;
 
 //! @class Teul::Packet
 //! @brief Provides a minimal-copy packet buffer for header & payload data.
@@ -32,7 +32,7 @@ struct PacketId
 	uint8_t	m_x, m_y;
 
 	template<typename T1, typename T2>
-	PacketId(T1 callX, T2 callY) noexcept : m_x((uint8_t)callX), m_y((uint8_t)callY) {}
+	PacketId(T1 callX, T2 callY) noexcept : m_x(static_cast<uint8_t>(callX)), m_y(static_cast<uint8_t>(callY)) {}
 };
 
 class Packet
@@ -41,20 +41,15 @@ public:
 	//! Create a packet for a specific callback.
 	Packet(PacketId id);
 	//! Default/receive constructor.
-	Packet();
-#if defined(ALLOW_TEUL_PACKET_MOVE)
-	//! Move constructor
-	Packet(Packet&& moveRef);
-#else
+	Packet() {}
 	Packet(Packet&& moveRef) = delete;
 	Packet& operator = (Packet&& rhs) = delete;
-#endif
 
 	//! Construct and populate with a copy of an existing object.
 	template<typename T>
 	explicit Packet(PacketId id, T src) : Packet(id)
 	{
-		new ((T*)allocateBytes(sizeof(T))) T(src);
+		new (reinterpret_cast<T*>(allocateBytes(sizeof(T)))) T(src);
 	}
 
 	//! Construct and populate from a pre-existing data source.
@@ -74,37 +69,43 @@ public:
 	~Packet();
 
 public:
-	enum { DefaultLocalDataSize = 256 };
+	enum { DefaultLocalDataSize = 4096 };
 	enum { GrowthRate = 256 };
-	enum { UnencryptedBytes = 3 };	// Start token and packet size unencrypted.
 
 private:
 	//! Data for this packet.
-	UCHAR*			m_data;
+	UCHAR*			m_data = m_localData;
 	//! The size of the whole thing.
-	UINT32			m_packetSizeBytes;
+	UINT32			m_packetSizeBytes = 0;
 	//! Current capacity of the packet.
-	UINT32			m_capacity;
+	UINT32			m_capacity = DefaultLocalDataSize;
 	//! Byte sent.
-	UINT32			m_sent;
+	UINT32			m_sent = 0;
 	//! Destination address for UDP.
-	UINT32			m_address;
+	UINT32			m_address = 0;
 	//! Destination port for UDP.
-	UINT32			m_port;
+	UINT32			m_port = 0;
 	//! Default local buffer of X bytes.
-	UCHAR			m_localData[DefaultLocalDataSize];
+	UCHAR			m_localData[DefaultLocalDataSize] = { 0 };
 
 public:
 	//! Is there any data in the packet?
-	bool empty() const { return payloadSizeBytes() <= 0; }
+	bool empty() const noexcept { return payloadSizeBytes() <= 0; }
 
 	//! Clear out contents of packet for re-population/work.
-	void reset();
+	void reset() noexcept
+	{
+		header().m_tag = 0;
+		m_packetSizeBytes = headerSizeBytes();
+		m_address = 0;
+		m_port = 0;
+		m_sent = 0;
+	}
 
 	//! Encrypt and send data to given teulIndex.
-	SINT32 send(const SINT32 teulIndex_);
+	SINT32 send(const SINT32 teulIndex_, const UCHAR protocolPreference = PROTOCOL_UNDEF);
 	//! Pack, encrypt and send data to given endpoint.
-	SINT32 send(ENDPOINT& endpoint_);
+	SINT32 send(ENDPOINT& endpoint_, const UCHAR protocolPreference=PROTOCOL_UNDEF);
 
 	//! Broadcast this packet to an array of endpoints.
 	void send(const std::vector<ENDPOINT*>& endpoints);
@@ -118,14 +119,19 @@ public:
 	SINT32 receive(ENDPOINT& endpoint_);
 
 	//! Disable encryption on this packet (e.g. for broadcasting).
-	void setUnencrypted();
+	void setUnencrypted() noexcept;
 
 	//! Determine whether this is encrypted or not.
-	bool wantsEncryption();
+	bool wantsEncryption() const noexcept;
 
 	//! Increase the total packet allocation.
 	//! @note We don't track the amount used.
-	void setPacketSizeBytes(const UINT32 sizeBytes_);
+	void setPacketSizeBytes(const UINT32 sizeBytes_)
+	{
+		if ( sizeBytes_ > m_capacity )
+			setPacketCapacityBytes(sizeBytes_);
+		m_packetSizeBytes = sizeBytes_;
+	}
 
 	//! Increase the total packet allocation to accommodate the given payload size.
 	//! @note We don't track the amount used.
@@ -145,7 +151,7 @@ public:
 	void increaseUsedPayloadBits(const UINT32 bits_) { increaseUsedPayloadBytes((bits_+7)/8); }
 
 	//! Allocate bytes and return a pointer to the start of those bytes.
-	//! @caution This pointer is potentially invalidated by any call
+	//! \caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	public:
 	void* allocateBytes(UINT32 growth_bytes)
@@ -153,14 +159,14 @@ public:
 		const UINT32 oldSize_bytes = packetSizeBytes();
 		reserve(oldSize_bytes + growth_bytes);	// May cause reallocation.
 		m_packetSizeBytes += growth_bytes;		// Change the end-of-data position.
-		return (char*)m_data + oldSize_bytes;	// Calculate pointer here because of potential realloc.
+		return reinterpret_cast<char*>(m_data) + oldSize_bytes;	// Calculate pointer here because of potential realloc.
 	}
 
 	//! Allocate space for an instance of Type_ and return a pointer to the start of those bytes.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	template<typename Type_>
-	Type_* allocatePtr(UINT32 numEntries=1) { return (Type_*)allocateBytes(sizeof(Type_) * numEntries); }
+	Type_* allocatePtr(UINT32 numEntries=1) { return reinterpret_cast<Type_*>(allocateBytes(sizeof(Type_) * numEntries)); }
 
 	//! Assign space for and return a pointer to a
 	//! blank instance of a particular type.
@@ -198,75 +204,75 @@ public:
 	//! Retrieve a const type-cast pointer to the payload portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	const void* payload() const { assert(payloadSizeBytes() > 0); return (m_data + headerSizeBytes()); }
+	const void* payload() const noexcept { assert(payloadSizeBytes() > 0); return (m_data + headerSizeBytes()); }
 	//! Retrieve a type-cast pointer to the payload portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	void* payload() { assert(payloadSizeBytes() > 0); return (m_data + headerSizeBytes()); }
+	void* payload() noexcept { assert(payloadSizeBytes() > 0); return (m_data + headerSizeBytes()); }
 
 	//! Get the current write pointers (end of current payload).
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	void* writePointer() { return m_data + packetSizeBytes(); }
+	void* writePointer() noexcept { return m_data + packetSizeBytes(); }
 
 	template<typename _Type>
-	_Type& payloadRef(UINT32 offset_=0) { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
+	_Type& payloadRef(UINT32 offset_=0) noexcept { return *reinterpret_cast<_Type*>(m_data + headerSizeBytes() + offset_); }
 
 	//! Retrieve a reference to the header portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	const PacketHeader& header() const { return *(const PacketHeader*)(m_data); }
-	PacketHeader& header() { return *(PacketHeader*)(m_data); }
+	const PacketHeader& header() const noexcept { return *reinterpret_cast<const PacketHeader*>(m_data); }
+	PacketHeader& header() noexcept { return *reinterpret_cast<PacketHeader*>(m_data); }
 
 	//! Pointer to the whole packet.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	const void* packet() const { return m_data; }
-	void* packet() { return m_data; }
+	const void* packet() const noexcept { return m_data; }
+	void* packet() noexcept { return m_data; }
 
 	//! Pointer to the first part of the packet that should be encrypted.
 	//! @note This points to a part of the header.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	UCHAR* encryptable() { return m_data + UnencryptedBytes; }
+	UCHAR* encryptable() noexcept { return m_data + Teul::PacketPrefixBytes; }
 
 	//! Get the size of the envelope section of the header
-	static UINT32 envelopeSizeBytes() { return headerSizeBytes() - UnencryptedBytes; }
+	static UINT32 envelopeSizeBytes() noexcept { return headerSizeBytes() - Teul::PacketPrefixBytes; }
 	//! Get the size of the envelope section of the header
-	static UINT32 envelopeSizeBits() { return envelopeSizeBytes() * 8; }
+	static UINT32 envelopeSizeBits() noexcept { return envelopeSizeBytes() * 8; }
 
 	//! Get the size of the entire packet header (in bytes).
-	static UINT32 headerSizeBytes();
+	static UINT32 headerSizeBytes() noexcept { return sizeof(Teul::PacketHeader); }
 	//! Get the size of the payload portion of the packet (in bytes).
-	UINT32 payloadSizeBytes() const { return packetSizeBytes() - headerSizeBytes(); }
+	UINT32 payloadSizeBytes() const noexcept { return packetSizeBytes() - headerSizeBytes(); }
 	//! Get the size of the whole packet (in bytes).
-	UINT32 packetSizeBytes() const { return m_packetSizeBytes; }
+	UINT32 packetSizeBytes() const noexcept { return m_packetSizeBytes; }
 
 	//! Get the size of the header portion of the packet (in bits).
 	//! @note We don't track the amount used.
-	static UINT32 headerSizeBits() { return headerSizeBytes() * 8; }
+	static UINT32 headerSizeBits() noexcept { return headerSizeBytes() * 8; }
 	//! Get the size of the payload portion of the packet (in bits).
 	//! @note We don't track the amount used.
-	UINT32 payloadSizeBits() const { return payloadSizeBytes() * 8; }
+	UINT32 payloadSizeBits() const noexcept { return payloadSizeBytes() * 8; }
 	//! Get the size of the whole packet (in bits).
 	//! @note We don't track the amount used.
-	UINT32 packetSizeBits() const { return packetSizeBytes() * 8; }
+	UINT32 packetSizeBits() const noexcept { return packetSizeBytes() * 8; }
 
 	//! Get the current capacity.
-	UINT32 packetCapacityBytes() const { return m_capacity; }
+	UINT32 packetCapacityBytes() const noexcept { return m_capacity; }
 
 	//! Get the current payload capacity.
-	UINT32 payloadCapacityBytes() const { return packetCapacityBytes() - headerSizeBytes(); }
+	UINT32 payloadCapacityBytes() const noexcept { return packetCapacityBytes() - headerSizeBytes(); }
 
 	//! Address we are destined for (or zero for connected sockets).
-	UINT32 address() const { return m_address; }
+	UINT32 address() const noexcept { return m_address; }
 	//! Port we are destined for (or zero for connected sockets).
-	UINT32 port() const { return m_port; }
+	UINT32 port() const noexcept { return m_port; }
 
 	//! Bytes we have sent.
-	UINT32 sentBytes() const { return m_sent; }
+	UINT32 sentBytes() const noexcept { return m_sent; }
 	//! Increment bytes sent.
-	void sentBytes(const UINT32 bytes_) { m_sent += bytes_; }
+	void addBytesSent(const UINT32 bytes_) noexcept { m_sent += bytes_; }
 };
 
 template<typename T>
@@ -276,7 +282,7 @@ struct OMGPacket : public Packet
 	OMGPacket(Args&&... args)
 		: Packet(PacketId(T::CallX, T::CallY))
 	{
-		new ((T*)allocateBytes(sizeof(T))) T{ std::forward<Args>(args)... };
+		new (reinterpret_cast<T*>(allocateBytes(sizeof(T)))) T{ std::forward<Args>(args)... };
 	}
 };
 

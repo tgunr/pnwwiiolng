@@ -1,0 +1,12 @@
+mkdir C:\playnet
+mkdir C:\playnet\bin
+mkdir C:\playnet\etc
+mkdir C:\playnet\lua
+mkdir c:\playnet\scripts
+mkdir c:\playnet\tmp
+mkdir C:\playnet\wwiiol
+mkdir c:\playnet\wwiiol\bin
+mkdir c:\playnet\wwiiol\data
+mkdir c:\playnet\wwiiol\lua
+mkdir c:\playnet\wwiiol\uweb
+mkdir c:\playnet\wwiiol\uweb\debug

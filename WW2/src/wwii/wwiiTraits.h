@@ -32,13 +32,13 @@ namespace WWII
 		//! Interface for objects which provide a playerID.
 		struct as_interface	IPlayerID			{ virtual playerid_t playerID() const = 0; };
 		//! Interface for objects which provide a (displayable) ChatHandle.
-		struct as_interface	IChatHandle			{ virtual const ChatHandle& chatHandle() const = 0; };
+		struct as_interface	IChatHandle			{ virtual ChatHandle chatHandle() const = 0; };
 		//! Interface for objects which provide a lowercase ChatHandle for matching/indexes.
-		struct as_interface	IMatchHandle		{ virtual const ChatHandle& matchHandle() const = 0; };
+		struct as_interface	IMatchHandle		{ virtual ChatHandle matchHandle() const = 0; };
 		//! Interface for objects which provide an Instance::Descriptor.
 		struct as_interface	IInstanceDescriptor	{ virtual const Instance::Descriptor& instDescriptor() const = 0; };
 		//! Interface for objects which provide a unique instanceID..
-		struct as_interface	IInstanceID			{ virtual const instanceid_t& instID() const = 0; };
+		struct as_interface	IInstanceID			{ virtual instanceid_t instID() const = 0; };
 		//! Interface for objects which provide a missionID.
 		struct as_interface	IMissionID			{ virtual UINT32 missionID() const = 0; };
 		//! Interface for objects which provide a brigadeID.
@@ -46,7 +46,7 @@ namespace WWII
 		//! Interface for objects which provide a sortieID.
 		struct as_interface	ISortieID			{ virtual sortieid_t sortieID() const = 0; };
 		//! Interface for objects which provide a WEAPON_SPEC.
-		struct as_interface	IWeaponSpec			{ virtual const WEAPON_SPEC& weaponSpec() const = 0; };
+		struct as_interface	IWeaponSpec			{ virtual WEAPON_SPEC weaponSpec() const = 0; };
 		//! Interface for objects which provide a WWII_SIDE.
 		struct as_interface	ISide				{ virtual WWII_SIDE side() const = 0; };
 		//! Interface for objects which provide a WWII_COUNTRY.

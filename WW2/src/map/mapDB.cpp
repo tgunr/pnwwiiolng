@@ -7,13 +7,10 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "versionNo.h"
-#include "revision.h"
-
+#include "build_info.hpp"
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseWrapper.h"
+#include "chat/chatName.h"
 #include "include/arenaLockEnums.h"
 #include "include/mydbQuery.h"
 #include "map/mapArenaDescription.h"
@@ -28,25 +25,24 @@
 #include "map/mapSwingMeter.h"
 #include "miss/mission.h"
 #include "miss/missHitArrayNode.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmQueries.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
 #include "strt/strtFacilityStruct.h"
 #include "tut/tutGroupProgress.h"
+#include "weap/weapLoadIndexes.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiErrorTypes.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRank.h"
 #include "wwii/wwiiThreads.h"
+#include "mm/mmdbPersonaSelections.h"
 
 bool activeCountries[MAX_COUNTRIES];
-
-extern void weapLoadIndexes(DB::handle_t* conn);
 
 struct DB_PERM_STRUCT
 {
@@ -56,9 +52,6 @@ struct DB_PERM_STRUCT
 };
 
 //static VEH_LIST_STRUCT _vehList;
-DBHANDLE dbh;
-
-DBCONNECTION dbConnection;
 
 extern SwingMeter g_swingMeter;
 
@@ -113,15 +106,11 @@ static void _removePrefix(std::string& from, const std::string& prefix)
 static void
 _setArenaDescriptionHostRevision()
 {
-	char hostRevision[200];
-	strprintf(hostRevision, "%s(%s)", REPOSITORY_INFO, cv_stratLanguage.GetString());
-
-	std::string revision = hostRevision;
-	_removePrefix(revision, "branches/");
-	_removePrefix(revision, "tags/");
-	g_arenaDescription["host_rev"] = revision;
-
-	dbugLog(_FLI, "set arena host revision to '%s'", revision.c_str());
+    g_arenaDescription["host_rev"] =
+        std::string("c:") + PN_code_git_commitish_string + " " +
+        std::string("d:") + PN_data_git_commitish_string + " " +
+        std::string("(")  + cv_stratLanguage.GetString() + ")";
+	dbugLog(_FLI, "set arena host revision to '%s'", g_arenaDescription["host_rev"].c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -133,7 +122,7 @@ static void _initializeBrigadeLocations()
 	HCUNIT_INDEX::iterator it;
 	for (it = hcUnits.begin(); it != hcUnits.end(); ++it) {
 		HCUnit* unit = it->second;
-		if (!unit->isBrigade() && !unit->isDivision())
+		if (!unit->isBrigade() && !unit->isDivision() && !unit->isGarrison())
 			continue;
 		if (unit->homeCPID().id == 0)
 			continue;
@@ -147,8 +136,6 @@ static void _initializeBrigadeLocations()
 static bool
 _readArenaDescription()
 {
-	_setArenaDescriptionHostRevision();
-
 	try
 	{
 		DBQuery q(dbh, QRY_SELECT_ARENA_DESCRIPTION);
@@ -168,6 +155,9 @@ _readArenaDescription()
 			dbugLog(_FLI, "arena config: %s=%s", name, value);
 		}
 
+        // Do this after loading from DB so our host_rev will always override
+        // one that may or may not be in the DB instead of vice versa.
+        _setArenaDescriptionHostRevision();
 		return true;
 	}
 	catch (std::exception& e)
@@ -180,7 +170,7 @@ _readArenaDescription()
 static void
 _connectGameDB()
 {
-	if ( dbh.connect(dbConnection) == false )
+	if ( dbh.connect() == false )
 		LogAbort("unable to connect to game database -- aborting");
 
 	DBSimpleQuery(dbh,
@@ -195,8 +185,8 @@ _connectGameDB()
 			"  `clientVersion` char(16) NOT NULL default '0.0.0.0',"
 			"  `platform` int(11) unsigned default NULL,"
 			"  `rxTime` timestamp NOT NULL,"
-			"  `hostTime` timestamp NOT NULL,"
-			"  `clientTime` timestamp NOT NULL,"
+			"  `hostTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+			"  `clientTime` datetime NULL,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -232,9 +222,9 @@ mapInitDB()
 		retval = false;
 	}
 
-	wwiiReadRanks(dbh);
+	wwiiReadRanks();
 
-#if !defined(DEV_BUILD) && !defined(FRES)
+#if !defined(DEV_BUILD)
 	mapPollChecksums(true);
 #endif
 
@@ -254,7 +244,6 @@ mapInitDB()
 void
 mapCloseDB()
 {
-	wwiiFreeRanks();
 	dbh.disconnect();
 }
 
@@ -269,26 +258,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 
 	try
 	{
-		TeulTimeMS entryTime = teulClock64;
-
-#undef TIME_QUERIES
-#ifdef TIME_QUERIES
-		TeulTimeMS startTime;
-
-		teulSyncClock();
-		startTime = teulClock64;
-#endif
-
-		DBQuery q(dbh, "CALL auth.p_get_player_details(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
-
-#ifdef TIME_QUERIES
-		teulSyncClock();
-
-		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "auth.p_get_player_details appears to be taking too long: apparent:%llums, actual:%llums"
-							, teulClock64 - entryTime
-							, teulClock64 - startTime);
-#endif
+		DBQuery q(dbh, "CALL `auth`.`p_get_player_details`(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
 
 		if ( q.HasRows() == false )
 			throw std::invalid_argument("No such playerID");
@@ -301,7 +271,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		if ( details.playerID != forPlayerID )
 			throw std::logic_error("get player info retrieved wrong player");
 		if ( details.callsign[0] == 0 )
-			throw std::logic_error("auth.p_get_player_details returned empty game name");
+			throw std::logic_error("`auth`.`p_get_player_details` returned empty game name");
 
 		SetPlayerID(details.playerID);			// Our playerID
 		m_customerID = details.customerID;		// Billing system ID
@@ -325,14 +295,10 @@ Player::selectPlayer(const playerid_t forPlayerID)
 
 		SetMeteredAccess(details.minuteBalance);
 
-#ifdef TIME_QUERIES
-		teulSyncClock();
-#endif
-		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%llx player:%llx mb:%u %s took %llums"
+		dbugLog(_FLN, "t:%d p:%u c:%s cust:%u found login info perms:%" PRPermMaskT " player:%" PRPermMaskT " mb:%u %s"
 						, teulIndex(), playerID(), callsign(), m_customerID
 						, permissionMask(), m_playerMask
-						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered")
-						, teulClock64 - entryTime);
+						, minuteBalance(), (meteredAccess() ? "metered" : "unmetered"));
 
 		return true;
 	}
@@ -344,27 +310,6 @@ Player::selectPlayer(const playerid_t forPlayerID)
 	return false;
 }
 
-UINT32
-Player::createPersonaRecord(WWII_COUNTRY countryID, BRANCH_ENUM branchID) const
-{
-	try
-	{
-		DBQuery q(dbh, QRY_INSERT_NEW_PERSONA_RECORD, playerID(), countryID, branchID);
-
-		static const char* branches[] = { "NONE", "ARMY", "AIR", "NAVY" };
-		dbugLog(_FLN, "t:%d p:%u c:%s created new %s %s persona id %d"
-						, teulIndex(), playerID(), callsign(), _countryName[countryID], branches[branchID], q.LastInsertID());
-
-		return q.LastInsertID();
-	}
-	catch (std::exception& e)
-	{
-		dbugLog(_FLA, "t:%d p:%u c:%s unable to create persona: %s", teulIndex(), playerID(), callsign(), e.what());
-	}
-
-	return 0;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Advance all of this player's personas in a particular branch to
 // the lower of either the top of the buddy rank system or the
@@ -374,7 +319,7 @@ void
 mapSaveRank(const Player* player, bool immediate)
 {
 	static char buffer[181];
-	strprintf(buffer, "CALL wwii.p_increase_rank_score(%u,%u,%u,%u,%u,%u)"
+	strprintf(buffer, "CALL `wwii`.`p_increase_rank_score`(%u,%u,%u,%u,%u,%u)"
 							, (UINT32)player->playerID(), player->country(), player->branch()
 							, (UINT32)player->personaID(), (UINT32)player->realRank(), (UINT32)player->points());
 	dbugLog(_FLI, "t:%d p:%u c:%s %s", player->teulIndex(), player->playerID(), player->callsign(), buffer);
@@ -402,148 +347,6 @@ Player::SetBranch(BRANCH_ENUM newBranch)
 					, newBranch, m_maxRank);
 }
 
-//////////////////////////////////////////////////////////////////////
-// Retrieve persona data
-
-PERSONA_LOAD_STATUS
-Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM branchID)
-{
-	// Sanity cleanup of various things you may already have
-	ExitBrigade(PERS_SELECTING_PERSONA);
-	try
-	{
-		static const char QRY_SELECT_PERSONA_DATA[] = "CALL wwii.p_get_persona_data(%u, %u, %u)";
-
-		DBQuery q(dbh, QRY_SELECT_PERSONA_DATA, playerID(), countryID, branchID);
-
-		// If there was no data, there is probably no such persona
-		if ( q.Rows() == 0 || !q.FetchRow() )
-			return PLS_MISSING;
-
-		auto& row = q.Row();
-
-		selectedID = row.NextUInt();								// 0
-
-		// We get a row for all of this personas branch-matching
-		// personas. The country-matching one should be first,
-		// if it isn't, then they don't have a persona.
-		WWII_COUNTRY thisCountry = (WWII_COUNTRY)row.NextUInt();	// 1
-		if ( thisCountry != countryID )
-			return PLS_MISSING;
-
-		RANK_NO myRankNo = (RANK_NO)row.NextUInt();					// 2
-		UINT32 myRankPoints = row.NextUInt();						// 3
-
-		// Determine if the persona is locked
-		m_sideLockTime = row.NextUInt();							// 4
-		m_lastSide = (WWII_SIDE)row.NextUInt();						// 5
-
-		if ( m_sideLockTime <= teulTime() )
-		{
-			m_sideLockTime = 0;
-			m_lastSide = WWII_NO_SIDE;
-		}
-
-		UINT32 lockedFor = isSideLocked(wwiiSide(countryID));
-		if ( lockedFor > 0 )
-		{
-			dbugLog(_FLN, "t:%d p:%u select persona %u:%u/%u is side-locked to %u for %u", teulIndex(), playerID(), selectedID, countryID, branchID, m_lastSide, lockedFor);
-			return PLS_LOCKED;
-		}
-
-		SetPersonaID(selectedID);
-		SetCountry(countryID, wwiiSide(countryID));
-		SetBranch(branchID);
-
-		m_playerMask = row.NextUINT64();							// 6
-		updateMask();
-
-		SetDecal(row.NextUInt());									// 7
-
-		SetSquad(row.NextUInt());									// 8
-		SetSquadHandle(chatGetHandle(row.NextString()));			// 9
-
-		UINT32 playedTime = row.NextUInt();							//10
-		UINT32 newMinuteBalance = row.NextUInt();					//11
-
-		SetRank(myRankNo);
-		m_rankPointsEarned = myRankPoints;
-
-		if ( useRank().permissions(ALL_SPAWN) )
-			dbugLog(_FLD, "t:%d p:%u c:%s persona has ALL_SPAWN", teulIndex(), playerID(), callsign());
-		if ( m_playerMask & ALL_SPAWN )
-			dbugLog(_FLD, "t:%d p:%u c:%s player has ALL_SPAWN", teulIndex(), playerID(), callsign());
-
-		if ( nullptr == m_antiAddiction && !permissions(IS_MATURE) )
-		{
-			mmAddMinor(this, playedTime);
-		}
-
-		// Now you need to select a brigade
-		SetState(PERS_SELECTING_BRIGADE);
-
-		updateMap();
-
-		updateChat(true);
-
-		// If the player is accessing a persona that might need
-		// to be buddied up, check the other personas for higher
-		// ranks within the same branch
-		const RANK_NO globalShareCeiling = std::min(maxRank(), (RANK_NO)host_config.score.maxGlobalSharedRank);
-		const RANK_NO sideShareCeiling = std::min(maxRank(), (RANK_NO)host_config.score.maxSideSharedRank);
-
-		bool changed = false;
-
-		while ( q.FetchRow() )
-		{
-			auto& altRow = q.Row();
-			altRow.NextUInt();	// Skip personaID
-			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) altRow.NextUInt();
-			const RANK_NO altPersRankNo = (RANK_NO) altRow.NextUInt();
-			const UINT32 altPersPoints = altRow.NextUInt();
-
-			const bool sameSide = (wwiiSide(altPersCountry) == wwiiSide(thisCountry));
-			const RANK_NO sharedRank = std::min(altPersRankNo, sameSide ? sideShareCeiling : globalShareCeiling);
-
-			if ( myRankNo > sharedRank )
-				continue;
-			if ( myRankNo == sharedRank && (!sameSide || myRankPoints >= altPersPoints) )
-				continue;
-
-			if ( myRankNo < sharedRank )
-				myRankNo = sharedRank;
-
-			myRankPoints = altPersPoints;
-
-			changed = true;
-		}
-
-		if ( changed )
-		{
-			log(_FLI, "applying rank sharing points to %s persona -> rank %u->%u pts %u->%u"
-					, _countryName[country()]
-					, realRank(), myRankNo
-					, m_rankPointsEarned, myRankPoints
-					);
-
-			if ( myRankNo > realRank() )
-				SetRank(myRankNo);
-			m_rankPointsEarned = myRankPoints;
-
-			mapSaveRank(this, false);
-		}
-
-		SetMeteredAccess(newMinuteBalance);
-
-		return PLS_LOADED;
-	}
-	catch (std::exception& e)
-	{
-		dbugLog(_FLW, "t:%d p:%u select persona %u data failed: %s", teulIndex(), playerID(), selectedID, e.what());
-		return PLS_ERROR;
-	}
-}
-
 void
 Player::loadChatMask()
 {
@@ -557,26 +360,11 @@ bool mapFillPersonaData(Player* const player)
 	player->SetRank(0);
 
 	// Refresh information when processing a player's mission scoring packet
-	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL auth.p_persona_refresh(%u, %u)";
+	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL `auth`.`p_persona_refresh`(%u, %u)";
 
 	try
 	{
-		TeulTimeMS entryTime = teulClock64;
-#ifdef TIME_QUERIES
-		TeulTimeMS startTime;
-		teulSyncClock();
-		startTime = teulClock64;
-#endif
-
 		DBQuery q(dbh, QRY_SELECT_PERSONA_REFRESH, player->personaID(), Server::myServerInfo.stats.arenaID);
-
-#ifdef TIME_QUERIES
-		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )
-			dbugLog(_FLW, "QRY_SELECT_PERSONA_REFRESH taking too long: apparent %llums, actual %llums"
-							, teulClock64 - entryTime
-							, teulClock64 - startTime
-							);
-#endif
 
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw std::logic_error("No rows for this player/persona");
@@ -602,15 +390,10 @@ bool mapFillPersonaData(Player* const player)
 
 		player->SetMeteredAccess(newMinuteBalance);
 
-#ifdef TIME_QUERIES
-		teulSyncClock();
-#endif
-
-		threadLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%llx tr:%u took %llums"
+		dbugLog(_FLD, "t:%d p:%u c:%s filled persona data pers:%d rank:%d gotrank:%d points:%u rankperms:%" PRPermMaskT " took %" PR64BitUT "ms"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->personaID(), newRank, player->realRank(), player->points(), player->useRank().permissions()
-						, player->minuteBalance()
-						, teulClock64 - entryTime
+						, (uint64_t)player->minuteBalance()
 						);
 
 		return true;
@@ -633,7 +416,7 @@ _errException(const WWII_ERROR_INFO& info, const Player& player, const UINT32 pl
 		if ( info.data.exceptInfo.stackAddrs[i] != 0 )
 		{
 			char addr[20];
-			sprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
+			strprintf(addr, "%x,", info.data.exceptInfo.stackAddrs[i]);
 			stackinfo.append(addr);
 		}
 	}
@@ -700,10 +483,10 @@ _errExit(const WWII_ERROR_INFO& info, const Player& player, const UINT32 platfor
 	{
 		src.erase(0, p);
 	}
-	wwiiEscapeString(src);
 
 	std::string error = info.data.piExitInfo.errorMessage.string;
-	wwiiEscapeString(error);
+	DBThread::EscapeString(src);
+	DBThread::EscapeString(error);
 
 	player.log(_FLN, "Received PIEXIT ver %s exit info type %u at %s:%u: %s"
 						, clientVersion, info.errorType
@@ -750,30 +533,27 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 		try
 		{
 			_errExit(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
-		break;
+	return;
+
 	case WW_ERR_EXCEPTION:
 		try
 		{
 			_errException(info, player, platform);
-			return;
 		}
 		catch ( std::exception& e )
 		{
 			dbugLog(_FLA, "Error writing bug report to database: %s", e.what());
-			return;
 		}
+	return;
 
-		break;
 	case WW_ERR_VALIDITY_CHECK:
 		player.log(_FLI, "Got validity check bug report");
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
 						", errorType, whereIP, clientVersion, platform, clientTime, hostTime, rxTime,  archiveCorrupt"
 						", invalidArchive, invalidFileName, invalidCRC, invalidMD5) "
 						" values (%u,%u,%u"
@@ -782,21 +562,22 @@ mapSaveErrorInfo(Player& player, WWII_ERROR_INFO& info)
 						, player.OTP(), info.eventID, player.playerID()
 						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
 						, info.data.validityInfo.archive.string,  info.data.validityInfo.filename.string,  info.data.validityInfo.crc, info.data.validityInfo.md5);
-		break;
+	break;
+
 	case WW_ERR_SYSTEM_INFO:
 		player.log(_FLW, "Got system info bug report???");
-		return;
-		break;
-		sprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
-						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
-						", sysNumPackets, sysPacketID, sysInfoText) "
-						" values (%u,%u,%u"
-						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
-						",%u,%u, '%s') "
-						, player.OTP(), info.eventID, player.playerID()
-						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
-						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
-		break;
+	return;
+
+//		strprintf(statement,"INSERT DELAYED INTO `wwii`.`client_terminations` (sessionOTP, eventID, playerID"
+//						", errorType, whereIP, clientVersion, platform,  clientTime, hostTime, rxTime,  archiveCorrupt"
+//						", sysNumPackets, sysPacketID, sysInfoText) "
+//						" values (%u,%u,%u"
+//						",%u,'%s','%s',%d, FROM_UNIXTIME(%u), FROM_UNIXTIME(%u), now(), %u"
+//						",%u,%u, '%s') "
+//						, player.OTP(), info.eventID, player.playerID()
+//						, info.errorType,teulGetAddress(info.hostIP), teulGetAddress(info.clientVersion),platform, info.clientTime, info.hostTime, info.archiveWasCorrupt
+//						, info.data.systemInfo.numPackets,  info.data.systemInfo.packetID,  info.data.systemInfo.infoText);
+
 	default:
 		return;
 	}
@@ -989,7 +770,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 		for ( auto it = hcUnits.begin(); it != hcUnits.end(); ++it )
 		{
 			HCUnit& unit = *(it->second);
-			if ( unit.isBrigade() == false || unit.isTrainingUnit() == true )
+			if ( (unit.isBrigade() == false && unit.isGarrison() == false) || unit.isTrainingUnit() == true )
 				continue;
 			if ( unit.homeCPID().Key() == host_config.routDestination[unit.country()] )
 				continue;
@@ -999,7 +780,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 	}
 	// Provide the callsign
 	m_callsign = player->chatHandle();
-	m_error = FALSE;
+	m_error = false;
 	if ( player->chatPermissions() == nullptr )
 		m_chatPermissions = nullChatPermissions;
 	else
@@ -1015,6 +796,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 	if ( player->m_sideLockTime > 0 )
 		m_sidelocked = player->m_lastSide;
 
+	bool savePersona = false;
 	for ( size_t i = 0; i < count; ++i )
 	{
 		PersonaSummary& ps = m_summaries[i];
@@ -1027,6 +809,27 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			ps.m_lastUsed = now - lastUsed;
 		else
 			ps.m_lastUsed = 0;
+
+		// Verify the brigade is for this persona is valid
+		if (ps.m_brigadeID != 0)
+		{
+			HCUnit *unit = HCUnit::Lookup(ps.m_brigadeID);
+			if (unit == nullptr || (unit->side() != wwiiSide(ps.m_countryID)))
+			{
+				Brigade * brigade = (Brigade *)HCUnit::GetTrainingUnit(ps.m_countryID, ps.m_branchID);
+				if (brigade != nullptr)
+				{
+					ps.m_brigadeID = brigade->brigadeID();
+					savePersona = true;
+					dbugLog(_FLD, "New unit id %d being returned for player %d, persona %d", ps.m_brigadeID, player->playerID(),
+							ps.m_personaID);
+				}
+				else
+				{
+					dbugLog(_FLW, "Could not find training unit for country %d, branch %d", ps.m_countryID, ps.m_branchID);
+				}
+			}
+		}
 
 		if ( lockReason == PersonaSummary::_ARENALOCK )
 		{
@@ -1042,7 +845,7 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 			else
 			{
-				betaLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
+				dbugLog(_FLI, "t:%d p:%u c:%s pers:[%d/%d:%d] locked %d"
 								, player->teulIndex(), player->playerID(), player->callsign()
 								, ps.m_countryID, ps.m_branchID, ps.m_personaID
 								, ps.m_lockedThru);
@@ -1050,6 +853,9 @@ PersonaSummaries::_list(Player* player, const std::vector<PersonaSummary>& perso
 			}
 		}
 	}
+
+	if (savePersona)
+		mmdbSavePersonaSelection(player);
 
 	m_activeMission.populate(player->activeMission());
 
@@ -1080,7 +886,7 @@ Player::saveMissionPacket()
 	dbugLog(_FLD, "p:%u m:%u v:%u saving mission results", playerID(), missionID(), sortieID());
 
 	UINT32 rtbFacilityOID = 0;
-	const FULL_OBJ_ID& rtbFacility = vehicle.rtbFacility();
+	const FULL_OBJ_ID rtbFacility = vehicle.rtbFacility();
 	if ( rtbFacility.id > 0 )
 	{
 		const FacilityStruct* const fac = strtGetFacility(rtbFacility);
@@ -1148,7 +954,7 @@ public:
 	TrainingQuery(const playerid_t playerID, SINT32 teulIndex)
 		: DBThreadQuery(DBThread::Default, "TrainingQuery", DBThreadQuery::_CALLBACK
 							,	"SELECT group_name, progress"
-								 " FROM wwii.training_progress p"
+								 " FROM `wwii`.`training_progress` p"
 								" WHERE p.player_id = %u LIMIT 64", playerID)
 		, m_playerID(playerID), m_teulIndex(teulIndex)
 		{}
@@ -1211,7 +1017,7 @@ mapLoadWeaponIndexes()
 // the chat host updates the rest.
 
 void
-HCUnit::setHomeCPID(const FULL_OBJ_ID& cpID)
+HCUnit::setHomeCPID(const FULL_OBJ_ID cpID)
 {
 	CPStruct* oldCP;
 	oldCP = strtGetCP(m_homeCPID);
@@ -1323,7 +1129,7 @@ protected:
 			bdu.m_owner = chatGetHandle(ownerHandle);
 		}
 
-		threadLog(_FLD, "received %u brigade detail updates", numRows);
+		dbugLog(_FLD, "received %" PRSizeT " brigade detail updates", numRows);
 
 		return true;
 	}
@@ -1346,8 +1152,7 @@ public:
 				continue;
 			}
 
-			strncpy(unit->m_name, bdu.m_title, MAX_HCUNIT_NAME_LENGTH);
-			unit->m_name[MAX_HCUNIT_NAME_LENGTH] = 0;
+			strsafecpy(unit->m_name, bdu.m_title);
 			unit->m_owner = bdu.m_owner;
 			unit->m_ownerRank = bdu.m_ownerRank;
 

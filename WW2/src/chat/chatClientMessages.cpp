@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Aug  1 16:06:48 2000
 //
 // Client Side API for chat communications
@@ -42,11 +42,12 @@
 #include "chat/chatUserNLA.h"
 #include "chat/chatHoldFallVote.h"
 #include "chat/chatTimeInterval.h"
+#include "chat/omgChat.h"
 #include "ui/uiMain.h"
 #include "ui/uiChat.h"
-#include "omg/omgChat.hxx"
 #include "sdm/StratDB.h"
 #include "chat/chatDotCommandList.h"
+#include "miss/missionJoinRequest.h"
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
 #include "client/GameClient.h"
@@ -55,6 +56,8 @@
 #include "map/mapAWS.h"
 #include "uimap/AWSManager.h"
 #include "tut/TutorialManager.h"
+
+extern SINT32 g_lastPing;
 
 const ChatPermissions nullChatPermissions;
 
@@ -68,6 +71,7 @@ static	TEUL_CALLBACK* _SEND_LOCALITY;
 static	TEUL_CALLBACK* _SEND_RECRUITER_REQUEST;
 
 TEUL_CALLBACK* HoldFallVote::s_callback;
+TEUL_CALLBACK* MissionJoinRequest::callback;
 
 static FULL_OBJ_ID _lastTargetFullObjID = {{0,0},0,0,0};
 
@@ -86,16 +90,19 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 												//	of the transmitting Index
 	outGoingMessage.m_handle = 0;
 	outGoingMessage.m_country = 0;
+	outGoingMessage.g_latestPing = g_lastPing;
 
 	outGoingMessage.m_length = strlen(message);
 
-	if (outGoingMessage.m_length >= MAX_MESSAGE_LENGTH)
-		outGoingMessage.m_length = MAX_MESSAGE_LENGTH-1;
+	if ( outGoingMessage.m_length >= MAX_MESSAGE_LENGTH )
+		outGoingMessage.m_length = MAX_MESSAGE_LENGTH - 1;
 
 	strncpy((char*)outGoingMessage.m_message, message, outGoingMessage.m_length + 1);
 
 	// Let chat know what you targetted last for use with dot commands
 	outGoingMessage.m_uiTarget = _lastTargetFullObjID;
+
+	Write_Debug("Chat sending client message %s with last ping: %d teulClock: %" PR64BitUT "", message, g_lastPing, outGoingMessage.g_latestPing);
 
 	return teulSend(teulIndex, _SEND_CLIENT_MESSAGE, &outGoingMessage);
 }
@@ -110,7 +117,7 @@ SINT32 chatSendMessage(SINT32 teulIndex, UINT16 radioIndex, const char* message)
 //  allows for host-side dot commands which have a
 //  higher degree of integration with the UI map.
 //////////////////////////////////////////////////
-void chatTargetSelection(const FULL_OBJ_ID& id)
+void chatTargetSelection(const FULL_OBJ_ID id)
 {
 	_lastTargetFullObjID = id;
 }
@@ -124,6 +131,13 @@ SINT32 chatSendModeNotice(SINT32 teulIndex, UCHAR updateMode)
 {
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::PREFERENCE_Y));
 	outgoing.construct<Chat::Preference>(CPR_UPDATE_MODE, updateMode);
+	return outgoing.send(teulIndex);
+}
+
+SINT32 chatSendNetcodeNotice(SINT32 teulIndex, bool netcode)
+{
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::PREFERENCE_Y));
+	outgoing.construct<Chat::Preference>(CPR_SET_NETCODE, netcode);
 	return outgoing.send(teulIndex);
 }
 
@@ -163,7 +177,7 @@ SINT32 chatTuneRadioToHandle(SINT32 teulIndex, UCHAR radioIndex, ChatHandle hand
 
 	TUT_MGR->DoEvent(TUT_EVENT_CHANNEL, &radioIndex, &tune.m_type);
 
-	return teulSend(teulIndex,_FE_TUNE_TO_CHANNEL,&tune);
+	return teulSend(teulIndex, _FE_TUNE_TO_CHANNEL, &tune);
 }
 
 //This function tells the server to toggle receiving for the radio channel
@@ -173,7 +187,7 @@ SINT32 chatUpdateChannelStatus(SINT32 teulIndex, UCHAR radioIndex, bool receiveS
 {
 	Chat::UpdateChannel updateChannel(radioIndex, receiveStatus);
 
-	return teulSend(teulIndex,_SEND_UPDATE_CHANNEL,&updateChannel);
+	return teulSend(teulIndex, _SEND_UPDATE_CHANNEL, &updateChannel);
 }
 
 //This function sends a message to the server to be distributed on the
@@ -186,7 +200,7 @@ SINT32 chatSendMotdRequest(SINT32 teulIndex, UINT32 id)
 }
 
 // FIXME - remove this when time is right!
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 LOGICAL chatSendLocality(SINT32 teulIndex, UINT32 vehicleHostIndex, const FLOAT64& rawX, const FLOAT64& rawY, const FLOAT64& rawZ, FULL_OBJ_ID nearestCP)
 {
 	static SINT32 lastTeulIndex = -1;
@@ -228,6 +242,11 @@ AWS::Request::send(SINT32 chatConnection)
 	return ( teulSend(chatConnection, AWS::callback, this) >= 0 );
 }
 
+bool
+MissionJoinRequest::Request::send(SINT32 chatConnection) {
+	return (teulSend(chatConnection, MissionJoinRequest::callback, this) >= 0);
+}
+
 //The actual send function for Messages
 static SINT32 _sendMessage(ACTION_OBJECT* const a)
 {
@@ -262,7 +281,7 @@ static SINT32 _sendLocality(ACTION_OBJECT* const a)
 
 static SINT32 _sendSquadControl(ACTION_OBJECT* const a)
 {
-	return ((SquadControl*)a->localRawData)-> packer(TEUL_PACK, a);
+	return ((SquadControl*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
 static SINT32 _sendServerTrackedObject(ACTION_OBJECT* const a)
@@ -296,10 +315,15 @@ _recvMOTD_Reply(ACTION_OBJECT* const a)
 }
 
 static SINT32
-_recvChatMissionStatus(ACTION_OBJECT* const a, Chat::MissionStatus& msg)
+_recvChatMissionStatus(ACTION_OBJECT* const a)
 {
-	///TODO:RAMP: Process the data.
-	clientProcessChatMissionStatus(a->teulIndex, &msg);
+    const TeulTimeMS ts = 0ULL;
+    static Chat::MissionStatus receiver;        // must either be allocated or static as later on game client will point to this for future reference, static for now since we are
+                                                // already riddled with statics, what is one more.
+    receiver.unpack(a, ts);
+
+	clientProcessChatMissionStatus(a->teulIndex, &receiver);
+
 	return a->offset;
 }
 
@@ -531,7 +555,7 @@ SINT32 EditString::receive(SINT32 teulIndex)
 SINT32
 _recvServerTrackedObjects(ACTION_OBJECT* const a)
 {
-#if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
+#if platBuild == BUILD_CLIENT
 	// How many STOs are there?
 	UINT32 count = 0;
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &count, 8);
@@ -586,7 +610,7 @@ _recvHoldFallInfo(ACTION_OBJECT* const a)
 	// use fullobjid to find cp name and use this for eventid
 	StratDB::StratObject* strat = StratDB::FindStratObject(incoming.m_fullObjID);
 
-	if(strat)
+	if ( strat )
 		eventId = strat->DisplayName(); //swprintf(eventId, MAX_HANDLE_WSIZE-1, L"%ls", strat->DisplayName());
 
 	chatGetCallsign(requester, incoming.m_requester);
@@ -635,6 +659,14 @@ HoldFallVote::~HoldFallVote()
 }
 
 //////////////////////////////////////////////////////////////////////
+// Request/receive info for joining another players' mission
+
+static SINT32 _sendJoinMiss(ACTION_OBJECT* const a) {
+	MissionJoinRequest::Request* request = (MissionJoinRequest::Request*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Send a request for a server tracked object to the host
 
 void
@@ -657,10 +689,10 @@ _recvDotCommandList(ACTION_OBJECT* const a)
 //Installs the client callbacks
 
 SINT32
-chatInstallClientCallbacks(void)
+chatInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
-
+	{
 		REGISTER_SENDER(Chat::CLIENT_MESSAGE_Y, _sendMessage, _SEND_CLIENT_MESSAGE);
 		REGISTER_SENDER(Chat::FE_TUNE_TO_CHANNEL_Y, _sendTuneToChannel, _FE_TUNE_TO_CHANNEL);
 		REGISTER_SENDER(Chat::UPDATE_CHANNEL_Y, _sendUpdateChannel, _SEND_UPDATE_CHANNEL);
@@ -702,10 +734,12 @@ chatInstallClientCallbacks(void)
 
 		REGISTER_RECEIVER(Chat::HOLD_FALL_INFO_Y, _recvHoldFallInfo);
 
-		REGISTER_OMG_RECEIVER(Chat::MissionStatus, _recvChatMissionStatus);
+		REGISTER_SENDER(Chat::JOIN_MISSION_Y, _sendJoinMiss, MissionJoinRequest::callback);
+
+        REGISTER_RECEIVER(Chat::OMG_Y, _recvChatMissionStatus);
 
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvDotCommandList);
-
-END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Chat::CallbackX)
 }
 

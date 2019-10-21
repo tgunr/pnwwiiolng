@@ -34,6 +34,9 @@ extern int ldLoadTextureRectangle(const std::string& texturename,
 extern void ldTextureRelease(TEXTURE* t);
 extern void ldTextureRelease(int id);
 extern void ldTextureKill();
+extern void ldReloadTextures();
+extern std::string ldGetOptionalFileSuffix();
+extern void ldSetOptionalFileSuffix(std::string suffix);
 
 extern Texture2D* ldTextureGet2D(int id);
 extern TextureRectangle* ldTextureGetRectangle(int id);

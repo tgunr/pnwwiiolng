@@ -57,7 +57,7 @@ public:
 	void populate(const Mission*, bool, bool, UINT32);
 
 	/// Pack/unpack routine.
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -107,7 +107,7 @@ public:
 	MissionList() : m_status(MLR_ERROR), m_listStart(true), m_listEnd(true), m_count(0) { }
 	MissionList(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~MissionList() { }
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
@@ -118,14 +118,13 @@ public:
 	SINT32 sendQuick(SINT32 teulIndex);
 
 	ML_RESULT		m_status;							// Status of the list
-	LOGICAL			m_listStart;						// True if this is the start of list
-	LOGICAL			m_listEnd;							// True if this is the end of the list
+	bool			m_listStart;						// True if this is the start of list
+	bool			m_listEnd;							// True if this is the end of the list
+	bool			m_canPost;							// Can I post here?
 	MissionSynopsis	m_missions[MAX_MISSIONS_PER_LIST];	// Array of missions
-	LOGICAL			m_canPost;							// Can I post here?
 	ActiveMission	m_activeMission;					// Details what mission, if any, you have active
 	UINT8			m_count;							// Number of missions described
 
 private:
 	SINT32 _sendResult(SINT32 teulIndex, ML_RESULT result) { m_status = result; return send(teulIndex); }
 };
-

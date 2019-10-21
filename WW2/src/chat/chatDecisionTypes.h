@@ -14,7 +14,7 @@
 #include <vector>
 #include "strt/strtChatTypes.h"
 #include "chat/chatData.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "teul/teulTime.h"
 
 //// ---> Typedefs
@@ -23,10 +23,10 @@
 class StratDecision;
 
 // Array's of votes: maybe a userlist would be more appropriate
-typedef std::vector<ChatHandle> VOTES;
+using VOTES = std::vector<ChatHandle>;
 
 // Type we use for storing queues of strat events
-typedef std::vector<StratDecision*> DECISION_QUEUE;
+using DECISION_QUEUE = std::vector<StratDecision*>;
 
 //// ---> Constants
 

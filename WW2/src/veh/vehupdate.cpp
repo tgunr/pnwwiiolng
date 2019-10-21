@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include "include/vars.h"
@@ -82,15 +82,14 @@ UINT32 vehNotTracked = 0;
 UINT32 unexpectedErrors = 0;
 #endif
 
-typedef struct
+struct IconRank
 {
 	const char* name;
 	UINT32 Rank;
-} IconRank;
+};
 
 static const IconRank _SpecialRanks[] =
 {
-#if !defined(CHINA) && !defined(HAPPYOO)
 	{"killer", 		KILLER_RANK },
 	{"martini", 	MARTINI_RANK },
 	{"toto", 		TOTO_RANK },
@@ -100,7 +99,6 @@ static const IconRank _SpecialRanks[] =
 	{"xoom",        XOOM_RANK },
 	{"ohm",         OHM_RANK },
 	{"victarus",    VICTARUS_RANK },
-#endif
 	{nullptr, 0}
 };
 
@@ -117,7 +115,7 @@ static LOGICAL _GetSoundDistance(FLOAT32* pMin, FLOAT32* pMax, UINT32* pType);
 
 static void vehUpdateRideChanged(vehVehicle*, UINT32 newRideVehicleIdx);
 static void _processBuildingDamage (vehVehicle& Vehicle);
-static void _playWeaponFireSound(SCHAR* sound, OBJECT* o, FLOAT64VECTOR* pos, UINT32 type);
+static void _playWeaponFireSound(const SCHAR* sound, OBJECT* o, const FLOAT64VECTOR* pos, UINT32 type);
 
 UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 											  SINT32 VehicleIdNum,
@@ -346,6 +344,7 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		_LastUpdateTime = frametime;
 	}
 
+	// Are we past the next update time
 	if (frametime - TempNum > 0 || ForceSend != 0)
 	{
 
@@ -448,6 +447,7 @@ UINT32 vehUpdatePositionInfo(vehVehicle* Vehicle)
 	return 0;
 }
 
+
 static UINT32 _ResolveAverages(vehVehicle* Vehicle)
 {
 	vehVehiclePositionData* PosData;
@@ -457,6 +457,9 @@ static UINT32 _ResolveAverages(vehVehicle* Vehicle)
 
 	PosData = &Vehicle->PosData;
 
+	// PosData->NumSamples is incremented each time a vehicle is updated.
+	// and is reset when a network update message is sent.
+	// This averages the velocity and acceleration since the last update message.
 	if (PosData->NumSamples == 0) return 0;
 
 	PosData->Vel.x = PosData->VelSum.x / PosData->NumSamples;
@@ -628,7 +631,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleHdr.present |= PR_FIRE_FLAGS;
 
     bool sendTurrets = (Data.HasSentUpdate >= 3);
-    
+
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
@@ -825,7 +828,9 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			// Send them our teulClock64
 			teulSyncClock();
 			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
-			teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
+            if (Online) { // wait until here to check this in case all that junk above actually does something to game state
+                teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub, PROTOCOL_UDP);
+            }
 		}
 	}
 	else
@@ -848,6 +853,9 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #ifdef NEW_INF_PREDICTOR
 	bool useNewPredictor = (_newpredictor && !(Vehicle->Flags & VEH_FLAGS_USE_OLD_INTERPOLATOR));
 
+    UINT32 beforePosAnimFlags = Vehicle->PosData.animationFlags;
+    static UINT32 lastAnimBits = 0;
+    
 	if(useNewPredictor)
 	{
 		if (VehicleHeader->present & PR_STATE0)
@@ -881,6 +889,14 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #ifdef NEW_INF_PREDICTOR
 	}
 #endif
+    
+    dbugLog(_FLD, "Changes in PosAnimFlags= %X (%X), AnimBits= %X (%X)",
+            (Vehicle->PosData.animationFlags ^ beforePosAnimFlags),
+            Vehicle->PosData.animationFlags,
+            (Vehicle->AnimationBits ^ lastAnimBits),
+            Vehicle->AnimationBits);
+    
+    lastAnimBits = Vehicle->AnimationBits;
 }
 
 /*
@@ -963,7 +979,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			a roll-over of the 16 bit time value ocurred (roughtly every 65 seconds)?
 		 */
 		if ( timeDiff < 0
-			
+
 			&& !(VehicleHeader->present & PR_ONE_TIME))
 		{
 
@@ -980,7 +996,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 #ifdef BETA_RELEASE
 			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
 #endif
-            
+
 #ifdef BETA_RELEASE
 			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
 				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);
@@ -998,7 +1014,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	applyStatusBits(PR_STATE0, (void *)&VehicleInfo->stateFlags0, 0, 16, VehicleHeader, Vehicle);
 	applyStatusBits(PR_STATE1, (void *)&VehicleInfo->stateFlags1, 16, 16, VehicleHeader, Vehicle);
 	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 16, 32, VehicleHeader, Vehicle);
+		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 32, 32, VehicleHeader, Vehicle);
 
 	// position
 	// if multicrew, only crew gets this data
@@ -1318,7 +1334,8 @@ lastLowUpdateTime = frametime;
 #ifdef DEBUG_UPDATES
 		++duplicateUpdatesIgnored;
 #endif
-		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
+		// Pointless debug - we know this can happen due to frequency of updates, don't report this anymore.
+		// Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
 
@@ -1577,7 +1594,7 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	vehVehiclePositionData* PosData = &Vehicle->PosData;
 
 	// interpolate from the last position
-	InterpolatorBase::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
+	vehInterpolator::Update const& update	= Vehicle->interpolator.Interpolate(frametime);
 
     // For .vspawn infantry
     if(!Vehicle->isSTO())
@@ -1591,12 +1608,15 @@ static UINT32 vehupdateInfantry(vehVehicle* Vehicle)
 	//anim->twist.UpdateYaw(Vehicle);
 
 	// update our position variables
-	PosData->RenderAtt.Yaw	= anim->twist.vehicleYaw;
-	PosData->Att.Yaw		= anim->twist.vehicleYaw;
-	PosData->Vel			= update.vel;
-	PosData->Vel.x			= -PosData->Vel.x; // usual bullshit
+	if ( !(Vehicle->Flags & VEH_FLAGS_IS_CLONE) )
+	{
+		PosData->RenderAtt.Yaw	= anim->twist.vehicleYaw;
+		PosData->Att.Yaw		= anim->twist.vehicleYaw;
+	}
 
 	Vehicle->AnimationBits	= update.animationFlags;
+	PosData->Vel			= update.vel;
+	PosData->Vel.x			= -PosData->Vel.x; // usual bullshit
 
 	fpProcessVehicleAnimationFlags(Vehicle);
 
@@ -1614,7 +1634,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	FLOAT64VECTOR			TempVec;
 	FLOAT64VECTOR			PrevVel,PrevVel1;
 	FLOAT64ATT				VAtt1,VAtt2;
-	FLOAT64VECTOR			WorldOriginOffset;
+	FLOAT64VECTOR			worldOriginOffset;
 	OBJECT*					pObject;
 
 	if (Vehicle == nullptr) return 0;
@@ -1738,7 +1758,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 
 	// Position
 // Absolutely no idea why it works like this
-// Seems to be due to some retardation in the FPS math, but fixing it is
+// Seems to be due to some brokenness in the FPS math, but fixing it is
 // a real potential can of worms
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	PosData->Pos.x += -PosData->Vel.x * Delta;
@@ -1763,11 +1783,11 @@ else
 	piVECTOR V1,V2;
 	SINT32 DummyNum;
 
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		V1.x = (FLOAT32)(PosData->Pos.x - WorldOriginOffset.x);
-		V1.y = (FLOAT32)(PosData->Pos.y - WorldOriginOffset.y);
-		V1.z = -(FLOAT32)(PosData->Pos.z - -WorldOriginOffset.z) - 0.3f;
+		V1.x = (FLOAT32)(PosData->Pos.x - worldOriginOffset.x);
+		V1.y = (FLOAT32)(PosData->Pos.y - worldOriginOffset.y);
+		V1.z = -(FLOAT32)(PosData->Pos.z - -worldOriginOffset.z) - 0.3f;
 
 		V2 = V1;
 		V2.z += 10000.0;
@@ -1775,7 +1795,7 @@ else
 		if (trncdCollideDownMediumList(&V1,&V2) == TRUE)
 		{
 
-			V2.z += (FLOAT32)WorldOriginOffset.z;
+			V2.z += (FLOAT32)worldOriginOffset.z;
 			V2.z = -V2.z;
 
 			PosData->LastUpdatePos.z = PosData->Pos.z = V2.z - (Vehicle->VehicleObjectData->LowestPoint);
@@ -1784,7 +1804,7 @@ else
 		{
 			if (trnopCollideDown(&V2, &DummyNum, &V1) == TRUE)
 			{
-				V2.z += (FLOAT32)WorldOriginOffset.z;
+				V2.z += (FLOAT32)worldOriginOffset.z;
 				V2.z = -V2.z;
 
 				PosData->LastUpdatePos.z = PosData->Pos.z = V2.z - (Vehicle->VehicleObjectData->LowestPoint);
@@ -2067,25 +2087,13 @@ FLOAT64 FireDelta;
 FLOAT64 CurrentTime;
 UINT32 AmmoFlags;
 FLOAT64VECTOR RelativePos;
-FLOAT64VECTOR WorldOriginOffset;
 LOGICAL WeaponFired;
 SINT32 SoundNum;
 OBJECT * TempObj;
 
 // Weapon Firing Stuff
-FLOAT64VECTOR	vecVehicleVel; // For recoil, etc.
-piMATRIX		FirePointMatrix, TempMatrix;
-FLOAT64VECTOR	FirePositionVector;
-FLOAT64VECTOR	FlashPositionVector;
 FLOAT64			LastFireTime = 0.0f;
 SINT32			RecoilNum = 0;
-
-    memset(&vecVehicleVel, 0, sizeof(FLOAT64VECTOR));
-    memset(&FirePositionVector, 0, sizeof(FLOAT64VECTOR));
-    memset(&FlashPositionVector, 0, sizeof(FLOAT64VECTOR));
-
-    FirePointMatrix = IdentityMatrix;
-    TempMatrix = IdentityMatrix;
 
 	if (Vehicle == nullptr)
 	{
@@ -2096,9 +2104,6 @@ SINT32			RecoilNum = 0;
 	{
 		return 0;
 	}
-
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
 
 	if (Vehicle->VehicleType == nullptr)
 	{
@@ -2118,7 +2123,7 @@ SINT32			RecoilNum = 0;
 	{
 		for (i=0;i<VEH_MAX_MOUNTS;i++)
 		{
-			// ghost fire can only occur for player's vehicle if he doesn't control that position
+			// ghost fire can only occur for player's vehicle if they don't control that position
 			if (Vehicle->ModelData != nullptr)
 			{
 				if (!(Vehicle->ModelData->FireMask & (1 << i)))
@@ -2471,9 +2476,9 @@ UINT32 vehResupplyWeapons(struct vehVehicle* Vehicle)
 // Function: _playWeaponFireSound
 // Description:
 //////////////////////////////////////////////////////////////////////
-void _playWeaponFireSound(SCHAR* sound,
+void _playWeaponFireSound(const char* sound,
                           OBJECT* o,
-                          FLOAT64VECTOR* pos,
+                          const FLOAT64VECTOR* pos,
                           UINT32 type)
 {
     SINT32 ID = fxSndGetNewSound();
@@ -2481,51 +2486,33 @@ void _playWeaponFireSound(SCHAR* sound,
     if(ID < 0) return;
 
     FLOAT32 fMin, fMax;
+	_GetSoundDistance(&fMin, &fMax, &type);
 
     // Check if distance file exists.
-    SCHAR* p = nullptr;
-    static SCHAR distSound[128];
-    LOGICAL hasDistant = FALSE;
-  //  LOGICAL canPlayDistantSound = FALSE;
+	std::string distSound(sound);
+	auto p = distSound.rfind(".wav");
+	if (p != distSound.npos)
+	{
+		distSound.replace(distSound.begin() + p, distSound.end(), "_distant.wav");
+        int fd = fioOpen(distSound.c_str());
+        fioClose(fd);
+		if (fd != -1)
+		{
+			piVECTOR v{ (FLOAT32)pos->x, (FLOAT32)pos->y, (FLOAT32)pos->z };
 
-    strncpy(distSound, sound, sizeof(distSound) - 1);
-	distSound[sizeof(distSound)-1] = 0;
+			math3dVectorMultiply(&v, &v, &o->mat);
 
-    p = strstr(distSound, ".wav");
+			FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
 
-    if(p)
-    {
-        *p = 0;
-        strcat(distSound, "_distant.wav");
+			if (z > fMax) return;
 
-        if(fioAccess(distSound))
-        {
-            hasDistant = TRUE;
-        }
-    }
-
-    _GetSoundDistance(&fMin, &fMax, &type);
-
-    if(hasDistant)
-    {
-        piVECTOR v;
-
-        v.x = (FLOAT32)pos->x;
-        v.y = (FLOAT32)pos->y;
-        v.z = (FLOAT32)pos->z;
-
-        math3dVectorMultiply(&v, &v, &o->mat);
-
-        FLOAT32 z = math3dDotProduct(&v, &playdir) + playtrans.z;
-
-        if(z > fMax) return;
-
-        if(z > fMax/4 && z <= fMax)
-        {
-            fMin = 150.0f;
-            sound = distSound;
-        }
-    }
+			if (z > fMax / 4 && z <= fMax)
+			{
+				fMin = 150.0f;
+				sound = distSound.c_str();
+			}
+		}
+	}
 
     fxSndSetSoundName(ID, sound);
     fxSndSetPriority(ID, IDE_TP_PRIORITY_HIGH);
@@ -2647,8 +2634,8 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 
 	for (i = 0; i < damagePacket.numHits; i++)
 	{
-		damagePacket.list[i].object.cell.ox = Vehicle.DamageQue.SuperCellX[i] << 4;
-		damagePacket.list[i].object.cell.oy = Vehicle.DamageQue.SuperCellY[i] << 4;
+		damagePacket.list[i].object.cell.ox = static_cast<SINT16>(static_cast<UINT16>(Vehicle.DamageQue.SuperCellX[i]) << 4);
+		damagePacket.list[i].object.cell.oy = static_cast<SINT16>(static_cast<UINT16>(Vehicle.DamageQue.SuperCellY[i]) << 4);
 		damagePacket.list[i].object.id = Vehicle.DamageQue.Id[i];
 		damagePacket.list[i].object.objType = 0;
 

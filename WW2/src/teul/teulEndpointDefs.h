@@ -30,33 +30,21 @@ namespace Teul
 	enum { TCPStdPayload = InternetMTU - OverheadTCP };
 	enum { UDPMaxPayload = MaxMTU - OverheadUDP };
 	enum { UDPStdPayload = InternetMTU - OverheadUDP };
-	enum { UDBMaxPayload = MaxPacket - OverheadUDP };
+	enum { UDBMaxPayload = MaxMTU - OverheadUDP };
 	enum { MaxPackBytes = UDBMaxPayload };
 	enum { MaxPackBits = MaxPackBytes * 8 };
 
 	enum { MaxEndpointTimeout = 60000 };
 	enum { KlivesPerTimeout = 3 };
 
-	enum { MinKliveNeeded = 1000 };
-	enum { MaxKliveNeeded = 10000 };
-	enum { FynNeeded = 1000 };
+	enum { MinKliveInterval = 1000 };
+	enum { MaxKliveInterval = 10000 };
 	enum { EndpointUpdateInterval = 1000 };
 
-	enum { MinEndpointTimeout = MinKliveNeeded * KlivesPerTimeout };
+	enum { MinEndpointTimeout = MinKliveInterval * KlivesPerTimeout };
 	enum { AnyIndex = -1001 };
 
 	enum { MaxEndpointSendErrors = 128 };
 
 	enum { BufferSize = 16384 };
-
-	namespace Tokens
-	{
-		//! 4-bit markers marker used to indicate start of a teul frame.
-		enum
-		{
-			Encrypted			=	9		// 1001
-		,	Unencrypted			=	6		// 0110
-		};
-	}
 }
-

@@ -1,14 +1,13 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/vertex_cache_optimize.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #15 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
 #include <memory.h>
 #include <math.h>
 
@@ -179,7 +178,7 @@ float FindVertexScore ( vcache_vertex_data *VertexData )
         }
         else
         {
-            assert ( CachePosition < MaxSizeVertexCache );
+            pp_assert ( CachePosition < MaxSizeVertexCache );
             // Points for being high in the cache.
             Score = 1.0f - ( (float)( CachePosition - 3 ) / (float)( MaxSizeVertexCache - 3 ) );
             Score = powf ( Score, FindVertexScore_CacheDecayPower );
@@ -203,7 +202,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
     for ( int i = 0; i < NumTris * 3; i++ )
     {
         int VertNum = IndexedTriListSource[i];
-        assert ( VertNum >= 0 );
+        pp_assert ( VertNum >= 0 );
         if ( VertNum > NumVerts )
         {
             NumVerts = VertNum;
@@ -276,7 +275,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
     vcache_vertex_data *CurVert = VertexData;
     for ( int i = 0; i < NumVerts; i++ )
     {
-        assert ( CurVert->NumActiveTris == CurVert->NumTris );
+        pp_assert ( CurVert->NumActiveTris == CurVert->NumTris );
         if ( MaxNumTrisPerVerts < CurVert->NumTris )
         {
             MaxNumTrisPerVerts = CurVert->NumTris;
@@ -328,9 +327,9 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
         // score is suspiciously low, scan all the tris to find the best one.
         if ( ( BestTriNum < 0 ) || ( BestTriScore < Vcache_MinimumBestTriScore ) )
         {
+#ifdef _DEBUG
             float BestOriginalScore = BestTriScore;
 
-#ifdef _DEBUG
             if ( ( BestTriScore > 0.0f ) && ( BestTriScore < Vcache_MinimumBestTriScore ) )
             {
                 // Convenient place for a breakpoint.
@@ -343,11 +342,11 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
                 vcache_vertex_data *CurVert = &(VertexData[i]);
                 if ( CurVert->CacheTag >= 0 )
                 {
-                    assert ( CurVert->CacheTag < MaxSizeVertexCache );
-                    assert ( CacheTags[CurVert->CacheTag].VertexNumber == i );
+                    pp_assert ( CurVert->CacheTag < MaxSizeVertexCache );
+                    pp_assert ( CacheTags[CurVert->CacheTag].VertexNumber == i );
                 }
                 float VertScore = FindVertexScore ( CurVert );
-                assert ( CurVert->CurrentScore == VertScore );
+                pp_assert ( CurVert->CurrentScore == VertScore );
             }
 #endif
 
@@ -365,11 +364,11 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
                     {
                         int VertNum = CurTri->VertexNumber[j];
                         float VertScore = VertexData[VertNum].CurrentScore;
-                        assert ( VertScore >= 0.0f );
+                        pp_assert ( VertScore >= 0.0f );
                         Score += VertScore;
                     }
-                    assert ( Score >= 0.0f );
-                    assert ( CurTri->Score == Score );
+                    pp_assert ( Score >= 0.0f );
+                    pp_assert ( CurTri->Score == Score );
 #endif
                     if ( CurTri->Score > BestTriScore )
                     {
@@ -379,7 +378,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
                 }
                 else
                 {
-                    assert ( CurTri->Score == -1.0f );
+                    pp_assert ( CurTri->Score == -1.0f );
                 }
                 CurTri++;
             }
@@ -398,11 +397,11 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
 
 
         // Add this tri.
-        assert ( BestTriNum >= 0 );
-        assert ( BestTriNum < NumTris );
+        pp_assert ( BestTriNum >= 0 );
+        pp_assert ( BestTriNum < NumTris );
         vcache_tri_data *BestTri = &(TriData[BestTriNum]);
-        assert ( BestTri->IsActive );
-        assert ( BestTri->Score == BestTriScore );
+        pp_assert ( BestTri->IsActive );
+        pp_assert ( BestTri->Score == BestTriScore );
         *IndexedTriListDst++ = BestTri->VertexNumber[0];
         *IndexedTriListDst++ = BestTri->VertexNumber[1];
         *IndexedTriListDst++ = BestTri->VertexNumber[2];
@@ -418,15 +417,15 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
         {
             int VertNum = BestTri->VertexNumber[VertIndex];
             vcache_vertex_data *CurVert = &(VertexData[VertNum]);
-            assert ( CurVert->CurrentScore >= 0.0f );
-            assert ( CurVert->NumActiveTris > 0 );
+            pp_assert ( CurVert->CurrentScore >= 0.0f );
+            pp_assert ( CurVert->NumActiveTris > 0 );
             // Where is this tri in the list?
             int PositionInList = FindInList ( BestTriNum, CurVert->NumActiveTris, CurVert->TriIndices );
-            assert ( PositionInList >= 0 );
+            pp_assert ( PositionInList >= 0 );
 
             // Move this tri to the bottom of the list and swap with the previous bottom.
             CurVert->NumActiveTris--;
-            assert ( CurVert->TriIndices[PositionInList] == BestTriNum );
+            pp_assert ( CurVert->TriIndices[PositionInList] == BestTriNum );
             CurVert->TriIndices[PositionInList] = CurVert->TriIndices[CurVert->NumActiveTris];
             CurVert->TriIndices[CurVert->NumActiveTris] = BestTriNum;
         }
@@ -446,7 +445,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
             {
                 // Already in the cache, so just move it to the top and shuffle everything else down to where it is.
                 LastToShiftDown = CacheTagNum;
-                assert ( CacheTags[CacheTagNum].VertexNumber == VertNum );
+                pp_assert ( CacheTags[CacheTagNum].VertexNumber == VertNum );
             }
             else
             {
@@ -461,7 +460,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
                 CacheTags[i] = CacheTags[i-1];
                 if ( TempVertNum >= 0 )
                 {
-                    assert ( VertexData[TempVertNum].CacheTag == ( i - 1 ) );
+                    pp_assert ( VertexData[TempVertNum].CacheTag == ( i - 1 ) );
                     VertexData[TempVertNum].CacheTag = i;
                 }
             }
@@ -472,14 +471,14 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
 
 
         // Re-find all scores for all verts in the cache, including any that might have just been pushed out.
-        assert ( NumVertsInCache <= MaxSizeVertexCache + 3 );
+        pp_assert ( NumVertsInCache <= MaxSizeVertexCache + 3 );
         for ( int VertIndex = 0; VertIndex < NumVertsInCache; VertIndex++ )
         {
             int VertNum = CacheTags[VertIndex].VertexNumber;
             if ( VertNum >= 0 )
             {
                 vcache_vertex_data *CurVert = &(VertexData[VertNum]);
-                assert ( CurVert->CacheTag == VertIndex );
+                pp_assert ( CurVert->CacheTag == VertIndex );
                 if ( VertIndex >= MaxSizeVertexCache )
                 {
                     // This just fell out of the cache.
@@ -491,7 +490,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
                 for ( int i = 0; i < CurVert->NumActiveTris; i++ )
                 {
                     TriNumsToRetest[NumTrisToRetest++] = CurVert->TriIndices[i];
-                    assert ( NumTrisToRetest <= MaxNumTrisNumsToRetest );
+                    pp_assert ( NumTrisToRetest <= MaxNumTrisNumsToRetest );
                 }
             }
         }
@@ -504,12 +503,12 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
         {
             int TriNum = TriNumsToRetest[TriListNum];
             vcache_tri_data *CurTri = &(TriData[TriNum]);
-            assert ( CurTri->IsActive );
+            pp_assert ( CurTri->IsActive );
             float Score = 0.0f;
             for ( int j = 0; j < 3; j++ )
             {
                 int VertNum = CurTri->VertexNumber[j];
-                assert ( VertexData[VertNum].CurrentScore >= 0.0f );
+                pp_assert ( VertexData[VertNum].CurrentScore >= 0.0f );
                 Score += VertexData[VertNum].CurrentScore;
             }
             CurTri->Score = Score;
@@ -526,7 +525,7 @@ void VcacheOptimize ( int NumTris, int const *IndexedTriListSource, int *Indexed
 
     for ( int VertNum = 0; VertNum < NumVerts; VertNum++ )
     {
-        assert ( VertexData[VertNum].NumActiveTris == 0 );
+        pp_assert ( VertexData[VertNum].NumActiveTris == 0 );
         delete[] VertexData[VertNum].TriIndices;
     }
 
@@ -566,8 +565,8 @@ void ApplyAnnotationPermutation(granny_vertex_annotation_set& Annotation,
     }
     else if (Annotation.VertexAnnotationCount != 0)
     {
-        assert(Annotation.VertexAnnotationType);
-        assert(Annotation.VertexAnnotationCount <= ActualCount);
+        pp_assert(Annotation.VertexAnnotationType);
+        pp_assert(Annotation.VertexAnnotationCount <= ActualCount);
 
         // Direct mapped.  Permute the structures.  Technically, we could just introduce a
         // mapping that was identical to Permutation here, but we'd like to not require
@@ -636,20 +635,14 @@ void ApplyPermutation(granny_int32x const* Permutation,
 }
 
 
-bool VertexCacheOptimize(input_file&     InputFile,
-                         key_value_pair* KeyValues,
-                         granny_int32x   NumKeyValues,
-                         granny_memory_arena* TempArena)
+granny_file_info*
+VertexCacheOptimize(char const*          OriginalFilename,
+                    char const*          OutputFilename,
+                    granny_file_info*    Info,
+                    key_value_pair*      KeyValues,
+                    granny_int32x        NumKeyValues,
+                    granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     // Optimize all meshes for the pre/post-transform cache
     {for(granny_int32x i = 0; i < Info->MeshCount; i++)
     {
@@ -704,7 +697,7 @@ bool VertexCacheOptimize(input_file&     InputFile,
                     Permutation[MeshIndex] = Current++;
                 }
             }}
-            assert(Current <= MeshVertexCount);
+            pp_assert(Current <= MeshVertexCount);
         }
 
         // Apply the permutation to all of the vertex_data's for the mesh
@@ -719,7 +712,7 @@ bool VertexCacheOptimize(input_file&     InputFile,
         // Permute the indices
         {for(granny_int32x Index = 0; Index < MeshIndexCount; ++Index)
         {
-            assert(Permutation[NewIndices[Index]] != -1);
+            pp_assert(Permutation[NewIndices[Index]] != -1);
             NewIndices[Index] = Permutation[NewIndices[Index]];
         }}
 
@@ -747,12 +740,18 @@ bool VertexCacheOptimize(input_file&     InputFile,
         Mesh->PrimaryTopology->TriAnnotationSets = 0;
     }}
 
-    // Write out the resulting file...
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile, true, true, true);
+    return Info;
 }
 
-static CommandRegistrar RegVertexCacheOptimize(eSingleFile_NoMultiRun,
-                                               VertexCacheOptimize,
+static const char* HelpString =
+    (" VertexCacheOptimize: Reorders the mesh index order for a wide array of vertex\n"
+     "  cache architectures. Reduces cache misses in the post-transform buffer found\n"
+     "  in all modern GPUs.\n"
+     "\n"
+     "    preprocessor VertexCacheOptimize char.gr2 -output char_opt.gr2\n");
+
+static CommandRegistrar RegVertexCacheOptimize(VertexCacheOptimize,
                                                "VertexCacheOptimize",
-                                               "Optimizes the mesh order for a wide array of vertex cache architectures");
+                                               "Optimizes the mesh order for a wide array of vertex cache architectures",
+                                               HelpString);
 

@@ -14,26 +14,28 @@ enum {
 	MAX_KEYS   = 256  // not really, but other stuff breaks because it hardcodes this value
 };
 
-	LOGICAL dipInit(void);
+	LOGICAL dipInit();
 
-	void dipKillKeyboard(void);
-	void dipKillMouse(void);
-	void dipKillJoystick(void);
-	void dipKill(void);
+	LOGICAL dipInitJoysticksOnly();
 
-	void dipUnacquireKeyboard(void);
-	void dipUnacquireMouse(void);
-	void dipUnacquireJoystick(void);
-	void dipUnacquire(void);
+	void dipKillKeyboard();
+	void dipKillMouse();
+	void dipKillJoystick();
+	void dipKill();
 
-	LOGICAL dipAcquireKeyboard(void);
-	LOGICAL dipAcquireMouse(void);
-	LOGICAL dipAcquireJoystick(void);
-	LOGICAL dipAcquire(void);
+	void dipUnacquireKeyboard();
+	void dipUnacquireMouse();
+	void dipUnacquireJoystick();
+	void dipUnacquire();
 
-	LOGICAL dipSetupKeyboard(void);
-	LOGICAL dipSetupMouse(void);
-	LOGICAL dipSetupJoystick(void);
+	LOGICAL dipAcquireKeyboard();
+	LOGICAL dipAcquireMouse();
+	LOGICAL dipAcquireJoystick();
+	LOGICAL dipAcquire();
+
+	LOGICAL dipSetupKeyboard();
+	LOGICAL dipSetupMouse();
+	LOGICAL dipSetupJoystick();
 
 	LOGICAL dipGetKeyboardData(DIDEVICEOBJECTDATA* od, UINT32* dwElements);
 	LOGICAL dipGetKeyboardState(int bufsize, LPVOID buffer);
@@ -41,7 +43,7 @@ enum {
 	LOGICAL dipGetMouseState(DIMOUSESTATE* ms);
 	LOGICAL dipGetJoystickData(DIDEVICEOBJECTDATA* didod, UINT32* dwElements);
 	LOGICAL dipGetJoystickState(SINT32 number, DIJOYSTATE* js);
-	SINT32 dipGetNumberJoysticks(void);
+	SINT32 dipGetNumberJoysticks();
 
 	LOGICAL dipHasKeyboard();
 	LOGICAL dipHasMouse();

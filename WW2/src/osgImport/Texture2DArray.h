@@ -212,7 +212,7 @@ class Texture2DArray : public Texture
 
         ref_ptr<SubloadCallback> _subloadCallback;
 
-        typedef buffered_value<unsigned int> ImageModifiedCount;
+        using ImageModifiedCount = buffered_value<unsigned int>;
         mutable std::vector<ImageModifiedCount> _modifiedCount;
 };
 

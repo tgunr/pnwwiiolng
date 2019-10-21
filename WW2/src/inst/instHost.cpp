@@ -10,7 +10,6 @@
 
 #include <mutex>
 
-#include "inst/instStateEnums.h"
 #include "inst/instHost.h"
 #include "inst/instHostInstance.h"
 #include "inst/instHostInstanceImpl.h"
@@ -41,14 +40,14 @@ _defaultHostInstanceImplFactory(Instance::HostInstance& _inst)
 	return new Instance::HostInstanceImpl(_inst);
 }
 
-Instance::HostInstanceImplFactory* Instance::s_implFactory = _defaultHostInstanceImplFactory;
+Instance::HostInstanceImplFactory Instance::s_implFactory = _defaultHostInstanceImplFactory;
 
 //////////////////////////////////////////////////////////////////////
 // Function to register a derived HostInstanceImpl's instead of the
 // base class new function.
 
 void
-Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory* factory)
+Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory factory)
 {
 	Instance::s_implFactory = factory;
 }
@@ -90,7 +89,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_CAMPAIGN:
 	{
@@ -105,7 +103,6 @@ _getScenario(const Instance::Descriptor& descriptor)
 					);
 		return scenario;
 	}
-	break;
 
 	case Instance::_SCENARIO:
 	{
@@ -122,7 +119,7 @@ _getScenario(const Instance::Descriptor& descriptor)
 	}
 
 	default:
-	break;
+		break;
 	}
 
 	static Instance::Scenario
@@ -148,7 +145,7 @@ _getHostInstance(const Instance::Descriptor& descriptor)
 	// Get the data on this scenario.
 	Instance::Scenario scenario = _getScenario(descriptor);
 
-	dbugLog(_FLI, "in:%u.%u.%llu.%llu creating new %s instance with capacity %u / gametime %u:%u"
+	dbugLog(_FLI, "in:%u.%u.%" PR64BitUT ".%" PR64BitUT " creating new %s instance with capacity %u / gametime %u:%u"
 					, descriptor.category(), descriptor.type(), descriptor.handle(), descriptor.id()
 					, scenario.m_internalDescription.c_str()
 					, scenario.m_capacity, (scenario.m_gameTime_m / 60), (scenario.m_gameTime_m % 60)
@@ -172,7 +169,7 @@ _campaignInstance()
 static void
 _deleteInstance(const Instance::HostInstance* instance)
 {
-	dbugLog(_FLI, "in:%u.%u.%llu.%llu deleting instance"
+	dbugLog(_FLI, "in:%u.%u.%" PR64BitUT ".%" PR64BitUT " deleting instance"
 					, instance->descriptor().category()
 					, instance->descriptor().type()
 					, instance->descriptor().handle()
@@ -189,7 +186,7 @@ namespace Instance
 {
 
 HostInstance*
-HostInstance::LookupByUID(const instanceid_t& uid)
+HostInstance::LookupByUID(const instanceid_t uid)
 {
 	INSTANCE_UIDS::iterator it = g_hostInstanceUIDs.find(uid);
 	return ( it != g_hostInstanceUIDs.end() ) ? it->second : nullptr;
@@ -220,7 +217,7 @@ HostInstance::getSquadMemberCount(UINT32 squadID) const
 void
 _adjustmentTrack(wwiiPlayer* const player, const char* const action, const HostInstance* const inst)
 {
-	player->log(_FLD, "%s to in:%u.%u.%llu.%llu side:%u"
+	player->log(_FLD, "%s to in:%u.%u.%" PR64BitUT ".%" PR64BitUT " side:%u"
 						" mps:%u counts:%u/%u/%u/%u"
 					, action
 					, inst->descriptor().category(), inst->descriptor().type(), inst->descriptor().handle(), inst->descriptor().id()
@@ -354,7 +351,7 @@ wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 
 	m_hostInstance = nullptr;
 	m_instance = Instance::g_invalid;
-	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%llu.%llu", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
+	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%" PR64BitUT ".%" PR64BitUT "", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
 
 	if ( toInstance.isValid() == true )
 	{
@@ -373,10 +370,7 @@ wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 void
 wwiiPlayer::SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide)
 {
-	if ( g_logDebug )
-	{
-		log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide);
-	}
+    log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide);
 
 	const bool swapInstanceSide = ( toSide != side() && instance().isValid() && m_hostInstance );
 	if ( swapInstanceSide )

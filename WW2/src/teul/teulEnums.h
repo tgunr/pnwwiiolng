@@ -14,8 +14,6 @@ enum // do not change order!
 	IS_OPENING,			// no callbacks are allowed in this mode
 	IS_LISTENING,		// state of all listening connections
 	IS_OPEN,			// connection is ready for callback transmission
-	IS_CLOSING,			// connection is in the process of closing, no callbacks are transmitted
-	IS_CLOSED,			// connection is closed and cleaning up.
 	IS_DEAD				// connection is dead and about to be freed
 };
 
@@ -27,6 +25,17 @@ enum PROTOCOL
 	PROTOCOL_UDP,			// User Datagram protocol, unreliable, datagram based, most flexible.
 	PROTOCOL_TCP,			// Transport Control Protocol, reliable, stream based, extra overhead.
 	PROTOCOL_UDB,			// UDB = UDP bare, no rel, also allows broadcast
-	PROTOCOL_CTRL			// CTRL = Via the controller
+	PROTOCOL_CTRL,			// CTRL = Via the controller
+	PROTOCOL_UNDEF
 };
 
+// The base packer modes.
+enum PACKER_MODE
+{
+	TEUL_UNPACK,
+	TEUL_PACK
+};
+
+// The mask for "send directly to"
+// TODO: Do we need this?
+#define DIRECT_MASK 0x000000ff

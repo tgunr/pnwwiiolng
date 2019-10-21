@@ -95,7 +95,7 @@ class ShadowMap : public Referenced
 {
 public:
     ShadowMap();
-    virtual ~ShadowMap(void) {};
+    virtual ~ShadowMap() {};
 
     static ShadowMap& GetInstance();
 

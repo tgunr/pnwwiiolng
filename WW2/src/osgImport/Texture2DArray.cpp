@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
  * This library is open source and may be redistributed and/or modified under
@@ -625,7 +625,7 @@ void Texture2DArray::allocateMipmap() const
     }
 }
 
-typedef buffered_value< ref_ptr<Texture2DArray::Extensions> > BufferedExtensions;
+using BufferedExtensions = buffered_value<ref_ptr<Texture2DArray::Extensions>>;
 static BufferedExtensions s_extensions;
 
 Texture2DArray::Extensions* Texture2DArray::getExtensions(unsigned int contextID,bool createIfNotInitalized)

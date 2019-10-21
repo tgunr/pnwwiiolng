@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Date: Fri Mar 24 16:11:48 CST 2006
 //
@@ -226,7 +226,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 
 	case ServerTrackedObject::_EFFECT:
-		sto = new SmokeGrenadeSTO(a);
+		sto = new SmokeSTO(a);
 	break;
 
 	case ServerTrackedObject::_ORDNANCE:

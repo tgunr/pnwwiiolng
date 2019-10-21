@@ -1,190 +1,47 @@
-#include <syscfg.h> // Path is project specific.
-//
-
+#include <syscfg.h>
 #include <winreg.h>
 #include "sys/sysreg.h"
-#include "VersionNo.h"
+#include "unique_opaque_ptr.hpp"
 
-#include "auth/authAppIDs.h"
-
-BOOL sysregGetKeyText(const TCHAR* keyloc, const TCHAR* keyname, TCHAR* keytext)
+BOOL sysregGetHKeyDword(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, DWORD *keydword)
 {
-TCHAR	keyvalue[256];
-DWORD	keysize=256;
-DWORD	keytype;
-HKEY	hkey;
+	unique_HKEY hkey;
+	DWORD keylen = sizeof(DWORD);
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, KEY_READ, &hkey))
-	{
-		return(FALSE);
-	}
-
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)keyvalue, &keysize))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
-	}
-
-	RegCloseKey(hkey);
-
-	ustrcpy(keytext, keyvalue);
-
-	return(TRUE);
+	return RegOpenKeyEx(HKey, keyloc, 0, KEY_READ, &hkey) == ERROR_SUCCESS &&
+		   RegQueryValueEx(hkey, keyname, nullptr, nullptr, reinterpret_cast<BYTE *>(&keydword), &keylen) == ERROR_SUCCESS;
 }
 
-
-BOOL sysregGetKeyDword(const TCHAR* keyloc, const TCHAR* keyname, DWORD* keydword)
+BOOL sysregGetHKeyText(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, std::wstring &keytext)
 {
-DWORD	keyvalue;
-DWORD	keysize=4;
-DWORD	keytype;
-HKEY	hkey;
+	unique_HKEY hkey;
+	DWORD keylen = 0;
 
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, KEY_READ, &hkey))
+	if (RegOpenKeyEx(HKey, keyloc, 0, KEY_READ, &hkey) != ERROR_SUCCESS ||
+		RegQueryValueEx(hkey, keyname, nullptr, nullptr, nullptr, &keylen) != ERROR_SUCCESS)
 	{
-		return(FALSE);
+		return false;
 	}
-
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)&keyvalue, &keysize))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
+	keytext.resize(keylen + 1, L'\0');
+	if (RegQueryValueEx(hkey, keyname, nullptr, nullptr, reinterpret_cast<BYTE *>(&keytext[0]), &keylen) != ERROR_SUCCESS) {
+		return false;
 	}
-
-	RegCloseKey(hkey);
-
-	*keydword = keyvalue;
-
-	return(TRUE);
+	keytext.resize(keylen);
+	return true;
 }
 
-
-BOOL sysregSetKeyText(const TCHAR* keyloc, const TCHAR* keyname, const TCHAR* keytext)
+BOOL sysregSetHKeyDword(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, DWORD keydword)
 {
-DWORD	disp;
-HKEY	hkey;
+	unique_HKEY hkey;
 
-	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, _T(""),
-			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hkey, &disp))
-	{
-		return(FALSE);
-	}
-
-	if (ERROR_SUCCESS != RegSetValueEx(hkey, keyname, 0, REG_SZ, (const BYTE*)keytext, ustrlen(keytext)))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
-	}
-
-	RegCloseKey(hkey);
-
-	return(TRUE);
+	return RegCreateKeyEx(HKey, keyloc, 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &hkey, nullptr) == ERROR_SUCCESS &&
+		   RegSetValueEx(hkey, keyname, 0, REG_DWORD, reinterpret_cast<const BYTE *>(&keydword), sizeof(keydword)) == ERROR_SUCCESS;
 }
 
-
-BOOL sysregSetKeyDword(const TCHAR* keyloc, const TCHAR* keyname, const DWORD* keydword)
+BOOL sysregSetHKeyText(HKEY HKey, const WCHAR *keyloc, const WCHAR *keyname, const WCHAR *keytext)
 {
-DWORD	disp;
-HKEY	hkey;
+	unique_HKEY hkey;
 
-	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, _T(""),
-			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hkey, &disp))
-	{
-		return(FALSE);
-	}
-
-	if (ERROR_SUCCESS != RegSetValueEx(hkey, keyname, 0, REG_DWORD, (const BYTE*)keydword, 4))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
-	}
-
-	RegCloseKey(hkey);
-
-	return(TRUE);
-}
-
-
-BOOL sysregGetHKeyDword(HKEY HKey, const TCHAR* keyloc, const TCHAR* keyname, DWORD* keydword)
-{
-DWORD	keyvalue;
-DWORD	keysize=4;
-DWORD	keytype;
-HKEY	hkey;
-
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKey, (const TCHAR*)keyloc, 0, KEY_READ, &hkey))
-	{
-		return(FALSE);
-	}
-
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)&keyvalue, &keysize))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
-	}
-
-	RegCloseKey(hkey);
-
-	*keydword = keyvalue;
-
-	return(TRUE);
-}
-
-
-BOOL sysregGetHKeyText(HKEY HKey, const TCHAR* keyloc, const TCHAR* keyname, TCHAR* keytext)
-{
-TCHAR	keyvalue[256];
-DWORD	keysize=256;
-DWORD	keytype;
-HKEY	hkey;
-
-	if (ERROR_SUCCESS != RegOpenKeyEx(HKey, (const TCHAR*)keyloc, 0, KEY_READ, &hkey))
-	{
-		return(FALSE);
-	}
-
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)keyvalue, &keysize))
-	{
-		RegCloseKey(hkey);
-
-		return(FALSE);
-	}
-
-	RegCloseKey(hkey);
-
-	ustrcpy(keytext, keyvalue);
-
-	return(TRUE);
-}
-
-#include "versionNo.h"
-
-const TCHAR* sysregGetInstallValue(const TCHAR* Key)
-{
-#ifdef BETA_RELEASE
-    int appid = Auth::Apps::BETA_APP_ID;
-#elif PN_WW2_BUILD_NO != 255
-    int appid = Auth::Apps::BETA_APP_ID;
-#else
-    int appid = Auth::Apps::LIVE_APP_ID;
-#endif
-
-	static TCHAR value[256+1];
-	value[0] = 0;
-
-	TCHAR path[256+1];
-
-	// create the path based on the appid
-	wsprintf(path, _T("SOFTWARE\\Playnet\\apps\\appid%d\\instance1"), appid);
-
-	if(sysregGetHKeyText(HKEY_LOCAL_MACHINE, path, Key, (TCHAR*)value) )
-		return value;
-
-	// return it
-	return nullptr;
+	return RegCreateKeyEx(HKey, keyloc, 0, nullptr, 0, KEY_ALL_ACCESS, nullptr, &hkey, nullptr) == ERROR_SUCCESS &&
+		   RegSetValueEx(hkey, keyname, 0, REG_SZ, reinterpret_cast<const BYTE *>(keytext), wcslen(keytext) * sizeof(WCHAR)) == ERROR_SUCCESS;
 }

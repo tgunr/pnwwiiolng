@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <ctype.h>
 
 #include "pi/pi.h"
@@ -11,7 +11,6 @@
 #include "math/math3d.h"
 #include "ob/obmain.h"
 #include "ob/obcd.h"
-#include "sys/sysWinISO.h"
 
 UINT32 mlUtilityFindVarname(UINT32* VarNum,
 							const UCHAR* VarName,
@@ -35,7 +34,7 @@ UINT32 mlUtilityFindVarname(UINT32* VarNum,
 
 	for (i=0;i<MaxNames;i++, VehicleVarName += VarNameSize)
 	{
-		if (stricmp((char*)VarName, (char*)VehicleVarName) == 0)
+		if (strcasecmp((char*)VarName, (char*)VehicleVarName) == 0)
 		{
 			*VarNum = i;
 			return 0;

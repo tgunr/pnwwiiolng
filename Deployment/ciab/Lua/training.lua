@@ -1,0 +1,8 @@
+deploy("uktrngd", "Fort Montgomery - British Training Ground")
+deploy("uktrngb", "Fort Montgomery - British Training Ground")
+deploy("frtrngd", "Fort De Gaulle - French Training Ground")
+deploy("frtrngb", "Fort De Gaulle - French Training Ground")
+deploy("detrngd", "Fort Rommel - German Training Ground")
+deploy("detrngb", "Fort Rommel - German Training Ground")
+deploy("ustrngd", "Fort Patton - U.S. Training Ground")
+deploy("ustrngb", "Fort Patton - U.S. Training Ground")

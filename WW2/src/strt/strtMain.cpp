@@ -15,6 +15,7 @@
 #include "strt/strtFB.h"
 #include "strt/strtMain.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtHostMessages.h"
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
@@ -22,7 +23,6 @@
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiConfig.h"
 //#include "cnvy/cnvyMain.h"
-#include "versionNo.h"
 #include "strt/strtCPClass.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"
@@ -33,6 +33,7 @@
 #include "teul/teulTime.h"
 #include "wwii/wwiiThreads.h"
 #include "strt/strtCaptureContribution.h"
+#include "chat/chatStratSupportMessages.h"
 
 #ifdef WEAP_TEST
 //Weapon testing stuff
@@ -120,7 +121,7 @@ _buildPocketMap()
 
 extern int inUse, allocations;
 
-LOGICAL
+bool
 strtMain(UINT32 currentTime)
 {
 	UINT32 i, toRun, leftToRun;
@@ -166,40 +167,33 @@ strtMain(UINT32 currentTime)
 		_buildPocketMap();
 		teulSyncClock();
 		end = teulClock64;
-		LogAbort("build pocket map too %llums", end - start);
+		LogAbort("build pocket map too %" PR64BitUT "ms", end - start);
 #endif
 
-		return FALSE;
+		return false;
 	}
 
-	return TRUE;
+	return true;
 }
 
-LOGICAL
-strtBroadcastCPs(void)
+void
+strtBroadcastCPs()
 {
-	CPStruct* cp;
-
-	if ( _cpList == nullptr )
-		return FALSE;
-
-	for ( cp = _cpList; cp != nullptr; cp = cp->next )
+	for ( auto cp = _cpList; cp ; cp = cp->next )
 	{
 		//Send the CP status
 		strtQueueCPStatus(cp);
 	}
-
-	return TRUE;
 }
 
 CPStruct*
-strtGetCPList(void)
+strtGetCPList()
 {
 	return _cpList;
 }
 
 Supercell*
-strtGetCellList(void)
+strtGetCellList()
 {
 	return _supercellList;
 }
@@ -244,10 +238,9 @@ strtInitializeStratSystem()
 	_cpList = strtImportStratData();
 	if (_cpList == nullptr)
 	{
-		strtReportDataErrors();
+		strtReportDataErrors(0);
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
-		exit(1);
 	}
 
 	//Hack to get bridges working
@@ -257,36 +250,29 @@ strtInitializeStratSystem()
 	if (strtVerifyStratSystem(_cpList,0) == false)
 	{
 		LogAbort("Strat System is not valid");
-		exit(1);
 	}
 
 	stratInitializeLua();
 
 	dbugLog(_FLN,"Strat System verified");
-	threadsLogging();
 
 	// Make sure all the global spawn data is ready;
 	// this doesn't actually initialize spawn lists tho.
 	strtInitSpawn();
-	threadsLogging();
 
 	//Turn on all the bases
 	// (which includes creating all the spawn lists)
 	strtInitBases(_cpList);
-	threadsLogging();
 
 	//Init all the firebases
 	strtInitStratSystemFirebases(_cpList);
-	threadsLogging();
 
 #if defined(IS_STRAT_HOST)
 	strtdbSaveGameWorld(_cpList);
-	threadsLogging();
 #endif // IS_STRAT_HOST
 
 	// Put brigades onto the map
 	strtInitializeHCUnits();
-	threadsLogging();
 
 	//Tell everyone the status of the CPs
 	strtBroadcastCPs();
@@ -306,4 +292,28 @@ bool
 strtIsStratInitialized()
 {
 	return _initialized;
+}
+
+void strtProcessGarrisons()
+{
+	// For garrisons that have changed side recently, put out an HC warning about country switch countdown
+	for ( auto cp = _cpList; cp ; cp = cp->next )
+	{
+		// don't assume that forever axis will have only one playing side
+		if (wwiiSideCount(cp->side) > 1)
+		{
+			UINT32 currentTime_s = teulTime();
+			UINT32 startTime_s = cp->getLastCaptureTime();
+			UINT32 expireTime_s = startTime_s + host_config.supply.noPenaltySwitchPeriod_m * 60;
+			if (startTime_s != 0 && (currentTime_s <= expireTime_s))
+			{
+				const UINT32 minutesLeft = ((expireTime_s - currentTime_s) / 60) + 1; // round up to the nearest minute
+				char minutes[16]; // minutes left
+				snprintf(minutes, 15, "%u", minutesLeft);
+
+				// NOTE: not using stored side because it might not be updated during a country switch
+				chatSendHCMessage( cp->side, LSTR_CP_COUNTRY_CHANGE_WARNING, cp->name, minutes);
+			}
+		}
+	}
 }

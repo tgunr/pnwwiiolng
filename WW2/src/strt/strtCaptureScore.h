@@ -28,14 +28,15 @@ struct CaptureContributionEvent
 	,	Killed
 	};
 	CaptureContributionEvent() {}
-	CaptureContributionEvent(Status withStatus, UINT32 facilityID, const ChatHandle& handle, UINT32 playerID, UINT32 sortieID, UINT32 missionID, UINT32 brigadeID)
-		: m_status(withStatus), m_facilityID(facilityID), m_handle(handle), m_playerID(playerID), m_sortieID(sortieID), m_missionID(missionID), m_unitID(brigadeID)
+	CaptureContributionEvent(Status withStatus, UINT32 facilityID, const ChatHandle handle, UINT32 playerID, UINT32 playerCountry, UINT32 sortieID, UINT32 missionID, UINT32 brigadeID)
+		: m_status(withStatus), m_facilityID(facilityID), m_handle(handle), m_playerID(playerID), m_playerCountry(playerCountry), m_sortieID(sortieID), m_missionID(missionID), m_unitID(brigadeID)
 		{}
 
 	Status		m_status;
 	UINT32		m_facilityID;	// Facility being affected
 	ChatHandle	m_handle;		// Chat handle of player
 	UINT32		m_playerID;		// Player ID
+	UINT32		m_playerCountry;// Player's country
 	UINT32		m_sortieID;		// Vehicle Sortie ID
 	UINT32		m_missionID;	// Player's mission
 	UINT32		m_unitID;		// Player's brigade
@@ -51,10 +52,9 @@ struct CaptureContributionEvent
 struct CaptureScore
 {
 	CaptureScore() {}
-	CaptureScore(const FULL_OBJ_ID& fid_, const WWII_SIDE& side_) : m_fullObjID(fid_), m_side(side_) {}
+	CaptureScore(const FULL_OBJ_ID fid, const WWII_SIDE side) : m_fullObjID(fid), m_side(side) {}
 
 	FULL_OBJ_ID		m_fullObjID;
 	WWII_SIDE		m_side;
 };
 #pragma pack(pop)
-

@@ -1,29 +1,22 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/kill_uncommon_data.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #14 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
 
-bool KillUncommonData(input_file&     InputFile,
-                      key_value_pair* KeyValues,
-                      granny_int32x   NumKeyValues,
-                      granny_memory_arena*)
+granny_file_info*
+KillUncommonData(char const*       OriginalFilename,
+                 char const*       OutputFilename,
+                 granny_file_info* Info,
+                 key_value_pair* KeyValues,
+                 granny_int32x   NumKeyValues,
+                 granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     // Remove exporter details
     Info->ExporterInfo = 0;
 
@@ -90,12 +83,22 @@ bool KillUncommonData(input_file&     InputFile,
     Info->ExtendedData.Object = 0;
 
     // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
+static const char* HelpString =
+    (" KillUncommonData removes data mostly useful in toolchains rather\n"
+     " than in the runtime to save space. This includes ExtendedData members\n"
+     " on granny_bones and granny_meshes, granny_vector_tracks, etc. This\n"
+     " command is useful more as a guide to creating your own tailored version\n"
+     " that removes elements that your engine doesn't care about; it paints\n"
+     " with a very broad brush.\n"
+     "\n"
+     "    preprocessor KillUncommonData file.gr2 -output file_stripped.gr2\n"
+     "    preprocessor KillUncommonData file.gr2 -output file.gr2\n");
 
-static CommandRegistrar RegKillUncommonData(eSingleFile_NoMultiRun,
-                                            KillUncommonData,
+static CommandRegistrar RegKillUncommonData(KillUncommonData,
                                             "KillUncommonData",
-                                            "Removes data mostly useful in toolchains rather than the runtime to save space");
+                                            "Removes data mostly useful in toolchains rather than the runtime to save space",
+                                            HelpString);
 

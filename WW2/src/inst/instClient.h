@@ -24,12 +24,12 @@ namespace Instance
 	// Select a specific instance. Note that returning true only indicates the
 	// request was sent. See instClient.cpp/_recvSelect for the OK/fail.
 	extern bool RequestSelect(const Instance::Descriptor& instance, SINT32 mapConnection);
-	extern bool RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, const instanceid_t& id, SINT32 mapConnection);
+	extern bool RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, const instanceid_t id, SINT32 mapConnection);
 
 	// Ask the host to create a specific instance for me. Note: if this completes
 	// the host will automatically select into it for you.
 	extern bool RequestCreate(const Instance::Descriptor& instance, SINT32 mapConnection);
-	extern bool RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SINT32 mapConnection);
+	extern bool RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64 instOwner, SINT32 mapConnection);
 
 	extern SINT32 InstallClientCallbacks();
 

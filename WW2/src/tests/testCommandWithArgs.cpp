@@ -28,7 +28,7 @@ public: bool TestCommand(const char* source, const char* expectCommand, const ch
 		START_TEST_STAGE( source )
 
 			char command[MAX_MESSAGE_LEN + 1];
-			strcpy(command, source);
+			strsafecpy(command, source);
 
 			Chat::CommandWithArgs result(command);
 

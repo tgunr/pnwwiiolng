@@ -1,21 +1,19 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "xml/XMLLoader2.h"
+
+#if platBuild != BUILD_SERVER
 #include "ui/uiMain.h" // for ui fio callbacks
+#endif
 
 const char* xmlTrimString(const char* value)
 {
-	static char buffer[MAX_XML_TRIM_SIZE+1];
-	static char* trimmed;
+	static char buffer[MAX_XML_TRIM_SIZE + 1]{};
 
-	memset(buffer, 0, MAX_XML_TRIM_SIZE+1);
-
-	if(value && strlen(value))
-		strncpy(buffer, value, MAX_XML_TRIM_SIZE);
-
-	trimmed = buffer;
-
-	//return rmlead(rmtrail(trimmed));
-	return trimmed;
+	if (value && value[0]) {
+		strsafecpy(buffer, value);
+		return rmlead(rmtrail(buffer));
+	}
+	return "";
 }
 
 bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char* attribute)
@@ -29,7 +27,7 @@ bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char*
 		switch(type)
 		{
 			case XML_DATA_BOOL:
-				*(bool*)value = (!stricmp((const char*)data, "true")) ? true: false;
+				*(bool*)value = (!strcasecmp((const char*)data, "true")) ? true: false;
 			break;
 			case XML_DATA_SINT:
 				*(int*)value = atoi((const char*)data);
@@ -69,6 +67,7 @@ const char* xmlGetStringFromNode(xmlNode* node, const char* attribute)
 	return (xmlGetNodeValue(node, XML_DATA_STRING, &str, attribute)) ? str: "";
 }
 
+#if platBuild != BUILD_SERVER
 // lame match functions are everywhere
 static int xmlinputmatch(const char* filename) { return 1; }
 
@@ -79,3 +78,4 @@ void xmlRegisterUIFIO()
 									  (xmlInputReadCallback)fioCallbacks.read,
 									  (xmlInputCloseCallback)fioCallbacks.close);
 }
+#endif

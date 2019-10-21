@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -53,18 +53,6 @@
 #include "SpatialDB.h"
 #endif
 
-#ifdef TERRAIN_EDITOR
-#include "iop.h"
-#include "uitxpik.h"
-#include "uiedfnc.h"
-#include "uitele.h"
-#include "rn/rntext.h"
-#include "uitab.h"
-#include "uistretch.h"
-#include "ml/mltypes.h"
-#include "pers/persmain.h"
-#endif
-
 #include "wwii/wwiiCovert.h"
 
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
@@ -76,7 +64,7 @@ static std::map<int, OBJECT*> ShadowObject;
 static int mapindex = 0;
 
 // typedefs
-typedef struct tag_CHAOTICSEEDTYPE
+struct _CHAOTICSEEDTYPE
 {
 	FLOAT64 X;
 	FLOAT64 Y;
@@ -86,8 +74,7 @@ typedef struct tag_CHAOTICSEEDTYPE
 	FLOAT64 A;
 	FLOAT64 B;
 	FLOAT64 C;
-
-} _CHAOTICSEEDTYPE;
+};
 
 
 // defines
@@ -115,8 +102,6 @@ static OBJECT*				_ImportObjectList[MAX_IMPORT_OBJECTS];
 static SINT32				_CurrentImportObjectCount;
 static SINT32				NumDrawnTriangles;
 
-static LOGICAL				_DrawVertices(int type, OBJECT* lpobj);
-
 // static prototypes
 static LOGICAL RawUpdate(LOGICAL ForceCompleteReLoad);
 LOGICAL trnmainFindSupercell(SINT16* scx, SINT16* scy, piVECTOR* p);
@@ -128,7 +113,7 @@ extern UINT32 OverrideSpawner;
 #endif
 
 // Static functions
-static SINT32 _GetChaoticNumber(void)
+static SINT32 _GetChaoticNumber()
 {
 FLOAT64		X,Y,Z;
 SINT16		ReturnNum;
@@ -150,7 +135,7 @@ SINT16		ReturnNum;
 	return ((SINT32)ReturnNum);
 }
 
-static LOGICAL _SeedChaoticNumberGenerator(void)
+static LOGICAL _SeedChaoticNumberGenerator()
 {
 _CHAOTICSEEDTYPE Seed;
 SINT32	i;
@@ -252,8 +237,8 @@ LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT
 {
 	FULL_OBJ_ID fid;
 
-	fid.cell.ox		= scx << 4;
-	fid.cell.oy		= scy << 4;
+	fid.cell.ox		= static_cast<SINT16>(static_cast<UINT16>(scx) << 4);
+	fid.cell.oy		= static_cast<SINT16>(static_cast<UINT16>(scy) << 4);
 	fid.id			= id;
 	fid.objClass	= 0;
 	fid.objType		= 0;
@@ -310,12 +295,11 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 			if (blist == nullptr)
 			{
-				// Temporarily silenced until we figure out the cause.
-				//rnmainListText("Invalid building message");
+#ifdef BETA_RELEASE
+				rnmainListText("Invalid building message");
+#endif
 				Write_Debug("Invalid building message in recvWorldUpdate, "
-							"supercell x=%d,y=%d,building id = %d",
-								td->scx,td->scy,
-								bid);
+				            "supercell [%d,%d] bid = %d", td->scx,td->scy, bid);
 				return -EINVAL;
 			}
 
@@ -349,13 +333,20 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 
 		for ( int i = 0 ; i < td->bldHash.maxBldID ; ++i ) {
 			if ( td->bldHash.building[i].pobj != lpobj )
-				continue;			
+				continue;
 			bid = i;
 			break;
 		}
 	}
 
-	if ( 0 > bid || bid >= td->bldHash.maxBldID ) {
+	if ( bid < 0 ) {
+		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (<0) - model type %d - model name %s",
+		          bid, lpobj->modelInstance == nullptr ? -1 : lpobj->modelInstance->GetModelType(),
+		          lpobj->name);
+		return -EINVAL;
+	}
+
+	if ( bid >= td->bldHash.maxBldID ) {
 		Write_Log(LOG_COMM, LOG_INFO, "trnUpdateStratData: Bad bid %d (>= %d)", bid, td->bldHash.maxBldID);
 		return -EINVAL;
 	}
@@ -406,11 +397,7 @@ int		i, j;
 
 	WorldOriginOffset.x = InitXOrigin;
 	WorldOriginOffset.y = InitYOrigin;
-#ifdef TERRAIN_EDITOR
 	WorldOriginOffset.z = 0;
-#else
-	WorldOriginOffset.z = 0;
-#endif
 
 	TerrainStable = TRUE;
 
@@ -422,16 +409,12 @@ int		i, j;
 	xstep *= 0.5f;
 	ystep *= 0.5f;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Terrain square dimensions: width = %f, height = %f", xstep / ScaleFactor, ystep / ScaleFactor);
-#endif
 
 	trnlod = 0;
 
 	horizon = 8000.0f * ScaleFactor;
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Terrain minimal horizons: %f", horizon / ScaleFactor);
-#endif
 
 	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -447,9 +430,9 @@ int		i, j;
 		}
 
 		trndtl[i].terrain->flags = OBJECT_COLLISION | OBJECT_USEMATRIX;
-		sprintf(trndtl[i].terrain->name, "%s_r%d", name, i);
+		strprintf(trndtl[i].terrain->name, "%s_r%d", name, i);
 //		lstrcpy(trndtl[i].terrain->name, name);
-//		sprintf(line, "_r%d", i);
+//		strprintf(line, "_r%d", i);
 //		lstrcat(trndtl[i].terrain->name, line);
 		trndtl[i].terrain->texid	= -1;
 		trndtl[i].terrain->trnum = i;
@@ -617,7 +600,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 		{
 			if (td->nonreplacementtiles[i] == nullptr)
 			{
-				sprintf(objname, "%s_t%d", td->terrain->name, i);
+				strprintf(objname, "%s_t%d", td->terrain->name, i);
 				if (!obmainCreateObject(&newobj, objname, MAX_TERRAIN_VERTICES, MAX_TERRAIN_TRIANGLES))
 				{
 					return(FALSE);
@@ -631,7 +614,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const
 			if (td->nonreplacementtiles[i]->numtris == 0)
 			{
 				newobj = td->nonreplacementtiles[i];
-				sprintf(newobj->name, "%s_t%d", td->terrain->name, i);
+				strprintf(newobj->name, "%s_t%d", td->terrain->name, i);
 				break;
 			}
 		}
@@ -749,24 +732,22 @@ TERRAIN_DETAIL*	td;
 		return(FALSE);
 	}
 
-#ifdef DONT_USE
-#ifdef TERRAIN_EDITOR
+#ifdef DEBUG_WW2
 	if (strcmp(newobj->texname, lpobj->texname) == 0)
 	{
 		Write_Debug("Source and destination texture objects are the same: '%s'", newobj->texname);
+#ifdef DONT_USE
 		return(TRUE);
+#endif
 	}
-	else
-	if (strcmp(newobj->texname, "null1.bmp") == 0)
+	else if (strcmp(newobj->texname, "null1.bmp") == 0 && strlen(lpobj->texname) > 0)
 	{
-		Write_Debug("Null texture object was destination");
+		Write_Debug("Null texture object was destination of source %s", lpobj->texname);
 	}
-	else
-	if (strcmp(lpobj->texname, "null1.bmp") == 0)
+	else if (strcmp(lpobj->texname, "null1.bmp") == 0)
 	{
 		Write_Debug("Null texture object was source");
 	}
-#endif
 #endif
 
 	if (!loading)
@@ -775,9 +756,6 @@ TERRAIN_DETAIL*	td;
 		if (td->trindx < 0 || td->trindx >= MAX_TERRAIN_EDIT_LIST)
 		{
 			Write_Debug("Out of edit buffer space.");
-#ifdef TERRAIN_EDITOR
-			rnmainListText("Out of edit buffer space.");
-#endif
 			return(FALSE);
 		}
 	}
@@ -983,48 +961,6 @@ TERRAIN_DETAIL*	td;
 		}
 	}
 
-#ifdef TERRAIN_EDITOR
-	if (!loading)
-	{
-	int			i, num;
-
-		num = 0;
-		td = &trndtl[lpobj->trnum];
-		lpobj = td->terrain;
-		if (lpobj != nullptr)
-		{
-			num += 1;
-			nv = 0;
-			nt = 0;
-			for (i=0; i < MAX_TERRAIN_TEXTURES; lpobj=td->txtobj[i++])
-			{
-				if (lpobj == nullptr)
-				{
-					continue;
-				}
-
-				num += 1;
-				nv += lpobj->numverts;
-				nt += lpobj->numtris;
-			}
-
-			// Only if some objects were not nullptr
-			if (num != 0)
-			{
-				if (nv < SUPERCELL_OCTETS_XY * NUM_VERTICES_PER_OCTET)
-				{
-					Write_Debug("Number of vertices in %04x_%04x at %d is incorrect: %d, %d", td->scx, td->scy, td->terrain->trnum, nv, SUPERCELL_OCTETS_XY * NUM_VERTICES_PER_OCTET);
-				}
-
-				if (nt < SUPERCELL_OCTETS_XY * NUM_TRIANGLES_PER_OCTET)
-				{
-					Write_Debug("Number of triangles in %04x_%04x at %d is incorrect: %d, %d", td->scx, td->scy, td->terrain->trnum, nt, SUPERCELL_OCTETS_XY * NUM_TRIANGLES_PER_OCTET);
-				}
-			}
-		}
-	}
-#endif
-
 	return(TRUE);
 }
 
@@ -1059,118 +995,93 @@ static LOGICAL SetHeight(SINT16* retd, SINT32 d)
 }
 #endif
 
-LOGICAL trnmainAddObject(SINT8* objname,
-                         piVECTOR* pos,
-                         OBJECT* lpmain,
-						 SINT32 StratSuperCellX,
-                         SINT32 StratSuperCellY,
-                         UINT32 StratId,
-						 REL_OBJ_ID * ObjId,
-						 SINT32 drag,
-                         SINT32 roughness,
-                         SINT32 style,
-                         SINT32 orientation,
-                         SINT32 sc,
-						 bool nonPlanarBase,
-						 const SDM_ObjInfo& objInfo,
-                         TERRAIN_DETAIL* terrainDetail)
-{
-    extern void trnopSetSC(int sc);
+LOGICAL trnmainAddObject(const char* objname, piVECTOR* pos, OBJECT* lpmain,
+                         SINT32 StratSuperCellX, SINT32 StratSuperCellY, UINT32 StratId,
+                         REL_OBJ_ID * ObjId,
+                         SINT32 drag, SINT32 roughness,
+                         SINT32 style, SINT32 orientation, SINT32 sc, bool nonPlanarBase,
+                         const SDM_ObjInfo& objInfo, TERRAIN_DETAIL* terrainDetail,
+                         const char** objRefName) {
+	assert ( loading && ! roughness && ! style );
 
-	SINT8				newname[_MAX_PATH];
-	SINT8*				ptr;
-	piVECTOR			newatt;
-	OBJECT*				masterObj;
-	OBJECT*				newobj;
-
-	FLOAT64VECTOR	WorldOriginOffset;
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-
-	assert(loading && !roughness && !style);
-
+	char newname[_MAX_PATH];
 	lstrcpy(newname, TERRAIN_PREPATH);
 	lstrcpy(newname + sizeof(TERRAIN_PREPATH) - 1, objname);
 
 	PoolModel* poolModel = obmgrGetPoolModel(objInfo.objname);
-	assert(poolModel);
+	assert ( poolModel );
 
-    // Ticket# 4583. Set for correct DTL selection for tree placements
-    trnopSetSC(sc);
+	// Ticket# 4583. Set for correct DTL selection for tree placements
+	extern void trnopSetSC(int sc);
+	trnopSetSC(sc);
 
-    if(poolModel->IsStaticTerrainModel())
-	{
-		piMATRIX	worldTransform = objInfo.transform;
+	if ( poolModel->IsStaticTerrainModel() ) {
+		FLOAT64VECTOR worldOriginOffset;
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		worldTransform._41 -= (float)WorldOriginOffset.x;
-		worldTransform._42 -= (float)WorldOriginOffset.y;
-		worldTransform._43 -= (float)WorldOriginOffset.z;
+		piMATRIX worldTransform = objInfo.transform;
+		worldTransform._41 -= (float)worldOriginOffset.x;
+		worldTransform._42 -= (float)worldOriginOffset.y;
+		worldTransform._43 -= (float)worldOriginOffset.z;
 
 		obmgrCreateModelInstance(newname, worldTransform, true);
-	}
-	else if(!obmgrCreateModelInstance(newname))
-	{
-		return(FALSE);
+	} else if ( ! obmgrCreateModelInstance(newname) ) {
+		return FALSE;
 	}
 
-	ptr = strrchr(objname, '\\');
+	const char* ptr = strrchr(objname, '\\');
 	if (ptr != nullptr)
-	{
-		strcpy(newname, ++ptr);
-	}
+		strsafecpy(newname, ++ptr);
 	else
-		strcpy(newname, objname);
+		strsafecpy(newname, objname);
 
+	OBJECT* masterObj, *newobj;
 	masterObj = newobj = obmainFindTopmostObject(newname);
 	assert(masterObj);
 
-    UINT32 flags = OBJECT_TERRAIN_OBJECT;
+	UINT32 flags = OBJECT_TERRAIN_OBJECT;
 
-    if(orientation != 0)
-        flags |= OBJECT_IS_ROTATED;
-    if(StratId != 0)
-        flags |= OBJECT_STRAT_OBJECT;
+	if ( orientation != 0 )
+		flags |= OBJECT_IS_ROTATED;
+	if ( StratId != 0 )
+		flags |= OBJECT_STRAT_OBJECT;
 
-	if (!obmainSetFlag2InObjectTree(newobj, flags))
-        return(FALSE);
+	if ( ! obmainSetFlag2InObjectTree(newobj, flags) )
+		return FALSE;
 
+	piVECTOR newatt;
 	newatt.x = newatt.y = 0.0f;
 	newatt.z = (FLOAT32)orientation * (PI * 0.25f);
 	newobj->att = newatt;
 
 	newobj->trnum = sc;
 
-	if(poolModel->IsStaticTerrainModel())
-	{
+	if ( poolModel->IsStaticTerrainModel() ) {
 		obmgrHandleSpecialObjects(newobj);
 
-        if(poolModel->hastrees)
-            trnopHandleSpeedTree(newobj->child);
-    }
+		if ( poolModel->hastrees )
+			trnopHandleSpeedTree(newobj->child);
+	}
 
-	if(!poolModel->IsStaticTerrainModel())
-	{
+	if ( ! poolModel->IsStaticTerrainModel() ) {
 		// translate the object to its new position
-		if (!trnopOrientSubobjects(newobj, pos, nonPlanarBase))
-		{
+		if ( ! trnopOrientSubobjects(newobj, pos, nonPlanarBase) ) {
 			obpoolFreeObjectCallback(newobj);
-
-			return(FALSE);
+			return FALSE;
 		}
 	}
 
-	sprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
-    assert(strlen(newname) < sizeof(newobj->name) );
+	strprintf(newname, "%s_%d_%d", newname, (int)pos->x, (int)pos->y);
+	assert ( strlen(newname) < sizeof(newobj->name) );
 	strcpy(newobj->name, newname);
+	*objRefName = newobj->name;
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Object renamed: %s", newname);
-#endif
+	//Write_Debug("Object renamed: %s", newname);
 
 	// temporary hack for the terrain collision detection routines
-	//
 
 	// In trnmainAddObject
-	if (1)
+	//if (1)
 	{
 		trncdAddTerrainObject(newobj, StratSuperCellX, StratSuperCellY, StratId, ObjId);
 		TERRAIN_DETAIL* td = trnGetTerainDetail((SINT16)StratSuperCellX, (SINT16)StratSuperCellY);
@@ -1193,7 +1104,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
                     trnCDTerrainObject* tto = (trnCDTerrainObject*)(obj->lpspare);
                     if ( tto )
                     {
-                        b.add( tto->BBox1.x+WorldOriginOffset.x, tto->BBox1.y+WorldOriginOffset.y, tto->BBox2.x+WorldOriginOffset.x, tto->BBox2.y+WorldOriginOffset.y );
+                        b.add( tto->BBox1.x+worldOriginOffset.x, tto->BBox1.y+worldOriginOffset.y, tto->BBox2.x+worldOriginOffset.x, tto->BBox2.y+worldOriginOffset.y );
                         if ( counter==0 )
                         {
                             avgz = (tto->BBox1.z + tto->BBox2.z) / 2;
@@ -1223,7 +1134,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
 #endif
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 /*
@@ -1797,6 +1708,9 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				trnldrReleaseSupercell(i);
+				// This process can take a long time, so attend to the network so the host
+				// doesn't think we've lost connection.
+				teulUpdateTransport();
 			}
 		}
 
@@ -2344,17 +2258,13 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 	_SetTerrainMatricies(Mat);
 #endif
 
-#ifdef TERRAIN_EDITOR
-	uiteleSetCrossing(TRUE);
-#endif
-
 	updated = TRUE;
 
 	return(TRUE);
 }
 
 #if(0)
-static LOGICAL FogUpdate(void)
+static LOGICAL FogUpdate()
 {
 int			i, j, k, num, spec;
 FLOAT32		dmin, dmax, idmm, d, x, y, z;
@@ -2453,7 +2363,7 @@ OBJECT*	tt;
 #endif
 
 #if(0)
-static LOGICAL WaveUpdate(void)
+static LOGICAL WaveUpdate()
 {
 SINT32		i, j, num;
 UINT32		color;
@@ -2570,7 +2480,7 @@ bool trnmainIsReplacement(const FLOAT64VECTOR& pos)
     return false;
 }
 
-LOGICAL trnmainUpdate(void)
+LOGICAL trnmainUpdate()
 {
 	SINT32			paints;
 	UINT32			tod;
@@ -2620,10 +2530,6 @@ LOGICAL trnmainUpdate(void)
     radclutterUpdate();
     speedgrassUpdate();
 
-#ifdef USE_GAME_ADVERTISING
-    adUpdate();
-#endif
-
     trndataUpdate();
 
 	logTimerEndMacro();
@@ -2631,7 +2537,7 @@ LOGICAL trnmainUpdate(void)
 	return TRUE;
 }
 
-LOGICAL trnmainLODChange(void)
+LOGICAL trnmainLODChange()
 {
 	trnlod += 1;
 	if (trnlod >= 3)
@@ -2809,7 +2715,7 @@ static void _cullTriangles(OBJECT* o)
         }
 #endif
 
-    std::vector<piVECTOR>* verts;
+    std::vector<piVECTOR>* verts = nullptr;
 
     for(i = 0, j = 0; i < octets; i++, pn++)
     {
@@ -3440,7 +3346,7 @@ void trnmainGetShadowReceivers(std::map<int, std::vector<piVECTOR> >& octets,
     objects = ShadowObject;
 }
 
-SINT32 trnmainGetNumDrawnTriangles(void)
+SINT32 trnmainGetNumDrawnTriangles()
 {
 	return(NumDrawnTriangles);
 }
@@ -3453,7 +3359,7 @@ LOGICAL trnmainSetLightingUpdate(LOGICAL newLightingUpdate)
 	return(TRUE);
 }
 
-void trnmainKill(void)
+void trnmainKill()
 {
 int		i;
     trndataKill();
@@ -3712,216 +3618,10 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 	return 0;
 }
 
-#ifdef TERRAIN_EDITOR
-LOGICAL trnmainSetTerrainOriginOffset(void)
-{
-	mlVehicleData*	VehicleData = persGetPersonaModelDataPtr();
-
-	VehicleData->VehiclePos.x = InitXOrigin;
-	VehicleData->VehiclePos.y = InitYOrigin;
-	VehicleData->VehiclePos.z = 500.0;
-
-	return(TRUE);
-}
-#endif
-
-LOGICAL trnmainWorldOriginMoved(void)
+LOGICAL trnmainWorldOriginMoved()
 {
 	return _WorldMoved;
 }
-
-static LOGICAL _DrawVertices(int type, OBJECT* lpobj)
-{
-	if (lpobj->flags & OBJECT_INDEXED)
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderIndexScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-								&sd, lpobj->numverts,
-								(UINT16*)lpobj->ptris,  lpobj->numtris * 3))
-		{
-			Write_Debug("piRenderIndexScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-	else
-	{
-		piSTRIDEDDATA sd;
-		lpobj->StridedRenderData(&sd);
-
-		if (!piRenderStridedScene((piPRIMITIVETYPE)type, piVT_VERTEX,
-									&sd, lpobj->numverts))
-		{
-			Write_Debug("piRenderScene failed at entity %s (no lite)", lpobj->name);
-			return(FALSE);
-		}
-	}
-
-	return(TRUE);
-}
-
-#ifdef TERRAIN_EDITOR
-
-// FIXME (I'M SLOW!!)
-static LOGICAL NormalizeOctetsSlow(TERRAIN_DETAIL* td)
-{
-SINT32		i1, i2, j1, j2, n1, n2;
-OBJECT*	t1, *t2;
-piVERTEX*	po1, pv1;
-piVERTEX*	po2, pv2;
-
-	// Normalize normals between octets
-	t1 = td->terrain;
-	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
-	{
-		if (t1 == nullptr ||
-			t1->flags & OBJECT_SKIPDRAWING ||
-			!(t1->flags & OBJECT_VISIBLE))
-		{
-			continue;
-		}
-
-		po1 = t1->pvorig;
-		pv1 = t1->pverts;
-		if (t1->numtris == 0)
-		{
-			continue;
-		}
-
-		n1 = t1->numverts;
-		for (j1=0; j1 < n1; j1++)
-		{
-			t2 = td->terrain;
-			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
-			{
-				if (t2 == nullptr ||
-					t2->flags & OBJECT_SKIPDRAWING ||
-					!(t2->flags & OBJECT_VISIBLE))
-				{
-					continue;
-				}
-
-				po2 = t2->pvorig;
-				pv2 = t2->pverts;
-				if (t2->numtris == 0)
-				{
-					continue;
-				}
-
-				n2 = t2->numverts;
-				for (j2=0; j2 < n2; j2++)
-				{
-					if (po1[j1].x == po2[j2].x &&
-						po1[j1].y == po2[j2].y &&
-						po1[j1].z == po2[j2].z)
-					{
-						math3dAddVectors((piVECTOR*)&pv1[j1].nx, (piVECTOR*)&po1[j1].nx, (piVECTOR*)&po2[j2].nx);
-						pv2[j2].nx = pv1[j1].nx;
-						pv2[j2].ny = pv1[j1].ny;
-						pv2[j2].nz = pv1[j1].nz;
-					}
-				}
-			}
-		}
-	}
-
-	// Normalize normals between octets
-	t1 = td->terrain;
-	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
-	{
-		if (t1 == nullptr ||
-			t1->flags & OBJECT_SKIPDRAWING ||
-			!(t1->flags & OBJECT_VISIBLE))
-		{
-			continue;
-		}
-
-		po1 = t1->pvorig;
-		pv1 = t1->pverts;
-		if (t1->numtris == 0)
-		{
-			continue;
-		}
-
-		n1 = t1->numverts;
-		for (j1=0; j1 < n1; j1++)
-		{
-			t2 = td->terrain;
-			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
-			{
-				if (t2 == nullptr ||
-					t2->flags & OBJECT_SKIPDRAWING ||
-					!(t2->flags & OBJECT_VISIBLE))
-				{
-					continue;
-				}
-
-				po2 = t2->pvorig;
-				pv2 = t2->pverts;
-				if (t2->numtris == 0)
-				{
-					continue;
-				}
-
-				n2 = t2->numverts;
-				for (j2=0; j2 < n2; j2++)
-				{
-					if (po1[j1].x == po2[j2].x &&
-						po1[j1].y == po2[j2].y &&
-						po1[j1].z == po2[j2].z)
-					{
-						math3dFastNormalize((piVECTOR*)&pv1[j1].nx);
-						pv2[j2].nx = pv1[j1].nx;
-						pv2[j2].ny = pv1[j1].ny;
-						pv2[j2].nz = pv1[j1].nz;
-					}
-				}
-			}
-		}
-	}
-
-	return(TRUE);
-}
-
-LOGICAL trnmainUpdateNormals(void)
-{
-UINT16		i, j;
-TERRAIN_DETAIL*	td;
-
-	for (i = 0; i < NUM_TERRAIN_RECTANGLES; ++i)
-	{
-		td = &trndtl[i];
-
-		for (j=0; j < td->tricnt; j++)
-		{
-			if (td->txtobj[j]->flags & OBJECT_VISIBLE)
-			{
-				if (!ldmdlCalcNormals(td->txtobj[j]) ||
-					!ldmdlGetBounds(td->txtobj[j]))
-				{
-					return(FALSE);
-				}
-			}
-		}
-
-#ifdef TERRAIN_EDITOR
-		Write_Debug("Normals for %d updated", i);
-#endif
-
-#ifdef DONT_USE
-		if (!NormalizeOctetsSlow(td))
-		{
-			return(FALSE);
-		}
-#endif
-
-	}
-
-	return(TRUE);
-}
-
-#endif // TERRAIN_EDITOR
 
 LOGICAL trnFindStratBuildingByTO(BUILDING** const bld, trnCDTerrainObject* const TO)
 {

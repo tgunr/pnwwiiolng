@@ -31,12 +31,12 @@
 #include "mm/mmSpawn.h"
 #include "mm/mmSpawnTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulServer.h"
 #include "teul/teulTransmission.h"
 #include "tut/tutGroupProgress.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiOpinionPoll.h"
+#include "strt/strtMapMessages.h"
 
 #define SPAWN_AT_DEPOTS
 
@@ -51,6 +51,8 @@ static	TEUL_CALLBACK*	_XCHG_MISSION_LIST;
 static	TEUL_CALLBACK*	_SEND_HCUNIT_LIST;
 static	TEUL_CALLBACK*	_SEND_ARENA_DESCRIPTION;
 static	TEUL_CALLBACK*	_SEND_TUT_PROGRESS;
+static	TEUL_CALLBACK*	_SEND_TOWN_STATUS;
+static	TEUL_CALLBACK*	_XCHG_GARRISON_COUNTRY_CHANGE;
 
 SINT32
 HCUnitList::send(SINT32 teulIndex)
@@ -145,7 +147,7 @@ _sendBrigadeListResponse(ACTION_OBJECT* const a)
 SINT32
 BrigadeSummaries::send(SINT32 teulIndex)
 {
-	betaLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
+	dbugLog(_FLD, "t:%d sending %u brigade summaries", teulIndex, m_count);
 	return teulSend(teulIndex, _XCHG_BRIGADE_LIST, this);
 }
 
@@ -169,7 +171,7 @@ _sendBrigadeSelectResponse(ACTION_OBJECT* const a)
 SINT32
 BrigadeSelection::send(SINT32 teulIndex)
 {
-	dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
+	//dbugLog(_FLD, "t:%d selected brigade %d result:%d", teulIndex, m_detail.brigadeID(), m_status);
 	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this);
 }
 
@@ -277,12 +279,12 @@ SendTutProgressBatch(SINT32 teulIndex, Tutorial::GroupProgressBatch& batch)
 // Installs our callbacks
 
 SINT32
-HostInstallCallbacks(void)
+HostInstallCallbacks()
 {
 	wwiiRegisterPlayerMessageCallback();
 
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
-
+	{
 		REGISTER_RECEIVER(Map::EXIT_WWIIOL_Y, _recvExitWWIIOL);
 
 		REGISTER_SENDER(Map::XCHG_HCUNIT_LIST_Y, _sendHCUnitList, _SEND_HCUNIT_LIST);
@@ -295,6 +297,7 @@ HostInstallCallbacks(void)
 		REGISTER_RECVSEND(Map::XCHG_MISSION_LIST_Y, _recvMissionListRequest, _sendMissionListResponse, _XCHG_MISSION_LIST);
 
 		REGISTER_MSG_SENDER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
+		REGISTER_MSG_SENDER(Map::HC_UNIT_COUNTRY_CHANGE_Y, HC_UNIT_COUNTRY_CHANGES);
 
 		REGISTER_MSG_SENDER(Map::SWING_METER_Y, SWING_METER_MSG);
 
@@ -302,8 +305,8 @@ HostInstallCallbacks(void)
 		REGISTER_MSG_RECEIVER(Map::POLL_RESULT_Y, OPINION_CHOICE_MSG);
 
 		REGISTER_SENDER(Map::TUT_PROGRESS_Y, _sendTutProgress, _SEND_TUT_PROGRESS);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }
 
 }

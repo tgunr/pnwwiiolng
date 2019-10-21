@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <math.h>
 
 #include "include/vars.h"
@@ -66,7 +66,7 @@ trnAutoGun _AutoGunHead;
 
 static LOGICAL _MoveGun(trnAutoGun * AG,piVECTOR* AimAtt);
 static LOGICAL _SetupElevAndTraverse(OBJECT * Object, piMATRIX * TravMat, piMATRIX * ElevMat);
-static LOGICAL _ReadAndSetupAutogunTypes(void);
+static LOGICAL _ReadAndSetupAutogunTypes();
 static LOGICAL _SetupWeapon(weapWeapon* Weapon,SINT8 * WeaponName, SINT8 * BeltFile);
 static LOGICAL _UpdateWeapon(trnAutoGun * AG);
 static LOGICAL _AimGunAtTargetPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt);
@@ -79,16 +79,17 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
 
 static bool _updateAI = true;
 
-LOGICAL trnInitAutogunSystem(void)
+LOGICAL trnInitAutogunSystem()
 {
 	_ReadAndSetupAutogunTypes();
-
-    _updateAI = Online ? true : false;
-
 	return TRUE;
 }
 
-static LOGICAL _ReadAndSetupAutogunTypes(void)
+void trnPostinitAutogunSystem(void) {
+	_updateAI = Online ? true : false;
+}
+
+static LOGICAL _ReadAndSetupAutogunTypes()
 {
     trnAutoGunType * AGT = nullptr;
     UINT32 Country = 0;
@@ -373,7 +374,7 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 }
 
 
-LOGICAL trnKillAutogunSystem(void)
+void trnKillAutogunSystem()
 {
 	// note: if there are any autoguns left to kill, we've got a problem
 	if (_AutoGunHead.next != nullptr)
@@ -382,20 +383,13 @@ LOGICAL trnKillAutogunSystem(void)
 		Write_Debug("Autoguns remaining after trnldrkill!!!!!");
 		Write_Debug("******************");
 	}
-
-	return TRUE;
 }
 
-LOGICAL trnKillAutogun(trnAutoGun** ppAutoGun)
+void trnKillAutogun(trnAutoGun** ppAutoGun)
 {
-trnAutoGun* pAutoGun = nullptr;
-
-	pAutoGun = *ppAutoGun;
-
+	trnAutoGun* pAutoGun = *ppAutoGun;
 	if (pAutoGun == nullptr)
-	{
-		return FALSE;
-	}
+		return;
 
 	if (pAutoGun->FireSoundId > 0)
 	{
@@ -417,8 +411,6 @@ trnAutoGun* pAutoGun = nullptr;
 
 	delete pAutoGun->Weapon;
 	memFree(pAutoGun);
-
-	return TRUE;
 }
 
 LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
@@ -462,9 +454,8 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		Write_Debug("Unable to allocate memory for autogun");
 		return FALSE;
 	}
-	memset(AG,0,sizeof(trnAutoGun));
 
-	AG->Weapon = new weapWeapon;
+	AG->Weapon = new weapWeapon{};
 	if (AG->Weapon == nullptr)
 	{
 		Write_Debug("Unable to allocate weapon space memory for autogun");
@@ -543,7 +534,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		return FALSE;
 	}
 
-	sprintf(AG->Object->name,"%s%d",ObjectName,Counter);
+	strprintf(AG->Object->name,"%s%d",ObjectName,Counter);
 	ogrpParseDOFParameters(AG->Object,(UCHAR*)(&mlDOFVarNameTable[0][0]),ML_DOF_MAXNUM,32);
 
 	ogrpFindSubObjectByDOFVar(&(AG->FirePnt),AG->Object,ML_DOF_AG_FIRE);
@@ -671,7 +662,7 @@ void trnautogunToggleAI()
 #endif
 }
 
-LOGICAL trnUpdateAutoGuns(void)
+LOGICAL trnUpdateAutoGuns()
 {
     trnAutoGun* AG = nullptr;
     trnAutoGun* AGSaved = nullptr;
@@ -1703,7 +1694,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 			// alive check
 			if (CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			{
-				// ignore dead guys
+				// ignore dead vehicles
 
 				if ((CurrentVehicle->VehicleObjectData->PlaneObject) &&
 					(CurrentVehicle->VehicleObjectData->PlaneObject->child) &&
@@ -1820,8 +1811,8 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 
 	// here are the target selection rules:
 	//
-	// first find a visible target, if found, shoot him
-	// otherwise see if there's a no-vis target, if found, aim at him but don't shoot
+	// first find a visible target, if found, shoot them
+	// otherwise see if there's a no-vis target, if found, aim at them but don't shoot
 	if (frametime - AG->NextTargetSelectTime > _TARGET_SELECTION_TIME)
 	{
 		AG->LastTarget = AG->Target;
@@ -1896,7 +1887,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
     FLOAT64 TempNum = 0;
     FLOAT64 Angle = 0;
     FLOAT64VECTOR TempVec = {0, 0, 0};
-    FLOAT64VECTOR WorldOriginOffset = {0, 0, 0};
+    FLOAT64VECTOR worldOriginOffset = {0, 0, 0};
     UINT32 NumCornersToCheck = 0;
     piVECTOR BBox1 = {0, 0, 0};
     piVECTOR BBox2 = {0, 0, 0};
@@ -1912,7 +1903,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 		return FALSE;
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	{
@@ -2098,13 +2089,13 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 		if(Vehicle->VehicleType->Type != VEH_TYPE_AIR)
 		{
 			// ok we're in view field, lets see if LOS is blocked
-			V1.x = (FLOAT32)(AG->Pos.x + AG->EyePos.x - WorldOriginOffset.x);
-			V1.y = (FLOAT32)(AG->Pos.y + AG->EyePos.y - WorldOriginOffset.y);
-			V1.z = -(FLOAT32)(AG->Pos.z + AG->EyePos.z + WorldOriginOffset.z);
+			V1.x = (FLOAT32)(AG->Pos.x + AG->EyePos.x - worldOriginOffset.x);
+			V1.y = (FLOAT32)(AG->Pos.y + AG->EyePos.y - worldOriginOffset.y);
+			V1.z = -(FLOAT32)(AG->Pos.z + AG->EyePos.z + worldOriginOffset.z);
 
-			V2.x = (FLOAT32)(Corners[i].x - WorldOriginOffset.x);
-			V2.y = (FLOAT32)(Corners[i].y - WorldOriginOffset.y);
-			V2.z = -(FLOAT32)(Corners[i].z + WorldOriginOffset.z);
+			V2.x = (FLOAT32)(Corners[i].x - worldOriginOffset.x);
+			V2.y = (FLOAT32)(Corners[i].y - worldOriginOffset.y);
+			V2.z = -(FLOAT32)(Corners[i].z + worldOriginOffset.z);
 
 #ifdef BETA_RELEASE
 draw3dLineDebug(&V1,&V2,colorBLUEALPHA);

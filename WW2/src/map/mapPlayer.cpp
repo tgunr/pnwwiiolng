@@ -7,14 +7,13 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "versionNo.h"
-
 #include "chat/chatConstants.h"
 #include "chat/chatGroupPermissions.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTypes.h"
+#include "chat/omgChat.h"
 #include "inst/instHost.h"				// For instAddPlayerToCampaignInstance
 #include "map/mapArenaDescription.h"
 #include "map/mapBrigades.h"
@@ -25,13 +24,11 @@
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChat.hxx"
 #include "miss/missionDamageEvent.h"
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"
 #include "miss/missionMission.h"
 #include "miss/missionResults.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPack.h"
@@ -51,15 +48,15 @@
 #include "teul/teulAuth.h"
 #include "teul/teulBlipRepeater.h"
 #include "teul/teulUtils.h"
-#include "wwii/wwiiAntiAddiction.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiHash.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRTBCodes.h"
-#include "wwii/wwiiThreads.h"
 
 #include "include/logging.h"
 #include "teul/teulMicroWebServer.h"
+
+#include "chat/chatBrigadeMove.h"
 
 static std::mutex s_sidecountMutex;
 
@@ -114,8 +111,7 @@ const char* _pstates[] =
 ,	"PERS_EXITING"
 };
 
-static void
-_reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
+static void _reportPlayerDetails(const Teul::uWeb::HTTPRequest &request, Teul::uWeb::HTTPResponse &response)
 {
 	char buffer[2048];
 	int len = 0;
@@ -124,29 +120,39 @@ _reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 		std::lock_guard<std::mutex> mutexLock(s_sidecountMutex);
 
 		len = strprintf(buffer
-							, "{\"stamp\":%llu,\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
-								, teulClock64
-								, g_players.size()
-								, host_config.balance.above
-								, host_config.balance.delaysMax
-								, host_config.balance.delaysPctg
-								, host_config.balance.marginPctg
-								, host_config.balance.personaDelay
-								, g_spawnedPlayers[ALLIED]
-								, g_spawnedPlayers[AXIS]
-								, g_heavySide
-								, g_overdog
-								, g_underdog
-								, g_sideImbalance
-								, g_sideDeviation
-								, g_swingMeter.inEffect()
-								, g_swingMeter.meter()
-								, g_swingMeter.delays()
+            , "{\"stamp\":%" PR64BitUT ",\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
+            , teulClock64
+            , g_players.size()
+            , host_config.balance.above
+            , host_config.balance.delaysMax
+            , host_config.balance.delaysPctg
+            , host_config.balance.marginPctg
+            , host_config.balance.personaDelay
+            , g_spawnedPlayers[ALLIED]
+            , g_spawnedPlayers[AXIS]
+            , g_heavySide
+            , g_overdog
+            , g_underdog
+            , g_sideImbalance
+            , g_sideDeviation
+            , g_swingMeter.inEffect()
+            , g_swingMeter.meter()
+            , g_swingMeter.delays()
 		);
 	}
 
-	if ( len > 0 )
-		send(fd, buffer, len, 0);
+	if (len > 0) {
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(200)
+            .header("Access-Control-Allow-Origin", "*")
+            .JSON(buffer)
+            .build(response);
+    } else {
+        return Teul::uWeb::HTTPResponseBuilder(request)
+            .status(500)
+            .JSON("{\"error\":\"An unknown error occurred\"}")
+            .build(response);
+    }
 }
 
 static inline UINT32
@@ -455,7 +461,7 @@ mapCheckSideCounts()
 
 #if defined(BETA_RELEASE) || defined(PUBLIC_RELEASE)
 		DBThread::Do(DBThread::Audit
-			, "INSERT INTO player_counts"
+			, "INSERT INTO `audit`.`player_counts`"
 					" (stamp,undecided,allied,axis,spawned_allied,spawned_axis,allied_favor,axis_favor,delay)"
 				"VALUES"
 					" (now(),%u,%u,%u,%u,%u,%d,%d,%u)"
@@ -484,6 +490,7 @@ Player::Player()
 	: wwiiPlayer()
 	, m_groups()
 	, m_permissions(&nullChatPermissions)
+	, m_deferredGarrisonChangeNotice(nullptr)
 	{
 	}
 
@@ -491,7 +498,16 @@ Player::Player()
 // Map Persona constructor
 
 Player::Player(SINT32 newTeulIndex, const Auth::Dispatch& newDispatch, const playerid_t newPlayerID)
-	: wwiiPlayer(), m_groups(), m_permissions(&nullChatPermissions)
+	: wwiiPlayer(), m_playerMask(), m_personaMask(0), m_nextSpam(0), m_lastHCUpdate(0), m_customSpawnLocation{0, 0, 0},
+      m_customerID(0), timeIn(0), m_rankPointsEarned(0), m_sideLockTime(0), m_portal(0), m_state(PERS_SELECTING_PERSONA),
+      m_vehicleState(MM_VEH_NONE), m_lastSide(WWII_NO_SIDE), m_sessionSide(WWII_NO_SIDE), m_brigade(nullptr),
+      m_mission(nullptr), m_roomFlags(0), m_loginState(0), m_loginSub(0), m_nextLaunch(0), m_lastPoll(0), m_useRank(nullptr),
+      m_actualRank(nullptr), m_hasValidMissionPacket(false), m_registered(false), m_launchPermitted(false), m_wantMobileSpawn(false),
+      m_requestedCapacity(false), m_receivedCapacity(false), m_needsChatSync(false), m_promoted(false), m_clientActivated(false),
+      m_xferedToChat(false), m_allowPollVote(false), m_hasBalanced(false), m_hasSelectedPersonaOnce(false), m_useCustomSpawnLocation(false),
+      m_isBuzzard(false), m_implementAntiAddiction(false), m_spawnedAsSide(0), m_lastSpawnedTo(0), m_mp(), m_weapOrigin{{0, 0}, 0, 0, 0},
+      m_weapon{{{0, 0}, 0, 0, 0}, 0, {}}, m_damageRecord(), m_repairRecord(), m_groups(), m_permissions(&nullChatPermissions),
+      m_accountGoodUntil(0), m_minuteBalance(0), m_nextCharge(0), m_sortie(nullptr), m_missionResults(nullptr), m_deferredGarrisonChangeNotice(nullptr)
 {
 	if ( newPlayerID <= DEFAULT_PLAYER_ID )
 	{
@@ -570,14 +586,13 @@ Player::SetGroups(const char* groupList)
 		// Update our permissions
 		m_permissions = chatGroupPermissionsForGroups(m_groups);
 
-		if ( g_logDebug )
-			log(_FLD, "groups: %s perm:%llx max army/air/sea/squad:%u/%u/%u/%u"
-						, groupList
-						, m_permissions->m_permissionMask
-						, m_permissions->m_limitRank[BRANCH_LAND]
-						, m_permissions->m_limitRank[BRANCH_AIR]
-						, m_permissions->m_limitRank[BRANCH_SEA]
-						, m_permissions->m_limitSquadRank);
+        log(_FLD, "groups: %s perm:%" PRPermMaskT " max army/air/sea/squad:%u/%u/%u/%u"
+                    , groupList
+                    , m_permissions->m_permissionMask
+                    , m_permissions->m_limitRank[BRANCH_LAND]
+                    , m_permissions->m_limitRank[BRANCH_AIR]
+                    , m_permissions->m_limitRank[BRANCH_SEA]
+                    , m_permissions->m_limitSquadRank);
 	}
 
 	// Update my rank restrictions
@@ -637,9 +652,6 @@ Player::~Player()
 		// are currently in.
 		SetInstance(Instance::g_invalid);
 
-		if ( nullptr != m_antiAddiction )
-			mmRemoveMinor(this);
-
 		ExitBrigade(PERS_EXITING);
 
 		// Make sure we're in country 0
@@ -694,7 +706,7 @@ Player::bumpRank()
 	m_rankPointsEarned = 0;
 	m_promoted = true;
 
-	mapSaveRank(this, true);
+	mapSaveRank(this, false);
 
 	dbugLog(_FLI, "t:%d p:%u c:%s PROMOTION to %d", teulIndex(), playerID(), callsign(), next->level());
 #ifdef PROMOTIONS_IN_CHAT
@@ -725,7 +737,7 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 		return false;
 	}
 
-	const FULL_OBJ_ID& origin = missionPacket().sortie().originFac();
+	const FULL_OBJ_ID origin = missionPacket().sortie().originFac();
 	const FacilityStruct* const facility = strtGetFacility(origin);
 	if ( facility == nullptr )
 	{
@@ -798,7 +810,9 @@ Player::checksum(UINT64 withChecksum)
 	bool isDirty = false;
 	if ( !mapCheckChecksum(dispatch().m_appVersion, withChecksum, permissions(IS_PRODUCER)) )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s invalid checksum %llu for app %u plat:%u"
+		auto severity = host_config.arena.checksums ? Debug::ERR_WARN : Debug::ERR_INFO;
+		dbugLog(_FL, severity,
+						"t:%d p:%u c:%s invalid checksum %" PR64BitUT " for app:%u plat:%u"
 						, teulIndex(), playerID(), callsign()
 						, withChecksum
 						, dispatch().m_appVersion
@@ -903,19 +917,11 @@ Player::evaluateMissionPacket()
 		return false;
 	}
 
-	FLOAT32 scoringModifier = mmAntiAddictionScoringMultiplier(this);
-	if ( scoringModifier == 0 )
-	{
-		dbugLog(_FLN, "t:%d p:%u c:%s No score in penalty time", teulIndex(), playerID(), callsign());
-		chatSendLocalizedMessage(playerID(), LSTR_CAUTION, LSTR_ANTI_ADDICTION_PENALTY);
-		return true;
-	}
-
 	m_mp.wasSuccessful = m_mp.successful(weaponSpec());
 
-	const UINT32 pointsScored = m_mp.scoring().points = (UINT32)(calculateSortieScore() * scoringModifier);
+	const UINT32 pointsScored = m_mp.scoring().points = (UINT32)(calculateSortieScore());
 
-	dbugLog(_FLD, "t:%d p:%u player %s missionID %d missionType %s rtb %s successful %d totalKills %d aamod: %1.1f"
+	dbugLog(_FLD, "t:%d p:%u player %s missionID %d missionType %s rtb %s successful %d totalKills %d"
 				, teulIndex()
 				, playerID()
 				, callsign()
@@ -924,7 +930,6 @@ Player::evaluateMissionPacket()
 				, _EXPAND_RTB(m_mp.vehicle().rtbState())
 				, m_mp.wasSuccessful
 				, pointsScored
-				, scoringModifier
 				);
 
 	//increment their points
@@ -972,7 +977,7 @@ Player::evaluateMissionPacket()
 	if ( m_rankPointsEarned >= actualRank().points() )
 		bumpRank();
 	else
-		mapSaveRank(this, true);
+		mapSaveRank(this, false);
 
 	// Give the database threads chance to eat the queue
 	std::this_thread::yield();
@@ -1155,6 +1160,18 @@ Player::onDespawn(SINT32 onTeulIndex)
 		dbugLog(_FLD, "t:%d p:%u c:%s not in PERS_SPAWNING, so not calculating mission results", teulIndex(), playerID(), callsign());
 	}
 
+	if (m_deferredGarrisonChangeNotice != nullptr)
+	{
+		dbugLog(_FLD, "Processing deferred garrison change for player %d", playerID());
+		mapNotifyPlayerInGarrison(m_deferredGarrisonChangeNotice->getUnitID(),
+			m_deferredGarrisonChangeNotice->getHCUnit(),
+			m_deferredGarrisonChangeNotice->getOriginalUnitCountry(),
+			m_deferredGarrisonChangeNotice->getOriginalUnitBranch(),
+			m_deferredGarrisonChangeNotice->getNewCountry());
+		delete m_deferredGarrisonChangeNotice;
+		m_deferredGarrisonChangeNotice = nullptr;
+	}
+
 	notifyChatOfCell();
 	updateChat();
 
@@ -1165,7 +1182,7 @@ Player::onDespawn(SINT32 onTeulIndex)
 // Tell the player that their post [request] has been denied.
 
 void
-Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool loseWeapon)
+Player::postDenied(const WEAPON_SPEC forWeapon, UINT32 forReasonCode, bool loseWeapon)
 {
 	BETAInfo(teulIndex());
 
@@ -1181,7 +1198,7 @@ Player::postDenied(const WEAPON_SPEC& forWeapon, UINT32 forReasonCode, bool lose
 // called by _recvMMFacilityCapacityResponse in strtMapMessages.cpp
 
 void
-Player::processCapacityResponse(const FULL_OBJ_ID& rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
+Player::processCapacityResponse(const FULL_OBJ_ID rtbFacility_, const WEAPON_SERIAL& reservedWeapon_, const bool vehicleDelivered_)
 {
 	setReceivedCapacity(true);
 
@@ -1516,7 +1533,7 @@ Player::SetPersonaMissionFlags()
 {
 	updateMask();
 
-	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%llx hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
+	dbugLog(_FLD, "t:%d p:%u c:%s rank:%d perm:%" PRPermMaskT " hc:%d", teulIndex(), playerID(), callsign(), realRank(), permissionMask(), isOfficer());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1546,7 +1563,7 @@ Player::SetSideLock()
 						);
 
 		DBThread::Do(DBThread::Default
-			, "UPDATE LOW_PRIORITY wwii_player"
+			, "UPDATE wwii_player"
 				" SET lockside = %u, locktime = %ld, modified = now()"
 				" WHERE playerid = %u AND lockside < 3"
 					" AND (lockside != %u OR locktime < %ld)"
@@ -1656,7 +1673,8 @@ Player::updateChat(bool immediate)
 	if ( needsChatSync() )
 		return;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%llx (plyr:%llx, chat:%llx)", teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
+	dbugLog(_FLD, "t:%d p:%u c:%s flagging for persona update perms:%" PRPermMaskT " (plyr:%" PRPermMaskT ", chat:%" PRPermMaskT ")"
+				, teulIndex(), playerID(), callsign(), permissionMask(), m_playerMask, m_permissions->m_permissionMask);
 
 	g_chatSyncQueue.push_back(this);
 	m_needsChatSync = true;
@@ -1678,7 +1696,7 @@ Player::updateMask()
 
 	PermissionMask newMask = m_playerMask | useRank().permissions() | m_permissions->m_permissionMask;
 
-#if defined(TRAINING_SERVER) || defined(FRES)
+#if defined(TRAINING_SERVER)
 	newMask |= POST_MISSIONS;
 #endif
 
@@ -1779,19 +1797,15 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 		case Server::Transfer::XferReason::Login:
 			assert( psn != nullptr );
 			return _playerLoggingIn(teulIndex, playerID, *psn, xfer);
-		break;
 
 		case Server::Transfer::XferReason::Reassign:
 			LogAbort("--- player logging in with PXR-TRANSFER; wtf oliver ---");
-		break;
 
 		case Server::Transfer::XferReason::Exit:
 			return _playerExiting(teulIndex, playerID, xfer);
-		break;
 
 		default:
 			throw std::invalid_argument("unhandled xfer reason");
-		break;
 		}
 	}
 	catch (std::exception& e)
@@ -2053,7 +2067,7 @@ _sendHCUnitMovements(Player* const player)
 	if ( player->m_lastHCUpdate >= lastBrigadeMovement )
 		return true;
 
-	betaLog(_FLD, "t:%d p:%u c:%s movements %llu->%llu", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
+	dbugLog(_FLD, "t:%d p:%u c:%s movements %" PR64BitUT "->%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->m_lastHCUpdate, lastBrigadeMovement);
 
 	static UINT64 _lastStart = 0;
 	static UINT64 _lastEnd = 0;
@@ -2069,7 +2083,7 @@ _sendHCUnitMovements(Player* const player)
 
 	if ( _packet.size() > 0 )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s updating with HCMovements %llu->%llu"
+		dbugLog(_FLD, "t:%d p:%u c:%s updating with HCMovements %" PR64BitUT "->%" PR64BitUT ""
 						, player->teulIndex()
 						, player->playerID()
 						, player->callsign()
@@ -2174,7 +2188,7 @@ Player::debug(const char* label, const char* mask, ...) const
 	vsnprintf(buf, sizeof(buf) - 1, mask, args);
 	va_end(args);
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%llu %s: %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%" PR64BitUT " %s: %s"
 				, teulIndex(), playerID(), callsign(), instance().id()
 				, label, buf);
 	chatSendLocalizedMessage(playerID(), LSTR_BETA, LSTR_LABELLED_GENERIC, label, buf);
@@ -2242,24 +2256,21 @@ _isEffectRepair(STRAT_DAMAGE_EFFECT effect)
 void
 Player::addStratHit(const MissionDamageEvent& mde)
 {
-	if ( g_logDebug )
-		dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %lld type %d"
-						, teulIndex(), playerID(), callsign()
-						, mde.m_targetID
-						, mde.m_targetType
-						);
+    dbugLog(_FLD, "t:%d p:%u c:%s received MDE for target %" PR64BitT " type %d"
+                    , teulIndex(), playerID(), callsign()
+                    , mde.m_targetID
+                    , mde.m_targetType
+                    );
 
 	// Make sure we understand this packet
 	if ( mde.m_effectType <= SDE_INVALID )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " invalid");
+        dbugLog(_FLD, " invalid");
 		return;
 	}
 	if ( mde.m_effectType >= SDE_NUM_EFFECTS )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " unknown effect");
+        dbugLog(_FLD, " unknown effect");
 		return;
 	}
 
@@ -2268,8 +2279,7 @@ Player::addStratHit(const MissionDamageEvent& mde)
 	auto it = record.find(mde.m_targetID);
 	if ( it != record.end() && it->second >= teulTime() )
 	{
-		if ( g_logDebug )
-			dbugLog(_FLDB, " duplicate");
+        dbugLog(_FLD, " duplicate");
 		return;
 	}
 	record[mde.m_targetID] = teulTime() + host_config.score.stratDmgInterval_s;
@@ -2344,3 +2354,251 @@ mapPlayerInit()
 
 	Teul::uWeb::s_debugServer.addVirtualFile("Player counts", "/player-balance.json", _reportPlayerDetails);
 }
+
+//////////////////////////////////////////////////////////////////////
+// Send a Unit country change to this player.
+bool
+_sendHCUnitCountryChange(Player* player, UINT32 unitID, WWII_COUNTRY country, UINT32 replacementUnitID, GARRISON_CHANGE_ACTION desiredClientAction)
+{
+	HCUnitCountryChange entry;
+
+	entry.m_unitID = unitID;
+	entry.m_country = country;
+	entry.m_replacementUnitID = replacementUnitID;
+	entry.m_action = desiredClientAction;
+
+	static HC_UNIT_COUNTRY_CHANGES _packet;
+	_packet.add(entry);
+
+	if (_packet.size() > 0)
+	{
+		dbugLog(_FLD, "t:%d p:%u c:%s sending a unit country change."
+			, player->teulIndex()
+			, player->playerID()
+			, player->callsign()
+		);
+		_packet.send(player->teulIndex());
+	}
+	_packet.clear();
+
+	return true;
+}
+
+void Player::mapNotifyPlayerInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry, BRANCH_ENUM originalUnitBranch,
+								WWII_COUNTRY newCountry)
+{
+	GARRISON_CHANGE_ACTION clientAction = CHANGE_NOTHING;
+	HCUnit *replacementHCUnit = nullptr;
+	UINT32 replacementHCUnitID = 0;
+	BrigadeSelection tempSelection;
+
+	if (brigadeID() == unitID)
+	{
+		if (wwiiSide(originalUnitCountry) == wwiiSide(newCountry))
+		{
+			//  Garrison Changes Country = HC Changes the Garrison unit Country. Persona = Change.
+			if (newCountry != originalUnitCountry)
+			{
+				dbugLog(_FLD, "Garrison Changed: Country for player %d.", playerID());
+			}
+			else
+			{
+				dbugLog(_FLD, "No country change for garrison %d where branch is %d and movement type is %d", unitID,
+						hcUnit->branch(), hcUnit->movementType());
+			}
+			//  Using the Same Unit.
+			replacementHCUnit = hcUnit;
+			clientAction = CHANGE_COUNTRY;
+
+			if (hcUnit->branch() == WWII_AIRFORCE && hcUnit->movementType() == WWII_AIRFORCE)
+			{
+				// check to see if the CP is frontline
+				CPStruct *const cp = strtGetCPorBridge(hcUnit->homeCPID());
+				if (cp != nullptr)
+				{
+					if (IS_CPFLAG(cp->flags, CP_STAT_FRONTLINE))
+					{
+						// Player can't remain in this garrison
+						if (hcUnit->country() == country())
+						{
+							replacementHCUnit = HCUnit::Lookup(HCUnit::GetArmyGarrison(hcUnit->homeCPID()));
+
+							dbugLog(
+								_FLD,
+								"Airforce garrison %d no longer valid choosing army garrison for player %d new garrison is %d",
+								unitID, playerID(), replacementHCUnit->unitID());
+							clientAction = CHANGE_BRANCH;
+						}
+						else
+						{
+							// don't send anything to the player, country change logic will handle this case
+							dbugLog(_FLD, "Player won't be sent anything - not same country as garrison anymore");
+							replacementHCUnit = nullptr;
+							replacementHCUnitID = 0;
+							clientAction = CHANGE_NOTHING;
+						}
+					}
+					else
+					{
+						dbugLog(_FLD, "CP %s is not known as frontline (FL, BL, AF, NAV) is (%d, %d, %d, %d)",
+								IS_CPFLAG(cp->flags, CP_STAT_FRONTLINE), IS_CPFLAG(cp->flags, CP_STAT_FRONTLINE_LINKED),
+								IS_CPFLAG(cp->flags, CP_STAT_HAS_AIRBASE), IS_CPFLAG(cp->flags, CP_STAT_HAS_NAVYBASE));
+					}
+				}
+				else
+				{
+					dbugLog(_FLD, "CP for homecpID " PRF_FULL_OBJ_ID " not found", PRA_FULL_OBJ_ID(hcUnit->homeCPID()));
+				}
+			}
+		}
+		else
+		{
+			//  Garrison Replacement Unit Required.
+			replacementHCUnit = tempSelection.GetReplacementGarrison(unitID, originalUnitCountry);
+
+			if (replacementHCUnit == nullptr)
+			{
+				//  No replacement unit selected, provide an appropriate Training Unit.
+				replacementHCUnit = HCUnit::GetTrainingUnit(originalUnitCountry, originalUnitBranch);
+			}
+
+			if (replacementHCUnit != nullptr)
+			{
+				if (originalUnitBranch == replacementHCUnit->branch())
+				{
+					//  Garrison Changes Side = CP captured by the Enemy. Persona = Probably NO Change.
+					dbugLog(_FLD, "Garrison Changed: Side.");
+
+					clientAction = CHANGE_SIDE;
+				}
+				else
+				{
+					if (originalUnitCountry == replacementHCUnit->m_countryID)
+					{
+						//  Garrison Changes Branch = The Replacement Unit has a different Branch. Persona = Change.
+						dbugLog(_FLD, "Garrison Changed: Branch.");
+
+						clientAction = CHANGE_BRANCH;
+					}
+					else
+					{
+						//  Garrison Changes Country and Branch = The Replacement Unit has a different Country AND Branch.
+						//  Persona = Change.
+						dbugLog(_FLD, "Garrison Changed Country and Branch.");
+
+						clientAction = CHANGE_COUNTRY_BRANCH;
+					}
+				}
+			}
+		}
+
+		if (replacementHCUnit != nullptr)
+		{
+			replacementHCUnitID = replacementHCUnit->unitID();
+			dbugLog(_FLD, "Replacement Unit: %s (%d) for Player: %d", replacementHCUnit->name(), replacementHCUnit->unitID(),
+					playerID());
+		}
+		else
+		{
+			//  NO Changes - This might be indicating an Error Condition because the replacementHCUnit SHOULD NEVER end up as
+			//  nullptr.
+			dbugLog(_FLD, "No Garrison Changes for Player: %d.  (###)", playerID());
+
+			replacementHCUnitID = 0;
+			clientAction = CHANGE_NOTHING;
+		}
+	}
+	else
+	{
+		//  NO Changes
+		dbugLog(_FLD, "No Garrison Changes for Player: %d.", playerID());
+
+		replacementHCUnitID = 0;
+		clientAction = CHANGE_NOTHING;
+	}
+
+	if (replacementHCUnit != nullptr && replacementHCUnit->side() != side())
+	{
+		UINT32 oldUnit = replacementHCUnitID;
+		replacementHCUnit = HCUnit::GetTrainingUnit(country(), branch());
+		replacementHCUnitID = replacementHCUnit->unitID();
+		dbugLog(_FLD, "Side does not match player %d replacement unit %d, replacing it with %d", playerID(), oldUnit,
+				replacementHCUnitID);
+	}
+	else if (replacementHCUnitID == 0)
+	{
+		HCUnit *unit = HCUnit::Lookup(brigadeID());
+		if (unit != nullptr && unit->side() != side())
+		{
+			UINT32 oldUnit = replacementHCUnitID;
+			replacementHCUnit = HCUnit::GetTrainingUnit(country(), branch());
+			replacementHCUnitID = replacementHCUnit->unitID();
+			dbugLog(_FLD, "Side does not match player %d current unit %d, replacing it with %d", playerID(), oldUnit,
+					replacementHCUnitID);
+		}
+	}
+
+	_sendHCUnitCountryChange(this, unitID, newCountry, replacementHCUnitID, clientAction);
+}
+
+void mapNotifyPlayersInGarrison(UINT32 unitID, HCUnit *hcUnit, WWII_COUNTRY originalUnitCountry, BRANCH_ENUM originalUnitBranch,
+								WWII_COUNTRY newCountry)
+{
+	//  Send the change to all connected players.
+	for (auto it = g_players.begin(), end = g_players.end(); it != end; ++it)
+	{
+		Player *const player = (Player *)(*it);
+
+		// if the player is in this brigade and is spawned in, defer the alternate selection logic
+		if ((player->brigadeID() == unitID) && player->isSpawned())
+		{
+			// make sure the player at least is told about the brigade change, later they'll get a notice again
+			// that will handle their own brigade selection
+			_sendHCUnitCountryChange(player, unitID, newCountry, 0, CHANGE_NOTHING);
+
+			dbugLog(_FLN, "Player %d is spawned in, attempting to deferr garrison change", player->playerID());
+			if (player->m_deferredGarrisonChangeNotice == nullptr)
+			{
+				player->m_deferredGarrisonChangeNotice
+					= new DeferredGarrisonChangeNotice(unitID, hcUnit, originalUnitCountry, originalUnitBranch, newCountry);
+			}
+			else
+			{
+				dbugLog(_FLD, "Previous garrison change deferral in progress, ignoring for player %d",
+					player->playerID());
+			}
+		}
+		else
+		{
+			player->mapNotifyPlayerInGarrison(unitID, hcUnit, originalUnitCountry, originalUnitBranch, newCountry);
+		}
+	}
+}
+
+// Map host calls this.
+void GarrisonCountryChange::process(UINT32 unitID, WWII_COUNTRY country)
+{
+	if (this->m_actionable)
+	{
+		HCUnit *hcUnit = HCUnit::Lookup(unitID);
+		if (hcUnit != nullptr)
+		{
+			WWII_COUNTRY originalUnitCountry = hcUnit->country();
+			BRANCH_ENUM originalUnitBranch = hcUnit->branch();
+
+			g_brigades[originalUnitCountry][originalUnitBranch].erase((Brigade *)hcUnit);
+
+			//  Set the Unit (unitID) to the NEW Country.
+			WWII_COUNTRY newCountry = GarrisonCountryChangeReq::getReplacementCountry(country, hcUnit);
+			hcUnit->setCountry(newCountry);
+			g_brigades[newCountry][hcUnit->branch()].insert((Brigade *)hcUnit);
+
+			mapNotifyPlayersInGarrison(unitID, hcUnit, originalUnitCountry, originalUnitBranch, newCountry);
+		}
+		else
+		{
+			dbugLog(_FLW, "%s: Invalid unitID ", __FUNCTION__);
+		}
+	}
+}
+

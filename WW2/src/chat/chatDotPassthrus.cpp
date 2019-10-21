@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatPlayer.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatHostMessages.h"
@@ -140,13 +138,19 @@ public:
 	}
 } dotRDP;
 
+class DotFactories : public DotPassthru
+{
+public:
+	DotFactories() : DotPassthru("factories", "List all factories and their current state", NO_MASK, LSTR_FACTORIES_USAGE, LSTR_FACTORIES_DETAIL) { }
+} dotFactories;
+
 class DotRedeploy : public DotPassthru
 {
 public:
 	DotRedeploy() : DotPassthru("redeploy", "Forcibly redeploy a brigade without checking movement rules or affecting resupply", NO_MASK, LSTR_REDEPLOY_USAGE, LSTR_REDEPLOY_DETAIL) {}
 } dotRedeploy;
 
-#if defined(BETA_RELEASE) || defined(FRES) || defined(TRAINING)
+#if defined(BETA_RELEASE) || defined(TRAINING)
 class DotSetTime : public DotCommand
 {
 public:

@@ -6,9 +6,8 @@
  *  Copyright 2011 Playnet Inc. All rights reserved.
  *
  */
+#include "syscfg.h" // Path is project specific.
 #ifdef MAKE_HOST_TERRAIN
-
-#include <syscfg.h> // Path is project specific.
 #include "GenerateHostTerrain.h"
 #include "sdm.h"
 #include <limits.h>
@@ -50,7 +49,7 @@ void updateGeneratingHostTerrain()
     {
         inited = true;
         getposition(x,y);
-        sprintf(buffer, "move %.0f %.0f 400",x,y);
+        strprintf(buffer, "move %.0f %.0f 400",x,y);
         dot_move(buffer);
         stable_frametime = frametime+2000;
     }
@@ -68,7 +67,7 @@ void updateGeneratingHostTerrain()
         else
         {
             getposition(x,y);
-            sprintf(buffer, "move %.0f %.0f 400",x,y);
+            strprintf(buffer, "move %.0f %.0f 400",x,y);
             dot_move(buffer);
             stable_frametime = frametime+2000;
         }

@@ -36,7 +36,7 @@ extern LOGICAL FXDetachFXFromObject(OBJECT*); //[IN] Object to detach FX
 //                       PARTICLES                             //
 //////////////////////////////////////////////////////////////////////
 
-typedef LOGICAL (*PARTICLEUSERDRAW)(FLOAT64VECTOR * Pos,
+using PARTICLEUSERDRAW = LOGICAL(*)(FLOAT64VECTOR * Pos,
 									FLOAT64 CurrentAlpha,
 									FLOAT64 CurrentSize,
 									UINT32 UserData);

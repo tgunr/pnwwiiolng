@@ -16,8 +16,8 @@
 #include "strt/strtChatTypes.h"
 
 OOBMessage
-::OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
-				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country)
+::OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle handleID, const char* command, const char* arguments
+				, const FULL_OBJ_ID cpID, WWII_SIDE side, WWII_COUNTRY country)
 	: m_originatorID(playerID)
 	, m_brigadeID(brigadeID)
 	, m_handleID(handleID)
@@ -44,7 +44,7 @@ OOBMessage::OOBMessage(ACTION_OBJECT* const a)
 }
 
 SINT32
-OOBMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
+OOBMessage::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this));
 	return a->offset;
@@ -63,7 +63,7 @@ StratCommand::StratCommand(ACTION_OBJECT* const a)
 }
 
 SINT32
-StratCommand::pack(LOGICAL mode, ACTION_OBJECT* a)
+StratCommand::pack(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this));
 	return a->offset;

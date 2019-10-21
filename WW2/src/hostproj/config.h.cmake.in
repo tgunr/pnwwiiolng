@@ -1,22 +1,5 @@
-// Header Files
-#cmakedefine HAVE_UNISTD_H 1
-#cmakedefine HAVE_SYS_TIME_H 1
-#cmakedefine HAVE_SYSLOG_H 1
-#cmakedefine HAVE_SIGNAL_H 1
-#cmakedefine HAVE_ARPA_INET_H 1
-#cmakedefine HAVE_SYS_SENDFILE_H 1
-#cmakedefine HAVE_PRECOMPILED_HEADER 1
-#cmakedefine HAVE_SYS_CDEFS_H 1
-
-// Functions
-#cmakedefine HAVE_GETHOSTBYNAME_R 1
-
-#cmakedefine HAVE_STRTOUQ 1
-
-#cmakedefine HAVE_SIGACTION 1
-
-#cmakedefine PN_PLAYNET_PATH "${PN_PLAYNET_PATH}"
+// Hostproj config
+#cmakedefine PN_PLAYNET_PATH R"!!(${PN_PLAYNET_PATH})!!"  // Use a raw string so that 'C:\Playnet' doesn't cause warnings.
 #cmakedefine PN_DISABLE_AUTH 1
-
+#cmakedefine PN_MEM_DEBUG 1
 #cmakedefine PN_DIFFERENT_PORTS 1
-

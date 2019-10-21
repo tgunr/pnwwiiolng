@@ -18,12 +18,12 @@
 #include "chat/chatManagementIDs.h"
 #include "chat/chatManagementPlayer.h"
 #include "chat/chatManagementTypes.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatSaveChannels.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverTypes.h"
 #include "teul/teulBasic.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulPacket.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
@@ -45,7 +45,7 @@ _indexPlayer(Player* player)
 	if ( player == nullptr )
 		LogAbort("Tried to map NULL player");
 
-	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%llx", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle());
+	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%" PR64BitUT "", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle());
 
 	// hash_map doesn't provide lower_bound, so we can't insert-at-place
 	PLAYER_INDEX::iterator it = playerIndex.find(player->matchHandle());
@@ -85,7 +85,7 @@ _indexPlayer(Player* player)
 }
 
 void
-chatInitPlayerLists(void)
+chatInitPlayerLists()
 {
 	_sideCount[WWII_NO_SIDE] = 0;
 	_sideCount[AXIS] = 0;
@@ -147,7 +147,7 @@ void chatPlayerDeactivate(Player* player)
 
 	if ( isValidSide(player->side()) )
 	{
-		betaLog(_FLI, "removing %p from %d side lists", player, player->side());
+		dbugLog(_FLI, "removing %p from %d side lists", player, player->side());
 		sidePlayers[player->side()].erase(player);
 	}
 
@@ -320,7 +320,7 @@ void chatFreePlayer(Player* player)
 	//Handle taken/squelched
 	if ( player->inGrab() )
 	{
-		dbugLog(_FLI, "takenby = %lld, grabbing = %lld"
+		dbugLog(_FLI, "takenby = %" PR64BitUT ", grabbing = %" PR64BitUT ""
 						, player->takenBy()
 						, player->grabbing()
 						);
@@ -329,25 +329,29 @@ void chatFreePlayer(Player* player)
 
 	if ( player->m_snoopBy )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 		player->m_snoopBy->m_snoopOn = nullptr;
 		player->m_snoopBy = nullptr;
 	}
 	if ( player->m_snoopOn )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign());
+		chatDispatchGMMessage("INFO", cmsg);
 		player->m_snoopOn->m_snoopBy = nullptr;
 		player->m_snoopOn = nullptr;
 	}
 	if ( player->m_crsSnoopBy )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 		player->m_crsSnoopBy->m_crsSnoopOn = nullptr;
 		player->m_crsSnoopBy = nullptr;
 	}
 	if ( player->m_crsSnoopOn )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign()));
+		PREP_CHAT_MSG(cmsg, "%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign());
+		chatDispatchCRSMessage("INFO", cmsg);
 		player->m_crsSnoopOn->m_crsSnoopBy = nullptr;
 		player->m_crsSnoopOn = nullptr;
 	}

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 
@@ -223,3 +223,18 @@ void mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRI
 	lpd->y = lpa.x * lpb->_12 + lpa.y * lpb->_22 + lpa.z * lpb->_32;
 	lpd->z = lpa.x * lpb->_13 + lpa.y * lpb->_23 + lpa.z * lpb->_33;
 }
+
+// This returns a vector that is the closest point on the line from the supplied point.
+FLOAT64VECTOR mathGetClosestPointOnLine(const FLOAT64VECTOR* lineStart, const FLOAT64VECTOR* lineEnd, FLOAT64VECTOR* point)
+{
+	FLOAT64VECTOR lineVector = *lineEnd - *lineStart;
+
+	FLOAT64VECTOR lineVector2 = *point - *lineStart;
+
+	FLOAT64 t = mathVectDotProduct(&lineVector2, &lineVector) / mathVectDotProduct(&lineVector, &lineVector);
+
+	t = std::max(t, 0.0);
+	t = std::min(t, 1.0);
+	return *lineStart + lineVector * t;
+}
+

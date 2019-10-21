@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: loclLang.cpp
 // Description: TODO: ***REDO with STL***
@@ -7,7 +7,7 @@
 #include "locl/loclLang.h"
 #include "mem/mem.h"
 
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
 #include "fio/fiod.h"
 #endif
 
@@ -58,7 +58,7 @@ LOGICAL loclLangInit(ENUM_LANGUAGES enumLang)
         else
         {
 // Need front end defined, since this module is used for settings.exe
-#ifdef FRONT_END
+#if platBuild == BUILD_CLIENT
             Write_Debug("[loclLangInit] **Loading language table FAILED**");
 #endif
             return FALSE;
@@ -73,7 +73,7 @@ LOGICAL loclLangInit(ENUM_LANGUAGES enumLang)
 // Function: loclLangKill
 // Description: Kill routine for loclLang.
 ///////////////////////////////////////////////////
-LOGICAL loclLangKill()
+void loclLangKill()
 {
 	/* no longer used
     SINT32 i;
@@ -87,8 +87,6 @@ LOGICAL loclLangKill()
         g_englishTable[i].next = nullptr;
     }
 	*/
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////////////
@@ -99,7 +97,7 @@ LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 {
 	LANGTABLE* langTable = nullptr;
 
-/*#ifdef FRONT_END
+/*#if platBuild == BUILD_CLIENT
     LOGICAL langDirectory = FALSE;
 
 #ifdef BETA_RELEASE
@@ -170,9 +168,15 @@ LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 /////////////////////////////////////////////////////
 UCHAR* loclLangGetString(ENUM_CATEGORIES enumCategory, UINT32 uID)
 {
-	static char buffer[128+1];
-	snprintf(buffer, 128, "loc.%s.%d", loclGetStringCategory(enumCategory), uID);
-	return (UCHAR*)buffer;
+    static std::unordered_map<uint64_t, std::string> s_cache;
+    
+    uint64_t cacheid = (static_cast<uint64_t>(enumCategory) << 32) | static_cast<uint64_t>(uID);
+    auto it = s_cache.find(cacheid);
+    if (it != s_cache.end()) {
+        return reinterpret_cast<UCHAR *>(const_cast<char *>(it->second.data()));
+    }
+    s_cache.emplace(cacheid, std::string("loc.") + reinterpret_cast<char *>(loclGetStringCategory(enumCategory)) + "." + std::to_string(uID));
+    return reinterpret_cast<UCHAR *>(const_cast<char *>(s_cache.at(cacheid).data()));
 
 	/*
     SINT32 category = (SINT32)enumCategory;

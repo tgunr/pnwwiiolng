@@ -185,7 +185,7 @@ static const char* revisions[] =
 ,	// Revision 15: Add weapon spec column to vehicle table so we don't have to keep calculating it.
 	//{
 		"ALTER TABLE `wwiionline`.`wwii_vehtype` ADD COLUMN `weapon_spec` INT(11) UNSIGNED DEFAULT NULL"
-	,	"UPDATE `wwiionline`.`wwii_vehtype` SET `weapon_spec` = wwii.f_weapon_spec(countryid, categoryid, classid, vehtype_oid)"
+	,	"UPDATE `wwiionline`.`wwii_vehtype` SET `weapon_spec` = `wwii`.`f_weapon_spec`(countryid, categoryid, classid, vehtype_oid)"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` MODIFY COLUMN `weapon_spec` INT(11) UNSIGNED NOT NULL"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` ADD INDEX `vt_os` (weapon_spec)"
 	,	nullptr
@@ -197,12 +197,12 @@ static const char* revisions[] =
 	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `resupplies` SMALLINT(5) UNSIGNED DEFAULT 0"
 	,	nullptr
 	//}
-,	// Revision 17: Fix wwii.v_vehicle_vs_vehicle view.
+,	// Revision 17: Fix `wwii`.`v_vehicle_vs_vehicle` view.
 	//{
-		"DROP VIEW `wwii`.`v_vehicle_vs_vehicle`"
+		"DROP VIEW IF EXISTS `wwii`.`v_vehicle_vs_vehicle`"
 	,	"CREATE "
 			"ALGORITHM = UNDEFINED "
-			"DEFINER = `osmith`@`66.28.224.245` "
+			"DEFINER = `osmith`@`localhost` "
 			"SQL SECURITY INVOKER "
 			"VIEW `wwii`.`v_vehicle_vs_vehicle` AS\n"
 		"select "

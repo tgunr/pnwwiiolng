@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <stdarg.h>	// var args
 
 #include "scen/scenMain.h"
@@ -513,7 +513,7 @@ bool ScenarioManager::Start(const char* path, bool init)
 			const Instance::Descriptor& instance = PlayerClient()->GetInstance();
 
 			// convert our instance id into a string
-			snprintf(buffer, 25, "%llu", instance.id());
+			strprintf(buffer, "%" PR64BitUT "", instance.id());
 
 			// tell our script what our instance id is
 			// this is needed for proper network comms
@@ -1143,7 +1143,7 @@ void ScenarioManager::SetConfig(const char* name, const char* value)
 	TUT_MGR->DoEvent(TUT_EVENT_SET, name, value);
 }
 
-void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC& spec)
+void ScenarioManager::SetRespawnWeapon(const WEAPON_SPEC spec)
 {
 	_respawnWeapon = spec;
 }
@@ -1198,8 +1198,7 @@ bool ScenarioManager::Spawn(const vehType* vehtype)
 		//uiConsoleprintf("SCENARIO: Spawning at %.2f, %.2f, %.2f", &at.x, &at.y, &at.z);
 		mlSetSpawnStuff(0,0,-1,1);
 		mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-		WEAPON_SERIAL blah;
-        memset(&blah, 0, sizeof(WEAPON_SERIAL));
+		WEAPON_SERIAL blah={0};
 		vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 	}
 
@@ -1555,7 +1554,7 @@ static content_command& _parse_command(std::string& command)
 {
 	static content_command cc;
 	static char buffer[128+1];
-	strncpy(buffer, command.c_str(), 128);
+	strsafecpy(buffer, command.c_str());
 
 	char* ptr = strchr(buffer, '.');
 
@@ -1626,7 +1625,7 @@ int ScenarioManager::AddContent(const char* line)
 	char data[255+1];
 
 	// copy the data inout buffer so we can manipulate it
-	strncpy(name, line, 255);
+	strsafecpy(name, line);
 
 	char* ptr = strchr(name, ' ');
 	if(ptr) *ptr = 0;
@@ -2189,7 +2188,7 @@ int ScenarioManager::AddContent(const char* line)
 		float z		= 0;
 
 		char color[10+1];
-		strncpy(color, "#FF0000", 10);
+		strsafecpy(color, "#FF0000");
 
 		if(sscanf(arguments.c_str(), "%255s %255s %f %f %f %10s", name, data, &x, &y, &z, color) >= 5)
 		{
@@ -2578,8 +2577,9 @@ const char* ScenarioManager::MapPath(const char* file, const char* ender)
 	if(ender)
 		mapPath += ender;
 
-	if(!fioAccess(mapPath.c_str()))
-	{
+    int fd = fioOpen(mapPath.c_str());
+
+    if (fd == -1) {
 		std::string tempPath;
 
 		for(size_t i = 0; i < mapPaths.size(); i++)
@@ -2594,12 +2594,14 @@ const char* ScenarioManager::MapPath(const char* file, const char* ender)
 			if(ender)
 				tempPath += ender;
 
-			if(fioAccess(tempPath.c_str()))
-			{
+			if ((fd = fioOpen(tempPath.c_str())) != -1) {
+			    fioClose(fd);
 				mapPath = tempPath;
 				break;
 			}
 		}
+	} else {
+	    fioClose(fd);
 	}
 
 	return mapPath.c_str();
@@ -3154,27 +3156,24 @@ void ScenarioManager::SetupTerrainPaths(const char* check)
 	mapPath += check;
 	mapPath += "/parent.txt";
 
-	if(fioAccess(mapPath.c_str()))
-	{
-		// lookup the parent
-		int fd = fioOpen(mapPath.c_str());
+    // lookup the parent
+    int fd = fioOpen(mapPath.c_str());
 
-		if(fd >= 0)
-		{
-			char parent[31+1];
-			parent[0] = 0;
+    if(fd >= 0)
+    {
+        char parent[31+1];
+        parent[0] = 0;
 
-			if(fioGetString(fd, parent, 31))
-			{
-				mapPaths.push_back(parent);
+        if(fioGetString(fd, parent, 31))
+        {
+            mapPaths.push_back(parent);
 
-				// look up its parent
-				SetupTerrainPaths(parent);
-			}
+            // look up its parent
+            SetupTerrainPaths(parent);
+        }
 
-			fioClose(fd);
-		}
-	}
+        fioClose(fd);
+    }
 }
 
 const char* ScenarioManager::CustomTerrainMap()
@@ -3535,9 +3534,9 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
                 /*
                  TBD: Clearly someone meant to process more than just 3 pieces of data here even
                       if it intended to be optional - but as is, its not processing more than three.
-                 
-                 OLD Code: 
-                 
+
+                 OLD Code:
+
 				FLOAT32 x, y, z, dx, dy, dz;
 				x = y = z = dx = dy = dz = 0.0f;
 
@@ -3548,12 +3547,12 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 				if(parsed > 3)
 					dir.set((double)dx, (double)dy, (double)dz);
                  */
-                
+
                 FLOAT32 x, y, z;
                 x = y = z = 0.0f;
-                
+
                 int parsed = sscanf(data, "%f %f %f", &x, &y, &z);
-                
+
                 if(parsed == 3)
                     position.set((double)x, (double)y, (double)z);
 			}
@@ -3894,7 +3893,7 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 			// now we have the 2 points that make up the boundary volume
             //  TBD - but only one is being used.  Why?  Is this an error in the calcualtion?
 			// Vec3d front = Vec3d(0,1,0);
-            
+
 			Vec3d up = Vec3d(0,0,1);
 
 			Matrixd rotate;
@@ -4086,7 +4085,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			TUT_MGR->RunCode(code);
 		}
 		break;
-            
+
             default:
             // no actions for any other types.
             break;
@@ -4147,12 +4146,6 @@ void ScenarioManager::LoadObjects(UINT32 loadFlags)
 {
 	for(size_t i = 0; i < objects.size(); i++)
 	{
-        /*
-            TBD: This is currently a NOP, what was actually indended?  To call Stop()?
-		if(strcasecmp(objects[i]->name.c_str(), "riverrun") == 0)
-			bool stop = true;
-         */
-        
 		LoadObject(objects[i], loadFlags);
 	}
 
@@ -4204,14 +4197,14 @@ void ScenarioManager::LoadContent()
 {
     /*
        TBD - whenever we actually do custom maps, lol, for now - gone.
-     
+
      bool active = IsActive();
-     
+
 	// global offset for custom maps; everything will be offset
 	Vec3d offset = (active) ? _scenario->offset : Vec3d();
-     
+
      */
-    
+
 	// load our category (mappack) include if one is defined
 	jsContentData mapPack;
 
@@ -4997,12 +4990,10 @@ void _extractNumbers(const char* source, double& x, double& y, double& z)
 	z = _z;
 }
 
-static LOGICAL _bob(struct OBJECT* o, void* userdata)
+static void _bob(OBJECT& o, void* userdata)
 {
 	Matrixf* newMat = (Matrixf*)userdata;
-	newMat->get(o->mat);
-	//o->mat._43 = FLOAT32(-(*((FLOAT64*)userdata)));
-	return TRUE;
+	newMat->get(o.mat);
 }
 
 void ScenarioWaveObject::Update()
@@ -5067,14 +5058,14 @@ void ScenarioWaveObject::Update()
 
         /*
           TBD - rotate it along the y, did this have an actual purpose?
-         
+
 		Vec3d from = Vec3d(0.0f, 1.0f, 0.0f);
 
 		rotate.makeRotate(from, position);
 		final = final * rotate;
-         
+
          */
-        
+
 		// rotate this into the object's world offsetted position
 		final = final * wd.objAtt;
 

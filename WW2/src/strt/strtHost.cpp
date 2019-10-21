@@ -7,20 +7,15 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-#include "hostproj/hostversion.h"
-#include "hostproj/revision.h"
-
 #include <signal.h>  //to catch SIGHUPS with
-
+#include <mysql.h>
+#include "build_info.hpp"
 #include "mem/mem.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
-#include "dbse/dbseConnection.h"
-#include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -48,7 +43,6 @@
 #include "strt/strtTOE.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -59,12 +53,9 @@
 
 extern ObjectiveStats g_objectiveStats;
 
-DBHANDLE dbh;
-DBCONNECTION dbConnection;
-
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
@@ -72,10 +63,9 @@ DBCONNECTION dbConnection;
 
 const char* HostLanguage = "en";
 
-static LOGICAL _exitSignaled = FALSE;
+static bool _exitSignaled = false;
 static bool _mustSyncChatHost = true;
 extern int tolua_stratd_open(struct lua_State*);
-extern ConfigPath cv_luaPath;
 
 //////////////////////////////////////////////////////////////////////////
 // Users never directly connect to strat, so while we are aware of them
@@ -110,7 +100,7 @@ static void	_personaErrorFunction (SINT32 teulIndex, const UCHAR* const data, SI
 
 static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
-	dbugLog(_FLA,"cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
+	dbugLog(_FLA, "cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -148,37 +138,30 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 
 static void _describeBuildConfigurationToLogFile()
 {
-	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:");
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLIB, "DEV_BUILD");
+	dbugLog(_FLI, "DEV_BUILD");
 #endif
 #if defined(BETA_RELEASE)
-	dbugLog(_FLIB, " BETA_RELEASE");
+	dbugLog(_FLI, " BETA_RELEASE");
 #endif
 #if defined(TEST_RELEASE)
-	dbugLog(_FLIB, " TEST_RELEASE");
+	dbugLog(_FLI, " TEST_RELEASE");
 #endif
 #if defined(OPEN_BETA)
-	dbugLog(_FLIB, " OPEN_BETA");
-#endif
-#if defined(CLOSED_BETA)
-	dbugLog(_FLIB, " CLOSED_BETA");
-#endif
-#if defined(FRES)
-	dbugLog(_FLIB, " FRES");
-#endif
-#if defined(HAPPYOO)
-	dbugLog(_FLIB, " HAPPYOO");
+	dbugLog(_FLI, " OPEN_BETA");
 #endif
 #if defined(TRAINING_SERVER)
-	dbugLog(_FLIB, " TRAINING_SERVER");
+	dbugLog(_FLI, " TRAINING_SERVER");
 #endif
 #if defined(PUBLIC_RELEASE)
-	dbugLog(_FLIB, " PUBLIC_RELEASE");
+	dbugLog(_FLI, " PUBLIC_RELEASE");
 #endif
 
-	dbugLog(_FLIB, ".");
+// See DEV-1028 for why this is here.
+#if !defined(PUBLIC_RELEASE)
+#error "Build type not defined!"
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -381,7 +364,7 @@ static void
 _strtSIGINT(int signo)
 {
 	dbugLog(_FLI, "Received exit signal");
-	_exitSignaled = TRUE;
+	_exitSignaled = true;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -406,8 +389,6 @@ _housekeeping()
 {
 	TeulTimeMS nextHouseKeep = teulClock64 + 25;
 
-	threadsLogging();
-
 	if ( !strtIsStratInitialized() )
 		return nextHouseKeep;
 
@@ -418,64 +399,147 @@ _housekeeping()
 	}
 
 	static UINT32 nextFBRepairCycle = 0;
-	if ( teulTime() >= nextFBRepairCycle )
-	{
-		strtProcessFBRepairQueue();
-		nextFBRepairCycle = teulTime() + 5;
+	static TeulTimeMS nextSecond = teulClock64+1000;
+	static TeulTimeMS nextMinute = teulClock64 + 1000 * 60;
+	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
+	static UINT32 nextObjectiveUpdate = teulTime() + 5;
+	static UINT32 nextForcedSupplyRouteCheck = 0;
+	static UINT32 nextTOESave = teulTime() + 120;
+	static UINT32 nextSupplyRouteCheck = teulTime() + 1;
+
+	static bool bInitiateFBRepairCycle = false;
+	static bool bInitiateHalfSecProcessing = false;
+	static bool bInitiateSecProcessing = false;
+	static bool bInitiateMinProcessing = false;
+	static bool bInitiateObjectiveUpdateProcessing = false;
+	static bool bInitiateSupplyRouteCheckProcessing = false;
+	static bool bInitiateForcedSupplyRouteCheckProcessing = false;
+	static bool bInitiateSaveTOESupplieskProcessing = false;
+
+	// Upate flags that control scheduling - but make sure we don't allow processing to affect the
+	// scheduled time.
+	if ( teulTime() >= nextFBRepairCycle ) {
+		nextFBRepairCycle += (teulTime()-nextFBRepairCycle) + 5;
+		bInitiateFBRepairCycle = true;
 	}
 
-	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
-	if ( teulClock64 >= nextHalfSecond )
+	if ( teulClock64 >= nextHalfSecond ) {
+		nextHalfSecond +=  500;
+		if (nextHalfSecond < teulClock64) {
+			nextHalfSecond = teulClock64;
+			dbugLog(_FLI, "Lost time, need to schedule next half second processing immediately");
+		}
+		bInitiateHalfSecProcessing = true;
+	}
+
+	if ( teulClock64 >= nextSecond ) {
+		dbugLog(_FLD, "strat _housekeeping Second procesing, scheduled");
+		nextSecond += 1000;
+		if (nextSecond < teulClock64) {
+			nextSecond = teulClock64;
+			dbugLog(_FLI, "Lost time, need to schedule next second processing immediately");
+		}
+		bInitiateSecProcessing = true;
+	}
+
+	if ( teulClock64 >= nextMinute ) {
+		dbugLog(_FLD, "strat _housekeeping Minute procesing, scheduled");
+		nextMinute += (1000 * 60);
+		if (nextMinute < teulClock64) {
+			nextMinute = teulClock64;
+			dbugLog(_FLD, "Lost time, need to schedule next minute processing immediately");
+		}
+		bInitiateMinProcessing = true;
+	}
+
+	if ( teulTime() >= nextObjectiveUpdate )
+	{
+		// keep DB connection alive
+		if (mysql_ping(dbh) != 0) {
+			dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+			threadsDBReconnect(dbh);
+		}
+
+		nextObjectiveUpdate += (teulTime()-nextObjectiveUpdate) + 5;
+		bInitiateObjectiveUpdateProcessing = true;
+	}
+
+	if ( teulTime() >= nextSupplyRouteCheck ) {
+
+		nextSupplyRouteCheck = teulTime() + 2;
+		bInitiateSupplyRouteCheckProcessing = true;
+		if ( teulTime() >= nextForcedSupplyRouteCheck ) {
+			nextForcedSupplyRouteCheck += (teulTime()-nextForcedSupplyRouteCheck) + 60;
+			bInitiateForcedSupplyRouteCheckProcessing = true;
+		}
+	}
+
+	if ( teulTime() >= nextTOESave ) {
+		nextTOESave +=  60;
+		bInitiateSaveTOESupplieskProcessing = true;
+	}
+
+	// Now actually act on the info above
+	if (bInitiateFBRepairCycle)
+	{
+		strtProcessFBRepairQueue();
+		bInitiateFBRepairCycle = false;
+	}
+
+	if (bInitiateHalfSecProcessing)
 	{
 		strtProcessDBQueue();
 		strtEvaluateEWSUpdates();
-		nextHalfSecond = teulClock64 + 500;
+		bInitiateHalfSecProcessing = false;
+
+		if (bInitiateSecProcessing) {
+			dbugLog(_FLD, "strat _housekeeping Half Second processing subverted");
+		}
 		return nextHouseKeep;
 	}
 
-	static TeulTimeMS nextSecond = 0;
-	if ( teulClock64 >= nextSecond )
+	if (bInitiateSecProcessing)
 	{
+		dbugLog(_FLD, "strat _housekeeping Second procesing, activated");
 		strtProcessResupply();
 		stratProcessLuaEventQueue();
-		nextSecond = teulClock64 + 1000;
+		bInitiateSecProcessing = false;
 		return nextHouseKeep;
 	}
 
-	static UINT32 nextObjectiveUpdate = teulTime() + 5;
-	if ( teulTime() >= nextObjectiveUpdate )
+	if (bInitiateMinProcessing)
+	{
+		dbugLog(_FLI, "strat _housekeeping Minute processing, activated");
+		strtProcessGarrisons();
+		bInitiateMinProcessing = false;
+		return nextHouseKeep;
+	}
+
+	if (bInitiateObjectiveUpdateProcessing)
 	{
 		g_objectiveStats.calculate();
 		if ( g_objectiveStats.m_cityAvailable[ALLIED] >= 1 )
 			strtGameEventTrigger("gameSpareAOCapacity", ALLIED);
 		if ( g_objectiveStats.m_cityAvailable[AXIS] >= 1 )
 			strtGameEventTrigger("gameSpareAOCapacity", AXIS);
-		nextObjectiveUpdate = teulTime() + 5;
+		bInitiateObjectiveUpdateProcessing = false;
 		return nextHouseKeep;
 	}
 
-	static UINT32 nextSupplyRouteCheck = teulTime() + 1;
-	static UINT32 nextForcedSupplyRouteCheck = 0;
-	if ( teulTime() >= nextSupplyRouteCheck )
+	if (bInitiateSupplyRouteCheckProcessing)
 	{
-		bool force = false;
-		if ( teulTime() >= nextForcedSupplyRouteCheck )
-		{
-			force = true;
-			nextForcedSupplyRouteCheck = teulTime() + 60;
-		}
-		strtBuildSupplyChains(force);
-		nextSupplyRouteCheck = teulTime() + 2;
+		strtBuildSupplyChains(bInitiateForcedSupplyRouteCheckProcessing);
+		bInitiateSupplyRouteCheckProcessing = false;
+		bInitiateForcedSupplyRouteCheckProcessing = false;
 		return nextHouseKeep;
 	}
 
 	// Wait 2 minutes before starting to save the lists
-	static UINT32 nextTOESave = teulTime() + 120;
-	if ( teulTime() >= nextTOESave )
+	if (bInitiateSaveTOESupplieskProcessing)
 	{
 		strtSaveTOESupplies();
 		// But then save every minute
-		nextTOESave = teulTime() + 60;
+		bInitiateSaveTOESupplieskProcessing = false;
 		return nextHouseKeep;
 	}
 
@@ -490,45 +554,77 @@ const char* g_serverName = "stratd";
 int
 main(int argc, const char* argv[])
 {
-	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
-	dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	std::vector<std::string> luaCmds;
+	bool initOnly = false;
+	bool debug = false;
+
+	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {
+		{ "--lua-cmd", "Execute lua code after initializing.", true,
+			[&](const char* code) { luaCmds.emplace_back(code); }, nullptr },
+		{ "--init-only", "Terminate after loading strat data.", false, [&](const char*) { initOnly = true; }, nullptr },
+		{ "--debug", "Enable verbose + console logging", false, [&](const char*) { debug = true; }, nullptr, }
+	});
+	if ( !debug ) {
+		dbugSetWriteLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+		dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
+	} else {
+		dbugSetLogLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+		dbugSetWriteLevel(Debug::ERR_DBUG | LOG_ALL_TO_STDERR);
+	}
 
 	HostLanguage = cv_stratLanguage.GetString();
 
 	_describeBuildConfigurationToLogFile();
 
-	threadsReadDBEnvironment();
 	threadsSetup();
 
 	teulSyncClock();
-
-	wwiiIRCInitialize(Server::localHost);
-	wwiiIRCActivate(true);
 
 	Lua::Start("stratd");
 
 	if ( !stratStartLua() )
 		exit(0);
 
-#ifdef IS_STRAT_HOST
 	if (!strtInitDB())
 	{
 		LogAbort("Couldn't initialize database");
 	}
-#endif
+
+	//Initializes the convoy system
+	cnvyInit();
+
+	// Initialize the strat objective limits
+	g_objectiveStats.calculate();
+
+	teulSyncClock();
+
+	strtInitializeStratSystem();
+
+    for ( auto&& code : luaCmds ) {
+        dbugLog(_FLM | STD_ERR, "executing %s", code.c_str());
+        Lua::RunObject("--lua-cmd", code);
+        auto results = Lua::Results();
+        for ( auto&& line : results ) {
+            printf("lua: %s\n", line.c_str());
+        }
+    }
+	
+	if ( initOnly ) {
+		dbugLog(_FLA | STD_ERR, "exiting after initialization (--init-only)");
+		return 0;
+	}
+
+	wwiiIRCInitialize(Server::localHost);
+	wwiiIRCActivate(true);
 
 	StatsThread statsThread;
 	statsThread.start();
 	threadsEnable();
 
-	//Initializes the convoy system
-	cnvyInit();
-
 	dbugLog(_FLN,"opening broadcast ports");
 	serverOpenBroadcastIndexes();
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, STRAT_HOST, STRAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
@@ -550,16 +646,6 @@ main(int argc, const char* argv[])
 	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
-	// Give the chat host 20 seconds to start
-	teulSyncClock();
-	TeulTimeMS cutoff = teulClock64 + 30000;
-	dbugLog(_FLI, "Waiting for chat server");
-	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
-	{
-		teulUpdateTransport(50);
-		threadsLogging();
-	}
-
 #ifdef DEBUG
 	dbugLog(_FLN,"Beginning strat processing");
 #endif
@@ -572,22 +658,6 @@ main(int argc, const char* argv[])
 
 	ABORT_IF(chatInstallStratSupportCallbacks() < 0);
 
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING);
-	for ( UINT32 i = 0; i < 10; ++i )
-	{
-		teulUpdateTransport(20);
-		threadsLogging();
-	}
-
-	// Initialize the strat objective limits
-	g_objectiveStats.calculate();
-
-	teulSyncClock();
-
-	strtInitializeStratSystem();
-
-	threadsLogging();
-
 	signal(SIGINT, _strtSIGINT);
 
 	// Run the map-restoration hack for restarts.
@@ -598,20 +668,12 @@ main(int argc, const char* argv[])
 		std::this_thread::sleep_for(std::chrono::seconds(1));
 		LogAbort("bailing because intermission script failed.");
 	}
-	threadsLogging();
-
 	strtBroadcastConfigUpdate();
-	threadsLogging();
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	extern void serverOpenLuaClientInterface(void);
-	serverOpenLuaClientInterface();
-
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-
-	threadsLogging();
 
 	TeulTimeMS tick100ms = 0;
 	bool runOnce = false;
@@ -647,7 +709,7 @@ main(int argc, const char* argv[])
 		}
 	}
 
-	teulClose(mapConnection, Teul::Closing::MapSrvClose);
+	teulClose(mapConnection);
 
 	wwiiIRCChannelMessage("-sys", "[[ Shutting down normally ]]");
 	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_EXITED);
@@ -658,11 +720,7 @@ main(int argc, const char* argv[])
 
 	teulCloseTransport();
 
-	threadsLogging();
-
-#ifdef IS_STRAT_HOST
 	strtCloseDB();
-#endif
 	dbugLog(_FLN,"strat system shutting down");
 
 	Lua::Stop();

@@ -46,7 +46,7 @@ enum SPAWN_DENY_REASONCODE
 	SPAWN_DELAYED,							// Denied by launch timer
 	SPAWN_ACCOUNT_MINUTES,					// Not enough minutes on your account
 	SPAWN_ACCOUNT_MASK,						// Your account doesn't have access to this vehicle.
-	SPAWN_ERROR								// Unknown error.
+	SPAWN_ERROR,							// Unknown error.
 };
 
 // Object visibility flags
@@ -73,6 +73,7 @@ enum {
 ,	SMOKELEVEL_HEAVY = 2
 ,	SMOKELEVEL_FIRE = 3
 };
+//tolua_end
 
 //------------------------------STRUCT SECTION-------------------------------
 
@@ -107,6 +108,7 @@ struct VISLEVEL_UPDATE
 	UCHAR			vislevel;
 };
 
+//tolua_begin
 // Structure for defining allocations of vehicles
 class WeaponCounter
 {
@@ -127,7 +129,7 @@ public:
         Copy(rhs);
 		return *this;
 	}
-    
+
 //tolua_begin
 
 public:
@@ -138,7 +140,7 @@ public:
         spawnable = rhs.spawnable;
         restricted = rhs.restricted;
     }
-    
+
 public:
 	UINT16	capacity;				// Automatic resupply level
 	UINT16	current;				// Current actual level
@@ -146,6 +148,7 @@ public:
 	UCHAR	spawnable;				// Used by the client
 	UCHAR	restricted;			// If your account prevents using this
 };
+//tolua_end
 
 #pragma pack(push, 1)				// Wire format capable.
 struct STRAT_ENEMY_REPORT
@@ -159,4 +162,3 @@ struct STRAT_ENEMY_REPORT
 };
 #pragma pack(pop)
 
-//tolua_end

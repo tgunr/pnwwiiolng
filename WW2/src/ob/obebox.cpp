@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -26,7 +26,7 @@ char        tname[32];
 char        texname[64];
 int         i, j;
 int         texid;
-OBJECT* lpobj, *lplast;
+OBJECT* lpobj, *lplast = nullptr;
 piVECTOR*  psnorms;
 piINDICES* ptris;
 piVECTOR	  faces[6][4]={{{-1, 1, 1},

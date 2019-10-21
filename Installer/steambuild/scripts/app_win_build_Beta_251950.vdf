@@ -1,0 +1,27 @@
+"appbuild"
+{
+    "appid"    "251950"
+
+    // description for this build
+    "desc"    "WWIIOnLine: Beta Client - Win"
+
+    // build output folder for .log, .csm & .csd files, relative to location of this file
+    "buildoutput"    "..\output\"
+
+    // root content folder, relative to location of this file
+    "contentroot"    "..\..\release-beta\steam\WWIIOnLine_Beta\"
+
+    // branch to set live after successful build, non if empty
+    "setlive"    ""
+
+    // to enable preview builds
+    "preview"    "0"
+
+    // set to flie path of local content server
+    "local"    ""
+
+    "depots"
+    {
+        "251951"    "depot_build_251951.vdf"
+    }
+}

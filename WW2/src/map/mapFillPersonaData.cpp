@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "map/mapFillPersonaData.h"			// Our header file
 #include "wwii/wwiiDBThreads.h"
 #include "map/mapPlayer.h"
@@ -24,7 +22,7 @@ class FillPersonaDataQuery : public DBThreadQuery
 public:
 	FillPersonaDataQuery(const Player* player)
 		: DBThreadQuery(DBThread::Default, "FillPersonaDataQuery", DBThreadQuery::_CALLBACK, 1
-							, "CALL auth.p_persona_refresh(%u, %u)"
+							, "CALL `auth`.`p_persona_refresh`(%u, %u)"
 								, player->personaID()
 								, Server::myServerInfo.stats.arenaID
 								)
@@ -108,7 +106,7 @@ protected:
 		// Apply the group list
 		player->SetGroups(m_result.m_newGroups.c_str()) ;
 
-		player->log(_FLI, "fpdq: pers:%u rank:%u gotrank:%d points:%u rankperm:%llx mb:%u took %llums"
+		player->log(_FLI, "fpdq: pers:%u rank:%u gotrank:%d points:%u rankperm:%" PRPermMaskT " mb:%u took %" PR64BitUT "ms"
 						, player->personaID()
 						, player->effectiveRank(), player->realRank(), player->points()
 						, player->useRank().permissions()

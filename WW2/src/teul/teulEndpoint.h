@@ -1,4 +1,3 @@
-#pragma once
 // This module provides high-level access to the transport
 // functions used in the teul API.
 //
@@ -8,39 +7,53 @@
 //
 // Originating Programmer: Martin Poulin
 
+#pragma once
 #include "teul/teulEnums.h"
 #include "teul/teulEndpointDefs.h"
 #include "teul/teulTimeMS.h"
-#include "teul/teulSockTypes.h"		// For SOCKET
 #include "teul/teulFuncTypes.h"
+#include "RakNetTypes.h"
+
+//#define DEBUG_CONNECTIONS
+
+class RakNetChannel;
 
 namespace Teul
 {
 	class Packet;
+
+#if platBuild == BUILD_SERVER
+        static const size_t MaxConnections = 6000;
+        static const size_t MaxClusterUsers = 5000;
+#elif !defined(MULTI_CLIENT)
+	// Number of users to support per client (cluster is the host term)
+	static const size_t MaxClusterUsers = 8;
+	// How many endpoints teulKit reserve, also limits the
+	// number of concurrent connections.
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + 4;
+#else
+	// Number of users to support per client instance (cluster is the host term)
+	static const size_t MaxClusterUsers = 2000;
+	// How many endpoints teulKit reserve, also limits the
+	// number of concurrent connections.
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4);
+#endif
+
+    typedef std::deque<ENDPOINT *> ENDPOINT_LIST;
+    extern Teul::ENDPOINT_LIST idleEndpoints;
 }
 
 struct EndpointImpl;
+typedef std::map<RakNet::RakNetGUID, ENDPOINT *> GUID_ENDPOINT_MAP;
 
 #ifdef TEUL_DETAIL_OUTPUT
 #define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
 #else
-#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes ) silence_unused_parameter_warning(ep, bIsRecv, bpInput, szBytes)
 #endif
 
-struct 	ENDPOINT
+struct ENDPOINT
 {
-public:
-	///! Set the OS "receive buffer" size.
-	///! Aligns size to a 4Kb boundary, only allows growth.
-	///! Typically, the operating system doubles this to allow for overheads.
-	int setRcvBufferSize(UINT32 newSize);
-	///! Set the OS "send buffer" size.
-	///! Aligns size to a 4Kb boundary, only allows growth.
-	///! Typically, the operating system doubles this to allow for overheads.
-	int setSndBufferSize(UINT32 newSize);
-
-	enum { MaxRcvBufferSize = 16 * 1024, MaxSndBufferSize = 128 * 1024 };
-
 public:
 	//! Query the endpoint's internal identifier (Teul Index).
 	SINT32 teulIndex() const { return m_teulIndex; }
@@ -63,17 +76,19 @@ public:
 	UCHAR				protocol;
 	UCHAR				m_readAheadBuffer[3];	//! Read-ahead buffer for storing token & size.
 
-	bool				m_inUse : 1;			// check if the endpoint is in use before we remove it DOH!!
-	bool				m_connected : 1;
-	bool				m_reliable : 1;
-	bool				m_doTimeoutCheck : 1;
-	bool				m_closed : 1;
-	bool				m_writesPending : 1;
-	bool				m_haveTicks : 1;		// False until we've started recording ticks.
-	bool				m_peer : 1;			// Peering connection.
+	bool				m_inUse;			// check if the endpoint is in use before we remove it DOH!!
+	bool				m_connected;
+	bool				m_reliable;
+	bool				m_doTimeoutCheck;
+	bool				m_closed;
+	bool				m_haveTicks;		// False until we've started recording ticks.
+	bool				m_peer;			// Peering connection.
+	bool				m_rakNetEnabled;	
 
 	//! Implementation entity for stuff we don't really need to expose to all callers.
 	EndpointImpl*		m_impl;
+	RakNetChannel*		m_pairdUdpConn;
+	RakNet::RakNetGUID  m_rakNetGuid;
 
 	//! Generic pointer to application-specific data associated with
 	//! this connection. Typically either a ww2Client (on the client)
@@ -92,12 +107,8 @@ public:
 	struct sockaddr_in	fromSockAddress;		// where a packet came from;
 	struct sockaddr_in	destSockAddress;		// socket address of the destination.
 
-#if platOS == OS_WIN32
-	WSAEVENT			eventObject;			// really a WSAEVENT/ HANDLE
-#endif
-
-	CONNECT_FUNCTION*	connectFn;				// Connect function.
-	ERROR_FUNCTION*		errorFn;				// Error function.
+	CONNECT_FUNCTION	connectFn;				// Connect function.
+	ERROR_FUNCTION		errorFn;				// Error function.
 
 public:
 	//! Notify our application of a connection accepted.
@@ -125,19 +136,12 @@ public:
 	//! Try to drain the write queue.
 	SINT32 pushSendQueue();
 
-	//! Enable or disable nagle's algorithm.
-	//! @return Prior state of the nagle algorithm.
-	bool setNagleEnabled(bool);
-
 	//! Attempt to send a packet, or queue it if we cannot
 	//! send it immediately.
-	SINT32 sendPacket(Teul::Packet& packet);
+	SINT32 sendPacket(Teul::Packet& packet, const UCHAR protocolPreference);
 
 	//! Flag the endpoint as having become connected.
 	void setConnected();
-
-	//! Flag whether the endpoint needs to monitor for writes or not.
-	void setWritesPending(const bool pending_);
 
 	//! Encrypt an outgoing stream.
 	void encrypt(UCHAR* const stream_, const size_t bytes_);
@@ -155,31 +159,38 @@ public:
 	UINT32 destAddress() const;
 	UINT16 destPort() const;
 
+	bool isFromClient() const noexcept { return protocol == PROTOCOL_TCP && !m_peer; }
+
+	RakNetChannel *getBackChannel() {
+		return m_pairdUdpConn;
+	}
+
 private:
 	//! Write the actual data to the socket.
-	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
-
-#if defined(AS_SERVER)
-public:
-	SINT32 writeRaw(const void* const data, const size_t sizeInBytes) noexcept;
-#endif
+	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT16 port);
+    friend void _controllerConnect(ENDPOINT& endpoint); // for server.cpp
 };
 
+static_assert(sizeof(ENDPOINT().m_readAheadBuffer) == Teul::PacketPrefixBytes, "Endpoint readahead buffer size must match packet prefix");
 
 /* Basic functions */
 
 /* Endpoint functions */
 
-void		teulCleanupEndpoints(void);
+void		teulEndpointBackchannels();
+void		teulCleanupEndpoints();
 
-ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
+ENDPOINT* 	teulCreateEndpoint(bool isListening, SINT32 timeout, PROTOCOL protocol);
 
 void		teulFreeEndpoint(ENDPOINT* theEndpoint);
 
 void		teulRemoveEndpoint(ENDPOINT* inEndpoint);
-void		teulKillDeadEndpoints(void);
+void		teulKillDeadEndpoints();
 
-// INTERNAL: Get the next free index.
-// Note: this value is incredibly transient.
-SINT32		teulQueryNextFreeIndex();
+//! Check for available endpoints. If none are available, checks for and recovers dead endpoints.
+bool		teulHasFreeEndpoints();
 
+template <typename T, typename = std::enable_if_t<std::is_integral<T>::value>>
+static inline constexpr bool safe_isEAGAIN(T const value) {
+    return value == PLAT_EAGAIN || value == PLAT_EWOULDBLOCK;
+}

@@ -76,6 +76,7 @@ public:
 	virtual void ProcessBrigadeControl(BrigadeControlList const& entry) override;
 	virtual void ProcessBrigadeControlNotice(const BrigadeControlNotice* const notice) override;
 	virtual void ProcessHCUnitLocation(const HCUnitLocation& unitloc) override;
+	virtual void ProcessHCUnitCountryChange(const HCUnitCountryChange& unitloc) override;
 	virtual void ProcessInstanceResult(const Instance::Result& result) override;
 	virtual void ProcessInstanceList(const Instance::ClientListing* list) override;
 	virtual void ProcessMissionStatus(const Chat::MissionStatus* const) override;
@@ -124,7 +125,8 @@ private:
 	GameClient& operator=(const GameClient&);	// prevent copy operator
 };
 
-int GameClientLogin(unsigned int hostAddress, int playerID, int otp,
-					unsigned int appVersion, short port);
+bool GameClientInitTeul(void);
+int GameClientLogin(unsigned int hostAddress, playerid_t playerID, UINT32 otp,
+					unsigned int appVersion, UINT16 port);
 GameClient* PlayerClient();
 void GameClientKill();

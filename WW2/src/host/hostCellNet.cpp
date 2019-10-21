@@ -25,15 +25,20 @@
 #include "host/hostVehicle.h"
 #include "teul/teulBasic.h"
 #include "teul/teulPacket.h"
+#include "teul/teulEndpointDefs.h"
 #include "wwii/wwiiThreads.h"
+#include "server/serverServerInfo.h"
+#if platOS != OS_WIN32
+#include <execinfo.h>
+#endif
 
-#include <unordered_map>
-typedef std::unordered_map<UINT32, bool> SYNCHED_VEHICLES;
+#include "wwii/wwiiHash.h"
+using SYNCHED_VEHICLES = std::unordered_map<UINT32, bool>;
 static SYNCHED_VEHICLES g_synched;
 
 static Teul::Packet vehicleBroadcasts(Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));
 static UINT32 numberOfVehiclesPending = 0;
-static UINT32 maxSize = 0;
+static SINT32 maxSize = 0;
 
 bool g_clustered = false;
 
@@ -43,14 +48,16 @@ bool g_clustered = false;
 extern SINT32
 cellVehicleRemoval(ACTION_OBJECT* const a)
 {
-	const UINT32 numUpdates = a->sizeInBytes() / sizeof(UINT32);
-	UINT32* data = (UINT32*)a->localRawData;
+	const UINT32 numUpdates = a->sizeInBytes() / (sizeof(UINT32)+sizeof(UCHAR));
+	UCHAR* data = reinterpret_cast<UCHAR*>(a->packed);
 
 	for ( UINT32 i = 0; i < numUpdates; ++i )
 	{
-		const UINT32 vehIndex = *(data++);
-		const UINT32 exitCode = *(data++);
-		hostRemoveRemoteVehicle(vehIndex, (PLAYER_EXIT_CODE)exitCode);
+		const UINT32 vehIndex = *(reinterpret_cast<UINT32 *>(data));
+		data += sizeof(UINT32);
+		const PLAYER_EXIT_CODE exitCode = static_cast<PLAYER_EXIT_CODE>(*data);
+		data ++;
+		hostRemoveRemoteVehicle(vehIndex, exitCode);
 	}
 
 	dbugLog(_FLD, "cell:%s removed %u remote vehicles"
@@ -63,21 +70,58 @@ cellVehicleRemoval(ACTION_OBJECT* const a)
 // Receive a vehicle update packet and pass it on to the comm system
 
 UINT32
-hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 source)
+hostReceiveVehicleUpdates(unsigned char* const input, const UINT32 bytes, const UINT32 source)
 {
-	const unsigned char* cur = input;
-	const unsigned char* const end = cur + bytes;
-	UINT32 count = 0;
-	while ( cur < end )
+
+#ifdef DEV_BUILD
+#if platOS != OS_WIN32
+	char temp_buff[bytes * 3 + 1];
+	for (UINT32 i=0; i < bytes; i++)
 	{
-		SINT32 size = *((const SINT32*)cur);
-		cur = cur + sizeof(SINT32);
-		commRecvVehicleUpdate(source, cur);
-		cur += size;
+		sprintf(temp_buff+i*3, "%02X ", input[i]);
+	}
+	temp_buff[bytes*3] = 0;
+	dbugLog(_FLD, "MultiCell: Incoming packet: %s", temp_buff);
+#endif
+#endif
+
+	const unsigned char* const end = input + bytes;
+	UINT32 count = 0;
+	SINT32 offset = 0;
+	SINT32 size = 0;
+	while ( (input + (offset/8)) < end  && offset >= 0 )
+	{
+		// Since we are padding each block and they aren't being accounted for in the PACK/UNPACK we need to
+		// reset the offset manually
+		SINT32 nextOffset = offset;
+	        offset = teulPackSINT32(TEUL_UNPACK, input, offset, &size, 0);
+		nextOffset += size * 8;
+
+#ifdef DEV_BUILD
+                dbugLog(_FLD, "hostReceiveVehicleUpdates extracting update of size %d", size);
+#endif
+		commRecvVehicleUpdate(source, input, offset);
+
+		offset = nextOffset;
 		++count;
 	}
 
 	return count;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Receive a vehicle list resync request packet 
+
+UINT32
+hostReceiveResyncVehicles(unsigned char* const input, const UINT32 bytes, const UINT32 source)
+{
+	// vehicles present in this list are presumed to be synched, by clearing the list we are telling our host
+	// that they need to resend the full information to other host
+	g_synched.clear();	
+
+	dbugLog(_FLI, "Received resync request from %s", teulGetAddress(source));
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -96,7 +140,9 @@ void
 hostPushVehicleBroadcasts()
 {
 	if ( vehicleBroadcasts.empty() == true )
+	{
 		return;
+	}
 
 	if ( !g_clustered )
 	{
@@ -106,15 +152,16 @@ hostPushVehicleBroadcasts()
 		return;
 	}
 
+	vehicleBroadcasts.setUnencrypted();
 	const bool sent = vehicleBroadcasts.send(updateBcastSend) > 0;
 	if ( sent == false )
 	{
-		threadLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes());
+		dbugLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes());
 	}
 	else
 	{
 #ifdef DEV_BUILD
-		threadLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
+		dbugLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%d, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
 #endif
 	}
 	vehicleBroadcasts.reset();
@@ -125,13 +172,15 @@ hostPushVehicleBroadcasts()
 // Send a vehicle broadcast to the other cellhosts
 
 bool
-hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
+hostSendVehicleBroadcast(UCHAR* buffer, SINT32 sizeBits)
 {
+	SINT32 sizeBytes = 0;
+
 	if ( buffer == nullptr )
 	{
 		LogAbort("called hostSendVehicleBroadcast with NULL");
 	}
-	if ( size == 0 )
+	if ( sizeBits == 0 )
 	{
 		LogAbort("called hostSendVehicleBroadcast with 0 size");
 	}
@@ -139,24 +188,46 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
 	if ( !g_clustered )
 		return false;
 
-	// Round size up to a multiple of 32.
-	size = ((size & ~((sizeof(size)*8)-1)) + sizeof(size)) / 8;
+	// Convert bits to bytes and round size up to a multiple of 32.
+	sizeBytes = ((sizeBits & ~((sizeof(SINT32)*8)-1))) / 8 + sizeof(SINT32);
 
-	if ( (UINT32)size > maxSize )
-		maxSize = size;
+	if ( sizeBytes > maxSize )
+		maxSize = sizeBytes;
 
-	if ( vehicleBroadcasts.packetSizeBytes() + size >= 4000 )
+	// Lets first test to see if we will bust our MTU size if we append this - if so, push out now
+	if ( (vehicleBroadcasts.packetSizeBytes() + sizeBytes) >= static_cast<SINT32>(Teul::UDBMaxPayload))
 		hostPushVehicleBroadcasts();
 
-	vehicleBroadcasts.append(buffer, size);
+	// store in the final size
+	teulPackSINT32(TEUL_PACK, buffer, 0, &sizeBytes, 0);
+
+	vehicleBroadcasts.append(buffer, sizeBytes);
 	++numberOfVehiclesPending;
+
+#ifdef DEV_BUILD
+	dbugLog(_FLD, "hostSendVehicleBroadcast: original bits = %d(bytes=%d), queuing size = %d, packet allocated length = %d, packet size = %d, pendingPackets = %d", 
+		sizeBits,
+		sizeBits/8,
+		sizeBytes,
+		vehicleBroadcasts.packetCapacityBytes(),
+		vehicleBroadcasts.packetSizeBytes(),
+		numberOfVehiclesPending);
+#endif
+
+	// Lets limit our size based on how many connections we have knowing that the average update is about 35 bytes
+	// also - lets do a sanity check on the user connections counter host is tracking
+	UINT32 limitPacketSize = static_cast<UINT32>(Server::myServerInfo.m_players.size()) * 35;
+	if ( vehicleBroadcasts.packetSizeBytes() >= limitPacketSize )
+	{
+		hostPushVehicleBroadcasts();
+	}
 
 	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Force FIRST_TIME updates for all
-
+// This should be called when a cell hosts starts
 void
 hostForceFirstTimeUpdates()
 {
@@ -164,7 +235,11 @@ hostForceFirstTimeUpdates()
 		return;
 
 	g_synched.clear();
+
+	dbugLog(_FLI, "Host initiating request to RESYNC vehicles to all listening cell hosts");
+
 	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, RESYNC_VEHICLES_Y));
+	outgoing.setUnencrypted();
 	outgoing.send(updateBcastSend);
 }
 
@@ -191,6 +266,8 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 			outgoing = new Teul::Packet(Teul::PacketId(Comm::CallbackX, BCAST_VEH_REMOVE_Y));
 			outgoing->setUnencrypted();
 		}
+
+		dbugLog(_FLD, "Adding vehicle to remove broadcast %u, exit code %u", vehIndex, exitCode);
 
 		outgoing->append(vehIndex);
 		outgoing->append(exitCode);

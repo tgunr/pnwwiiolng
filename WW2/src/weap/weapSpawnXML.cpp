@@ -10,23 +10,144 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "fio/fiod.h"						// for fiodGetPrepath()
-#include "tinyxml/tinyxml.h"			// For TinyXML functions
+//  #include "fio/fiod.h"						// for fiodGetPrepath()  --  27-June-2019. No longer required  Seems to only cause build errors in the hosts. MJH.
 #include "weap/weapDefs.h"					// For MAX_WEAP_CLASSES
 #include "weap/weapList.h"					// For weaponClass[]
 #include "weap/weapSpawnXML.h"				// Our header file
 #include "wwii/wwiiHash.h"					// for unordered_map
+#include "weap/weapSpec.h"
 
-// By-building, what can spawn here.
-using BUILDING_SPAWNS = std::unordered_map<std::string, WEAPON_LIST>;
-static BUILDING_SPAWNS s_buildingSpawns;
+#define XML_TAG_HANDLER_IMPL(handler) bool SpawnLoader::handler(xmlNode* node, bool first, void* userData)
 
-//////////////////////////////////////////////////////////////////////
-// Find the highest weapon class number
+#define SPAWN_SPEC    "/xml/spawn.xml"
 
-static UINT8
-_getFirstFreeWeaponClass()
+SpawnLoader::SpawnLoader() : XMLLoader2<SpawnLoader>(SPAWN_SPEC)
 {
+        AddHandler("building", &SpawnLoader::DoBuilding, this);
+        AddHandler("dof", &SpawnLoader::DoDof, this);
+        AddHandler("class", &SpawnLoader::DoClass, this);
+        AddHandler("weapon", &SpawnLoader::DoWeapon, this);
+
+	weaponList = nullptr;
+	fail = false;
+}
+
+XML_TAG_HANDLER_IMPL(DoBuilding)
+{
+        if(first)
+	{
+		std::string buildingName  = xmlGetStringFromNode(node, "name");
+
+
+		// Make sure this is not a duplicate
+		if ( weapFindClass(buildingName.c_str()).wClass != 0 )
+		{
+			dbugLog(_FLA, "spawn.xml: duplicate building: %s", buildingName.c_str());
+			fail = true;
+		}
+		else
+		{
+			WEAPON_SPEC classSpec(0, 0, firstFreeClass++, 0);
+
+			dbugLog(_FLI, "Adding virtual weapon-class #%u %s:: ", classSpec.wClass, buildingName.c_str());
+
+			weapAddClass(classSpec.wClass, buildingName);
+
+			weaponList = &g_weaponSpawns[classSpec.wClass];
+			if ( weaponList->empty() == false )
+				throw std::domain_error("weaponSpawnList for vClass already populated");
+
+			classes.clear();
+
+                	ProcessChildren(node, nullptr);
+
+
+		}
+
+		if ( fail )
+			throw std::domain_error("Invalid spawn.xml");
+	}
+
+        return false;
+}
+
+
+XML_TAG_HANDLER_IMPL(DoDof)
+{
+        if(first)
+                ProcessChildren(node, nullptr);
+
+        return false;
+}
+
+XML_TAG_HANDLER_IMPL(DoWeapon)
+{
+        if(first)
+	{
+		char *elText;
+		if (xmlGetNodeValue(node, XML_DATA_STRING, &elText, nullptr))
+		{
+			dbugLog(_FLI, "weapon:%s ", elText);
+			WEAPON* weap = weapLookupWeaponByName(elText);
+			if ( weap == nullptr )
+			{
+				dbugLog(_FLA, "Invalid weapon '%s' in spawn.xml", elText);
+				fail = true;
+			}
+			else
+				(*weaponList)[weap->spec()] = weap;
+		}
+	}
+        return false;
+}
+
+XML_TAG_HANDLER_IMPL(DoClass)
+{
+
+        if(first)
+	{
+		char *elText;
+		if (xmlGetNodeValue(node, XML_DATA_STRING, &elText, nullptr))
+		{
+
+			WEAPON_SPEC spec = weapFindClass(elText);
+			if ( spec == NULL_WEAP_SPEC || spec.wClass == 0 )
+			{
+				dbugLog(_FLA, "Invalid weapon class '%s' in spawn.xml", elText);
+				fail = true;
+			}
+			// Duplicate, ignore
+			else if ( classes.find(spec) == classes.end() )
+			{
+				classes.insert(spec);
+
+				// Stack it up for later consumption
+				dbugLog(_FLI, "class:%s", elText);
+
+				// Now add the spawnlist for all spawn lists of this class into our list
+				for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
+				{
+					if ( (spawn->first & 255) != spec.wClass )
+						continue;
+					WEAPON_LIST& weapons = spawn->second;
+					for ( it = weapons.begin()
+						; it != weapons.end()
+						; ++it
+					)
+					{
+						weaponList->insert(*it);
+					}
+				}
+			}
+		}
+	}
+
+        return false;
+}
+
+void SpawnLoader::load()
+{
+	// Find the highest weapon class number
 	UINT8 lastUsedClass = 0;
 	for ( UINT8 i = 1; i <= g_maxWeaponClass; ++i )
 	{
@@ -35,155 +156,19 @@ _getFirstFreeWeaponClass()
 	}
 
 	// So the first free class will be the next one after the last one used
-	return lastUsedClass + 1;
-}
+	firstFreeClass = lastUsedClass + 1;
 
-//////////////////////////////////////////////////////////////////////
-//
-
-bool
-weapLoadSpawnXML()
-{
-
+	if ( firstFreeClass >= MAX_WEAP_CLASSES )
+		throw std::domain_error("Too many classes");
 	try
 	{
-		// Find out where we start our virtual classes.
-		UINT8 firstFreeClass = _getFirstFreeWeaponClass();
-
-		if ( firstFreeClass >= MAX_WEAP_CLASSES )
-			throw std::domain_error("Too many classes");
+		fail = false;
 
 		// Get the base path name
-		std::string filename(fiodGetPrepath());
-		filename += "/xml/spawn.xml";
-
-		// Try and open a TinyXmlDocument.
-		TiXmlDocument doc(filename.c_str());
-
-		if ( doc.LoadFile() == false )
-			throw std::runtime_error("Load failed");						///Terminal
-
-		// Look for the spawner root object
-		TiXmlNode* root = doc.FirstChild("SPAWNER");
-		if ( root == nullptr )
-			throw std::runtime_error("Unable to find root object");		///Terminal
-
-		std::set<WEAPON_SPEC> classes;
-		WEAPON_LIST::iterator it;
-
-		bool fail = false;
-
-		TiXmlNode* node;
-		for ( node = root->FirstChild("building")
-			; node != nullptr
-			; node = node->NextSibling("building")
-			)
-		{
-			TiXmlElement* building = node->ToElement();
-			const std::string buildingName = building->Attribute("name");
-
-			// Make sure this is not a duplicate
-			if ( weapFindClass(buildingName.c_str()).wClass != 0 )
-			{
-				dbugLog(_FLA, "spawn.xml: duplicate building: %s", buildingName.c_str());
-				fail = true;
-				continue;
-			}
-
-			WEAPON_SPEC classSpec(0, 0, firstFreeClass++, 0);
-
-			dbugLog(_FLI, "Adding virtual weapon-class #%u %s:: ", classSpec.wClass, buildingName.c_str());
-
-			weapAddClass(classSpec.wClass, buildingName);
-
-			WEAPON_LIST& weaponList = g_weaponSpawns[classSpec.wClass];
-			if ( weaponList.empty() == false )
-				throw std::domain_error("weaponSpawnList for vClass already populated");
-
-			// Go through the DOF and build a list of classes.
-
-			TiXmlElement* dof;
-
-			classes.clear();
-
-			// Grab a unique list of all the classes this dof introduces.
-			for ( dof = building->FirstChildElement("dof")
-				; dof != nullptr
-				; dof = dof->NextSiblingElement("dof")
-				)
-			{
-				TiXmlElement* child = nullptr;
-				for ( child = dof->FirstChildElement()
-					; child != nullptr
-					; child = child->NextSiblingElement()
-					)
-				{
-					const char* elType = child->Value();
-					const char* elText = child->GetText();
-
-					// Weapons can be specified individually
-					if ( strcasecmp(elType, "weapon") == 0 )
-					{
-						dbugLog(_FLIB, "weapon:%s ", elText);
-						WEAPON* weap = weapLookupWeaponByName(elText);
-						if ( weap == nullptr )
-						{
-							dbugLog(_FLA, "Invalid weapon '%s' in spawn.xml", elText);
-							fail = true;
-							continue;
-						}
-						weaponList[weap->spec()] = weap;
-						continue;
-					}
-
-					// Otherwise we only understand classes
-					if ( strcasecmp(elType, "class") != 0 )
-						continue;
-
-					WEAPON_SPEC spec = weapFindClass(elText);
-					if ( spec == NULL_WEAP_SPEC || spec.wClass == 0 )
-					{
-						dbugLog(_FLA, "Invalid weapon class '%s' in spawn.xml", elText);
-						fail = true;
-						continue;
-					}
-
-					// Duplicate, ignore
-					if ( classes.find(spec) != classes.end() )
-						continue;
-
-					classes.insert(spec);
-
-					// Stack it up for later consumption
-					dbugLog(_FLIB, "class:%s ", elText);
-
-					// Now add the spawnlist for all spawn lists of this class into our list
-					for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
-					{
-						if ( (spawn->first & 255) != spec.wClass )
-							continue;
-						WEAPON_LIST& weapons = spawn->second;
-						for ( it = weapons.begin()
-							; it != weapons.end()
-							; ++it
-							)
-						{
-							weaponList.insert(*it);
-						}
-					}
-
-					dbugLog(_FLIB, ", ");
-				}
-			}
-
-			if ( fail == true )
-				throw std::domain_error("Invalid spawn.xml");
-		}
+		Load();
 	}
 	catch ( std::exception& e )
 	{
 		LogAbort("%s: %s", __FUNCTION__, e.what());
 	}
-
-	return true;
 }

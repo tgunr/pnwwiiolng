@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Tue Mar 21 14:55:05 CST 2006
 //
 // Functions for the server tracked object classes
@@ -20,7 +20,7 @@
 // what the next STO UID should be. On the client, which shouldn't
 // really be creating STO UIDs except in offline mode,
 // it can just be a UINT32
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 # include "wwii/wwiiSerialNumber.h"
   static SerialNumber stoUniqueID("sto_uid", HOST_STO_SERIAL_START, 100, 0x7fffffff);	// max is 2^31 - 1
 #else
@@ -28,14 +28,14 @@
 #endif
 
 // UID-based lookup table for STOs
-typedef std::map<UINT32,ServerTrackedObject*> STO_MAP;
+using STO_MAP = std::map<UINT32,ServerTrackedObject*>;
 static STO_MAP stoMap;
 
 //////////////////////////////////////////////////////////////////////
 // STO base class pack routine
 
 SINT32
-wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* const buffer, SINT32 offset, UINT16* const type, SINT32 /*size*/)
+wwiiPackServerTrackedObjectType(PackMode mode, UCHAR* const buffer, SINT32 offset, UINT16* const type, SINT32 /*size*/)
 {
 	return teulPackUINT16(mode, buffer, offset, type, 4);
 }
@@ -43,7 +43,7 @@ wwiiPackServerTrackedObjectType(LOGICAL mode, UCHAR* const buffer, SINT32 offset
 // My poor, poor STO packer. I blame Ramp for how complicated and
 // messy it has gotten =/
 SINT32
-ServerTrackedObject::packer(LOGICAL mode, ACTION_OBJECT* const a)
+ServerTrackedObject::packer(PackMode mode, ACTION_OBJECT* const a)
 {
 	a->offset = wwiiPackServerTrackedObjectType(mode, a->packed, a->offset, &m_type, 0);
 
@@ -155,7 +155,7 @@ ServerTrackedObject::addToIndex(ServerTrackedObject* sto)
 	{
 		sto->m_uid = static_cast<UINT32>(++stoUniqueID);
 
-#if platBuild != TEUL_SERVER
+#if platBuild != BUILD_SERVER
 		// local client sto ids range from 1 and 99
 		if(Online)
 		{
@@ -254,10 +254,13 @@ void wwiiExpireSTOs()
 
 	// Get me a list of all the expirable STOs
 	STO_MAP::iterator it = stoMap.begin();
-	while ( it != stoMap.end() )
+	while (it != stoMap.end())
 	{
-		if ( it->second->expired() )
-			expired.push_back(it->first);
+		if (it->second->getCanExpire())
+		{
+			if (it->second->expired())
+				expired.push_back(it->first);
+		}
 		++it;
 	}
 
@@ -271,7 +274,7 @@ void wwiiExpireSTOs()
 		it = stoMap.find(expired[i]);
 		if ( it == stoMap.end() )
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			LogAbort("stoMap is corrupt: could not re-find sto#%u", expired[i]);
 #else
 			continue;
@@ -281,7 +284,7 @@ void wwiiExpireSTOs()
 		ServerTrackedObject* const sto = it->second;
 		if ( sto->activated() )
 		{
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 			dbugLog(_FLD, "sto:%u expired, deactivating", sto->uid());
 #endif
 			sto->deactivate();
@@ -297,7 +300,7 @@ void wwiiExpireSTOs()
 // Apply a function across all current STOs.
 
 void
-wwiiForEachSTO(STO_ITERATOR& func)
+wwiiForEachSTO(STO_ITERATOR func)
 {
 	STO_MAP::iterator it = stoMap.begin();
 	while ( it != stoMap.end() )
@@ -313,7 +316,7 @@ wwiiForEachSTO(STO_ITERATOR& func)
 // Apply a function across all current STOs with handler function data
 
 bool
-wwiiForEachSTO(STO_COOKIE_ITERATOR& func, void* cookie)
+wwiiForEachSTO(STO_COOKIE_ITERATOR func, void* cookie)
 {
 	STO_MAP::iterator it = stoMap.begin();
 

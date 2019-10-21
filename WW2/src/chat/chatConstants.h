@@ -38,11 +38,13 @@ namespace Chat
 		TICK_SAMPLE_Y,				// Speed hack report
 		ATTACK_ORDER_Y,				// Strat->Chat attack order replies
 		HOST_LOCALITY_UPDATES_Y,	// Locality update batches.
+		MEMREQ_RESULT_Y, // The result of an antihack message
 
 		// 50 - Insert new client
 		DOT_COMMAND_LIST_Y,	// Used to send the Dot Command Array
 		AWS_Y,					// AWS request/reply
 		HOLD_FALL_INFO_Y,		// Messages about hold/fall votes
+		JOIN_MISSION_Y, // Request the info needed to join another player's mission
 
 		/////  ^^^ INSERT NEW CALLBACKS HERE^^^  /////
 		OMG_Y = 100,				// OMG-numbered callbacks start here
@@ -83,7 +85,7 @@ namespace Chat
 		KICK_NOTICE_Y,
 		CLIENT_LOCALITY_Y,
 		GENERIC_STRING_Y,		// Exchange a string
-		BANDWIDTH_NOTICE_Y,
+		BANDWIDTH_NOTICE_Y,     // VisLimit (um) changed
 		WAYPOINT_H,
 		SIDE_MESSAGE_Y,		// Message to a side [and optional objective]
 		___SPARE_CALLBACK_1___,
@@ -101,6 +103,8 @@ namespace Chat
 		MISSION_INVITE_Y,		// invitation/directive to join a mission
 
 		MAP_REFRESH_PLAYER_Y,	// Chat needs a refresh of a player.
+		NETCODE_NOTICE_Y,		// Netcode enabled value changed
+		GARRISON_COUNTRY_Y,     // Change a Garrisons country
 		MAX_MESSAGE_Y
 	};
 }

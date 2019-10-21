@@ -11,7 +11,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 
 class ThreadTextQuery
@@ -26,7 +26,7 @@ public:
 		, m_commitFrom(0LL)
 	{
 		m_statement[0] = 0;
-		assert( strlen(m_prefix) + strlen(m_suffix) < TEXT_POOL_SIZE - 80 );
+		assert( strlen(m_prefix) + m_sufLen < sizeof(m_statement) - 1 );
 	}
 	~ThreadTextQuery() { commit(0LL); }
 
@@ -37,15 +37,14 @@ public:
 
 	// Commit the buffer if maxAge milliseconds have elapsed since the last
 	// commit (thus if maxAge = 0 it will force a commit)
-	bool commit(const TeulTimeMS& maxAge);
+	bool commit(const TeulTimeMS maxAge);
 
 	// Return true if the number of bytes specified would exceed the available
 	// space left in the current buffer.
 	// current length + separator (,) plus new string length plus suffix string length plus null byte
-	bool noRoomFor(size_t lenBytes) { return m_length + 1 + lenBytes + m_sufLen + 1 >= TEXT_POOL_SIZE; }
+	bool noRoomFor(size_t lenBytes) { return m_length + 1 + lenBytes + m_sufLen + 1 >= sizeof(m_statement) - 1; }
 
-	// Return the separator character - in case I decide to make it an option later.
-	char separator() const { return ','; }
+	size_t roomLeft() const { return TEXT_POOL_SIZE - 1 - m_sufLen - 1 - m_length; }
 
 private:
 	DBThread::DBNo		m_db;
@@ -57,7 +56,7 @@ private:
 	size_t				m_length;
 	TeulTimeMS			m_commitFrom;	// Timestamp from which we decide whether commit maturity has been reached
 
-private:
-	ThreadTextQuery& operator = (const ThreadTextQuery& rhs);
+public:
+	ThreadTextQuery& operator = (const ThreadTextQuery& rhs) = delete;
 };
 

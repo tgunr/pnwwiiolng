@@ -1,13 +1,22 @@
 // $Id: stdafx.h 102 2009-01-09 20:42:45Z osmith@CRS $
+
 // stdafx.h : include file for standard system include files,
 // or project specific include files that are used frequently,
 // but are changed infrequently
+
+//  ============================
+//
+//  Playgate.exe - stdafx.h
+//
+//  ============================
 
 #pragma once
 
 #ifndef NOMINMAX
 #define NOMINMAX 1
 #endif
+
+#define _CRT_RAND_S
 
 #ifndef _SECURE_ATL
 #define _SECURE_ATL 1
@@ -27,18 +36,15 @@
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 
-
 #include <afxdisp.h>        // MFC Automation classes
-
-
 
 #ifndef _AFX_NO_OLE_SUPPORT
 #include <afxdtctl.h>           // MFC support for Internet Explorer 4 Common Controls
 #endif
+
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>                     // MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
-
 
 #include <afxsock.h>            // MFC socket extensions
 

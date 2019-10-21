@@ -30,10 +30,10 @@ extern void strtSaveCP(CPStruct* cp);
 extern void strtSaveFacility(FacilityStruct* facility);
 
 extern void strtdbSaveGameWorld(CPStruct* cp);
-extern void strtdbPopulateVehTypesTable(void);
-extern void strtdbReadVehicleAccess(void);
-extern void strtdbSaveVehicleCVCs(void);
-extern void strtdbSaveVehicleAccess(void);
+extern void strtdbPopulateVehTypesTable();
+extern void strtdbReadVehicleAccess();
+extern void strtdbSaveVehicleCVCs();
+extern void strtdbSaveVehicleAccess();
 extern void strtSaveFactoryOutput(ObjectStruct* factory);
 extern bool strtdbFetchLuaScript(const char* name, std::string& obj);
 extern void strtdbSaveConfigVar(const char* name, const char* value);
@@ -46,7 +46,7 @@ extern void strtdbLoadTOETemplates();
 extern void strtdbRestoreTOESupplies();
 
 extern void strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
-							, const ChatHandle& handle, UINT32 customerID, UINT32 missionID
+							, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID
 							, const HCUnit* unit, UINT32 started, UINT32 seconds
 							, bool wasContested, bool tookControl, bool tookOwnership);
 

@@ -135,26 +135,26 @@ struct LISTHEADER;
 #define DOF_ONE_TRANS_AXIS				0x00000200	// at least one tranlation axis
 #define DOF_FREE_MEMORY					0x00000400  // new HACK to stop leak
 
-typedef LOGICAL (*DeprecatedDrawCallback)(struct OBJECT* lpobj);
-typedef LOGICAL (*PROCESSCALLBACK)(struct OBJECT* lplod, UINT32 user);
-typedef LOGICAL (*FINDCALLBACK)(struct OBJECT* lplod, void* userdata);
+using DeprecatedDrawCallback = LOGICAL(*)(struct OBJECT* lpobj);
+using PROCESSCALLBACK = LOGICAL(*)(struct OBJECT* lplod, UINT32 user);
+using FINDCALLBACK = LOGICAL(*)(struct OBJECT* lplod, void* userdata);
 
-typedef bool (*CullCallback)(struct OBJECT* o);
-typedef bool (*UpdateCallback)(struct OBJECT* o);
-typedef bool (*DrawCallback)(struct OBJECT* o);
-typedef bool (*KillCallback)(struct OBJECT* o);
+using CullCallback = bool(*)(struct OBJECT* o);
+using UpdateCallback = bool(*)(struct OBJECT* o);
+using DrawCallback = bool(*)(struct OBJECT* o);
+using KillCallback = bool(*)(struct OBJECT* o);
 
 #ifdef __cplusplus
 
 #include "ob/stride_ptr.h"
 
 // "smart" strided pointers
-typedef stride_ptr<piVECTOR> 				piVectorPtr;
-typedef stride_ptr<piVECTOR const> 			piVectorConstPtr;
-typedef stride_ptr<piVERTEX_COLOR> 			piVertexColorPtr;
-typedef stride_ptr<piVERTEX_COLOR const> 	piVertexColorConstPtr;
-typedef stride_ptr<piUV> 					piTexCoordPtr;
-typedef stride_ptr<piUV const> 				piTexCoordConstPtr;
+using piVectorPtr = stride_ptr<piVECTOR>;
+using piVectorConstPtr = stride_ptr<piVECTOR const>;
+using piVertexColorPtr = stride_ptr<piVERTEX_COLOR>;
+using piVertexColorConstPtr = stride_ptr<piVERTEX_COLOR const>;
+using piTexCoordPtr = stride_ptr<piUV>;
+using piTexCoordConstPtr = stride_ptr<piUV const>;
 
 struct piStridedVertexConstPtr
 {
@@ -227,11 +227,13 @@ class RenderStateSet;
 class oglMaterial;
 #endif
 
+struct Tree;
+
 namespace ogl	{class MeshContext;}
 
 struct OBJECT
 {
-	typedef	char	Name[64];
+	using Name = char[64];
 
 	struct OBJECT*	prev;			// Previous object in list
 	struct OBJECT*	next;			// Next object in list
@@ -245,7 +247,7 @@ struct OBJECT
 	UINT32				flags;			// Object flags 1
 	UINT32				flag2;			// Object flags 2
     UINT32              flag3;          // Object flags 3
-    UINT32              treeID = 0;     // ID of speedtree object
+    Tree                *treePtr;       // Pointer to speedtree object
 	float               createtime;     // When an FX was created.
 	float               updatetime;     // When an FX was last updated.
 	void*				lpspare;		// Object spare pointer
@@ -305,22 +307,6 @@ struct OBJECT
 
     float reflectiondist;
     float shadowdist;
-
-#if NEW_OBJECT_MEM
-    bool valid;
-#endif
-
-#if defined(NOT_USED_OBJECT_VARIABLES)
-	UINT16 numttris;		// Number of tesselation indices        REMOVE
-    piVECTOR acc;			// Change in movement speed
-    piVECTOR dir;			// Direction facing or moving
-    UINT32 gfxmodes;		// Graphics modes
-    int pmapid;			// Parent environment map texture id
-    const piQUAT* tangent;
-	DeprecatedDrawCallback userdraw;   // Callback for userdraw objects
-    UINT16 maxnumverts; // Hack for terrain loader changing numverts
-	piINDICES*			pttris;			// Tesselation indices                  REMOVE
-#endif
 
 	// TODO: Currently doubles up as a TerrainTile pointer...
     SINT32              soundID;        // Sound associated with this object.
@@ -427,9 +413,9 @@ struct OBJECT
 #endif
 };
 
-typedef OBJECT DOFOBJECT;
-typedef OBJECT LODOBJECT;
-typedef OBJECT GROUPOBJECT;
+using DOFOBJECT = OBJECT;
+using LODOBJECT = OBJECT;
+using GROUPOBJECT = OBJECT;
 
 extern struct OBJECT* obmainGetNewObject();
 extern struct OBJECT* obmainGetNewNotObject(UINT32 obtype);
@@ -464,7 +450,7 @@ extern struct OBJECT*	obmainFindNamedObject(const char* name);
 extern struct OBJECT*	obmainFindGroupObject(const char* name);
 extern struct OBJECT*	obmainFindChildObject(const char* group, const char* name);
 extern struct OBJECT*	obmainFindChildFromObject(struct OBJECT* lpgrp, const char* name);
-extern struct OBJECT*	obmainGetFirstTopmostObject(void);
+extern struct OBJECT*	obmainGetFirstTopmostObject();
 extern struct OBJECT*	obmainGetNextTopmostObject(struct OBJECT* lpobj);
 extern struct OBJECT*	obmainFindTopmostObject(const char* name);
 extern struct OBJECT*	obmainGetFirstSubobject(struct OBJECT* lpmain);
@@ -478,7 +464,7 @@ extern LOGICAL		obmainFindCommentCallback(struct OBJECT* lpmain, char* comment, 
 extern LOGICAL		obmainFindCommentFirstPartCallback(struct OBJECT* lpmain, const char* comment, UINT32 user, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectLOD(struct OBJECT* lpmain, int lod, PROCESSCALLBACK callback);
 extern LOGICAL		obmainFindObjectDamage(struct OBJECT* lpmain, int dmg, PROCESSCALLBACK callback);
-extern void			obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata);
+extern void			obmainFindCallback(struct OBJECT* lpmain, void(*callback)(OBJECT&, void*), void* userdata);
 extern struct OBJECT*	obmainCopyObjectFull(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyObject(struct OBJECT* lpcopy);
 extern struct OBJECT*	obmainCopyNamedObject(char* name);
@@ -488,9 +474,9 @@ extern LOGICAL		obmainCreateObjectFull(struct OBJECT** newobj, const char* name,
 extern LOGICAL		obmainSnapObjectToXYGrid(struct OBJECT* Object, FLOAT32 GridSize, UINT32 UseObjectMatrix);
 extern LOGICAL		obmainSnapObjectTreeToXYGrid(struct OBJECT* Object,FLOAT32 GridSize,UINT32 UseObjectMatrix);
 
-extern LOGICAL		obmainInit(void);
-extern void		obmainKill(void);
-extern LOGICAL		obmainUpdate(void);
+extern LOGICAL		obmainInit();
+extern void		obmainKill();
+extern LOGICAL		obmainUpdate();
 
 extern LOGICAL obmainGetBoundingBoxMax(FLOAT32* pfLeft,
 								FLOAT32* pfTop,
@@ -517,7 +503,7 @@ extern LOGICAL obmainSetObjectTreeMatrix(OBJECT * Obj,piMATRIX * Mat);
 extern void obmainCreateMutableSurfaceNormals(OBJECT*);
 extern void obmainCreateMutableCollisionNormals(OBJECT*);
 
-extern LOGICAL obmainValidateObject(OBJECT*); // last resort to track down garbage objects
+extern bool obmainValidateObject(const OBJECT*) noexcept;  // last resort to track down garbage objects
 
 // get a screen oriented bounding box for the object
 extern LOGICAL obmainGetScreenBBOX(OBJECT* lpob, float& x, float& y, float &z, float& w, float& h);

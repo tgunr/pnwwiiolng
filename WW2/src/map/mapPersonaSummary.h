@@ -65,7 +65,7 @@ public:
 	PersonaSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Pack/unpack routine
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
@@ -118,14 +118,14 @@ public:
 	PersonaSummaries() : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(nullChatPermissions) { }
 	PersonaSummaries(ACTION_OBJECT* const a) : m_error(false), m_count(0), m_callsign(0LL), m_chatPermissions(), m_accountGoodUntil(0) { a->offset = packer(TEUL_UNPACK, a); }
 
-    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+    SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
 	SINT32 send(SINT32 teulIndex);		// host "send" function
 	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
-	LOGICAL			m_error;							// True error occured
+	bool			m_error;							// True error occured
 	UINT32			m_count;							// Number of summaries described
 	ChatHandle		m_callsign;							// Player's handle
 	PersonaSummary	m_summaries[MAX_PLAYER_PERSONAS];	// Array of summaries
@@ -170,6 +170,13 @@ public:
 		: m_status(s), m_personaID(pid), m_countryID(cid), m_branchID(bid), m_checksum(0), m_rank(0), m_rankPctg(0), m_chatPermissions(nullChatPermissions)
 		{ }
 
+	// copy constructor
+	PersonaSelection(const PersonaSelection & s)
+		: m_status(s.m_status), m_personaID(s.m_personaID), m_countryID(s.m_countryID), 
+		m_branchID(s.m_branchID), m_checksum(s.m_checksum), m_rank(s.m_rank),
+		 m_rankPctg(s.m_rankPctg), m_chatPermissions(s.m_chatPermissions), m_accountGoodUntil(s.m_accountGoodUntil)
+		{ }
+
 	// Construct from network object
 	PersonaSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
@@ -178,7 +185,7 @@ public:
 	SINT32 receive(SINT32 teulIndex);
 
 	// Packer
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	//// ---- Member variables ---- ////
 public:
@@ -192,9 +199,7 @@ public:
 	ChatPermissions	m_chatPermissions;	// Permission details
 	UINT32			m_accountGoodUntil; // teulTime() + seconds remaining on acct
 
-	// Private host functions
-private:
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 
 	SINT32 _create(Player*);
 	SINT32 _delete(Player*);

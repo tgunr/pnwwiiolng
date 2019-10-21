@@ -16,8 +16,10 @@ template<bool Encrypting>
 class Cryptographer
 {
 public:
-	typedef unsigned long long SeedType;
-	typedef unsigned char ByteType;
+	// note: uint8_t is not guaranteed to exist, if we build for such a system
+	// we have big problems.
+	using ByteType = uint8_t;
+	using SeedType = uint64_t;
 
 public:
 	//! Default constructor.
@@ -42,7 +44,10 @@ public:
 	//! Generate a new seed.
 	void newSeed()
 	{
-		m_seed = teulClock64 + (((TeulTimeMS)rand()) << 32) + ((TeulTimeMS)rand());
+        // random() actually returns 64 bits already on 64-bit platforms, but on
+        // 32-bit platforms you need two calls to get 64 bits, so just combine
+        // the entropy if needed. XOR will mix on 64-bit and function as OR on 32.
+		m_seed = (static_cast<uint64_t>(random()) << 32) ^ static_cast<uint64_t>(random());
 	}
 
 private:
@@ -123,20 +128,28 @@ public:
 
 		// Incorporate the byte count into the seed.
 		_addValueToSeed((SeedType)bytes);
+        #define readBase(i) ((static_cast<UINT32>(stream[((i) << 2) + 3]) << 24) | \
+                             (static_cast<UINT32>(stream[((i) << 2) + 2]) << 16) | \
+                             (static_cast<UINT32>(stream[((i) << 2) + 1]) <<  8) | \
+                             (static_cast<UINT32>(stream[((i) << 2) + 0]) <<  0) )
 		UINT32* const base = (UINT32*)stream;
 		UINT32 base0, base1;
 		if ( Encrypting )
-			base0 = ((SeedType)(base[0]));
+			base0 = readBase(0);
 		else
-			base1 = ((SeedType)(base[numUINT32s - 1]));
+			base1 = readBase(numUINT32s - 1);
 		for ( size_t i = 0; i < numUINT32s; i++ )
 		{
-			base[i] ^= ((m_seed + i) >> (i & 31));
+            UINT32 value = readBase(i) ^ ((m_seed + i) >> (i & 31));
+            stream[(i << 2) + 0] = (value >>  0) & 0x000000ff;
+            stream[(i << 2) + 1] = (value >>  8) & 0x000000ff;
+            stream[(i << 2) + 2] = (value >> 16) & 0x000000ff;
+            stream[(i << 2) + 3] = (value >> 24) & 0x000000ff;
 		}
 		if ( !Encrypting )
-			base0 = ((SeedType)(base[0]));
+			base0 = readBase(0);
 		else
-			base1 = ((SeedType)(base[numUINT32s - 1]));
+			base1 = readBase(numUINT32s - 1);
 		_addValueToSeed(base0);
 		if ( base1 != base0 )
 			_addValueToSeed(base1);

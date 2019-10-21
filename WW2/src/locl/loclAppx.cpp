@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: loclApp.c
 // Description: Module to house application specific localization structures.
@@ -28,12 +28,12 @@ SCHAR g_szFiles[NUMBER_OF_CATEGORIES][64] =
 SCHAR g_szPaths[NUMBER_OF_LANGUAGES][64] =
 {
     "languages\\english\\",
-    "languages\\italian\\",
-    "languages\\french\\",
+	"languages\\italian\\",
+	"languages\\french\\",
     "languages\\german\\",
     "languages\\spanish\\",
 	"languages\\chinese\\",
-    "languages\\piglatin\\"
+	"languages\\russian\\"
 };
 
 const SCHAR* g_szLanguages[NUMBER_OF_LANGUAGES] =
@@ -41,8 +41,8 @@ const SCHAR* g_szLanguages[NUMBER_OF_LANGUAGES] =
 	"english",
     "italian",
     "french",
-    "german",
-    "spanish",
-	"chinese",
-	"piglatin"
-};
+    "german", 
+	"spanish", 
+	"chinese", 
+	"russian"
+}; 

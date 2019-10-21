@@ -1,0 +1,116 @@
+#!/bin/bash
+#
+# 8/5/2017 - frisbone, Created, Adapted from clustercontrol
+#
+# NOTES:
+#        1. Wont return until specified app has been successfully launched (TBD - detect failed launch)
+#        2. If interfaces are not setup homogeneously on the network (e.g. eth0 is broadcast net on one node and eth1 on another)
+#           the file /home/wwiiol/DEFAULT_IFACE can be created with "ethN" to reflect the primary interface adapter.  If someone fixes it later,
+#           simply delete the file.
+function start_server {
+
+    echo starting $1
+
+    logfile="/tmp/"$1".0.log"
+
+    default_iface=""
+    iface_file="/home/wwiiol/DEFAULT_IFACE"
+    if [ -e "$iface_file" ]; then
+        default_iface=`cat $iface_file`
+    fi
+
+    if ! [ -z "$default_iface" ]; then 
+        env DEFAULT_IFACE=$default_iface nohup /playnet/wwiiol/bin/$1 >/dev/null 2>&1 &
+    else
+        nohup /playnet/wwiiol/bin/$1 >/dev/null 2>&1 &
+    fi
+ 
+    while ! [ -e "$logfile" ]
+    do
+        sleep .1
+    done
+
+    if ! [ -z "$2" ]; then 
+        tail -f -n +0 $logfile | while read LOGLINE
+        do
+           [[ "${LOGLINE}" == *"$2"* ]] && pkill -n -P $$ tail
+        done
+    fi
+
+    echo started $1
+}
+
+function stop_server {
+    # Try a gentler SIGINT first, then forcibly SIGKILL anything that stuck around
+    possible_processes="authHost mmhostd hostd chatd stratd dbd stratd_all_firebases chatUpdater teuld pinghostd"
+    killall -q -v -s INT $possible_processes
+    sleep 3
+    killall -q -v -s KILL $possible_processes
+
+    # Save logs
+    /playnet/bin/savelogs || { echo "WARNING: FAILED TO SAVE LOG FILES!"; exit 1 ; }
+}
+
+#############
+# Game Cluster Node Control Application.
+#############
+
+if [[ $( whoami ) != "wwiiol" ]]; then
+    echo "nodecontrol must be run as the wwiiol user to prevent permissions issues"
+    exit 1
+fi
+
+CLUSTER_DOWN=${CLUSTER_DOWN:-/tmp/CLUSTER_DOWN}
+NODE_DOWN=${NODE_DOWN:-/tmp/NODE_DOWN}
+
+case "$1" in
+  stby)
+    touch $NODE_DOWN
+    ;;
+
+  start)
+    # Make sure log save directory exists
+    mkdir -p /home/wwiiol/logs || { echo "can't ensure log directory"; exit 1 ; }
+    [[ -w /home/wwiiol/logs ]] || { echo "log directory isn't writeable"; exit 1 ; }
+
+    # Mark cluster online so periodic scripts will try to restart i
+    rm -f $CLUSTER_DOWN
+    rm -f $NODE_DOWN
+
+    # Be in the right place so the binaries find their config file
+    cd /playnet/wwiiol/bin
+
+    # check which application needs to be started and start it
+    if [ "$2" = "stratd" ]; then
+        start_server "stratd" "Map state restored"
+    elif [ "$2" = "chatd" ]; then
+        start_server "chatd" "strat peer connection complete"
+    elif [ "$2" = "cellhost" ]; then
+        start_server "hostd" ""
+    elif [ "$2" = "mmhostd" ]; then
+        start_server "mmhostd" "NOW SERVER_ACCEPTING"
+    elif [ "$2" = "authHost" ]; then
+        /playnet/wwiiol/bin/authHost >/dev/null 2>&1 &
+        echo started authHost
+    else
+        echo "Unknown host $2!"
+        exit 1
+    fi
+    exit 0
+    ;;
+
+  stop)
+    # Mark cluster down
+    touch $CLUSTER_DOWN
+    rm -f $NODE_DOWN
+    stop_server
+    ;;
+  *)
+    # Help message
+    echo "Usage: $0 start {stratd|chatd|cellhost|mmhostd|authHost}"
+    echo "       $0 stop"
+    echo
+    echo "Example: $0 start stratd"
+esac
+
+exit 0

@@ -453,8 +453,8 @@
                   GLenum mask,
                   GLenum filter);
 
-        typedef std::map<BufferComponent, FrameBufferAttachment> AttachmentMap;
-        typedef std::vector<GLenum> MultipleRenderingTargets;
+        using AttachmentMap = std::map<BufferComponent, FrameBufferAttachment>;
+        using MultipleRenderingTargets = std::vector<GLenum>;
 
         FrameBufferObject();
 
@@ -478,7 +478,7 @@
 #endif
         void UnApply() const
         {
-            glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+            glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
 
             if(_attachments.size() == 1)
             {

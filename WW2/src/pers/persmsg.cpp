@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////
 // Module: persmsg.cpp
 // Description: Handle capture message and builder statue
@@ -30,7 +30,7 @@ static bool _drawBuilderMessage = false;
 static WWII_COUNTRY g_wwiiTableOwner = MAX_COUNTRIES;
 static char g_wwiiTableFacility[128];
 
-typedef struct _popupmessage
+struct PopUpMessage
 {
     bool isdrawn;
     bool dead;
@@ -39,13 +39,13 @@ typedef struct _popupmessage
 
     std::string file;
 
-    _popupmessage()
+    PopUpMessage()
     {
         isdrawn = false;
         dead = false;
     }
 
-} PopUpMessage;
+};
 
 static std::map<OBJECT*, PopUpMessage*> _messages;
 
@@ -62,9 +62,8 @@ LOGICAL persmsgInit()
 // Function: persmsgKill
 // Description:
 //////////////////////////////////////////////////////////
-LOGICAL persmsgKill()
+void persmsgKill()
 {
-    return TRUE;
 }
 
 //////////////////////////////////////////////////////////

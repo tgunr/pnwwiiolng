@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "pi/pi.h"
 #include <math.h>
@@ -47,11 +47,7 @@
 
 #define MAX_DRAW_PRIMITIVES  1000
 
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
+#define INLINE inline
 
 #include <vector>
 
@@ -728,7 +724,7 @@ UINT32			flags;
 }
 #endif
 
-static LOGICAL InitMultiTexture(void)
+static LOGICAL InitMultiTexture()
 {
 SINT32		i;
 
@@ -758,7 +754,7 @@ SINT32		i;
 	return(TRUE);
 }
 
-static void KillMultiTexture(void)
+static void KillMultiTexture()
 {
 SINT32		i;
 
@@ -1253,19 +1249,6 @@ piTexCoordConstPtr	ptu;
 
     if(!lpobj) return TRUE;
 
-#if ANDREW_TEST
-	stage = 1;
-    texid = lpobj->texid;
-
-	while (stage < gMaxTextureUnits && obdrawFindMultiTextureById(texid, &offset))
-	{
-        oglSetActiveTextureStage(stage);
-
-        piSetTextureMatrix(&MultiTextureInfo[offset].MultiTextureMatrix);
-	    stage += 1;
-	    texid = MultiTextureInfo[offset].MultiTextureId;
-	}
-#else
 	ptu = lpobj->ImmutableTexCoords();
 
 	texid = lpobj->texid;
@@ -1336,7 +1319,6 @@ piTexCoordConstPtr	ptu;
 		stage += 1;
 		texid = MultiTextureInfo[offset].MultiTextureId;
 	}
-#endif
 
 	return(TRUE);
 }
@@ -1721,36 +1703,6 @@ static bool _initWaterRefractionFBO()
 }
 #endif
 
-#if ANDREW_TEST
-static void InitShaderForAndrew()
-{
-    // This setup has been offloaded to a file in ca2.
-    glslProgram* pgm = GLSL.loadProgram("multitexture", nullptr, nullptr);
-
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/fogutility.frag").get());
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/lightutility.frag").get());
-    pgm->AddShader(GLSL.loadVertexShader("fx/shaders/GLSL/multitexture/multi.vert").get());
-    pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/multitexture/multi.frag").get());
-
-    pgm->GetOrCreateUniform("src1", glslUniform::SAMPLER_2D);
-    pgm->GetOrCreateUniform("src2", glslUniform::SAMPLER_2D);
-    pgm->GetOrCreateUniform("src3", glslUniform::SAMPLER_2D);
-
-    pgm->GetUniform("src1")->Set(0);
-    pgm->GetUniform("src2")->Set(1);
-    pgm->GetUniform("src3")->Set(2);
-
-    pgm->GetUniform("src1")->SetOneTimeApply(true);
-    pgm->GetUniform("src2")->SetOneTimeApply(true);
-    pgm->GetUniform("src3")->SetOneTimeApply(true);
-
-    glslLoadGlobalUniforms(pgm);
-
-    pgm->Apply();
-    ProgramState::Bind(0);
-}
-#endif
-
 Texture* obdrawGetSceneTexture()
 {
     return _sceneRTT.get();
@@ -1765,7 +1717,7 @@ static bool _initSceneFBO()
 {
     _sceneFBO = new FrameBufferObject;
 
-    if(oglCanUseTexture2D(WantedWidth, WantedHeight))
+    if(oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight()))
     {
         Texture2D* tex = new Texture2D;
 
@@ -1774,14 +1726,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new Texture2D;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1820,14 +1772,14 @@ static bool _initSceneFBO()
         tex->setInternalFormat(GL_RGBA8);
         tex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
         tex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
-        tex->setTextureHeight(WantedHeight);
-        tex->setTextureWidth(WantedWidth);
+        tex->setTextureHeight(ddpGetHeight());
+        tex->setTextureWidth(ddpGetWidth());
 
         _sceneRTT = tex;
 
         tex = new TextureRectangle;
 
-        tex->setTextureSize(WantedWidth, WantedHeight);
+        tex->setTextureSize(ddpGetWidth(), ddpGetHeight());
         tex->setInternalFormat(GL_DEPTH_COMPONENT32F);
         tex->setSourceFormat(GL_DEPTH_COMPONENT);
         tex->setSourceType(GL_FLOAT);
@@ -1861,11 +1813,11 @@ static bool _initSceneFBO()
     {
         int samples = 16;
 
-        RenderBuffer* rb1 = new RenderBuffer(WantedWidth, WantedHeight, GL_RGBA, samples);
+        RenderBuffer* rb1 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_RGBA, samples);
         FrameBufferAttachment* fba1 = new FrameBufferAttachment(rb1);
         _sceneFBO->setAttachment(FrameBufferObject::COLOR_BUFFER, *fba1);
 
-        RenderBuffer* rb2 = new RenderBuffer(WantedWidth, WantedHeight, GL_DEPTH_COMPONENT32F, samples);
+        RenderBuffer* rb2 = new RenderBuffer(ddpGetWidth(), ddpGetHeight(), GL_DEPTH_COMPONENT32F, samples);
         FrameBufferAttachment* fba2 = new FrameBufferAttachment(rb2);
         _sceneFBO->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba2);
     }
@@ -1884,7 +1836,7 @@ static bool _initSceneFBO()
     return true;
 }
 
-LOGICAL obdrawInit(void)
+LOGICAL obdrawInit()
 {
     if (!obcsInit())
 	{
@@ -1923,15 +1875,10 @@ LOGICAL obdrawInit(void)
         _initSceneFBO();
 #endif
 
-#if ANDREW_TEST
-    if(ogl::UseDeprecatedPath())
-        InitShaderForAndrew();
-#endif
-
     return(TRUE);
 }
 
-void obdrawKill(void)
+void obdrawKill()
 {
     if(_surfaceFBO.valid())
     {
@@ -1957,11 +1904,17 @@ void obdrawKill(void)
         _reflectionFBO = nullptr;
     }
 
-    while(_reflectionRTT->referenceCount() > 1)
-        _reflectionRTT->unref();
+	if (_reflectionRTT.valid())
+	{
+		while (_reflectionRTT->referenceCount() > 1)
+			_reflectionRTT->unref();
+	}
 
-    while(_surfaceRTT->referenceCount() > 1)
-        _surfaceRTT->unref();
+	if (_surfaceRTT.valid())
+	{
+		while (_surfaceRTT->referenceCount() > 1)
+			_surfaceRTT->unref();
+	}
 
     _surfaceRTT = nullptr;
     _reflectionRTT = nullptr;
@@ -2217,7 +2170,7 @@ void _renderWaterRefractions()
 
     g_wantNormalMaps = normalhistory;
 
-    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, 0);
+    glBindFramebufferEXT(FrameBufferObject::READ_DRAW_FRAMEBUFFER, ddpDefaultFramebuffer());
     oglSetViewport(0, 0, piGetWidth(), piGetHeight());
 #endif
 }
@@ -4849,7 +4802,6 @@ inline void _drawMultiTexture()
             _unsetStates(last);
             _setStates(o);
 
-#if !ANDREW_TEST
             if(!(o->meshContext && (o->flag2 & OBJECT_USEBUFFERS)))
             {
                 // Has at least 3 textures
@@ -4864,7 +4816,6 @@ inline void _drawMultiTexture()
                     }
                 }
             }
-#endif
             o->material->Apply();
         }
 
@@ -4953,12 +4904,12 @@ void obdrawDrawShadowCasters()
     {
         oglDisableTexturesAboveAndIncluding(0);
 
-        oglLockTextureState(1);
+        oglLockTextureState(true);
         oglLockMaterialState(1);
 
         logTimerCallVoid(_drawUnsorted);
 
-        oglLockTextureState(0);
+        oglLockTextureState(false);
         oglLockMaterialState(0);
     }
 }
@@ -5014,12 +4965,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_DEPTH_BUFFER_BIT,
                             GL_NEAREST);
         }
@@ -5043,12 +4994,12 @@ LOGICAL _drawDeprecatedPath()
             _sceneFBO->Blit(_resolveSceneFBO.get(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             0,
                             0,
-                            WantedWidth,
-                            WantedHeight,
+                            ddpGetWidth(),
+                            ddpGetHeight(),
                             GL_COLOR_BUFFER_BIT,
                             GL_NEAREST);
         }
@@ -5587,7 +5538,6 @@ LOGICAL obdrawProcessLODCallback(OBJECT* lplod, UINT32 user,piVECTOR* InPos,
 FLOAT32		distsqr;
 FLOAT32		maxlod;
 piVECTOR	pp, pos;
-//piMATRIX	mat;
 OBJECT * 	lplodtopobject;
 FLOAT32		ratio;
 
@@ -5611,48 +5561,12 @@ FLOAT32		ratio;
 		}
 	}
 
-//	pos = lplod->pos;
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		// Rotate/Translate position to object space
-		math3dInvertMatrix(&mat, &lplodtopobject->mat);
-		math3dVectorMultiply(&pp, &pp, &mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			// Rotate/Translate position to object space
-			math3dInvertMatrix(&mat, &lplod->mat);
-			math3dVectorMultiply(&pp, &pp, &mat);
-		}
-	}
-*/
-/*
-	if (lplodtopobject->flags & OBJECT_USEMATRIX)
-	{
-		math3dVectorMultiply(&pos,&pos,&lplodtopobject->mat);
-	}
-	else
-	{
-		if (lplod->flags & OBJECT_USEMATRIX)
-		{
-			math3dVectorMultiply(&pos,&pos,&lplod->mat);
-		}
-	}
-*/
 	pos = *InPos;
 
 	math3dSubtractVectors(&pp, &pp, &pos);
 
-	// z axis only applies at 1/2 value, so that planes in the air don't lose
-	// complete vis on the object beyond horizon distance in the z axis
-//	pp.z *= 0.5;
-
 	// factor in field of view, assuming that 90 degree FOV results in normal LOD
 	// cos of 45 degrees = 0.0707106781
-//	ratio =  (0.5f / 0.707106781f) / (FLOAT32)cos(FieldOfView * PI / 180.0 * 0.5);
 	if (LODFieldOfView == TRUE)
 	{
 		if (rnvisVectorFOVCheck(&pos,Radius) == TRUE)
@@ -5667,15 +5581,20 @@ FLOAT32		ratio;
 		math3dScaleVector(&pp,&pp,ratio);
 	}
 
-	// we're disabling this for the time being due to ground objects
-	// popping in/out
-//	math3dScaleVector(&pp, &pp, InvFrameFactor);
-
 #ifndef VEHICLE_OBJECT_ANALYSIS // for artists to test LOD's in-game with external dropped camera
 	if (lplod->flag2 & OBJECT_USERVEHICLE)
 	{
 		distsqr = 1.0f;
 	}
+#ifdef BETA_RELEASE
+    else if (lplod->flag2 & OBJECT_IS_PARTOF_VEHICLE)
+    {
+		OBJECT *lpObj = lplod->modelInstance->rootObject;
+
+		distsqr = GetDistance(lpObj, true);
+
+    }
+#endif
 	else
 #endif
 	{
@@ -5683,17 +5602,8 @@ FLOAT32		ratio;
 	}
 
 	maxlod = lplod->maxlod;
-/*
-    FLOAT32 horizon = 0.0f;
-    trnmainGetHorizon(&horizon);
 
-	if (maxlod > horizon * horizon)
-	{
-		maxlod = piLongLikeFloat(FogEnd) + 800.0f;
-		maxlod *= maxlod;
-	}
-*/
-	if (distsqr >= lplod->minlod &&
+    if (distsqr >= lplod->minlod &&
 		distsqr < maxlod)
 	{
 		if (lplodtopobject->flags & OBJECT_SKIPDRAWING)
@@ -6100,7 +6010,7 @@ bool obdrawDrawBuildingShadowCasters(int sx,
             continue;
 
         char buff[128];
-        sprintf(buff, "%s_%x_%x", so->Filename(), (UINT16)so->PosX(), (UINT16)so->PosY());
+        strprintf(buff, "%s_%x_%x", so->Filename(), (UINT16)so->PosX(), (UINT16)so->PosY());
 
         OBJECT* o = obmainFindTopmostObject(buff);
 
@@ -6246,13 +6156,6 @@ bool obdrawDrawBuildingShadowCasters(int sx,
     return success;
 }
 
-void obdrawDrawAdvertisements()
-{
-#ifdef USE_GAME_ADVERTISING
-    _drawAdvertisements();
-#endif
-}
-
 void obdrawDrawMesh(OBJECT* o)
 {
     if(ogl::UseDeprecatedPath())
@@ -6296,4 +6199,28 @@ int obdrawGetMultiTextureID(int offset)
 void obdrawGetMultiTextureMatrix(int offset, Matrixf& matrix)
 {
     matrix.set(MultiTextureInfo[offset].MultiTextureMatrix);
+}
+
+//This method recursively searches all children and all siblings of the input object for a populated 'distsqr' field.
+//If 'multiply' is 'true', then the found value will be multiplied by 100.0f before being returned. Otherwise the found value is returned unchanged.
+//If it does not find a populated 'distsqr' field, it will return '0'.
+//NOTE: This may result in a performance drop; please investigate toggle options for the LOD Distance display if performance testing is necessary with the Beta Release.
+float GetDistance(OBJECT * lplod, bool multiply)
+{
+	float retval = 0;
+	if (lplod->distsqr > 0)
+	{
+		retval = lplod->distsqr;
+		if (multiply)
+			retval *= 100.0f;
+	}
+	else
+	{
+		if (lplod->child)
+			retval = GetDistance(lplod->child, multiply);
+
+		if (retval <= 0 && lplod->sibling)
+			retval = GetDistance(lplod->sibling, multiply);
+	}
+	return retval;
 }

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // This module provides support utilities used in
 // the teul API. The end-user developer
 // should not need the functions provided here.
@@ -13,44 +13,15 @@
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiCallbacks.h"
 
-#include "host/hostTiming.h"
-
-static LOGICAL _callbacksInited = FALSE;
-
 TEUL_CALLBACK* TEUL_CALLBACK::s_callbackArray[256][256];
 
 TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* const ci);
-
-// Callback Errors are handled differently here. This routine simply
-// executes the Callback error routine that is found in the ERROR_STRUCT.
-SINT32
-teulPostCallbackError(const SINT32 teulIndex, const UCHAR* const data, const SINT32 size, const TEUL_CALLBACK* const object, const SINT32 error)
-{
-	if ( object == nullptr && data == nullptr )
-		return -EINVAL;
-
-	const TEUL_CALLBACK* const callback = (object == nullptr) ? TEUL_CALLBACK::Lookup(data) : object;
-	if (callback == nullptr)
-		return -EINVAL;
-
-	dbugLog(_FLW, "executing error for callX:%d callY:%d", callback->callX(), callback->callY());
-
-	if ( callback->error == nullptr )
-	{
-		dbugLog(_FLW, "t:%d err:%u,%u can't execute error callback, no handler registered", teulIndex, callback->callX(), callback->callY());
-		return 0;
-	}
-
-	// Invoke the error handler.
-	(callback->error)(teulIndex, data, size, callback, error);
-
-	return 0;
-}
 
 // This routine initializes a TEUL_CALLBACK structure and points
 // to it from the callback array.
@@ -66,7 +37,7 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 			|| (ci->sendAction != nullptr && prevObject->sendAction() != nullptr)  )
 		{
 			dbugSetErrno(EINVAL);
-			LogAbort("cb:%u,%u Attempt to re-allocate an in use callback", ci->callX, ci->callY);
+			LogAbort("Attempt to re-allocate callback x:%u y:%u", ci->callX, ci->callY);
 		}
 
 		if (ci->sendAction != nullptr)
@@ -97,8 +68,6 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 		realObject->inData = nullptr;
 	}
 
-	realObject->error = ci->error;
-
 	return realObject;
 }
 
@@ -106,7 +75,7 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 // the main differentiation is that system callbacks are reinstalled
 // in the teulClient (AKA teulKit) and teulServer and provide the
 // base functionality of teul.  The User callbacks are usable by
-// the application programmer for his application.
+// the application programmer for their application.
 
 // this allocates User Callbacks
 TEUL_CALLBACK*
@@ -115,13 +84,13 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 	if(	PN_UNLIKELY(ci->callX < Teul::RestrictedCallbackRange_X) )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid Parameter for callback %d: %d", ci->callX, ci->callY );
+		dbugLog(_FLA,"Invalid Parameter for callback x:%u y:%u", ci->callX, ci->callY );
 		return nullptr;
 	}
 	if ( PN_UNLIKELY(ci->sendAction == nullptr && ci->recvAction == nullptr) )
 	{
 		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid handlers for callback %d: %d", ci->callX, ci->callY );
+		dbugLog(_FLA,"Invalid handlers for callback x:%u y:%u", ci->callX, ci->callY );
 		return nullptr;
 	}
 
@@ -154,10 +123,10 @@ teulAllocSystemCallback(Teul::CallbackInit* const ci)
 void
 TEUL_CALLBACK::Release()
 {
-	dbugLog(_FLI, "cb:%u,%u freeing callback", callX(), callY());
+	dbugLog(_FLI, "freeing callback " PRF_CALLBACK "", PRA_CALLBACK(*this));
 
-	memFree(this);
 	s_callbackArray[callX()][callY()] = nullptr;
+	memFree(this);
 }
 
 // sometimes you just have to free them all
@@ -172,8 +141,6 @@ void teulFreeAllCallbacks()
 				objPtr->Release();
 		}
 	}
-
-	_callbacksInited = TRUE;
 }
 
 static SINT32
@@ -182,9 +149,6 @@ _doAction(ENDPOINT& endpoint
 		  , UCHAR* const data
 		  , const SINT32 dataSize_bytes)
 {
-	TIMER_USE_HERE
-	TIMER_START
-
 	if (callback.outData == nullptr)
 	{
 		static char tempData[Teul::MaxPacket * 2];
@@ -208,16 +172,14 @@ _doAction(ENDPOINT& endpoint
 	actionObj.fromAddress = ntohl(from.sin_addr.s_addr);
 	actionObj.fromPort = ntohs(from.sin_port);
 
-	TIMER_STOP("doact:start")
+	dbugLog(_FLD, "t:%d executing callback " PRF_CALLBACK " size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), dataSize_bytes);
 
-	dbugLog(_FLD, "t:%d executing callback x:%d(%s) y:%d(%s) size:%d", endpoint.teulIndex(), callback.callX(), callback.callXName(), callback.callY(), callback.callYName(), dataSize_bytes);
-
-	TIMER_START
 	const SINT32 retval = callback.recvAction()(&actionObj);
-	TIMER_STOP("doact:recv")
 
-	if (PN_UNLIKELY(retval < 0))
-		dbugLog(_FLA, "t:%d error %d executing callback x:%d y:%d size:%d", endpoint.teulIndex(), abs(retval), callback.callX(), callback.callY(), dataSize_bytes);
+	if (retval < 0 && (callback.callX() != Teul::Module::CallbackX || retval != -ENOTCONN)) {
+        // Don't log ENOTCONN on system callbacks, as that typically means "quickly dropped connection"
+		dbugLog(_FLA, "t:%d callback " PRF_CALLBACK " err:%d size:%d", endpoint.teulIndex(), PRA_CALLBACK(callback), abs(retval), dataSize_bytes);
+    }
 
 	return retval;
 }
@@ -225,21 +187,14 @@ _doAction(ENDPOINT& endpoint
 // this routine not only executes callbacks but also relays callbacks not
 // destined for this module to the appropriate interface either directly
 // with _relayCALLBACK() or _routeCALLBACK().
-SINT32
-TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
+SINT32 TEUL_CALLBACK::processCallback(ENDPOINT& endpoint_, UCHAR* const callData_, const SINT32 dataSize_bytes)
 {
-	if ( PN_UNLIKELY(recvAction() == nullptr) )
-	{
-		dbugLog(_FLA, "t:%d cb:%u,%u null action", endpoint_.teulIndex(), callX(), callY());
+	if (!recvAction()) {
+		dbugLog(_FLA, "t:%d " PRF_CALLBACK " null action", endpoint_.teulIndex(), PRA_CALLBACK(*this));
 		return -EINVAL;
 	}
 
-	const SINT32 result = _doAction(endpoint_, *this, callData_, dataSize_bytes);
-	if ( PN_UNLIKELY(result == -ETEUL_CB_REQ_DATA) )
-	{
-		endpoint_.sendError(ETEUL_CB_REQ_DATA);
-	}
-	return result;
+	return _doAction(endpoint_, *this, callData_, dataSize_bytes);
 }
 
 SINT32

@@ -12,7 +12,7 @@
 // Our logging callback
 GRANNY_CALLBACK(void) LogCallback(granny_log_message_type Type,
                                   granny_log_message_origin Origin,
-								  char const* File, granny_int32x Line,
+                                  char const* File, granny_int32x Line,
                                   char const * Message,
                                   void * UserData);
 
@@ -58,11 +58,9 @@ int main(int, char const*[])
     }
 
 #ifdef _MACOSX
-    // If we're on the mac, we want to use ansi file operations
-    GrannySetDefaultFileReaderOpenCallback(GrannyGetOSXAnsiFileReaderOpenCallback());
     #define BASE_DIR "../../../media/"
 #else
-    #define BASE_DIR "../media/"
+    #define BASE_DIR "media/"
 #endif
 
     granny_log_callback NewCallback;
@@ -104,9 +102,9 @@ int main(int, char const*[])
         granny_allocation_information Info;
         GrannyGetAllocationInformation(Header, &Info);
 
-        printf("%s(%d): %d bytes allocated at address %p\n",
+        printf("%s(%d): %u bytes allocated at address %p\n",
                Info.SourceFileName, Info.SourceLineNumber,
-               Info.RequestedSize, Info.Memory);
+               (granny_uint32)Info.RequestedSize, Info.Memory);
     }
     printf("end allocation_list\n"
            "===================\n\n");
@@ -139,7 +137,7 @@ int main(int, char const*[])
 // See the tutorial "Error Reporting" for details on log callbacks.
 GRANNY_CALLBACK(void) LogCallback(granny_log_message_type Type,
                                   granny_log_message_origin Origin,
-								  char const* File, granny_int32x Line,
+                                  char const* File, granny_int32x Line,
                                   char const * Message,
                                   void* /*UserData*/)
 {
@@ -148,5 +146,5 @@ GRANNY_CALLBACK(void) LogCallback(granny_log_message_type Type,
     char const* OriginString = GrannyGetLogMessageOriginString(Origin);
 
     printf("Granny sez: %s (%s)\n"
-		"  %s(%d): %s\n", TypeString, OriginString, File, Line, Message);
+        "  %s(%d): %s\n", TypeString, OriginString, File, Line, Message);
 }

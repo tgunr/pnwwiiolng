@@ -1,14 +1,14 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/samples/filter_vector_tracks.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #4 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "../preprocessor.h"
 #include <stdio.h>
-#include <assert.h>
+#include <string.h>
 #include <vector>
 
 using namespace std;
@@ -28,8 +28,8 @@ using namespace std;
 bool
 MatchesFilter(char const* TrackName, char const* Filter)
 {
-    assert(TrackName);
-    assert(Filter);
+    pp_assert(TrackName);
+    pp_assert(Filter);
 
     // Very (!) simple matching rule, we just check to see if the track name begins with
     // the filter string.  This can be replaced with regexp matching, dos glob style
@@ -46,7 +46,7 @@ FilterAnimation(granny_animation*    Animation,
                 granny_int32x        NumKeyValues,
                 granny_memory_arena* TempArena)
 {
-    assert(Animation);
+    pp_assert(Animation);
 
     vector<granny_track_group*> TrackGroups;
     {for (int TGIdx = 0; TGIdx < Animation->TrackGroupCount; ++TGIdx)
@@ -100,24 +100,17 @@ FilterAnimation(granny_animation*    Animation,
 }
 
 
-bool
-FilterVectorTracks(input_file&     InputFile,
-                   key_value_pair* KeyValues,
-                   granny_int32x   NumKeyValues,
+granny_file_info*
+FilterVectorTracks(char const*          OriginalFilename,
+                   char const*          OutputFilename,
+                   granny_file_info*    Info,
+                   key_value_pair*      KeyValues,
+                   granny_int32x        NumKeyValues,
                    granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
     if (FindFirstValueForKey(KeyValues, NumKeyValues, "filter") == 0)
     {
         ErrOut("must specify at least one -filter <string>\n");
-        return false;
-    }
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
         return false;
     }
 
@@ -130,13 +123,10 @@ FilterVectorTracks(input_file&     InputFile,
         FilterAnimation(Animation, KeyValues, NumKeyValues, TempArena);
     }}
 
-
-    // Write out the result
-    return SimpleWriteInfo(KeyValues, NumKeyValues, Info);
+    return Info;
 }
 
 
-static CommandRegistrar RegFilterVectorTracks(eSingleFile_NoMultiRun,
-                                              FilterVectorTracks, "FilterVectorTracks",
+static CommandRegistrar RegFilterVectorTracks(FilterVectorTracks, "FilterVectorTracks",
                                               "Removes tracks that don't string(s) specified with -filter.");
 

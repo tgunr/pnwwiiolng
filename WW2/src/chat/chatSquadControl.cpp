@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Sep 20 18:26:36 CDT 2005
 //
 // Packers etc for SquadControl
@@ -16,7 +16,7 @@
 #include "chat/chatName.h"
 
 SINT32
-SquadControl::packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControl::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_action, 8);
 
@@ -70,7 +70,7 @@ SquadControl::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-SquadControl::CREATE_packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControl::CREATE_packer(PackMode mode, ACTION_OBJECT* a)
 {
 	UINT32 len = 0;
 
@@ -98,14 +98,14 @@ SquadControl::CREATE_packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-SquadControl::handle_packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControl::handle_packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);
 	return a->offset;
 }
 
 SINT32
-SquadControl::text_packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControl::text_packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_key, 8);
 	a->offset = wwiiPackString(mode, a->packed, a->offset, m_text, MAX_TEXT_LEN);
@@ -113,7 +113,7 @@ SquadControl::text_packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-SquadControl::int_packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControl::int_packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_key, 8);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_value, 0);
@@ -121,7 +121,7 @@ SquadControl::int_packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-SquadControlResult::packer(LOGICAL mode, ACTION_OBJECT* a)
+SquadControlResult::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_result, 8);
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_action, 8);
@@ -132,7 +132,7 @@ SquadControlResult::packer(LOGICAL mode, ACTION_OBJECT* a)
 extern TEUL_CALLBACK* CHAT_SQUAD_CONTROL;
 
 SINT32
-SquadControl::_sendBasic(SINT32 connection, UINT32 action, const ChatHandle& handle, const std::string& text)
+SquadControl::_sendBasic(SINT32 connection, UINT32 action, const ChatHandle handle, const std::string& text)
 {
 	if ( PN_UNLIKELY(connection < 0) )
 		return -EINVAL;

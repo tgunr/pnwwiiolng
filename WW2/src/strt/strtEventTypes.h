@@ -18,7 +18,8 @@ class Event
 {
 public:
 	// Determine the number of events likely to fit into a packet.
-	enum	{ MaxPerPacket = 375 };	// Should fit comfortably inside an average packet.
+	enum	{ MaxPerPacket = 375 };	// Most packets are 20 bits but some can be 68, but on average we'll
+									// consume no more than 1200 bytes in a packet with this value
 private:
 	FULL_OBJ_ID		m_fid;
 	UINT8			m_ownership;
@@ -26,13 +27,13 @@ private:
 	UINT32			m_flags;
 
 public:
-	const FULL_OBJ_ID& fid() const { return m_fid; }
+	FULL_OBJ_ID fid() const { return m_fid; }
 	UINT8 ownership() const { return m_ownership; }
 	UINT32 flags() const { return m_flags; }
 
 public:
 	Event() : m_fid(), m_ownership(0), m_largeFlags(false), m_flags(0) {}
-	Event(const FULL_OBJ_ID& _fid, WWII_COUNTRY _ownership, UINT32 _flags)
+	Event(const FULL_OBJ_ID _fid, WWII_COUNTRY _ownership, UINT32 _flags)
 		: m_fid(_fid), m_ownership(_ownership)
 		, m_largeFlags(_flags >= (1 << 3))	// More than 3 bits for flags?
 		, m_flags(_flags)
@@ -42,7 +43,7 @@ public:
 		packer(TEUL_UNPACK, a);
 	}
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_fid, 0);
 		a->packer(mode, m_ownership, 4);
@@ -59,7 +60,7 @@ public:
 class EventPacket
 {
 private:
-	typedef WWII::inplace_vector<Strat::Event, Strat::Event::MaxPerPacket> Events;
+	using Events = WWII::inplace_vector<Strat::Event, Strat::Event::MaxPerPacket>;
 	Events m_events;
 
 public:
@@ -80,7 +81,7 @@ public:
 	const Events& events() const { return m_events; }
 	Events& events() { return m_events; }
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		UINT32 count = m_events.size();
 		a->packer(mode, count, 16);

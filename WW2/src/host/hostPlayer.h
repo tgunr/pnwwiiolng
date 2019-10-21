@@ -34,7 +34,7 @@ public:
 	// be marked for AWS.
 	void awsCheck();
 
-	void changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool isInCaptureBuilding);
+	void changeFPSBuilding(const FULL_OBJ_ID newBuildingID, bool isInCaptureBuilding);
 
 	UINT16 getCurrentFramingMode();
 	UINT16 getPreferredFramingMode() { return m_framingMode; }
@@ -48,7 +48,7 @@ public:
 	void setFramingMode(UINT16 mode);
 	void setVehicle(HostVehicle* const vehicle_);
 
-	const FULL_OBJ_ID& fpsBuildingID() const { return m_fpsBuildingID; }
+	FULL_OBJ_ID fpsBuildingID() const { return m_fpsBuildingID; }
 
 public:
 	static SINT32 Create(const Server::PersonaLogin& xfer, class PlayerStatusNode& psn);
@@ -59,9 +59,14 @@ public:
 public:
 	TeulTimeMS				m_lastTimeRx;			// Timestamp on the player's client as of last rx.
 	TeulTimeMS				m_lastTimeRxed;			// Host timestamp for the rx'ed value.
+	TeulTimeMS				m_nextMemReq = 0;		// The next time to send out a memory request
+
+	TeulTimeMS				m_hostClientOffset_ms;		// difference between the host and client monotonic clock
+	TeulTimeMS				m_ibdTimeReachedMaxAccumDelay; 	// track how long we are at the max inbound
+	TeulTimeMS				m_obdTimeReachedMaxAccumDelay; 	// track how long we are at the max outbound
 
 	HostVehicle*			vehicle;
-	class AntiHack*			m_antiHack;
+	class SpeedhackCheck*	m_antiHack;
 
 	PERSONA_STATE			state;					// enum of condition at this moment
 	UINT32 					stationID;
@@ -74,6 +79,7 @@ public:
 
 	UINT32					m_nextVelocityCheck;
 	UINT32					m_awsTrigger;
+	UINT32					m_lastAwsCheck;
 
 	UINT32					m_expectUpdateNo;
 	UINT32					m_updatePrime;
@@ -82,7 +88,7 @@ public:
 	UINT16					m_updatesSinceRX;
 	UINT16					m_updatesFailed;
 	SINT16					m_lastIndex;			// Last index we were on
-	UINT16					m_timeToLive;
+	TeulTimeMS				m_timeToLive;
 	UCHAR					station;
 
 	bool					active : 1;
@@ -99,5 +105,6 @@ public:
 
 	FULL_OBJ_ID				exitFacility;
 	FULL_OBJ_ID				m_fpsBuildingID;
+	SINT32                  m_exitTeulIndex;
 };
 

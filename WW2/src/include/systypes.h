@@ -45,85 +45,106 @@
 
 	#include <tchar.h>
 
-#elif platOS == OS_MACOS
+#elif platOS == OS_MACOS || platOS == OS_LINUX
 
 	#include <sys/types.h>
-	#include <malloc/malloc.h>
 
+    #if platOS == OS_MACOS
+	#include <malloc/malloc.h>
+    #elif platOS == OS_LINUX
+    #include <malloc.h>
+    #endif
+
+//tolua_begin
 	// Logical types
-	typedef		unsigned int		LOGICAL;		//!< TRUE or FALSE.
+    typedef     uint32_t            LOGICAL;		//!< TRUE or FALSE.
 
 	// character types
-	typedef		unsigned char		UCHAR;			//!< 8 bit unsigned value.
+	typedef		unsigned char       UCHAR;			//!< 8 bit unsigned value.
 	typedef		char				SCHAR;			//!< 8 bit signed value.
 	typedef		wchar_t				WCHAR;			//!< UTF character.
 	typedef		wchar_t				TCHAR;			//!< Conditional UTF character.
 	typedef		char				SINT8;			//!< 8 bit signed value.
-	typedef		unsigned char		UINT8;			//!< 8 bit unsigned value.
+	typedef		unsigned char       UINT8;			//!< 8 bit unsigned value.
 
 	// Signed types
-	typedef		short				SINT16;			//!< 16 bit signed value.
-	typedef		signed int	 		SINT32;			//!< 32 bit signed value.
-	typedef		long long			SINT64;			//!< 64 bit signed value.
+	typedef		int16_t				SINT16;			//!< 16 bit signed value.
+	typedef		int32_t             SINT32;			//!< 32 bit signed value.
+	typedef		int64_t             SINT64;			//!< 64 bit signed value.
 
 	// Unsigned types
-	typedef		unsigned short		UINT16;			//!< 16 bit unsigned value.
-	typedef		unsigned int		UINT32;			//!< 32 bit unsigned value.
-	typedef		unsigned long long	UINT64;			//!< 64 bit unsigned value.
+	typedef		uint16_t            UINT16;			//!< 16 bit unsigned value.
+	typedef		uint32_t            UINT32;			//!< 32 bit unsigned value.
+	typedef		uint64_t            UINT64;			//!< 64 bit unsigned value.
 
 	// Float types; single (32 bits) and double (64 bits)
 	typedef		float				FLOAT32;		//!< 32 bit single-precision float.
 	typedef		double				FLOAT64;		//!< 64 bit double-precision float.
 
 	typedef		void*				LPVOID;
+//tolua_end
 
 	#define APIENTRY
-	#define PN_MAX_PATH		260
 
-	typedef LOGICAL (*SYS_DDINITFUNC)(void);
-	typedef LOGICAL (*SYS_D3DINITFUNC)(void);
-	typedef LOGICAL (*SYS_DDRENDERFUNC)(void);
-	typedef LOGICAL (*SYS_D3DRENDERFUNC)(void);
-	typedef void (*SYS_DDKILLFUNC)(void);
-	typedef void (*SYS_D3DKILLFUNC)(void);
+	using SYS_DDINITFUNC = LOGICAL(*)();
+	using SYS_D3DINITFUNC = LOGICAL(*)();
+	using SYS_DDRENDERFUNC = LOGICAL(*)();
+	using SYS_D3DRENDERFUNC = LOGICAL(*)();
+	using SYS_DDKILLFUNC = void(*)();
+	using SYS_D3DKILLFUNC = void(*)();
 
-#elif platOS == OS_LINUX
-//tolua_begin
-
-	// Logical types
-	typedef unsigned int			LOGICAL;		//!< TRUE or FALSE.
-
-	// character types
-	typedef	unsigned char			UCHAR;			//!< 8 bit unsigned value.
-	typedef	char					SCHAR;			//!< 8 bit signed value.
-
-	// Signed types
-	typedef char					SINT8;			//!< 8 bit signed value.
-	typedef short					SINT16;			//!< 16 bit signed value.
-	typedef int						SINT32;			//!< 32 bit signed value.
-	typedef long long				SINT64;			//!< 64 bit signed value.
-
-	// Unsigned types
-	typedef unsigned char			UINT8;			//!< 8 bit unsigned value.
-	typedef unsigned short			UINT16;			//!< 16 bit unsigned value.
-	typedef unsigned int			UINT32;			//!< 32 bit unsigned value.
-	typedef unsigned long long		UINT64;			//!< 64 bit unsigned value.
-
-	// Float types; single (32 bits) and double (64 bits)
-	typedef float					FLOAT32;		//!< 32 bit single-precision float.
-	typedef double					FLOAT64;		//!< 64 bit double-precision float.
-
-//tolua_end
 #else
 #error "platform not defined for systypes.h!"
-#endif // OS_MACOS
+#endif
 
-struct FLOAT64VECTOR
-{
+//==============================================================================
+
+struct FLOAT64VECTOR {
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
+
+
+	FLOAT64 length();
+
 };
+
+//--------------
+
+inline FLOAT64VECTOR operator + (const FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ return { v1.x + v2.x, v1.y + v2.y, v1.z + v2.z }; }
+
+inline FLOAT64VECTOR& operator += (FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{ v1 = v1 + v2; return v1; }
+
+//--------------
+
+inline FLOAT64VECTOR operator * (const FLOAT64VECTOR& v, double s)
+{ return { v.x * s, v.y * s, v.z * s }; }
+
+inline FLOAT64VECTOR& operator *= (FLOAT64VECTOR& v, double s)
+{ v = v * s; return v; }
+
+//--------------
+
+inline FLOAT64VECTOR operator / (const FLOAT64VECTOR& v, double s)
+{ return { v.x / s, v.y / s, v.z / s }; }
+
+inline FLOAT64VECTOR operator /= (FLOAT64VECTOR& v, double s)
+{ v = v / s; return v; }
+
+inline FLOAT64VECTOR operator - (const FLOAT64VECTOR& v1, const FLOAT64VECTOR& v2)
+{
+	return { v1.x - v2.x, v1.y - v2.y, v1.z - v2.z };
+}
+
+inline FLOAT64 FLOAT64VECTOR::length() 
+{
+	return sqrt(x * x + y * y + z * z);
+}
+
+
+//==============================================================================
 
 struct FLOAT32VECTOR
 {
@@ -158,8 +179,10 @@ using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
 using TeulDeltaMS = SINT64;
 
-namespace Instance { typedef UINT64 UniqueID ; }
-
+//! Identifier for an arena
+using arenaid_t = uint32_t;
+//! Index for a user/customer ID
+using userid_t = uint32_t;
 //! Index for a player ID
 using playerid_t = uint32_t;
 //! Index for a sortie ID

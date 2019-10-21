@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
@@ -30,14 +30,14 @@
 #define PA_TOC_SIZE 8192
 #define PA_MAX_ARC 64
 
-typedef struct
+struct parcHead
 {
 	int magic;
 	int version;
 	unsigned char md5[16];
-} parcHead;
+};
 
-typedef struct
+struct paMemberHead
 {
 	char name[PA_MAX_NAME+1];
 	unsigned int filelen;
@@ -46,16 +46,16 @@ typedef struct
 	unsigned int flags;
 	unsigned int seed;
 	unsigned char md5[16];
-} paMemberHead;
+};
 
-typedef struct
+struct parc
 {
 	FILE* f;
 	char name[PA_MAX_NAME+1];
 	int updatemd5;
-} parc;
+};
 
-typedef struct
+struct paTOC
 {
 	parc* pa;
 	char name[PA_MAX_NAME+1];
@@ -65,9 +65,9 @@ typedef struct
 	unsigned int crc;
 	unsigned int flags;
 	unsigned int seed;
-} paTOC;
+};
 
-struct tagpaFILE
+struct paFILE
 {
 	parc arc[PA_MAX_ARC];
 
@@ -148,17 +148,25 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 {
 	int i;
 
-	for(i = 0; i < PA_MAX_ARC; i++)
+#if platOS == OS_WIN32
+    wwiiolpath_string curWorkingDir = L"";
+	wchar_t wBuffer[MAX_PATH + 1];
+
+	wBuffer[0] = 0;
+	GetCurrentDirectory(MAX_PATH, wBuffer);
+
+	curWorkingDir = wBuffer;
+
+	SetCurrentDirectory(WW2_exePlayarcPath.c_str());
+
+#endif
+    
+    for(i = 0; i < PA_MAX_ARC; i++)
 	{
 		if(pf->arc[i].f == nullptr)
 		{
 			pf->arc[i].f = fopen(archivename, mode);
 
-      /* saves vm but takes too damn long to load now
-#if platOS == OS_MACOS
-      fcntl(pf->arc[i].f->_file,F_NOCACHE);
-#endif
-       */
 			if(pf->arc[i].f != nullptr)
 			{
 				strncpy(pf->arc[i].name, archivename, PA_MAX_NAME);
@@ -168,6 +176,10 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 			}
 		}
 	}
+
+#if platOS == OS_WIN32
+	SetCurrentDirectory(curWorkingDir.c_str());
+#endif
 
 	return -1;
 }
@@ -213,7 +225,7 @@ int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, size
 
 	pf->updatetoc = 0;
 
-	strncpy(name, membername, PA_MAX_NAME);
+	strsafecpy(name, membername);
 	fix_path_name(name);
 
 	member = (paTOC*) bsearch(name, pf->toc, pf->numtoc, sizeof(paTOC), toc_search);
@@ -315,7 +327,7 @@ int paAppendmember(paFILE* pf, const char* membername, const unsigned char* memb
 	// member header
 	fseek(f, 0, SEEK_END);
 
-	strncpy(memberhead.name, membername, 127);
+	strsafecpy(memberhead.name, membername);
 	fix_path_name(memberhead.name);
 
 	memberhead.filelen = writelen;
@@ -391,11 +403,7 @@ static int paUpdateTOC(paFILE* pf)
 			curtoc += numtoc[i];
 		}
 
-#if platOS == OS_MACOS
-		mergesort(pf->toc, pf->numtoc, sizeof(paTOC), toc_compare);
-#else
         qsort(pf->toc, pf->numtoc, sizeof(paTOC), toc_compare);
-#endif
 	}
 
 	for(i = 0; i < tocidx; i++)
@@ -452,7 +460,7 @@ static int create_toc(parc* pa, paTOC** toc, int* numtoc)
 #ifdef PRINT_TOC_ENTRIES
       printf("%s [%d]\n",memberhead.name,memberhead.datalen);
 #endif
-			strncpy((*toc)[i].name, memberhead.name, PA_MAX_NAME);
+			strsafecpy((*toc)[i].name, memberhead.name);
 			(*toc)[i].pa = pa;
 			(*toc)[i].offset = ftell(pa->f);
 			(*toc)[i].datalen = memberhead.datalen;
@@ -534,7 +542,7 @@ static void fix_path_name(char* name)
 	}
     t[j] = '\0';
 
-    strncpy(name, t, PA_MAX_NAME);
+    strsafecpy(name, t, PA_MAX_NAME);
 }
 
 /************************************************************************************************
@@ -864,7 +872,7 @@ static int validity_check(paTOC* member, unsigned char* data, unsigned char* src
 /*		char str[256];
 		snprintf(str, 255, "Validity check on archive %s failed",  member->pa->name);
 
-		piExitProgram(__FILE__, __LINE__, str);
+		piExitProgram(_FL, str);
 		*data = nullptr;
 */
 	}

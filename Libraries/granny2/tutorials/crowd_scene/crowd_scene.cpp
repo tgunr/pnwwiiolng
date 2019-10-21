@@ -340,10 +340,10 @@ struct
     // The backdrop is by Adam Hart-Davis (yes, the TV presenter), and it's from the DHD Multimedia Gallery, at http://gallery.hd.org/
     // Say thankyou to the nice people for putting pretty pics on the web for all to use.
 
-    { &d3dtexRadLogo,    256,  256, "Media/radlogo.png" },
-    { &d3dtexGrannyLogo, 256,  256, "Media/granny piano logo.png" },
-    { &d3dtexBackdrop,   512,  512, "Media/England-Northumberland.jpg" },
-    { &d3dtexSpeedTest,  256,  256, "Media/speed_test.png" }
+    { &d3dtexRadLogo,    256,  256, "media/crowd_scene/radlogo.png" },
+    { &d3dtexGrannyLogo, 256,  256, "media/crowd_scene/granny piano logo.png" },
+    { &d3dtexBackdrop,   512,  512, "media/crowd_scene/England-Northumberland.jpg" },
+    { &d3dtexSpeedTest,  256,  256, "media/crowd_scene/speed_test.png" }
 };
 
 bool ShowText = false;
@@ -377,6 +377,80 @@ INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR, INT )
 }
 
 
+
+
+struct ThreadArgs
+{
+    CMyD3DApplication* Application;
+
+    HANDLE GoEvent;
+    HANDLE DoneEvent;
+    
+    int StartIdx;
+    int EndIdx;
+    granny_real32 Elapsed;
+    bool TerminateLoop;
+};
+
+
+vector<HANDLE>      s_WorkerThreads;
+vector<ThreadArgs*> s_ThreadArgs;
+
+DWORD WINAPI DoWorkThreadProc(LPVOID lpParameter)
+{
+    ThreadArgs* Args = (ThreadArgs*)lpParameter;
+
+    do
+    {
+        WaitForSingleObject(Args->GoEvent, INFINITE);
+        
+        for (int i = Args->StartIdx; i < Args->EndIdx; ++i)
+            Args->Application->m_walkingInstances[i]->DoThreadWork(Args->Elapsed);
+
+        SetEvent(Args->DoneEvent);
+    } while(Args->TerminateLoop == false);
+    
+    return 0;
+}
+
+static void AlignThreadCount(CMyD3DApplication* Application)
+{
+	if (AppNumThreads == (int)s_WorkerThreads.size())
+		return;
+
+	while ((int)s_WorkerThreads.size() < AppNumThreads)
+	{
+
+        ThreadArgs* newArgs = new ThreadArgs;
+        newArgs->Application = Application;
+        newArgs->GoEvent     = CreateEvent(0, FALSE, FALSE, 0);
+        newArgs->DoneEvent   = CreateEvent(0, FALSE, FALSE, 0);
+        newArgs->StartIdx    = 0;
+        newArgs->EndIdx      = 0;
+        newArgs->Elapsed     = 0;
+        newArgs->TerminateLoop = false;
+        s_ThreadArgs.push_back(newArgs);
+
+        HANDLE NewThread = CreateThread(0, 0, DoWorkThreadProc, (int*)newArgs, 0, 0);
+        s_WorkerThreads.push_back(NewThread);
+    }
+
+    while ((int)s_WorkerThreads.size() > AppNumThreads)
+    {
+        ThreadArgs* Args   = s_ThreadArgs.back();    s_ThreadArgs.pop_back();
+        HANDLE      Thread = s_WorkerThreads.back(); s_WorkerThreads.pop_back();
+
+		Args->TerminateLoop = true;
+		Args->StartIdx = 0;
+		Args->EndIdx = 0;
+		SetEvent(Args->GoEvent);
+		WaitForSingleObject(Thread, INFINITE);
+		CloseHandle(Args->GoEvent);
+		CloseHandle(Args->DoneEvent);
+		CloseHandle(Thread);
+		delete Args;
+    }
+}
 
 
 //-----------------------------------------------------------------------------
@@ -437,38 +511,6 @@ CMyD3DApplication::~CMyD3DApplication()
     SAFE_DELETE(m_walkingModel);
 }
 
-
-granny_uint32 StringCallback(void *Data, char *String)
-{
-    if ( Data != NULL )
-    {
-        // We're saying these have already been CRCd!
-        ASSERT ( sizeof(DWORD) == sizeof(char*) );
-        ASSERT ( ( (DWORD)String & 0xffff0000 ) == 0x43210000 );
-        return (DWORD)String;
-    }
-
-    ASSERT ( ( (DWORD)String & 0xffff0000 ) != 0x43210000 );
-
-
-    granny_uint32 Hash = 0;
-    for ( unsigned int i = 0; i < strlen(String); i++ )
-    {
-        Hash += String[i];
-        Hash ^= Hash >> 3;
-    }
-    return ( Hash & 0xffff ) | 0x43210000;
-}
-
-
-char *RebaseStringCallback(void* /*Data*/, granny_int32 Identifier)
-{
-    ASSERT ( ( Identifier & 0xffff0000 ) == 0x43210000 );
-    // Leak memory like crazy.
-    char *TheString = (char*)malloc ( 30 );
-    sprintf ( TheString, "StringCRC 0x%08x", Identifier );
-    return TheString;
-}
 
 // LAMELAMELAME!
 void ReadAppVariables()
@@ -922,25 +964,6 @@ float MoveTowardsTarget ( float CurrentValue, float TargetValue, float MaxChange
 }
 
 
-struct ThreadArgs
-{
-    CMyD3DApplication* Application;
-    int StartIdx;
-    int EndIdx;
-    granny_real32 Elapsed;
-};
-
-DWORD WINAPI DoWorkThreadProc(LPVOID lpParameter)
-{
-    ThreadArgs* Args = (ThreadArgs*)lpParameter;
-
-    for (int i = Args->StartIdx; i < Args->EndIdx; ++i)
-        Args->Application->m_walkingInstances[i]->DoThreadWork(Args->Elapsed);
-
-    return 0;
-}
-
-
 //-----------------------------------------------------------------------------
 // Name: FrameMove()
 // Desc: Called once per frame, the call is the entry point for animating
@@ -1256,7 +1279,7 @@ HRESULT CMyD3DApplication::FrameMove()
         m_walkingInstances[InstanceNum]->AdvanceClock(GameTimeElapsed);
     }
 
-    if (AppNumThreads == 1)
+	if (AppNumThreads == 1)
     {
         for (size_t InstanceNum = 0; InstanceNum < m_walkingInstances.size(); InstanceNum++)
         {
@@ -1265,31 +1288,30 @@ HRESULT CMyD3DApplication::FrameMove()
     }
     else
     {
-        GrannySetAllowGlobalStateChanges(false);
+		// Make sure we have the appropriate number of worker threads.
+		AlignThreadCount(this);
 
+		GrannySetAllowGlobalStateChanges(false);
+
+		// We need to collect the DoneEvents so we can wait on them
         int const Portion = int(m_walkingInstances.size() / AppNumThreads);
-        vector<HANDLE> ThreadHandles(AppNumThreads - 1);
-        vector<ThreadArgs> ThreadArgs(AppNumThreads - 1);
+        vector<HANDLE> EventHandles(AppNumThreads);
 
-        for (int i = 0; i < AppNumThreads-1; ++i)
+        for (int i = 0; i < AppNumThreads; ++i)
         {
             // start threads for instances [i*Portion, (i+1)*Portion)
-            ThreadArgs[i].Application = this;
-            ThreadArgs[i].StartIdx = i * Portion;
-            ThreadArgs[i].EndIdx = (i+1) * Portion;
-            ThreadArgs[i].Elapsed = GameTimeElapsed;
-            ThreadHandles[i] = CreateThread(0, 0, DoWorkThreadProc, &ThreadArgs[i], 0, 0);
+            s_ThreadArgs[i]->Application = this;
+            s_ThreadArgs[i]->StartIdx = i * Portion;
+            
+			if (i != AppNumThreads-1) s_ThreadArgs[i]->EndIdx = (i+1) * Portion;
+			else                      s_ThreadArgs[i]->EndIdx = (int)m_walkingInstances.size();
+
+			s_ThreadArgs[i]->Elapsed = GameTimeElapsed;
+			EventHandles[i] = s_ThreadArgs[i]->DoneEvent;
+			SetEvent(s_ThreadArgs[i]->GoEvent);
         }
 
-        // Clean up the remainder.
-        for (size_t InstanceNum = (AppNumThreads-1)*Portion; InstanceNum < m_walkingInstances.size(); InstanceNum++)
-        {
-            m_walkingInstances[InstanceNum]->DoThreadWork(GameTimeElapsed);
-        }
-
-        WaitForMultipleObjects(AppNumThreads-1, &ThreadHandles[0], TRUE, INFINITE);
-        for (int i = 0; i < AppNumThreads-1; ++i)
-            CloseHandle(ThreadHandles[i]);
+        WaitForMultipleObjects(AppNumThreads, &EventHandles[0], TRUE, INFINITE);
 
         GrannySetAllowGlobalStateChanges(true);
     }
@@ -1667,19 +1689,21 @@ HRESULT CMyD3DApplication::Render()
         // Render the logos
         {
             // These numbers are good for 16:9 aspect, but we nqeed to adapt to other aspects.
-            const float HeightScale = ( (float)m_d3dsdBackBuffer.Width / (float)m_d3dsdBackBuffer.Height ) / ( 16.0f / 9.0f );
+            const float HeightScale = ((float)m_d3dsdBackBuffer.Width / (float)m_d3dsdBackBuffer.Height) / (16.0f / 9.0f);
 
-            const float XL1 = 0.8f * m_d3dsdBackBuffer.Width;
-            const float XR1 = 1.0f * m_d3dsdBackBuffer.Width;
-            const float YT1 = 0.0f * m_d3dsdBackBuffer.Height * HeightScale;
-            const float YB1 = 0.2f * m_d3dsdBackBuffer.Height * HeightScale;
-            RenderScreenQuad(XL1, XR1, YT1, YB1, d3dtexGrannyLogo, true);
+            {
+                const float XL1 = 0.8f * m_d3dsdBackBuffer.Width;
+                const float XR1 = 1.0f * m_d3dsdBackBuffer.Width;
+                const float YT1 = 0.0f * m_d3dsdBackBuffer.Height * HeightScale;
+                const float YB1 = 0.2f * m_d3dsdBackBuffer.Height * HeightScale;
+                RenderScreenQuad(XL1, XR1, YT1, YB1, d3dtexGrannyLogo, true);
 
-            const float XL2 = 0.0f  * m_d3dsdBackBuffer.Width;
-            const float XR2 = 0.2f  * m_d3dsdBackBuffer.Width;
-            const float YT2 = 0.05f * m_d3dsdBackBuffer.Height * HeightScale;
-            const float YB2 = 0.20f * m_d3dsdBackBuffer.Height * HeightScale;
-            RenderScreenQuad(XL2, XR2, YT2, YB2, d3dtexRadLogo, true);
+                const float XL2 = 0.0f  * m_d3dsdBackBuffer.Width;
+                const float XR2 = 0.2f  * m_d3dsdBackBuffer.Width;
+                const float YT2 = 0.05f * m_d3dsdBackBuffer.Height * HeightScale;
+                const float YB2 = 0.20f * m_d3dsdBackBuffer.Height * HeightScale;
+                RenderScreenQuad(XL2, XR2, YT2, YB2, d3dtexRadLogo, true);
+            }
 
             if (!m_renderingOn && !m_renderingSkelOn)
             {
@@ -1712,15 +1736,9 @@ HRESULT CMyD3DApplication::RenderText()
 {
     D3DCOLOR fontColor        = D3DCOLOR_ARGB(255,255,255,0);
 
-    // On dual processor systems, always show the timing warning
-    if (IsMultiProc)
-    {
-        m_pFont->DrawText( 2, 10.0f, fontColor, "Warning: Multiproc systems may display timing irregularities when the task manager is active");
-    }
-
     if ( !ShowText )
     {
-        m_pFont->DrawText( 2, 30.0f, fontColor, "Press 'F1' to show help text" );
+        m_pFont->DrawText( 2, 10.0f, fontColor, "Press 'F1' to show help text" );
         return S_OK;
     }
 
@@ -1749,7 +1767,7 @@ HRESULT CMyD3DApplication::RenderText()
 
         fNextLine -= 20.0f;
         sprintf(szMsg, "Animating %d instances.  %4.4f ms last frame  (%4.4f in Granny)",
-                m_walkingInstances.size(),
+                (int)m_walkingInstances.size(),
                 m_fElapsedTime * 1000.0f,
                 m_animTimeLastFrame * 1000.0f);
         fNextLine -= 20.0f; m_pFont->DrawText( fLeftEdge, fNextLine, fontColor, szMsg );
@@ -1991,19 +2009,19 @@ WalkingModel* GetPixoWalkingModel(Scene* TheScene)
         const char*      TrackGroupName;
         EControlAnimType AnimType;
     } PixoAnimations[] = {
-        { "media/pixo/run_fast.gr2",        "run_fast",        "grannyRootBone", ControlAnim_RunMed       },
-        { "media/pixo/run_slow.gr2",        "run_slow",        "grannyRootBone", ControlAnim_RunSlow      },
-        { "media/pixo/run_sprint.gr2",      "run_sprint",      "grannyRootBone", ControlAnim_RunFast      },
-        { "media/pixo/walk_fast.gr2",       "walk_fast",       "grannyRootBone", ControlAnim_WalkMed      },
-        { "media/pixo/walk_slow.gr2",       "walk_slow",       "grannyRootBone", ControlAnim_WalkSlow     },
-        { "media/pixo/walk_veryFast.gr2",   "walk_veryFast",   "grannyRootBone", ControlAnim_WalkFast     }
+        { "media/crowd_scene/run_fast.gr2",        "run_fast",        "grannyRootBone", ControlAnim_RunMed       },
+        { "media/crowd_scene/run_slow.gr2",        "run_slow",        "grannyRootBone", ControlAnim_RunSlow      },
+        { "media/crowd_scene/run_sprint.gr2",      "run_sprint",      "grannyRootBone", ControlAnim_RunFast      },
+        { "media/crowd_scene/walk_fast.gr2",       "walk_fast",       "grannyRootBone", ControlAnim_WalkMed      },
+        { "media/crowd_scene/walk_slow.gr2",       "walk_slow",       "grannyRootBone", ControlAnim_WalkSlow     },
+        { "media/crowd_scene/walk_veryFast.gr2",   "walk_veryFast",   "grannyRootBone", ControlAnim_WalkFast     }
     };
     const int NumPixoAnimations = sizeof(PixoAnimations) / sizeof(PixoAnimations[0]);
 
 
     WalkingModel* pNewModel = new WalkingModel;
     {
-        pNewModel->SourceModel = TheScene->FindOrLoadModel("media/pixo/reference.gr2", "grannyRootBone");
+        pNewModel->SourceModel = TheScene->FindOrLoadModel("media/crowd_scene/reference.gr2", "grannyRootBone");
 
         for (int i = 0; i < NumPixoAnimations; i++)
         {

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "include/vars.h"
 #include "gl/glplat.h"
 
@@ -12,7 +12,7 @@
 #include "ld/ldpix.h"
 #include "rn/rnvis.h"
 #include "rn/rntext.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/ww2func.h"
 #include "cfg/cfgPrefs.h"
 #include "ui/uiMain.h"
@@ -26,6 +26,7 @@
 #include "ogl/States.h"
 #include "fp/fpFPS.h"
 #include "fx/TransformEffect.h"
+#include "ob/obdraw.h"
 
 /************************************************************************************************
 	vehIcon
@@ -38,7 +39,7 @@ enum{ ICON_MODE_NORMAL, ICON_MODE_VEHICLE_TYPE, ICON_MODE_NONE, ICON_MODE_MAX };
 
 #define MaxHandleVisDist	1500.0f		// maximum distance to see handle
 #define MaxIdVisDist		1500.0f 	// maximum distance to see vehicle id
-#define MaxRangeCircleDist	6000.0f		// maximum range on range circle
+#define MaxRangeCircleDist	4000.0f		// maximum range on range circle
 
 #define IconFadeStartDist 	100.0f 		// icon starts to fade at this distance
 #define IconFadeEndDist 	4000.0f 	// icon fully faded at this distance
@@ -83,16 +84,12 @@ static void   _HandleIconMode(vehVehicle* CurrentVehicle, LOGICAL& DrawRangeCirc
 	vehIconInit
 *************************************************************************************************/
 
-SINT32 vehIconInit(void)
+SINT32 vehIconInit()
 {
-	ldpixSetTextureReduction(FALSE);
-
 	_IconRangeCircleTexId = ldpixLoadImageFileToSurface("iconring1.bmp", colorBLACK, LDPIX_NONE);
 	_RankIcons = drawIconLoad("gamerank");
 	_DeathIcon = drawIconLoad("\\ui\\uidata\\icons\\misc\\icon_death");
 	_ColorRankIcons = drawIconLoad("\\ui\\uidata\\chat\\commrank");
-
-	ldpixSetTextureReduction(TextureReduction);
 
 	imapInstallNonRemovableControlCallback(IMAP_CYCLE_ICON_MODE, _CycleIconMode);
 
@@ -111,7 +108,7 @@ SINT32 vehIconInit(void)
 	vehIconKill
 *************************************************************************************************/
 
-SINT32 vehIconKill(void)
+SINT32 vehIconKill()
 {
 	if (piIsTexture(_IconRangeCircleTexId, 0))
 		piFreeMipTextures(_IconRangeCircleTexId);
@@ -158,6 +155,10 @@ UINT32 vehIconColor(vehVehicle* Vehicle)
 	UINT32 IconColor = 0;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
+	//check for null player vehicle
+	if (PlayerVehicle == nullptr)
+		return colorALPHA;
+
 	if(Vehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
 		IconColor = colorYELLOW;
@@ -203,7 +204,7 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	if(!PlayerVehicle) return 0;
 
-	FLOAT64VECTOR WorldOriginOffset, DeltaVec;
+	FLOAT64VECTOR worldOriginOffset, DeltaVec;
 	FLOAT32 Dist, Percent;
 	piVECTOR TempVec;
 	FLOAT32 TempFloat;
@@ -286,10 +287,10 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	SCEN_MGR->SetVehicleIcon(Vehicle);
 
 	// get vector to vehicle from camera
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	TempVec.x = (FLOAT32)( Vehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-	TempVec.y = (FLOAT32)( Vehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-	TempVec.z = (FLOAT32)(-Vehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	TempVec.x = (FLOAT32)( Vehicle->PosData.RenderPos.x - worldOriginOffset.x);
+	TempVec.y = (FLOAT32)( Vehicle->PosData.RenderPos.y - worldOriginOffset.y);
+	TempVec.z = (FLOAT32)(-Vehicle->PosData.RenderPos.z - worldOriginOffset.z);
 	mathAddVectors(&TempVec,&TempVec,&playpos);
 	math3dNormalize(&TempVec);
 
@@ -344,7 +345,7 @@ SINT32 vehIconUpdate(vehVehicle* Vehicle)
 	vehIconDraw
 *************************************************************************************************/
 
-SINT32 vehIconDrawDeprecated(void)
+SINT32 vehIconDrawDeprecated()
 {
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	if (!PlayerVehicle)	return 0;
@@ -471,7 +472,7 @@ void vehIconDraw()
 	vehIconMode
 *************************************************************************************************/
 
-SINT32 vehIconMode(void)
+SINT32 vehIconMode()
 {
 	return _IconMode;
 }
@@ -649,13 +650,34 @@ static void _DrawVehicleIconDeprecated(vehVehicle* CurrentVehicle)
 			{
 				wchar_t buffer[10+1];
 
+                SINT32 selectedLod = 0;
+                SINT32 dist = 0;
 				OBJECT* po = CurrentVehicle->VehicleObjectData->PlaneObject;
 
 				if(CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON && po->animModel)
-					swprintf(buffer, 10, L"%dm (%d)", (SINT32)po->distsqr, po->animModel->model.GetLOD() + 1); // make it 1 based for producer types
-				else
-					swprintf(buffer, 10, L"%dm", (SINT32)po->distsqr);
+                {
+                    selectedLod = po->animModel->model.GetLOD() + 1;
+                    dist = static_cast<SINT32>(po->distsqr);
+                }
+                else
+                {
+                    OBJECT * rootChild = po;
 
+					dist = static_cast<SINT32>(GetDistance(rootChild, false));
+
+                    for (SINT32 i = 0; i < ML_MAX_LODS; i++)
+                    {
+                        if (CurrentVehicle->VehicleObjectData->LODObjects[i] &&
+                            !(CurrentVehicle->VehicleObjectData->LODObjects[i]->flags & OBJECT_SKIPDRAWING))
+                        {
+                            selectedLod = i+1;
+                            break;
+                        }
+                    }
+                }
+                
+                swprintf(buffer, 10, L"%dm (%d)", dist, selectedLod); // make it 1 based for producer types
+                
 				FLOAT32 squadSize = size * .8f;
 				_DrawIconString(&Pos, squadSize, vOffset, buffer, Color);
 				vOffset += squadSize;

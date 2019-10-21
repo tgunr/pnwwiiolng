@@ -34,16 +34,16 @@ namespace Teul
 
 	public:
 		TeulTimeMS time() const { return m_clock64; }
-		UINT32 timePartial() const { return (UINT32)m_clock64 & 0x000fffff; }
+		UINT32 timePartial() const { return static_cast<UINT32>(m_clock64) & 0x000fffff; }
 //		Teul::TimeMS& time(const TeulTimeMS& _clock) { m_clock64 = _clock; return *this; }
 		void makeNever() { m_clock64 = ~0ULL; }
 		void makeZero() { m_clock64 = 0ULL; }
 		void makeCurrent() { m_clock64 = teulClock64; }
 
-		TeulDeltaMS elapsed() const { return (TeulDeltaMS)(teulClock64 - m_clock64); }
-		SINT32 elapsedPartial() const { return (SINT32)((teulClock64 & 0x000fffff) - timePartial()); }
+		TeulDeltaMS elapsed() const { return static_cast<TeulDeltaMS>(teulClock64 - m_clock64); }
+		SINT32 elapsedPartial() const { return static_cast<SINT32>((teulClock64 & 0x000fffff) - timePartial()); }
 
-		TeulDeltaMS elapsedSince(const Teul::TimeMS& rhs) const { return (TeulDeltaMS)(time() - rhs.time() ); }
-		SINT32 elapsedSincePartial(const Teul::TimeMS& rhs) const { return (SINT32)timePartial() - (SINT32)rhs.timePartial(); }
+		TeulDeltaMS elapsedSince(const Teul::TimeMS& rhs) const { return static_cast<TeulDeltaMS>(time() - rhs.time() ); }
+		SINT32 elapsedSincePartial(const Teul::TimeMS& rhs) const { return static_cast<SINT32>(timePartial()) - static_cast<SINT32>(rhs.timePartial()); }
 	};
 }

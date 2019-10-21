@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #ifdef OPENGL3D
@@ -8,14 +8,11 @@
 #include "ogl/ogl.h"
 #include "pi/pi.h"
 #include "mem/mem.h"
-#include "versionNo.h"
 #include "sysmain.h"
 #include "dimain.h"
 #include "fio/fio.h"
 
 #if platOS == OS_WIN32
-#include "crashhandler.h"
-
 extern HWND			myhwnd;
 extern LOGICAL		running;
 #endif
@@ -100,12 +97,12 @@ SINT32 piFindBitCount(UINT32 bits)
 	return c;
 }
 
-LOGICAL piInit(void)
+LOGICAL piInit()
 {
-	return(oglInit());
+	return oglInit();
 }
 
-void piKill(void)
+void piKill()
 {
 	dimainKill();
 	oglKill();
@@ -122,7 +119,7 @@ LOGICAL piClearPorts(piRECT piRect, UINT32 uTargets)
 	return oglClearPorts(piRect, uTargets);
 }
 
-SINT32 piGetNumberVertices(void)
+SINT32 piGetNumberVertices()
 {
 	return(oglGetNumberVertices());
 }
@@ -153,7 +150,7 @@ LOGICAL piAddTexRef(SINT32 texid)
 	return(oglAddTexRef(texid));
 }
 
-void piUpdateTextures(void)
+void piUpdateTextures()
 {
 	return(oglUpdateTextures());
 }
@@ -190,7 +187,7 @@ SINT32 piGetTextureMipmapLevel(SINT32 texid)
 	return(oglGetTextureMipmapLevel(texid));
 }
 
-LOGICAL piReleaseTextureHandles(void)
+LOGICAL piReleaseTextureHandles()
 {
 	return(oglReleaseTextureHandles());
 }
@@ -313,7 +310,7 @@ LOGICAL piEnableTexture()
 	return TRUE;
 }
 
-LOGICAL piDisableTexture(void)
+LOGICAL piDisableTexture()
 {
 	oglDisableTexture();
 	return TRUE;
@@ -444,7 +441,7 @@ LOGICAL piSetActiveMaterial(SINT32 matid)
 	return(oglSetActiveMaterial(matid));
 }
 
-LOGICAL piDisableMaterial(void)
+LOGICAL piDisableMaterial()
 {
 	return(oglSetActiveMaterial(DefaultMaterialId));
 //	return(oglDisableMaterial());
@@ -455,7 +452,7 @@ SINT32 piGetLights(LIGHT** lplight)
 	return(oglGetLights(lplight));
 }
 
-UINT32 piGetAmbLight(void)
+UINT32 piGetAmbLight()
 {
 	return(oglGetAmbLight());
 }
@@ -470,7 +467,7 @@ SINT32 piGetMaterials(MATERIAL** lpmat)
 	return(oglGetMaterials(lpmat));
 }
 
-piMATRIX* piGetProjectionMatrix(void)
+piMATRIX* piGetProjectionMatrix()
 {
 	return(oglGetProjectionMatrix());
 }
@@ -480,7 +477,7 @@ void piSetProjectionMatrix(const piMATRIX* newproj)
 	oglSetProjectionMatrix(newproj);
 }
 
-piMATRIX* piGetWorldMatrix(void)
+piMATRIX* piGetWorldMatrix()
 {
 	return(oglGetWorldMatrix());
 }
@@ -490,7 +487,7 @@ void piSetWorldMatrix(const piMATRIX* newworld)
 	oglSetWorldMatrix(newworld);
 }
 
-piMATRIX* piGetViewMatrix(void)
+piMATRIX* piGetViewMatrix()
 {
 	return(oglGetViewMatrix());
 }
@@ -525,12 +522,12 @@ LOGICAL piSetViewportZ(FLOAT32 znear, FLOAT32 zfar)
 	return(oglSetViewportZ(znear, zfar));
 }
 
-LOGICAL piBeginScene(void)
+LOGICAL piBeginScene()
 {
 	return(oglBeginScene());
 }
 
-LOGICAL piEndScene(void)
+LOGICAL piEndScene()
 {
 	return(oglEndScene());
 }
@@ -540,7 +537,7 @@ void piSetRenderState(int StateType, UINT32 State)
 	oglSetRenderState((oglRENDERSTATETYPES)StateType, State);
 }
 
-LOGICAL piDisplayRenderStates(void)
+LOGICAL piDisplayRenderStates()
 {
 	return(oglDisplayRenderStates());
 }
@@ -550,7 +547,7 @@ LOGICAL piSetLightState(SINT32 lightNum, UINT32 State)
 	return(oglSetLightState(lightNum, State));
 }
 
-void piResetRenderStats(void)
+void piResetRenderStats()
 {
 	oglResetRenderStats();
 }
@@ -565,17 +562,17 @@ void piGetRenderTypes(UINT32* draw, UINT32* drawindex)
 	oglGetRenderTypes(draw, drawindex);
 }
 
-void piResetRenderBuckets(void)
+void piResetRenderBuckets()
 {
 	oglResetRenderBuckets();
 }
 
-void piDisplayRenderBuckets(void)
+void piDisplayRenderBuckets()
 {
 	oglDisplayRenderBuckets();
 }
 
-void piDisplayRenderIndexBuckets(void)
+void piDisplayRenderIndexBuckets()
 {
 	oglDisplayRenderIndexBuckets();
 }
@@ -590,7 +587,7 @@ LOGICAL piRenderIndexScene(piPRIMITIVETYPE pipt, piVERTEXTYPE pivt, LPVOID lpVer
 	return(oglRenderIndexScene((oglPRIMITIVETYPE)pipt, (oglVERTEXTYPE)pivt, lpVertices, VertexCount, lpIndices, IndexCount));
 }
 
-void* piGetInstance(void)
+void* piGetInstance()
 {
 #if platOS == OS_WIN32
 	return(ddpGetInstance());
@@ -607,22 +604,22 @@ void piPostRenderFilterScene()
 {
 }
 
-SINT32 piGetTotalPaints(void)
+SINT32 piGetTotalPaints()
 {
 	return(ddpGetTotalPaints());
 }
 
-SINT32 piGetHeight(void)
+SINT32 piGetHeight()
 {
 	return(ddpGetHeight());
 }
 
-SINT32 piGetWidth(void)
+SINT32 piGetWidth()
 {
 	return(ddpGetWidth());
 }
 
-FLOAT32 piGetFPS(void)
+FLOAT32 piGetFPS()
 {
 	return(ddpGetFPS());
 }
@@ -642,7 +639,7 @@ LOGICAL piGetWorldToScreen(double x, double y, double z, double& sx, double& sy,
 	return oglGetWorldToScreen(x, y, z, sx, sy, sz);
 }
 
-void piResetFPS(void)
+void piResetFPS()
 {
 	ddpResetFPS();
 }
@@ -657,7 +654,7 @@ UINT32 piCapture(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero)
 	return 1;
 }
 
-LOGICAL piFlip(void)
+LOGICAL piFlip()
 {
 	return(ddpFlip());
 }
@@ -705,7 +702,7 @@ LOGICAL piLockSurface(void* lpdds, piSURFACEDESC* lppisd)
 	return(TRUE);
 }
 
-void piCloseProgram(void)
+void piCloseProgram()
 {
 	Write_Debug("piCloseProgram was called");
 
@@ -722,7 +719,7 @@ LOGICAL	piGetTextureUVAlpha(UINT32* alpha, SINT32 texid, SINT32 miplevel, FLOAT3
 	return(oglGetTextureUVAlpha(alpha, texid, miplevel, u, v));
 }
 
-piMATRIX* piGetCockpitViewMatrix(void)
+piMATRIX* piGetCockpitViewMatrix()
 {
 	return(oglGetCockpitViewMatrix());
 }
@@ -737,7 +734,7 @@ LOGICAL piMaterialHasSpecular(SINT32 matid)
 	return(oglMaterialHasSpecular(matid));
 }
 
-piMATRIX* piGetUnscaledViewMatrix(void)
+piMATRIX* piGetUnscaledViewMatrix()
 {
 	return(oglGetUnscaledViewMatrix());
 }
@@ -757,15 +754,10 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 	oglSetTextureMatrix(newtexmat);
 }
 
+NORETURN_FN
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
-	FILE* fp = Fio::OpenLogFile();
-
 #if platOS == OS_WIN32
-#ifdef CRASH_HANDLER
-
-	nonExceptionErrorReport(file,line,MessageString==0?"":MessageString);
-#endif
 	running = 0;
 
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
@@ -782,22 +774,7 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 #endif
 
-#ifndef CRASH_HANDLER
-	if ( fp != nullptr )
-		fprintf(fp, "Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
-	printf("Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
-	if(MessageString)
-	{
-		if ( fp != nullptr )
-			fprintf(fp, "Message string: %s\n", MessageString);
-		printf("Message string: %s\n", MessageString);
-	}
-	if ( fp != nullptr )
-		fclose(fp);
-
-#endif
-
-	exit(0);
+	abort(); // Abort raises SIGABRT, which will be trapped by the crash handler
 }
 
 extern SINT32	frametime;
@@ -845,7 +822,7 @@ LOGICAL piRenderSourceIndexedScene(piPRIMITIVETYPE PrimitiveType, UINT32 MinInde
 	return TRUE;
 }
 
-void piResetIndexSource(void)
+void piResetIndexSource()
 {
 }
 
@@ -854,7 +831,7 @@ LOGICAL piRenderSourceScene(piPRIMITIVETYPE PrimitiveType, UINT32 StartVertex, U
 	return TRUE;
 }
 
-void piResetVertexSource(void)
+void piResetVertexSource()
 {
 }
 
@@ -883,7 +860,7 @@ void piLockState(SINT32 state, LOGICAL lock)
 	oglLockState(state, lock);
 }
 
-void piLockTextureState(LOGICAL lock)
+void piLockTextureState(bool lock)
 {
 	oglLockTextureState(lock);
 }

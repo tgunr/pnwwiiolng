@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"
@@ -40,6 +38,9 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRank.h"
+#include "weap/weapSpec.h"
+
+using Chat::ARGV;
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -59,6 +60,7 @@
 
 static const UCHAR PRIVATE_CHAN_ICON = 15;
 
+extern UINT32 serverUpTimeMinutes();
 
 //////////////////////////////////////////////////////////////////////
 //// Private helper functions
@@ -146,67 +148,6 @@ public:
 		}
 	}
 } dotAfk;
-
-#ifdef DOT_ALARM
-//////////////////////////////////////////////////////////////////////
-// .alarm requests an alarm message after a given number of seconds
-//////////////////////////////////////////////////////////////////////
-
-//! @internal
-class DotAlarm : public DotCommand
-{
-public:
-	DotAlarm() : DotCommand("alarm", "Request timed notice"
-							, IS_PLAYNET, LSTR_NONE, LSTR_NONE
-							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
-}
-
-void
-DotAlarm::actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
-{
-	static ARGV args;
-	vectorize(arguments, args, 3);
-	const char* usage = "Usage: /alarm <number> [<Seconds|Minutes|Hours>";
-	char unit = 's';
-
-	if ( args.size() < 1 )
-	{
-		help(player);
-		return;
-	}
-
-	UINT32 seconds = atol(args[0]);
-	if ( seconds == 0 )
-	{
-		player.message(LSTR_CAUTION, LSTR_LABELLED_GENERIC, "Invalid number of seconds", argv[0]);
-		return;
-	}
-
-	if ( args.size() > 1 )
-		unit = tolower(args[1][0]);
-
-	switch ( unit )
-	{
-		case 's': break;
-		case 'm': seconds *= 60; break;
-		case 'h': seconds *= 3600; break;
-		default:
-			throw Chat::LStringErr("Please specify one of Seconds, Minutes or Hours (abbreviations s, m or h)");
-	}
-
-	if ( seconds < 10 )
-		throw Chat::LStringErr("Minimum of 10 seconds for an alarm");
-
-	if ( seconds > 72 * 3600 )
-		throw Chat::LStringErr("Maximum of 72 hours for an alarm");
-
-	if ( player.hasAlarm() )
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Cancelling previous alarm");
-
-	player.addAlarm(seconds);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // /backupleader command
@@ -503,7 +444,7 @@ public:
 			// You're here, so we tell the sender that we're sending your message.
 			dest->notifyOtherIfAFK(player);
 
-			// Show me how its going to look to him
+			// Show me how its going to look to them
 			if ( player.isHiddenFrom(dest) == false )
 			{
 				try
@@ -524,7 +465,8 @@ public:
 		if ( player.isHiddenFrom(dest) )
 		{
 			player.gmNote("GM", "/gmm", dest->callsign(), args[1]);
-			chatDispatchGMMessage("GMM", chatMakeTempString("%s->%s %s", player.callsign(), dest->callsign(), args[1]));
+			PREP_CHAT_MSG(cmsg, "%s->%s %s", player.callsign(), dest->callsign(), args[1])
+			chatDispatchGMMessage("GMM", cmsg);
 			dest->message(LSTR_GM, LSTR_GENERIC, args[1], nullptr);
 		}
 		else
@@ -594,7 +536,7 @@ class DotNoEChat : public DotCommand
 public:
 	DotNoEChat() : DotCommand("noechat", "Toggle receipt of enemy area chat on/off"
 								, NO_MASK, LSTR_NOECHAT_USAGE, LSTR_NOECHAT_DETAIL
-								) { };
+								) { }
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( player.noEnemyChat() )
@@ -619,7 +561,7 @@ class DotNoWho : public DotCommand
 public:
 	DotNoWho() : DotCommand("nowho", "Allows you to hide from .who"
 								, NO_MASK, LSTR_NOWHO_USAGE, LSTR_NOWHO_DETAIL
-								) { };
+								) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
@@ -645,7 +587,7 @@ class DotOrders : public DotCommand
 public:
 	DotOrders() : DotCommand("orders", "Set/view current mission orders"
 							, NO_MASK, LSTR_ORDERS_USAGE, LSTR_ORDERS_DETAIL
-							) { };
+							) { }
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const  override
 	{
@@ -689,6 +631,124 @@ public:
 } dotOrders;
 
 //////////////////////////////////////////////////////////////////////
+// Player bug submission
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotBug : public DotCommand
+{
+public:
+        DotBug() : DotCommand("bug", "Submit a bug/problem/feedback report"
+                                                                , NO_MASK, LSTR_BUG_USAGE, LSTR_BUG_DETAIL
+                                                                ) { }
+        virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
+        {
+
+		// Client Information header contains client platform, OS version, and application version info
+		std::string systemInfo;
+		systemInfo.append("Platform=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_PLATFORM]));
+		systemInfo.append(",OSVer=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+1]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+2]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_OS_VERSION+3]));
+		systemInfo.append(",ClientVer=");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+1]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+2]));
+		systemInfo.append(".");
+		systemInfo.append(std::to_string(message->clientInfo.m_clientInfo[INFO_OFFSET_CLIENT_VERSION+3]));
+		systemInfo.append(",uptime=");
+		systemInfo.append(std::to_string(serverUpTimeMinutes()));
+		systemInfo.append("min");
+
+		std::string info;
+		player.GetWeaponStr(info);
+		info.append(",");
+                player.whereabouts(info, player.lastX(), player.lastY());
+		info.append(",");
+		info.append(systemInfo.c_str());
+
+                dbugLog(_FLI, "!BUG|%s|%s|%s|%s", player.callsign(), systemInfo.c_str(), arguments, info.c_str());
+                chatdbRecordEvent("BUG", player.callsign(), command(), arguments, info.c_str());
+
+                std::string reply(arguments);
+                reply += " ";
+                reply += info;
+
+                Chat::LocalizedMessage lmsg(LSTR_BUG, LSTR_REPORTING, player.callsign(), reply.c_str());
+                const char* ircMessage = chatLString(lmsg);
+                wwiiIRCChannelMessage("-sys", ircMessage);
+                chatBroadcastLocMessage(commandList.begin(), commandList.end(), lmsg, [] (wwiiPlayer* const& subject) { return subject->isEffectiveGM(); });
+
+                player.message(LSTR_NOTE, LSTR_REPORTED, nullptr, nullptr);
+
+                return;
+        }
+} dotBug;
+
+//////////////////////////////////////////////////////////////////////
+// uptime command
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotUptime: public DotCommand
+{
+public:
+        DotUptime() : DotCommand("uptime", "Report number of minutes the system has been running"
+                                                                , NO_MASK, LSTR_UPTIME_USAGE, LSTR_UPTIME_DETAIL
+                                                                ) { }
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
+        {
+		int totalMins = serverUpTimeMinutes();
+		int days = totalMins / (60 * 24);
+		totalMins -= days * 60 * 24;
+		int hours = totalMins / 60;
+		totalMins -= hours * 60;
+		int mins = totalMins;
+
+		std::string timeStr;
+		timeStr.append("Running for ");
+		if (days > 0)
+		{
+			timeStr.append(std::to_string(days));
+			timeStr.append(" day");
+			if (days > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+		if (hours > 0)
+		{
+			timeStr.append(std::to_string(hours));
+			timeStr.append(" hour");
+			if (hours > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+		if (mins > 0)
+		{
+			timeStr.append(std::to_string(mins));
+			timeStr.append(" minute");
+			if (mins > 1)
+				timeStr.append("s");
+			timeStr.append(" ");
+		}
+
+                dbugLog(_FLI, "!UPTIME: %s", timeStr.c_str());
+		player.message(LSTR_NONE, LSTR_GENERIC, timeStr.c_str());
+
+                return;
+        }
+} dotUptime;
+
+
+//////////////////////////////////////////////////////////////////////
 // Player report submission
 //////////////////////////////////////////////////////////////////////
 
@@ -696,22 +756,21 @@ public:
 class DotReport : public DotCommand
 {
 public:
-	DotReport() : DotCommand("report", "Submit a bug/problem/feedback report"
+	DotReport() : DotCommand("report", "Report suspiscious player activity"
 								, NO_MASK, LSTR_REPORT_USAGE, LSTR_REPORT_DETAIL
 								) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, SCHAR* arguments) const  override
 	{
-		SCHAR info[MAX_MESSAGE_LENGTH + 1];
-
 		if ( !player.isPlaynet() && !player.isEffectiveGM() && _featureLockedM(player, REPORT_TIME_LIMIT_M) )
 			return;
 
-		info[0] = '[';
-		player.whereabouts(info+1, player.lastX(), player.lastY());
-		strcat(info, "]");
+		std::string info;
+		info.append("[");
+		player.whereabouts(info, player.lastX(), player.lastY());
+		info.append("]");
 
-		dbugLog(_FLI, "!REPORT:%s:.%s:%s %s", player.callsign(), command(), arguments, info);
-		chatdbRecordEvent("RPRT", player.callsign(), command(), arguments, info);
+		dbugLog(_FLI, "!REPORT:%s:.%s:%s %s", player.callsign(), command(), arguments, info.c_str());
+		chatdbRecordEvent("RPRT", player.callsign(), command(), arguments, info.c_str());
 
 		std::string reply(arguments);
 		reply += " ";
@@ -791,6 +850,38 @@ public:
 		player.message(LSTR_NOTE, LSTR_SERVER_TIME, chatTimeString(teulTime()));
 	}
 } dotTime;
+
+//////////////////////////////////////////////////////////////////////
+// Turn Trainer messages on or off
+//////////////////////////////////////////////////////////////////////
+
+class DotTROff : public DotCommand
+{
+public:
+	DotTROff() : DotCommand("troff", "Detune the TR channel"
+		, NO_MASK, LSTR_TROFF_USAGE, LSTR_TROFF_DETAIL
+	) { }
+
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
+	{
+		player.SetTrOff(true);
+		player.message(LSTR_NOTE, LSTR_TR_OFF, nullptr, nullptr);
+	}
+} dotTROff;
+
+class DotTROn : public DotCommand
+{
+public:
+	DotTROn() : DotCommand("tron", "Retune the TR channel"
+		, NO_MASK, LSTR_TRON_USAGE, LSTR_TRON_DETAIL
+	) { }
+
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
+	{
+		player.SetTrOff(false);
+		player.message(LSTR_NOTE, LSTR_TR_ON, nullptr, nullptr);
+	}
+} dotTROn;
 
 //////////////////////////////////////////////////////////////////////
 // List trainers in the game
@@ -888,10 +979,6 @@ public:
 	}
 } dotTrainers;
 
-//////////////////////////////////////////////////////////////////////
-// The .um command
-//////////////////////////////////////////////////////////////////////
-
 //! @internal
 class DotUM : public DotCommand
 {
@@ -904,8 +991,14 @@ public:
 	{
 		SINT32 mode = -1;
 
-		if ( !player.isSpawned() )
+		if (!player.isGM())
+			throw Chat::LStringErr(LSTR_UNKNOWN_COMMAND);
+
+		if (!player.isSpawned())
 			throw Chat::LStringErr(LSTR_ONLY_WHILE_SPAWNED);
+
+		if (!player.isBuzzard())
+			throw Chat::LStringErr(LSTR_ONLY_WHILE_BUZZARD);
 
 		if ( arguments[0] != '?' )
 		{
@@ -918,6 +1011,7 @@ public:
 			mode = 255;
 		}
 
+		// NOTE: this will only affect this spawn, mode selected is not stored - next spawn will read from player setting.
 		chatSendBandwidthNotice(player, (UINT32)mode);
 	}
 
@@ -1060,7 +1154,8 @@ private:
 		responses.push_back("Blame Hasselt for the poor quality of this wtf. It was gonna be funny until I got shot while typing it.");
 		responses.push_back("Too busy watching mercy with a machine gun?");
 		responses.push_back("Parachuting dogs should be careful where they pack their bone");
-		responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
+		//  responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
+		responses.push_back("World War II Online train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");  //  MJH - Feburary 27, 2018.
 		responses.push_back("Could everyone just stop getting shot?");
 		responses.push_back("WTF = Willy Tee Funny?");
 		responses.push_back("Please wait while we bill you a second time...");
@@ -1121,11 +1216,6 @@ public:
 		reset();
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
-	{
-        action(player, message) ;
-	}
-
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		const char* str;
@@ -1159,8 +1249,6 @@ public:
 
 //////////////////////////////////////////////////////////////////////
 //! @internal
-
-#include "dbug/dbugExtErrors.h"
 
 class DotTestError : public DotCommand
 {
@@ -1206,7 +1294,7 @@ public:
 		}
 
 		char response[80];
-		sprintf(response, "Sending you error code #%u", (UINT32)err);
+		strprintf(response, "Sending you error code #%u", (UINT32)err);
 		player.message(LSTR_NOTE, LSTR_GENERIC, response);
 
 		teulSendError(player.teulIndex(), err);

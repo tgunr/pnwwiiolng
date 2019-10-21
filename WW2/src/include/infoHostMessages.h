@@ -12,4 +12,4 @@
 extern SINT32 infoSendCompInfoRequest(SINT32 connection, const char* message);
 
 // Install the callbacks for dealing with non-auth playgate connections
-extern SINT32 infoInstallHostCallbacks(void);
+extern SINT32 infoInstallHostCallbacks();

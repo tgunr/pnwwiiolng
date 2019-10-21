@@ -46,7 +46,7 @@ weapSaveVehicleTypes()
 }
 
 void
-weapLoadIndexes(DB::handle_t* conn)
+weapLoadIndexes(DBHANDLE& conn)
 {
 	DBQuery query(conn
 		, "SELECT v.countryID, v.categoryID, v.classID, v.typeID"
@@ -86,7 +86,7 @@ weapLoadIndexes(DB::handle_t* conn)
 		WEAPON* const weap = weapLookup(spec);
 
 #ifdef DEV_BUILD
-		dbugLog(__FILE__, __LINE__, (weap ? Debug::ERR_DBUG : Debug::ERR_WARN)
+		dbugLog(_FL, (weap ? Debug::ERR_DBUG : Debug::ERR_WARN)
 						, "v:%u %s [%u.%u.%u.%u] campaignReady:%u access:%u next:%u weap:%p(%s)"
 						, oid, fullName
 						, (UINT32)spec.wCountry, (UINT32)spec.wCategory, (UINT32)spec.wClass, (UINT32)spec.wType
@@ -101,7 +101,7 @@ weapLoadIndexes(DB::handle_t* conn)
 			continue;
 
 		weap->m_localIndex = oid;
-		strncpy(weap->fullName, fullName, sizeof(weap->fullName));
+		strsafecpy(weap->fullName, fullName);
 
 		weapAddWeaponIndex(weap);
 

@@ -1,37 +1,38 @@
-
-#ifndef PN_PROJECT_SYSCFG_H
-#define PN_PROJECT_SYSCFG_H 1
+#ifndef __WW2_SYSCFG_H__
+#define __WW2_SYSCFG_H__ 1
 // Can't use a pragma guard, because there are multiple syscfgs.
 
-#if platOS == OS_WIN32
+//  ============================
+//
+//  WW2.exe - syscfg.h
+//
+//  ============================
 
-#define platBuild TEUL_CLIENT
+#if platOS == OS_WIN32
 
 // Windows defines
 #define OPENGL3D	1
 #define WIN32_LEAN_AND_MEAN
-#define FRONT_END
-
 #define _GDI32_
 
 #define NO_DEBUG_WRITE
-#pragma warning (disable: 4800) // shut the #$!@ up
 
 #include "include/platforms.h"
+#include "fio/fiostructure.h"
 
 #include <windows.h>
 #undef PostMessage
 
 // Project defines - Non-Specific
-typedef LOGICAL(*SYS_DDINITFUNC)(void);
-typedef LOGICAL(*SYS_D3DINITFUNC)(void);
-typedef LOGICAL(*SYS_DDRENDERFUNC)(void);
-typedef LOGICAL(*SYS_D3DRENDERFUNC)(void);
-typedef void(*SYS_DDKILLFUNC)(void);
-typedef void(*SYS_D3DKILLFUNC)(void);
-typedef void(*SYS_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_DDINITFUNC = LOGICAL(*)();
+using SYS_D3DINITFUNC = LOGICAL(*)();
+using SYS_DDRENDERFUNC = LOGICAL(*)();
+using SYS_D3DRENDERFUNC = LOGICAL(*)();
+using SYS_DDKILLFUNC = void(*)();
+using SYS_D3DKILLFUNC = void(*)();
+using SYS_MOUSEFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
+using SYS_TIMERFUNC = void(*)(WPARAM wparam, LPARAM lparam);
+using SYS_KEYBOARDFUNC = void(*)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #define MAXENUMDRIVERS		32
 #define MAXMIPLEVELS		12
@@ -42,11 +43,8 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 #define SYS_COMPANY_NAME		"Playnet"
 #define SYS_REGISTRY_NAME		_T(SYS_COMPANY_NAME) _T("\\") _T(SYS_TITLE)
 
-#define PREPATH ".\\Data\\"
 #define TERRAIN_PREPATH "Terrain\\"
 #define GR2DATA_PREPATH "gr2Data\\"
-#define USERDATA_PREPATH "\\Battleground Europe\\"
-#define USERDATA_PREPATH_BETA "\\Battleground Europe TEST\\"
 
 #define HIGHSPEED_LIGHTING
 
@@ -56,13 +54,17 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 // Project defines - DEBUG
 #ifdef _DEBUG
 #ifndef NO_LOGGING
+#ifndef EVENT_LOG
 #define EVENT_LOG
 #define EVENT_LOG_TIMES
 //		#define EVENT_LOG_EXTREME
 #endif
+#endif
 // #define MEMORY_DEBUG_EXTREME
 #elif defined(BETA_RELEASE)
-#define EVENT_LOG
+#ifndef EVENT_LOG
+# define EVENT_LOG
+#endif
 #endif	// _DEBUG
 
 #define NO_DEBUG_WRITE
@@ -71,23 +73,8 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #pragma warning (disable: 4800) // shut the #$!@ up
 
-#ifndef snprintf
-# define snprintf _snprintf
-#endif
 #ifndef usleep
 # define usleep(n) Sleep((n))
-#endif
-
-#if _MSC_VER >= 1500
-// Visual Studio 9
-#else
-#ifndef vsnprintf
-#define vsnprintf _vsnprintf
-#endif
-#endif // _MSC_VER >= 1500
-
-#ifndef strcasecmp
-#define strcasecmp _stricmp
 #endif
 
 // we undefine these so we can redefine them below
@@ -125,7 +112,7 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "include/precompile_includes.h"
 #include <deque>
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 
 #include "math/mathvect.h"
 #include "math/math3d.h"
@@ -148,7 +135,8 @@ typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "pi/pi.h"
 
-#endif
+extern UINT64 GetMicroSeconds(void);
 
 #endif
 
+#endif // __WW2_SYSCFG_H__

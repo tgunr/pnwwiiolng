@@ -1,7 +1,8 @@
-#pragma once
+#ifndef __MATHNUM_H__
+#define __MATHNUM_H__
 
 #include "pi/pi.h"
-#include "math/Rand.h"
+#include "Rand.h"
 
 #define ABS(x) x < 0 ? -x : x
 
@@ -12,8 +13,12 @@ namespace PNRandom
     // Return min <= x <= max
     inline int random(int mn, int mx)
     {
-        int diff = mx - mn + 1;
-        return mn + (randomMT() % diff);
+        if (mn == 0 && mx == RAND_MAX) {
+            return randomMT();
+        } else {
+            int diff = mx - mn + 1;
+            return mn + (randomMT() % diff);
+        }
     }
 
     inline float random(float mn, float mx)
@@ -62,24 +67,6 @@ extern const Vec3f& GetEightPartOrdinalDirection(unsigned char ordinal);
 
 extern UINT32 closestPowerOfTwo(UINT32 x);
 
-// Prevent link errors with inline
-#ifndef MATHNUM_INLINE
-
 extern void mathFloatToInt(SINT32* int_pointer, FLOAT32 f);
-
-#else // MATHNUM_INLINE
-
-#define MATHNUM_INLINE
-
-#if platOS == OS_MACOS
-    #define INLINE inline
-#else
-    #define INLINE __forceinline
-#endif
-
-#include "math/mathnum.cpp"
-
-#undef INLINE
-#undef MATHNUM_INLINE
 
 #endif

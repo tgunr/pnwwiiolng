@@ -12,7 +12,7 @@
 class SerialNumber
 {
 public:
-	typedef unsigned long long serialno_t;
+	using serialno_t = unsigned long long;
 
 public:
 	SerialNumber(const char* const name_, const serialno_t minimum_, const serialno_t interval_, const serialno_t maximum_)

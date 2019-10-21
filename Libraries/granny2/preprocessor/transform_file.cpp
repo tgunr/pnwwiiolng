@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/transform_file.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #15 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "preprocessor.h"
 #include <stdio.h>
@@ -20,6 +20,9 @@ static const AxisMapping AxisMap[] = {
     { "X", { 1, 0, 0 } },
     { "Y", { 0, 1, 0 } },
     { "Z", { 0, 0, 1 } },
+    { "PosX", { 1, 0, 0 } },
+    { "PosY", { 0, 1, 0 } },
+    { "PosZ", { 0, 0, 1 } },
     { "NegX", { -1, 0, 0 } },
     { "NegY", { 0, -1, 0 } },
     { "NegZ", { 0, 0, -1 } },
@@ -44,21 +47,14 @@ void FindAxisArg(const char* Arg, granny_triple* Axis)
 }
 
 
-bool TransformFile(input_file&     InputFile,
-                   key_value_pair* KeyValues,
-                   granny_int32x   NumKeyValues,
-                   granny_memory_arena*)
+granny_file_info*
+TransformFile(char const*          OriginalFilename,
+              char const*          OutputFilename,
+              granny_file_info*    Info,
+              key_value_pair*      KeyValues,
+              granny_int32x        NumKeyValues,
+              granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
-    granny_file* File = InputFile.GrannyFile;
-    granny_file_info* Info = GrannyGetFileInfo(File);
-    if (Info == 0)
-    {
-        ErrOut("unable to obtain a granny_file_info from the input file\n");
-        return false;
-    }
-
     // Parse out the coordinate system
     granny_real32 UnitsPerMeter = 1.0f;
     granny_triple RightVector = { 1, 0, 0 };
@@ -95,7 +91,7 @@ bool TransformFile(input_file&     InputFile,
                                      Affine3, Linear3x3, InverseLinear3x3) == false)
     {
         ErrOut("GrannyComputeBasisConversion failed.  Probably bad coordinate system specified\n");
-        return false;
+        return 0;
     }
 
     // Just transform the file...
@@ -104,18 +100,28 @@ bool TransformFile(input_file&     InputFile,
                         1e-5f, 1e-5f,
                         GrannyRenormalizeNormals | GrannyReorderTriangleIndices);
 
-    // Since we've transformed into the final coordinate system, we
-    // don't need the ArtToolInfo anymore.  Go ahead and remove that
-    // from the output
-    Info->ArtToolInfo = 0;
+    Info->ArtToolInfo->UnitsPerMeter = UnitsPerMeter;
+    memcpy(Info->ArtToolInfo->UpVector,    UpVector,    sizeof(UpVector));
+    memcpy(Info->ArtToolInfo->RightVector, RightVector, sizeof(RightVector));
+    memcpy(Info->ArtToolInfo->BackVector,  BackVector,  sizeof(BackVector));
 
-
-    // Write out the modified Info
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, File, true, true, false);
+    return Info;
 }
 
-static CommandRegistrar RegTransformFile(eSingleFile_NoMultiRun,
-                                         TransformFile,
+static const char* HelpString =
+    (" TransformFile converts to a consistent coordinate system. Saves calling\n"
+     " GrannyTransformFile at runtime.\n"
+     "\n"
+     "    preprocessor TransformFile char.gr2 -output char_xf.gr2 \\\n"
+     "        -unitsPerMeter 1.0 -right PosX -back PosZ -up PosY\n"
+     "\n"
+     " Valid keys for the -right/-back/-up fields are:\n"
+     "   PosX NegX\n"
+     "   PosY NegY\n"
+     "   PosZ NegZ\n");
+
+static CommandRegistrar RegTransformFile(TransformFile,
                                          "TransformFile",
-                                         "Converts to a consistent coordinate system.");
+                                         "Converts to a consistent coordinate system.",
+                                         HelpString);
 

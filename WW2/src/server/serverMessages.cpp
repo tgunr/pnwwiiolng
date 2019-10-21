@@ -19,7 +19,6 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 
@@ -34,7 +33,7 @@ TEUL_CALLBACK*			CLUSTER_SHUTDOWN_CB;
 // move players from one server list to another and update state
 extern SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update);
 
-extern ERROR_FUNCTION*	extErrorFn;
+extern ERROR_FUNCTION	extErrorFn;
 
 static SINT32
 _recvPlayerUpdate(ACTION_OBJECT* const a)
@@ -47,7 +46,7 @@ _recvPlayerUpdate(ACTION_OBJECT* const a)
 
 	Server::PlayerStatusUpdate& update = a->read<Server::PlayerStatusUpdate>();
 
-	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %llu "
+	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %" PR64BitUT ""
 				,update.dispatch.m_customerID
 				,update.dispatch.m_callsign
 				,update.id
@@ -125,15 +124,6 @@ _sendHeartBeat(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static void
-_persXferError(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
-{
-	dbugLog(_FLA, "couldn't transfer persona!");
-
-	if ( extErrorFn)
-		(extErrorFn) (teulIndex, data, size, object, error);
-}
-
 static SINT32
 _sendPersonaExit(ACTION_OBJECT* const a)
 {
@@ -164,19 +154,16 @@ _recvPlayerMirror(ACTION_OBJECT* const a)
 	mirror.packer(TEUL_UNPACK, a);
 	Server::PersonaMirrorReply reply(mirror);
 
-	if ( g_logDebug )
-	{
-		char remoteServerAddress[64];
-		teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
-		dbugLog(_FLI, "xfer:%llu(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
-					, mirror.xferID()
-					, remoteServerAddress
-					, mirror.dispatch().m_customerID
-					, mirror.dispatch().m_callsign
-					, mirror.dispatch().m_OTP
-					, teulGetAddress(mirror.dispatch().m_clientIP)
-					);
-	}
+    char remoteServerAddress[64];
+    teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
+    dbugLog(_FLD, "xfer:%" PR64BitUT "(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
+                , mirror.xferID()
+                , remoteServerAddress
+                , mirror.dispatch().m_customerID
+                , mirror.dispatch().m_callsign
+                , mirror.dispatch().m_OTP
+                , teulGetAddress(mirror.dispatch().m_clientIP)
+                );
 
 	const SINT32 result = mirror.onReceive(a->teulIndex);
 
@@ -222,11 +209,11 @@ _recvHostConfig(ACTION_OBJECT* const a)
 }
 
 SINT32
-serverInitCallbacks(void)
+serverInitCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+	{
 		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB);
-		PLAYER_MIRROR_CB->error = _persXferError;
 
 		REGISTER_SENDRECV(PLAYER_MIRROR_REPLY_Y, _sendPlayerMirrorReply, _recvPlayerMirrorReply, PLAYER_MIRROR_REPLY_CB);
 
@@ -239,7 +226,7 @@ serverInitCallbacks(void)
 		REGISTER_RECEIVER(PLAYER_UPDATE_Y, _recvPlayerUpdate);
 
 		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
 }
 

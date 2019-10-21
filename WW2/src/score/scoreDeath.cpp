@@ -4,6 +4,7 @@
 // Implement the functionality behind Scoring::Death
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "inst/instTypes.h"
 #include "map/mapPlayer.h"
@@ -12,18 +13,18 @@
 #include "score/scoreSortie.h"
 #include "weap/weapDefs.h"
 #include "wwii/wwiiConfig.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 
 //////////////////////////////////////////////////////////////////////
 // Player killed themselves.
 
 static void
-_doSuicide(const Player& idiotPlayer, const Scoring::Sortie& idiotSortie)
+_doSuicide(const Player& deadPlayer, const Scoring::Sortie& idiotSortie)
 {
 #ifdef BETA_RELEASE
 	///TODO:134:REMOVE
 	char explanation[81];
-	sprintf(explanation, "%s killed by self or AI.", idiotPlayer.callsign());
+	strprintf(explanation, "%s killed by self or AI.", deadPlayer.callsign());
 	chatSendBroadcastAll(LSTR_BETA, LSTR_GENERIC, explanation);
 #endif
 }
@@ -35,7 +36,6 @@ static void
 _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 {
 /*
-#if !defined(CHINA) && !defined(HAPPYOO)
 	if ( ! host_config.kills.notifyKiller )
 		return;
 	if ( victim.spec().wCategory != _INFANTRY && victim.spec().wCategory != _GROUND_VEHICLE )
@@ -72,17 +72,16 @@ _areaKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer)
 	snprintf(kill, 127, fmt, victimName, killerName);
 
 	chatEmitMessageFromPlayer(activePlayer->playerID(), LSTR_CAUTION, LSTR_GENERIC, kill, "");
-#endif
 */
 }
 
 //////////////////////////////////////////////////////////////////////
-// Notify a player he got a kill.
+// Notify a player they got a kill.
 
 static void
 _playerKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer, const bool friendlyFire)
 {
-	if ( host_config.kills.notifyKiller != 2 )
+	if ( !host_config.kills.notifyKiller )
 		return;
 
 	char vehicleName[MAX_HANDLE_SIZE];
@@ -110,7 +109,7 @@ _playerKillNotice(const Scoring::Sortie& victim, const Scoring::Sortie& killer, 
 static void
 _doKillARat(const Scoring::Sortie& victim, const Scoring::Sortie& killer, bool friendlyFire)
 {
-	if ( friendlyFire || ! host_config.kills.reportRats )
+	if ( friendlyFire || !host_config.kills.reportRats )
 		return;
 
 	const bool ratKiller = killer.isPlaynet();
@@ -255,7 +254,7 @@ _awardAssists(Scoring::Sortie& deadSortie, Scoring::Sortie& killerSortie)
 bool
 Scoring::Death::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " death");	///TODO:134:REMOVE
+	dbugLog(_FLI, " death");	///TODO:134:REMOVE
 
 	// We need to look up the sortie on which the player died.
 	Scoring::Sortie* const deadSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
@@ -303,10 +302,10 @@ Scoring::Death::process(Player* const lhsPlayer)
 
 	const bool friendlyFire = (deadSortie->side() == killerSortie->side());
 
-	const WEAPON_SPEC& killerSpec = killerSortie->spec();
-	const WEAPON_SPEC& deadSpec = deadSortie->spec();
+	const WEAPON_SPEC killerSpec = killerSortie->spec();
+	const WEAPON_SPEC deadSpec = deadSortie->spec();
 	DBThread::Do(DBThread::Default
-		, "CALL wwii.p_add_kill"
+		, "CALL `wwii`.`p_add_kill`"
 			"(%u, %u,%u,%u,%u, %u,%u,%u,%u, %u, %u,%u,%u,%u, %u,%u,%u,%u, 0, %d,%d,%d)"
 			, killerSortie->sortieID()
 			, 0 /*enemy->m_crew[0]*/, 0 /*enemy->m_personas[0]*/, 0 /*enemy->m_crew[1]*/, 0 /*enemy->m_personas[1]*/

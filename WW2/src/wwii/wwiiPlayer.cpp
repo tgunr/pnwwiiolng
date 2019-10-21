@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <map>
-#include "versionNo.h"
+#include "chat/chatLocalizedMessage.h"
 #include "wwii/wwiiPlayer.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiPermissions.h"
@@ -21,204 +21,10 @@
 #include "teul/teulBasic.h"				// For teulClose
 #include "mem/mem.h"
 
-// Allocate in blocks of 64 at a time.
-static const UINT32 _CALLOC_RATE = 64;
-// How fast to grow the pool indexes (to avoid allocations)
-static const UINT32 _POOL_GROWTH_RATE = 1024;
-// Rounding size (how big each allocation is rounded up to)
-static const size_t _ROUNDING = 1023;
-// Maximum number of pools to have (max size of a player)
-static const UINT32 _MAX_POOLS = 3;
-
-static std::mutex allocMutex;
-typedef UINT64 StorageHeader;
-typedef	std::vector<UINT64*> Pool;
-static UINT32 _callocs = 0;
-static UINT32 _reserved = 0;
-static UINT32 _inUse = 0;
-static UINT32 _news = 0;
-static UINT32 _frees = 0;
-// Pools are ONE BASED, i.e. pools[0] is actually the
-// pool for objects with a non-zero size.
-static Pool pools[_MAX_POOLS];
-
 // Callback registration for sending localized messages.
 namespace Chat
 {
 	TEUL_CALLBACK*	_SEND_LOCALIZED_MESSAGE;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Normalize the per-object size into a standardized object allocation
-// size based on _ROUNDING. Sizes are rounded up.
-
-static inline size_t
-_normalizeObjectSize(size_t actualSize)
-{
-	assert( actualSize > 0 );
-	return (actualSize + sizeof(StorageHeader) + _ROUNDING) & ~_ROUNDING;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Given an allocation size, return which pool to use.
-
-static inline UINT32
-_getPoolNo(size_t allocSize)
-{
-	assert( (allocSize & _ROUNDING) == 0 );
-
-	UINT32 poolNo = (UINT32)(allocSize / (_ROUNDING + 1));
-	// This will always be > 1. "pools" is 1 based so we
-	// must subtract one to get the poolNo
-	poolNo = poolNo - 1;
-
-	assert( poolNo < _MAX_POOLS );
-
-	return poolNo;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Custom allocator for wwiiPlayer derived objects.
-// Sizes are rounded up into pages based on _ROUNDING, this helps
-// avoid memory fragmentation but also tends to group different
-// types into one memory space.
-// Free objects are kept on our own stack to tend to re-use the
-// same memory space and reduce system alloc calls, and are also
-// allocated _CALLOC_RATE at a time to further reduce alloc
-// calls.
-// Allocations are made with calloc and re-used objects are auto-
-// matically memset to ensure the constructor starts with an
-// all zeros memory space.
-// A mutex is used to make this thread safe.
-
-void*
-wwiiPlayer::operator new(size_t actualSize)
-{
-	// Because wwiiPlayer is intended to be a base clase, we
-	// need to be aware that descendants may have different
-	// sizes; by normalizing the sizes to significant
-	// boundaries we can avoid pool fragmentation by sharing
-	// the same blocks for different sized structs. So I use
-	// multiple pools indexed by (normalized size / boundary)
-	size_t allocSize = _normalizeObjectSize(actualSize);
-	UINT32 poolNo = _getPoolNo(allocSize);
-
-	Pool& pool = pools[poolNo];
-
-	StorageHeader* ptr = nullptr;
-
-	// We'll need a lock.
-	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
-
-	// When the pool is empty, allocate a batch of objects.
-	if ( pool.empty() )
-	{
-		if ( pool.capacity() < _POOL_GROWTH_RATE )
-			pool.reserve(_POOL_GROWTH_RATE);
-
-		// calloc: so that we have pre-zero'd memory.
-		void* block = memCalloc(_CALLOC_RATE, allocSize);
-		_callocs++;
-		if ( block == nullptr )
-		{
-			delete lock;
-			throw std::bad_alloc();
-		}
-
-		_reserved += _CALLOC_RATE;
-
-		// Now we need to split this block up into units
-		// and feed them backwards onto the pool
-		for ( UINT32 i = 1; i <= _CALLOC_RATE; ++i )
-		{
-			StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
-			pool.push_back(alloc);
-		}
-	}
-
-	// Grab the last entry off the vector
-	ptr = pool.back();
-	pool.pop_back();
-
-	// Adjust counters
-	_reserved--;
-	_inUse++;
-	_news++;
-
-	delete lock;
-
-	assert( ptr != nullptr );
-
-	if ( *ptr != 0 )
-	{
-		// Initialized, so it needs to be cleaned
-		memset(ptr, 0, allocSize);
-	}
-	*ptr = allocSize;
-
-	dbugLog(_FLD, "+player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", actualSize, poolNo, allocSize, ptr);
-
-	// Return the address of data after StorageHeader
-	return ++ptr;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Custom delete operator puts the objects back into the apporipate
-
-void
-wwiiPlayer::operator delete(void* p)
-{
-	// Each player allocation actually carries a secret "size" value.
-	StorageHeader* ptr = static_cast<StorageHeader*>(p) - 1;
-
-	// Make sure storage header is good data
-	UINT32 poolNo = _getPoolNo((size_t)*ptr);
-	Pool& pool = pools[poolNo];
-
-	dbugLog(_FLD, "-player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr);
-
-	size_t newSize = 0;
-
-	{
-		std::lock_guard<std::mutex> lock(allocMutex);
-
-		// We're going to push this onto the top of the
-		// pool, so check if this would push the pool
-		// over it's capacity and grow it by a suitable
-		// increment in advance.
-		if ( pool.size() + 1 >= pool.capacity() )
-		{
-			newSize = pool.capacity() + _POOL_GROWTH_RATE;
-			pool.reserve(newSize);
-		}
-
-		// Push it onto the back of the pool
-		pool.push_back(ptr);
-
-		// Adjust counters
-		_reserved++;
-		_inUse--;
-		_frees++;
-	}
-
-	if ( newSize > 0 )
-	{
-		dbugLog(_FLD, "playerPool#%u grown to %" PRSizeT " spaces", poolNo, newSize);
-	}
-}
-
-//////////////////////////////////////////////////////////////////////
-// Log stats on the player allocation system
-
-void
-wwiiPlayer::logStats()
-{
-	std::lock_guard<std::mutex> lock(allocMutex);
-	dbugLog(_FLN, "callocs:%u news:%u frees:%u reserved:%u inUse:%u"
-					, _callocs
-					, _news, _frees
-					, _reserved, _inUse
-					);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -268,10 +74,10 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 {
 	m_dispatch.m_customerID = (overridingCustomerID) ? overridingCustomerID : rhs.m_customerID;
 	m_dispatch.m_OTP = rhs.m_OTP;
-	strncpy(m_dispatch.m_callsign, rhs.m_callsign, sizeof(m_dispatch.m_callsign));
-	m_dispatch.m_callsign[sizeof(m_dispatch.m_callsign) - 1] = 0;
 	m_dispatch.m_clientIP = rhs.m_clientIP;
 	m_dispatch.m_appVersion = rhs.m_appVersion;
+	m_dispatch.m_platform = rhs.m_platform;
+	strsafecpy(m_dispatch.m_callsign, rhs.m_callsign);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -280,7 +86,7 @@ wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 void
 wwiiPlayer::log(const char* msg) const
 {
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, msg);
@@ -289,8 +95,6 @@ wwiiPlayer::log(const char* msg) const
 void
 wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* mask, ...) const
 {
-	if ( errType == Debug::ERR_DBUG && !g_logDebug ) return;
-
 	static char buf[512];
 
 	va_list args;
@@ -299,7 +103,7 @@ wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* 
 	va_end(args);
 
 	dbugLog(file, lineno, errType
-				, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
+				, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " %s"
 				, teulIndex(), playerID(), callsign()
 				, instance().category(), instance().type(), instance().handle(), instance().id()
 				, buf);
@@ -311,7 +115,7 @@ wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* 
 bool
 wwiiPlayer::isEffectiveGM() const
 {
-#if defined(TRAINING_SERVER) || defined(BETA_RELEASE) || defined(FRES)
+#if defined(TRAINING_SERVER) || defined(BETA_RELEASE)
 	return permissions(IS_PLAYNET | GAME_MANAGER | GAME_TRAINER);
 #else
 	return permissions(IS_PLAYNET | GAME_MANAGER);
@@ -354,7 +158,7 @@ wwiiPlayer::Release(SINT32 onTeulIndex, Server::ReleaseType releaseType)
 	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, releaseType);
 
 	if ( closeRequired )
-		teulClose(onTeulIndex, Teul::Closing::PlayerDtor);
+		teulClose(onTeulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////

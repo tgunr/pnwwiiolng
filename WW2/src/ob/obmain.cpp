@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <set>
 #include <ctype.h>
 #include <math.h>
@@ -34,11 +34,7 @@
 
 #include "spt/sptmain.h"
 
-#if platOS == OS_MACOS
-#include <pthread.h>
-#endif
-
-typedef std::unordered_set<OBJECT*> ObjectSet;
+using ObjectSet = std::unordered_set<OBJECT*>;
 
 static ObjectSet objectmap;
 static ObjectSet updatecallbacks;
@@ -121,12 +117,12 @@ LOGICAL obmainMoveToNotObjectTree(OBJECT* lpobj)
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 // doesn't work anymore since goddamn shawnce changed the application loop
 //	if(!pthread_main_np())
-//		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
+//		piExitProgram(_FL, "Adding object outside main thread!");
 #endif
 
 	if (lpobj == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	listDeleteOBJECT(lpobj);
@@ -140,19 +136,19 @@ LOGICAL obmainMoveToNotObjectTree(OBJECT* lpobj)
 		listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainMoveToObjectTree(OBJECT* lpobj)
 {
 #if defined(BETA_RELEASE) && (platOS == OS_MACOS)
 //	if(!pthread_main_np())
-//		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
+//		piExitProgram(_FL, "Adding object outside main thread!");
 #endif
 
 	if (lpobj == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	listDeleteOBJECT(lpobj);
@@ -166,7 +162,7 @@ LOGICAL obmainMoveToObjectTree(OBJECT* lpobj)
 		listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainAttachObject(OBJECT* lpmain, OBJECT* lpobj)
@@ -178,7 +174,7 @@ piVECTOR	obox[2];
 	if (lpmain == nullptr ||
 		lpobj == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpobj->flags |= OBJECT_ATTACHED;
@@ -187,14 +183,14 @@ piVECTOR	obox[2];
 
 	if (!ldmdlGetObjectBounds(lpmain, &loc, obox, &minrad, &maxrad))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpmain->loc = loc;
 	lpmain->obox[0] = obox[0];
 	lpmain->obox[1] = obox[1];
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainAddChildObject(OBJECT* lpmain, OBJECT* lpobj)
@@ -202,13 +198,13 @@ LOGICAL obmainAddChildObject(OBJECT* lpmain, OBJECT* lpobj)
 	if (lpmain == nullptr ||
 		lpobj == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpobj->child = lpmain->child;
 	lpmain->child = (OBJECT*)lpobj;
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainSetObject(OBJECT* lpnew, OBJECT* lpold)
@@ -216,7 +212,7 @@ LOGICAL obmainSetObject(OBJECT* lpnew, OBJECT* lpold)
 	if (lpnew == nullptr ||
 		lpold == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* prev = (OBJECT*)lpnew->prev;
@@ -225,7 +221,7 @@ LOGICAL obmainSetObject(OBJECT* lpnew, OBJECT* lpold)
 	lpnew->prev = (OBJECT*)prev;
 	lpnew->next = (OBJECT*)next;
 
-	return(TRUE);
+	return TRUE;
 }
 
 void obmainFreeObjectMemory(OBJECT*  lpobj)
@@ -370,7 +366,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 
 	if (lpobj->animModel != nullptr)
 	{
-		gr2AnimKillObject(lpobj);
+		gr2AnimKillObject(*lpobj);
 	}
 
     if(lpobj->meshContext)
@@ -464,7 +460,7 @@ OBJECT* obmainFindChildObject(const char* group, const char* name)
 	OBJECT* lpgrp = obmainFindNamedObject(group);
 	if (lpgrp == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpgrp->child;
@@ -522,7 +518,7 @@ LOGICAL obmainSetFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -532,7 +528,7 @@ LOGICAL obmainSetFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 		{
 			if (!obmainSetFlagsInObjectTree(lpobj->child, flags))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -547,7 +543,7 @@ LOGICAL obmainSetFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does do siblings at top level!
@@ -555,7 +551,7 @@ LOGICAL obmainClearFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -565,7 +561,7 @@ LOGICAL obmainClearFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 		{
 			if (!obmainClearFlagsInObjectTree(lpobj->child, flags))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -580,7 +576,7 @@ LOGICAL obmainClearFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -588,7 +584,7 @@ LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -608,7 +604,7 @@ LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 		{
 			if (!obmainSetFlagsInObjectTree(lpobj->child, flags))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -623,7 +619,7 @@ LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -631,7 +627,7 @@ LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -651,7 +647,7 @@ LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 		{
 			if (!obmainClearFlagsInObjectTree(lpobj->child, flags))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -666,7 +662,7 @@ LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does do siblings at top level!
@@ -674,7 +670,7 @@ LOGICAL obmainSetFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -684,7 +680,7 @@ LOGICAL obmainSetFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 		{
 			if (!obmainSetFlag2InObjectTree(lpobj->child, flag2))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -699,7 +695,7 @@ LOGICAL obmainSetFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does do siblings at top level!
@@ -707,7 +703,7 @@ LOGICAL obmainClearFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -717,7 +713,7 @@ LOGICAL obmainClearFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 		{
 			if (!obmainClearFlag2InObjectTree(lpobj->child, flag2))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -732,7 +728,7 @@ LOGICAL obmainClearFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -740,7 +736,7 @@ LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -760,7 +756,7 @@ LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 		{
 			if (!obmainSetFlag2InObjectTree(lpobj->child, flag2))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -775,7 +771,7 @@ LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -783,7 +779,7 @@ LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -803,7 +799,7 @@ LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 		{
 			if (!obmainClearFlag2InObjectTree(lpobj->child, flag2))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -818,7 +814,7 @@ LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Flag 3
@@ -827,7 +823,7 @@ LOGICAL obmainSetFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -837,7 +833,7 @@ LOGICAL obmainSetFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 		{
 			if (!obmainSetFlag3InObjectTree(lpobj->child, flag3))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -852,7 +848,7 @@ LOGICAL obmainSetFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does do siblings at top level!
@@ -860,7 +856,7 @@ LOGICAL obmainClearFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -870,7 +866,7 @@ LOGICAL obmainClearFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 		{
 			if (!obmainClearFlag3InObjectTree(lpobj->child, flag3))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -885,7 +881,7 @@ LOGICAL obmainClearFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -893,7 +889,7 @@ LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -913,7 +909,7 @@ LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 		{
 			if (!obmainSetFlag3InObjectTree(lpobj->child, flag3))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -928,7 +924,7 @@ LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 // Does NOT do siblings at top level!
@@ -936,7 +932,7 @@ LOGICAL obmainClearFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 {
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	OBJECT* lpobj = lpmain;
@@ -956,7 +952,7 @@ LOGICAL obmainClearFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 		{
 			if (!obmainClearFlag3InObjectTree(lpobj->child, flag3))
 			{
-				return(FALSE);
+				return FALSE;
 			}
 		}
 
@@ -971,7 +967,7 @@ LOGICAL obmainClearFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 		lpobj = lpobj->sibling;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 OBJECT* obmainFindGroupObject(const char* name)
@@ -1035,7 +1031,7 @@ OBJECT*    lpobj;
 	return(nullptr);
 }
 
-OBJECT* obmainGetFirstTopmostObject(void)
+OBJECT* obmainGetFirstTopmostObject()
 {
 	return (OBJECT*)topmostlist.next;
 }
@@ -1045,31 +1041,16 @@ OBJECT* obmainGetNextTopmostObject(OBJECT* lpobj)
 	return lpobj->next;
 }
 
-OBJECT* obmainFindTopmostObject(const char* name)
-{
-OBJECT*    lpobj;
+OBJECT* obmainFindTopmostObject(const char* name) {
+	for ( OBJECT* obj = topmostlist.next ; obj != nullptr ; obj = obj->next ) {
+		// This list should only contain top-most objects.
+		assert ( (obj->flag2 & OBJECT_TOPMOST) );
 
-	lpobj = (OBJECT*)topmostlist.next;
-	while (lpobj != nullptr)
-	{
-		// search only the topmost objects in the list
-
-        assert( lpobj->flag2 & OBJECT_TOPMOST);
-
-		//if (lpobj->flag2 & OBJECT_TOPMOST)
-		{
-
-			if (strcasecmp(lpobj->name, name) == 0)
-			{
-				//return(lpobj);
-                break;
-			}
-		}
-
-		lpobj = (OBJECT*)lpobj->next;
+		if ( strcasecmp(obj->name, name) == 0 )
+			return obj;
 	}
 
-	return(lpobj);
+	return nullptr;
 }
 
 OBJECT* obmainGetFirstSubobject(OBJECT* lpmain)
@@ -1116,7 +1097,7 @@ SINT8*	pre, *ptr;
 
 	if (comment == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	ptr = comment;
@@ -1136,11 +1117,11 @@ SINT8*	pre, *ptr;
 		if (strncmp(pre, cmp, ptr - pre) == 0)
 		{
 			*retptr = pre;
-			return(TRUE);
+			return TRUE;
 		}
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, const SINT8* cmp)
@@ -1149,7 +1130,7 @@ LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, const 
 	int len;
 	if (comment == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	len = strlen(cmp);
@@ -1170,11 +1151,11 @@ LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, const 
 		if (strncmp(pre, cmp, len) == 0)
 		{
 			*retptr = pre;
-			return(TRUE);
+			return TRUE;
 		}
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 LOGICAL obmainFindCommentName(SINT8** retptr, SINT8* comment, const SINT8* cmp)
 {
@@ -1182,7 +1163,7 @@ SINT8*	pre, *ptr;
 
 	if (comment == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	ptr = comment;
@@ -1202,7 +1183,7 @@ SINT8*	pre, *ptr;
 		if (strncmp(pre, cmp, ptr - pre) == 0)
 		{
 			*retptr = ptr;
-			return(TRUE);
+			return TRUE;
 		}
 
 		pre = strstr(ptr, "\r\n");
@@ -1216,7 +1197,7 @@ SINT8*	pre, *ptr;
 		}
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SINT8* cmp)
@@ -1225,7 +1206,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SIN
 
 	if (comment == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	int n = strlen(cmp);
@@ -1247,7 +1228,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SIN
 		if (strncmp(pre, cmp, n) == 0)
 		{
 			*retptr = pre;
-			return(TRUE);
+			return TRUE;
 		}
 
 		pre = strstr(ptr, "\r\n");
@@ -1261,7 +1242,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SIN
 		}
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL obmainFindComment(OBJECT** retobj, OBJECT* lpmain, const char* comment)
@@ -1271,7 +1252,7 @@ OBJECT*    lpobj;
 
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpobj = lpmain;
@@ -1281,20 +1262,20 @@ OBJECT*    lpobj;
 		{
 			if (obmainFindComment(retobj, lpobj->child, comment))
 			{
-				return(TRUE);
+				return TRUE;
 			}
 		}
 
 		if (obmainFindCrackedComment(&ptr, lpobj->comment, comment))
 		{
 			*retobj = lpobj;
-			return(TRUE);
+			return TRUE;
 		}
 
 		lpobj = lpobj->sibling;
 	}
 
-	return(FALSE);
+	return FALSE;
 }
 
 LOGICAL obmainFindCommentCallback(OBJECT* lpmain, char* comment, UINT32 user, PROCESSCALLBACK callback)
@@ -1305,7 +1286,7 @@ OBJECT*    lpobj;
 
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpobj = lpmain;
@@ -1339,7 +1320,7 @@ OBJECT*    lpobj;
 
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	lpobj = lpmain;
@@ -1367,21 +1348,20 @@ OBJECT*    lpobj;
 
 LOGICAL obmainFindObjectLOD(OBJECT* lpmain, int lod, PROCESSCALLBACK callback)
 {
-SINT8		lodname[32];
-
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	sprintf(lodname, "lod%d", lod);
+	char lodname[32];
+	strprintf(lodname, "lod%d", lod);
 
 	if (!obmainFindCommentCallback(lpmain, lodname, lod, callback))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainFindObjectDamage(OBJECT* lpmain, int dmg, PROCESSCALLBACK callback)
@@ -1390,36 +1370,27 @@ SINT8		dmgname[32];
 
 	if (lpmain == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	sprintf(dmgname, "damage %d", dmg);
 
 	if (!obmainFindCommentCallback(lpmain, dmgname, dmg, callback))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
-void obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata)
+void obmainFindCallback(OBJECT* lpmain, void(*callback)(OBJECT&, void*), void* userdata)
 {
-	OBJECT* lpobj = nullptr;
-
-	if (lpmain == nullptr)
-		return;
-
-	lpobj = lpmain;
-
-	while (lpobj)
+	for (auto lpobj = lpmain; lpobj; lpobj = lpobj->sibling)
 	{
 		if (lpobj->child)
 			obmainFindCallback(lpobj->child, callback, userdata);
 
-		callback(lpobj, userdata);
-
-		lpobj = lpobj->sibling;
+		callback(*lpobj, userdata);
 	}
 }
 
@@ -1431,7 +1402,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, const char* name, int numverts, 
 	lpobj = obmainGetNewObject();
 	if (lpobj == nullptr)
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 #ifdef SPATIAL_DB
@@ -1461,7 +1432,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, const char* name, int numverts, 
 			lpobj->pscdn == nullptr)
 		{
 			obmainFreeObject(lpobj);
-			return(FALSE);
+			return FALSE;
 		}
 
 		//if (lpobj->flags & OBJECT_TESSELATION)
@@ -1471,7 +1442,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, const char* name, int numverts, 
             if (lpobj->ptverts == nullptr)
 			{
 				obmainFreeObject(lpobj);
-				return(FALSE);
+				return FALSE;
 			}
 		}
 	}
@@ -1489,7 +1460,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, const char* name, int numverts, 
 
 	*newobj = lpobj;
 
-	return(TRUE);
+	return TRUE;
 }
 
 LOGICAL obmainCreateObject(OBJECT** newobj, const char* name, int numverts, int numtris)
@@ -1632,32 +1603,32 @@ int obmainGetObjects(LISTHEADER** lplist)
 	return(NumObjUsed);
 }
 
-LOGICAL obmainInit(void)
+LOGICAL obmainInit()
 {
 	NumObjUsed = 0;
 
     if (!obdrawInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (!obdliteInit())
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
 	if (!obpoolInit("blitzWor.csv"))
 	{
-		return(FALSE);
+		return FALSE;
 	}
 
-	return(TRUE);
+	return TRUE;
 }
 
 
 extern void ldfltKill() ;	// It's only used here, so why pollute namespaces with it?
 
-void obmainKill(void)
+void obmainKill()
 {
 	OBJECT*	lpobj, *prev, *next;
 
@@ -1696,7 +1667,7 @@ void obmainKill(void)
     Write_Log(LOG_OLD, LOG_INFO, "[obmainKill]");
 }
 
-LOGICAL obmainUpdate(void)
+LOGICAL obmainUpdate()
 {
 	if (!obwldUpdate())
 		return FALSE;
@@ -1795,7 +1766,7 @@ FLOAT64 TempNum;
 piVECTOR TempVec;
 piMATRIX InvMat;
 FLOAT64 OneOverGridSize;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	if (Object == nullptr)
 	{
@@ -1817,7 +1788,7 @@ FLOAT64VECTOR WorldOriginOffset;
 		math3dInvertMatrix(&InvMat,&Object->mat);
 	}
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	OneOverGridSize = 1.0/GridSize;
 
@@ -1833,21 +1804,21 @@ FLOAT64VECTOR WorldOriginOffset;
 
 		TempNum = TempVec.x;
 
-		TempNum += WorldOriginOffset.x;
+		TempNum += worldOriginOffset.x;
 		TempNum *= OneOverGridSize;
 		TempNum = floor(TempNum + 0.5);
 		TempNum *= GridSize;
-		TempNum -= WorldOriginOffset.x;
+		TempNum -= worldOriginOffset.x;
 
 		TempVec.x = (FLOAT32)TempNum;
 
 		TempNum = TempVec.y;
 
-		TempNum += WorldOriginOffset.y;
+		TempNum += worldOriginOffset.y;
 		TempNum *= OneOverGridSize;
 		TempNum = floor(TempNum + 0.5);
 		TempNum *= GridSize;
-		TempNum -= WorldOriginOffset.y;
+		TempNum -= worldOriginOffset.y;
 
 		TempVec.y = (FLOAT32)TempNum;
 
@@ -2306,12 +2277,12 @@ OBJECT* _newObject(UINT32 obtype)
 		break;
 
 		default:
-			piExitProgram(__FILE__, __LINE__, "Unexpected object flags");
+			piExitProgram(_FL, "Unexpected object flags");
 		break;
 	}
 
 	if (PN_UNLIKELY(!lpobj))
-		piExitProgram(__FILE__, __LINE__, "Out of memory");
+		piExitProgram(_FL, "Out of memory");
 
 	lpobj->matid = -1;
 	lpobj->texid = -1;
@@ -2639,22 +2610,22 @@ void obmainCreateMutableCollisionNormals(OBJECT* lpobj)
 	obmainValidateObject
 *************************************************************************************************/
 
-LOGICAL obmainValidateObject(OBJECT* lpobj)
+bool obmainValidateObject(const OBJECT* lpobj) noexcept
 {
     if(!lpobj)
-        return FALSE;
+        return false;
 
     // disable to see if we've fixed root cause
-    LOGICAL	isValid = objectmap.find(lpobj) != objectmap.end();
+    bool isValid = objectmap.find((OBJECT*)lpobj) != objectmap.end();
 
 #if(0)
     if(!isValid)
 	{
-		piExitProgram(__FILE__, __LINE__, "Invalid object found!");
+		piExitProgram(_FL, "Invalid object found!");
 	}
 #endif
 
-    return (isValid);
+    return isValid;
 }
 
 LOGICAL obmainGetScreenBBOX(OBJECT* lpobj, float& x, float& y, float &z, float& w, float& h)

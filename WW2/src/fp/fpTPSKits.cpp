@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "str/strpool.h"
 
@@ -7,7 +7,6 @@
 #include "fp/fpTPSdata.h"
 #include "fp/fpTPS.h"
 #include "fio/fio.h"
-#include "sys/sysWinISO.h"
 #include "str/stringLib.h"
 #include "xml/XMLLoader2.h"
 #include "gr2/gr2Anim.h"
@@ -15,9 +14,9 @@
 
 #define	KITS_SPEC "vehicles\\ground\\groundman\\kits.xml"
 
-typedef std::vector<std::string> KitNameList;
-typedef std::pair<std::string, UINT32> KitModelLOD;
-typedef std::vector<KitModelLOD> KitModelLODList;
+using KitNameList = std::vector<std::string>;
+using KitModelLOD = std::pair<std::string, UINT32>;
+using KitModelLODList = std::vector<KitModelLOD>;
 
 // lowest level; visual model
 struct KitModel
@@ -26,8 +25,8 @@ struct KitModel
 	KitModelLODList lods;
 };
 
-typedef std::map<std::string,KitModel> KitModelMap;
-typedef std::vector<KitModel*> KitModelPtrList;
+using KitModelMap = std::map<std::string,KitModel>;
+using KitModelPtrList = std::vector<KitModel*>;
 
 // logical grouping of visual models for selection; possibly random
 struct KitObject
@@ -35,8 +34,8 @@ struct KitObject
 	KitModelPtrList models;
 };
 
-typedef std::map<std::string,KitObject> KitObjectMap;
-typedef std::vector<KitObject*> KitObjectPtrList;
+using KitObjectMap = std::map<std::string,KitObject>;
+using KitObjectPtrList = std::vector<KitObject*>;
 
 // highest level object
 // represents a kit spec and is used to populate a gr2AnimTrooper
@@ -46,8 +45,8 @@ struct Kit
 	KitObjectPtrList objects;
 };
 
-typedef std::map<std::string,Kit> KitMap;
-typedef std::vector<Kit*> KitPtrList;
+using KitMap = std::map<std::string,Kit>;
+using KitPtrList = std::vector<Kit*>;
 
 // represents a vehicle in kit terms...by vehicle id
 struct KitTrooper
@@ -55,7 +54,7 @@ struct KitTrooper
 	KitPtrList kits;
 };
 
-typedef std::map<std::string,KitTrooper> KitTrooperMap;
+using KitTrooperMap = std::map<std::string,KitTrooper>;
 
 struct Kits
 {

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 // Module: vehdecal.cpp
 // Description: Vehicle decals
@@ -25,8 +25,8 @@
 #include <vector>
 static std::vector<int> troop_personal_id;
 
-#define PERSONAL_DIVISOR    4       // Number of textures in row and column
-#define PERSONAL_UV         0.25f   // 128 / 512 (each texture is 128x128 on a 512x512
+#define PERSONAL_DIVISOR    8       // Number of textures in row and column
+#define PERSONAL_UV         0.125f  // 128 / 512 (each texture is 128x128 on a 512x512
 
 #define INDIVIDUAL_DIVISOR 8        // Number of texture in row and column
 #define INDIVIDUAL_UV      0.125f   // 128 / 1024 (each texture is 128x128 on a 1024x1024)
@@ -86,14 +86,13 @@ int vehdecalInit()
 
 	personal_id = ldddsLoadDDSTexture("vehicles/decals/personal.dds", GL_TEXTURE_2D, 0);
 
-	// Granny sucks! Hopefully we can use the above someday for granny troopers.
+	// Granny stinks! Hopefully we can use the above someday for granny troopers.
 	int count = 1;
 
 	while(1)
 	{
 		char buff[64];
-
-		sprintf(buff, "vehicles/decals/personal/%d.dds", count++);
+		strprintf(buff, "vehicles/decals/personal/%d.dds", count++);
 		int id = ldddsLoadDDSTexture(buff, GL_TEXTURE_2D, 0);
 
 		// Load textures old way for troopers.

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // player gauges data
 //
 // this file contains functions for accessing and creating the player's gauge data
@@ -235,7 +235,7 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"vehseat",1,ML_DOF_VEH_SEAT,nullptr,0,0}
 };
 
-UINT32 mlGaugeInit(void)
+UINT32 mlGaugeInit()
 {
 UINT32 i,j;
 
@@ -285,7 +285,7 @@ FLOAT32 WheelPos;
 UINT32 DeltaTime;
 UINT32 Alpha;
 OBJECT* Object1;
-UCHAR s[32];
+char s[32];
 
 
 	DeltaTime = frametime - VehicleData->AnimationData.LastAnimationTime;
@@ -305,21 +305,21 @@ UCHAR s[32];
 
 		VehicleData->AnimationData.LastPropPosition[i] = PropPos;
 
+		strprintf(s, "propstate%u", i + 1);
 		if(VehicleData->AnimationData.PropFailed[i])
 		{
-			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, FALSE);
+			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), FALSE);
 		}else
 		{
-			sprintf((char*)s,"propstate%u",i+1);
 			if (_VarData.PropRpm[i] >= 300.0 &&
 				_VarData.LastPropRpm[i] < 300.0)
 			{
-				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, TRUE);
+				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), TRUE);
 			}
 			if (_VarData.PropRpm[i] < 300.0 &&
 				_VarData.LastPropRpm[i] >= 300.0)
 			{
-				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, FALSE);
+				vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, reinterpret_cast<UCHAR *>(s), FALSE);
 			}
 		}
 		// set prop transparency
@@ -400,7 +400,7 @@ UCHAR s[32];
 UINT32 mlGaugeUpdatePlayerGaugeData(mlVehicleData* VehicleData,OBJECT * Object)
 {
 FLOAT64VECTOR TempVec1;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 FLOAT64ATT TempAtt,TempAtt1;
 FLOAT32 TempNum;
 piVECTOR TempPos;
@@ -715,10 +715,10 @@ static SINT32 LastUpdateTime;
 	// do agl check
 	_VarData.AGLMeters = 0.0f;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	TempPos.x = (FLOAT32)(VehicleData->AdjustedForCGPos.x - WorldOriginOffset.x);
-	TempPos.y = (FLOAT32)(VehicleData->AdjustedForCGPos.y - WorldOriginOffset.y);
-	TempPos.z = -(FLOAT32)(VehicleData->AdjustedForCGPos.z - WorldOriginOffset.z);
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	TempPos.x = (FLOAT32)(VehicleData->AdjustedForCGPos.x - worldOriginOffset.x);
+	TempPos.y = (FLOAT32)(VehicleData->AdjustedForCGPos.y - worldOriginOffset.y);
+	TempPos.z = -(FLOAT32)(VehicleData->AdjustedForCGPos.z - worldOriginOffset.z);
 
 	V1 = TempPos;
 	V1.z += 1000.0f;
@@ -727,9 +727,9 @@ static SINT32 LastUpdateTime;
 
 	if (trncdCollideDownMediumList(&TempPos,&V1) == TRUE)
 	{
-		TempPos.x = (FLOAT32)(V1.x + WorldOriginOffset.x);
-		TempPos.y = (FLOAT32)(V1.y + WorldOriginOffset.y);
-		TempPos.z = (FLOAT32)(V1.z + WorldOriginOffset.z);
+		TempPos.x = (FLOAT32)(V1.x + worldOriginOffset.x);
+		TempPos.y = (FLOAT32)(V1.y + worldOriginOffset.y);
+		TempPos.z = (FLOAT32)(V1.z + worldOriginOffset.z);
 		TempPos.z = -TempPos.z;
 
 		_VarData.AGLMeters = (FLOAT32)(VehicleData->VehiclePos.z - TempPos.z);

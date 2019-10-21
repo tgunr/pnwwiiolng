@@ -9,5 +9,5 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern SINT32 packCompInfoReq(LOGICAL mode, UCHAR* data, SINT32 offset, struct COMPUTER_INFO_REQ* object, SINT32 size);
+extern SINT32 packCompInfoReq(PackMode mode, UCHAR* data, SINT32 offset, struct COMPUTER_INFO_REQ* object, SINT32 size);
 

@@ -33,8 +33,8 @@ struct MM_POST_REQUEST
 	FULL_OBJ_ID		facility;	//The facility from which they wish to
 								//spawn
 	WEAPON_SPEC		weapon;		//The weaponType they want to take
-	LOGICAL			multicrew;		// if TRUE we are multicrew wating for a crew
-	LOGICAL			immediateSpawn;	// If true, the person is spawned immediately
+	bool			multicrew;		// if TRUE we are multicrew wating for a crew
+	bool			immediateSpawn;	// If true, the person is spawned immediately
 
 	UINT32			brigadeID;	// Brigade ID of the user
 };
@@ -47,8 +47,8 @@ struct MM_POST_ACCEPT
 	WEAPON_SERIAL weaponSerial;	//The weapon serial, the bane of my
 								//	existence
 	SINT16		portal;
-	LOGICAL		multicrew;		// if TRUE we are multicrew wating for a crew
-	LOGICAL		immediateSpawn;	// If true, the person is spawned immediately
+	bool		multicrew;		// if TRUE we are multicrew wating for a crew
+	bool		immediateSpawn;	// If true, the person is spawned immediately
 
 };
 
@@ -82,7 +82,7 @@ struct MM_POST_INFO_REQUEST
 	ChatHandle	handle;		// Compressed chat handle of sender
 	UINT32	customerID;
 	WEAPON_SERIAL weaponSerial;
-	LOGICAL join;	//Whether we are going to use this information to join
+	bool join;	//Whether we are going to use this information to join
 					//	a vehicle or cancel a request
 };
 
@@ -91,7 +91,7 @@ struct MM_POST_INFO_UPDATE
 {
 	UINT32	customerID;
 	WEAPON_SERIAL weaponSerial;
-	LOGICAL multicrew;
+	bool multicrew;
 };
 
 //this message is information on a posted weapon
@@ -99,7 +99,7 @@ struct MM_POST_INFO_RESPONSE
 {
 	UINT32	customerID;
 	MM_POSTED_WEAPON postedWeapon;
-	LOGICAL join;	//Whether we are going to use this information to join
+	bool join;	//Whether we are going to use this information to join
 					//	a vehicle or cancel a request
 };
 
@@ -148,6 +148,7 @@ struct MM_SPAWN_GRANT_REQUEST
 	FULL_OBJ_ID		facility;
 	UINT32			missionID;
 	UINT32			playerID;
+	bool            usedMobileSpawn;
 };
 
 struct MM_SPAWN_GRANT_RESPONSE
@@ -169,12 +170,12 @@ struct MM_SPAWN_DENY
 //This message tells the strat system to cancel a spawn
 struct MM_SPAWN_CANCEL
 {
-	UINT32	customerID;
-	FULL_OBJ_ID	facility; //The facility the mmhost wants information on
+	UINT32	      customerID;
+	FULL_OBJ_ID	  facility; //The facility the mmhost wants information on
 	WEAPON_SERIAL weaponSerial;
 };
 
-//Message telling the map server to tell the commander front end that his
+//Message telling the map server to tell the commander front end that their
 //	crew has bailed
 struct MM_CREW_BAILED
 {

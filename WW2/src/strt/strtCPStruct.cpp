@@ -62,7 +62,7 @@ CPStruct::linkTo(const CPStruct* rhs) const
 // Function to test if a CP has a link to a CP with the following fullObjID
 
 LinkStruct*
-CPStruct::linkTo(const FULL_OBJ_ID& rhs) const
+CPStruct::linkTo(const FULL_OBJ_ID rhs) const
 {
 	return linkTo(strtGetCP(rhs));
 }
@@ -133,6 +133,30 @@ CPStruct::flagsFor(WWII_SIDE forSide, const Instance::Descriptor& instance) cons
 		///TODO:INST: Really need to return instanced flags.
 		return (flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY;
 	}
+}
+
+bool CPStruct::islinkedToAnAO()
+{
+    if (!isEnemyLinked())
+        return false;
+
+
+    CPStruct::LINKS::iterator it;
+    LinkStruct* link;
+
+    for (it = m_links.begin(); it != m_links.end(); ++it)
+    {
+        link = *it;
+        CPStruct* cp = link->endDepot->cp;
+        if (ControllingSide() != cp->ControllingSide())
+        {
+            if (cp->isDefendObjective(cp->ControllingSide()))
+            {
+                return true;
+            }
+        }  
+    }
+    return false;
 }
 
 //////////////////////////////////////////////////////////////////////

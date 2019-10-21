@@ -18,7 +18,7 @@
 #include <mysql.h>
 
 #include "errmsg.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 #include "weap/weapSpec.h"
 
 using namespace std;
@@ -97,18 +97,6 @@ DBQuery::_finish(bool thorough)
 	}
 }
 
-#ifdef DB_USE_SQLITE
-//////////////////////////////////////////////////////////////////////
-// Throw an error for an sqlite3 connection
-
-static void
-_throwSqlite3Error(DB::handle_t* handle)
-{
-	std::string error = sqlite3_errmsg(m_conn);
-	throw std::logic_error(error);
-}
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Check for a result set and make a smart decision as to whether
 // to call _handleResult or _handleNoResult
@@ -184,8 +172,8 @@ DBQuery::_query(const char* statement, size_t stlen)
 //////////////////////////////////////////////////////////////////////
 // Constructor (with a query)
 
-DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
-	m_conn(dbh),
+DBQuery::DBQuery(DBHANDLE& conn, const char* query, ...) :
+	m_conn(conn),
 	m_result(nullptr),
 	m_executed(false),
 	m_error(0),
@@ -198,7 +186,7 @@ DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 	m_row(nullptr)
 {
 	if ( m_conn == nullptr )
-		throw std::domain_error("NULL dbh");
+		throw std::domain_error("NULL conn");
 
 	if ( query == nullptr )
 		throw std::invalid_argument("query == NULL");

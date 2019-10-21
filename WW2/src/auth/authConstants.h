@@ -51,6 +51,6 @@ enum
 	AUTH_LAUNCH_REQUEST_Y,			// Client requesting to launch
 	AUTH_LAUNCH_SUCCESS_Y,			// Launch request granted
 	AUTH_LAUNCH_REDIRECT_Y,			// Launch request denied
-	AUTH_QUEUE_POSITION_Y			// You have been placed in a queue
+	AUTH_QUEUE_POSITION_Y,			// You have been placed in a queue
 };
 

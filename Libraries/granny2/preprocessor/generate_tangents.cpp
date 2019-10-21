@@ -1,21 +1,20 @@
 // ========================================================================
-// $File: //jeffr/granny/preprocessor/generate_tangents.cpp $
-// $DateTime: 2010/03/24 14:46:42 $
-// $Change: 25872 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "generate_tangents.h"
 
-#define STBI_HEADER_FILE_ONLY
 #include "stb_image.h"
 
-#include <assert.h>
 #include <math.h>
 #include <algorithm>
 #include <map>
 #include <string>
+#include <string.h>
 #include <vector>
 
 using namespace std;
@@ -33,7 +32,12 @@ struct CompVertex
     }
 };
 
-#define TestName(nm, val) do { if (_strnicmp(Name, (nm), strlen((nm))) == 0) return (val); } while (false)
+#if _MSC_VER
+  #pragma warning(disable:4127)
+#endif
+
+#define TestName(nm, val) \
+  do { if (_strnicmp(Name, (nm), strlen((nm))) == 0) return (val); } while (false)
 
 static bool IsBoneName(char const* Name)
 {
@@ -90,7 +94,7 @@ RemoveTangentsFromType(granny_data_type_definition* Type, granny_memory_arena* A
             NewType[NewTypeSize++] = Type[Idx];
         }
     }}
-    assert(NewType[NewTypeSize-1].Type == GrannyEndMember);
+    pp_assert(NewType[NewTypeSize-1].Type == GrannyEndMember);
 
     return NewType;
 }
@@ -101,8 +105,8 @@ AddTangentsToType(granny_data_type_definition* Type,
                   bool KeepWeights,
                   granny_memory_arena* Arena)
 {
-    assert(GrannyFindMatchingMember(Type, 0, GrannyVertexNormalName, 0));
-    assert(AddTangents || AddBinormals);
+    pp_assert(GrannyFindMatchingMember(Type, 0, GrannyVertexNormalName, 0));
+    pp_assert(AddTangents || AddBinormals);
 
     int const MemberCount = GrannyGetTotalTypeSize(Type) / sizeof(granny_data_type_definition);
 
@@ -140,7 +144,7 @@ AddTangentsToType(granny_data_type_definition* Type,
             }
         }
     }}
-    assert(NewType[NewTypeSize-1].Type == GrannyEndMember);
+    pp_assert(NewType[NewTypeSize-1].Type == GrannyEndMember);
 
     return NewType;
 }
@@ -189,7 +193,7 @@ StripTangentsFromBuffer(granny_vertex_data*  VertexData,
     {for (int Idx = 0; Idx < VertexData->VertexCount; ++Idx)
     {
         RemappedIndex[Idx] = SourceIndices[VertMap[&VertCopy[Idx * NewVertexSize]]];
-        assert(RemappedIndex[Idx] != -1);
+        pp_assert(RemappedIndex[Idx] != -1);
     }}
 
     granny_vertex_data* VertData = PushObject(Arena, granny_vertex_data);
@@ -212,7 +216,7 @@ RemoveMorphTangents(granny_vertex_data*  VertexData,
 {
     granny_data_type_definition* NewType = RemoveTangentsFromType(VertexData->VertexType, Arena);
     granny_int32x const NewSize = GrannyGetTotalObjectSize(NewType);
-    assert(NewSize <= GrannyGetTotalTypeSize(VertexData->VertexType));
+    pp_assert(NewSize <= GrannyGetTotalTypeSize(VertexData->VertexType));
 
     granny_int32x NewVertexSize  = GrannyGetTotalObjectSize(NewType);
     vector<granny_uint8> VertCopy(VertexData->VertexCount * NewVertexSize);
@@ -273,7 +277,7 @@ PushVertsIntoBuilder(granny_mesh_builder*  Builder,
                      bool                  MorphIsDeltas,
                      vector<granny_int32>& Indices32)
 {
-    assert(OrigVertexData->VertexCount == MorphVertexData->VertexCount);
+    pp_assert(OrigVertexData->VertexCount == MorphVertexData->VertexCount);
 
     int const VertexCount = MorphVertexData->VertexCount;
 
@@ -323,7 +327,7 @@ PushVertsIntoBuilder(granny_mesh_builder*  Builder,
         vector< vector< granny_real32 > > MorphChannelValues;
         ExtractChannels(*OrigVertexData,  OrigChannelValues);
         ExtractChannels(*MorphVertexData, MorphChannelValues);
-        assert(OrigChannelValues.size() == MorphChannelValues.size());
+        pp_assert(OrigChannelValues.size() == MorphChannelValues.size());
 
         if (MorphIsDeltas)
         {
@@ -332,7 +336,7 @@ PushVertsIntoBuilder(granny_mesh_builder*  Builder,
                 MorphNormals[Idx].Position[0] += OrigNormals[Idx].Position[0];
                 MorphNormals[Idx].Position[1] += OrigNormals[Idx].Position[1];
                 MorphNormals[Idx].Position[2] += OrigNormals[Idx].Position[2];
-			}
+            }
 
             for (int chan = 0; chan < (int)OrigChannelValues.size(); ++chan)
             {
@@ -340,13 +344,13 @@ PushVertsIntoBuilder(granny_mesh_builder*  Builder,
                 vector<granny_real32>& Morph = MorphChannelValues[chan];
                 int ChannelSize = int(Orig.size() / OrigVertexData->VertexCount);
 
-				for (int Idx = 0; Idx < VertexCount; Idx++)
-				{
-					for (int val = 0; val < ChannelSize; ++val)
-					{
-						Morph[Idx * ChannelSize + val] += Orig[Idx * ChannelSize + val];
-					}
-				}
+                for (int Idx = 0; Idx < VertexCount; Idx++)
+                {
+                    for (int val = 0; val < ChannelSize; ++val)
+                    {
+                        Morph[Idx * ChannelSize + val] += Orig[Idx * ChannelSize + val];
+                    }
+                }
             }
         }
 
@@ -367,10 +371,10 @@ PushVertsIntoBuilder(granny_mesh_builder*  Builder,
             {
                 vector<granny_real32>& Channel = MorphChannelValues[v];
                 int ChannelSize = int(Channel.size() / OrigVertexData->VertexCount);
-                assert((Channel.size() % OrigVertexData->VertexCount) == 0);
-                assert(ChannelSize <= 4);
+                pp_assert((Channel.size() % OrigVertexData->VertexCount) == 0);
+                pp_assert(ChannelSize <= 4);
 
-                GrannySetChannel(Builder, Side, v, &Channel[VertexIndex * ChannelSize]);
+                GrannySetChannel(Builder, Side, v, &Channel[VertexIndex * ChannelSize], ChannelSize);
             }}
 
             if ((Idx % 3) == 2)
@@ -466,10 +470,10 @@ BuildTangents(granny_mesh*  OldMesh,
                     {
                         vector<granny_real32>& Channel = ChannelValues[Idx];
                         int ChannelSize = int(Channel.size() / VData.VertexCount);
-                        assert((Channel.size() % VData.VertexCount) == 0);
-                        assert(ChannelSize <= 4);
+                        pp_assert((Channel.size() % VData.VertexCount) == 0);
+                        pp_assert(ChannelSize <= 4);
 
-                        GrannySetChannel(Builder, Side, Idx, &Channel[VertexIndex * ChannelSize]);
+                        GrannySetChannel(Builder, Side, Idx, &Channel[VertexIndex * ChannelSize], ChannelSize);
                     }}
                 }}
 
@@ -497,9 +501,9 @@ static void
 RedeltifyVertexData(granny_vertex_data* OrigVertexData,
                     granny_vertex_data* NewVData)
 {
-    assert(OrigVertexData && NewVData);
-    assert(OrigVertexData->VertexCount == NewVData->VertexCount);
-    assert(OrigVertexData->VertexType && NewVData->VertexType);
+    pp_assert(OrigVertexData && NewVData);
+    pp_assert(OrigVertexData->VertexCount == NewVData->VertexCount);
+    pp_assert(OrigVertexData->VertexType && NewVData->VertexType);
 
     // Very slow, but: eh.
     int const OrigSize = GrannyGetTotalObjectSize(OrigVertexData->VertexType);
@@ -558,8 +562,8 @@ BuildMorphTangents(granny_vertex_data*   OrigVertexData,
     {for (int Idx = 0; Idx < NewVertexCount; ++Idx)
     {
         // We need to find the index that's in the original buffer.
-        int OrigVert = VertSpawnMap[Idx];
-        while (OrigVert > MorphVertexData->VertexCount)
+        int OrigVert = Idx;
+        while (OrigVert >= MorphVertexData->VertexCount)
         {
             OrigVert = VertSpawnMap[OrigVert];
         }
@@ -591,7 +595,7 @@ BuildMorphTangents(granny_vertex_data*   OrigVertexData,
     GrannyEndMeshInPlace(Builder,
                          PushArray(Arena, GrannyGetResultingVertexDataSize(Builder), granny_uint8), &NewVData,
                          PushArray(Arena, GrannyGetResultingTopologySize(Builder), granny_uint8), &NewTopo);
-    assert(NewVData->VertexCount == NewVertexCount);
+    pp_assert(NewVData->VertexCount == NewVertexCount);
 
     if (MorphIsDeltas)
     {
@@ -602,8 +606,8 @@ BuildMorphTangents(granny_vertex_data*   OrigVertexData,
 }
 
 granny_data_type_definition UVVerts[] = {
-	{ GrannyReal32Member, GrannyVertexTextureCoordinatesName "0", 0, 2 },
-	{ GrannyEndMember }
+    { GrannyReal32Member, GrannyVertexTextureCoordinatesName "0", 0, 2 },
+    { GrannyEndMember }
 };
 
 granny_mesh*
@@ -611,7 +615,7 @@ GenTangentsForMesh(granny_mesh* OriginalMesh,
                    bool AddTangents, bool AddBinormals,
                    granny_memory_arena* Arena)
 {
-    assert(AddTangents || AddBinormals);
+    pp_assert(AddTangents || AddBinormals);
 
     // Normalize the verts first.  What we want is a mesh with no tangents or binormal
     // components, with morph targets that are mapped in the same way.  (Note that
@@ -657,23 +661,16 @@ GenTangentsForMesh(granny_mesh* OriginalMesh,
     return NewMesh;
 }
 
-bool
-GenerateTangents(input_file& InputFile,
+granny_file_info*
+GenerateTangents(char const*          OriginalFilename,
+                 char const*          OutputFilename,
+                 granny_file_info* Info,
                  key_value_pair* KeyValues,
                  granny_int32x NumKeyValues,
-                 granny_memory_arena* Arena)
+                 granny_memory_arena* TempArena)
 {
-    RequireKey("output", "must specify an output file with \"-output <filename>\"\n");
-
     bool AddTangents  = true;
     bool AddBinormals = true;
-
-    granny_file_info* Info = GrannyGetFileInfo(InputFile.GrannyFile);
-    if (!Info)
-    {
-        ErrOut("unable to obtain a file info");
-        return false;
-    }
 
     {for (int MeshIdx = 0; MeshIdx < Info->MeshCount; ++MeshIdx)
     {
@@ -681,14 +678,26 @@ GenerateTangents(input_file& InputFile,
         if (!Mesh)
             continue;
 
-        Info->Meshes[MeshIdx] = GenTangentsForMesh(Mesh, AddTangents, AddBinormals, Arena);
+        Info->Meshes[MeshIdx] = GenTangentsForMesh(Mesh, AddTangents, AddBinormals, TempArena);
     }}
 
-    return WriteInfoPreserve(KeyValues, NumKeyValues, Info, InputFile.GrannyFile, true, true, true);
+    return Info;
 }
 
+static const char* HelpString =
+    (" GenerateTangents will create or refresh the tangent coordinates\n"
+     " for all of the granny_mesh objects in a file, including their\n"
+     " morph targets. Really, you probably only want to use this to\n"
+     " create valid morph target tangent fields, which is something that\n"
+     " Max and Maya have trouble providing in a game-appropriate fashion.\n"
+     "\n"
+     "    preprocessor GenerateTangents file.gr2 -output file_w_tang.gr2\n");
+     
+   
+
 // Register the commands
-static CommandRegistrar RegGenerateTextures(eSingleFile_NoMultiRun, GenerateTangents,
+static CommandRegistrar RegGenerateTextures(GenerateTangents,
                                             "GenerateTangents",
-                                            "Generates tangents for the meshes in the specified file");
+                                            "Generates tangents for the meshes in the specified file",
+                                            HelpString);
 

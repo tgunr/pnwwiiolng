@@ -7,10 +7,9 @@
 //
 // Originating Programmer: Brian "Stick" Duelm
 
-#include "versionNo.h"
-#include "dbug/dbugExtErrors.h"
-#include "hostproj/hostversion.h"
+#include "build_info.hpp"
 
+#include <mysql.h>
 #if platOS != OS_WIN32
 #include <netinet/in.h>
 #else
@@ -26,6 +25,7 @@
 #include "chat/chatTypes.h"
 #include "comm/commTypes.h"
 #include "include/arenaLockEnums.h"
+#include "include/configVars.h"
 #include "include/wthrTime.h"
 #include "inst/instHostMessages.h"
 #include "inst/instTypes.h"
@@ -36,19 +36,17 @@
 #include "map/mapData.h"
 #include "map/mapDB.h"
 #include "map/mapHostMessages.h"
-#include "map/mapMinuteBalance.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapThreads.h"
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"
 #include "miss/missionUtils.h"
-#include "mm/mmAntiAddiction.h"
 #include "mm/mmHostInstanceImpl.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPolls.h"
-#include "sdm/sdmConfigVars.h"
+#include "include/configVars.h"
 #include "server/serverFlagsEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -63,6 +61,7 @@
 #include "server/serverServerInfo.h"
 #include "server/serverInitializeProcess.h"
 #include "strt/strtData.h"
+#include "strt/strtDataErrors.h"
 #include "strt/strtDB.h"
 #include "strt/strtEvents.h"
 #include "strt/strtIO.h"
@@ -70,25 +69,27 @@
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
 #include "teul/teulAuth.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulHousekeeper.h"
 #include "teul/teulKit.h"
-#include "teul/teulServer.h"
 #include "teul/teulTickSample.h"
 #include "teul/teulVersion.h"
 #include "weap/weapList.h"
 #include "wwii/wwiiActivate.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
+#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiHostMessages.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiSortieManager.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiPPOLoader.h"
 
 const char* g_serverName = "mmhostd";
+
+PPOSpecLoader specLoader;
 
 #define CHECKSUM_POLL_INTERVAL	300000	// Every 5 minutes
 
@@ -97,7 +98,7 @@ const char* g_serverName = "mmhostd";
 
 #ifdef DEBUG
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
-    #define DEF_ERR_FLAGS LOG_ALL_TO_STDERR
+    #define DEF_ERR_FLAGS STD_ERR  // LOG_ALL_TO_STDERR
 #else
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
     #define DEF_ERR_FLAGS STD_ERR
@@ -105,7 +106,6 @@ const char* g_serverName = "mmhostd";
 
 extern void mapPlayerInit();
 
-UINT32 g_appID = APP_ID;
 UINT32 myMaxUsers;
 
 UINT32 hostAddress = 0;
@@ -114,8 +114,8 @@ static SINT32 _userConnections = 0;
 
 UINT32 mmStratInternalAddress = 0;
 static SINT32 _stratIndex = -1;
-static LOGICAL _stratOpen = FALSE;
-static LOGICAL _stratError = FALSE;
+static bool _stratOpen = false;
+static bool _stratError = false;
 
 static SINT32 _chatClientPort = 0;
 
@@ -145,7 +145,15 @@ extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode);
 
-extern ConfigUint cv_appID;
+
+namespace {
+	UINT32 GetPublicAddress(UINT32 addr) {
+		// HACK: Assumes the last octet is both the only difference
+		// and remains in the same position relative to the mmhost.
+		return cv_publicIP.GetUint32() + (addr - Server::myServerInfo.stats.address);
+	}
+}
+
 
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)
@@ -158,7 +166,8 @@ mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsig
 	activate.teulIndex = 0;
 	activate.playerID = 0;
 	activate.otp = 0;
-
+	activate.theme = host_config.arena.theme;
+	
 	const SINT32 activateResult = wwiiSendActivate(teulIndex, &activate);
 	if ( activateResult < 0 )
 	{
@@ -181,7 +190,7 @@ class PersonaMirrorTo : public Server::PersonaMirror
 			{
 				char servIP[64];
 				teulGetAddress(_destination->stats.address, servIP, sizeof(servIP));
-				dbugLog(_FLD, "p:%u c:%s otp:%u xfer:%llu sending mirror to %s: %s"
+				dbugLog(_FLD, "p:%u c:%s otp:%u xfer:%" PR64BitUT " sending mirror to %s: %s"
 								, dispatch().m_customerID
 								, dispatch().m_callsign
 								, dispatch().m_OTP
@@ -207,7 +216,7 @@ PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 	{
 		// Player has logged out.
 		if ( resultCode >= 0 )
-			dbugLog(_FLM, "p:%u c:%s xfer:%llu player logged out during transfer to chat"
+			dbugLog(_FLM, "p:%u c:%s xfer:%" PR64BitUT " player logged out during transfer to chat"
 							, dispatch().m_customerID
 							, dispatch().m_callsign
 							, m_xferID
@@ -215,7 +224,7 @@ PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 		return -EINVAL;
 	}
 
-	dbugLog(_FLD, "p:%u c:%s xfer:%llu mirror to chat complete, rc:%d"
+	dbugLog(_FLD, "p:%u c:%s xfer:%" PR64BitUT " mirror to chat complete, rc:%d"
 					, dispatch().m_customerID
 					, dispatch().m_callsign
 					, m_xferID
@@ -235,7 +244,7 @@ template<>
 SINT32
 PersonaMirrorTo<CELL_HOST>::onComplete(SINT32 resultCode) const
 {
-	dbugLog(_FLD, "p:%u c:%s xfer:%llu mirrored player to cell host", dispatch().m_customerID, dispatch().m_callsign, m_xferID);
+	dbugLog(_FLD, "p:%u c:%s xfer:%" PR64BitUT " mirrored player to cell host", dispatch().m_customerID, dispatch().m_callsign, m_xferID);
 	return -EINVAL;
 }
 
@@ -295,7 +304,7 @@ Player::mirrorToCellHost(Server::ServerInfo* const server)
 	auto mirror = new PersonaMirrorTo<CELL_HOST>(pxd, server, "cell");
 	server->mirrorPlayer(mirror);
 
-	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, (UINT8)(server->stats.address & 0xff), server->stats.port, OTP());
+	Teul::ConnectionInstruction connIns(Teul::ConnectionInstruction::Cell, GetPublicAddress(server->stats.address), server->stats.port, OTP());
 	const SINT32 retval = connIns.send(teulIndex());
 
 	m_lastSpawnedTo = server->stats.address;
@@ -391,7 +400,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player != nullptr)
 	{
-		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
+		teulClose(player->teulIndex());
 		player->setDisconnected();
 	}
 }
@@ -410,7 +419,7 @@ _stratErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, cons
 		dbugLog(_FLA,"t:%d strat error: %d", teulIndex, error );
 	}
 
-	_stratError = TRUE;
+	_stratError = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -526,11 +535,11 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
-			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatSendTickSample(MAP_HOST, player->playerID(), data);
 		}
 		else
-			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
+			dbugLog(_FLW, "t:%d clock drift host:%" PR64BitUT ", client:%" PR64BitUT ", delta:%" PR64BitT ", ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 	}
 	else
 	{
@@ -542,7 +551,7 @@ static void
 _stratConnectionOpen(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN,"t:%d strat connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
-	_stratOpen = TRUE;
+	_stratOpen = true;
 }
 
 static void
@@ -550,7 +559,7 @@ _connectToStrat()
 {
 	_stratIndex = -1;
 	_stratHost = 0;
-	_stratError = FALSE;
+	_stratError = false;
 
 	dbugLog(_FLN,"waiting for strat server");
 
@@ -598,9 +607,10 @@ _checkChatMaster()
 		return false;
 	}
 
-	if ( _chatClientHost != server->stats.address )
+	UINT32 chat_addr = GetPublicAddress(server->stats.address);
+	if ( _chatClientHost != chat_addr )
 	{
-		_chatClientHost = server->stats.address;
+		_chatClientHost = chat_addr;
 		_chatClientPort = server->stats.port;
 
 		dbugLog(_FLN,"Chat host master at %s", teulGetAddress(_chatClientHost));
@@ -669,10 +679,10 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, SIG_IGN);
 
 	//Reconnect to the authHost
-	SINT32 retval = authGameInit(Server::localHost, WWII::Net::Ports::MapHost,
-											_authHost, WWII::Net::Ports::InternalAuth, g_appID, HOST_VERSION,
-											HOST_VERSION, Teul::MaxClusterUsers,
-											_acceptLogin, _authErrorFunction);
+	SINT32 retval = authGameInit(Server::localHost, cv_publicIP.GetUint32(), WWII::Net::Ports::MapHost,
+	                             _authHost, WWII::Net::Ports::InternalAuth, cv_appID.GetUint32(),
+	                             PN_build_version_value, PN_build_version_value,
+	                             Teul::MaxClusterUsers, _acceptLogin, _authErrorFunction);
 	if ( retval < 0)
 		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
 
@@ -683,7 +693,7 @@ _handleSIGUSR1(SINT32 k)
 //////////////////////////////////////////////////////////////////////
 
 SINT32
-mapGetStratIndex(void)
+mapGetStratIndex()
 {
 	return _stratIndex;
 }
@@ -719,7 +729,7 @@ _checkStratMaster()
 //////////////////////////////////////////////////////////////////////
 
 static void
-_updateMasterInfo(void)
+_updateMasterInfo()
 {
 	// Check to see if the chat host master has changed
 	_checkChatMaster();
@@ -964,14 +974,14 @@ _pollChecksums()
 class Housekeeper
 {
 public:
-	typedef void (FUNCTION)(void);
+	using FUNCTION = void(*)();
 
 private:
-	FUNCTION**		m_functions;
+	FUNCTION*		m_functions;
 	UINT32			m_state;
 
 public:
-	Housekeeper(FUNCTION** functions)
+	Housekeeper(FUNCTION* functions)
 		: m_functions(functions)
 		, m_state(0)
 		{
@@ -992,16 +1002,6 @@ public:
 	}
 };
 
-static void
-_logWWIIPlayerStats()
-{
-	static TeulTimeMS nextBlip = 0ULL;
-	if ( teulClock64 < nextBlip )
-		return;
-	wwiiPlayer::logStats();
-	nextBlip = teulClock64 + 60 * 1000;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Periodic "housekeeping" routines that are run every few seconds.
 
@@ -1010,7 +1010,7 @@ extern void mapExpireSorties();
 static bool
 _housekeeping()
 {
-	static Housekeeper::FUNCTION* functions[] =
+	static Housekeeper::FUNCTION functions[] =
 	{
 		_fullCheck
 	,	_commitSorties
@@ -1022,10 +1022,8 @@ _housekeeping()
 #if !defined(DEV_BUILD)
 	,	_pollChecksums
 #endif
-	,	mmCheckAddictionTimers
 	,	Instance::RecordPopulations
-	,	_logWWIIPlayerStats
-	,	(Housekeeper::FUNCTION*)chatHousekeepGroupPermissions
+	,	[](){ chatHousekeepGroupPermissions(); }
 	,	mapExpireSorties
 	,	mapRequestBrigadeDetailsUpdate
 	,	_checkForUpdatedMissionLists
@@ -1080,6 +1078,7 @@ main(int argc, const char* argv[])
 				printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player));
 				exit(0);
 			}
+			, nullptr
 		}
 	});
     dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
@@ -1096,7 +1095,6 @@ main(int argc, const char* argv[])
 	// Utterly lock the arena.
 	host_config.arena.lock = ~0;
 
-	threadsReadDBEnvironment();
 	mapThreadsSetup();
 
 	HostLanguage = cv_stratLanguage.GetString();
@@ -1106,15 +1104,14 @@ main(int argc, const char* argv[])
 	_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();
 
+	specLoader.loadSpecMap();
+
 	wwiiIRCInitialize(Server::localHost, false);
 	wwiiIRCActivate(false);
 
 	// Set up signal handlers
 #if defined(SIGINT)
 	signal(SIGINT, _shutdown);
-#endif
-#if defined(SIGHUP)
-	signal(SIGHUP, _shutdown);
 #endif
 #if defined(SIGUSR1)
 	signal(SIGUSR1, _handleSIGUSR1);
@@ -1125,20 +1122,31 @@ main(int argc, const char* argv[])
 	mapPlayerInit();
 
 	dbugLog(_FLI, "Initializing auth");
-	SINT32 retval = authGameInit(
+	SINT32 retval = -1;
+
+	// Assume that auth is not up when the cluster is started (useful in development environment)
+	while ( retval < 0 )
+	{
+		retval = authGameInit(
 					Server::localHost
+					, cv_publicIP.GetUint32()
 					, WWII::Net::Ports::MapHost
 					, _authHost
 					, WWII::Net::Ports::InternalAuth
-					, g_appID
-					, HOST_VERSION
-					, HOST_VERSION
+					, cv_appID.GetUint32()
+					, PN_build_version_value
+					, PN_build_version_value
 					, Teul::MaxClusterUsers
 					, _acceptLogin
 					, _authErrorFunction
 				);
-	if ( retval < 0 )
-		LogAbort("%s authGameInit failed retval %d", __FUNCTION__, retval);
+		if ( retval < 0 )
+		{
+			// keep trying until we connect - at intervals
+			dbugLog(_FLA, "%s authGameInit failed retval %d", __FUNCTION__, retval);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_INITIALIZING);
 
@@ -1154,7 +1162,7 @@ main(int argc, const char* argv[])
 		LogAbort("Couldn't initialize database!");
 
 	mapCPList = strtImportStratData();
-	strtReportDataErrors();
+	strtReportDataErrors(0);
 	if (!mapCPList)
 		LogAbort("Unable to initialize Strat System");
 
@@ -1165,7 +1173,7 @@ main(int argc, const char* argv[])
 
 	Server::myServerInfo.stats.port = WWII::Net::Ports::MapHost;
 
-	serverInit(HOST_VERSION
+	serverInit(PN_build_version_value
 				, MAP_HOST, AUTH_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
@@ -1214,7 +1222,6 @@ main(int argc, const char* argv[])
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_SYNCING);
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
-	threadsLogging();
 
 	dbugLog(_FLI, "entering update loop");
 
@@ -1223,7 +1230,7 @@ main(int argc, const char* argv[])
 	TeulTimeMS nextHousekeeping = teulClock64 + 1000;
 	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
-	while(TRUE)
+	while (1)
 	{
 		teulUpdateTransport(50);
 
@@ -1237,16 +1244,13 @@ main(int argc, const char* argv[])
 		// Return to "accepting" status if necessary
 		_checkAcceptingStatus();
 
-		threadsLogging();
 		threadsCallNextCallback();
-		threadsLogging();
 
-		static Housekeeper::FUNCTION* functions[] =
+		static Housekeeper::FUNCTION functions[] =
 		{
 			mapSendChatUpdates
 		,	mapProcessLogins
 		,	mapSendHCUpdates
-		,	mapChargeMinutes
 		,	nullptr
 		};
 		static Housekeeper housekeeper(functions);
@@ -1257,14 +1261,19 @@ main(int argc, const char* argv[])
 
 		if ( teulClock64 >= nextHousekeeping )
 		{
+			// keep DB connection alive
+			if (mysql_ping(dbh) != 0) {
+				dbugLog(_FLA, "dbc:Main thread server connection failure - %d(%s)", mysql_errno(dbh), mysql_error(dbh));
+				threadsDBReconnect(dbh);
+			}       
+
 			if ( _housekeeping() == false )
 				nextHousekeeping = teulClock64 + 5000;
 		}
 	}
 
-	_shutdown(0);
-
-	exit(0);
+	// if we make the loop above break
+//	_shutdown(0);
 }
 
 //////////////////////////////////////////////////////////////////////

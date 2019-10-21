@@ -25,6 +25,10 @@ nearfardistance  =
 
 fuzetime = 0.0
 
+# armingtime = (time before ammo can trigger its fuze in seconds)
+
+armingtime = 5
+
 # fps machine guns should fire at accurate rates, *UNLESS THEY FIRE TRACERS* for ghost fire
 # if they fire tracers, the tracer rate should be used.
 

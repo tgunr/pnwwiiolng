@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "fio/fioa.h"
 #include "fio/fio.h"
@@ -45,6 +45,26 @@ int fioaAddArchive(const char* archive)
 	}
 
 	return paOpen(fioa.pf, archive, "rb");
+}
+
+int fioaAddArchive(wwiiolpath_string archive)
+{
+	if (PN_UNLIKELY(fioaMutex == nullptr))
+		fioaMutex = systhreadMutexCreate();
+
+	if (PN_UNLIKELY(fioa.pf == nullptr))
+	{
+		fioa.pf = paAlloc();
+		if (PN_UNLIKELY(fioa.pf == nullptr))
+			return -1;
+	}
+
+	char buffer[MAX_PATH + 1] = "";
+	unsigned int ret = Wstring2Char(archive, buffer, sizeof(buffer));
+
+	ret = paOpen(fioa.pf, buffer, "rb");
+
+	return ret;
 }
 
 /************************************************************************************************
@@ -240,6 +260,15 @@ int fioaEOF(int fd)
 }
 
 /************************************************************************************************
+ fioaFileExists
+ *************************************************************************************************/
+
+bool fioaFileExists(const char* filename)
+{
+	return paFetchMember(fioa.pf, filename, nullptr, nullptr) >= 0;
+}
+
+/************************************************************************************************
 	fioaFileSize
 *************************************************************************************************/
 
@@ -250,13 +279,4 @@ size_t fioaFileSize(const char* filename)
 	paFetchMember(fioa.pf, filename, nullptr, &len);
 
 	return len;
-}
-
-/************************************************************************************************
-	fioaAccess
-*************************************************************************************************/
-
-int fioaAccess(const char* filename)
-{
-	return paFetchMember(fioa.pf, filename, nullptr, nullptr) == 0;
 }

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <math.h>
 
 #include "include/vars.h"
@@ -389,9 +389,7 @@ UINT32 mlLoadBeltFile(weapWeapon* Weapon,UCHAR* VarContents,SINT32 AmmoGroupNum)
 	if(!Weapon || !VarContents) return 1;
 
 	char Buffer[256];
-
-	// Use 'Buffer' for file name while we open the file.
-	sprintf(Buffer, "vehicles\\ammo\\%s", VarContents);
+	strprintf(Buffer, "vehicles\\ammo\\%s", VarContents);
 	SINT32 File = fioOpen(Buffer);
 	if (File == -1)
 	{
@@ -428,7 +426,6 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 {
 	mlWeaponMount* Mount;
 	UINT32 MountFiring;
-	UINT32 Position;
 	UINT32 PrimaryTriggerDown, SecondaryTriggerDown;
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 
@@ -446,7 +443,7 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 	PrimaryTriggerDown 	= VehicleData->PrimaryTriggerDown;
 	SecondaryTriggerDown= VehicleData->SecondaryTriggerDown;
 
-	persGetPersonaPosition(&Position);
+	UINT32 Position = persGetPersonaPosition();
 
 	*PrimaryIsFiring = *SecondaryIsFiring = 0;
 
@@ -724,8 +721,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*PrimaryTriggerDown)
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 			*PrimaryTriggerDown = 0;
 	}
@@ -734,8 +730,7 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		*SecondaryTriggerDown)
 	{
-		mlGetSecondaryPickleSetting(&Pickle);
-
+		Pickle = mlGetSecondaryPickleSetting();
 		if (Pickle == 0)
 			*SecondaryTriggerDown = 0;
 	}
@@ -744,12 +739,10 @@ static void _HandlePickle(mlWeaponMount* Mount, UINT32* PrimaryTriggerDown, UINT
 		Mount->PickleMount != 0 &&
 		(*PrimaryTriggerDown || *SecondaryTriggerDown))
 	{
-		mlGetPrimaryPickleSetting(&Pickle);
-
+		Pickle = mlGetPrimaryPickleSetting();
 		if (Pickle == 0)
 		{
-			mlGetSecondaryPickleSetting(&Pickle);
-
+			Pickle = mlGetSecondaryPickleSetting();
 			if (Pickle == 0)
 			{
 				*PrimaryTriggerDown = 0;
@@ -1411,19 +1404,19 @@ static LOGICAL _IsMountBlocked(mlWeaponMount* Mount, int i, vehVehicle* Vehicle)
 	FLOAT64VECTOR CollideRay = {0,1000,0};
 	FASTCOLLIDE CollideList[32], *CollideListPtr;
 	UINT32 NumCollisions;
-	FLOAT64VECTOR WorldOriginOffset;
+	FLOAT64VECTOR worldOriginOffset;
 	piVECTOR start, end;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	_GetFireAttPosVel(Mount, i, Vehicle->ModelData, &FireAtt, &RelPnt, &FirePnt, &FireVel);
 
 	// Fire out a ray and see if it collides with our own vehicle
 	mathVectorMultiply64(&CollideRay, &CollideRay, &FireAtt);
 
-	start.x = (FLOAT32)(FirePnt.x - WorldOriginOffset.x);
-	start.y = (FLOAT32)(FirePnt.y - WorldOriginOffset.y);
-	start.z = (FLOAT32)(FirePnt.z - WorldOriginOffset.z);
+	start.x = (FLOAT32)(FirePnt.x - worldOriginOffset.x);
+	start.y = (FLOAT32)(FirePnt.y - worldOriginOffset.y);
+	start.z = (FLOAT32)(FirePnt.z - worldOriginOffset.z);
 	end.x = start.x + (FLOAT32)CollideRay.x;
 	end.y = start.y + (FLOAT32)CollideRay.y;
 	end.z = start.z + (FLOAT32)CollideRay.z;
@@ -1437,7 +1430,7 @@ static LOGICAL _IsMountBlocked(mlWeaponMount* Mount, int i, vehVehicle* Vehicle)
 
 	weapCollideRoundWithVehicles(&CollideListPtr, &NumCollisions,
 									&start, &end, frametime/1000.0, frametime/1000.0,
-									TRUE, TRUE, &WorldOriginOffset, FALSE, 0);
+									TRUE, TRUE, &worldOriginOffset, FALSE, 0);
 	NumCollisions = 32 - NumCollisions;
 
 	return NumCollisions;

@@ -1,10 +1,10 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
 
 #include "mem/mem.h"
-#include "imap/imap.h"
+#include "imaplib/imap.h"
 #include "imap/iac.h"
 #include "imap/ww2imap.h"
 #include "imap/ww2func.h"
@@ -16,7 +16,6 @@
 #include "ml/mlhead.h"
 #include "pers/pershud.h"
 #include "ui/uiMain.h"
-#include "sys/sysWinISO.h"
 #include "weap/weapList.h"
 #include "xml/XMLLoader2.h"
 #include "cfg/cfgPrefs.h"
@@ -28,10 +27,9 @@
 	ww2imap
 *************************************************************************************************/
 
-#define USER_CFML_DIR ((WantDataDir) ? "usercfml" : "cfml")
-//#define IMAP_PRESETS "cfml" FILE_SEPARATOR "presets.xml"
-#define GLOBAL_CALIBRATION_FILENAME ((WantDataDir) ? "usercfml/global.calib" : "cfml/global.calib")
-#define IMAP_PRESETS "cfml/presets.xml"
+#define USER_CFML_DIR                   "cfml"
+#define GLOBAL_CALIBRATION_FILENAME     "cfml/global.calib"
+#define IMAP_PRESETS                    "cfml/presets.xml"
 
 #define MAX_VEHICLES 512
 #define ALL_VEHICLES -1
@@ -123,7 +121,7 @@ static int curFuncLang = -1;
 static int _defaultcfml;
 static int _turretAndMouseLookUseSameKeymap;
 
-typedef std::map<int, int> ImapIndexMap;
+using ImapIndexMap = std::map<int, int>;
 static std::map<int,ImapIndexMap> _imapIndexMap;
 
 // load imap presets
@@ -150,7 +148,7 @@ public:
 
 			for(int i = 0; i < WW2_FUNC_NUM_CATEGORIES; i++)
 			{
-				if(!stricmp(cat, categoryName[i]))
+				if(!strcasecmp(cat, categoryName[i]))
 				{
 					ProcessChildren(node, &i);
 					break;
@@ -188,11 +186,11 @@ public:
 
 			if(requires && *requires)
 			{
-				if(!stricmp(requires, "joystick"))
+				if(!strcasecmp(requires, "joystick"))
 					preset.requires = PRESET_REQ_JOYSTICK;
-				else if(!stricmp(requires, "mouse"))
+				else if(!strcasecmp(requires, "mouse"))
 					preset.requires = PRESET_REQ_MOUSE;
-				else if(!stricmp(requires, "keyboard"))
+				else if(!strcasecmp(requires, "keyboard"))
 					preset.requires = PRESET_REQ_KEYBOARD;
 			}
 
@@ -1510,7 +1508,7 @@ static void ww2imapSetAxisCalibration(imap_axis_calib* calib)
 
 void iac_localized_string(const char* language, int locid, char* str, int maxlen)
 {
-	if(language && stricmp(language, "english") == 0)
+	if(language && strcasecmp(language, "english") == 0)
 		strncpy(str, uiInputString(IDE_LANG_IAC, locid).c_str(), maxlen);
 	else
 		strncpy(str, uiLocString2(IDE_LANG_IAC, locid).c_str(), maxlen);
@@ -1547,7 +1545,7 @@ void iac_localized_string(const char* language, int locid, char* str, int maxlen
 
 void ww2func_localized_string(const char* language, int locid, char* str, int maxlen)
 {
-	if(language && !stricmp(language, "english"))
+	if(language && !strcasecmp(language, "english"))
 		strncpy(str, uiInputString(IDE_LANG_FUNCTION, locid).c_str(), maxlen);
 	else
 		strncpy(str, uiLocString2(IDE_LANG_FUNCTION, locid).c_str(), maxlen);
@@ -1595,7 +1593,7 @@ static int lookup_lang_id(const char* language)
 
 	for(i = 0; i < NUMBER_OF_LANGUAGES; i++)
 	{
-		if(!stricmp(g_szLanguages[i], language))
+		if(!strcasecmp(g_szLanguages[i], language))
 			return i;
 	}
 

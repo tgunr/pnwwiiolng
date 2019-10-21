@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // main first person module
 
 /*
@@ -50,7 +50,7 @@
 
 /*
  TODO - what should be done with this??
- 
+
 // z-physics hackery data
 static piVECTOR _CageEdgesStand[7] = {
 {-0.125f,	 0.0f,	0.0f},
@@ -106,8 +106,8 @@ static piVECTOR	_CageEdgesProne[10] = {
 #define fpFALL_DISTANCE_WATER_HURT_MIN	12
 #define fpFALL_DISTANCE_WATER_HURT_MAX	20
 
-typedef std::pair<int, int> FPAdjustKey;
-typedef std::map<FPAdjustKey, float> FPAdjustments;
+using FPAdjustKey = std::pair<int, int>;
+using FPAdjustments = std::map<FPAdjustKey, float>;
 
 static FPAdjustments _fpsAdjustments;
 static FPAdjustments _tpsAdjustments;
@@ -151,11 +151,11 @@ int fpAdjustLoader::getIndex(const char* type, const char* name)
 	// -1 means default
 	// 0 and greater are real pose and move types
 	// less than -1 are artificial stand ins
-	if(!stricmp("pose", type) && !stricmp("dead", name))
+	if(!strcasecmp("pose", type) && !strcasecmp("dead", name))
 	{
 		return -2;
 	}
-	else if(!stricmp("pose", type) && !stricmp("emote", name))
+	else if(!strcasecmp("pose", type) && !strcasecmp("emote", name))
 	{
 		return -3;
 	}
@@ -186,7 +186,7 @@ void fpAdjustLoader::addAdjustment(FPAdjustments& a, xmlNode* node)
 LOGICAL UpdatePositionRotation(mlVehicleData* pVehicleData, FLOAT64 DeltaTime, FLOAT64VECTOR* pCurrentVelocity);
 
 static Vec3d _vehicleCollision(vehVehicle* me, vehVehicle* cv);
-static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOAT64 Velocity);
+static void ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOAT64 Velocity);
 FLOAT64 DetermineFallEffect(FLOAT64 Velocity, FLOAT64 MinDistance, FLOAT64 MaxDistance);
 /*
 LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTOR* testArray, FLOAT32 rayLength,
@@ -287,271 +287,20 @@ int				expendable;
 	return TRUE;
 }
 
-LOGICAL fpKill(mlVehicleData* VehicleData)
+void fpKill(mlVehicleData& VehicleData)	///TODO: Convert to destructor?
 {
-	fpPersonData* PersonData;
-
-	if(VehicleData->PersonData != nullptr)
+	if(VehicleData.PersonData != nullptr)
 	{
-		PersonData = (fpPersonData*)VehicleData->PersonData;
-
-		memFree(VehicleData->PersonData);
-		VehicleData->PersonData = nullptr;
+		memFree(VehicleData.PersonData);
+		VehicleData.PersonData = nullptr;
 	}
 
-	fpFPSKill ();
-
-	return TRUE;
+	fpFPSKill();
 }
-
-/*
-static void _doFallingOriginal()
-{
-	FLOAT64 Velocity = 0.0;
-	FLOAT64	 outerRingGroundHeight, useGroundHeight;
-
-	LastPos.z = pVehicleData->VehiclePos.z;
-	useGroundHeight = -Pos.z - WorldOriginOffset.z;
-
-	pPersonData->heightAboveGround = (LastPos.z > useGroundHeight) ? LastPos.z - useGroundHeight: 0.0f;
-
-	//uiChatPrintLine("Height Above Ground is %.2f", pPersonData->heightAboveGround);
-
-	// test for falling
-	// if we're falling, check the waist (outer) ring
-	// if the outer ring gets a hit
-	if (ColObj && (fpFPSGetPlayerPose() != POSE_PRONE) && fpCheckFallRing (pVehicleData, 6, _WaistOuterRing, _WaistInnerRing, &ColObj, &Pos, &VehicleWalkingOn))
-	{
-		outerRingGroundHeight = -Pos.z - WorldOriginOffset.z;
-
-		if (outerRingGroundHeight > useGroundHeight)
-			useGroundHeight = outerRingGroundHeight;
-	}
-
-	pVehicleData->VehiclePos.z = useGroundHeight;
-
-	if (ColObj)
-		fpFPSSetStandMaterial (ColObj->matid);
-
-	// final test for falling based on the resulting position
-	if ((LastPos.z - pVehicleData->VehiclePos.z > 0.15) && (!fpsTrooper.teleportToGround))
-	{
-		// at this point, we're falling, so figure out what to do about it
-		fxAmbDisable();
-
-		if (pPersonData->StartFallTime10ms == 0)
-		{
-			pPersonData->StartFallTime10ms = ft10mscount;
-			pPersonData->StartFallHeight = LastPos.z;
-			pPersonData->Flags |= fpFLAGS_FALLING;
-			fallShortSoundPlayed = fallFarSoundPlayed = 0;
-			Velocity = 0.0f;
-		}
-
-		if (ft10mscount - pPersonData->StartFallTime10ms > 10) // i.e. 10 * 10ms == 0.1 second
-		{
-			Velocity = 9.8 * (ft10mscount - pPersonData->StartFallTime10ms - 10) / 100.0;
-		}
-		else
-		{
-			pVehicleData->VehiclePos.z = LastPos.z;
-		}
-
-		if (fpsTrooper.parachuteOpen)
-		{
-			Velocity = fpFPSGetParachuteFallSpeed ();
-		}
-		else if (fpsTrooper.parachuteWorn && fpsTrooper.parachuteOKToOpen)
-		{
-			if(fpFPSIsTrooperFalling())
-				fpFPSetHeadFixed(TRUE);
-
-			if ((ft10mscount - pPersonData->StartFallTime10ms) > (fpsTrooper.parachuteDeployTime * 100.0))
-			{
-				fpFPSParachuteOpened();
-			}
-		}
-		else if (((ft10mscount - pPersonData->StartFallTime10ms) > (fpsTrooper.fallShortTime * 100.0)) && (!fallShortSoundPlayed))
-		{
-			fpFPSPlaySound(fpsTrooper.fallShortSound);
-			fallShortSoundPlayed = 1;
-		}
-		else if (((ft10mscount - pPersonData->StartFallTime10ms) > (fpsTrooper.fallFarTime * 100.0)) && (!fallFarSoundPlayed))
-		{
-			fpFPSPlaySound(fpsTrooper.fallFarSound);
-			fallFarSoundPlayed = 1;
-		}
-
-//				Write_Log (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
-
-		LastPos.z = LastPos.z - Velocity * (ft10mscount - pPersonData->LastFallTime10ms) / 100.0f;
-
-		if (LastPos.z > pVehicleData->VehiclePos.z)
-		{
-			pVehicleData->VehiclePos.z = LastPos.z;
-		}
-
-		pPersonData->LastFallTime10ms = ft10mscount;
-		fpFPSAddWeaponLag(AROUND_X, -3.0f);
-	}
-	else
-	{
-		if (pPersonData->Flags & fpFLAGS_FALLING)
-		{
-			fxAmbEnable();
-#ifdef BETA_RELEASE
-			if(!SuperTroop)
-				ApplyFallEffects(pObject, pPersonData, pPersonData->StartFallHeight - pVehicleData->VehiclePos.z);
-#else
-			ApplyFallEffects(pObject, pPersonData, pPersonData->StartFallHeight - pVehicleData->VehiclePos.z);
-#endif // BETA_RELEASE
-
-			pPersonData->StartFallTime10ms = 0;
-			pPersonData->Flags &= ~fpFLAGS_FALLING;
-			if ((fpsTrooper.parachuteOpen) || (fpsTrooper.parachuteOKToOpen))
-				fpFPSParachuteLanded();
-		}
-
-		pPersonData->StartFallTime10ms = 0;
-	}
-
-	CurrentVelocity.z = Velocity;
-	//
-	// End Falling
-	//
-}
-*/
-
-/* not used
-static FLOAT64 _doFalling(mlVehicleData* vd, OBJECT* ColObj, piVECTOR& Pos, FLOAT64VECTOR& LastPos)
-{
-	static LOGICAL fallShortSoundPlayed, fallFarSoundPlayed;
-
-	// our vehicle
-	vehVehicle* v = vd->VehicleMasterPtr;
-
-	// Initialize
-	fpPersonData* pd = (fpPersonData*)vd->PersonData;
-
-	FLOAT64 Velocity = 0.0;
-	FLOAT64	 outerRingGroundHeight, useGroundHeight;
-
-	LastPos.z = vd->VehiclePos.z;
-	useGroundHeight = -Pos.z - WorldOriginOffset.z;
-
-	pd->heightAboveGround = (LastPos.z > useGroundHeight) ? LastPos.z - useGroundHeight: 0.0f;
-
-	//uiChatPrintLine("Height Above Ground is %.2f", pPersonData->heightAboveGround);
-
-	// test for falling
-	// if we're falling, check the waist (outer) ring
-	// if the outer ring gets a hit
-	if (ColObj && (fpFPSGetPlayerPose() != POSE_PRONE) && fpCheckFallRing (vd, 6, _WaistOuterRing, _WaistInnerRing, &ColObj, &Pos, nullptr)) // &VehicleWalkingOn
-	{
-		outerRingGroundHeight = -Pos.z - WorldOriginOffset.z;
-
-		if (outerRingGroundHeight > useGroundHeight)
-			useGroundHeight = outerRingGroundHeight;
-	}
-
-	vd->VehiclePos.z = useGroundHeight;
-
-	if (ColObj)
-		fpFPSSetStandMaterial (ColObj->matid);
-
-	// final test for falling based on the resulting position
-	if ((LastPos.z - vd->VehiclePos.z > 0.15) && (!fpsTrooper.teleportToGround))
-	{
-		// at this point, we're falling, so figure out what to do about it
-		fxAmbDisable();
-
-		if (pd->StartFallTime10ms == 0)
-		{
-			pd->StartFallTime10ms = ft10mscount;
-			pd->StartFallHeight = LastPos.z;
-			pd->Flags |= fpFLAGS_FALLING;
-			fallShortSoundPlayed = fallFarSoundPlayed = 0;
-			Velocity = 0.0f;
-		}
-
-		if (ft10mscount - pd->StartFallTime10ms > 10) // i.e. 10 * 10ms == 0.1 second
-		{
-			Velocity = 9.8 * (ft10mscount - pd->StartFallTime10ms - 10) / 100.0;
-		}
-		else
-		{
-			vd->VehiclePos.z = LastPos.z;
-		}
-
-		if (fpsTrooper.parachuteOpen)
-		{
-			Velocity = fpFPSGetParachuteFallSpeed ();
-		}
-		else if (fpsTrooper.parachuteWorn && fpsTrooper.parachuteOKToOpen)
-		{
-			if(fpFPSIsTrooperFalling())
-				fpFPSetHeadFixed(TRUE);
-
-			if ((ft10mscount - pd->StartFallTime10ms) > (fpsTrooper.parachuteDeployTime * 100.0))
-			{
-				fpFPSParachuteOpened();
-			}
-		}
-		else if (((ft10mscount - pd->StartFallTime10ms) > (fpsTrooper.fallShortTime * 100.0)) && (!fallShortSoundPlayed))
-		{
-			fpFPSPlaySound(fpsTrooper.fallShortSound);
-			fallShortSoundPlayed = 1;
-		}
-		else if (((ft10mscount - pd->StartFallTime10ms) > (fpsTrooper.fallFarTime * 100.0)) && (!fallFarSoundPlayed))
-		{
-			fpFPSPlaySound(fpsTrooper.fallFarSound);
-			fallFarSoundPlayed = 1;
-		}
-
-//				Write_Log (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
-
-		LastPos.z = LastPos.z - Velocity * (ft10mscount - pd->LastFallTime10ms) / 100.0f;
-
-		if (LastPos.z > vd->VehiclePos.z)
-		{
-			vd->VehiclePos.z = LastPos.z;
-		}
-
-		pd->LastFallTime10ms = ft10mscount;
-		fpFPSAddWeaponLag(AROUND_X, -3.0f);
-	}
-	else
-	{
-		if (pd->Flags & fpFLAGS_FALLING)
-		{
-			fxAmbEnable();
-#ifdef BETA_RELEASE
-			if(!SuperTroop)
-				ApplyFallEffects(vd->VehicleObjectData->PlaneObject, pd, pd->StartFallHeight - vd->VehiclePos.z);
-#else
-			ApplyFallEffects(pObject, pPersonData, pPersonData->StartFallHeight - pVehicleData->VehiclePos.z);
-#endif // BETA_RELEASE
-
-			pd->StartFallTime10ms = 0;
-			pd->Flags &= ~fpFLAGS_FALLING;
-			if ((fpsTrooper.parachuteOpen) || (fpsTrooper.parachuteOKToOpen))
-				fpFPSParachuteLanded();
-		}
-
-		pd->StartFallTime10ms = 0;
-	}
-
-	//CurrentVelocity.z = Velocity;
-	return Velocity;
-	//
-	// End Falling
-	//
-}
-*/
 
 static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT64VECTOR& LastPos, FLOAT64 DeltaTime)
 {
-	static LOGICAL fallShortSoundPlayed, fallFarSoundPlayed;
+	static bool fallShortSoundPlayed, fallFarSoundPlayed;
 
 	// Initialize
 	fpPersonData* pd = (fpPersonData*)vd->PersonData;
@@ -623,7 +372,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			if(agl > fallThreshold)
 			{
 				pd->Flags |= fpFLAGS_FALLING;
-				fallShortSoundPlayed = fallFarSoundPlayed = 0;
+				fallShortSoundPlayed = fallFarSoundPlayed = false;
 			}
 		}
 
@@ -649,7 +398,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			if(agl > fallThreshold)
 			{
 				fpFPSPlaySound(fpsTrooper.fallShortSound);
-				fallShortSoundPlayed = 1;
+				fallShortSoundPlayed = true;
 			}
 		}
 		else if(((ft10mscount - pd->StartFallTime10ms) > (fpsTrooper.fallFarTime * 100.0)) && (!fallFarSoundPlayed))
@@ -657,7 +406,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			if(agl > fallThreshold)
 			{
 				fpFPSPlaySound(fpsTrooper.fallFarSound);
-				fallFarSoundPlayed = 1;
+				fallFarSoundPlayed = true;
 			}
 		}
 
@@ -756,7 +505,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 
 static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT64VECTOR& LastPos, FLOAT64 DeltaTime)
 {
-	static LOGICAL fallShortSoundPlayed, fallFarSoundPlayed;
+	static bool fallShortSoundPlayed, fallFarSoundPlayed;
 
 	// Initialize
 	fpPersonData* pd = (fpPersonData*)vd->PersonData;
@@ -822,7 +571,7 @@ static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			pd->StartFallTime10ms = ft10mscount;
 			pd->StartFallHeight = LastPos.z;
 			pd->Flags |= fpFLAGS_FALLING;
-			fallShortSoundPlayed = fallFarSoundPlayed = 0;
+			fallShortSoundPlayed = fallFarSoundPlayed = false;
 			Velocity = 0.0f;
 		}
 
@@ -857,7 +606,7 @@ static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 		else if (((ft10mscount - pd->StartFallTime10ms) > (fpsTrooper.fallFarTime * 100.0)) && (!fallFarSoundPlayed))
 		{
 			fpFPSPlaySound(fpsTrooper.fallFarSound);
-			fallFarSoundPlayed = 1;
+			fallFarSoundPlayed = true;
 		}
 
 //				Write_Log (LOG_FPS, LOG_INFO, "Falling at %4.2f m/s", Velocity);
@@ -981,10 +730,10 @@ static FLOAT64 _doGravity(mlVehicleData* vd, vehVehicle** walkOn, FLOAT64VECTOR&
 		return _doGravityCampaign(vd, walkOn, LastPos, DeltaTime);
 }
 
-static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
+static bool _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 {
 	if (!fpFPSUpdatePerson(pVehicleData, DeltaTime))
-		return FALSE;
+		return false;
 
 	fpFPSSetStandingOnVehicle(FALSE);
 
@@ -1004,7 +753,7 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		if (FPSRideVehicle->StateAnimation.PlayCrash == 1) // check for plane blowup .. if so kill you
 		{
 			// bye bye!
-			persApplyDamage(450.0f, 0, PERS_HITLOCATION_HEAD, FALSE);
+			persApplyDamage(450.0, 0, PERS_HITLOCATION_HEAD, false);
 		}
 
 		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
@@ -1096,10 +845,10 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
-static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
+static bool _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 {
 	vehVehicle* Vehicle = pVehicleData->VehicleMasterPtr;
 
@@ -1108,7 +857,7 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 
 	// Initialize
 	if (!fpFPSUpdatePerson (pVehicleData, DeltaTime))
-		return FALSE;
+		return false;
 
 	trncdCheckTreeBox(TRUE);
 
@@ -1125,7 +874,7 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		if (FPSRideVehicle->StateAnimation.PlayCrash == 1) // check for plane blowup .. if so kill you
 		{
 			// bye bye!
-			persApplyDamage(450.0f, 0, PERS_HITLOCATION_HEAD, FALSE);
+			persApplyDamage(450.0, 0, PERS_HITLOCATION_HEAD, false);
 		}
 
 		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
@@ -1284,10 +1033,10 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 
 	//mlInfantryCheckLeanLines(pVehicleData);
 
-	return TRUE;
+	return true;
 }
 
-LOGICAL fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
+bool fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 {
 	// Sanity Checks
 	if (pVehicleData == nullptr) return 0;
@@ -1306,8 +1055,7 @@ LOGICAL fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 	}
 	*/
 
-	LOGICAL result = FALSE;
-
+	bool result;
 	if(gCustomTerrain)
 		result = _updatePersonScenario(pVehicleData, DeltaTime);
 	else
@@ -1321,7 +1069,7 @@ LOGICAL fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 	// Set the AnimationFlags
 	fpFPSSetAnimationFlags();
 
-	// update our tps guy
+	// update our tps
 	gr2AnimProcessAnimationFlags(pObject, fpGetFPPersonDataPtr()->AnimationFlags);
 
 	if(!Online)
@@ -1331,204 +1079,6 @@ LOGICAL fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 
 	return result;
 }
-
-/*
-LOGICAL fpUpdatePerson2(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
-{
-	fpPersonData*	pPersonData;
-	OBJECT*			pObject;
-	FLOAT64VECTOR	LastPos;
-	vehVehicle*		VehicleWalkingOn = nullptr;
-	// z-physics hack vars
-	//piVECTOR*		testArray;
-	SINT32			i;
-	//OBJECT*			keeperColObj = nullptr;
-	//piVECTOR		keeperPos;
-	vehVehicle*		FPSRideVehicle = nullptr;
-//	static LOGICAL	fallShortSoundPlayed, fallFarSoundPlayed;
-
-	// Sanity Checks
-	if (pVehicleData == nullptr) return 0;
-	if (pVehicleData->VehicleObjectData == nullptr) return 0;
-	if (pVehicleData->VehicleObjectData->PlaneObject == nullptr) return 0;
-
-	vehVehicle* Vehicle = pVehicleData->VehicleMasterPtr;
-
-	// Initialize
-	pPersonData = (fpPersonData*) pVehicleData->PersonData;
-	pObject = pVehicleData->VehicleObjectData->PlaneObject;
-
-	if (!fpFPSUpdatePerson (pVehicleData, DeltaTime))
-		return FALSE;
-
-	trncdCheckTreeBox(TRUE);
-
-	fpFPSSetStandingOnVehicle(FALSE);
-
-	if(Vehicle->RideVehicleHostIndex > 0)
-		FPSRideVehicle = vehFindVehicle(Vehicle->RideVehicleHostIndex);
-
-	if (FPSRideVehicle != nullptr && FPSRideVehicle->RideVehicleHostIndex == 0)
-	{
-		if(Vehicle->RideSeatNum == VEH_TROOPER_ON_DECK_RIDE_SEAT && pVehicleData->LastRideVehicle == Vehicle->RideVehicleHostIndex)
-			fpMoveToRelRidePos(FPSRideVehicle, Vehicle);	// allows trooper to "stick" to the deck
-
-		if (FPSRideVehicle->StateAnimation.PlayCrash == 1) // check for plane blowup .. if so kill you
-		{
-			// bye bye!
-			persApplyDamage(450.0f, 0, PERS_HITLOCATION_HEAD, FALSE);
-		}
-
-		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
-		{
-			// kick rider off of vehicle
-			FPSRideVehicle = nullptr;
-			fpFPSRideUnrideVehicle();
-		}
-	}
-	else if(fpFPSGetPlayerPose() == POSE_SIT) // ahh, disappeared from under our feet
-	{
-		FPSRideVehicle = nullptr;
-		fpFPSRideUnrideVehicle();
-	}
-
-	// if riding a vehicle, vehicle attitude and position override all
-	if (FPSRideVehicle != nullptr && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
-	{
-		vehAttachToRidePoint(Vehicle);
-		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
-//		Write_Log (LOG_FPS, LOG_INFO, "Vehicle Yaw = %f", mlRAD_TO_DEG(FPSRideVehicle->PosData.Att.Yaw));
-		fpFPSDoRidingShake();
-	}
-	else
-	{
-		FLOAT64VECTOR	CurrentVelocity;
-		fpFPSGetVelocity (&CurrentVelocity);
-
-		// Update Positional Info
-		LastPos.x = pVehicleData->VehiclePos.x;
-		LastPos.y = pVehicleData->VehiclePos.y;
-		LastPos.z = pVehicleData->VehiclePos.z;
-		UpdatePositionRotation(pVehicleData, DeltaTime, &CurrentVelocity);
-
-		// /////////////////
-		// Collision Code //
-		////////////////////
-		//FLOAT64			CosValue, SinValue;
-		//piVECTOR		OldPos,NewPos, TempPiVec;
-		//FASTCOLLIDE		CollisionList[32];
-		//FASTCOLLIDE*		CollideListPtr;
-		//UINT32			TempUint;
-		//UINT32			NumCollides;
-		//UINT32			CollideNum;
-		//OBJECT*			ColObj;
-		//FLOAT64			HeightVariance;
-		//piVECTOR		Pos;
-		//FLOAT64VECTOR	WorldOriginOffset;
-		//UINT32			RetVal;
-		//SINT32			numGroundRays;
-
-		//piVECTOR groundNormal;
-		//groundNormal.set(0, 0, 0);
-
-		//trnGetWorldOriginOffset(&WorldOriginOffset);
-		//memset(CollisionList, 0x0, sizeof(CollisionList));
-
-		FLOAT64 SavedYaw  = pVehicleData->VehicleAtt.Yaw;
-
-		// collider works
-		// move forward
-		// collide back
-		// if collision, move back, then forward to collide point
-		// could be .. more efficient
-		// checks only for models
-		if (mlDetermineInfantryCollisions(pVehicleData, &CurrentVelocity, (UINT32)(fpFPSGetPlayerPose()), FALSE ))
-		{
-			pVehicleData->VehiclePos.x = LastPos.x;
-			pVehicleData->VehiclePos.y = LastPos.y;
-			pVehicleData->VehiclePos.x += CurrentVelocity.x * DeltaTime;
-			pVehicleData->VehiclePos.y += CurrentVelocity.y * DeltaTime;
-		}
-
-		pVehicleData->LastYaw = SavedYaw;
-
-		if (fpFPSVehicleCollideCheckNeeded() && fpsTrooper.lastUnrideTime && (frametime - fpsTrooper.lastUnrideTime) < 1000)
-			mlDetermineInfantryCollisions(pVehicleData, &CurrentVelocity, (UINT32)(fpFPSGetPlayerPose()), TRUE );
-
-		fpFPSMarkForVehicleCollideCheck (FALSE);
-
-		// do falling code once our pos has been reset
-		if(Vehicle->ModelData->LastResetTime)
-			CurrentVelocity.z = _doGravity(pVehicleData, &VehicleWalkingOn, LastPos, DeltaTime);
-		else
-			CurrentVelocity.z = 0.0f;
-
-		fpsTrooper.teleportToGround = FALSE;
-
-		pVehicleData->VehicleVel = CurrentVelocity;
-
-		// Set VechicleAttMat
-		pVehicleData->VehicleAtt.Pitch = pVehicleData->VehicleAtt.Roll = 0.0;
-
-		piVECTOR TempPiVec;
-		TempPiVec.x =  (FLOAT32)pVehicleData->VehicleAtt.Pitch;
-		TempPiVec.y =  (FLOAT32)pVehicleData->VehicleAtt.Roll;
-		TempPiVec.z = -(FLOAT32)pVehicleData->VehicleAtt.Yaw;
-
-		mathEul_ToMatrix(&pVehicleData->VehicleAttMat,EulOrdXYZs,&TempPiVec);
-
-		//mlgearDetermineHeightVariance(&HeightVariance,&pVehicleData->VehiclePos,0.0,0.0);
-		//pVehicleData->VehiclePos.z += HeightVariance;
-	}
-	////////////////////////
-	// End Collision Code //
-	////////////////////////
-
-	pVehicleData->VehicleAttVel.Pitch = 0;
-	pVehicleData->VehicleAttVel.Roll = 0;
-	pVehicleData->VehicleAttVel.Yaw = 0;
-
-	if(VehicleWalkingOn && !VehicleWalkingOn->isHulked())
-	{
-		fpFPSStartSwimming (pVehicleData, FALSE);
-		Vehicle->RideVehicleHostIndex = VehicleWalkingOn->VehicleHostIndex;
-		Vehicle->RideSeatNum = VEH_TROOPER_ON_DECK_RIDE_SEAT;
-
-		// save relative position
-		fpSaveRelRidePos(VehicleWalkingOn, Vehicle);
-	}
-	else
-	{
-		LOGICAL	overWater;
-
-		// we were on the deck now we're not
-		if(Vehicle->RideSeatNum == VEH_TROOPER_ON_DECK_RIDE_SEAT)
-		{
-			Vehicle->RideVehicleHostIndex = 0;
-			Vehicle->RideSeatNum = 0;
-		}
-		if (mlIsFPSOnWater(pVehicleData, &overWater))
-		{
-			fpFPSStartSwimming (pVehicleData, overWater);
-		}
-//		else
-//		{
-//			fpFPSStartSwimming (pVehicleData, FALSE);
-//		}
-	}
-
-	mlInfantryCheckLeanLines (pVehicleData);
-
-	// Sound Update
-	fpFPSUpdateSounds(pObject);
-
-	// Set the AnimationFlags
-	fpFPSSetAnimationFlags ();
-
-	trncdCheckTreeBox(FALSE);
-	return TRUE;
-}
-*/
 
 LOGICAL _doUpdatePosRotCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaTime, FLOAT64VECTOR* pCurrentVelocity)
 {
@@ -1669,17 +1219,17 @@ LOGICAL UpdatePositionRotation(mlVehicleData* pVehicleData, FLOAT64 DeltaTime, F
 		return _doUpdatePosRotCampaign(pVehicleData, DeltaTime, pCurrentVelocity);
 }
 
-static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOAT64 Distance)
+static void ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOAT64 Distance)
 {
 	SINT32			fallType = FPS_FALL_NORMAL;
 	FLOAT64			Damage;
-	LOGICAL			ATPOnly = FALSE;
+	bool			ATPOnly = false;
 	FLOAT64			speed, fallTime;
 
 	if ((fpsTrooper.parachuteOpen) || (fpsTrooper.parachuteOKToOpen))
 	{
 		Damage = 0.5;
-		ATPOnly = TRUE;
+		ATPOnly = true;
 
 		speed = mathExactVectorLength(&fpsTrooper.inheritedVehicleVelocity);
 
@@ -1692,20 +1242,18 @@ static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOA
 			{
 				// splat
 				Damage = 1.0;
-#pragma message("TBD: Should fallType be set to FPS_FALL_HURT?")
-//				fallType = FPS_FALL_HURT;
+                // fallType = FPS_FALL_NORMAL_HURT; // See DEV-781
 			}
 		}
 	}
-	else
-	if (fpFPSIsSwimming())
+	else if (fpFPSIsSwimming())
 	{
 		Damage = DetermineFallEffect(Distance, fpFALL_DISTANCE_WATER_HURT_MIN, fpFALL_DISTANCE_WATER_HURT_MAX);
 		if (Damage == 0.0)
 		{
 			Damage   = DetermineFallEffect(Distance, fpFALL_DISTANCE_WATER_STUN_MIN, fpFALL_DISTANCE_WATER_STUN_MAX);
 			fallType = FPS_FALL_WATER;
-			ATPOnly  = TRUE;
+			ATPOnly  = true;
 		}
 		else
 		{
@@ -1723,7 +1271,7 @@ static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOA
 				fallType = FPS_FALL_NORMAL_HURT;
 			}
 
-			ATPOnly  = TRUE;
+			ATPOnly  = true;
 		}
 		else
 		{
@@ -1735,17 +1283,15 @@ static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOA
 
 	if (Damage > 400.0)
 	{
-		persApplyDamage((FLOAT32) Damage, 0, PERS_HITLOCATION_HEAD, FALSE);
+		persApplyDamage(Damage, 0, PERS_HITLOCATION_HEAD, false);
 	}
 	else
 	{
-		persApplyDamage((FLOAT32) Damage, 0, PERS_HITLOCATION_LEGS, ATPOnly);
+		persApplyDamage(Damage, 0, PERS_HITLOCATION_LEGS, ATPOnly);
 		fpFPSAddWeaponLag(AROUND_X, 20.0f, true);
 	}
 
 	fpFPSPlayFallSound(pObject, fallType);
-
-	return TRUE;
 }
 
 FLOAT64 DetermineFallEffect(FLOAT64 Distance, FLOAT64 MinDistance, FLOAT64 MaxDistance)
@@ -1903,13 +1449,13 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 	piVECTOR		SphereCenter;
 	UINT32			Collision;
 //	SINT32			collisionOccurred = 0;
-	FLOAT64VECTOR 	WorldOriginOffset;
+	FLOAT64VECTOR 	worldOriginOffset;
 	OBJECT*			colObject;
 
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	vehGetVehicleHead(&CurrentVehicle);
-	trnGetWorldOriginOffset(&WorldOriginOffset);
-	WorldOriginOffset.z = -WorldOriginOffset.z;
+	trnGetWorldOriginOffset(&worldOriginOffset);
+	worldOriginOffset.z = -worldOriginOffset.z;
 
 	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
 	{
@@ -1944,9 +1490,9 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 
 		//CurrentVehicle->VehicleObjectData->CollideExternObject
 		//CurrentVehicle->VehicleObjectData->HitBox
-		SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - WorldOriginOffset.x);
-		SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - WorldOriginOffset.y);
-		SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - WorldOriginOffset.z);
+		SphereCenter.x =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.x - worldOriginOffset.x);
+		SphereCenter.y =  (FLOAT32)(CurrentVehicle->PosData.RenderPos.y - worldOriginOffset.y);
+		SphereCenter.z = -(FLOAT32)(CurrentVehicle->PosData.RenderPos.z - worldOriginOffset.z);
 
 		mlUtilityCheckLineSphereCollide(&Collision, &SphereCenter, OldPos,
 										NewPos, CurrentVehicle->VehicleObjectData->Radius);
@@ -2033,7 +1579,7 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 {
 	FLOAT64			CosValue, SinValue;
 	SINT32			i;
-	FLOAT64VECTOR	WorldOriginOffset;
+	FLOAT64VECTOR	worldOriginOffset;
 	OBJECT*			keeperColObj = nullptr;
 	piVECTOR		keeperPos;
 	piVECTOR		rayStart, rayEnd;
@@ -2051,14 +1597,14 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 
 	CosValue = cos((pVehicleData->VehicleAtt.Yaw));
 	SinValue = sin((pVehicleData->VehicleAtt.Yaw));
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 	memset(CollisionList, 0x0, sizeof(CollisionList));
 
 	for (i=0; i < numLines; i++)
 	{
-		rayStart.x = (FLOAT32)(pVehicleData->VehiclePos.x - WorldOriginOffset.x);
-		rayStart.y = (FLOAT32)(pVehicleData->VehiclePos.y - WorldOriginOffset.y);
-		rayStart.z = -(FLOAT32)(pVehicleData->VehiclePos.z + WorldOriginOffset.z);
+		rayStart.x = (FLOAT32)(pVehicleData->VehiclePos.x - worldOriginOffset.x);
+		rayStart.y = (FLOAT32)(pVehicleData->VehiclePos.y - worldOriginOffset.y);
+		rayStart.z = -(FLOAT32)(pVehicleData->VehiclePos.z + worldOriginOffset.z);
 
 		rayEnd = rayStart;
 

@@ -108,7 +108,7 @@ public:
 	float* _namecolor;
 	float _cutoff;
 
-	typedef std::vector<MapIcon> MapIcons;
+	using MapIcons = std::vector<MapIcon>;
 	MapIcons _statusicons;
 
 	int _font, _fontwidth;
@@ -169,12 +169,12 @@ public:
 	virtual SuperCell* NewSuperCell(Renderer* r, int scx, int scy);
 	void FilterStrat(const char* name, const unsigned char* value);
 
-	typedef void (*straticontexfn)(StratDB::StratObject const*, bool selected, MapIcon&);
+	using straticontexfn = void (*)(StratDB::StratObject const*, bool selected, MapIcon&);
 	straticontexfn _straticon;
 
 	virtual void MessageReceived(phui::Message* m, phui::MessageHandler* reply);
 
-	bool showsmallcps, showlargecps, showews, showfront, showrear, showairfields, showports;
+	bool showsmallcps, showlargecps, showews, showfrontline, showbackline, showreserve, showrear, showairfields, showports;
 	bool showobjectives, showbrigades, showdeployments, showorders, showmydivision;
 	bool showcps, showcivilian, showarmy, showairforce, shownavy, showdepots, showbridges;
 	bool shownames, showcpnames, showfacnames, showicons, showflags, showclutter;
@@ -211,7 +211,7 @@ public:
 	void RemoveStratObject(StratMapObject*);
 
 protected:
-	typedef std::map<sdm_lookup_id, phui::ref_ptr<StratMapObject> > ObjectMap;
+	using ObjectMap = std::map<sdm_lookup_id, phui::ref_ptr<StratMapObject> >;
 	ObjectMap _objectmap;
 };
 

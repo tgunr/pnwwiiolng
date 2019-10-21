@@ -1,0 +1,23 @@
+#!/bin/bash
+HOMEDIR='/home/wwiiol'
+LOGDIR='/home/wwiiol/logs/'
+DATE=`date +%Y-%m-%d-%H.%M.%S`
+
+mkdir -p $LOGDIR$DATE
+for i in /playnet/wwiiol/bin/*
+do
+ i=${i##*/}
+ core=${HOMEDIR}/${i}/core
+ if [ -e ${core} ] ; then
+  mv -f ${core} ${LOGDIR}/${DATE}/core.${i}
+ else
+  mv -f $HOMEDIR/$i/core.* $LOGDIR$DATE/core.$i 2>/dev/null
+ fi
+done
+mv /tmp/*.*.log $LOGDIR$DATE >/dev/null 2>&1
+if [[ -n $(find $LOGDIR$DATE -type f) ]]; then
+	(cd $LOGDIR && tar -c -z -f "$DATE.tar.gz" "$DATE" && rm -r "$DATE")
+else
+	rm -r $LOGDIR$DATE
+fi
+

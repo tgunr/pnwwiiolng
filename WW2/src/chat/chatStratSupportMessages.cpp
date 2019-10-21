@@ -9,10 +9,9 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "versionNo.h"
-
 #include "chat/chatBrigadeMove.h"
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatSideMessage.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatTypes.h"
@@ -27,11 +26,10 @@
 #include "strt/strtObjectiveStats.h"
 #include "strt/strtObjectStruct.h"
 #include "strt/strtTypes.h"
-#include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiThreads.h"
 
 static TEUL_CALLBACK* _SEND_SCMD_RESULT;
 static TEUL_CALLBACK* _SEND_SIDE_MESSAGE;
@@ -91,7 +89,7 @@ chatGetPopulation(WWII_SIDE side)
 static bool
 _sideMessage(SIDE_MESSAGE_TYPE type
 				, WWII_SIDE side
-				, const FULL_OBJ_ID& objective
+				, const FULL_OBJ_ID objective
 				, LSTRING_ID prefix
 				, LSTRING_ID message
 				, const char* arg1
@@ -122,7 +120,7 @@ _sideMessage(SIDE_MESSAGE_TYPE type
 // Send a message to one side, possibly limited to one CP
 
 bool
-chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID& objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
+chatSendSideMessage(WWII_SIDE side, const FULL_OBJ_ID objective, LSTRING_ID prefix, LSTRING_ID message, const char* arg1, const char* arg2)
 {
 	return _sideMessage(SM_SIDE, side, objective, prefix, message, arg1, arg2);
 }
@@ -150,6 +148,7 @@ bool
 chatSendSCMDResult(SINT32 playerID
 					, SCMD_ENUM command
 					, FULL_OBJ_ID cp
+                    , WWII_SIDE side
 					, SCMD_RESULT result
 					, UINT32 data
 					)
@@ -159,11 +158,11 @@ chatSendSCMDResult(SINT32 playerID
 		StratCommand scmd(playerID
 							, command
 							, cp
-							, WWII_NO_SIDE
+							, side
 							, result
 							);
 		scmd.m_data = data;
-		if ( scmd.send() <= 0 )
+		if ( scmd.send() < 0 )
 			throw std::logic_error("Send error");
 
 		return true;
@@ -177,7 +176,8 @@ chatSendSCMDResult(SINT32 playerID
 }
 
 //////////////////////////////////////////////////////////////////////
-
+// Used by the stratd host
+//////////////////////////////////////////////////////////////////////
 void
 chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 {
@@ -193,12 +193,30 @@ chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Used by the stratd host 
+//////////////////////////////////////////////////////////////////////
+void stratSendGarrisonCountryChange(GARRISON_COUNTRY_CHANGE_MSG & outgoing)
+{
+	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST);
+	if (endpoint != nullptr)
+		outgoing.send(*endpoint);
+
+	endpoint = serverPeerEndpointByType(MAP_HOST);
+	if (endpoint != nullptr)
+		outgoing.send(*endpoint);
+
+}
+
+//////////////////////////////////////////////////////////////////////
 
 template<>
 SINT32
 BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 {
+	dbugLog(_FLD, "Received BRIGADE_MOVE_MSG");
+	
 	BrigadeMove& request = incoming.data();
+	
 	if ( incoming.action() != BRIGADE_MOVE_MSG::EXCHANGE || request.m_action != BMR_APPROVED )
 	{
 		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
@@ -214,7 +232,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 	UINT32 destination = (cp) ? cp->uOID : 0;
 	const char* unitName = (unit ? unit->callsign() : "NULL");
 	char fidBuffer[FULL_OBJ_ID::PrintLen];
-	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(&request.m_destination, fidBuffer));
+	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(request.m_destination, fidBuffer));
 
 	dbugLog(_FLI, "%s: %s requesting %s %s(%u) to %s"
 					, __FUNCTION__, requester.c_str(), (request.m_actionable ? "move" : "check")
@@ -223,8 +241,9 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 					);
 
 	request.m_action = request.process(incoming.key(), requester.c_str(), unit, cp, (bool)incoming.flags());
+	
 	DBThread::Do(DBThread::Default
-				, "INSERT INTO strat.move_requests"
+				, "INSERT INTO `wwiionline`.`move_requests`"
 					"(recorded, requester, action, unit_id, from_cp_oid, to_cp_oid, result)"
 					"VALUES"
 					"(NOW(), '%s', %u, %u, %u, %u, %d)"
@@ -240,7 +259,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 }
 
 BRIGADE_MOVE_RESULT
-BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
+BrigadeMove::process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
 {
 	if ( unit == nullptr )
 	{
@@ -263,7 +282,7 @@ BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit*
 	}
 
 	// If actionable is set, then we actually want to move the brigade
-	if ( m_actionable )
+	if (m_actionable)
 		return unit->move(callsign, cp);
 
 	// Otherwise, the caller just wants to know if its allowed
@@ -273,13 +292,143 @@ BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit*
 	return bmr;
 }
 
+
+// Used by Strat host
+template<>
+SINT32
+GARRISON_COUNTRY_CHANGE_MSG::receive(SINT32 /*teulIndex*/, GARRISON_COUNTRY_CHANGE_MSG& incoming)
+{
+	dbugLog(_FLD, "Received GARRISON_COUNTRY_CHANGE_MSG");
+
+	GarrisonCountryChange& request = incoming.data();
+	
+	if ( incoming.action() != GARRISON_COUNTRY_CHANGE_MSG::EXCHANGE || request.m_action != GCR_APPROVED )
+	{
+		dbugLog(_FLW, "%s: Invalid message type", __FUNCTION__);
+		return -EINVAL;
+	}
+
+	// The incoming key is the packed* display* handle of the requester
+	Chat::Name requester(incoming.key());
+
+	StratHCUnit* unit = StratHCUnit::Lookup(request.m_brigadeID);
+
+	const char* unitName = (unit ? unit->callsign() : "NULL");
+	const char *countryName = _countryCode[request.m_newCountryId];
+	dbugLog(_FLI, "%s: %s requesting changing country of %s(%u) to %s"
+					, __FUNCTION__, requester.c_str() 
+					, unitName, request.m_brigadeID
+					, countryName
+					);
+
+	request.m_action = request.process(incoming.key(), requester.c_str(), incoming.data().m_brigadeID, incoming.data().m_newCountryId);
+
+	// Add an entry to the wwiionline.move_requests table so that Manually Changed Garrisons can be reviewed/monitored
+	DBThread::Do(DBThread::Default
+				, "INSERT INTO `wwiionline`.`move_requests`"
+					"(recorded, requester, action, unit_id, from_country_id, to_country_id, result)"
+					"VALUES"
+					"(NOW(), '%s', %u, %u, %u, %u, %d)"
+					, requester.c_str(), request.m_actionable, request.m_brigadeID
+					, unit->country(), request.m_newCountryId
+					, request.m_action
+					);
+					
+	if ( !request.m_actionable || request.m_action != GCR_APPROVED )
+	{
+		dbugLog(_FLD, "Calling stratSendGarrisonCountryChange");
+		stratSendGarrisonCountryChange(incoming);
+	}
+	else
+	{
+		dbugLog(_FLD, "Not actionable or not approved", request.m_actionable, request.m_action);
+	}
+	
+	return 1;
+}
+
+// Used by Strat host
+GARRISON_COUNTRY_CHANGE_RESULT
+GarrisonCountryChange::process(const ChatHandle mover, const char* callsign, UINT32 unitID, WWII_COUNTRY country)
+{
+	dbugLog(_FLD, "GarrisonCountryChange::process() was called from %s for unit %d and country %d where action=%d",
+		callsign, unitID, country, m_action);
+
+	GARRISON_COUNTRY_CHANGE_RESULT result = GCR_FAILED;
+
+	// TODO: here we are to actually perform the strat hosts function of verifying and then
+	//       changing the country when "actionable"
+	StratHCUnit *unit = StratHCUnit::Lookup(unitID);
+	CPStruct *cp = strtGetCP(unit->m_homeCPID);
+	if (cp == nullptr)
+	{
+		dbugLog(_FLI, "GarrisonCountryChangeReq(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(unit->m_homeCPID));
+	}
+	else
+	{
+		if (cp->isObjective() || cp->islinkedToAnAO())
+		{
+			result = GCR_FAILED_HAS_OBJECTIVE;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP has an Objective or is linked to one.");
+		}
+		else if (wwiiSide(country) != wwiiSide(cp->country))
+		{
+			result = GCR_FAILED_WRONG_OWNER;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the other side.");
+		}
+        else if (country == cp->country)
+        {
+            result = GCR_FAILED_OWNER_ALREADY;
+            dbugLog(_FLI, "GarrisonCountryChangeReq failed because the CP is owned by the requested country already.");
+        }
+        else
+        {
+	        // TODO Add some checks here for percentages of UK, French and US towns already on the front line.
+
+            if (cp->canChangeOwnership(country, true))
+            {
+				if (m_actionable)
+				{
+					dbugLog(_FLI, "CP Change country request (vote) from %s to change CP %u to country %u ", callsign,
+							unit->m_homeCPID.id, country);
+
+					cp->changeOwnership(country, true, true);
+
+					// Now that the town has changed owner we need to change the Garrison to match.
+					if(cp->m_townstatus == INACTIVE)
+					{
+						// Inactive towns that are changed by the HC do not incur the extended supply timers
+						cp->changeAllGarrisonCountries(country, false);
+					}
+					else
+					{
+						// All others do incur the extended supply timers
+						cp->changeAllGarrisonCountries(country, true);
+					}
+				}
+
+                result = GCR_APPROVED;
+                dbugLog(_FLI, "Approved GarrisonCountryChangeReq received from %s to change CP %u to country %u ", callsign, unit->m_homeCPID.id, country);
+            }
+            else
+            {
+                dbugLog(_FLI, "GarrisonCountryChangeReq cp->changeOwnership failed for %s whilst changing from country %u to %u",
+                        cp->name, cp->country, country);
+                result = GCR_FAILED;
+            }
+        }
+	}
+
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////
 //This function installs all the host callbacks
 SINT32
-chatInstallStratSupportCallbacks(void)
+chatInstallStratSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(CHAT_X)
-
+	{
 		REGISTER_SENDER(Chat::SIDE_MESSAGE_Y, _sendSideMessage, _SEND_SIDE_MESSAGE);
 
 		REGISTER_RECEIVER(Chat::OOB_MESSAGE_Y, _recvOOBMessage);
@@ -288,5 +437,7 @@ chatInstallStratSupportCallbacks(void)
 
 		REGISTER_MSG(Chat::BRIGADE_MOVE_Y, BRIGADE_MOVE_MSG);
 
-	END_CALLBACK_REGISTRATION
+		REGISTER_MSG(Chat::GARRISON_COUNTRY_Y, GARRISON_COUNTRY_CHANGE_MSG);
+	}
+	END_CALLBACK_REGISTRATION(CHAT_X)
 }

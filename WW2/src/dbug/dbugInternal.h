@@ -12,78 +12,58 @@
 #pragma error "Must have included platform.h first"
 #endif
 
+#include "str/stringLib.h"
+
 #if platOS == OS_WIN32
 #define vsnprintf _vsnprintf
 #endif
 
-static const UINT32 DBUG_FLAG_MASK = 0xfffffff0;	// flags mask
-static const UINT32 DBUG_MAX_STRING = 4224;
-static const UINT32 DBUG_MAX_PATH = 128;
+constexpr UINT32 DBUG_FLAG_MASK = 0xfffffff0;	// flags mask
+constexpr UINT32 DBUG_MAX_STRING = 4224;
+constexpr UINT32 DBUG_MAX_PATH = 128;
 
-class DebugLogger
+struct DebugLogger
 {
-public:
-	DebugLogger()
-		:	initialized(false)
-		,	dbugfile(0)
-		,	logType(0)
-		,	isLog(0)
-		,	writeLevel(0)
-		,	logLevel(0)
-		,	writeFlags(0)
-		,	logFlags(0)
-		,	flags(0)
-		,	errType(0)
-		,	err(0)
-		,	lineno(0)
-		,	m_program(nullptr), m_file(nullptr)
-		{
-			m_text[0] = m_text[sizeof(m_text)-1] = 0;
-		}
+	DebugLogger() noexcept {}
 
-public:
-	const char* file() const { return m_file; }
-	const char* program() const { return m_program; }
-	const char* text() const { return m_text; }
+	const char* program() const noexcept { return m_program; }
+	const char* text() const noexcept { return m_text; }
 
-	void setFileName(const char* src) { m_file = src; }
-	void setProgram(const char* src) { m_program = src; }
-	void setText(char* src) { if ( src ) strncpy(m_text, src, DBUG_MAX_STRING); else m_text[0] = 0; m_text[DBUG_MAX_STRING-1] = 0; }
+	void setProgram(const char* src) noexcept { m_program = src; }
 
-	int vformatText(const char* fmt, va_list args)
+	UINT32 vformatText(const char* fmt, va_list args) noexcept
 	{
-		const int len = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1);
-		m_text[len] = 0;
+		UINT32 len = static_cast<UINT32>(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args));
+		if (len < DBUG_MAX_STRING)
+			m_text[len++] = '\n';
+		else
+			m_text[DBUG_MAX_STRING] = '\n';
 		return len;
 	}
 
 	template<typename... Args>
-	int formatText(const char* fmt, Args... args)
+	UINT32 formatText(const char* fmt, Args&&... args) noexcept
 	{
-		int len = std::min(snprintf(m_text, DBUG_MAX_STRING, fmt, std::forward<Args>(args)...), (int)DBUG_MAX_STRING-1);
-		m_text[len] = 0;
-		return len;
+		return strprintf(m_text, fmt, std::forward<Args>(args)...);
 	}
 
-	void initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 file_, const char* program_);
-	bool isInitialized() const { return initialized; }
+	void initialize(LogMode logMode, Debug::ERROR_TYPE level, SINT32 file, const char* program) noexcept;
+	bool isInitialized() const noexcept { return m_initialized; }
 
-	void close();
+	void close() noexcept;
 
 public:
-	bool		initialized;
-	SINT32		dbugfile;
-	SINT32		logType;
-	LOGICAL		isLog;
-	UINT32		writeLevel;
-	UINT32		logLevel;
-	SINT32		writeFlags;
-	SINT32		logFlags;
-	SINT32		flags;
-	UINT32		errType;
-	SINT32		err;
-	SINT32		lineno;
-	const char*	m_program;
-	const char*	m_file;
-	char		m_text[DBUG_MAX_STRING + 1];
+	bool			m_initialized;
+	int				m_dbugfile;
+	LogMode			m_logMode;
+	unsigned int	m_writeLevel;
+	unsigned int	m_logLevel;
+	unsigned int	m_writeFlags;
+	unsigned int	m_logFlags;
+	//unsigned int	m_flags;
+	//unsigned int	m_errType;
+	//int				m_lineno;  // can be -1
+	const char*		m_program;
+	//const char*		m_file;
+	static thread_local char m_text[DBUG_MAX_STRING + 1];
 };

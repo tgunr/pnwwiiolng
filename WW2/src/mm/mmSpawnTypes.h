@@ -62,9 +62,9 @@ struct FE_POST_ACCEPT
 {
 	WEAPON_SERIAL	weaponSerial;	//The weapon serial, the bane of my
 									//	existence
-	LOGICAL			newVehicle;
 	SINT16			portal;
-	LOGICAL			mobileSpawnAvailable;
+	bool			newVehicle;
+	bool			mobileSpawnAvailable;
 };
 
 //The message from the front end that cancels a post
@@ -91,7 +91,7 @@ struct FE_POST_LIST_REQUEST
 //This message contains a list of posted vehicles at a facility
 struct FE_POST_LIST_RESPONSE
 {
-	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID& _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
+	FE_POST_LIST_RESPONSE(const FULL_OBJ_ID _facility, SINT32 _numWeapons, COMMANDED_WEAPON* const _commandedWeapon)
 		: facility(_facility), numWeapons(_numWeapons), commandedWeapon(_commandedWeapon) {}
 	FE_POST_LIST_RESPONSE()
 		: facility(nullObjID), numWeapons(0), commandedWeapon(nullptr) {}
@@ -122,7 +122,7 @@ struct POSTED_WEAPON;
 
 struct MM_POSTED_WEAPON
 {
-	MM_POSTED_WEAPON(const WEAPON_SERIAL& _weaponSerial, SINT16 _portal, UINT32 _commander, UINT32 _missionID, UINT32 _crew)
+	MM_POSTED_WEAPON(const WEAPON_SERIAL _weaponSerial, SINT16 _portal, UINT32 _commander, UINT32 _missionID, UINT32 _crew)
 	: weaponSerial(_weaponSerial), portal(_portal), commander(_commander), missionID(_missionID), crew(_crew) {}
 	MM_POSTED_WEAPON()
 	: weaponSerial(NULL_WEAP_SERIAL), portal(0), commander(0), missionID(0), crew(0) {}
@@ -156,7 +156,7 @@ struct FE_POST_EXPIRED
 	WEAPON_SERIAL weaponSerial;
 };
 
-//This message asks a front end if he wants a player to join his posted
+//This message asks a front end if they want a player to join their posted
 //	vehicle
 struct FE_JOIN_PERM_REQUEST
 {
@@ -180,7 +180,7 @@ struct FE_JOIN_PERM_KILL
 struct FE_CLIENT_SPAWN
 {
 	WEAPON_SERIAL	weaponSerial;
-	UCHAR			wantMobileSpawn;
+	bool			wantMobileSpawn;
 };
 
 //This is the notification that the front end gets when it is spawning
@@ -194,7 +194,7 @@ public:
 					, UCHAR _decal = 0
 					, bool isHighCommander = false, bool isBuilder = false, bool isMissionleader = false);
 	FESpawnNotify(ACTION_OBJECT* const a);
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 public:
 	WEAPON_SERIAL	weaponSerial;	// What you're spawning
@@ -207,7 +207,7 @@ public:
 };
 #pragma pack(pop)
 
-//Used by the mmHost to notify a commander that his crew has bailed
+//Used by the mmHost to notify a commander that their crew has bailed
 struct FE_CREW_BAILED
 {
 	UINT32 joinRequestID;

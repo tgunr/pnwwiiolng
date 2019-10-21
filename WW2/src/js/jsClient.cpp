@@ -1,10 +1,15 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 #include <algorithm>
+#include <locale>
+
+#include "steam_api.h" // HACK
 
 #include "phui/Util.h"
 
 #include "include/vars.h"
+#include "auth/authSteam.h"
+#include "sys/sysSteam.h"
 #include "js/jsClient.h"
 #include "js/jsStratDB.h"
 #include "js/jsGame.h"
@@ -24,7 +29,9 @@
 #include "strt/strtFacilityWeaponList.h"
 #include "uimap/uiMap.h"
 #include "client/GameClient.h"
+#include "client/clientNetError.h"
 #include "ui/uiMain.h"
+#include "js/jsAuthHandler.h"
 #include "js/jsPosition.h"
 #include "wwii/wwiiSquadMsg.h"
 #include "chat/chatSquadControl.h"
@@ -51,6 +58,7 @@
 #include "strt/strtCaptureState.h"
 #include "pers/persmain.h"
 #include "scen/ScenarioManager.h"
+#include "rn/rnmain.h"
 
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
@@ -71,6 +79,15 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, createauthhandler,0),
+	JS_FUNCTION_SPEC(jsClient, connecttoarena,0),
+	JS_FUNCTION_SPEC(jsClient, startofflinemode,0),
+	JS_FUNCTION_SPEC(jsClient, issteamcopy,0),
+	JS_FUNCTION_SPEC(jsClient, steamconnect,2),
+    JS_FUNCTION_SPEC(jsClient, getLastUnknownErrorCode,0),
+	JS_FUNCTION_SPEC(jsClient, emailReset,0),
+    JS_FUNCTION_SPEC(jsClient, releasesteamticket,0),
+	JS_FUNCTION_SPEC(jsClient, loadrootwindow,0),
 	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
 	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
@@ -112,61 +129,62 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, joininstance,4),
 	JS_FUNCTION_SPEC(jsClient, isavailable, 0),
 	JS_FUNCTION_SPEC(jsClient, ismissionleader, 0),
-	{0}
+	{0, NULL, 0, 0, 0}
 };
 
 JSPropertySpec jsClient::jsproperties[] =
 {
-	{"country",				jsClient::COUNTRY_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"branch",				jsClient::BRANCH_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"handle",				jsClient::HANDLE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missions",			jsClient::MISSIONS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"personas",			jsClient::PERSONAS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionroomlist",		jsClient::MISSIONROOMLIST_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"personalisttime",		jsClient::PERSONALISTTIME_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidelocked",			jsClient::SIDELOCKED_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"currentmission",		jsClient::CURRENTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionresults",		jsClient::MISSIONRESULTS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"despawntimer",		jsClient::DESPAWNTIMER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"canpostmission",		jsClient::CANPOSTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"persona",				jsClient::PERSONA_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missionlistupdate",	jsClient::MISSIONLISTUPDATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnliststatus",	jsClient::LASTSPAWNLISTSTATUS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnlistsource",	jsClient::LASTSPAWNLISTSOURCE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"activemission",		jsClient::ACTIVEMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"lastspawnliststate",	jsClient::LASTSPAWNLISTSTATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"squad",				jsClient::SQUAD_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"squadinvite",			jsClient::SQUADINVITE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"currentorders",		jsClient::CURRENTORDERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"isplaynet",			jsClient::ISPLAYNET_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidebalance",			jsClient::SIDEBALANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"sidedelay",			jsClient::SIDEDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"poll",				jsClient::POLL_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"spawndelay",			jsClient::SPAWNDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"ismobilespawn",		jsClient::ISMOBILESPAWN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"cansto",				jsClient::CANSTO_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"brigadenotices",		jsClient::BRIGADENOTICES_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"ishc",				jsClient::ISHC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"isoic",				jsClient::ISOIC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"oicof",				jsClient::OICOF_PROP,				JSPROP_READONLY | JSPROP_PERMANENT},
-	{"havenotices",			jsClient::HAVEBRIGADENOTICES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
-	{"recruiter",			jsClient::RECRUITER_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"recruiters",			jsClient::RECRUITERS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"haverecruiters",		jsClient::HAVERECRUITERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"missioninvite",		jsClient::MISSIONINVITE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
-	{"nextsupply",			jsClient::NEXTSUPPLY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"instance",			jsClient::INSTANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"state",				jsClient::STATE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"capturestate",		jsClient::CAPTURESTATE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{"instances",			jsClient::INSTANCES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
-	{0}
+	{"country",				jsClient::COUNTRY_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"branch",				jsClient::BRANCH_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"handle",				jsClient::HANDLE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missions",			jsClient::MISSIONS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"personas",			jsClient::PERSONAS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigade",				jsClient::BRIGADE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"reservedweapon",		jsClient::RESERVEDWEAPON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigades",			jsClient::BRIGADES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"chatchannels",		jsClient::CHATCHANNELS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"spawnablevehicles",	jsClient::SPAWNABLE_VEHICLES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"weaponcounter",		jsClient::WEAPONCOUNTER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionroomlist",		jsClient::MISSIONROOMLIST_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"personalisttime",		jsClient::PERSONALISTTIME_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidelocked",			jsClient::SIDELOCKED_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"currentmission",		jsClient::CURRENTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionresults",		jsClient::MISSIONRESULTS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"despawntimer",		jsClient::DESPAWNTIMER_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"canpostmission",		jsClient::CANPOSTMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"persona",				jsClient::PERSONA_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missionlistupdate",	jsClient::MISSIONLISTUPDATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnliststatus",	jsClient::LASTSPAWNLISTSTATUS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnlistsource",	jsClient::LASTSPAWNLISTSOURCE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"activemission",		jsClient::ACTIVEMISSION_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"lastspawnliststate",	jsClient::LASTSPAWNLISTSTATE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"squad",				jsClient::SQUAD_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"squadinvite",			jsClient::SQUADINVITE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"currentorders",		jsClient::CURRENTORDERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"isplaynet",			jsClient::ISPLAYNET_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidebalance",			jsClient::SIDEBALANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"sidedelay",			jsClient::SIDEDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"poll",				jsClient::POLL_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"spawndelay",			jsClient::SPAWNDELAY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"ismobilespawn",		jsClient::ISMOBILESPAWN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"cansto",				jsClient::CANSTO_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"brigadenotices",		jsClient::BRIGADENOTICES_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"ishc",				jsClient::ISHC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"isoic",				jsClient::ISOIC_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"oicof",				jsClient::OICOF_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"havenotices",			jsClient::HAVEBRIGADENOTICES_PROP,	JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"recruiter",			jsClient::RECRUITER_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"recruiters",			jsClient::RECRUITERS_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"haverecruiters",		jsClient::HAVERECRUITERS_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"missioninvite",		jsClient::MISSIONINVITE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"nextsupply",			jsClient::NEXTSUPPLY_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"instance",			jsClient::INSTANCE_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"state",				jsClient::STATE_PROP,				JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"capturestate",		jsClient::CAPTURESTATE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"instances",			jsClient::INSTANCES_PROP,			JSPROP_READONLY | JSPROP_PERMANENT, nullptr, nullptr},
+	{"mscheckboxinit",		jsClient::MSCHECKBOXINIT_PROP,		JSPROP_PERMANENT, nullptr, nullptr},  //  Added 24-12-2018
+	{"mscheckboxstate",		jsClient::MSCHECKBOXSTATE_PROP,		JSPROP_PERMANENT, nullptr, nullptr},  //  Added 24-12-2018
+	{0, 0, 0, nullptr, nullptr}
 };
 
 /************************************************************************************************
@@ -203,6 +221,283 @@ jsClient::jsClient(ww2::Client* c) :
 
 jsClient::~jsClient()
 {
+}
+
+/************************************************************************************************
+	auth connection
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, createauthhandler) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	// HACK: At some point it would be nice to not have the controllers pointing to a global
+	// connection and actually have that connection be attached to the client or something.
+	*rval = (new jsAuthHandler())->jsVal();
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, connecttoarena) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	try {
+		// HACK: We should pass in the auth info, but for now it's set semi-globally.
+		rnconnectToServer();
+	} catch ( ClientNetError& ) {
+		// TODO: Error message
+		*rval = BOOLEAN_TO_JSVAL(false);
+	}
+
+	*rval = BOOLEAN_TO_JSVAL(true);
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	arena joining
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, startofflinemode) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	rnstartOfflineMode();
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	checking steam
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, issteamcopy) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	*rval = BOOLEAN_TO_JSVAL(IsSteamCopy());
+
+	return JS_TRUE;
+}
+
+/************************************************************************************************
+	steam connection
+*************************************************************************************************/
+
+namespace {
+	// The point in the login process we're at.
+	enum { LoginReady, LoginNewUser, LoginNeedEmail } steam_login_state = LoginReady;
+    
+    // Simple RAII wrapper to ensure proper setup/takedown for Steam auth tickets.
+    struct SteamAuthSessionTicket {
+        SteamAuthSessionTicket() {}
+        ~SteamAuthSessionTicket() {} // do NOT call release() here, it's not safe to do so from a global destructor
+  
+        const char *getData() { LoadIfNeeded(); return data; }
+        uint32_t getLength() { LoadIfNeeded(); return length; }
+        void release() { if (handle != k_HAuthTicketInvalid) { SteamUser()->CancelAuthTicket(handle); } }
+
+        private:
+        HAuthTicket handle = k_HAuthTicketInvalid;
+        char data[512] = {0};
+        uint32_t length = 0;
+        
+        void LoadIfNeeded() { if (handle == k_HAuthTicketInvalid) { handle = SteamUser()->GetAuthSessionTicket(data, static_cast<int>(array_size(data)), &length); } }
+    };
+    SteamAuthSessionTicket steamAuthTicket;
+    
+    // The most recent response's support code
+    std::string lastSupportCode;
+
+    // Update our global (eww) state to reflect the most recent API result
+	void UpdateLoginState(const SteamLoginResult &res) {
+        lastSupportCode = res.supportCode;
+        
+		switch ( res.status ) {
+        // Login succeeded - go to initial state
+		case SteamLoginResponse::LoginSuccess:
+			steam_login_state = LoginReady;
+			break;
+        // Need login info - go to new user state
+		case SteamLoginResponse::LoginNewUser:
+			assert( steam_login_state == LoginReady );
+			steam_login_state = LoginNewUser;
+			break;
+        // Need email info - go to need email only state
+		case SteamLoginResponse::LoginEmailRequired:
+			assert( steam_login_state == LoginReady );
+			steam_login_state = LoginNeedEmail;
+			break;
+        // Need email validation - go to initial state (try login next)
+        case SteamLoginResponse::LoginEmailNotValidated:
+            steam_login_state = LoginReady;
+            break;
+
+		// Issues/conflicts with user input; don't affect state.
+		case SteamLoginResponse::LoginCallsignInvalid:
+		case SteamLoginResponse::LoginCallsignDisallowed:
+		case SteamLoginResponse::LoginCallsignInUse:
+		case SteamLoginResponse::LoginEmailInvalid:
+            break;
+            
+        // Email in use during Signup flow requires transitioning to Email flow
+        // because EmailInUse during Signup means the callsign is already
+        // immutable in the backend. This is a hacky solution to what is
+        // ultimately a design problem in the database.
+		case SteamLoginResponse::LoginEmailInUse:
+            if (steam_login_state == LoginNewUser) { // in Signup flow
+                steam_login_state = LoginNeedEmail;
+            } else {
+                assert( steam_login_state == LoginNeedEmail ); // must be in Email flow if not in Signup flow
+            }
+			break;
+   
+        // State problems on the server side; we need to stick to the Login state.
+        case SteamLoginResponse::LoginArenaDown:
+        case SteamLoginResponse::LoginArenaDenied:
+        case SteamLoginResponse::LoginVersionMismatch:
+            assert( steam_login_state == LoginReady );
+            break;
+        
+		// Something went wrong, reset things on our end.
+		case SteamLoginResponse::LoginNotValidUser:
+		case SteamLoginResponse::LoginUnknownError:
+		case SteamLoginResponse::LoginExistingUser:
+			steam_login_state = LoginReady;
+			break;
+            
+		default:
+			dbugLog(_FLW, "Unknown login response %u", res.status);
+			steam_login_state = LoginReady;
+		}
+	}
+
+	// Call the appropriate Steam auth API based on our current state
+	SteamLoginResult AttemptSteamLogin(uint32_t arena, const char* callsign, const char* email) {
+        // For now, don't try to pre-validate the user's inputs; this pesters the relay more than is
+        // strictly necessary, but allows the rules to be purely under the relay's control in realtime,
+        // rather than requiring a new client build. It also significantly simplifies the already weird
+        // and messy JavaScript driving this UI.
+
+		//------
+
+		switch ( steam_login_state ) {
+		case LoginReady:
+			return authRequestSteamLogin(steamAuthTicket.getData(), steamAuthTicket.getLength(), arena);
+		case LoginNewUser: {
+            SteamLoginResult result = authRequestSteamSignup(steamAuthTicket.getData(), steamAuthTicket.getLength(), callsign, email);
+            
+            if (result.status == SteamLoginResponse::LoginSuccess) {
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
+            }
+            return result;
+        }
+		case LoginNeedEmail: {
+			SteamLoginResult result = authRequestSteamEmailChange(steamAuthTicket.getData(), steamAuthTicket.getLength(), email);
+
+            if (result.status == SteamLoginResponse::LoginSuccess) {
+                return { SteamLoginResponse::LoginEmailNotValidated, result.supportCode };
+            }
+            return result;
+        }
+		default:
+			assert ( false );
+			return { SteamLoginResponse::LoginUnknownError, "01000000-0000-0000-0000-000000000000" };
+		}
+	}
+}
+
+// Perform a login (or signup or email as appropriate) attempt.
+JS_FUNCTION_DEF(jsClient, steamconnect) {
+	assert ( IsSteamCopy() );
+
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+	if ( argc < 1 ) return JS_FALSE;
+
+	uint32_t arena;
+	if ( gArena[0] ) // Overridden by command line
+		arena = static_cast<uint32_t>(strtol(gArena, nullptr, 10));
+	else {
+		int32 jsarena;
+		JS_ValueToInt32(ctx, argv[0], &jsarena);
+		arena = static_cast<uint32_t>(jsarena);
+	}
+
+	const char* email = "";
+	if ( argc >= 2 )
+		email = JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
+
+	const char* callsign = "";
+	if ( argc >= 3 )
+		callsign = JS_GetStringBytes(JS_ValueToString(ctx, argv[2]));
+
+	//--------------
+
+	SteamLoginResult result = AttemptSteamLogin(arena, callsign, email);
+	UpdateLoginState(result);
+
+	if ( result.status == SteamLoginResponse::LoginSuccess )
+		rnsetServerInfo(result.serverIP, result.serverPort, result.otp);
+
+	*rval = INT_TO_JSVAL(result.status);
+	return JS_TRUE;
+}
+
+// Return the most recent support code.
+JS_FUNCTION_DEF(jsClient, getLastUnknownErrorCode) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+    
+    *rval = phui::js::NewString(lastSupportCode.c_str());
+    return JS_TRUE;
+}
+
+// Go to the "reset your email" state. We only need this to keep the jsClient side in sync with the JS.
+JS_FUNCTION_DEF(jsClient, emailReset) {
+    assert ( IsSteamCopy() );
+
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+    if ( argc < 1 ) return JS_FALSE;
+
+    assert( steam_login_state == LoginReady || steam_login_state == LoginNeedEmail );
+    
+    bool forward = JSVAL_TO_BOOLEAN(argv[0]);
+    
+    if (forward) {
+	    steam_login_state = LoginNeedEmail;
+    } else {
+        steam_login_state = LoginReady;
+    }
+	return JS_TRUE;
+}
+
+// Attempt not to hold onto Steam tickets longer than strictly necessary
+JS_FUNCTION_DEF(jsClient, releasesteamticket) {
+    assert ( IsSteamCopy() );
+
+    jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+    if ( ! jsclient ) return JS_FALSE;
+
+    steamAuthTicket.release();
+    return JS_TRUE;
+}
+
+/************************************************************************************************
+	gui state
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, loadrootwindow) {
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx, jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	rnloadRootWindow();
+
+	return JS_TRUE;
 }
 
 
@@ -429,7 +724,7 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		else if(_chatRateSamples)
 		{
 			static int lastChat = 0;
-			static int chatSamples[CHAT_RATE_SAMPLES];
+			static int chatSamples[CHAT_RATE_SAMPLES]{};
 
 			if(_chatRateSamples > CHAT_RATE_SAMPLES)
 				_chatRateSamples = CHAT_RATE_SAMPLES;
@@ -475,7 +770,10 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		// this allows us to localize host commands on the
 		// client
 		if(Online && result == DC_PASS_USE_LAST)
+        {
 			msg = uiDotCommandLast();
+            cmsg = uiUTF16toUTF8(msg);
+        }
 	}
 
 	unsigned int txmask = 0;
@@ -774,8 +1072,7 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	std::string missiondesc = UTF8(wmissiondesc);
 	if(missiondesc.empty()) return JS_FALSE;
 
-	MISSION_POST_REQ post;
-	memset(&post, 0x0, sizeof(post));
+	MISSION_POST_REQ post{};
 
 //	WWII_SIDE playerside = weapLookupSide(jsclient->client->PersonaSelected().m_countryID);
 
@@ -783,8 +1080,8 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	post.subType = (SINT8)subtype;
 	post.origin = *jsorigin->stratobj->FullObjID();
 	post.target = *jstarget->stratobj->FullObjID();
-	post.descSize = strlen(missiondesc.c_str());
-	strncpy(post.desc,missiondesc.c_str(), MapMiss::MISSION_DESC_LENGTH);
+	post.descSize = static_cast<SINT16>(strlen(missiondesc.c_str()));
+	strsafecpy(post.desc, missiondesc.c_str());
 
 	*rval = INT_TO_JSVAL(0); // trying
 
@@ -1535,9 +1832,9 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 			{
                 /*
                  TODO: Send in whether or not the player was wounded into Mission Results
-                 
+
                  NOTE: unsure whether code here is connected to above statement.
-                 
+
 				const PersonaSelection& persona = PlayerClient()->PersonaSelected();
 				Player* player = playerGetPlayer();
 				vehVehicle* vehicle = playerGetVehicle();
@@ -1787,6 +2084,16 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case INSTANCES_PROP:
 			*val = instances->jsVal();
 		break;
+		case MSCHECKBOXINIT_PROP:  //  UI Mobile Spawn Initialise logic. Added 24-12-2018
+		{
+			*val = BOOLEAN_TO_JSVAL((bool)js_mscheckboxinit);
+		}
+		break;
+		case MSCHECKBOXSTATE_PROP:  //  UI Mobile Spawn Current State. Added 24-12-2018
+		{
+			*val = BOOLEAN_TO_JSVAL((bool)js_mscheckboxstate);
+		}
+		break;
 	}
 
 	return JS_TRUE;
@@ -1794,20 +2101,36 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 {
+	switch (propid)
+	{
+	case MSCHECKBOXINIT_PROP:  //  Added 24-12-2018
+	{
+		js_mscheckboxinit = (bool)JSVAL_TO_BOOLEAN(*val);
+	}
+	break;
+	case MSCHECKBOXSTATE_PROP:  //  Added 24-12-2018
+	{
+		js_mscheckboxstate = (bool)JSVAL_TO_BOOLEAN(*val);
+	}
+	break;
+	}
+
 	return JS_TRUE;
 }
 
+#ifndef GM_RELEASE
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
-    ENABLE_FLOATERS.
+    GM_RELEASE.
 *************************************************************************************************/
-static bool _isRegularVehicle(const WEAPON_SPEC& spec)
+static bool _isRegularVehicle(const WEAPON_SPEC spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
 
 	return !weapon || weapon->isPlayerWeapon();
 }
+#endif
 
 /************************************************************************************************
 	ProcessWeapList
@@ -1828,7 +2151,7 @@ void jsClient::ProcessWeapList()
 
 		WeaponCounter counter = weaplist.m_counters[i];
 
-#ifndef ENABLE_FLOATERS
+#ifndef GM_RELEASE
 		if(false == _isRegularVehicle(weaplist.m_weapons[i])) {
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 		}
@@ -2186,6 +2509,12 @@ JSPropertySpec jsBrigade::jsproperties[] =
 	{"objective",		jsBrigade::OBJECTIVE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"mobilespawns",	jsBrigade::MOBILESPAWNS_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"isbrigade",		jsBrigade::ISBRIGADE_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isgarrison",		jsBrigade::ISGARRISON_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isfrontlinelinked", jsBrigade::ISFLLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isfrontline",		jsBrigade::ISFL_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
+	{"isenemylinked",	jsBrigade::ISENEMYLINKED_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
+	{"hasaf",			jsBrigade::HASAF_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
+	{"hasnavy",			jsBrigade::HASNAVY_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"issquadbrigade",	jsBrigade::ISSQUADBRIGADE_PROP,	JSPROP_READONLY | JSPROP_PERMANENT},
 	{"callsign",		jsBrigade::CALLSIGN_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"oic",				jsBrigade::OIC_PROP,			JSPROP_READONLY | JSPROP_PERMANENT},
@@ -2204,10 +2533,9 @@ JSPropertySpec jsBrigade::jsproperties[] =
 
 jsBrigade::jsBrigade(BrigadeDetail const& d)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), detail(d), officerranks(0), officernames(0)
+			, detail(d), officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
-	unit = HCUnit::Lookup(d.brigadeID());
 
 	DefineProperty("officernames", officernames = new phui::js::Array);
 	DefineProperty("officerranks", officerranks = new phui::js::Array);
@@ -2224,14 +2552,12 @@ jsBrigade::jsBrigade(BrigadeDetail const& d)
 
 jsBrigade::jsBrigade(BrigadeSummary const& s)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), officerranks(0), officernames(0)
+			, officerranks(0), officernames(0)
 
 {
 	JS_CONSTRUCTOR_LOCK;
 	*(BrigadeSummary*)(&detail) = s;
 	detail.m_motd[0] = '\0';
-
-	unit = HCUnit::Lookup(s.brigadeID());
 
 	DefineProperty("officernames", officernames = new phui::js::Array);
 	DefineProperty("officerranks", officerranks = new phui::js::Array);
@@ -2246,10 +2572,10 @@ jsBrigade::jsBrigade(BrigadeSummary const& s)
 
 jsBrigade::jsBrigade(unsigned int brigadeid)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(0), officerranks(0), officernames(0)
+			, officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
-	unit = HCUnit::Lookup(brigadeid);
+	HCUnit* unit = HCUnit::Lookup(brigadeid);
 	if(unit)
 		*(HCUnit*)(&detail) = *unit;
 
@@ -2490,19 +2816,23 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case ID_PROP:
 			*val = INT_TO_JSVAL(detail.brigadeID());
 		break;
-		case PARENT_PROP:
+		case PARENT_PROP: {
+			// TODO: This ID can be cached
+			HCUnit* unit = HCUnit::Lookup(detail.brigadeID());
 			if(unit != nullptr && unit->parent())
-				*val = (new jsHCUnit(unit->parent()))->jsVal();
-			else if(detail.parent())
-				*val = (new jsHCUnit(detail.parent()))->jsVal();
+				*val = (new jsHCUnit(*unit->parent()))->jsVal();
+			else
+				*val = JSVAL_NULL;
+		}
 		break;
-		case DIVISION_PROP:
+		case DIVISION_PROP: {
+			// TODO: This ID can be cached
+			HCUnit* unit = HCUnit::Lookup(detail.brigadeID());
 			if (unit && unit->parent())
 				*val = phui::js::NewString(UTF16(unit->parent()->name()));
-			else if(detail.parent())
-				*val = phui::js::NewString(UTF16(detail.parent()->name()));
 			else
 				*val = JS_GetEmptyStringValue(ctx);
+		}
 		break;
 		case DIVISION_ID_PROP:
 			*val = INT_TO_JSVAL(detail.m_parentID);
@@ -2525,23 +2855,21 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OFFICERS_PROP:
 			*val = INT_TO_JSVAL(detail.officers());
 		break;
-		case HOME_PROP:
-            {
-				// this can change, so we look it up everytime
+		case HOME_PROP: {
 				HCUnit* unit = HCUnit::Lookup(detail.m_unitID);
 
 				if(unit)
 					detail.setHomeCPID(unit->homeCPID());
 
-			    StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.m_homeCPID);
-			    if(stratobj)
-				    *val = (new jsStratObject(stratobj->FullObjID()))->jsVal();
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.m_homeCPID);
+				if(stratobj)
+					*val = (new jsStratObject(stratobj->FullObjID()))->jsVal();
 				else
 					*val = JSVAL_NULL;
-            }
+			}
 		break;
 		case OBJECTIVE_PROP:
-        {
+		{
 			StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.objectiveCPID());
 			if(stratobj)
 			{
@@ -2561,7 +2889,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 					*val = JSVAL_NULL;
 				}
 			}
-        }
+		}
 		break;
 		case MOBILESPAWNS_PROP:
 			*val = INT_TO_JSVAL(detail.m_mobileSpawns);
@@ -2569,6 +2897,44 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case ISBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(detail.isBrigade());
 		break;
+		case ISGARRISON_PROP:
+			*val = BOOLEAN_TO_JSVAL(detail.isGarrison());
+			break;
+		case ISFLLINKED_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool fllinked = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE_LINKED));
+				*val = BOOLEAN_TO_JSVAL(fllinked);
+			}
+			break;
+		case ISFL_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool fl = (stratobj && (stratobj->StratFlags(true) & CP_STAT_FRONTLINE));
+				*val = BOOLEAN_TO_JSVAL(fl);
+			}
+			break;
+		case ISENEMYLINKED_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool felinked = (stratobj && (stratobj->StratFlags(true) & CP_STAT_ENEMY_LINKED));
+				*val = BOOLEAN_TO_JSVAL(felinked);
+			}
+			break;
+		case HASNAVY_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool hasnavy = (stratobj && (stratobj->StratFlags(true) & CP_STAT_HAS_NAVYBASE ));
+				*val = BOOLEAN_TO_JSVAL(hasnavy);
+			}
+			break;
+		case HASAF_PROP:
+			{
+				StratDB::StratObject* stratobj = StratDB::FindStratObject(detail.homeCPID());
+				bool hasaf = (stratobj && (stratobj->StratFlags(true) & CP_STAT_HAS_AIRBASE));
+				*val = BOOLEAN_TO_JSVAL(hasaf);
+			}
+			break;
 		case ISSQUADBRIGADE_PROP:
 			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadBrigade(detail.brigadeID()));
 		break;
@@ -2578,7 +2944,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case OWNERRANK_PROP:
 			*val = (new jsRank(detail.country(), detail.branch(), detail.ownerRank()))->jsVal();
 		break;
-		case OIC_PROP: // guy who is currently in charge (may be null)
+		case OIC_PROP: // player who is currently in charge (may be null)
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic && oic->m_officer > 0)
@@ -3114,19 +3480,24 @@ JSPropertySpec jsHCUnit::jsproperties[] =
 	jsHCUnit
 *************************************************************************************************/
 
-jsHCUnit::jsHCUnit(HCUnit const* h)
+jsHCUnit::jsHCUnit(HCUnit& h)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(h)
+			, unitid(h.unitID())
 {
 	JS_CONSTRUCTOR_LOCK;
-	DefineProperty("country",  new jsCountry(unit->country()));
+	DefineProperty("country",  new jsCountry(h.country()));
 };
 
-jsHCUnit::jsHCUnit(UINT32 unitID)
+jsHCUnit::jsHCUnit(UINT32 id)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(HCUnit::Lookup(unitID))
+			, unitid(id)
 {
 	JS_CONSTRUCTOR_LOCK;
+	HCUnit* unit = HCUnit::Lookup(unitid);
+	assert(unit);
+	if ( ! unit )
+		return;
+
 	DefineProperty("country",  new jsCountry(unit->country()));
 };
 
@@ -3142,6 +3513,13 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 {
 	*val = JSVAL_NULL;
 
+	// This *was* a pointer, but the old team abused the privilage so we had to take that away.
+	// TODO: A lot of this can be cached since it never changes.
+	HCUnit* unit = HCUnit::Lookup(unitid);
+	assert(unit);
+	if ( ! unit )
+		return JS_FALSE;
+
 	switch(propid)
 	{
 		case NAME_PROP:
@@ -3156,7 +3534,7 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 		case PARENT_PROP:
 			if(unit != nullptr && unit->parent())
-				*val = (new jsHCUnit(unit->parent()))->jsVal();
+				*val = (new jsHCUnit(*unit->parent()))->jsVal();
 		break;
 
 		case BRANCH_PROP:
@@ -3224,11 +3602,15 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 	: phui::js::Object(&jsclass,jsfunctions,jsproperties)
 {
 	JS_CONSTRUCTOR_LOCK;
-	phui::js::Array* typehit, *numhit, *numkilled;
+	phui::js::Array* typehit, *numhit, *numkilled, *enemyunits, *enemycallsigns;
 
 	DefineProperty("typehit", typehit = new phui::js::Array);
 	DefineProperty("numhit", numhit = new phui::js::Array);
 	DefineProperty("numkilled", numkilled = new phui::js::Array);
+	// Arrays for all enemy units and their callsigns, to be sent to the client
+	// Used as results.enemyunits and results.enemycallsigns in the client's JS
+	DefineProperty("enemyunits", enemyunits = new phui::js::Array);
+	DefineProperty("enemycallsigns", enemycallsigns = new phui::js::Array);
 
 	StratDB::StratObject* stratobj = StratDB::FindStratObject(results.rtbFacility);
 	if(stratobj)
@@ -3242,6 +3624,17 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 			typehit->SetElement(new jsVehtype(vehtype),i);
 			numhit->SetElement(INT_TO_JSVAL(results.hitArray[i].numVehiclesHit),i);
 			numkilled->SetElement(INT_TO_JSVAL(results.hitArray[i].numVehiclesKilled),i);
+		}
+	}
+
+	// Populate the enemy unit and callsign arrays
+	for(UINT32 i = 0; i < results.kills; i++)
+	{
+		vehType const* enemyVehType = vehTypeGetBySpec(results.enemiesArray[i].vehSpec);
+		if(enemyVehType)
+		{
+			enemyunits->SetElement(new jsVehtype(enemyVehType), i);
+			enemycallsigns->SetElement(phui::js::NewString(chatGetWideCallsign(results.enemiesArray[i].callsignId)), i);
 		}
 	}
 
@@ -3508,7 +3901,7 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(UTF16(squad.name().c_str()));
 		break;
 		case SHORTNAME_PROP:
-			*val = phui::js::NewString(UTF16(squad.shortName()));
+			*val = phui::js::NewString(UTF16(squad.callsign().c_str()));
 		break;
 		case CO_PROP:
 		{
@@ -4012,6 +4405,13 @@ JS_FUNCTION_DEF(jsBrigadeControlNotice, veto)
 							jsnotice->notice.m_target,
 							jsnotice->notice.m_origin);
 				break;
+			case BrigadeControlNotice::REQ_COUNTRY_CHANGE:
+
+				req.vetoBrigadeCountryChange(PlayerClient()->ChatConnection(),
+					        jsnotice->notice.m_brigadeID,
+							jsnotice->notice.m_origin,
+							(WWII_COUNTRY)jsnotice->notice.m_country);
+				break;
 		}
 
 		*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
@@ -4213,9 +4613,11 @@ JSBool jsInstance::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(chatGetWideCallsign(descriptor->handle()));
 		break;
 		case ID_PROP:
+		{
 			char idBuffer[32+1];
-			snprintf(idBuffer, 32, "%llu", descriptor->id()); // really long long unsigned int?
+			strprintf(idBuffer, "%" PR64BitUT "", descriptor->id());
 			*val = phui::js::NewString(idBuffer);
+		}
 		break;
 		case RESULT_PROP:
 			*val = INT_TO_JSVAL(lastResult);
@@ -4353,10 +4755,10 @@ JS_FUNCTION_DEF(jsClientState, paccess)
 
 JS_FUNCTION_DEF(jsClient, isavailable)
 {
-    
+
 #define AVAIL "available"
 #define INACT "inactive"
-    
+
 	jsPersonaSummary* summary = phui::js::Cast<jsPersonaSummary*>(ctx, argv[0]);
 	if(!summary) return JS_FALSE;
 	else if(strncmp(summary->Summary().availability(), AVAIL, strlen(AVAIL)) == 0 ||

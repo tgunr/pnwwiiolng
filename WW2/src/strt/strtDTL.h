@@ -14,16 +14,7 @@
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiFullObjID.h"
 
-#if platOS == OS_MACOS
-	#pragma options align=packed
-#elif platOS == OS_WIN32
-	#pragma pack(push, 1)
-#elif platOS == OS_LINUX
-	#pragma pack(push, 1)
-#else
-	#error No packing specified
-#endif
-
+#pragma pack(push, 1)
 
 //tolua_begin
 
@@ -159,7 +150,6 @@ enum WAYPOINT_TYPE
 	// Add new waypoint types here
 	MAX_WAYPOINT_TYPES
 };
-//tolua_begin
 
 
 // These appear to be flags for certain strat element classes.
@@ -189,8 +179,6 @@ struct STRT_DTL_HEADER
 	UINT16 reserved3;
 
 };
-
-//tolua_end
 
 struct CP
 {
@@ -293,10 +281,4 @@ struct WAYPOINT
 
 };
 
-#if platOS == OS_MACOS
-	#pragma options align=reset
-#elif platOS == OS_WIN32
-	#pragma pack(pop)
-#elif platOS == OS_LINUX
-	#pragma pack(pop)
-#endif
+#pragma pack(pop)

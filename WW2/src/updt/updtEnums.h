@@ -34,7 +34,7 @@ enum
 	UPDT_CONTROL,
 	UPDT_OTHER
 };
-typedef UCHAR UPDT_STATION;
+using UPDT_STATION = UCHAR;
 
 enum ONETIME_BITS
 {
@@ -88,7 +88,7 @@ enum
 	PR_RIDING	= 0x0800,		//!< Riding information being sent.
 
 	PR_RELPOS	= 0x1000,		//!< Relative position-to-ride being sent.
-	PR_FROM_CONTROLLER	= 0x2000	//!< Indicates message is from controlling player.
+	PR_FROM_CONTROLLER	= 0x2000,	//!< Indicates message is from controlling player.
 };
 
 enum
@@ -101,8 +101,7 @@ enum
 enum { PR_NUM_BITS = 16, PRX_NUM_BITS = 24 };
 
 static const UINT32 PR_FIRE_FLAGS = PR_FIRE1 | PR_FIRE2;
-static const UINT32 FIRSTTIME_PR_FLAGS = PR_STATE0|PR_STATE1|PR_FIRE_FLAGS|PR_POSITION|PR_TURRET|PR_VEH_VIS|PR_ONE_TIME|PR_RIDING|PR_RELPOS;
-typedef UINT32 PRESENT_FLAGS;
+using PRESENT_FLAGS = UINT32;
 
 #define PR_SET_ALL ( PR_STATE0 | PR_STATE1 | PR_POSITION | PR_TURRET | PR_VEH_VIS | PR_ONE_TIME | PR_DEAD | PR_KILLED | PR_RIDING | PR_RELPOS | PR_FROM_CONTROLLER | PRX_REALLY_ACTIVE | PRX_FIRST_TIME | PR_FIRE_FLAGS )
 

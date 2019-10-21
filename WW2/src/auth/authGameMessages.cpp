@@ -15,22 +15,19 @@
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
-#include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPackers.h"
+#include "wwii/wwiiCallbacks.h"
 
-TEUL_CALLBACK*	authGAME_INIT;
-TEUL_CALLBACK*	authSERVER_LOAD;
-TEUL_CALLBACK*	authGAME_CAPACITY;
+TEUL_CALLBACK*	authGAME_INIT               = nullptr;
+TEUL_CALLBACK*	authSERVER_LOAD             = nullptr;
+TEUL_CALLBACK*	authGAME_CAPACITY           = nullptr;
 
-static TEUL_CALLBACK*	_AUTH_DISPATCH;
-static TEUL_CALLBACK*	_MANAGEMENT_MSG;
-static TEUL_CALLBACK*	_AUTH_GAME_ACK;
-static TEUL_CALLBACK*	_INIT_LOGIN;
-static TEUL_CALLBACK*	_PLAYER_LOGIN;
-static TEUL_CALLBACK*	_PLAYER_LOGIN_REPLY;
+static TEUL_CALLBACK*	_MANAGEMENT_MSG     = nullptr;
+static TEUL_CALLBACK*	_INIT_LOGIN         = nullptr;
+static TEUL_CALLBACK*	_PLAYER_LOGIN_REPLY = nullptr;
 
-static ERROR_FUNCTION* _externalErrorFn;
+static ERROR_FUNCTION _externalErrorFn;
 
 
 //Callback function declaraton
@@ -44,97 +41,30 @@ static SINT32 _sendPlayerLoginReply(ACTION_OBJECT* const a);
 static SINT32 _sendServerLoad(ACTION_OBJECT* const a);
 static SINT32 _sendGameCapacity(ACTION_OBJECT* const a);
 
-//error function declaration
-static void _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
-
 //This function installs our two callbacks
-SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
+SINT32 authInstallGameCallbacks(ERROR_FUNCTION externErrorFn)
 {
-	Teul::CallbackInit ci;
-
 	_externalErrorFn = externErrorFn;
 
-	memset(&ci,0,sizeof(ci));
+    BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
+    {
+        REGISTER_RECEIVER(AUTH_DISPATCH_Y, _recvDISPATCH);
+        REGISTER_SENDER(AUTH_GAME_INIT_Y, _sendGAME_INIT, authGAME_INIT);
 
-	//Global values
-	ci.error		= _errorFn;
-	ci.callX		= Auth::CallbackX;
+        REGISTER_RECEIVER(PLAYER_LOGIN_Y, _recvPlayerLogin);
+        REGISTER_SENDER(PLAYER_LOGIN_REPLY_Y, _sendPlayerLoginReply, _PLAYER_LOGIN_REPLY);
+        
+        REGISTER_RECEIVER(AUTH_GAME_ACK_Y, _recvGAME_ACK);
+        REGISTER_SENDER(GAME_MANAGEMENT_Y, _sendManagementMsg, _MANAGEMENT_MSG);
+        
+        REGISTER_SENDER(SERVER_LOAD_Y, _sendServerLoad, authSERVER_LOAD);
+        REGISTER_SENDER(GAME_CAPACITY_Y, _sendGameCapacity, authGAME_CAPACITY);
+        
+        REGISTER_SENDER(GAME_CLEAR_LOGIN_TABLE_Y, _sendClearLoginTable, _INIT_LOGIN);
+    }
+    END_CALLBACK_REGISTRATION(Auth::CallbackX)
 
-	//The recv function setup
-	ci.callY		= AUTH_DISPATCH_Y;
-	ci.sendAction	= nullptr;
-	ci.recvAction	= _recvDISPATCH;
-
-	_AUTH_DISPATCH = teulAllocCallback(&ci);
-
-	//The send function setup
-	ci.callY		= AUTH_GAME_INIT_Y;
-	ci.sendAction	= _sendGAME_INIT;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((authGAME_INIT = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//The send function setup
-	ci.callY		= PLAYER_LOGIN_Y;
-	ci.sendAction	= nullptr;
-	ci.recvAction	= _recvPlayerLogin;
-
-	if ( PN_UNLIKELY((_PLAYER_LOGIN = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//The send function setup
-	ci.callY		= PLAYER_LOGIN_REPLY_Y;
-	ci.sendAction	= _sendPlayerLoginReply;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((_PLAYER_LOGIN_REPLY = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//The game ack recv callback
-	ci.callY		= AUTH_GAME_ACK_Y;
-	ci.sendAction	= nullptr;
-	ci.recvAction	= _recvGAME_ACK;
-
-	if ( PN_UNLIKELY((_AUTH_GAME_ACK = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//The managementMsg send function setup
-	ci.callY		= GAME_MANAGEMENT_Y;
-	ci.sendAction	= _sendManagementMsg;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((_MANAGEMENT_MSG = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//server load send msg
-	ci.callY		= SERVER_LOAD_Y;
-	ci.sendAction	= _sendServerLoad;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((authSERVER_LOAD = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//game capacity send msg
-	ci.callY		= GAME_CAPACITY_Y;
-	ci.sendAction	= _sendGameCapacity;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((authGAME_CAPACITY = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-	//The setup for the login init message
-	ci.callY		= GAME_CLEAR_LOGIN_TABLE_Y;
-	ci.sendAction	= _sendClearLoginTable;
-	ci.recvAction	= nullptr;
-
-	if ( PN_UNLIKELY((_INIT_LOGIN = teulAllocCallback(&ci)) == nullptr) )
-		return (0-dbugGetErrno());
-
-#ifdef DEBUG
-	dbugWrite(_FLN,"installed auth game callbacks");
-#endif
-
+	dbugLog(_FLD, "installed auth game callbacks");
 	return 0;
 }
 
@@ -148,11 +78,6 @@ static SINT32 _sendGameCapacity(ACTION_OBJECT* const a)
 static SINT32 _sendServerLoad(ACTION_OBJECT* const a)
 {
 	return authPackSERVER_LOAD(TEUL_PACK, a->packed, a->offset, (AUTH_SERVER_LOAD*) a->localRawData, sizeof(AUTH_SERVER_LOAD));
-}
-
-static void _errorFn(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
-{
-	dbugLog(_FLA, "t:%d auth connection error %d", teulIndex, error);
 }
 
 //Send function
@@ -194,13 +119,13 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 
 	try
 	{
-		a->offset = login.packer(TEUL_UNPACK, a->packed, a->offset);
+		login.packer(TEUL_UNPACK, a);
 		if ( PN_UNLIKELY(a->offset < 0) )
 			throw std::logic_error("unable to unpack player login");
 
 		char versionNo[4 * 6 + 1];
 		teulGetAddress(login.appVersion, versionNo, sizeof(versionNo) - 1);
-		dbugLog(_FLI, "t:%d otp:%u app:%s crs:%s", a->teulIndex, login.OTP, versionNo, login.CopyRightString);
+		dbugLog(_FLI, "t:%d LOGIN: att:%u app:%s otp:%u crs:%s", a->teulIndex, login.attemptID, versionNo, login.OTP, login.CopyRightString);
 
 		UINT32 destAddress = a->endpoint->destAddress();
 
@@ -220,13 +145,13 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 	catch (std::exception& e)
 	{
 		dbugLog(_FLA, "t:%d %s. off:%d, sr:%d, ar:%d", a->teulIndex, e.what(), a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginExcept);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 	catch ( ... )
 	{
 		dbugLog(_FLA, "t:%d !!!Unhandled exception!!! off:%d, sr:%d, ar:%d", a->teulIndex, a->offset, sendResult, acceptResult);
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginErr);
+		teulClose(a->teulIndex);
 		return -EINVAL;
 	}
 }

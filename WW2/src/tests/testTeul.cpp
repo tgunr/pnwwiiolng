@@ -5,7 +5,7 @@
 //
 // Originating Programmer: Oliver "kfs1" Smith
 
-#include <syscfg.h>		// Should use the teulKit syscfg.h
+#include "syscfg.h"		// Should use the teulKit syscfg.h
 
 #include <sys/types.h>
 
@@ -94,52 +94,26 @@ namespace Config
 	static size_t iterFactor = 1;
 }
 
-//////////////////////////////////////////////////////////////////////
-#if platOS == OS_WIN32
-// Windows support.
-// This app is primarily developed for Linux, but the whole point of
-// teulKit is that it's cross-platform, so this code should largely
-// be able to run on both platforms.
-//
-// Naturally, there are a few minor differences here and there...
+#if platBuild != BUILD_SERVER
 
-#if platBuild != TEUL_SERVER
-	// Under Linux, this is supplied by libteulserver.
-	#include "teul/teulConnectionInstruction.h"
-	SINT32
-	Teul::ConnectionInstruction::receive(SINT32 teulIndex)
-	{
-		throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
-	}
-#endif
-// End of windows support section.
-#elif platOS == OS_MACOS
-// Mac support.
 #include "teul/teulConnectionInstruction.h"
 SINT32
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
+    throw Teul::IndexError(teulIndex, "Unexpected connection instruction received.\n", m_hostIP);
 }
 
-// End of mac support.
-#elif platOS == OS_LINUX
-// Linux support.
-
-// End of linux support.
-#else
-	#error("You need a -DplatOS=OS_... for your platform.")
 #endif
 
 //////////////////////////////////////////////////////////////////////
 // Macro: Only print output if debugOutput is enabled.
 
-#define Dprintf(...) { if ( Config::debugOutput == true ) printf("[D] " __VA_ARGS__); }
+#define Dprintf(m, ...) { if ( Config::debugOutput == true ) printf("%s:%d [D] " m, sane_basename(__FILE__), __LINE__, ## __VA_ARGS__); }
 
 //////////////////////////////////////////////////////////////////////
 // Macro: Only print output if infoOutput is enabled.
 
-#define Iprintf(...) { if ( Config::infoOutput == true ) printf("[I] " __VA_ARGS__); }
+#define Iprintf(m, ...) { if ( Config::infoOutput == true ) printf("%s:%d [I] " m, sane_basename(__FILE__), __LINE__, ## __VA_ARGS__); }
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -158,6 +132,8 @@ struct EchoPacketHeader
 	UINT32		m_size;				// How big the data is.
 
 	UINT16		m_count;			// Number of entries.
+    
+    UINT16      m_padding = 0;
 
 	UCHAR		m_data[1200];
 
@@ -165,7 +141,7 @@ struct EchoPacketHeader
 	static UINT64 s_requested;
 
 	template<typename Type_>
-	void packData(LOGICAL mode, ACTION_OBJECT* const a)
+	void packData(PackMode mode, ACTION_OBJECT* const a)
 	{
 		Type_* data = (Type_*)(m_data);
 		const size_t typeSize = sizeof(Type_) * 8;
@@ -178,7 +154,7 @@ struct EchoPacketHeader
 		}
 	}
 
-	void packer(LOGICAL mode, ACTION_OBJECT* const a)
+	void packer(PackMode mode, ACTION_OBJECT* const a)
 	{
 		a->packer(mode, m_direction, 2);
 		a->packer(mode, m_type, 6);
@@ -213,7 +189,6 @@ struct EchoPacketHeader
 		default:
 			Dprintf("Echo type: %u\n", m_type);
 			throw std::runtime_error("Invalid echo type");
-		break;
 		}
 
 		if ( a->offset < 0 )
@@ -332,7 +307,7 @@ struct Role
 
 		// Initialize the teulKit transport, telling it how/where to log,
 		// and providing it with our custom error and shutdown handlers.
-		SINT32 ret = teulInitTransport(LOG_TO_FILE, moduleName, Role::transportErrorFn, nullptr);
+		SINT32 ret = teulInitTransport(LogMode::TO_FILE, moduleName, Role::transportErrorFn, nullptr);
 		if ( ret < 0 )
 			throw Teul::Error("teulInitTransport failed", ret);
 
@@ -344,7 +319,7 @@ struct Role
 
 		Dprintf("teulTransport initialized.\n");
 
-		dbugLog(_FLI, "teulTransport initialized.\n");
+		dbugLog(_FLI, "teulTransport initialized.");
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -459,9 +434,10 @@ struct Role
 				throw Teul::IterationError(i, "Teul::Packet has bad data", data[i]);
 		}
 
-		UINT32* testValue = (UINT32*)(data + textSize + Teul::Packet::DefaultLocalDataSize);
-		if ( *testValue != Config::Test32BitValue )
-			throw Teul::Error("Got wrong 32-bit test value", *testValue);
+		UINT32 testValue = 0;
+        memcpy(&testValue, data + textSize + Teul::Packet::DefaultLocalDataSize, sizeof(testValue));
+		if ( testValue != Config::Test32BitValue )
+			throw Teul::Error("Got wrong 32-bit test value", testValue);
 
 		if ( memcmp(data + textSize + Teul::Packet::DefaultLocalDataSize + sizeof(UINT32), Config::teulPacketString, textSize) != 0 )
 			throw Teul::Error("Tail copy of test string is wrong", 0);
@@ -474,10 +450,6 @@ struct Role
 	{
 		if ( tTeulPkt.isEnabled() == false )
 			return;
-
-		// UnencryptedBytes is supposed to be '3'.
-		if ( Teul::Packet::UnencryptedBytes != 3 )
-			throw Teul::Error("UnencryptedBytes is not 3", Teul::Packet::UnencryptedBytes);
 
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
@@ -552,11 +524,15 @@ struct Role
 		if ( packet.packetCapacityBytes() != Teul::Packet::DefaultLocalDataSize + Teul::Packet::GrowthRate  )
 			throw Teul::Error("Adding second copy of string caused unexpected capacity growth.", packet.packetCapacityBytes());
 
+        Dprintf("sending packet to t:%d\n", teulIndex);
 		SINT32 result = packet.send(teulIndex);
-		if ( result < 0 )
-			throw Teul::Error("Teul::Packet send failed", result);
-
-		Iprintf("Teul::Packet sent: %u [%u of %u].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
+		if (result < 0 && result != -EPIPE) {
+			throw Teul::IndexError(teulIndex, "Teul::Packet send failed", result);
+        } else if (result >= 0) {
+		    Iprintf("Teul::Packet sent: %u [%u of %u].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
+        } else {
+            Iprintf("Teul::Packet was not sent due to connection loss\n");
+        }
 	}
 
 };
@@ -585,12 +561,14 @@ TEUL_CALLBACK* Role::s_cbUnregistered;
 static void
 _usage(const char* const argv[], const bool listTests)
 {
-	printf("FAIL: Usage: %s [options] [--test=<testname>] [--skip=<testname>] {client | server}\n", argv[0]);
+	printf("FAIL: Usage: %s [options] [--test=<testname>] [--skip=<testname>] [--udp|--udb] {client | server}\n", argv[0]);
 	printf("Options:\n");
 	printf("  --debug\n\tEnable debug output.\n");
 	printf("  --host=ad.dr.e.ss\n\tSpecifies the IP address for client mode to connect to.\n");
 	printf("  --quiet\n\tDisables informational ([I]) output.\n");
 	printf("  --iterfactor=nnn\n\tNumber of times to repeat iterative tests [default: 1].\n");
+    printf("  --udp\n\tRun tests with UDP sockets instead of TCP.\n");
+    printf("  --udb\n\tRun tests with UDP broadcast sockets instead of TCP.\n");
 
 	if ( listTests == false )
 		printf("  --tests\n\tList all of the registered tests.\n");
@@ -600,7 +578,7 @@ _usage(const char* const argv[], const bool listTests)
 		for ( auto it = TestItem::s_index.begin(), end = TestItem::s_index.end(); it != end; ++it )
 		{
 			const TestItem& test = *it->second;
-			printf("--test=%s\n\t%s\n", test.name(), test.description());
+			printf("--[test|skip]=%s\n\t%s\n", test.name(), test.description());
 		}
 	}
 	exit(-1);
@@ -782,7 +760,7 @@ _doCryptTests()
 		ep.m_impl->m_rxCrypt.newSeed();
 		ep.m_impl->m_txCrypt.setSeed(ep.m_impl->m_rxCrypt.seed());
 
-		Dprintf("- ver %04x. rxSeed = %llu, txSeed = %llu\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
+		Dprintf("- ver %04x. rxSeed = %" PR64BitUT ", txSeed = %" PR64BitUT "\n", version, ep.m_impl->m_rxCrypt.seed(), ep.m_impl->m_txCrypt.seed());
 
 		memcpy(buf1, buf2, len1);
 		ep.m_impl->m_version = ep.m_impl->m_cryptVersion = version;
@@ -817,7 +795,7 @@ _doCryptTests()
 int
 main(int argc, const char* const argv[])
 {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	Teul::ConfigVar::InitializeConfigVars();
 #endif
 
@@ -872,4 +850,3 @@ main(int argc, const char* const argv[])
 
 	return result;
 }
-

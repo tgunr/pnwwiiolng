@@ -68,7 +68,7 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 		return 0;
 
 	// You can only use firebases when spawning your brigade or divisional equipment.
-	if ( type == FACILITY_FIREBASE && (brigade->isBrigade() == false || brigade->movementType() != BRANCH_LAND) )
+	if ( type == FACILITY_FIREBASE && ((brigade->isBrigade() == false && brigade->isGarrison() == false) || brigade->movementType() != BRANCH_LAND) )
 		return 0;
 
 	// If the CP is here, then its definitely the supplying unit.
@@ -174,8 +174,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( forUnit.homeCPID() != cp->fullObjID )
 			return nullptr;
 
-		return armyBase;
-	break;
+	return armyBase;
 
 	case FACILITY_FIREBASE:
 		assert( armyBase != nullptr );
@@ -186,8 +185,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( side != forUnit.side() )
 			return nullptr;
 
-		return armyBase->supplyingFacility(forUnit, false);
-	break;
+	return armyBase->supplyingFacility(forUnit, false);
 
 	case FACILITY_DEPOT:
 		assert( armyBase != nullptr );
@@ -223,12 +221,10 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 		if ( forUnit.homeCPID() != m_incomingLink->startDepot->cp->fullObjID )
 			return nullptr;
 
-		return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
-	break;
+	return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
 
 	default:
-		return nullptr;
-	break;
+	return nullptr;
 	}
 }
 
@@ -239,7 +235,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 bool
 FacilityStruct::canABSupply(WWII_SIDE forSide) const
 {
-	return ( this != nullptr && isOpen() == true && side == forSide && cp->side == forSide );
+	return ( isOpen() == true && side == forSide && cp->side == forSide );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -307,16 +303,16 @@ FacilityStruct::getCaptureRemaining() const
 	{
 	case _CAP_DISABLED:
 		return 100;
-	break;
+
 	case _CAP_PENDING:
 		{
 			UINT32 timeOut = m_captureStateChanged + m_captureCounter;
 			return (UINT16)( timeOut > teulTime() ? timeOut - teulTime() : 0 );
 		}
-	break;
+
 	case _CAP_ENABLED:
 		return (UINT16)100 - std::min(m_captureCounter, (UINT16)100);
-	break;
+
 	default:
 	break;
 	}
@@ -369,7 +365,7 @@ CaptureState::populate(const class FacilityStruct* facility
 // replaces strtFindWeaponEntry
 
 WeaponEntry*
-FacilityStruct::weaponEntry(const WEAPON_SPEC& weapon) const
+FacilityStruct::weaponEntry(const WEAPON_SPEC weapon) const
 {
 	WEAPON_ENTRIES::const_iterator it = m_weaponEntries.find(weapon);
 	return ( it != m_weaponEntries.end() ) ? (it->second) : nullptr;

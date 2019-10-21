@@ -406,12 +406,12 @@ public:														\
 															\
 	void construct(pointer _Ptr, const value_type& _Val)			\
 	{														\
-		std::_Construct(_Ptr, _Val);						\
+		new (_Ptr) value_type(_Val);						\
 	}														\
 															\
 	void destroy(pointer _Ptr)								\
 	{														\
-		std::_Destroy(_Ptr);								\
+		_Ptr->~value_type();								\
 	}														\
 															\
 	size_type max_size() const									\

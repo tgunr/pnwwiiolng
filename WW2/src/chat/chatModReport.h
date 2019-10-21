@@ -9,12 +9,16 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+struct MemoryRequest;
+
 namespace Chat
 {
 	enum
 	{
 		ModUnknown, ModUpdateSeq, ModUpdatePrime, ModTamper, ModResupply, ModDamned, ModHack, ModMax
 	};
-	typedef unsigned int ModReport;
-	void SendModReport(const ChatHandle& handle, const unsigned int report);
+	using ModReport = unsigned int;
+	void SendModReport(const ChatHandle handle, const unsigned int report);
+	// TODO: Change the header name since this is more generic anti-hack stuff now.
+	void SendMemoryRequestResult(playerid_t player, MemoryRequest& req);
 }

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 
@@ -1627,7 +1627,7 @@ static int Count;
 										   RollCoefficientMult,
 										   nullptr,
 										   CollideObject,
-										   TRUE);
+										   true);
 		}
 
 	}

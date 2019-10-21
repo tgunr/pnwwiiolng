@@ -11,6 +11,7 @@
 #include "chat/chatBrigadeMoveResults.h"
 #include "teul/teulNetworkMsg.h"
 #include "wwii/wwiiFullObjID.h"
+#include "garrisons/garrisonCountryChangeRequest.h"
 
 class StratHCUnit;
 class CPStruct;
@@ -19,9 +20,9 @@ class BrigadeMove
 {
 public:
 	BrigadeMove() : m_action(BMR_FAILED), m_brigadeID(0), m_delay(0), m_actionable(false) {}
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
-	BRIGADE_MOVE_RESULT process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM);
-	void process(const ChatHandle& playerHandle) const;
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
+	BRIGADE_MOVE_RESULT process(const ChatHandle mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM);
+	void process(const ChatHandle playerHandle) const;
 
 public:
 	BRIGADE_MOVE_RESULT	m_action;		// What we're doing
@@ -33,6 +34,35 @@ public:
 										// otherwise it will only test the move for validity
 };
 
-typedef teul_network_msg<BrigadeMove> BRIGADE_MOVE_MSG;
+using BRIGADE_MOVE_MSG = teul_network_msg<BrigadeMove>;
 
 void chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing);
+
+
+class GarrisonCountryChange
+{
+public:
+	GarrisonCountryChange() : m_action(GCR_FAILED), m_brigadeID(0), m_newCountryId(WWII_NO_COUNTRY), m_actionable(false) {}
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))); }
+	
+	// for strat host
+	GARRISON_COUNTRY_CHANGE_RESULT process(const ChatHandle mover, const char* callsign, const UINT32 unitID, const WWII_COUNTRY country = WWII_NO_COUNTRY);
+	
+	// for chat host
+	void process(const ChatHandle playerHandle) const;
+	
+	// for map host
+	void process(UINT32 unitID, WWII_COUNTRY country);
+
+public:
+	GARRISON_COUNTRY_CHANGE_RESULT	m_action;		// What we're doing
+	UINT32		  m_brigadeID;
+	WWII_COUNTRY  m_newCountryId;
+	bool		m_actionable;			// Set to true if you want the strat host to
+										// execute this move if the result is BMR_APPROVED
+										// otherwise it will only test the move for validity
+};
+
+using GARRISON_COUNTRY_CHANGE_MSG = teul_network_msg<GarrisonCountryChange>;
+
+void stratSendGarrisonCountryChange(GARRISON_COUNTRY_CHANGE_MSG& outgoing);

@@ -43,7 +43,7 @@ static void sndsDump(snSound* snd, const char* funcname);
 	sndsGetMaxNumberOfSounds
 *************************************************************************************************/
 
-UINT32 sndsGetMaxNumberOfSounds(void)
+UINT32 sndsGetMaxNumberOfSounds()
 {
  	return MaxNumberOfSounds;
 }
@@ -52,14 +52,14 @@ UINT32 sndsGetMaxNumberOfSounds(void)
 	sndsPlatformInit
 *************************************************************************************************/
 
-LOGICAL sndsPlatformInit(void)
+LOGICAL sndsPlatformInit()
 {
 	alutInit(0, NULL);
 	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 
 	// EAX extension stuff would go here
 
-	#if platOS == OS_MACOS
+#if platOS == OS_MACOS
 	alDopplerFactor(1);				// current OpenAL used on Mac OS X has doppler issues...
 	alDopplerVelocity(340.0);		// so let it stay at its defaults. Working with Apple on this issue
 
@@ -75,7 +75,7 @@ LOGICAL sndsPlatformInit(void)
 		alEnable(ALC_CONVERT_DATA_UPON_LOADING);
 	else
 		alDisable(ALC_CONVERT_DATA_UPON_LOADING);
-	#endif
+#endif
 
 	alGenSources(MAX_ALSRCS, alSrc);
 
@@ -86,7 +86,7 @@ LOGICAL sndsPlatformInit(void)
 	sndsPlatformKill
 *************************************************************************************************/
 
-LOGICAL sndsPlatformKill(void)
+LOGICAL sndsPlatformKill()
 {
 	alutExit();
 
@@ -97,7 +97,7 @@ LOGICAL sndsPlatformKill(void)
 	sndsPlatformReset
 *************************************************************************************************/
 
-LOGICAL sndsPlatformReset(void)
+LOGICAL sndsPlatformReset()
 {
 	return TRUE;
 }

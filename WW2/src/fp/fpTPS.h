@@ -28,15 +28,15 @@ enum fpHitLocations
 	FP_HIT_LOCATION_NUM
 };
 
-typedef std::map<UINT64, gr2AnimationBlend*> TPS_BLEND_MAP;
+using TPS_BLEND_MAP = std::map<UINT64, gr2AnimationBlend*>;
 
 extern fpHitLocations	fpHitMap[60];
 
-extern LOGICAL	fpTPSLoad (void);
-extern void	fpTPSKill (void);
+extern LOGICAL	fpTPSLoad ();
+extern void	fpTPSKill ();
 
 // using tps weapon types
-extern const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type, bool* exists = nullptr);
+extern const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int type);
 extern UINT64 fpTPSCreateBlendID(int pose, int move, int weap, int point, int type = 0);
 extern gr2AnimationBlend* fpTPSGetBlend(int pose, int move, int weap, int point, int type = 0);
 

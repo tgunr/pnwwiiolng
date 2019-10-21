@@ -1,10 +1,10 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/export_scripting/mel_examples.mel $
-// $DateTime: 2007/02/07 16:55:05 $
-// $Change: 14382 $
-// $Revision: #2 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 
 // Utility function to determine if an object is hidden.
@@ -166,7 +166,7 @@ global proc BasicBatchExport(string $SourceDir,
    AdvancedBatchExport("d:/source_art/", "*.mb" "d:/exported_art", "d:/source_art/standard_settings.ges", "d:/tools/postprocess.exe")
    $-
 
-   In addition to the GrannyExport call, described previously, this funtion makes use of
+   In addition to the GrannyExport call, described previously, this function makes use of
    the GrannyLoadSettings call, which takes a single argument which is the settings file
    to load.  Although not demonstrated here, you can also make the corresponding call,
    GrannySaveSettings, to save to a .ges file rather than load from it.

@@ -7,7 +7,7 @@
 
 //This is the function to call before any of the others.
 //Installs all the necessary callbacks for the map system
-extern SINT32 mapInstallClientCallbacks(void);
+extern SINT32 mapInstallClientCallbacks();
 
 extern SINT32 mapSendExitWWIIOL(SINT32 hostIndex);
 

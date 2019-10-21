@@ -19,14 +19,13 @@
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiConfig.h"
 #include "include/mydbQuery.h"
-
-extern DBHANDLE dbh;
+#include "include/strprintf.h"
 
 // TOE templates.
 TOE_TEMPLATES toeTemplates;
 
 // TOE_::WeaponInstances that need saving and the original number of units
-typedef std::vector< std::pair<TOE_::WeaponInstance*,UINT16> > TOE_SAVE_LIST;
+using TOE_SAVE_LIST = std::vector<std::pair<TOE_::WeaponInstance*,UINT16>>;
 TOE_SAVE_LIST toeSaveList;
 
 //////////////////////////////////////////////////////////////////////
@@ -40,7 +39,7 @@ TOE_::TemplateHeader::Lookup(const char* id)
 }
 
 TOE_::TemplateHeader*
-TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
+TOE_::TemplateHeader::Lookup(const ChatHandle handle)
 {
 	TOE_TEMPLATES::iterator it = toeTemplates.find(handle);
 	return (it != toeTemplates.end()) ? &it->second : nullptr;
@@ -50,13 +49,13 @@ TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
 // First time initialization of a TOE header
 
 void
-TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withName, UINT32 withCountry, UINT32 withBranch)
+TOE_::TemplateHeader::initialize(const ChatHandle withHandle, const char* withName, UINT32 withCountry, UINT32 withBranch)
 {
 	// If ID isn't null, we're already initialized
 	assert( m_handle == 0LL );
 
 	Chat::Name newName(withHandle);
-	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
+	dbugLog(_FLI, "toe:%s(%" PR64BitUT ") c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
 
 	m_handle = withHandle;
 	m_name = withName;
@@ -75,7 +74,7 @@ TOE_::TemplateHeader::setName(const char* newName)
 		return;
 
 	Chat::Name oldName(handle());
-	dbugLog(_FLI, "toe:%s(%llu) new name: %s", oldName.c_str(), handle(), newName);
+	dbugLog(_FLI, "toe:%s(%" PR64BitUT ") new name: %s", oldName.c_str(), handle(), newName);
 
 	m_name = newName;
 }
@@ -84,7 +83,7 @@ TOE_::TemplateHeader::setName(const char* newName)
 // Update or add a weapon entry and its capacity to this TOE
 
 void
-TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
+TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
 	TOE_WEAPONS::iterator it = m_weapons.lower_bound(spec);
 	bool newWeapon = false;
@@ -95,10 +94,10 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 		Chat::Name toeName(handle());
 		const WEAPON* weapon = weapLookup(spec);
 		if ( weapon == nullptr )
-			LogAbort("toe:%s(%llu) wanted unknown weapon spec " PRF_WEAPON_SPEC ""
+			LogAbort("toe:%s(%" PR64BitUT ") wanted unknown weapon spec " PRF_WEAPON_SPEC ""
 							, toeName.c_str(), handle(), PRA_WEAPON_SPEC(spec));
 
-		dbugLog(_FLI, "toe:%s(%llu) adding %s(" PRF_WEAPON_SPEC ") capacity %u"
+		dbugLog(_FLI, "toe:%s(%" PR64BitUT ") adding %s(" PRF_WEAPON_SPEC ") capacity %u"
 						, toeName.c_str(), handle()
 						, weapon->name
 						, PRA_WEAPON_SPEC(spec)
@@ -172,6 +171,8 @@ TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 	assert( m_subscribers.find(unit) != m_subscribers.end() );
 
 	m_subscribers.erase(unit);
+
+	unit->clearTOEInstance();
 
 	toe.clear();
 }
@@ -268,7 +269,7 @@ strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country
 // Update a vehicle entry within a TOE template and all of its subscribers
 
 void
-strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
+strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
 	assert( id != nullptr );
 
@@ -334,5 +335,30 @@ strtSaveTOESupplies()
 		DBSimpleQuery(dbh, buffer);
 
 	toeSaveList.clear();
+}
+
+
+void strtClearTOESaveList(StratHCUnit& unit)
+{
+	// Clear out the unit in the DB
+	char buffer[TEXT_POOL_SIZE+1];
+	const char* format = "DELETE FROM toe.supply where unit_id=%u";
+	strprintf(buffer, format, unit.unitID());
+	DBSimpleQuery(dbh, buffer);
+
+	// Now clear the list
+	for (auto it = toeSaveList.begin(); it != toeSaveList.end();)
+	{
+		TOE_::WeaponInstance& entry = *it->first;
+
+		if (entry.unit().unitID() == unit.unitID())
+		{
+			it = toeSaveList.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 

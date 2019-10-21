@@ -12,6 +12,9 @@
 #include "chat/chatClientMessage.h"
 #include "chat/chatGroupsType.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatArgv.h"
+
+#define MAX_INT_REP  10
 
 const PermissionMask NO_MASK = 0;
 const PermissionMask ALL_MASK = ~0ULL;
@@ -34,21 +37,18 @@ public:
 	const LSTRING_ID usage;
 	const LSTRING_ID detail;
 
-	DotUsage(const ChatHandle& newMask, LSTRING_ID usageID, LSTRING_ID detailID) :
-		mask(newMask),
-		usage(usageID),
-		detail(detailID)
+	DotUsage(PermissionMask newMask, LSTRING_ID usageID, LSTRING_ID detailID)
+		: mask(newMask)
+		, usage(usageID)
+		, detail(detailID)
 	{ }
 
-private:
-	DotUsage& operator = (const DotUsage& rhs);
-	DotUsage(const DotUsage& rhs);
+	DotUsage& operator = (const DotUsage& rhs) = delete;
+	DotUsage(const DotUsage& rhs) = delete;
 
 public:
 	bool isHidden() const;
 };
-
-typedef std::vector<const char*> ARGV;	//!< Vector of arguments.
 
 //////////////////////////////////////////////////////////////////////
 //! DotCommand class. Encapsulates a constructor which defines the
@@ -65,10 +65,13 @@ public:
 	DotCommand* m_next;
 
 public:
-	typedef std::vector<const DotUsage*> Usages;
+	using Usages = std::vector<std::unique_ptr<DotUsage>>;
+
 protected:
 	Usages m_usages;
 	CHAT_GROUPS m_groups;
+
+//	void catIntToText(UINT32 value, char *dest) const;
 
 private:
 	DotCommand(const DotCommand& rhs);
@@ -77,14 +80,14 @@ private:
 public:
 	//! Constructor.
 	DotCommand(const std::string& newCommand, const std::string& description
-				, const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false);
-	virtual ~DotCommand() { };
+				, const PermissionMask mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false);
+	virtual ~DotCommand() { }
 
 	//! Retrieves the master index of all dot commands.
 	static DotCommandIndex* index();
 
 	//! Transforms an incoming argument string into an ARGV (vector of arguments).
-	static int vectorize(char* source, ARGV& dest, int maxArguments, bool translateSpaces=false);
+	static int vectorize(char* source, Chat::ARGV& dest, int maxArguments, bool translateSpaces=false);
 
 	// Accessors
 	const char* command() const { return m_command.c_str(); }
@@ -94,9 +97,9 @@ public:
 	void addGroup(UINT32 id) { m_groups.insert(id); }
 
 	//! Add a new usage to this dot Command.
-	void addUsage(const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail)
+	void addUsage(const ChatHandle mask, LSTRING_ID usage, LSTRING_ID detail)
 	{
-		m_usages.push_back(new DotUsage(mask, usage, detail));
+		m_usages.emplace_back(std::make_unique<DotUsage>(mask, usage, detail));
 	}
 
 	//! Determine if a client has access to a dotCommand.
@@ -105,7 +108,7 @@ public:
 	//! Display the contextual help for this client.
 	//! @param[in]	player		Player to test.
 	//! @return false if no permission.
-	//! @note client is not const because we may send data to him.
+	//! @note client is not const because we may send data to them.
 	virtual bool help(Player& player) const;
 
 	//! Virtual function that implements the actual command for "/command <something...>".

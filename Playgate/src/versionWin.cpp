@@ -21,7 +21,7 @@
 #define _tcslen	strlen
 #endif
 
-static bool GetFileVersion(TCHAR* const buffer, const size_t bufferSize, TCHAR* const filename);
+bool GetFileVersion(TCHAR* const buffer, const size_t bufferSize, const TCHAR* const filename);
 static void chopOffRevision(TCHAR* fileversion);
 
 void versionWinExec(const char* FileName)
@@ -131,7 +131,7 @@ SINT32 versionWinGetVersion(SINT32 AppId, UINT32 MaxVer, UINT32 *CurrentVer, cha
 	return NumberOfMatches;
 }
 
-bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filename)
+bool GetFileVersion(TCHAR* const dest, const size_t destSize, const TCHAR* const filename)
 {
 	// Initialize dest as empty string.
 	dest[0] = 0;
@@ -174,7 +174,7 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filen
 
 	TCHAR* ptrFVI;		// FileVersion info
 	TCHAR keyName[128];
-	usprintf(keyName, sizeof(keyName) - 1, _T("\\StringFileInfo\\%04x%04x\\FileVersion"), (LPVOID*)ptranslate->wLanguage, (PUINT)ptranslate->wCodePage);
+	usprintf(keyName, sizeof(keyName) - 1, _T("\\StringFileInfo\\%04x%04x\\FileVersion"), (UINT32)ptranslate->wLanguage, (UINT32)ptranslate->wCodePage);
 	if (!VerQueryValue(pVersion, keyName, (LPVOID*)&ptrFVI, (PUINT)&Len))
 	{
 		//Write_Debug("Problem with VerQueryValue");

@@ -20,8 +20,9 @@ public:
 	void start()
 	{
 		if (!m_cancelled && !m_started.exchange(true))
-			m_thread = std::move(std::thread([this] { run(); }));
+			m_thread = std::thread([this] { run(); });
 	}
+
 	//! Cancel thread and return whether or not we performed cancellation.
 	//! @return true if we changed the cancellation state.
 	bool cancel()
@@ -45,7 +46,7 @@ public:
 	}
 
 	bool isStarted() const { return m_started; }
-	bool isRunning() const { return m_thread.joinable(); }
+	bool isRunning() const { return m_started && m_thread.joinable(); }
 	bool isCancelled() const { return m_cancelled; }
 
 	virtual void run() = 0;

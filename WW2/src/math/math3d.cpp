@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 #include <float.h>
@@ -84,27 +84,6 @@ struct
 	fd.d += 0x1fc00000;
 	return(fd.f);
 }
-
-/*
- * Very Fast Assembly, Low Precision Sqrt of float fx
- */
-#if platOS == OS_WIN32
-INLINE float math3dFastAsmSqrt(float fx)
-{
-	__asm
-	{
-		mov eax,	fx
-		sub eax,	FP_ONE
-		sar eax,	1
-		add eax,	FP_ONE
-		mov [fx],	eax
-	}
-
-	return fx;
-}
-#else
-#define math3dFastAsmSqrt(fx)	(float)sqrt(fx)
-#endif
 
 /*
  * Fast, Low Precision Normalize of vector v
@@ -926,11 +905,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 
 	lpd->x = dec;
 
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->x) && isfinite(lpd->x))
-#else
-	if (!_isnan(lpd->x) && _finite(lpd->x))
-#endif
 	{
 		while (lpd->x < 0)
 		{
@@ -948,11 +923,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 	}
 
 	lpd->y = lon - ha - ha2;
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->y) && isfinite(lpd->y))
-#else
-	if (!_isnan(lpd->y) && _finite(lpd->y))
-#endif
 	{
 		while(lpd->y < 0)
 		{
@@ -970,11 +941,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 	}
 
 	lpd->z -= az;
-#if platOS == OS_MACOS
 	if (!std::isnan(lpd->z) && isfinite(lpd->z))
-#else
-	if (!_isnan(lpd->z) && _finite(lpd->z))
-#endif
 	{
 		while (lpd->z < 0)
 		{

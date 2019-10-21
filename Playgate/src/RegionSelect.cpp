@@ -19,13 +19,13 @@ static const char* asUTF8(const wchar_t* in)
 }
 
 // Regions define the domains we operate within,
-// the default is to assume we are running Battleground Europe
+// the default is to assume we are running World War II Online
 // for playnet.com, but otherwise we obtain the data from
 // the regions.txt file.
 
 typedef std::vector<PNRegion> PN_REGIONS;
 static PN_REGIONS g_regions;
-static const PNRegion g_defaultRegion(L"Playnet", ".playnet.com", ".battlegroundeurope.com");
+static const PNRegion g_defaultRegion(L"Playnet", ".playnet.com", ".wwiionline.com");
 PNRegion g_region;
 
 //////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ CRegionSelect::ReadRegionsFile()
 	g_regions.clear();
 
 	const wchar_t* regionsTxt = L"\\regions.txt";
-	std::wstring filename = g_exePath + regionsTxt;
+	std::wstring filename = WW2_exeDocsPath + regionsTxt;
 	FILE *fp = nullptr;
 	if ( _wfopen_s(&fp, filename.c_str(), L"r, ccs=UTF-8") != 0 || fp == nullptr )
 	{
@@ -195,19 +195,27 @@ static bool _lookupAuthHost()
 	if ( auth_override )
 		dbugLog(_FLI, "'%s' was passed in as a command-line argument. Forcing its use as the authhost.", g_authHostName) ;
 
-	if ( auth_override || !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() ) {
-		if ( ! auth_override )
-			strprintf(g_authHostName, "authdevng%s", g_region.authSuffix().c_str());
+	UINT32 addr = 0;
 
-		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() ) {
+	g_authHosts.clear();
+	if ( auth_override || !(addr = Teul::GetSingleIP(g_region.authSuffix().c_str())) ) {
+		if (!auth_override) {
+#ifndef BETA_RELEASE
+			strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
+#else
+			strprintf(g_authHostName, "authdev%s", g_region.authSuffix().c_str());
+#endif
+		}
+		if ( !(addr = Teul::GetSingleIP(g_authHostName)) ) {
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
 		}
 	}
+	g_authHosts.push_back( addr );
 	// Copy the list to a permanent home
 	dbugLog(_FLI, "lookup(%s) gave", g_authHostName);
 	for ( auto ip : g_authHosts ) {
-		dbugLog(_FLIB, " %s", teulGetAddress(ip));
+		dbugLog(_FLI, " %s", teulGetAddress(ip));
 	}
 
 	return true;

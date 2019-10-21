@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -36,7 +36,7 @@
 #include "SpatialDB.h"
 #endif
 
-typedef std::stack< TDTL_TREES* > TREE_POOL;
+using TREE_POOL = std::stack<TDTL_TREES*>;
 static TREE_POOL _treePool;
 
 #include "shader/glslWater.h"
@@ -413,7 +413,7 @@ SINT32		i, j, k;
 	Write_Debug("Edit list has been minimized and ordered");
 }
 
-LOGICAL trnldrInit(void)
+LOGICAL trnldrInit()
 {
 SINT8	filename[MAX_PATH], mapname[64];
 SINT32	i;
@@ -448,32 +448,10 @@ SINT32	i;
 		return(FALSE);
 	}
 
-#ifdef USE_VSS
-	{
-	SINT8		work[512], curpath[_MAX_PATH], workpath[_MAX_PATH], batchfile[_MAX_PATH];
-
-		GetCurrentDirectory(_MAX_PATH, curpath);
-		sprintf(work, "%s", PREPATH);
-		strcpy(work, &work[1]);
-		sprintf(workpath, "%s%s%s", curpath, work, TERRAIN_PREPATH);
-		SetCurrentDirectory(workpath);
-
-		strcpy(batchfile, ".\\");
-		strcat(batchfile, VSS_SUBDIRECTORY);
-
-		if (OS_ACCESS(batchfile, 00) != 0)
-		{
-			OS_MKDIR(batchfile);
-		}
-
-		SetCurrentDirectory(curpath);
-	}
-#endif
-
 	return(TRUE);
 }
 
-void trnldrKill(void)
+void trnldrKill()
 {
 SINT32	i;
 
@@ -582,7 +560,8 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 	if (deletion != nullptr)
 	{
-		switch(lpobj->modelInstance->GetModelType())
+		UINT32 mType = lpobj->modelInstance->GetModelType();
+		switch(mType)
 		{
 		case ModelTypes::CLOUD:
 
@@ -595,7 +574,9 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 		}
 
 		deletion(lpobj, 0, 0, 0, nullptr);
-		trnUpdateStratData(td, lpobj, -1, FALSE);
+
+	if (mType != ModelTypes::TERRAIN_OBJECT && mType != ModelTypes::TERRAIN_TILE)
+		trnUpdateStratData(td, lpobj, -1, FALSE); // DEV-731 - could be called to update building model types only
 	}
 
 	obpoolFreeObjectCallback(lpobj);
@@ -605,87 +586,55 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 	return(TRUE);
 }
 
-static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
-{
-SINT32		i;//, place=0;
-SINT8		filename[_MAX_PATH];
+static void ReleaseSupercellObjects(TERRAIN_DETAIL* td) {
+	if ( td == nullptr )
+        return;
 
-	if (td == nullptr)
-	{
-		return(FALSE);
-	}
+	logTimerBeginMacro();
 
-    logTimerBeginMacro();
+	for ( int i = 0; i < td->tobndx; ++i ) {
+		if (td->trnobjRefs[i] != nullptr) {
+			OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
+			if ( lpobj == nullptr ) {
+				dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+			} else if ( ! trnldrReleaseTerrainObject(lpobj, td) ) {
+				dbugLog(_FLW, "ReleaseSupercellObjects for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
+			}
 
-	for (i=0; i < td->tobndx; i++)
-	{
-	SCHAR*		ptr;
-	OBJECT*	lpobj;
-
-		sprintf(filename, "%s_%d_%d", td->trnobj[i].objname, (int)td->trnobj[i].pos.x, (int)td->trnobj[i].pos.y);
-
-		// strip off the directory subname
-		ptr = strrchr(filename,'\\');
-		if (ptr != nullptr)
-		{
-			strcpy(filename,++ptr);
-		}
-
-		lpobj = obmainFindTopmostObject(filename);
-		if (!trnldrReleaseTerrainObject(lpobj, td))
-		{
-#if RELEASE_CLIENT == 0
-			//Write_Debug("ReleaseSupercellObjects for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
-#endif
+			td->trnobjRefs[i] = nullptr;
 		}
 	}
 
-    logTimerEndMacro();
-
-	return(TRUE);
+	logTimerEndMacro();
 }
 
-static LOGICAL ReleaseSupercellObjectsSequenced(SINT32 sc)
-{
-SINT32		i;
-SINT8		filename[_MAX_PATH];
-TERRAIN_DETAIL*	td;
-TRNSTATEBLOCK*	tsb;
+static bool ReleaseSupercellObjectsSequenced(SINT32 sc) {
+	TERRAIN_DETAIL* td = &trndtl[sc];
+	TRNSTATEBLOCK* tsb = &td->trnstate;
 
-	td = &trndtl[sc];
-	tsb = &td->trnstate;
+	FLOAT32 horizon;
+	trnmainGetHorizon(&horizon);
 
-    FLOAT32 horizon, hyster, hysterFar;
+	FLOAT32 hyster = horizon * 1.1f; // Hysterisis
+	hyster *= hyster;
+	FLOAT32 hysterFar = hyster * 10.0f;
 
-    trnmainGetHorizon(&horizon);
-	hyster = horizon * 1.1f;	// Hysterisis
-	hyster *= hyster;			// To avoid sqrt
-	hysterFar = hyster * 10.0f;
+	// Was originally a while loop that would return false after the first iteration?
+	UINT32 i;
+	if ( ! FindObjectsInOctetSCUnloading(&i, sc, (UINT32*)&tsb->varone, hyster, hysterFar) )
+		return true;
 
-	while (FindObjectsInOctetSCUnloading((UINT32*)&i, sc, (UINT32*)&tsb->varone, hyster, hysterFar ))
-	{
-	SCHAR*		ptr;
-	OBJECT*	lpobj;
+	if ( td->trnobjRefs[i] != nullptr ) {
+		OBJECT* lpobj = obmainFindTopmostObject(td->trnobjRefs[i]);
+		if ( lpobj == nullptr )
+			dbugLog(_FLW, "Topmost object not found for %s.", td->trnobjRefs[i]);
+		else if ( ! trnldrReleaseTerrainObject(lpobj, td) )
+			dbugLog(_FLW, "ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove.", td->terrain->trnum, td->trnobjRefs[i]);
 
-		sprintf(filename, "%s_%d_%d", td->trnobj[i].objname, (int)td->trnobj[i].pos.x, (int)td->trnobj[i].pos.y);
-
-		// strip off the directory subname
-		ptr = strrchr(filename,'\\');
-		if (ptr != nullptr)
-		{
-			strcpy(filename,++ptr);
-		}
-
-		lpobj = obmainFindTopmostObject(filename);
-		if (!trnldrReleaseTerrainObject(lpobj, td))
-		{
-			Write_Debug("ReleaseSupercellObjectsSequenced for supercell %d could not find object '%s' to remove", td->terrain->trnum, filename);
-		}
-
-		return(FALSE);
+		td->trnobjRefs[i] = nullptr;
 	}
 
-	return(TRUE);
+	return false;
 }
 
 LOGICAL trnldrLoadNormals(OBJECT* tt, short normals[SUPERCELL_SIZE_XY])
@@ -875,18 +824,17 @@ STRT_DTL_HEADER		sdh;
 
     _isdefault = 0;
 
-
-	sprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TRN_EXT);
+	strprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TRN_EXT);
 
 	hfile = fioOpen(filename);
 
 	ReadingSDM = TRUE;
 
-#if !defined(TERRAIN_EDITOR) && RELEASE_CLIENT == 0
+#if RELEASE_CLIENT == 0
 
 	if (hfile == -1)
 	{
-		sprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TERRAINFILE_EXTENSION);
+		strprintf(filename, "%s%04x_%04x%s", TERRAIN_PREPATH, (UINT16)td->scx, (UINT16)td->scy, TERRAINFILE_EXTENSION);
 		Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
 		hfile = fioOpen(filename);
 		ReadingSDM = FALSE;
@@ -901,21 +849,19 @@ STRT_DTL_HEADER		sdh;
         // Change back to old archive to get this
         // default.dtl is not ####_####.dtl!
 
-		sprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TRN_EXT);
+		strprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TRN_EXT);
 		hfile = fioOpen(filename);
 
 		ReadingSDM = TRUE;
 
 #if RELEASE_CLIENT == 0
-
 		if (hfile == -1)
 		{
-			sprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TERRAINFILE_EXTENSION);
+			strprintf(filename, "%sdefault%s", TERRAIN_PREPATH, TERRAINFILE_EXTENSION);
 			Write_Debug("Attempting to substitue DTL file (%s) for SDM", filename);
 			hfile = fioOpen(filename);
 			ReadingSDM = FALSE;
 		}
-
 #endif
 
 		if (hfile == -1)
@@ -1147,7 +1093,7 @@ STRT_DTL_HEADER		sdh;
 
 				td->numFacilities = sdh.numFacilities;
 
-				td->facTable = sdmCreateFacilityTable(td->pfac, td->numFacilities, td->numCPs);
+				td->facTable = sdmCreateFacilityTable(td->pfac, td->numFacilities, td->pcp, td->numCPs);
 			}
 
 			if (sdh.numBuildings > 0)
@@ -1463,7 +1409,7 @@ SINT32		count;
 
 	if (count == 0)
 	{
-		Write_Debug("Texture index was not found: %d", txndx);
+		//Write_Debug("Texture index was not found: %d", txndx);
 	}
 
 	return(count);
@@ -1559,7 +1505,7 @@ TERRAIN_DETAIL*	td;
 	{
 		if (td->nonreplacementtiles[i] == nullptr)
 		{
-			sprintf(objname, "%s_t%d", td->terrain->name, i);
+			strprintf(objname, "%s_t%d", td->terrain->name, i);
 
 			if (td->trindx <= SUPERCELL_OCTETS_XY)
 			{
@@ -1770,7 +1716,7 @@ TRNSTATEBLOCK*		tsb;
 	{
 		if (td->nonreplacementtiles[i] == nullptr)
 		{
-			sprintf(objname, "%s_t%d", td->terrain->name, i);
+			strprintf(objname, "%s_t%d", td->terrain->name, i);
 
 			if (td->trindx <= SUPERCELL_OCTETS_XY)
 			{
@@ -2233,7 +2179,9 @@ static LOGICAL LoadObjects(SINT32 sc)
 								td->trnobj[i].ortdrg & 0xf,
                                 sc,
 								td->trnobj[i].flags & TRNOBJ_NON_PLANAR_BASE,
-                                td->trnobj[i],td))
+                                td->trnobj[i],
+                                td,
+                                &td->trnobjRefs[i]))
 			{
 				KillObject = TRUE;
 			}
@@ -2298,7 +2246,9 @@ static LOGICAL		trip;
 								td->trnobj[i].ortdrg & 0xf,
                                 sc,
 								td->trnobj[i].flags & TRNOBJ_NON_PLANAR_BASE,
-								td->trnobj[i],td))
+								td->trnobj[i],
+                                td,
+                                &td->trnobjRefs[i]))
 			{
 				KillObject = TRUE;
 			}
@@ -3200,7 +3150,7 @@ TERRAIN_DETAIL*	td;
 	return(retval);
 }
 
-LOGICAL trnldrUpdate(void)
+LOGICAL trnldrUpdate()
 {
 LOGICAL		retval;
 UINT32		start, elapse, numticks;
@@ -3421,7 +3371,7 @@ static SINT32		cell=0;
 	return(TRUE);
 }
 
-LOGICAL trnldrFinishUpdate(void)
+LOGICAL trnldrFinishUpdate()
 {
 LOGICAL		retval;
 SINT32		cell=0;
@@ -3477,7 +3427,7 @@ UINT32		iterations=0;
 	return(TRUE);
 }
 
-LOGICAL trnldrFinishUpdateRelocate(void)
+LOGICAL trnldrFinishUpdateRelocate()
 {
 LOGICAL		retval;
 SINT32		cell=0;
@@ -4232,20 +4182,6 @@ LOGICAL trnldrModifySupercell(SINT32 sc)
 //LOGICAL			retval=TRUE;
 TERRAIN_DETAIL*	td;
 
-#ifdef EVENT_LOG_TIMES
-LARGE_INTEGER norm_count1, norm_count2;
-static __int64    count=0;
-#endif //EVENT_LOG_TIMES
-
-
-
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&norm_count1))
-	{
-		//Error
-	}
-#endif //EVENT_LOG_TIMES
-
 	td = &trndtl[sc];
 
 	if (loading)
@@ -4333,15 +4269,6 @@ static __int64    count=0;
 	loading = FALSE;
 
 	td->trnstate.state = TRN_STATE_WAIT;
-
-#ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&norm_count2))
-	{
-		count += norm_count2.QuadPart - norm_count1.QuadPart;
-		QueryPerformanceFrequency(&norm_count2);
-		count = 0;
-	}
-#endif //EVENT_LOG_TIMES
 
 	return(TRUE);
 }

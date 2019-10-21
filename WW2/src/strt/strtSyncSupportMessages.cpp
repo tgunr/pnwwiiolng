@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "versionNo.h"
-
 #include "include/wthrTime.h"
 #include "server/serverInterface.h"
 #include "strt/strtConstants.h"
@@ -35,9 +33,7 @@
 #if defined(IS_MAP_HOST)
 #define _USE_STRAT_EVENTS
 #include "strt/strtEvents.h"
-#endif
-
-#if defined(IS_MAP_HOST)
+#include "map/mapBrigades.h"
 #include "miss/mission.h"
 #include "map/mapData.h"
 #endif
@@ -142,6 +138,9 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 		facility->m_captureProgress = (float)captureCounter;
 	facility->m_captureStateChanged = teulTime() - lastChange;
 
+	//dbugLog(_FLN, "_facilityStatusHandler.m_captureStage: %u m_captureCounter: %u m_captureProgress: %f \n"
+	//	, facility->m_captureStage, facility->m_captureCounter, facility->m_captureProgress);
+
 #if defined(IS_MAP_HOST)
 	if ( hasChanged )
 	{
@@ -177,6 +176,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 #endif
 
 	//actually set the ownership
+	WWII_SIDE origSide = cp->side;
 	cp->country = country;
 	cp->side = wwiiSide(country);
 	cp->controllingCountry = controllingCountry;
@@ -185,6 +185,33 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	cp->flags = flags;
 	cp->m_contention = (flags & CP_STAT_CONTENTION) == CP_STAT_CONTENTION;
 	cp->m_enemyLinked = (flags & CP_STAT_ENEMY_LINKED) == CP_STAT_ENEMY_LINKED;
+	cp->m_frontlineLinked = (flags & CP_STAT_FRONTLINE_LINKED) == CP_STAT_FRONTLINE_LINKED;
+	bool origFrontLine = cp->m_frontline;
+	cp->m_frontline = (flags & CP_STAT_FRONTLINE) == CP_STAT_FRONTLINE;
+
+#if defined(IS_MAP_HOST)
+	/*
+		So long as this isn't a side switch AND
+		CP became front-line AND
+		there is an airbase involved
+	*/
+	if ((origSide == wwiiSide(country)) && 
+		cp->m_frontline && !origFrontLine && 
+		cp->facilityTypeIndex[FACILITY_AIRBASE] != nullptr)
+	{
+		std::list<HCUnit *> garrisons;
+		HCUnit::GetGarrisonUnits(garrisons, cp->fullObjID);
+		for (HCUnit *garrison : garrisons)
+		{
+			if (garrison->branch() == WWII_AIRFORCE &&
+				garrison->movementType() == WWII_AIRFORCE)
+			{
+				dbugLog(_FLN, "Becoming frontline, clearing airfield Garrison %d missions", garrison->unitID());
+				mapClearBrigadeMissions(garrison->unitID());
+			}
+		}
+	}
+#endif
 
 #if defined(IS_MAP_HOST)
 	if ( hasChanged )
@@ -239,6 +266,8 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 static SINT32
 _recvStratUpdate(ACTION_OBJECT* const a)
 {
+	//dbugLog(_FLN, "_recvStratUpdate.");
+
 	if ( a->m_client != nullptr )
 		return -EINVAL;
 
@@ -344,24 +373,18 @@ _recvTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32
-_registerStrtXCallbacks()
+SINT32
+strtSyncSupportInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
+	{
 		REGISTER_RECEIVER(STRT_UPDATE_Y, _recvStratUpdate);
 		REGISTER_RECEIVER(STRT_SYNC_CPS_Y, _recvSyncCPs);
 		REGISTER_RECEIVER(STRT_SYNC_FACILITIES_Y, _recvSyncFacilities);
 		REGISTER_RECEIVER(STRT_SYNC_BUILDINGS_Y, _recvSyncBuildings);
 		REGISTER_RECEIVER(STRT_BROADCAST_CONFIG_UPDATE_Y, _recvConfigUpdate);
 		REGISTER_RECEIVER(STRT_BROADCAST_TIME_UPDATE_Y, _recvTimeUpdate);
-	END_CALLBACK_REGISTRATION
-}
-
-SINT32
-strtSyncSupportInstallCallbacks(void)
-{
-	_registerStrtXCallbacks();
-
-	return 0;
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 

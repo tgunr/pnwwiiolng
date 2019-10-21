@@ -1,17 +1,17 @@
 // ========================================================================
-// $File: //jeffr/granny/tutorial/attachment/attachment_helpers.cpp $
-// $DateTime: 2009/10/29 11:47:12 $
-// $Change: 23788 $
-// $Revision: #5 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "attachment.h"
 #include <assert.h>
 
 // ---------------------------------------------------------
 // Win32 objects
-const char* MainWindowTitle = "DirectX9 GrannySample";
+LPCTSTR MainWindowTitle = TEXT("DirectX9 GrannySample");
 HWND g_hwnd = NULL;
 bool GlobalRunning = false;
 
@@ -48,9 +48,9 @@ DemoScene GlobalScene;
 // stuff them out of the documentation autogenerate section.
 // ---------------------------------------------------------------------------------------
 
-char const* const PixelShaderFile         = "media\\PixelShader.xpu";
-char const* const VertexShaderRigidFile   = "media\\RigidVS.xvu";
-char const* const VertexShaderSkinnedFile = "media\\SkinVSVertexFetch.xvu";
+char const* const PixelShaderFile         = "attachment\\media\\PixelShader.xpu";
+char const* const VertexShaderRigidFile   = "attachment\\media\\RigidVS.xvu";
+char const* const VertexShaderSkinnedFile = "attachment\\media\\SkinVSVertexFetch.xvu";
 
 #define HARDCODED_DISPLAY_WIDTH  1280
 #define HARDCODED_DISPLAY_HEIGHT 720
@@ -89,7 +89,7 @@ bool InitializeD3D()
         WindowClass.hInstance = GetModuleHandle(0);
         //WindowClass.hIcon = LoadIcon(WindowClass.hInstance, MAKEINTRESOURCE(101));
         WindowClass.hCursor = LoadCursor(0, IDC_ARROW);
-        WindowClass.lpszClassName = "DX9Basic_SimpleClass";
+        WindowClass.lpszClassName = TEXT("DX9Basic_SimpleClass");
 
         if(!RegisterClassEx(&WindowClass))
             return false;
@@ -642,7 +642,7 @@ bool InitCameraAndLights()
 
                     CameraFields CameraFields;
                     GrannyConvertSingleObject(CameraStoredType, CameraObject,
-                                              CameraFieldsType, &CameraFields);
+                                              CameraFieldsType, &CameraFields, 0);
 
                     // Ok, now we can setup the camera...
                     GrannyInitializeDefaultCamera(&GlobalScene.DemoCamera);

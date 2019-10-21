@@ -44,7 +44,7 @@ protected:
 
     void updateStateSet();
 
-    typedef std::vector<float> TextureWeightList;
+    using TextureWeightList = std::vector<float>;
     TextureWeightList _textureWeightList;
 };
 

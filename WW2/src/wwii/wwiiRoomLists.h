@@ -24,7 +24,7 @@ class RoomListEntry
 public:
 	RoomListEntry() {}
 
-	SINT32 packer(LOGICAL, ACTION_OBJECT*);
+	SINT32 packer(PackMode, ACTION_OBJECT*);
 
 	RMLIST_ACTION		m_action;
 	ChatHandle			m_handle;		// "chatHandle" of player's callsign
@@ -48,7 +48,7 @@ public:
 	RoomList() : m_numEntries(0) {}
 	~RoomList() {}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 
 	UINT32				m_numEntries;
 	RoomListEntry		m_entry[MAX_ROOM_LIST_ENTRIES];	// An array of room lists

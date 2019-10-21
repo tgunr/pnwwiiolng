@@ -20,25 +20,37 @@ class Vote
 {
 public:
 	// Modes of voting
-	//  NOMINATION - election for a player (60s veto window)
-	//	OFFER - completed ELECT now offering role to a player (90s window)
-	//  TOREMOVE - election for removal of a player (60s veto window)
-	//	REMOVING - player in the process of being removed/resigned/replaced (60s window)
-	//	REPLACING - player being replaced at end of timeout
-	enum Mode { NOMINATION, OFFER, TOREMOVE, REMOVING, TOREPLACE, TOMOVE, TOATTACK, TOCLEAR, TODEFEND, MAX_VOTE_MODES };
+	enum Mode { 
+		NOMINATION,			//  NOMINATION - election for a player (60s veto window)
+		OFFER,				//	OFFER - completed ELECT now offering role to a player (90s window)
+		TOREMOVE,			//  TOREMOVE - election for removal of a player (60s veto window)
+		REMOVING,			//	REMOVING - player in the process of being removed/resigned/replaced (60s window)
+		TOREPLACE, 
+		TOMOVE, 
+		TOATTACK, 
+		TOCLEAR, 
+		TODEFEND, 
+		CHANGECOUNTRY, 
+		MAX_VOTE_MODES };
 
-	Vote(Mode voteMode, UINT32 forAction, const ChatHandle& nominee, const ChatHandle& sponsor, UINT32 duration, const FULL_OBJ_ID& origin=nullObjID)
+	Vote(Mode voteMode, BrigadeControl::BRIGADE_ACTION_REQ forAction, const ChatHandle nominee, const ChatHandle sponsor, UINT32 duration, WWII_COUNTRY country=WWII_NO_COUNTRY, const FULL_OBJ_ID origin=nullObjID)
 		: m_voteMode(voteMode), m_forAction(forAction)
 		, m_nominee(nominee), m_sponsor(sponsor)
 		, m_startedAt(teulTime()), m_closeAt(teulTime() + duration)
 		, m_origin(origin)
+		, m_country(country)
 	{
 	}
 
 public:
 	static bool IsTargettedAction(UINT32 forAction)
 	{
-		return ( forAction == TOMOVE || forAction == TOATTACK || forAction == TOCLEAR || forAction == TODEFEND );
+		return ( 
+			forAction == TOMOVE || 
+			forAction == TOATTACK || 
+			forAction == TOCLEAR || 
+			forAction == TODEFEND ||
+			forAction == CHANGECOUNTRY );
 	}
 	bool isTargettedAction()
 	{
@@ -50,12 +62,13 @@ public:
 
 public:
 	Mode		m_voteMode;		// See enums
-	UINT32		m_forAction;
+	BrigadeControl::BRIGADE_ACTION_REQ		m_forAction;
 	// Vote is either for a player or a destination/target
 	ChatHandle	m_nominee;			// Player being proposed
 	ChatHandle	m_sponsor;			// Player who sponsored them
 	UINT32		m_startedAt;		// When the vote begins
 	UINT32		m_closeAt;			// When to close the vote
 	FULL_OBJ_ID	m_origin;			// Where it wants to move from
+	WWII_COUNTRY m_country;			// target country (for garrison move)
 };
 

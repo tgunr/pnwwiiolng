@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "osgImport/ShadowMap.h"
 #include "osgImport/Texture2D.h"
 #include "osgImport/BoundingBox.h"
@@ -650,7 +650,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         glClear(GL_DEPTH_BUFFER_BIT);
         fbo->UnApply();
 
-        oglSetViewport(0, 0, WantedWidth, WantedHeight);
+        oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
         obdrawSetRenderPass(RENDER_SCENE);
 
         return;
@@ -746,7 +746,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         oglSetViewport(0, 0, DynamicTexWidth, DynamicTexHeight);
         glClear(GL_DEPTH_BUFFER_BIT);
         DynShadowMap.fbo->UnApply();
-        oglSetViewport(0, 0, WantedWidth, WantedHeight);
+        oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
         obdrawSetRenderPass(RENDER_SCENE);
 
         return;
@@ -1997,7 +1997,7 @@ Description:
 ----------------------------------------------------------------------------*/
 void ShadowMap::EndShadowMap()
 {
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     States::LockState(RS_SHADEMODEL, 0);
     States::LockState(RS_COLORMASK, 0);
@@ -2022,7 +2022,7 @@ void ShadowMap::EndShadowMap()
 {
     smoctet.fbo->UnApply();
 
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     glPolygonOffset(0, 0);
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -2055,7 +2055,7 @@ Description:
 ----------------------------------------------------------------------------*/
 void ShadowMap::EndStaticShadowMap(int corner)
 {
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     States::LockState(RS_SHADEMODEL, 0);
     States::LockState(RS_COLORMASK, 0);
@@ -2079,7 +2079,7 @@ void ShadowMap::EndStaticShadowMap(int corner)
 {
     _smOctet[corner].fbo->UnApply();
 
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     glPolygonOffset(0, 0);
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -2111,7 +2111,7 @@ Description:
 ----------------------------------------------------------------------------*/
 void ShadowMap::EndDynamicShadowMap()
 {
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     States::LockState(RS_SHADEMODEL, 1);
     States::LockState(RS_COLORMASK, 1);
@@ -2135,7 +2135,7 @@ Description:
 void ShadowMap::EndDynamicShadowMap()
 {
     DynShadowMap.fbo->UnApply();
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
     glPolygonOffset(0, 0);
 
     oglLockState(oglRENDERSTATE_LIGHTING, 0);
@@ -2169,12 +2169,13 @@ void ShadowMap::Kill()
 {
     for(int i = 0; i < 4; i++)
     {
-        while(_smOctet[i].fbo->referenceCount() > 1)
+		// TODO: It's hideously wrong to forcibly kill all existing refcounts
+        while(_smOctet[i].fbo && _smOctet[i].fbo->referenceCount() > 1)
             _smOctet[i].fbo->unref();
 
         _smOctet[i].fbo = nullptr;
 
-        while(_smOctet[i].map->referenceCount() > 1)
+        while(_smOctet[i].map && _smOctet[i].map->referenceCount() > 1)
             _smOctet[i].map->unref();
 
         _smOctet[i].map = nullptr;
@@ -2280,7 +2281,7 @@ void ShadowMap::init()
 		fbo->UnApply();
 	}
 
-    oglSetViewport(0, 0, WantedWidth, WantedHeight);
+    oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
 
     if(ogl::UseDeprecatedPath())
     {
@@ -2390,7 +2391,7 @@ void ShadowMap::init()
 			fbo->UnApply();
 		}
 
-        oglSetViewport(0, 0, WantedWidth, WantedHeight);
+        oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
         _program = GLSL.getProgram("shadow");
     }
 }

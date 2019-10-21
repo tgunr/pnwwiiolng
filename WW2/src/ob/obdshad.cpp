@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -39,7 +39,7 @@ static SINT32		shadow_start_y, shadow_finish_y;
 static SINT32		shadow_width, shadow_height;
 static FLOAT32		sundot;
 
-LOGICAL obdshadInit(void)
+LOGICAL obdshadInit()
 {
     shadow_texture_size = 1 << 6;
 
@@ -603,7 +603,7 @@ piVECTOR		vmn, vmx, sv[3];
 piVECTOR		psl[3];
 piVECTOR const*		psnorms;
 piINDICES*		ptris;
-piMATRIX*		lpmat;
+piMATRIX*		lpmat = nullptr;
 
 	vmn = lpshad->obox[0];
 	vmx = lpshad->obox[1];
@@ -972,7 +972,7 @@ piMATRIX		mat;
 }
 
 
-LOGICAL obdshadUpdate(void)
+LOGICAL obdshadUpdate()
 {
     // This routine if totally screwed up. Should be completely removed.
 
@@ -982,15 +982,10 @@ LOGICAL obdshadUpdate(void)
     piVECTOR	up;
 
 #ifdef EVENT_LOG_TIMES
-LARGE_INTEGER count1, count2;
-static __int64    count=0;
-static int        number=0;
-#endif
+    static UINT64 count = 0;
+    static int number = 0;
 
-#ifdef EVENT_LOG_TIMES
-	if (!QueryPerformanceCounter(&count1))
-	{
-	}
+    UINT64 beginhere = GetMicroSeconds();
 #endif
 
     // This shadow routine is a framerate killer.
@@ -1077,18 +1072,13 @@ static int        number=0;
     }
 
 #ifdef EVENT_LOG_TIMES
-	if (QueryPerformanceCounter(&count2))
-	{
-		count += count2.QuadPart - count1.QuadPart;
-		number += shadcnt;
-		if (number >= 1000)
-		{
-			QueryPerformanceFrequency(&count2);
-			Write_Debug("Dynamic shadow time: %d us", (DWORD)(count / number) * 1000 / (DWORD)(count2.LowPart / 1000));
-			number = 0;
-			count = 0;
-		}
-	}
+    count += GetMicroSeconds() - beginhere;
+    if ((number += shadcnt) >= 1000)
+    {
+        Write_Debug("Dynamic shadow time: %lu us", count);
+        number = 0;
+        count = 0;
+    }
 #endif
 
 	return(TRUE);

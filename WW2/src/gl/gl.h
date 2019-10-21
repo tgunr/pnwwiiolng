@@ -1908,12 +1908,10 @@ WINGDIAPI void APIENTRY glVertex4sv (const GLshort* v);
 WINGDIAPI void APIENTRY glVertexPointer (GLint size, GLenum type, GLsizei stride, const GLvoid* pointer);
 WINGDIAPI void APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
-#ifdef FRONT_END
-#if platOS == OS_MACOS
+#ifndef _WIN32
 #include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
-#endif
 #endif
 
 #ifdef __cplusplus

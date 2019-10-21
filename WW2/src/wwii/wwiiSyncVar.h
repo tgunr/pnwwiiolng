@@ -42,21 +42,21 @@ public:
 		++m_members;
 	}
 
-	const TeulTimeMS& lastModified() const { return m_lastModified; }
+	TeulTimeMS lastModified() const { return m_lastModified; }
 
 	//! Function to pack member SyncVars, implemented by derived classes.
-	void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes)
+	void groupPacker(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes)
 	{
 		return (mode == TEUL_PACK) ? groupPack(a, lastPacked, changes) : groupUnpack(a, lastPacked, changes);
 	}
 
-	virtual void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes) const = 0;
-	virtual void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes) = 0;
+	virtual void groupPack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes) const = 0;
+	virtual void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked, UINT32& changes) = 0;
 
 	//! Function to pack self if there are any changes, otherwise returns false.
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) { return (mode == TEUL_PACK) ? pack(a, lastPacked) : unpack(a, lastPacked); }
-	bool pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) const;
-	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked);
+	bool packer(PackMode mode, ACTION_OBJECT* const a, const TeulTimeMS lastPacked) { return (mode == TEUL_PACK) ? pack(a, lastPacked) : unpack(a, lastPacked); }
+	bool pack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked) const;
+	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS lastPacked);
 };
 
 //! @class WWII::SyncVar
@@ -69,20 +69,20 @@ template<typename _Type, SINT32 _BitSize=0>
 class SyncVar
 {
 public:
-	typedef _Type valuetype;
-	typedef SyncVar<_Type, _BitSize> selftype;
+	using value_type = _Type;
+	using self_type = SyncVar<_Type, _BitSize>;
 
 private:
-	Teul::Packer<valuetype> m_value;
+	Teul::Packer<value_type> m_value;
 	TeulTimeMS	m_lastModified;
 	class VarGroup* const m_parent;
 
-	const valuetype& value() const { return m_value.m_value; }
-	valuetype& value() { return m_value.m_value; }
+	const value_type& value() const { return m_value.m_value; }
+	value_type& value() { return m_value.m_value; }
 
 	SyncVar() {}
-	SyncVar(const selftype& rhs) {}
-	SyncVar(const valuetype& rhs) {}
+	SyncVar(const self_type& rhs) {}
+	SyncVar(const value_type& rhs) {}
 
 public:
 	template<typename Tp>
@@ -91,19 +91,19 @@ public:
 	SyncVar(class VarGroup* const parent)
 		: m_value(), m_lastModified(teulClock64), m_parent(parent) { m_parent->addMember(); }
 
-	valuetype operator = (const valuetype& rhs) { set(rhs); return value(); }
-	selftype& operator = (const selftype& rhs) { m_value = rhs.m_value; m_lastModified = rhs.m_lastModified; return *this; }
+	value_type operator = (const value_type& rhs) { set(rhs); return value(); }
+	self_type& operator = (const self_type& rhs) { m_value = rhs.m_value; m_lastModified = rhs.m_lastModified; return *this; }
 
 	SINT32 bitSize() const { return _BitSize; }
 
-	selftype& setModified()
+	self_type& setModified()
 	{
 		m_parent->setModified();
 		m_lastModified = teulClock64;
 		return *this;
 	}
 
-	void set(const valuetype& rhs)
+	void set(const value_type& rhs)
 	{
 		if ( rhs == value() )
 			return;
@@ -111,28 +111,28 @@ public:
 		setModified();
 	}
 
-	const valuetype& get() const { return value(); }
-	const valuetype& operator()() const { return value(); }
-	void operator()(const valuetype& rhs) { set(rhs); }
+	const value_type& get() const { return value(); }
+	const value_type& operator()() const { return value(); }
+	void operator()(const value_type& rhs) { set(rhs); }
 
-	selftype& operator+=(const valuetype& rhs) { value() += rhs; return setModified(); }
-	selftype& operator-=(const valuetype& rhs) { value() -= rhs; return setModified(); }
-	selftype& operator*=(const valuetype& rhs) { value() *= rhs; return setModified(); }
-	selftype& operator/=(const valuetype& rhs) { value() /= rhs; return setModified(); }
-	selftype& operator<<=(const int rhs) { value() <<= rhs; return setModified(); }
-	selftype& operator>>=(const int rhs) { value() >>= rhs; return setModified(); }
-	selftype& operator++() { ++value(); return setModified(); }
-	selftype& operator--() { --value(); return setModified(); }
-	selftype& operator++(int) { ++value(); return setModified(); }
-	selftype& operator--(int) { --value(); return setModified(); }
-	selftype& operator&=(const valuetype& rhs) { value() &= rhs; return setModified(); }
-	selftype& operator|=(const valuetype& rhs) { value() |= rhs; return setModified(); }
-	selftype& operator^=(const valuetype& rhs) { value() ^= rhs; return setModified(); }
+	self_type& operator+=(const value_type& rhs) { value() += rhs; return setModified(); }
+	self_type& operator-=(const value_type& rhs) { value() -= rhs; return setModified(); }
+	self_type& operator*=(const value_type& rhs) { value() *= rhs; return setModified(); }
+	self_type& operator/=(const value_type& rhs) { value() /= rhs; return setModified(); }
+	self_type& operator<<=(const int rhs) { value() <<= rhs; return setModified(); }
+	self_type& operator>>=(const int rhs) { value() >>= rhs; return setModified(); }
+	self_type& operator++() { ++value(); return setModified(); }
+	self_type& operator--() { --value(); return setModified(); }
+	self_type& operator++(int) { ++value(); return setModified(); }
+	self_type& operator--(int) { --value(); return setModified(); }
+	self_type& operator&=(const value_type& rhs) { value() &= rhs; return setModified(); }
+	self_type& operator|=(const value_type& rhs) { value() |= rhs; return setModified(); }
+	self_type& operator^=(const value_type& rhs) { value() ^= rhs; return setModified(); }
 
-	valuetype operator!() { return !get(); }
+	value_type operator!() { return !get(); }
 
 	//! Packers which only self-pack when data is modified.
-	void pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes, UINT32 fieldNo) const
+	void pack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes, UINT32 fieldNo) const
 	{
 		const bool hasChanged = m_lastModified >= lastPack;
 		if ( hasChanged )
@@ -142,7 +142,7 @@ public:
 		}
 	}
 
-	void unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes, UINT32 fieldNo)
+	void unpack(ACTION_OBJECT* const a, const TeulTimeMS lastPack, UINT32& changes, UINT32 fieldNo)
 	{
 		const bool hasChanged = (changes & (1 << fieldNo)) != 0;
 		if ( hasChanged )
@@ -151,4 +151,3 @@ public:
 };
 
 } // WWII namespace
-

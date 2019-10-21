@@ -1,6 +1,8 @@
 // PlaygateDlg.cpp : implementation file
 //
 
+#include "syscfg.h" // Path is project specific.
+
 #include "Playgate.h"
 #include "PlaygateDlg.h"
 #include "LoginData.h"
@@ -35,7 +37,9 @@ const char* states[NUM_LOCK_STATES] =
 static CPlaygateDlg* g_dlg;
 static bool g_launchInProgress;
 
+
 // CPlaygateDlg dialog
+IMPLEMENT_DYNAMIC(CPlaygateDlg, CDialog)
 
 CPlaygateDlg::CPlaygateDlg(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CPlaygateDlg::IDD, pParent)
@@ -69,6 +73,7 @@ BEGIN_MESSAGE_MAP(CPlaygateDlg, CBDialog)
 	ON_LBN_SELCHANGE(IDC_SERVER_LIST, &CPlaygateDlg::OnLbnSelchangeServerList)
 	ON_BN_CLICKED(IDOK, &CPlaygateDlg::OnBnClickedOk)
 	ON_WM_TIMER()
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
 
 
@@ -184,7 +189,10 @@ static void _ServerSelection(CListBox* serverList, int i)
 	else
 	{
 		Auth::GameEntry& server = Auth::g_games.m_games[i];
-		std::string info = "Server: v";
+		std::string info = "";
+
+#if 0
+		info += "Server: v";
 		if ( server.m_minVer != 0 && server.m_minVer != server.m_maxVer )
 		{
 			info += teulGetAddress(server.m_minVer);
@@ -208,11 +216,11 @@ static void _ServerSelection(CListBox* serverList, int i)
 			else if ( localVersion > server.m_maxVer )
 				info += "Wrong Version";
 		}
+#endif
 
 		std::wstring infoW(info.begin(), info.end());
 		CWnd* stateText = hMainWnd->GetDlgItem(IDS_SERVER_NOTE);
 
-#if(0)
 		// I can't see a way to clear the text, wtf?
 		if (stateText != nullptr )
 		{
@@ -220,16 +228,15 @@ static void _ServerSelection(CListBox* serverList, int i)
 			
 			stateText->SetWindowText(L"");
 			stateText->SetWindowText(infoW.c_str());
-			stateText->RedrawWindow();
-			
+#if 0
 			std::string url = "http://www";
 			url += g_region.m_webSuffix;
 			url += "/pgservers.html";
 			std::wstring wideUrl(url.begin(), url.end());
 			pgdialog->m_browser.Navigate(wideUrl.c_str(), nullptr, nullptr, nullptr, nullptr);
+#endif
 
 		}
-#endif
 
 		if ( server.m_lockState < AL_OFF )
 		{
@@ -420,4 +427,15 @@ void CPlaygateDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 
 	CBDialog::OnTimer(nIDEvent);
+}
+
+HBRUSH CPlaygateDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	// Add the following code
+	if (pWnd->GetDlgCtrlID() == IDS_SERVER_NOTE)
+		pDC->SetTextColor(RGB(255, 255, 255)); // make white
+
+	return hbr;
 }

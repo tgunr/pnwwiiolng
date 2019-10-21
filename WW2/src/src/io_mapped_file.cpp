@@ -40,7 +40,9 @@ static inline void _copyStr(wchar_t* dest_, const wchar_t* src_) { wcscpy(dest_,
 static inline imf_handle_t OsOpenFile(const char* filename_)
 {
 #if IO_MAP_TYPE != _IMT_WINDOWS
-	return OS_OPEN(filename_, O_RDONLY);
+	imf_handle_t f = -1;
+	OS_OPEN(&f, filename_, O_RDONLY, 0);
+	return f;
 #else
 	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 #endif
@@ -173,7 +175,7 @@ MappedFile::mapFileHandleInternal()
 		return unmapFile();
 #else
 	// Posix implementation.
-	static const int flags = 
+	static const int flags =
 			  MAP_FILE 		// Compatibility flag, not really required.
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;

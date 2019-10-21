@@ -12,9 +12,6 @@
 #include "include/mydbQuery.h"
 #include "chat/chatHandle.h"
 #include "chat/chatName.h"
-#include "dbse/dbseHandle.h"
-
-extern DBHANDLE dbh;
 
 #if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"
@@ -88,7 +85,6 @@ wwiiReadHCUnits()
 		ChatHandle lastMovedBy;
 		UCHAR unitClass;
 
-
 		while (q.FetchRow())
 		{
 			DBRow& row = q.Row();
@@ -137,7 +133,7 @@ wwiiReadHCUnits()
 			//// them alone, this is not a memory leak.
 			HCUnit* newUnit;
 
-			if ( typeID != HCU_BRIGADE && typeID != HCU_DIVISION )
+			if ( typeID != HCU_BRIGADE && typeID != HCU_DIVISION && typeID != HCU_GARRISON )
 			{
 				homeCP = nullObjID;
 				startCpOID = 0;
@@ -146,9 +142,10 @@ wwiiReadHCUnits()
 			switch ( typeID )
 			{
 				case HCU_BRIGADE:
+				case HCU_GARRISON:
 #if defined(IS_MAP_HOST)
 				// On the map host we have more detailed types for some sub-types
-					newUnit = (HCUnit*)(new Brigade(unitID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank));
+					newUnit = (HCUnit*)(new Brigade(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank));
 				break;
 #elif defined(IS_STRAT_HOST)
 				// Fallthru, treat brigade & division the same
@@ -168,6 +165,8 @@ wwiiReadHCUnits()
 					newUnit = new HCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank);
 				break;
 			}
+
+			newUnit->addToRegistry();
 
 			Chat::Name lastMovedByName(lastMovedBy);
 			dbugLog(_FLD, "hcu:%u start:%u fall:%u nm:%u temp:%s lmb:%s lm:%u %p +ALLOC"

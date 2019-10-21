@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Tue Apr 17 14:42:44 2001
 //
 // Pack functions for the merged mmhost, including the things necessary to
@@ -18,9 +18,10 @@
 #include "mm/mmSpawnTypes.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiPack.h"
+#include "wwii/wwiiPackBool.h"
 
 SINT32
-mmPackPostedWeapon(LOGICAL mode, UCHAR* data, SINT32 offset, MM_POSTED_WEAPON* object, SINT32 /*size*/)
+mmPackPostedWeapon(PackMode mode, UCHAR* data, SINT32 offset, MM_POSTED_WEAPON* object, SINT32 /*size*/)
 {
 	offset = wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 //	offset = teulPackUINT32(mode,data, offset, &(object->posted), 0);
@@ -32,7 +33,7 @@ mmPackPostedWeapon(LOGICAL mode, UCHAR* data, SINT32 offset, MM_POSTED_WEAPON* o
 }
 
 SINT32
-mmPackFEPostRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_REQUEST* object, SINT32 /*size*/)
+mmPackFEPostRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_REQUEST* object, SINT32 /*size*/)
 {
 
 	offset = wwiiPackFullObjID(mode, data, offset, &(object->facility), 0);
@@ -44,17 +45,17 @@ mmPackFEPostRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_REQUEST* o
 }
 
 SINT32
-mmPackFEPostAccept(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_ACCEPT* object, SINT32 /*size*/)
+mmPackFEPostAccept(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_ACCEPT* object, SINT32 /*size*/)
 {
-	offset = teulPackUINT32(mode,data, offset, (UINT32*)&(object->newVehicle), 0);
 	offset = wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 	offset = teulPackSINT16(mode, data, offset, &(object->portal), 0);
-	offset = teulPackUINT32(mode, data, offset, &(object->mobileSpawnAvailable), 1);
+	offset = wwiiPackBool(mode,data, offset, object->newVehicle);
+	offset = wwiiPackBool(mode, data, offset, object->mobileSpawnAvailable);
 	return offset;
 }
 
 SINT32
-mmPackFEPostDeny(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_DENY* object, SINT32 /*size*/)
+mmPackFEPostDeny(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_DENY* object, SINT32 /*size*/)
 {
 	offset = wwiiPackWeaponSpec(mode,data, offset, &(object->weapon), 0);
 	offset = teulPackUINT32(mode, data, offset, &(object->reasonCode), 0);
@@ -64,13 +65,13 @@ mmPackFEPostDeny(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_DENY* object,
 }
 
 SINT32
-mmPackFEPostListRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_LIST_REQUEST* object, SINT32 /*size*/)
+mmPackFEPostListRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_LIST_REQUEST* object, SINT32 /*size*/)
 {
 	return wwiiPackFullObjID(mode, data, offset, &(object->facility), sizeof(FULL_OBJ_ID));
 }
 
 SINT32
-mmPackFEPostListResponse(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_LIST_RESPONSE* object, SINT32 /*size*/)
+mmPackFEPostListResponse(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_LIST_RESPONSE* object, SINT32 /*size*/)
 {
 	SINT16 i;
 
@@ -91,31 +92,31 @@ mmPackFEPostListResponse(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_LIST_
 }
 
 SINT32
-mmPackFEJoinRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_REQUEST* object, SINT32 /*size*/)
+mmPackFEJoinRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_JOIN_REQUEST* object, SINT32 /*size*/)
 {
 	return wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 }
 
 SINT32
-mmPackFEJoinAccept(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_ACCEPT* object, SINT32 /*size*/)
+mmPackFEJoinAccept(PackMode mode, UCHAR* data, SINT32 offset, FE_JOIN_ACCEPT* object, SINT32 /*size*/)
 {
 	return mmPackPostedWeapon(mode, data, offset, &(object->postedWeapon), 0);
 }
 
 SINT32
-mmPackFEJoinDeny(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_DENY* object, SINT32 /*size*/)
+mmPackFEJoinDeny(PackMode mode, UCHAR* data, SINT32 offset, FE_JOIN_DENY* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, &(object->reasonCode), 0);
 }
 
 SINT32
-mmPackFEPostExpired(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_EXPIRED* object, SINT32 /*size*/)
+mmPackFEPostExpired(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_EXPIRED* object, SINT32 /*size*/)
 {
 	return wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 }
 
 SINT32
-mmPackFEJoinPermRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_PERM_REQUEST* object, SINT32 /*size*/)
+mmPackFEJoinPermRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_JOIN_PERM_REQUEST* object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &(object->joinRequestID), 0);
 	offset = wwiiPackHandle(mode, data, offset, &object->chatHandle, 0);
@@ -124,7 +125,7 @@ mmPackFEJoinPermRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_PERM_R
 }
 
 SINT32
-mmPackFECrewRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CREW_REQUEST* object, SINT32 /*size*/)
+mmPackFECrewRequest(PackMode mode, UCHAR* data, SINT32 offset, FE_CREW_REQUEST* object, SINT32 /*size*/)
 {
 	offset = wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&(object->numCrewNeeded), 0);
@@ -133,13 +134,13 @@ mmPackFECrewRequest(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CREW_REQUEST* o
 }
 
 SINT32
-mmPackFECrewAccept(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CREW_ACCEPT* object, SINT32 /*size*/)
+mmPackFECrewAccept(PackMode mode, UCHAR* data, SINT32 offset, FE_CREW_ACCEPT* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, &(object->joinRequestID), 0);
 }
 
 SINT32
-mmPackCommandedWeapon(LOGICAL mode, UCHAR* data, SINT32 offset, COMMANDED_WEAPON* object, SINT32 /*size*/)
+mmPackCommandedWeapon(PackMode mode, UCHAR* data, SINT32 offset, COMMANDED_WEAPON* object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&(object->action), 0);
 	offset = wwiiPackHandle(mode, data, offset, &(object->handle), 0);
@@ -149,22 +150,22 @@ mmPackCommandedWeapon(LOGICAL mode, UCHAR* data, SINT32 offset, COMMANDED_WEAPON
 }
 
 SINT32
-mmPackFEPostCancel(LOGICAL mode, UCHAR* data, SINT32 offset, FE_POST_CANCEL* object, SINT32 /*size*/)
+mmPackFEPostCancel(PackMode mode, UCHAR* data, SINT32 offset, FE_POST_CANCEL* object, SINT32 /*size*/)
 {
 	return wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
 }
 
 SINT32
-mmPackFEJoinPermKill(LOGICAL mode, UCHAR* data, SINT32 offset, FE_JOIN_PERM_KILL* object, SINT32 /*size*/)
+mmPackFEJoinPermKill(PackMode mode, UCHAR* data, SINT32 offset, FE_JOIN_PERM_KILL* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, &(object->joinRequestID), 0);
 }
 
 SINT32
-mmPackFEClientSpawn(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CLIENT_SPAWN* object, SINT32 /*size*/)
+mmPackFEClientSpawn(PackMode mode, UCHAR* data, SINT32 offset, FE_CLIENT_SPAWN* object, SINT32 /*size*/)
 {
 	offset = wwiiPackWeaponSerial(mode, data, offset, &(object->weaponSerial), 0);
-	offset = teulPackUCHAR(mode, data, offset, &(object->wantMobileSpawn), 1);
+	offset = wwiiPackBool(mode, data, offset, object->wantMobileSpawn);
 	return offset;
 }
 
@@ -185,7 +186,7 @@ FESpawnNotify::FESpawnNotify(ACTION_OBJECT* const a)
 }
 
 SINT32
-FESpawnNotify::packer(LOGICAL mode, ACTION_OBJECT* a)
+FESpawnNotify::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &spawnVehicleID, 0);
 	if ( spawnVehicleID != 0 )
@@ -213,7 +214,7 @@ FESpawnNotify::packer(LOGICAL mode, ACTION_OBJECT* a)
 }
 
 SINT32
-mmPackFECrewBailed(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CREW_BAILED* object, SINT32 /*size*/)
+mmPackFECrewBailed(PackMode mode, UCHAR* data, SINT32 offset, FE_CREW_BAILED* object, SINT32 /*size*/)
 {
 	offset = teulPackUINT32(mode, data, offset, &(object->joinRequestID), 0);
 	offset = teulPackUINT32(mode, data, offset, &(object->reasonCode), 0);
@@ -222,7 +223,7 @@ mmPackFECrewBailed(LOGICAL mode, UCHAR* data, SINT32 offset, FE_CREW_BAILED* obj
 }
 
 SINT32
-Map::DirectSpawn::packer(LOGICAL mode, ACTION_OBJECT* a)
+Map::DirectSpawn::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	m_weapon.packer(mode, a);
 	a->packer(mode, &m_location.x);

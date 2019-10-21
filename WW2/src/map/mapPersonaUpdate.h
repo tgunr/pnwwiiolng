@@ -13,7 +13,7 @@ class MapPersonaUpdate
 {
 public:
 	MapPersonaUpdate() : m_squadHandle(0), m_isSquadUpdate(false), m_isDecalUpdate(false), m_playerID(0), m_squadID(0), m_decal(0) {}
-	MapPersonaUpdate(const ChatHandle& squadHandle_, const bool isSquadUpdate_, const bool isDecalUpdate_, const UINT32 playerID_, const UINT32 squadID_, const UINT32 decal_)
+	MapPersonaUpdate(const ChatHandle squadHandle_, const bool isSquadUpdate_, const bool isDecalUpdate_, const UINT32 playerID_, const UINT32 squadID_, const UINT32 decal_)
 		: m_squadHandle(squadHandle_)
 		, m_isSquadUpdate(isSquadUpdate_)
 		, m_isDecalUpdate(isDecalUpdate_)

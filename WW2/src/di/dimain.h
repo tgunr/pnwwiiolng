@@ -15,15 +15,18 @@ struct CHAR_INPUT
 
 };
 
-#include "imap/imapTypes.h"
+#include "imaplib/imapTypes.h"
 #include "imap/iac.h"
 
 #define NUM_IAC_QUEUE_ENTRIES		256
 #define _DIMAIN_INPUT_BUFFERSIZE	256
 #define NUM_SLIDERS_PER_JOYSTICK	2
 
-LOGICAL dimainInit(void);
-void dimainKill(void);
+LOGICAL dimainInit();
+LOGICAL dimainInitJoysticks();
+void dimainInitTrackIR();
+void dimainKill();
+void dimainKillJoysticks();
 LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);
 
 UINT32 dimainVKToIAC(UINT32 uVK);

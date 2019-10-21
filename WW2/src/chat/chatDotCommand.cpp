@@ -11,8 +11,6 @@
 
 #include <stdexcept>
 
-#include "versionNo.h"
-
 #include "chat/chatDB.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatDotCommandIndex.h"
@@ -23,14 +21,14 @@
 #include "chat/chatTimeInterval.h"
 #include "include/mydbQuery.h"
 #include "teul/teulTime.h"
-#include "wwii/wwiiThreads.h"
+#include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "teul/teulPacket.h"	// For the all-commands list.
 #include "chat/chatDotCommandList.h"
 #include "chat/chatHostPlayerIndex.h"
 #include "chat/chatLStringErr.h"
 
-extern DBHANDLE& chatdbGetDBH();
+using Chat::ARGV;
 
 static Teul::Packet* g_commandListPacket = nullptr;
 
@@ -78,7 +76,7 @@ Chat::LStringErr::LStringErr(const char* err, const char* arg)
 // Constructor
 
 DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDescription
-						, const ChatHandle& mask, LSTRING_ID usage, LSTRING_ID detail
+						, const PermissionMask mask, LSTRING_ID usage, LSTRING_ID detail
 						, bool playnetOnly)
 	: m_command(newCommand)
 	, m_description(dotDescription)
@@ -192,9 +190,16 @@ DotCommand::setAvailability(char level)
 	break;
 
 	default:
-		dbugLog(_FLA, "%s has unrecognized availability level %c", command(), level);
+#ifdef DEBUG
+		LogAbort("'%s' command has unrecognized availability level %c", command(), level);
+#else
+		dbugLog(_FLA, "'%s' command has unrecognized availability level %c", command(), level);
+		// If we somehow deployed with an invalid command, at least mark it as Playnet-only
+		// to limit its potential use as much as possible.
 		m_public = false;
 		m_playnetOnly = true;
+		break;
+#endif
 	}
 }
 
@@ -225,14 +230,20 @@ DotCommand::allow(Player& player) const
 {
 	// Some dot commands* require* you to be playnet
 	if ( m_playnetOnly && !player.isPlaynet() )
+	{
+		dbugLog(_FLD, "Command requires playnet status");
 		return nullptr;
+	}
 
 	// Are group permissions required?
 	if ( !player.isManager() && !m_public )
 	{
 		// Command is not in any groups, ergo not available
 		if ( m_groups.empty() )
+		{
+			dbugLog(_FLD, "Non-public command cannot be run by non-manager player");
 			return nullptr;
+		}
 
 		// Request the most recent group set; groups will load
 		// in the player's permissions if they're not already loaded.
@@ -240,7 +251,10 @@ DotCommand::allow(Player& player) const
 
 		// Client is not in any groups, don't bother checking
 		if ( clGroups.empty() )
+		{
+			dbugLog(_FLD, "Command not available, player not in any groups");
 			return nullptr;
+		}
 
 		// See if the player is in at least one of the required groups
 		CHAT_GROUPS::iterator clgIt, clgEnd = clGroups.end();
@@ -253,14 +267,23 @@ DotCommand::allow(Player& player) const
 		}
 
 		if ( !isIn )
+		{
+			dbugLog(_FLD, "Player is not in any of the required groups for Command:");
+			for (auto cmdIt = m_groups.begin(), end = m_groups.end(); isIn == false && cmdIt != end; ++cmdIt)
+			{
+				dbugLog(_FLD, "   %d", *cmdIt);
+			}
 			return nullptr;
+		}
 	}
 
 	for ( UINT32 i = 0; i < m_usages.size(); i++ )
 	{
 		if ( m_usages[i]->mask == NO_MASK || player.permissions(m_usages[i]->mask) )
-			return m_usages[i];
+			return m_usages[i].get();
 	}
+
+	dbugLog(_FLD, "Player with permissions %" PRPermMaskT " does not have permission to access command", player.m_permissionMask);
 
 	return nullptr;
 }
@@ -387,7 +410,7 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 void
 DotCommandIndex::add(DotCommand* dotCommand)
 {
-	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
+	dbugLog(_FLD, "Registering dotCommand: %s", dotCommand->command());
 
 	if ( lookup(dotCommand->m_command, TRUE) != nullptr )
 		throw std::domain_error("Duplicate dot command");
@@ -398,9 +421,9 @@ DotCommandIndex::add(DotCommand* dotCommand)
 		++it;
 	insert(it, dotCommand);
 
-	// Now add to the database incase it's not already there
+	// Now add to the database in case it's not already there
 	std::string desc = dotCommand->description();
-	wwiiEscapeString(desc);
+	DBThread::EscapeString(desc);
 
 	DBThread::Do(DBThread::Default
 				, "INSERT IGNORE INTO chat_commands"
@@ -509,7 +532,7 @@ DotCommandIndex::readPermissions()
 	dbugLog(_FLI, "Reading new permissions");
 	try
 	{
-		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc");
+		DBQuery dbq(dbh, "SELECT cc.command, cc.availability FROM chat_commands cc");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();
@@ -521,7 +544,7 @@ DotCommandIndex::readPermissions()
 			DotCommand* dc = const_cast<DotCommand*> (lookup(row[0], true));
 			if ( dc == nullptr )
 			{
-				betaLog(_FLW, "chat_command %s not recognized", row[0]);
+				dbugLog(_FLW, "chat_command %s not recognized", row[0]);
 				continue;
 			}
 			dc->setAvailability(row[1][0]);
@@ -538,11 +561,11 @@ DotCommandIndex::readPermissions()
 		UINT32 lastCmd = 0;
 		DotCommand* dc = nullptr;
 
-		DBQuery dbq(chatdbGetDBH()
-						, "SELECT cc.cmd_oid, cc.command, cgc.group_oid"
-		  					" FROM	chat_commands cc, chat_group_cmds cgc"
-		 					" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
-							" ORDER BY cc.cmd_oid");
+		DBQuery dbq(dbh,
+					"SELECT cc.cmd_oid, cc.command, cgc.group_oid"
+						" FROM	chat_commands cc, chat_group_cmds cgc"
+						" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
+						" ORDER BY cc.cmd_oid");
 		while ( dbq.FetchRow() )
 		{
 			DBRow& row = dbq.Row();
@@ -583,8 +606,7 @@ DotCommandIndex::readPermissions()
 void
 DotCommandIndex::buildCommandListPacket()
 {
-	if ( g_commandListPacket )
-		delete g_commandListPacket;
+	delete g_commandListPacket;
 
 	g_commandListPacket = new Teul::Packet(Teul::PacketId(CHAT_X, Chat::CMD_LIST_Y));
 	g_commandListPacket->setUnencrypted();
@@ -705,7 +727,6 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 			interval = 0;
 			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString);
 			return false;
-		break;
 	};
 
 	return true;

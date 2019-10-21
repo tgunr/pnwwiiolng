@@ -188,17 +188,11 @@
     <Filter Include="ez">
       <UniqueIdentifier>{b7c6d220-78bc-49b4-b25a-3bbd0a2b919a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="omg">
-      <UniqueIdentifier>{924ef35e-ec8e-4a1c-98a3-63a090201b44}</UniqueIdentifier>
+    <Filter Include="auth">
+      <UniqueIdentifier>{e23d7e80-2e2b-4cd4-82a7-841bbda438a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="omg\.OMG Files">
-      <UniqueIdentifier>{7e0fd77b-6ef4-4915-bf41-461e8753d630}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="omg\Generated Headers">
-      <UniqueIdentifier>{36e73825-89d4-4cbb-a34c-b19fae5fc7f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="omg\Generated Source">
-      <UniqueIdentifier>{828d491a-a561-466c-b3c3-f0306ba21c09}</UniqueIdentifier>
+    <Filter Include="imaplib">
+      <UniqueIdentifier>{64e477d6-5b2b-485e-aabb-3927a03f46b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +200,6 @@
       <Filter>cfg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\cfg\cfgData.h">
-      <Filter>cfg</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\cfg\cfgLoad.h">
       <Filter>cfg</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\cfg\cfgLua.h">
@@ -398,9 +389,6 @@
       <Filter>draw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\draw\drawIcon.h">
-      <Filter>draw</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\draw\sneaky.h">
       <Filter>draw</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\draw\TextureFont.h">
@@ -1093,12 +1081,6 @@
     <ClInclude Include="..\..\src\strt\strtWOR.h">
       <Filter>strt</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\sys\callstack.h">
-      <Filter>sys</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\sys\crashhandler.h">
-      <Filter>sys</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\sys\syscfg.h">
       <Filter>sys</Filter>
     </ClInclude>
@@ -1420,9 +1402,6 @@
     <ClInclude Include="..\..\src\wwii\wwiiSquads.h">
       <Filter>wwii</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\wwii\wwiiString.h">
-      <Filter>wwii</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\wwii\wwiiTypes.h">
       <Filter>wwii</Filter>
     </ClInclude>
@@ -1586,8 +1565,7 @@
     <ClInclude Include="..\..\src\ogl\GLCounter.h">
       <Filter>ogl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\client_revision.h" />
-    <ClInclude Include="..\..\src\dbug\dbugExtErrors.h">
+    <ClInclude Include="..\..\src\teul\teulExtErrors.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\maptools\GenerateIcons.h">
@@ -1626,30 +1604,70 @@
     <ClInclude Include="..\..\src\include\precompile_includes.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\imap\imapTypes.h">
-      <Filter>imap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\src\math\Rand.h">
-      <Filter>math</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\math\SuperFastHash.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx">
-      <Filter>omg\Generated Headers</Filter>
+    <ClInclude Include="..\..\src\chat\omgMissionSortieData.h">
+      <Filter>chat</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\include\io_mapped_file.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\omg\omgChat.hxx">
-      <Filter>omg\Generated Headers</Filter>
+    <ClInclude Include="..\..\src\chat\omgChat.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\include\unique_opaque_ptr.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiPPOLoader.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiBackChannel.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\auth\authSteam.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\auth\authPack.h">
+      <Filter>auth</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsAuthHandler.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysSteam.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysAntihack.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiAntihack.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiThemes.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionJoinRequest.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\cfml.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imap.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imapInternals.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imaplib\imapTypes.h">
+      <Filter>imaplib</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fio\fiostructure.h">
+      <Filter>fio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
-      <Filter>cfg</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\cfg\cfgLoad.cpp">
       <Filter>cfg</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\cfg\cfgLua.cpp">
@@ -1752,9 +1770,6 @@
       <Filter>draw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\draw\FTFontReplacement.cpp">
-      <Filter>draw</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\draw\sneaky.cpp">
       <Filter>draw</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\draw\TextureFont.cpp">
@@ -2294,12 +2309,6 @@
     <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp">
       <Filter>strt</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\sys\callstack.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\sys\crashhandler.cpp">
-      <Filter>sys</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp">
       <Filter>sys</Filter>
     </ClCompile>
@@ -2519,9 +2528,6 @@
     <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\wwii\wwiiString.cpp">
-      <Filter>wwii</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiSyncVar.cpp">
       <Filter>wwii</Filter>
     </ClCompile>
@@ -2672,20 +2678,56 @@
     <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
       <Filter>fio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\math\Rand.cpp">
-      <Filter>math</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx">
-      <Filter>omg\Generated Source</Filter>
+    <ClCompile Include="..\..\src\chat\omgMissionSortieData.cpp">
+      <Filter>chat</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\omg\omgChat.cxx">
-      <Filter>omg\Generated Source</Filter>
+    <ClCompile Include="..\..\src\chat\omgChat.cpp">
+      <Filter>chat</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\ob\obinfo.cpp">
       <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiPPOLoader.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiBackChannel.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\GenerateHostTerrain.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authSteam.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnections.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\auth\authPack.cpp">
+      <Filter>auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsAuthHandler.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysSteam.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysAntihack.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imaplib\cfml.cpp">
+      <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imaplib\imap.cpp">
+      <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imaplib\imapKeymap.cpp">
+      <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fiostructure.cpp">
+      <Filter>fio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2701,13 +2743,5 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WW2.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
-      <Filter>omg\.OMG Files</Filter>
-    </OMGGen>
-    <OMGGen Include="..\..\src\omg\omgChat.omg">
-      <Filter>omg\.OMG Files</Filter>
-    </OMGGen>
   </ItemGroup>
 </Project>

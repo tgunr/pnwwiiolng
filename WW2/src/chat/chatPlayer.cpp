@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "mem/mem.h"
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatData.h"
@@ -46,13 +44,13 @@
 #include "server/serverInterface.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverServerInfo.h"
+#include "str/stringLib.h"
 #include "strt/strtChatTypes.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTypeEnums.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
@@ -63,12 +61,10 @@
 
 static HANDLES _spawning;
 
-extern DBHANDLE& chatdbGetDBH();
-
-typedef std::unordered_map< UINT32, std::set<UINT32> > RECRUITS;
+using RECRUITS = std::unordered_map<UINT32, std::set<UINT32>>;
 static RECRUITS _recruits;
 
-typedef std::unordered_set< UINT32 > PLAYERIDS;
+using PLAYERIDS = std::unordered_set<UINT32>;
 static PLAYERIDS _logins;
 #ifdef RECORD_LOGOUTS
 static PLAYERIDS _logouts;
@@ -83,21 +79,9 @@ struct AWS_READING
 	UINT16	allied;
 	UINT16	axis;
 };
-typedef std::map<UINT32, AWS_READING> AWS_GRID;
-typedef std::map<instanceid_t, AWS_GRID> AWS_INSTANCES;
+using AWS_GRID = std::map<UINT32, AWS_READING>;
+using AWS_INSTANCES = std::map<instanceid_t, AWS_GRID>;
 AWS_INSTANCES g_awsGrids, g_awsSnapshots;
-
-// Decal saving
-static const char* const _DECAL_UPDATE_PREFIX = "INSERT INTO `player`.`players` (id,player_decal)VALUES";
-static const char* const _DECAL_UPDATE_SUFFIX = "ON DUPLICATE KEY UPDATE player_decal=values(player_decal)";
-ThreadTextQuery _decalUpdates(DBThread::Default, _DECAL_UPDATE_PREFIX, _DECAL_UPDATE_SUFFIX);
-
-bool
-Chat::CommitDecalUpdates()
-{
-	_decalUpdates.commit(1000);
-	return true;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Internal, private functionality
@@ -110,7 +94,7 @@ public:
 		, m_featureLocks()
 		, m_groups()
 		, m_recruiter(0)
-		, m_lastPing(0)
+		, m_latestPing(0)
 		, m_awsSide(WWII_NO_SIDE)
 		, m_awsX(0), m_awsY(0)
 		, m_timers()
@@ -138,7 +122,7 @@ public:
 	UINT32			m_recruiter;
 
 	// Last ping from the cell host
-	UINT32			m_lastPing;
+	UINT32			m_latestPing;
 
 	// AWS Data
 	WWII_SIDE		m_awsSide;
@@ -238,7 +222,17 @@ Player::_setChannel(UCHAR index, CHANNEL_TYPE type, Chat::Channel* toChannel, bo
 // Constructor
 
 Player::Player(UINT32 withPlayerid, bool playerIsManager)
-	: wwiiPlayer()
+	: wwiiPlayer(), m_takenBy(0), m_grabbing(0), m_joinedMission(0), m_playerMask(0), m_lastSquadInfo_ms(0), m_lastAWSRequest(0),
+      m_lastX(0), m_lastY(0), m_lastZ(0), m_originCpID{{0,0},0,0,0}, m_objectiveCpID{{0,0},0,0,0}, m_uiTarget{{0,0},0,0,0},
+      m_chatPermissions(nullptr), m_loginTime(0), m_messagesSent(0), m_shortestMessage(0), m_longestMessage(0), m_bytesSent(0),
+      m_lastMessageID(0), m_prevSide(WWII_NO_SIDE), m_goneAFK(0),m_lastAfkNoticeFrom(0), m_lastGroupRead(0), m_joinedSquad(0),
+      m_cellHost(0), m_gridX(0), m_gridY(0), m_channels{}, m_friends(), m_ignores(), m_weapon(), m_impl(nullptr), m_squadInvite(nullptr),
+      m_lastCP(nullptr), m_insideFacility(nullptr), m_snoopBy(nullptr), m_snoopOn(nullptr), m_crsSnoopBy(nullptr), m_crsSnoopOn(nullptr),
+      func_hashes(), tampered_funcs(), m_tunes(nullptr), m_capping(nullptr), m_capProgress(0), m_state(nullptr), m_leadingBrigade(0),
+      m_initialized(false), m_hqOff(false), m_hcOff(false), m_trOff(false), m_gmHide(false), m_gmNote(false), m_active(false),
+      m_inFacility(false), m_feReady(false), m_rxAllHQ(false), m_grabbed(false), m_isSpawned(false), m_onCommandList(false),
+      m_noWho(false), m_noEnemyChat(false), m_invalidData(false), m_haveChannels(false), m_announcedToSquad(false),
+      m_isBuzzard(false), m_afkMessage{0}
 {
 	dbugLog(_FLI, "p:%u creating %s player %p", withPlayerid, (playerIsManager ? "management" : "standard"), this);
 	_construct(withPlayerid);
@@ -248,7 +242,17 @@ Player::Player(UINT32 withPlayerid, bool playerIsManager)
 // Construct from baseline data
 
 Player::Player(const PlayerStatusNode* psn, const Chat::PlayerInfo* playerInfo)
-	: wwiiPlayer()
+	: wwiiPlayer(), m_takenBy(0), m_grabbing(0), m_joinedMission(0), m_playerMask(0), m_lastSquadInfo_ms(0), m_lastAWSRequest(0),
+      m_lastX(0), m_lastY(0), m_lastZ(0), m_originCpID{{0,0},0,0,0}, m_objectiveCpID{{0,0},0,0,0}, m_uiTarget{{0,0},0,0,0},
+      m_chatPermissions(nullptr), m_loginTime(0), m_messagesSent(0), m_shortestMessage(0), m_longestMessage(0), m_bytesSent(0),
+      m_lastMessageID(0), m_prevSide(WWII_NO_SIDE), m_goneAFK(0),m_lastAfkNoticeFrom(0), m_lastGroupRead(0), m_joinedSquad(0),
+      m_cellHost(0), m_gridX(0), m_gridY(0), m_channels{}, m_friends(), m_ignores(), m_weapon(), m_impl(nullptr), m_squadInvite(nullptr),
+      m_lastCP(nullptr), m_insideFacility(nullptr), m_snoopBy(nullptr), m_snoopOn(nullptr), m_crsSnoopBy(nullptr), m_crsSnoopOn(nullptr),
+      func_hashes(), tampered_funcs(), m_tunes(nullptr), m_capping(nullptr), m_capProgress(0), m_state(nullptr), m_leadingBrigade(0),
+      m_initialized(false), m_hqOff(false), m_hcOff(false), m_trOff(false), m_gmHide(false), m_gmNote(false), m_active(false),
+      m_inFacility(false), m_feReady(false), m_rxAllHQ(false), m_grabbed(false), m_isSpawned(false), m_onCommandList(false),
+      m_noWho(false), m_noEnemyChat(false), m_invalidData(false), m_haveChannels(false), m_announcedToSquad(false),
+      m_isBuzzard(false), m_afkMessage{0}
 {
 	if ( psn == nullptr )
 		throw std::domain_error("Tried to create Client with NULL player");
@@ -326,8 +330,7 @@ Player::~Player()
 		m_tunes = nullptr;
 	}
 
-	if ( m_impl )
-		delete m_impl;
+	delete m_impl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -545,11 +548,11 @@ Player::addToCommandList()
 
 	if ( !isActiveOfficer() && !isEffectiveGM() )
 	{
-		betaLog(_FLI, "%s[%d] lacks permissions for command list", callsign(), playerID());
+		dbugLog(_FLI, "%s[%d] lacks permissions for command list", callsign(), playerID());
 		return;
 	}
 
-	betaLog(_FLI, "%s[%d] adding to command list", callsign(), playerID());
+	dbugLog(_FLI, "%s[%d] adding to command list", callsign(), playerID());
 
 	commandList.insert(this);
 	m_onCommandList = true;
@@ -622,7 +625,7 @@ Player::contextualStratCommand(const char* string, const char* arguments, WWII_C
 
 	OOBMessage outgoing(playerID(), brigadeID(), chatHandle(), string, arguments, property->m_fid, withSide, withCountry);
 
-	betaLog(_FLI, "t:%d p:%u c:%s contextual oob: %s [at %s]", teulIndex(), playerID(), callsign(), outgoing.m_text, property->Name());
+	dbugLog(_FLI, "t:%d p:%u c:%s contextual oob: %s [at %s]", teulIndex(), playerID(), callsign(), outgoing.m_text, property->Name());
 
 	outgoing.send();
 
@@ -680,17 +683,14 @@ extern const char* const channelTypeName[];
 void
 Player::detuneAllRadios()
 {
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
+    dbugLog(_FLD, "t:%d p:%u c:%s DETUNE", teulIndex(), playerID(), callsign());
 
-		for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
-		{
-			auto& cnode = this->getChannelSub(i);
-			dbugLog(_FLDB, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
-							, i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
-		}
-	}
+    for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
+    {
+        auto& cnode = this->getChannelSub(i);
+        dbugLog(_FLD, " radio%u:{chan:%p, type:%u[%s], subs:%" PRSizeT "}"
+            , i, cnode.channel(), cnode.type(), channelTypeName[cnode.type()], (cnode.channel() ? cnode.channel()->numSubscribers() : 0));
+    }
 
 	for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
 		detuneRadio(i);
@@ -947,6 +947,9 @@ Player::isVisibleTo(const Player* viewer, bool ignoreSide) const
 	// GMs can always send to everyone
 	if ( viewer->isGM() )
 		return true;
+	// Training chat can be turned OFF.
+	if (m_trOff)
+		return false;
 	// Non-GMs get "unreachable" when a GM is in GM hide mode
 	if ( isGM() )
 		return ( !m_gmHide );
@@ -972,7 +975,7 @@ Player::lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, boo
 			return "";
 		return " (not spawned yet)";
 	}
-	if ( isSpawned() && (x == INVALID_GRID_COORD || y == INVALID_GRID_COORD) )
+	if ( isSpawned() && (x >= INVALID_GRID_COORD || y >= INVALID_GRID_COORD) )
 	{
 		return " (spawning)";
 	}
@@ -1038,7 +1041,7 @@ Player::objectiveCP() const
 	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
-#include <unordered_map>
+#include "wwii/wwiiHash.h"
 static std::unordered_map<playerid_t, std::vector<UINT32>> playerGroups;
 static std::mutex playerGroupsMutex;
 
@@ -1074,7 +1077,7 @@ public:
 	PlayerGroupQuery(const playerid_t _playerID)
 		: DBThreadQuery(DBThread::Default, "PlayerGroupQuery", DBThreadQuery::_IMMEDIATE
 							, "SELECT v.group_oid"
-								" FROM auth.v_player_active_groups v"
+								" FROM `auth`.`v_player_active_groups` v"
 								" WHERE v.playerid = %u AND v.arenaid = %u"
 									, _playerID
 									, Server::myServerInfo.stats.arenaID
@@ -1100,7 +1103,7 @@ protected:
 
 	virtual void Failure() override
 	{
-		threadLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
+		dbugLog(_FLA, "p:%u unable to read player groups from database", m_playerID);
 	}
 };
 
@@ -1219,7 +1222,7 @@ Player::removeFromCommandList()
 	if ( !m_onCommandList )
 		return;
 
-	betaLog(_FLI, "%s[%d] removing from command list", callsign(), playerID());
+	dbugLog(_FLI, "%s[%d] removing from command list", callsign(), playerID());
 
 	commandList.erase(this);
 	m_onCommandList = false;
@@ -1416,7 +1419,7 @@ Player::SetMission(UINT32 toMissionID)
 // Set when to send the next reminder not to spam the help channel
 
 void
-Player::SetTimer(const char* timer, const TeulTimeMS& time)
+Player::SetTimer(const char* timer, const TeulTimeMS time)
 {
 	m_impl->m_timers[timer] = time;
 }
@@ -1458,9 +1461,22 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 	switch ( prefId )
 	{
 	case CPR_UPDATE_MODE:
-		dbugLog(_FLD, "t:%d p:%u c:%s updateMode:%u req:%u"
-						, teulIndex(), playerID(), callsign()
-						, value, request);
+	{
+		if (fromClient)
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s updateMode from Client:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			chatSendBandwidthNotice(*this, (UINT32)value);
+		}
+		else
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s updateMode response from cell host:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			SetUpdateMode(value);
+		}
+	}
 	break;
 	case CPR_IS_RECRUITING:
 		if ( squadID() )
@@ -1473,11 +1489,31 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 		if ( value > 0 )
 		{
 			log(_FLI, "setting decal to %u", value);
-			char buffer[65];
-			strprintf(buffer, "(%u,%u)", playerID(), value);
-			_decalUpdates.addEntry(buffer);
+			DBThread::Do(DBThread::Default,
+					"UPDATE `wwiionline`.`wwii_player`"
+						" SET player_decal=%u"
+						" WHERE playerid=%u",
+							value, playerID());
 			chatSendMapPersonaUpdate(playerID(), false, 0, 0, true, value);
 		}
+	break;
+	case CPR_SET_NETCODE:
+	{
+		if (fromClient)
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s netcode from Client:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+			SetNetcode(value);
+			chatSendNetcodeNotice(*this, (UINT32)value);
+		}
+		else
+		{
+			dbugLog(_FLD, "t:%d p:%u c:%s netcode response from cell host:%u req:%u"
+				, teulIndex(), playerID(), callsign()
+				, value, request);
+		}
+	}
 	break;
 	default:
 	break;
@@ -1556,11 +1592,18 @@ Player::SetSpawned(bool newValue)
 
 		// If they have a non-zero update mode, then update their vis mode
 		chatSendBandwidthNotice(*this, getPreference(CPR_UPDATE_MODE));
+		chatSendNetcodeNotice(*this, getPreference(CPR_SET_NETCODE));
 
 		if ( m_snoopBy != nullptr )
-			chatDispatchGMMessage("SNOOP", chatMakeTempString("Snooped player %s is spawning", callsign()));
+		{
+			PREP_CHAT_MSG(cmsg, "Snooped player %s is spawning", callsign());
+			chatDispatchGMMessage("SNOOP", cmsg);
+		}
 		else if ( m_crsSnoopBy != nullptr )
-			chatDispatchCRSMessage("SNOOP", chatMakeTempString("CRSSnooped player %s is spawning", callsign()));
+		{
+			PREP_CHAT_MSG(cmsg, "CRSSnooped player %s is spawning", callsign());
+			chatDispatchCRSMessage("SNOOP", cmsg);
+		}
 	}
 	else
 	{
@@ -1578,7 +1621,7 @@ Player::SetSpawned(bool newValue)
 }
 
 void
-Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UINT32 joined)
+Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle handle, UINT32 joined)
 {
 	if ( m_squadID != toSquadID )
 		m_announcedToSquad = false;
@@ -1609,8 +1652,7 @@ Player::SetSquad(UINT32 toSquadID, RANK_NO newRank, const ChatHandle& handle, UI
 void
 Player::SetSquadInvite(SquadInvite* invite)
 {
-	if ( m_squadInvite )
-		delete m_squadInvite;
+	delete m_squadInvite;
 	m_squadInvite = invite;
 }
 
@@ -1619,11 +1661,24 @@ Player::SetSquadInvite(SquadInvite* invite)
 // not it is a buzzard
 
 void
-Player::SetWeapon(const WEAPON_SPEC& toWeapon)
+Player::SetWeapon(const WEAPON_SPEC toWeapon)
 {
+	dbugLog(_FLD, "Weapon was %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 	m_weapon = toWeapon;
+	dbugLog(_FLD, "Weapon is now %d.%d.%d.%d", m_weapon.wType, m_weapon.wClass, m_weapon.wCategory, m_weapon.wCountry);
 
 	m_isBuzzard = (m_weapon.wCategory == 4 && m_weapon.wClass == 9 && (m_weapon.wType == 4 || m_weapon.wType == 5));
+}
+
+void Player::GetWeaponStr(std::string &str) const
+{
+	str.append(std::to_string(m_weapon.wType));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wClass));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wCategory));
+	str.append(".");
+	str.append(std::to_string(m_weapon.wCountry));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1924,21 +1979,22 @@ _nameForCP(const Property* nearCP, const Property* lastCP)
 
 void
 Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
-						, bool cpChanged, const FULL_OBJ_ID& nearCP
+						, bool cpChanged, const FULL_OBJ_ID nearCP
 						, UINT32 ride
-						, const FULL_OBJ_ID& nowInFacility
+						, const FULL_OBJ_ID nowInFacility
 						, UINT32 lastPing
 						, bool isOnAWS
 						, bool inCapBldg
-						, const FULL_OBJ_ID& capFac
+						, const FULL_OBJ_ID capFac
 						, SINT32 progress
 						)
 {
-	if ( x == INVALID_GRID_COORD )
+	if ( x >= INVALID_GRID_COORD )
 		return;
 
 	// Feh. We send ourselves this when the player is hacking wwiiCovert
-	if ( x == 39 && y == 40 && z == 41 && nearCP.id == 42 )
+DISABLE_WARNING("-Wfloat-equal")
+    if ( x == 39 && y == 40 && z == 41 && nearCP.id == 42 )
 	{
 		///TODO:COVERT:
 		if ( !m_invalidData )
@@ -1961,7 +2017,7 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 		return;
 	}
 
-	m_impl->m_lastPing = lastPing;
+	m_impl->m_latestPing = lastPing;
 	bool capBldgChanged = false;
 	if ( (m_capping == nullptr && inCapBldg == true) || (m_capping != nullptr && inCapBldg == false) )
 	{
@@ -1970,6 +2026,7 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 	}
 	if ( isSpawned() && m_lastX == x && m_lastY == y && m_lastZ == z && cpChanged == false && isOnAWS == m_impl->onAWS() && capBldgChanged == false && progress == m_capProgress )
 		return;
+POP_WARNINGS()
 
 	Property* nearest = (cpChanged) ? chatFindProperty(nearCP) : m_lastCP;
 
@@ -2063,7 +2120,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 		}
 	}
 
-	if ( g_logDebug & g_debugPersonas )
+	if ( g_debugPersonas )
 	{
 		WEAPON_SPEC ws = m_weapon;
 		dbugLog(_FLD, "t:%d p:%u c:%s update c:%u, b:%u, br:%u, m:%u, or:" PRF_FULL_OBJ_ID ", ob:" PRF_FULL_OBJ_ID " spawned:%d weap:" PRF_WEAPON_SPEC ""
@@ -2082,7 +2139,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 
 	if ( newSide != m_prevSide )
 	{
-		betaLog(_FLI, "removing %p from %d side index", this, m_prevSide);
+		dbugLog(_FLI, "removing %p from %d side index", this, m_prevSide);
 		sidePlayers[m_prevSide].erase(this);
 	}
 
@@ -2097,7 +2154,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 
 		if ( newSide != side() )
 		{
-			betaLog(_FLI, "insert %p to %d side index", this, newSide);
+			dbugLog(_FLI, "insert %p to %d side index", this, newSide);
 			sidePlayers[newSide].insert(this);
 		}
 
@@ -2213,24 +2270,23 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 	{
 		case CPR_UPDATE_MODE:
 			return _validateUpdateMode(request);
-		break;
+		default:
+			return request;
 	}
-
-	return request;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Describe the whereabouts of a player
 
 void
-Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
+Player::whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const
 {
-	assert(into != nullptr);
+	char tmpbuf[MAX_MESSAGE_LENGTH+1];
 
 	if ( noSide() )
 	{
-		strcpy(into, "PersonaScrn");
-		strcat(into, lastPosition("last near", x, y, true));
+		into.append("PersonaScrn");
+		into.append(lastPosition("last near", x, y, true));
 		return;
 	}
 
@@ -2242,68 +2298,72 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 	// He's not in a facility, ergo at the map
 	if ( !missionID() )
 	{
-		snprintf(into, MAX_MESSAGE_LENGTH, "%s brigade scrn", affiliation);
-		strcat(into, lastPosition("last near", x, y, true));
+		strprintf(tmpbuf, "%s brigade scrn", affiliation);
+		into.append(tmpbuf);
+		into.append(lastPosition("last near", x, y, true));
 		return;
 	}
 
-	strcpy(into, affiliation);
-	strcat(into, " ");
+	into.append(affiliation);
+	into.append(" ");
 
 	HCUnit* unit = HCUnit::Lookup(brigadeID());
 	if ( unit != nullptr )
 	{
-		strcat(into, unit->name());
-		strcat(into, " ");
+		into.append(unit->name());
+		into.append(" ");
 	}
 
 	ChatMission* mission = chatFindMission(missionID());
 	if ( mission )
-		strcat(into, Chat::Name(mission->leader()).c_str());
+		into.append(Chat::Name(mission->leader()).c_str());
 	else
-		strcat(into, "unknown");
-	strcat(into, " mission " );
+		into.append("unknown");
+	into.append(" mission ");
 
 	// He's started the spawning process
 	UINT32 cellIP = getCellHost();
 	if ( cellIP == 0 )
 	{
-		strcat(into, originCP());
-		strcat(into, " mission room");
-		strcat(into, lastPosition("last posn. ", x, y, false));
+		into.append(originCP());
+		into.append(" mission room");
+		into.append(lastPosition("last posn. ", x, y, false));
 	}
 	else
 	{
-		strcat(into, chatMakeTempString("cell#%u", (cellIP & 0xff)));
+		into.append("cell#");
+		into.append(std::to_string((cellIP & 0xff)));
 		// He may not have finished spawning
 		if ( !isSpawned() )
 		{
-			strcat(into, " spawning ");
-			strcat(into, originCP());
+			into.append(" spawning ");
+			into.append(originCP());
 		}
 		else
 		{
 			if ( sortieID() == 0 )
-				strcat(into, "?missingsortieid?");
+				into.append("?missingsortieid?");
 			else
-				strcat(into, chatMakeTempString("sortie #%u", sortieID()));
+			{
+				into.append("sortie #");
+				into.append(std::to_string(sortieID()));
+			}
 
 			if ( isBuzzard() )
-				strcat(into, " buzzard");
-			strcat(into, lastPosition("near ", x, y, false));
+				into.append(" buzzard");
+			into.append(lastPosition("near ", x, y, false));
 			if ( lastCP() == nullptr || lastCP()->Matches(originCpID()) == false )
 			{
-				strcat(into, " origin: ");
-				strcat(into, originCP());
+				into.append(" origin: ");
+				into.append(originCP());
 			}
 		}
 	}
 
-	if ( isSpawned() && m_impl->m_lastPing > 0 )
+	if ( isSpawned() && m_impl->m_latestPing > 0 )
 	{
-		char ping[20];
-		strprintf(ping, " ping:%ums", m_impl->m_lastPing);
-		strcat(into, ping);
+		snprintf(tmpbuf, sizeof(tmpbuf), " ping:%ums", m_impl->m_latestPing);
+		into.append(tmpbuf);
 	}
 }
 
@@ -2337,7 +2397,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")
@@ -2390,18 +2450,15 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 		++populatedRows;
 	}
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
-						, player.teulIndex()
-						, player.playerID()
-						, player.callsign()
-						, (isAllied ? "allied" : "axis")
-						, static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
-						, (reply.m_hasData ? "yes" : "no")
-						, populatedRows, populatedCells
-						);
-	}
+    dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
+                    , player.teulIndex()
+                    , player.playerID()
+                    , player.callsign()
+                    , (isAllied ? "allied" : "axis")
+                    , static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
+                    , (reply.m_hasData ? "yes" : "no")
+                    , populatedRows, populatedCells
+                    );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2460,7 +2517,7 @@ Player::updateAWSPosition(bool onAWS)
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u update %f.%f => %hd/%hd"
+		dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u update %f.%f => %hd/%hd"
 						, teulIndex(), playerID(), callsign()
 						, instance().category(), instance().type(), instance().handle(), instance().id()
 						, side()
@@ -2514,7 +2571,7 @@ Player::removeFromAWS()
 		}
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu aws side %u extraction %f.%f => %d/%d"
+	dbugLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%" PR64BitUT ".%" PR64BitUT " aws side %u extraction %f.%f => %d/%d"
 					, teulIndex(), playerID(), callsign()
 					, instance().category(), instance().type(), instance().handle(), instance().id()
 					, m_impl->m_awsSide
@@ -2538,27 +2595,24 @@ chatUpdateAWSSnapshot()
 		return;
 	nextCheck = teulClock64 + (AWS::UPDATE_INTERVAL_S * 1000);
 
-	if ( g_logDebug )
-	{
-		const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
-		const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
-		UINT16 oldX = 0, oldY = 0;
-		UINT16 newX = 0, newY = 0;
-		if ( awsSnapshot.empty() == false )
-		{
-			oldX = awsSnapshot.begin()->first & 0xff;
-			oldY = awsSnapshot.begin()->first >> 16;
-		}
-		if ( awsGrid.empty() == false )
-		{
-			newX = awsGrid.begin()->first & 0xff;
-			newY = awsGrid.begin()->first >> 16;
-		}
-		dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
-						, awsSnapshot.size(), oldX, oldY
-						, awsGrid.size(), newX, newY
-						);
-	}
+    const AWS_GRID& awsSnapshot = g_awsSnapshots[Instance::_CAMPAIGN];
+    const AWS_GRID& awsGrid = g_awsGrids[Instance::_CAMPAIGN];
+    UINT16 oldX = 0, oldY = 0;
+    UINT16 newX = 0, newY = 0;
+    if ( awsSnapshot.empty() == false )
+    {
+        oldX = awsSnapshot.begin()->first & 0xff;
+        oldY = awsSnapshot.begin()->first >> 16;
+    }
+    if ( awsGrid.empty() == false )
+    {
+        newX = awsGrid.begin()->first & 0xff;
+        newY = awsGrid.begin()->first >> 16;
+    }
+    dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
+                    , awsSnapshot.size(), oldX, oldY
+                    , awsGrid.size(), newX, newY
+                    );
 
 	for (auto it = g_awsGrids.begin(), end = g_awsGrids.end(); it != end; ++it)
 	{
@@ -2629,7 +2683,7 @@ PlayerInterface::Lookup(UINT32 playerID)
 }
 
 Player*
-PlayerInterface::Lookup(const ChatHandle& handle)
+PlayerInterface::Lookup(const ChatHandle handle)
 {
 	PLAYER_INDEX::iterator it = playerIndex.find(chatGetLowercaseHandle(handle));
 	return ( it == playerIndex.end() ) ? nullptr : it->second;

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <math.h>
 
@@ -57,7 +57,7 @@ static UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 					   FLOAT64VECTOR const* pPos,
 					   piVECTOR const* pNormal,
-					   LOGICAL bIsWater);
+					   bool bIsWater);
 static UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration);
 
 static UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR* pos);
@@ -69,26 +69,17 @@ static UINT32 _CreateDebris(weapAmmo const* pAmmo,
 							void* pVehicle,
 							SINT32 iPenetration);
 static SINT32 _Attach3DBombSound(weapAmmo* pAmmo);
-#if(0)
-static bool _Attach3DBulletSound(weapAmmo* pAmmo);
-#endif
 static bool _InitObjectParams(OBJECT* o, piVECTOR& dir, float scale, FLOAT64VECTOR& pos);
 
 static OBJECT* _GetFreeFlash();
 static OBJECT* _GetFreeDebris();
 
-#if(0)
-static void _DebrisKillCallback(void* pData);
-static void _FlashKillCallback(void* pData);
-static LOGICAL _OkForDebris(weapAmmo const* pAmmo, void* pVehicle);
-#endif
 static void ReleaseFlash(OBJECT* o);
 
-static LOGICAL _IsWater(OBJECT* lpObj);
-static LOGICAL _InitFlashObjs();
-static LOGICAL _InitDebrisObjs();
+static bool _IsWater(const OBJECT* lpObj);
+static bool _InitFlashObjs();
 
-static FLOAT32 PiOver180 = 0.0f;
+constexpr FLOAT32 PiOver180 = PI / 180.0f;
 
 static OBJECT* _debris[MAX_DEBRIS_HITS];
 static std::deque<OBJECT*> _freedebris;
@@ -152,44 +143,24 @@ void DoHitSound(FLOAT64VECTOR* Pos, FLOAT32 Energy,	const char* TextureName)
 }
 
 /************************************************************************************************
-	weapfxInit
+_InitDebrisObjs
 *************************************************************************************************/
-LOGICAL weapfxInit()
-{
- logTimerBeginMacro();
-
-	PiOver180 = PI / 180.0f;
-
-	if(!_InitDebrisObjs())
-		return FALSE;
-
-	if(!_InitFlashObjs())
-		return FALSE;
-
- logTimerEndMacro();
-
-	return TRUE;
-}
-
-/************************************************************************************************
-	_InitDebrisObjs
-*************************************************************************************************/
-LOGICAL _InitDebrisObjs()
+static bool _InitDebrisObjs()
 {
 	SINT32 i;
 
 	OBJECT* o;
 
-	for(i = 0; i < MAX_DEBRIS_HITS; i++)
+	for (i = 0; i < MAX_DEBRIS_HITS; i++)
 	{
-		if(!obmgrCreateModelInstance("debris2"))
-			return FALSE;
+		if (!obmgrCreateModelInstance("debris2"))
+			return false;
 
 		o = obmainFindNamedObject("debris2");
 
-		if(!o)
+		if (!o)
 		{
-			return FALSE;
+			return false;
 		}
 
 		// Draw double sided (if flat polygon)
@@ -202,6 +173,24 @@ LOGICAL _InitDebrisObjs()
 
 		_freedebris.push_back(o->child);
 	}
+
+	return true;
+}
+
+/************************************************************************************************
+	weapfxInit
+*************************************************************************************************/
+LOGICAL weapfxInit()
+{
+ logTimerBeginMacro();
+
+	if(!_InitDebrisObjs())
+		return FALSE;
+
+	if(!_InitFlashObjs())
+		return FALSE;
+
+ logTimerEndMacro();
 
 	return TRUE;
 }
@@ -236,18 +225,16 @@ struct AddBlendFunc
 	}
 };
 
-LOGICAL _InitFlashObjs()
+bool _InitFlashObjs()
 {
 	static bool first = true;
-
-	OBJECT* o;
 
 	for(int i = 0; i < MAX_MUZZLE_FLASH; i++)
 	{
 		if(!obmgrCreateModelInstance("muzzleflash"))
-			return FALSE;
+			return false;
 
-		o = obmainFindNamedObject("muzzleflash");
+		OBJECT* o = obmainFindNamedObject("muzzleflash");
 
 		if(first)
 		{
@@ -261,29 +248,27 @@ LOGICAL _InitFlashObjs()
 
 		if(!_muzzelflash[i])
 		{
-			return FALSE;
+			return false;
 		}
 
 		obmainSetFlagsInThisTree(o, OBJECT_ZWRITEOFF);
 		ReleaseFlash(o->child);
 	}
 
-	return TRUE;
+	return true;
 }
 #else
 /************************************************************************************************
 	_InitFlashObjs
 *************************************************************************************************/
-LOGICAL _InitFlashObjs()
+bool _InitFlashObjs()
 {
-	OBJECT* o;
-
 	for(int i = 0; i < MAX_MUZZLE_FLASH; i++)
 	{
 		if(!obmgrCreateModelInstance("muzzleflash"))
-			return FALSE;
+			return false;
 
-		o = obmainFindNamedObject("muzzleflash");
+		OBJECT* o = obmainFindNamedObject("muzzleflash");
 
 		_muzzelflash[i] = o;
 
@@ -296,7 +281,7 @@ LOGICAL _InitFlashObjs()
 		ReleaseFlash(o->child);
 	}
 
-	return TRUE;
+	return true;
 }
 #endif
 
@@ -854,23 +839,6 @@ void weapfxGetObjectPosition(FASTCOLLIDE const* pFast, FLOAT64VECTOR* pPos)
 }
 
 /************************************************************************************************
-	_DebrisKillCallback
-*************************************************************************************************/
-void _DebrisKillCallback(void* data)
-{
-	OBJECT* o = (OBJECT*)data;
-
-	if(o == nullptr)
-	{
-		return;
-	}
-
-	fxUtlSetMatrixInTree(o, &IdentityMatrix);
-
-	_freedebris.push_back(o);
-}
-
-/************************************************************************************************
 	weapfxFlashKillCallback
 *************************************************************************************************/
 void weapfxFlashKillCallback(void* data)
@@ -1048,8 +1016,10 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 	piVECTOR DeltaVec;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
-	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX) return 0;
-	if(Ammo->AmmoType->IsSmokeGrenade) return 0;
+	if(Ammo->Flags & WEAP_AMMOFLAG_NOFX)
+		return 0;
+	if(Ammo->AmmoType->HasSmoke == 1) // HACK: 1 is for smoke-only rounds
+		return 0;
 
 	mathSubVectors(&DeltaVec, NewPos, OldPos);
 	mathReallyFastNormalize(DeltaVec);
@@ -1087,9 +1057,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 						DoHitSound(&Pos,(FLOAT32)KE,"fps");
 					}
 
-#if IS_CHINA // Ticket # 5888
 					if(WantBloodEffects)
-#endif
 					{
 						Vec3f n;
 
@@ -1403,7 +1371,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 		}
 		else
 		{
-			weapfxExplosion(Ammo, Pos, nullptr, FALSE);
+			weapfxExplosion(Ammo, Pos, nullptr, false);
 		}
 	}
 	// Special case with satchels
@@ -1414,7 +1382,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 	// Air burst
 	else
 	{
-		weapfxExplosion(Ammo, Pos, nullptr, FALSE);
+		weapfxExplosion(Ammo, Pos, nullptr, false);
 	}
 
 	physicsAddWorldForce(*Pos, (FLOAT64)Ammo->AmmoType->ExplosiveEnergy);
@@ -1554,163 +1522,140 @@ UINT32 weapfxAmmoTracer(weapAmmo* Ammo, FLOAT64VECTOR const* LastPosition)
 
 UINT32 weapfxAmmoFlyby(weapAmmo* Ammo)
 {
-	FLOAT64VECTOR Pos;
-	piVECTOR Pos1,Pos2;
-	piVECTOR Vec1,Vec2;
-	FLOAT32 D1,D2;
-	FLOAT32 TempNum;
-	piVECTOR p;
-	FLOAT64 SpeedOfSound;
+	FLOAT64VECTOR distanceToRound ;
+	FLOAT64VECTOR distanceToRoundStart ;
+	FLOAT64VECTOR roundPosition ;
+	FLOAT64VECTOR roundStartPosition ;
+	FLOAT64VECTOR playerPosition ;
+	FLOAT64       absoluteDistanceToRound;
+	bool          comingTowardsMe = false;
+	FLOAT64       speedOfSound;
 
-	// Don't want this for bombs
-	if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
+	if (!Ammo->flybySoundPlayed)
 	{
-		return 0;
-	}
 
-	if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO)
-	{
-		return 0;
-	}
-
-	if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_MORTAR)
-	{
-		return 0;
-	}
-#if(0)
-	if(!_Attach3DBulletSound(Ammo) == 0)
-	{
-		return 0;
-	}
-#endif
-	if(Ammo->AmmoType->Diameter <= 0.03f)
-		return 0;
-
-	p.x = -playpos.x;
-	p.y = -playpos.y;
-	p.z = -playpos.z;
-
-	Pos1.x = (FLOAT32)(Ammo->LastCollidePos.x - WorldOriginOffset.x);
-	Pos1.y = (FLOAT32)(Ammo->LastCollidePos.y - WorldOriginOffset.y);
-	Pos1.z = (FLOAT32)(Ammo->LastCollidePos.z - WorldOriginOffset.z);
-
-	Pos2.x = (FLOAT32)(Ammo->Position.x - WorldOriginOffset.x);
-	Pos2.y = (FLOAT32)(Ammo->Position.y - WorldOriginOffset.y);
-	Pos2.z = (FLOAT32)(Ammo->Position.z - WorldOriginOffset.z);
-
-	// determine if we even hear the sound
-	mathSubVectors(&Vec1,&Pos2,&Pos1);
-	mathSubVectors(&Vec2,&p,&Pos1);
-	D1 = mathVectDotProduct(&Vec1,&Vec2);
-	if (D1 < 0.0f)
-	{
-		return 0;
-	}
-	mathSubVectors(&Vec1,&Pos1,&Pos2);
-	mathSubVectors(&Vec2,&p,&Pos2);
-	D2 = mathVectDotProduct(&Vec1,&Vec2);
-	if (D2 < 0.0f)
-	{
-		return 0;
-	}
-
-	D1 = (FLOAT32)math3dFastSqrt(D1);
-	D2 = (FLOAT32)math3dFastSqrt(D2);
-
-	if (D2 + D1 < 0.001)
-	{
-		return 0;
-	}
-	// ok we're going to generate the sound
-	// calculate the position in the world
-	TempNum = D1 / (D1 + D2); // time, 0.0 = 1st pos, 1.0 = 2nd
-	mathSubVectors(&Vec1,&Pos2,&Pos1);
-	Pos2 = Pos1;
-	Pos2.x += TempNum * Vec1.x;
-	Pos2.y += TempNum * Vec1.y;
-	Pos2.z += TempNum * Vec1.z;
-
-	mathSubVectors(&Vec1,&p,&Pos2);
-	if (mathVectDotProduct(&Vec1,&Vec1) < 40000.0)
-	{
-		Pos.x = Pos2.x + WorldOriginOffset.x;
-		Pos.y = Pos2.y + WorldOriginOffset.y;
-		Pos.z = Pos2.z + WorldOriginOffset.z;
-
-		// voila, now play the sound
-		mlGetAltSpeedOfSound(&SpeedOfSound,Ammo->Position.z);
-		double sos2 = SpeedOfSound * SpeedOfSound;
-
-		double speed2 = (FLOAT32)(mathExactVectorLength2(&Ammo->Velocity));
-
-		if (speed2 < sos2)
+		// Don't want this for bombs
+		if (Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
 		{
-			SINT32 iID = fxSndGetNewSound();
-
-			if(iID == -1)
-				return 1;
-
-			fxSndSetPitch(iID, 1.0f);
-			fxSndSetVolume(iID, 1.0f);
-			fxSndSetPriority(iID, IDE_TP_PRIORITY_LOW);
-			fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
-			fxSndSetPosition(iID, Pos.x, Pos.y, Pos.z);
-			fxSndSetMinDistance(iID, 100.0f);
-			fxSndSetMaxDistance(iID, 200.0f);
-			fxSndSetPlayType(iID, DEF_PLAYTYPE_WORLD);
-
-			// subsonic round
-			if (Ammo->AmmoType->Diameter < 0.02f)
-			{
-				fxSndSetSoundName(iID, "sounds\\loshot1.wav");
-			}
-			else if (Ammo->AmmoType->Diameter < 0.06f)
-			{
-				fxSndSetSoundName(iID, "sounds\\loshot2.wav");
-			}
-			else
-			{
-				fxSndSetSoundName(iID, "sounds\\loshot3.wav");
-			}
-
-			fxSndInitSound(iID);
-
-			combattime = frametime;
+			return 0;
 		}
-		else
+
+		if (Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO)
 		{
-			SINT32 iID = fxSndGetNewSound();
+			return 0;
+		}
 
-			if(iID == -1)
-				return 1;
+		if (Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_MORTAR)
+		{
+			return 0;
+		}
 
-			fxSndSetPitch(iID, 1.0f);
-			fxSndSetVolume(iID, 1.0f);
-			fxSndSetPriority(iID, IDE_TP_PRIORITY_LOW);
-			fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
-			fxSndSetPosition(iID, Pos.x, Pos.y, Pos.z);
-			fxSndSetPlayType(iID, DEF_PLAYTYPE_WORLD);
-			fxSndSetMinDistance(iID, 100.0f);
-			fxSndSetMaxDistance(iID, 200.0);
+		playerPosition.x = -playpos.x;
+		playerPosition.y = -playpos.y;
+		playerPosition.z = playpos.z;
 
-			// supersonic round
-			if (Ammo->AmmoType->Diameter < 0.02f)
+		roundPosition = Ammo->Position - WorldOriginOffset;
+		roundStartPosition = Ammo->LastCollidePos - WorldOriginOffset;
+
+		// Get the distance from the player to where the round is now.
+		mathSubVectors(&distanceToRound, &playerPosition, &roundPosition); 
+		// Get the distance from the player to where the round started.
+		mathSubVectors(&distanceToRoundStart, &playerPosition, &roundStartPosition);
+
+		absoluteDistanceToRound = abs(distanceToRound.length());
+		
+		// Determine whether the round is coming towards us.
+		// This won't be correct if the bullet started right beside the player
+		// but in that case you wouldn't hear it flyby anyway due to the gun going bang!
+		if (absoluteDistanceToRound < abs(distanceToRoundStart.length()))
+		{
+			comingTowardsMe = true;
+		}
+
+		if (absoluteDistanceToRound < 20.0 && comingTowardsMe)
+		{
+			// Project the rounds vector past our position so we can calculate the closest point it will be.
+			FLOAT64VECTOR projectedRoundPosition = roundPosition + ((roundPosition - roundStartPosition) * 10.0);
+			FLOAT64VECTOR closestPoint = mathGetClosestPointOnLine(&projectedRoundPosition, &roundPosition, &playerPosition);
+			FLOAT64 distanceToClosestPoint = abs((closestPoint - playerPosition).length());
+
+			// Get the speed of sound at this altitude.
+			mlGetAltSpeedOfSound(&speedOfSound, Ammo->Position.z);
+			FLOAT64 sos2 = speedOfSound * speedOfSound;
+
+			FLOAT64 speed2 = mathExactVectorLength2(&Ammo->Velocity);
+
+			// If the round is traveling slower than the speed of sound.
+			if (speed2 < sos2)
 			{
-				fxSndSetSoundName(iID, "sounds\\hishot1.wav");
+				SINT32 iID = fxSndGetNewSound();
+
+				if (iID == -1)
+					return 1;
+
+				fxSndSetPitch(iID, 1.0f);
+				fxSndSetVolume(iID, 1.0f);
+				fxSndSetPriority(iID, IDE_TP_PRIORITY_LOW);
+				fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
+				fxSndSetPosition(iID, Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
+				fxSndSetPlayType(iID, DEF_PLAYTYPE_WORLD);
+				fxSndSetMinDistance(iID, 10.0f);
+				fxSndSetMaxDistance(iID, 100.0f);
+
+				// subsonic round
+				if (Ammo->AmmoType->Diameter < 0.008f && distanceToClosestPoint < 0.5)
+				{
+					fxSndSetSoundName(iID, "sounds\\loshot1.wav");
+				}
+				else if (Ammo->AmmoType->Diameter < 0.11f && distanceToClosestPoint < 1.0)
+				{
+					fxSndSetSoundName(iID, "sounds\\loshot2.wav");
+				}
+				else if(Ammo->AmmoType->Diameter >= 0.11f && distanceToClosestPoint < 2.0)
+				{
+					fxSndSetSoundName(iID, "sounds\\loshot3.wav");
+				}
+
+				fxSndInitSound(iID);
+				Ammo->flybySoundPlayed = true;
+
+				combattime = frametime;
 			}
 			else
-			if (Ammo->AmmoType->Diameter < 0.06f)
 			{
-				fxSndSetSoundName(iID, "sounds\\hishot2.wav");
-			}
-			else
-			{
-				fxSndSetSoundName(iID, "sounds\\hishot3.wav");
-			}
+				SINT32 iID = fxSndGetNewSound();
 
-			fxSndInitSound(iID);
+				if (iID == -1)
+					return 1;
 
-			combattime = frametime;
+				fxSndSetPitch(iID, 1.0f);
+				fxSndSetVolume(iID, 1.0f);
+				fxSndSetPriority(iID, IDE_TP_PRIORITY_LOW);
+				fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
+				fxSndSetPosition(iID, Ammo->Position.x, Ammo->Position.y, Ammo->Position.z);
+				fxSndSetPlayType(iID, DEF_PLAYTYPE_WORLD);
+				fxSndSetMinDistance(iID, 10.0f);
+				fxSndSetMaxDistance(iID, 100.0);
+
+				// supersonic round
+				if (Ammo->AmmoType->Diameter < 0.008f  && distanceToClosestPoint < 0.5)
+				{
+					fxSndSetSoundName(iID, "sounds\\hishot1.wav");
+				}
+				else if (Ammo->AmmoType->Diameter < 0.11f && distanceToClosestPoint < 1.0)
+				{
+					fxSndSetSoundName(iID, "sounds\\hishot2.wav");
+				}
+				else if (Ammo->AmmoType->Diameter >= 0.11f && distanceToClosestPoint < 2.0)
+				{
+					fxSndSetSoundName(iID, "sounds\\hishot3.wav");
+				}
+
+				fxSndInitSound(iID);
+				Ammo->flybySoundPlayed = true;
+
+				combattime = frametime;
+			}
 		}
 	}
 
@@ -2275,79 +2220,6 @@ SINT32 _Attach3DBombSound(weapAmmo* pAmmo)
 }
 
 /************************************************************************************************
-	_Attach3DBulletSound
-*************************************************************************************************/
-bool _Attach3DBulletSound(weapAmmo* pAmmo)
-{
-	if(pAmmo->SoundID > 0)
-		return false;
-
-	if(pAmmo->AmmoType->SubType != WEAPAMMO_SUBTYPE_BALLISTIC)
-		return false;
-
-	if(pAmmo->AmmoType->ExplosiveEnergy > 0.0001f)
-		return false;
-
-	if(pAmmo->AmmoType->Diameter > 0.03f)
-		return false;
-
-	Vec3d p(playpos);
-	p = -p;
-
-	Vec3d pos = Vec3d(pAmmo->Position) - Vec3d(WorldOriginOffset);
-
-	static float min = 5.0f;
-	static float max = 1000.0f;
-
-	// Player to ammo
-	p = p - pos;
-
-	if(p.length2() > max * max)
-		return false;
-
-	p.normalize();
-
-	Vec3d vel(pAmmo->Velocity);
-	vel.normalize();
-
-	// Bullet behind player?
-	if(p * vel < 0)
-		return false;
-
-	int id = fxSndGetNewSound();
-
-	if(id == -1)
-	{
-		return false;
-	}
-
-	fxSndSetSoundName(id, "sounds\\bulletby.wav");
-	fxSndSetPriority(id, IDE_TP_PRIORITY_LOW);
-	fxSndSetSoundType(id, TYPE_INFINITE_EXTERNAL_SOUND);
-
-	static float pitch = 1.0f;
-
-	fxSndSetPitch(id, pitch);
-	fxSndSetVolume(id, 1.0f);
-	fxSndSetPlayType(id, DEF_PLAYTYPE_AMMO);
-	fxSndPushFlags(id, SOUND_NO_DOPPLER);
-
-	fxSndSetMinDistance(id, min);
-	fxSndSetMaxDistance(id, max);
-	fxSndSetAmmo(id, pAmmo);
-
-	if(!fxSndInitSound(id))
-	{
-		fxSndStopSound(id);
-		return false;
-	}
-
-	pAmmo->SoundID = id;
-
-	return true;
-}
-
-/************************************************************************************************
 	weapfxAmmoDetachSound
 *************************************************************************************************/
 
@@ -2360,10 +2232,6 @@ UINT32 weapfxAmmoDetachAmmo(weapAmmo const* Ammo)
 
 	return 0;
 }
-
-#ifdef __MWERKS__
-#pragma mark -
-#endif
 
 /************************************************************************************************
 	weapfxMountFireSound
@@ -2478,10 +2346,6 @@ UINT32 weapfxMountStopFireSound(mlWeaponMount* Mount, UINT32 i, SINT32 RoundsLef
 	return 0;
 }
 
-#ifdef __MWERKS__
-#pragma mark -
-#endif
-
 /************************************************************************************************
 	AddBulletDecal
 *************************************************************************************************/
@@ -2493,7 +2357,7 @@ UINT32 AddBulletDecal(weapAmmo const* lpAmmo,
 					  SINT32 iPenetration,
 					  bool usehiteffect)
 {
-	LOGICAL iswater = _IsWater(lpFast->CollideObject);
+	bool iswater = _IsWater(lpFast->CollideObject);
 
 	if(iswater)
 	{
@@ -2830,7 +2694,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 					   FLOAT64VECTOR const* pPos,
 					   piVECTOR const* pNormal,
-					   LOGICAL bIsWater)
+					   bool bIsWater)
 {
 	SINT32 iID = -1;
 
@@ -2984,7 +2848,6 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 {
 	FLOAT64VECTOR vecPos;
 	piVECTOR vecNorm;
-	LOGICAL bWater = FALSE;
 	SINT32 id = -1;
 
 	vecPos.x = Ammo->AttachedPnt.x;
@@ -3013,7 +2876,7 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 					 (FLOAT32)Ammo->Velocity.y,
 					 (FLOAT32)Ammo->Velocity.z);
 
-	bWater = _IsWater(Ammo->AttachedObject);
+	bool bWater = _IsWater(Ammo->AttachedObject);
 
 	if(Ammo->AttachedObject != nullptr)
 	{
@@ -3061,14 +2924,14 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 /************************************************************************************************
 	_IsWater
 *************************************************************************************************/
-LOGICAL _IsWater(OBJECT* lpObj)
+bool _IsWater(const OBJECT* lpObj)
 {
 	if(lpObj == nullptr)
-		return FALSE;
+		return false;
 
 	if(trnwtrIsWaterTexture(lpObj->texid))
 	{
-		return TRUE;
+		return true;
 	}
 
 	FLOAT32 fRollCoef = 0.0f;
@@ -3090,37 +2953,37 @@ LOGICAL _IsWater(OBJECT* lpObj)
 			{
 				if(fRollCoef > 0.999f && fRollCoef < 1.001f)
 				{
-					return TRUE;
+					return true;
 				}
 			}
 			else if(fRollCoef > 198.99f && fRollCoef < 199.001f)
 			{
-				return TRUE;
+				return true;
 			}
 		}
 	}
 	else if(fRollCoef > 198.99f && fRollCoef < 199.001f)
 	{
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
 /************************************************************************************************
-	weapfxAttachSmokeGrenadeToAmmo
+	weapfxAttachSmokeToAmmo
 *************************************************************************************************/
-UINT32 weapfxAttachSmokeGrenadeToAmmo(weapAmmo const* pAmmo)
+UINT32 weapfxAttachSmokeToAmmo(weapAmmo const* pAmmo)
 {
 	return 0;
 }
 
 /************************************************************************************************
-	weapfxDetonateSmokeGrenade
+	weapfxDetonateSmoke
 	Start billowing smoke after tracer dies.
 	return 1 to kill the ammo; 0 to keep it around for the old behavior
 *************************************************************************************************/
-UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pos, const weapAmmo* ammo)
+UINT32 weapfxDetonateSmoke(FLOAT64VECTOR* pos, const weapAmmo* ammo)
 {
 	UINT16 mslifetime = 47500 + ((rand() & 63) * 100);	// 47.5-53.8 seconds
 
@@ -3166,16 +3029,16 @@ UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pos, const weapAmmo* ammo)
 		pos->z -= 0.02f;
 
 		if(strcmp((const char*)ammo->AmmoType->Name, "uk_smokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::BRITISH;
+			colorFlag = SmokeSTO::BRITISH;
 		else if(strcmp((const char*)ammo->AmmoType->Name, "fr_smokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::FRENCH;
+			colorFlag = SmokeSTO::FRENCH;
 		else if(strcmp((const char*)ammo->AmmoType->Name, "desmokegrenade") == 0)
-			colorFlag = SmokeGrenadeSTO::GERMAN;
+			colorFlag = SmokeSTO::GERMAN;
 	}
 
 	WorldPosition_m position(pos->x, pos->y, pos->z);
 
-	SmokeGrenadeSTO* sg = new SmokeGrenadeSTO(position, attitude, mslifetime, colorFlag);
+	SmokeSTO* sg = new SmokeSTO(position, attitude, mslifetime, colorFlag);
 
 	if(Online)
 	{

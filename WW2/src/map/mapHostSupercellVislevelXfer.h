@@ -65,7 +65,8 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 			static std::pair<void*, size_t>
 			allocateFor(_ItrType begin, _ItrType end, UINT32& numBuildings, UINT32& maxBuildings)
 			{
-				numBuildings = 0, maxBuildings = 0;
+				numBuildings = 0;
+                maxBuildings = 0;
 
 				// Calculate total size.
 				size_t totalBytes = 0;

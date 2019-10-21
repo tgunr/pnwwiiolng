@@ -20,8 +20,6 @@ UINT32 serverGetMaxClusterUsers();
 #include "wwii/wwiiServerTypeEnums.h"
 void serverEnableDebugWebServer(SERVER_TYPE offset);
 
-void serverInitAddresses();
-
 void serverOpenBroadcastIndexes();
 
 void serverBroadcastHostConfig();
@@ -31,4 +29,3 @@ size_t serverGetPlayerCount(const UINT32 serverType_);
 // Find out how many players the cluster can support, adjusted
 // by different host types and configuration parameters.
 size_t serverGetClusterCapacity();
-

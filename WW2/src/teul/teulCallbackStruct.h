@@ -13,7 +13,7 @@ all of the  communication parameters, and references to the specific routines
 that manipulate it (packer, send, callback, error handler, etc..).  By
 combining this all into one object we save ourselves a lot of repetitive work.
 The developer no longer has to worry about all the parameters after an object
-is initialized unless he needs to change them (typically these do not change).
+is initialized unless they need to change them (typically these do not change).
 
 	This is critical for acknowledged messages.  The point of an acknowledged
 message is that if it times out the sending application can decide weather to
@@ -47,7 +47,6 @@ developer's callback routine can check the size instead.
 
 struct TEUL_CALLBACK
 {
-	ERROR_FUNCTION* error;			// Error handling function (or null).
 	UINT32		timeout;			// how long do we try to send data (zero for connection default)
 									// to delayTeimout;
 	void*		inData;				// pointer to the input object
@@ -61,7 +60,7 @@ struct TEUL_CALLBACK
 	ACTION_FN	m_recvAction;		// how to receive data
 
 	UINT8			m_callX;		// the X and Y position in the callback matrix
-	UINT8           m_callY;        // the developer gets a pointer to obj,
+	UINT8			m_callY;		// the developer gets a pointer to obj,
 
 	const char      *m_callXName;
 	const char      *m_callYName;
@@ -94,4 +93,7 @@ public:
 
 	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_);
 };
+
+#define PRF_CALLBACK "x:%d(%s) y:%d(%s)"
+#define PRA_CALLBACK(cb) (cb).callX(), (cb).callXName(), (cb).callY(), (cb).callYName()
 

@@ -21,6 +21,6 @@ namespace Chat
 		bool Login(SINT32 teulIndex);
 
 		// Network packer
-		SINT32 packer(LOGICAL, ACTION_OBJECT*);
+		SINT32 packer(PackMode, ACTION_OBJECT*);
 	};
 }

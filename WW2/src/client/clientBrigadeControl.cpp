@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Date: Wed Oct 11 12:36:21 CDT 2006
 //
@@ -92,7 +92,7 @@ bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 // H/C: Client nominating an OIC
 // Brigade must be supplied to eliminate race conditions
 
-bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& nomineeHandle)
+bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle nomineeHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(nomineeHandle)) )
 		return false;
@@ -107,7 +107,7 @@ bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const 
 //////////////////////////////////////////////////////////////////////
 // H/C: Client vetoing an OIC
 
-bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& onHandle)
+bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle onHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(onHandle)) )
 		return false;
@@ -138,7 +138,7 @@ bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 // H/C: Client requesting to replace existing OIC (must be HC)
 // Handle is provided for race condition elimination
 
-bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oldHandle)
+bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oldHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oldHandle)) )
 		return false;
@@ -154,7 +154,7 @@ bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const C
 // H/C: Client requesting to remove existing OIC (must be HC)
 // Handle is provided for race condition elimination
 
-bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oicHandle)
+bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle oicHandle)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oicHandle)) )
 		return false;
@@ -170,7 +170,7 @@ bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const Ch
 // H/C: Propose a brigade move; must specify the location you think you are
 // moving it from.
 
-bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
+bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -192,7 +192,7 @@ bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade,
 // H/C: Propose a brigade move; must specify the location you think you are
 // moving it from.
 
-bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
+bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const FULL_OBJ_ID origin)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -211,9 +211,53 @@ bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, co
 }
 
 //////////////////////////////////////////////////////////////////////
+// H/C: Propose a CP/garrison country change.
+
+bool BrigadeControlRequest::requestBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country)
+{
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
+		return false;
+
+	// You must specify where you want to move it to and where you want to move it from
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
+
+	m_action = REQ_COUNTRY_CHANGE;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = destination;
+	m_country = country;
+
+	return send(teulIndex);
+}
+
+//////////////////////////////////////////////////////////////////////
+// H/C: Propose veto of a CP/garrison country change.
+
+bool BrigadeControlRequest::vetoBrigadeCountryChange(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID destination, const WWII_COUNTRY country)
+{
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
+		return false;
+
+	// You must specify where you want to move it to and where you want to move it from
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
+
+	m_action = REQ_VETO;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = destination;
+	m_country = country;
+
+	return send(teulIndex);
+}
+
+//////////////////////////////////////////////////////////////////////
 // H/C: Veto an objective (attack/defend/clear)
 
-bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& target)
+bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID target)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
@@ -231,7 +275,7 @@ bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, cons
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
@@ -248,7 +292,7 @@ bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& d
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
@@ -265,7 +309,7 @@ bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& d
 	return send(teulIndex);
 }
 
-bool BrigadeControlRequest::requestClear(SINT32 teulIndex, const FULL_OBJ_ID& destination)
+bool BrigadeControlRequest::requestClear(SINT32 teulIndex, const FULL_OBJ_ID destination)
 {
 	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
@@ -336,7 +380,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case BCERR_YOU_WRONG_BRIGADE:		return BCD_ControlError(this, "error.wrongbrigade");	// You are in the wrong brigade
 				case BCERR_OWN_TOWN:				return BCD_ControlError(this, "error.owntown");				// Target invalid because its friendly
 				case BCERR_ALREADY_OBJECTIVE:		return BCD_ControlError(this, "error.alreadyobjective");	// Target already has an objective
-				case BCERR_NOT_OBJECTIVE:			return BCD_ControlError(this, "error.notobjective");		// Not an objective, retard
+				case BCERR_NOT_OBJECTIVE:			return BCD_ControlError(this, "error.notobjective");		// Not an objective
 				case BCERR_CANT_CANX_DEFEND:		return BCD_ControlError(this, "error.cantcancel");			// Can't cancel defend, tit
 				case BCERR_NOT_FRONTLINE:			return BCD_ControlError(this, "error.notfrontline");		// Can't attack non-frontline towns
 				case BCERR_NOMINEE_CANT_OIC:			return BCD_ControlError(this, "error.notpermitted");		// We can't nominate this player
@@ -352,6 +396,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_REPLACE:			return BCD_OfficerBrigade(this, "proposal.replace", me);		// Request to take over from an existing OIC
 				case REQ_REMOVE:			return BCD_SponsorOfficerBrigade(this, "proposal.remove", me);		// Want to remove an OIC
 				case REQ_MOVE:				return BCD_SponsorBrigadeOriginTarget(this, "proposal.move", me);		// Move a brigade
+				case REQ_COUNTRY_CHANGE:	return BCD_SponsorGarrisonCountryChange(this, "proposal.changecountry", me);		// Change a garrisons's country
 
 				case REQ_ATTACK:
 				case REQ_DEFEND:
@@ -367,6 +412,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_NOMINATE:			return BCD_OfficerSponsorBrigade(this, "vetoed.nominate", me);		// Nominate a player for OIC of a brigade
 				case REQ_REMOVE:			return BCD_SponsorOfficerBrigade(this, "vetoed.remove", me);		// Want to remove an OIC
 				case REQ_MOVE:				return BCD_SponsorBrigadeOriginTarget(this, "vetoed.move", me);			// Move a brigade
+				case REQ_COUNTRY_CHANGE:	return BCD_SponsorGarrisonCountryChange(this, "vetoed.changecountry", me);		// Change a garrisons's country
 
 				case REQ_ATTACK:
 				case REQ_DEFEND:
@@ -389,6 +435,13 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				return BCD_SponsorBrigadeOriginTarget(this, "unit.moved", false);
 			else
 				return BCD_BrigadeOriginTarget(this, "unit.moved.system", false);
+		}
+		case _COUNTRY_CHANGED:	// CPs country with garrison was changed
+		{
+			if(m_sponsor)
+				return BCD_SponsorGarrisonCountryChange(this, "country.changed", false);
+			else
+				return BCD_GarrisonCountryChange(this, "country.changed.system", false);
 		}
 	}
 

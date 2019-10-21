@@ -12,8 +12,9 @@
 namespace Map
 {
 	// Installs our callbacks
-	extern SINT32 HostInstallCallbacks(void);
+	SINT32 HostInstallCallbacks();
 
-	extern void BroadcastSwingMeter();
+	void BroadcastSwingMeter();
 }
 
+SINT32 mmhostToClientGarrisonCountryChange(ACTION_OBJECT* const a);

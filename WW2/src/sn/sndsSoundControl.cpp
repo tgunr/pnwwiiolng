@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "include/vars.h"
 
@@ -48,12 +48,8 @@ static std::deque<snSound*> _freesounds;
 // ------------------------------------------------------------
 // externally visible functions
 // ------------------------------------------------------------
-LOGICAL sndsInit(void)
+LOGICAL sndsInit()
 {
-#if platOS == OS_MACOS
-    b3DSoundEnable = TRUE;
-#endif
-
 	if (bSoundEnable == FALSE)
 	{
 		Write_Log(LOG_SOUND, LOG_INFO, "Sounds have been disabled in the config file");
@@ -84,11 +80,11 @@ LOGICAL sndsInit(void)
 // return values:   0 if no errors occurred during startup
 //					1 if startup failed for any reason
 
-LOGICAL sndsKill(void)
+void sndsKill()
 {
 	if (bSoundEnable == FALSE)
 	{
-		return TRUE;
+		return;
 	}
 
     while(!_freesounds.empty())
@@ -102,13 +98,11 @@ LOGICAL sndsKill(void)
 	sndsKillCache();
 	sndsReset();
 
-	LOGICAL rval = sndsPlatformKill();
+	sndsPlatformKill();
 
     _sndsFreeRemainingSounds();
 
     Write_Log(LOG_OLD, LOG_INFO, "[sndsKill]");
-
-    return rval;
 }
 
 // does any driver configuration (such as on windows, enumerating sound drivers and picking
@@ -129,7 +123,7 @@ LOGICAL sndsDriverConfig(void* obj)
 // return values:   0 if no errors occurred during shutdown
 //					1 if shutdown failed for any reason
 
-LOGICAL sndsReset(void)
+LOGICAL sndsReset()
 {
 LOGICAL		retval;
 snSound*		eachSound;
@@ -172,7 +166,7 @@ snSound*		eachSound;
 // return values:	0 if no errors occurred during reset
 //					1 if reset failed for any reason
 
-void sndsUpdateSounds(void)
+void sndsUpdateSounds()
 {
 snSound*	listSound;
 
@@ -276,9 +270,9 @@ snSound*	listSound;
 // it is also a convienent place to put possible resource optomisations such as deleting sounds which have
 // finished playing (and are not looping), or doing performance monitoring, etc.
 #ifdef SOUND_DEBUG
-	snSound * sndsLoadSoundDebug(LPSNDSCREATE lpCreate, SCHAR* file, SINT32 line)
+	snSound * sndsLoadSoundDebug(SNDSCREATE* lpCreate, SCHAR* file, SINT32 line)
 #else
-	snSound * sndsLoadSound(LPSNDSCREATE lpCreate)
+	snSound * sndsLoadSound(SNDSCREATE* lpCreate)
 #endif
 {
 snSound* newSound = nullptr;
@@ -299,6 +293,7 @@ LOGICAL	success;
     {
         newSound = _freesounds.front();
         _freesounds.pop_front();
+		memset(newSound, 0, sizeof(*newSound));
     }
     else
     {
@@ -307,9 +302,7 @@ LOGICAL	success;
 
     if(newSound != nullptr)
     {
-        memset(newSound, 0, sizeof(snSound));
-
-        strncpy(newSound->name, lpCreate->pszName, MAX_SND_NAME_LENGTH - 1);
+        strsafecpy(newSound->name, lpCreate->pszName);
 
 		success = sndsApplyDefaultOptions(newSound);
 
@@ -343,7 +336,7 @@ LOGICAL	success;
 					ptr = file;
 				}
 
-				strncpy(newSound->file, ptr, SND_CHECK_FILE_LENGTH);
+				strsafecpy(newSound->file, ptr);
 				newSound->line = line;
 			}
 
@@ -1042,32 +1035,6 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
     headPos->y = -playpos.y;
     headPos->z = -playpos.z;
 
-#if FRES
-	piVECTOR up = {0,0,-1};
-	piVECTOR front = {0,1,0};
-	piVECTOR right = {1,0,0};
-
-	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if(Vehicle && Vehicle->ModelData)
-	{
-		math3dMultiplyRotation(&front, &front, &Vehicle->ModelData->VehicleAttMat);
-		math3dMultiplyRotation(&up, &up, &Vehicle->ModelData->VehicleAttMat);
-		math3dMultiplyRotation(&right, &right, &Vehicle->ModelData->VehicleAttMat);
-
-		headUp->x = up.x;
-		headUp->y = up.y;
-		headUp->z = up.z;
-
-		headLook->x =  front.x;
-		headLook->y =  front.y;
-		headLook->z = -front.z;
-
-		headRight->x = right.x;
-		headRight->y = right.y;
-		headRight->z = right.z;
-	}
-
-#else
     headUp->x = playup.x;
     headUp->y = playup.y;
     headUp->z = playup.z;
@@ -1079,7 +1046,6 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
     headRight->x = playright.x;
     headRight->y = playright.y;
     headRight->z = playright.z;
-#endif
 
     persGetPlayerVelocity(&vel);
 
@@ -1136,7 +1102,7 @@ LOGICAL sndsSetListener3DVel(piVECTOR* pVel, UINT32 uApply)
 // Function: sndsSetSound3DPos
 // Description: Set the sound position.
 //////////////////////////////////////////////////////////////////////
-LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, piVECTOR* pPos, UINT32 uApply)
+LOGICAL sndsSetSound3DPos(snSound* lpSound, piVECTOR* pPos, UINT32 uApply)
 {
     if(lpSound == nullptr || pPos == nullptr)
         return FALSE;
@@ -1152,7 +1118,7 @@ LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, piVECTOR* pPos, UINT32 uApply)
 // Function: sndsSetSound3DVel
 // Description: Set the sound velocity.
 //////////////////////////////////////////////////////////////////////
-LOGICAL sndsSetSound3DVel(snSoundPtr lpSound, piVECTOR* pVel, UINT32 uApply)
+LOGICAL sndsSetSound3DVel(snSound* lpSound, piVECTOR* pVel, UINT32 uApply)
 {
     if(lpSound == nullptr || pVel == nullptr)
         return FALSE;
@@ -1168,7 +1134,7 @@ LOGICAL sndsSetSound3DVel(snSoundPtr lpSound, piVECTOR* pVel, UINT32 uApply)
 // Function: sndsSetSound3DMode
 // Description: Set the sound mode (NORMAL, DISABLE, HEAD_RELATIVE.)
 //////////////////////////////////////////////////////////////////////
-LOGICAL sndsSetSound3DMode(snSoundPtr lpSound, UINT32 uMode, UINT32 uApply)
+LOGICAL sndsSetSound3DMode(snSound* lpSound, UINT32 uMode, UINT32 uApply)
 {
 #if XAUDIO
     return TRUE;
@@ -1195,7 +1161,7 @@ LOGICAL sndsCommitDeferredSettings()
 // Function: sndsPlatformSetMinDistance
 // Description: Set sound buffer minimum distance.
 //////////////////////////////////////////////////////////
-LOGICAL sndsSetMinDistance(snSoundPtr sound, FLOAT32 mindist, UINT32 apply)
+LOGICAL sndsSetMinDistance(snSound* sound, FLOAT32 mindist, UINT32 apply)
 {
     if(sound == nullptr)
         return FALSE;
@@ -1209,7 +1175,7 @@ LOGICAL sndsSetMinDistance(snSoundPtr sound, FLOAT32 mindist, UINT32 apply)
 // Function: sndsSetMaxDistance
 // Description: Set sound buffer maximum distance.
 //////////////////////////////////////////////////////////
-LOGICAL sndsSetMaxDistance(snSoundPtr sound, FLOAT32 maxdist, UINT32 apply)
+LOGICAL sndsSetMaxDistance(snSound* sound, FLOAT32 maxdist, UINT32 apply)
 {
     if(sound == nullptr)
         return FALSE;
@@ -1232,7 +1198,7 @@ LOGICAL sndsSetOrientation(piVECTOR* pFront, piVECTOR* pTop, UINT32 uApply)
 // Function: sndsSetConeAngles
 // Description: Set inside and outside cone volume angles.
 //////////////////////////////////////////////////////////
-LOGICAL sndsSetConeAngles(snSoundPtr lpSound, UINT32 uIn, UINT32 uOut, UINT32 uApply)
+LOGICAL sndsSetConeAngles(snSound* lpSound, UINT32 uIn, UINT32 uOut, UINT32 uApply)
 {
     if(lpSound == nullptr)
         return FALSE;
@@ -1251,7 +1217,7 @@ LOGICAL sndsSetConeAngles(snSoundPtr lpSound, UINT32 uIn, UINT32 uOut, UINT32 uA
 // Function: sndsSetConeOrientation
 // Description: Set the cone orientation.
 //////////////////////////////////////////////////////////
-LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, piVECTOR* pVec, UINT32 uApply)
+LOGICAL sndsSetConeOrientation(snSound* lpSound, piVECTOR* pVec, UINT32 uApply)
 {
     if(lpSound == nullptr || pVec == nullptr)
         return FALSE;
@@ -1269,7 +1235,7 @@ LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, piVECTOR* pVec, UINT32 uApply
 // Function: sndsGetVolume
 // Description: Get volume for specific sound buffer.
 //////////////////////////////////////////////////////////
-LOGICAL sndsGetVolume(snSoundPtr lpSound, SINT32* pVolume)
+LOGICAL sndsGetVolume(snSound* lpSound, SINT32* pVolume)
 {
     if(lpSound == nullptr || pVolume == nullptr)
         return FALSE;

@@ -12,9 +12,9 @@
 
 using namespace std;
 
-char const* const GlobalCharacterFilename = "media\\combined.gr2";
-char const* const GlobalBatonFilename     = "media\\baton.gr2";
-char const* const GlobalCapeFilename     = "media\\cape.gr2";
+char const* const GlobalCharacterFilename = "media\\pixo_run_walk.gr2";
+char const* const GlobalBatonFilename     = "media\\attachment\\baton.gr2";
+char const* const GlobalCapeFilename     = "media\\attachment\\cape.gr2";
 
 // ---------------------------------------------------------
 // Scene instance objects

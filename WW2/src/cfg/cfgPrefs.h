@@ -20,7 +20,7 @@
 #define CFG_MAP_FILTER_ARMY 		"map.army"
 #define CFG_MAP_FILTER_AIRFORCE 	"map.airforce"
 #define CFG_MAP_FILTER_NAVY			"map.navy"
-#define CFG_MAP_FILTER_DEPOTS		"map.deopots"
+#define CFG_MAP_FILTER_DEPOTS		"map.depots"
 #define CFG_MAP_FILTER_NAMES		"map.names"
 #define CFG_MISC_AUTORELOAD			"misc.autoreload"
 #define CFG_APP_LOADTIME			"app.loadtime" // long
@@ -30,20 +30,16 @@
 
 #define PREF_FILE_NAME "wwiiol.xml"
 
-#if platOS == OS_MACOS
-#undef PREF_FILE_NAME
-#define PREF_FILE_NAME "wwiiolprefs.xml"
-#ifdef BETA_RELEASE
-#undef PREF_FILE_NAME
-#define PREF_FILE_NAME "wwiiolbeta.xml"
-#endif
-
-#endif
+//  #ifdef BETA_RELEASE
+//  #undef PREF_FILE_NAME
+//  #define PREF_FILE_NAME "wwiiol_beta.xml"
+//  #endif
 
 bool cfgPrefsLoad(); // loads prefs from disk
 void cfgPrefsSave(); // tolua_export // saves all prefs to disk
 void cfgPrefsKill(); // kills the global prefs object
 void cfgPrefsInit(); // called very late in the load process to post process globals if needed
+void cfgPrefsPostInit(void); // Called after we've decided to go online/offline
 void cfgPrefsSyncGlobals(); // syncs xml config to globals
 void cfgPrefsSyncPrefs(); // syncs globals to xml config
 bool cfgPrefsRestartNeeded(); // returns true if any restart vars are changed

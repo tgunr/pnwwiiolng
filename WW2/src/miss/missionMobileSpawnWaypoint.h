@@ -14,26 +14,28 @@
 struct MobileSpawnWaypoint
 {
 	MobileSpawnWaypoint() {}
-	MobileSpawnWaypoint(UINT32 missionID, UINT32 playerID, const ChatHandle& owner
+	MobileSpawnWaypoint(UINT32 missionID, UINT32 playerID, const ChatHandle owner
 						, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z
-						, bool deployed, UINT32 stoUID, UINT32 reason)
+						, bool deployed, UINT32 stoUID, SINT32 stoSubType, UINT32 reason)
 		: m_missionID(missionID), m_playerID(playerID), m_ownerCall(owner)
 		, m_x(x), m_y(y), m_z(z)
 		, m_deployed(deployed)
 		, m_stoUID(stoUID)
+		, m_stoSubType(stoSubType)
 		, m_reason(reason)
 		{}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
 	UINT32		m_missionID;				// ID of the mission
 	UINT32		m_playerID;
 	ChatHandle	m_ownerCall;				// Callsign of the owner
 	FLOAT64		m_x, m_y, m_z;				// Co-ordinates
-	bool		m_deployed;					// So we can tell its state
-	UINT32		m_stoUID;					// STO if any associated with this
+	bool		m_deployed;				// So we can tell its state
+	UINT32		m_stoUID;				// STO if any associated with this
+	SINT32		m_stoSubType;				// STO Sub Type
 	UINT32		m_reason;					// MSPAWN_RESULT code.
 };
 
-typedef teul_network_object<MobileSpawnWaypoint> MOBILE_SPAWN_WAYPOINT;
+using MOBILE_SPAWN_WAYPOINT = teul_network_object<MobileSpawnWaypoint>;
 

@@ -2,7 +2,7 @@
 // Created: Mon Jul 11 18:06:13 CDT 2005
 //
 // This file defines "concealled" names for FPS variables. So that
-// hacking little bastards don't get a user-friendly list.
+// hacking little ****s don't get a user-friendly list.
 //
 // If you need to add a new variable, use the hash function
 // defined in fpHash.h
@@ -128,6 +128,7 @@ static const UINT64 atpBackwardMinimum_hash = 98078732316ULL;
 static const UINT64 standToCrouchTime_hash = 98729579636ULL;
 static const UINT64 bridgeDamageJoules_hash = 100075173842ULL;
 static const UINT64 bridgeRepairJoules_hash = 100138960850ULL;
+static const UINT64 fbDamageJoules_hash = 368179154ULL;
 static const UINT64 fallWaterHurtSound_hash = 102228914935ULL;
 static const UINT64 parachuteFallSpeed_hash = 276308554259ULL;
 static const UINT64 backwardsCrouchSpeed_hash = 377084138003ULL;
@@ -205,5 +206,7 @@ static const UINT64 stenmk2File_hash = 24378096ULL ;
 static const UINT64 m3a1File_hash = 18446744073709548016ULL ;
 static const UINT64 mp34File_hash = 797680ULL ;
 static const UINT64 fg42gFile_hash = 195568ULL;
+static const UINT64 carcanoFile_hash = 3261424ULL;
+static const UINT64 beretta38File_hash = 53928176ULL;
 
 static const UINT64 eyeHeights_hash = 2722382ULL;

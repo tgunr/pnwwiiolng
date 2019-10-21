@@ -8,16 +8,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"
-
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadTypes.h"
 #include "wwii/wwiiSerialNumber.h"
 
-#include "dbse/dbseClient.h"
-#include "dbse/dbseWrapper.h"
+#include "chat/chatName.h"
 #include "include/mydbQuery.h"
 #include "strt/strtdbSaveWorld.h"
 #include "strt/strtCPStruct.h"
@@ -48,7 +45,7 @@
 #endif
 
 static const char QRY_SAVE_VEHICLE_ACCESS[] =
-	"UPDATE LOW_PRIORITY wwii_vehtype"
+	"UPDATE wwii_vehtype"
 		" SET campaign_ready = 1"
 			", initial_rank = %u"
 			", current_rank = %u"
@@ -72,8 +69,6 @@ public:
 static QUEUE objQueue, weaponQueue;
 
 bool _queueEnabled = false;
-
-extern DBHANDLE dbh;
 
 UINT32 g_gameDay;
 
@@ -127,7 +122,7 @@ strAdd(char* dest, char* src)
 #include <set>
 #include "wwii/wwiiThreadTextQuery.h"
 
-typedef std::map< std::string, std::set<UINT32> > SAVE_SET;
+using SAVE_SET = std::map<std::string, std::set<UINT32>>;
 static SAVE_SET _cpSaves, _facSaves, _objOwnSaves, _objMaxSaves, _objStateSaves;
 
 static void
@@ -150,7 +145,7 @@ _saveData(SAVE_SET& saves, const char* const tableName, const char* const indexF
 
 		for ( std::set<UINT32>::iterator idit = vit->second.begin(); idit != vit->second.end(); ++idit )
 		{
-			sprintf(id, "%u", *idit);
+			strprintf(id, "%u", *idit);
 			query.addEntry(id);
 		}
 
@@ -165,7 +160,7 @@ _commitCP(CPStruct* cp)
 {
 	UINT16 attacker = (cp->isCity() && cp->attackingUnit() != nullptr) ? cp->attackingUnit()->unitID() : 0;
 	char valuesKey[128];
-	sprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
+	strprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
 			, cp->controllingSide
 			, cp->controllingCountry
 			, cp->side
@@ -181,7 +176,7 @@ static void
 _commitFacility(FacilityStruct* fac)
 {
 	char valuesKey[128];
-	sprintf(valuesKey, "side=%u,country=%u,capacity=%d,storedrps=%d,open=%u"
+	strprintf(valuesKey, "side=%u,country=%u,capacity=%d,storedrps=%d,open=%u"
 			, fac->side
 			, fac->country
 			, fac->capacity
@@ -207,11 +202,11 @@ static void
 _commitObject(ObjectStruct* obj)
 {
 	char valuesKey[80];
-	sprintf(valuesKey, "side=%u,country=%u", obj->m_side, obj->m_country);
+	strprintf(valuesKey, "side=%u,country=%u", obj->m_side, obj->m_country);
 	_objOwnSaves[valuesKey].insert(obj->m_uid);
 	if ( _needsSave(obj->m_maxDamageJoules, obj->m_maxDamageJoulesSaved) || _needsSave(obj->m_maxCapacity, obj->m_maxCapacitySaved) )
 	{
-		sprintf(valuesKey, "maxdamagejoules=%llu,maxcapacity=%u"
+		strprintf(valuesKey, "maxdamagejoules=%" PR64BitUT ",maxcapacity=%u"
 				, obj->m_maxDamageJoules
 				, obj->m_maxCapacity
 				);
@@ -223,7 +218,7 @@ _commitObject(ObjectStruct* obj)
 			|| _needsSave(obj->m_repairRPs, obj->m_repairRPsSaved)
 		)
 	{
-		sprintf(valuesKey, "damagejoules=%llu"
+		strprintf(valuesKey, "damagejoules=%" PR64BitUT ""
 				",capacity=%d"
 				",lastcapacity=%d"
 				",repairrps=%d"
@@ -237,7 +232,7 @@ _commitObject(ObjectStruct* obj)
 	obj->modified = false;
 }
 
-typedef std::vector<UINT16> _SAVE_IDS;
+using _SAVE_IDS = std::vector<UINT16>;
 
 static void
 _saveRows(const char* table, const char* field, UINT64 value, const char* idField, _SAVE_IDS& ids)
@@ -248,7 +243,7 @@ _saveRows(const char* table, const char* field, UINT64 value, const char* idFiel
 	char* query = threadsAllocText();
 	char* p = query;
 
-	p += sprintf(p, "UPDATE %s SET %s=%llu WHERE %s IN (", table, field, value, idField);
+	p += sprintf(p, "UPDATE %s SET %s=%" PR64BitUT " WHERE %s IN (", table, field, value, idField);
 	_SAVE_IDS::iterator it;
 	for ( it = ids.begin(); it != ids.end(); ++it )
 	{
@@ -317,9 +312,8 @@ strtProcessDBQueue()
 			_commitLink((LinkStruct*)object);
 		break;
 
-		default :
+		default:
 			LogAbort("Queue processing excpetion! Unhandled case.");
-		break;
 		}
 	}
 
@@ -418,19 +412,18 @@ strtdbPopulateVehTypesTable()
 		if ( spec.wCountry == 0 || spec.wCountry > MAX_COUNTRIES )
 		{
 			LogAbort("illegal weapon spec " PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
-			continue;
 		}
 
 		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now(),%u)"
 								, (needInsert ? ',' : ' ')
 								, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
-								, weap.name
+								, weap.fullName
 								, weap.access(), weap.access(), weap.access()
 								, weap.value
 								, weap.name
 								, spec.asUINT32()
 								);
-		dbugLog(_FLIB, "%s", buf);
+		dbugLog(_FLI, "%s", buf);
 		inserts += buf;
 
 		snprintf(buf, _BUF_SIZE, (needInsert ? ",%u" : "%u"), spec.asUINT32());
@@ -497,7 +490,7 @@ strtdbSaveVehicleCVCs()
 				continue;
 
 			length = snprintf(buf, _BUF_SIZE
-								, "UPDATE LOW_PRIORITY wwii_vehtype SET cvc_value=%u WHERE vehtype_oid=%u AND cvc_value != %u"
+								, "UPDATE wwii_vehtype SET cvc_value=%u WHERE vehtype_oid=%u AND cvc_value != %u"
 									, weap->value, weap->localIndex(), weap->value
 									);
 			q.Query(length, buf);
@@ -595,6 +588,8 @@ strtdbReadVehicleAccess()
 bool
 strtInitHostDB()
 {
+	dbugLog(_FLI, "Initializing strtHostDB");
+
 	memset(&objQueue,0,sizeof(objQueue));
 	objQueue.name = "Object";
 	memset(&weaponQueue,0,sizeof(weaponQueue));
@@ -609,7 +604,7 @@ strtInitHostDB()
 void
 strtSaveFactoryOutput(ObjectStruct* factory)
 {
-#if defined(TRAINING_SERVER) || defined(DEV_BUILD) || defined(FRES)
+#if defined(TRAINING_SERVER) || defined(DEV_BUILD)
 	return;
 #else
 	if ( host_config.arena.intermission > 0 || factory == nullptr )
@@ -660,7 +655,7 @@ strtSaveFactoryOutput(ObjectStruct* factory)
 void
 ObjectiveStats::save()
 {
-#if !defined(TRAINING_SERVER) && !defined(FRES) && !defined(DEV_BUILD)
+#if !defined(TRAINING_SERVER) && !defined(DEV_BUILD)
 	static const UINT32 OBJECTIVE_STAT_SAVE_INTERVAL = 600;	// Save after this many seconds
 	static UINT32 nextSaveTime = teulTime();					// First time round, save now
 
@@ -670,7 +665,7 @@ ObjectiveStats::save()
 	dbugLog(_FLD, "Saving objective stats");
 
 	DBThread::Do(DBThread::Audit
-			, "INSERT INTO audit.objective_counts"
+			, "INSERT INTO `audit`.`objective_counts`"
 				" ( recorded"
 				 ", city_limit"
 				 ", allied_city_attacks"
@@ -707,7 +702,7 @@ ObjectiveStats::save()
 
 void
 strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
-				, const ChatHandle& handle, UINT32 customerID, UINT32 missionID
+				, const ChatHandle handle, UINT32 customerID, UINT32 country, UINT32 missionID
 				, const HCUnit* unit, UINT32 started, UINT32 seconds
 				, bool wasContested, bool tookControl, bool tookOwnership)
 {
@@ -738,7 +733,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 						" , %u"
 						" , '%s', %u, %u"
 						" )"
-						, state, customerID, unit->country(), unit->unitID()
+						, state, customerID, country, unit->unitID()
 						, fromCountry, started, seconds, missionID
 						, facility->uOID
 						, contentionState, tookControl, tookOwnership
@@ -751,7 +746,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: START %s#%d(%s)@%s(%s %s) requires %ds cs:%s"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -763,7 +758,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLW, "cap: ILLEGAL %s#%d(%s)@%s(%s %s) started %d took %d seconds"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -775,7 +770,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: CAPTURED %s#%d(%s)@%s(%s %s) started %u took %u seconds cs:%s ctrl:%s own:%s"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -790,7 +785,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 			dbugLog(_FLI, "cap: SAVED %s#%d(%s)@%s(%s %s) started %d took %d seconds"
 							, Chat::Name(handle).c_str()
 							, customerID
-							, _countryCode[unit->country()]
+							, _countryCode[country]
 							, unit->callsign()
 							, facility->name
 							, _countryCode[fromCountry]
@@ -828,7 +823,7 @@ strtdbFetchLuaScript(const char* name, std::string& obj)
 void
 strtdbSaveConfigVar(const char* name, const char* value)
 {
-	DBSimpleQuery(dbh, "UPDATE host_config SET value = '%s' WHERE variableName = '%s'", value, name);
+	DBSimpleQuery(dbh, "UPDATE `wwiionline`.`wwii_config` SET value = '%s' WHERE variableName = '%s'", value, name);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -837,7 +832,7 @@ strtdbSaveConfigVar(const char* name, const char* value)
 ///CAVEAT: Must be done before we load in the HCUnits.
 
 static const char* QRY_BOOTSTRAP_TOE_HEADERS =
-"INSERT INTO toe.headers"
+"INSERT INTO `toe`.`headers`"
 	"(id, name, country, branch)"
 " VALUES"
 	" ('ukgrdfor', 'BEF Ground Forces', 1, 1)"
@@ -865,7 +860,7 @@ strtdbLoadTOETemplates()
 
 		// Take the current database timestamp so that we can perform
 		// incremental reads in subsequent calls.
-		q.Query("SELECT COUNT(*), UNIX_TIMESTAMP(NOW()) FROM toe.headers t");
+		q.Query("SELECT COUNT(*), UNIX_TIMESTAMP(NOW()) FROM `toe`.`headers` t");
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw "Failed reading 'now' from database";
 
@@ -883,8 +878,8 @@ strtdbLoadTOETemplates()
 
 		snprintf(statement, 500
 				, "SELECT DISTINCT t.id, t.name, t.country, t.branch"
-					" FROM toe.headers t"
-						" LEFT JOIN toe.vehicles v USING (id)"
+					" FROM `toe`.`headers` t"
+						" LEFT JOIN `toe`.`vehicles` v USING (id)"
 					" WHERE t.modified >= FROM_UNIXTIME(%u)"
 						" OR v.modified >= FROM_UNIXTIME(%u)"
 					" GROUP BY 1"
@@ -910,8 +905,8 @@ strtdbLoadTOETemplates()
 
 		strprintf(statement
 				, "SELECT v.id, vt.countryID, vt.categoryID, vt.classID, vt.typeID, v.capacity, v.resupply_time_m"
-					" FROM toe.headers t"
-						" JOIN toe.vehicles v USING (id)"
+					" FROM `toe`.`headers` t"
+						" JOIN `toe`.`vehicles` v USING (id)"
 							" JOIN wwii_vehtype vt USING (vehtype_oid)"
 					" WHERE vt.in_service=1 AND v.modified >= FROM_UNIXTIME(%u)"
 					" ORDER BY 1, 2"
@@ -962,7 +957,7 @@ strtdbRestoreTOESupplies()
 	try
 	{
 		DBQuery q(dbh, "SELECT s.unit_id, v.countryID, v.categoryID, v.classID, v.typeID, s.present, s.vehtype_oid"
-						" FROM toe.supply s JOIN wwii_vehtype v USING (vehtype_oid)"
+						" FROM `toe`.`supply` s JOIN wwii_vehtype v USING (vehtype_oid)"
 						" ORDER BY 1, 2");
 
 		StratHCUnit* unit = nullptr;
@@ -983,7 +978,7 @@ strtdbRestoreTOESupplies()
 			{
 				unit = StratHCUnit::Lookup(unitID);
 				if ( unit == nullptr )
-					dbugLog(_FLW, "toe.supply: unrecognized unit ID %u", unitID);
+					dbugLog(_FLW, "`toe`.`supply`: unrecognized unit ID %u", unitID);
 				lastUnitID = unitID;
 			}
 
@@ -994,7 +989,7 @@ strtdbRestoreTOESupplies()
 			// Set this as the initial value
 			if ( unit->initializeWeapon(spec, present) == false )
 			{
-				DBThread::Do(DBThread::Default, "DELETE LOW_PRIORITY IGNORE FROM toe.supply WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
+				DBThread::Do(DBThread::Default, "DELETE IGNORE FROM `toe`.`supply` WHERE unit_id=%u AND vehtype_oid=%u", unitID, vehTypeOID);
 			}
 		}
 	}
@@ -1005,7 +1000,7 @@ strtdbRestoreTOESupplies()
 
 	dbugLog(_FLI, "Saving initial TOE levels");
 	// Purge the old entries
-	DBSimpleQuery(dbh, "TRUNCATE toe.supply");
+	DBSimpleQuery(dbh, "TRUNCATE `toe`.`supply`");
 
 	char buffer[TEXT_POOL_SIZE+1];
 	UINT32 len = 0;
@@ -1014,7 +1009,7 @@ strtdbRestoreTOESupplies()
 	HCUNIT_INDEX::iterator it;
 	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
-		if ( it->second->isDivision() == false && it->second->isBrigade() == false )
+		if ( it->second->isDivision() == false && it->second->isBrigade() == false && it->second->isGarrison() == false)
 			continue;
 
 		StratHCUnit* unit = (StratHCUnit*)it->second;
@@ -1025,7 +1020,6 @@ strtdbRestoreTOESupplies()
 			if ( wit->second.weapon().isSupplied() )
 				wit->second.saveText(len, buffer);
 		}
-		threadsLogging();
 	}
 
 	if ( len > 0 )

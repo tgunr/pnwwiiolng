@@ -17,14 +17,14 @@ namespace StratDB
 
 class StratObject;
 
-typedef std::vector<StratObject*> StratObjList;
-typedef int (*stratDatafn)(int scx, int scy, sdm_strat_data*);
+using StratObjList = std::vector<StratObject*>;
+using stratDatafn = int(*)(int scx, int scy, sdm_strat_data*);
 
 int Init(stratDatafn);
 void Kill();
 
 StratObject* FindStratObject(const sdm_full_obj_id&);
-StratObject* FindStratObject(const FULL_OBJ_ID&);
+StratObject* FindStratObject(const FULL_OBJ_ID);
 StratObject* FindStratObject(const char* cp, const char* fac = nullptr);
 
 // returns a list of objects with klass and type starting from start
@@ -81,6 +81,7 @@ public:
 
 	unsigned int StratFlags(bool filter = false) const;
 	unsigned int UpdateTime() const { return _updatetime; }
+	bool IsLoaded() const { return _loaded;  }
 	int VisLevel() const { return _vislevel;}
 
 // updated from strat server
@@ -91,6 +92,7 @@ public:
 	StratObject(sdm_cp const&, int sx, int sy);
 	StratObject(sdm_facility const&, int sx, int sy);
 	StratObject(sdm_building const&, int sx, int sy);
+	virtual ~StratObject() {}
 
 	// Comparison operator == just compare addresses (so that nullptr ptr compares work too)
 	bool operator==(const StratObject& rhs) const { return this == &rhs; }
@@ -101,6 +103,7 @@ public:
 	void SetName(const char* name);
 	void SetCountry(int country);
 	void SetUpdateTime(unsigned int t) { _updatetime = t; }
+	void SetLoaded(bool loaded) { _loaded = loaded; }
 	void SetStratFlags(unsigned int flags)  { _stratflags = flags; }
 	void SetVisLevel(int vislevel) { _vislevel = vislevel; }
 	void AddStratFlags(unsigned int flags)  { _stratflags |= flags; }
@@ -110,8 +113,8 @@ public:
 	void SetIndex(unsigned int i) { _index = i; }
 	unsigned int GetIndex() const { return _index; }
 
-typedef std::vector<StratObject*> ChildList;
-typedef std::vector<UINT32> UnitList;
+using ChildList = std::vector<StratObject*>;
+using UnitList = std::vector<UINT32>;
 
 	ChildList ChildStratObjects() const;
 
@@ -120,12 +123,12 @@ typedef std::vector<UINT32> UnitList;
 	bool IsUnitHere(unsigned int id) const;
 	const UnitList& GetUnits() const { return _units; }
 	unsigned int GetUnitCount() const { return (unsigned int)_units.size(); }
-	unsigned int FindBestUnit(int s, int c, int b) const;
+	unsigned int FindBestUnit(int s, int c, int b, bool ignoreGarrisons = false) const;
 	unsigned int FindBestAlliedUnit(int c, int b) const;
 
 	bool IsSpawnable() const;
 	bool IsDeepWaterPort() const;
-	bool IsRelated(const FULL_OBJ_ID& id) const;
+	bool IsRelated(const FULL_OBJ_ID id) const;
 	bool IsRelated(const StratDB::StratObject* strat) const;
 
 	StratDB::StratObject* GetLinkedDepot() const;
@@ -159,6 +162,7 @@ union StratTypeUnion
 	int _side, _country;
 	unsigned int _stratflags;
 	unsigned int _updatetime;
+	bool _loaded;
 	int _vislevel;
 
 	std::string _name;

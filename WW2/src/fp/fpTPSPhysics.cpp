@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "fp/fpTPSPhysics.h"
 #include "gr2/gr2Layer.h"
 #include "gr2/gr2Anim.h"
@@ -48,7 +48,7 @@ static Vec3d _focusPos;// player ragdoll position
 static int _numFallSounds = 4;
 #endif
 
-typedef std::vector<fpTPSRagdoll*> RagdollList;
+using RagdollList = std::vector<fpTPSRagdoll*>;
 
 struct WeaponShape
 {
@@ -75,7 +75,7 @@ struct WeaponShape
 	std::vector<Link> links;
 };
 
-typedef std::map<std::pair<int, int>, WeaponShape> WeaponShapeMap;
+using WeaponShapeMap = std::map<std::pair<int, int>, WeaponShape>;
 
 static RagdollList _ragdolls;
 static WeaponShapeMap _weapShapes;
@@ -611,7 +611,7 @@ static void _calculateCamPos(Vec3d& camPos, Vec3d& lookAt, UINT32 maxLOS)
 	if(strcmp(lastDebug, debug))
 	{
 		uiChatPrintLine(debug);
-		strncpy(lastDebug, debug, 255);
+		strsafecpy(lastDebug, debug);
 	}
 	*/
 }
@@ -850,7 +850,7 @@ bool fpTPSDeathCamera(piVECTOR* pos, piVECTOR* aim)
 			if(frametime > respawnTime && !uiFindView("despawn"))
 			{
 				SCEN_MGR->SetFlag(ScenarioManager::RESPAWN_ME);
-				vehExitVehicle(1,0,0);
+				vehExitVehicle();
 
 				// make it exit right away
 				v->VehicleDeadTime = frametime - 4000;
@@ -998,7 +998,7 @@ TestRagdoll::TestRagdoll() : gr2PhysicsModel()
     // setup our bone joints
     /*
         TBD
-     
+
 	//
 	// setup our joints
 	//
@@ -1598,7 +1598,7 @@ void fpTPSRagdoll::AddDrama(const Vec3d* force)
     gr2PhysicsBone* rforearm	= GetBone("Bip01 R Forearm");
     gr2PhysicsBone* pelvis		= GetBone("Bip01 Pelvis");
      */
-    
+
 	gr2PhysicsBone* lhand		= GetBone("Bip01 L Hand");
 	gr2PhysicsBone* rhand		= GetBone("Bip01 R Hand");
 	gr2PhysicsBone* lfoot		= GetBone("Bip01 L Foot");
@@ -2010,10 +2010,10 @@ fpTPSWeapon::fpTPSWeapon(gr2AnimTrooper* anim, const Vec3d* force, const WeaponS
 	Init();
 
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
-    
+
     /*
      TBD - incorporate velocity?  why commented out?
-     
+
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
      */
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
@@ -2389,10 +2389,10 @@ fpTPSKitObject::fpTPSKitObject(gr2AnimTrooper* anim, const Vec3d* force, const W
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
     /*
       TBD - incoporate velocity.  Why commented out below?
-     
+
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
      */
-    
+
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
 
 	Vec3d worldPos;

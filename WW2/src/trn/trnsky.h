@@ -3,7 +3,8 @@
 #define USE_LENS_FLARE
 //#undef USE_LENS_FLARE
 
-#define RAIN_CLOUD_HEIGHT       800.0f // Approx height of vertices in the .FLT file
+#define RAIN_CLOUD_HEIGHT_OFFSET 1000.0f // 1km - HACK: DEV-787
+#define RAIN_CLOUD_HEIGHT       RAIN_CLOUD_HEIGHT_OFFSET + 800.0f // Approx height of vertices in the .FLT file
 #define INTEROPLATE_DIST        500.0f // WAG
 #define START_SUNSHINE_HEIGHT   RAIN_CLOUD_HEIGHT + INTEROPLATE_DIST
 #define MIN_FOG_SCALE           1.0f//0.5f
@@ -60,12 +61,12 @@ enum ENUM_TERRAIN_COLOR
 };
 
 	extern LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale);
-	extern LOGICAL trnskyUpdate(void);
-	extern LOGICAL trnskyDrawDeprecated(void);
+	extern LOGICAL trnskyUpdate();
+	extern LOGICAL trnskyDrawDeprecated();
     extern void trnskyDraw();
-	extern void trnskyKill(void);
-	extern LIGHT* trnskyGetSunSource(void);
-	extern LIGHT* trnskyGetMoonSource(void);
+	extern void trnskyKill();
+	extern LIGHT* trnskyGetSunSource();
+	extern LIGHT* trnskyGetMoonSource();
 
     extern FLOAT32 trnskyGetColor(SINT32 i);
     extern FLOAT32 trnskyGetAltitude();

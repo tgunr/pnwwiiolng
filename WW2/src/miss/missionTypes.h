@@ -95,7 +95,7 @@ struct MISS_LAUNCH_UPDATE
 	bool	m_isOpen;						// Is mission still open?
 };
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 	#include "miss/missionServerTypes.h"
 #endif
 

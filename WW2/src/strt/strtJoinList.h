@@ -10,7 +10,7 @@ class WeapJoinRequestNode;
 class FacilityStruct;
 struct POSTED_WEAPON;
 
-typedef std::vector<WeapJoinRequestNode*> WeapJoinRequestList;
+using WeapJoinRequestList = std::vector<WeapJoinRequestNode*>;
 
 struct JOIN_LIST
 {

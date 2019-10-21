@@ -4,7 +4,7 @@
 
 #include "phui/Javascript.h"
 
-typedef std::map<std::string, std::string> jsAttributeMap;
+using jsAttributeMap = std::map<std::string, std::string>;
 
 /************************************************************************************************
 	jsContentData
@@ -12,8 +12,8 @@ typedef std::map<std::string, std::string> jsAttributeMap;
 
 struct jsContentData : public jsAttributeMap
 {
-	typedef std::vector<std::pair<std::string, std::string> > LinkList;
-	typedef std::vector<std::string> IncludeList;
+	using LinkList = std::vector<std::pair<std::string, std::string>>;
+	using IncludeList = std::vector<std::string>;
 
 	jsContentData() : type(0), body(""), links(nullptr), includes(nullptr), locMap(nullptr)
 	{
@@ -38,7 +38,7 @@ struct jsContentData : public jsAttributeMap
 
 	// some content contains name/value pairs in the body
 	// that are localization strings
-	typedef std::map<std::string, std::wstring> LocMap;
+	using LocMap = std::map<std::string, std::wstring>;
 	LocMap* locMap;
 };
 

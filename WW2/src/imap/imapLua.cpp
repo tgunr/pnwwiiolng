@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
 ** Lua binding: imap
 ** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:08.
@@ -721,6 +721,7 @@ TOLUA_API int tolua_imap_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"IMAP_MOM_UI_MAP_ZOOMOUT",IMAP_MOM_UI_MAP_ZOOMOUT);
    tolua_constant(tolua_S,"IMAP_CONTINUE_TUTORIAL",IMAP_CONTINUE_TUTORIAL);
    tolua_constant(tolua_S,"IMAP_MOM_SHOW_IN_GAME_MAP",IMAP_MOM_SHOW_IN_GAME_MAP);
+   tolua_constant(tolua_S,"IMAP_MOM_SHOW_IN_GAME_KEYMAPPER",IMAP_MOM_SHOW_IN_GAME_KEYMAPPER);
    tolua_constant(tolua_S,"IMAP_MOM_TAKE_SCREEN_SHOT",IMAP_MOM_TAKE_SCREEN_SHOT);
    tolua_constant(tolua_S,"IMAP_MOM_TOGGLE_HUD",IMAP_MOM_TOGGLE_HUD);
    tolua_constant(tolua_S,"IMAP_MOM_RESET_HUD",IMAP_MOM_RESET_HUD);

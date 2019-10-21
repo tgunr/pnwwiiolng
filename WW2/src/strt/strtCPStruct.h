@@ -13,24 +13,22 @@
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtDTL.h"
 #include "weap/weapDefs.h"
+#include "wwii/wwiiHCUnitsIndex.h"
 #include "strt/strtCPFlags.h"
 #include "inst/instDescriptor.h"
 
 class EWSReport;
 struct WEAPON_SERIAL;
-class StratHCUnit;
-
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
-
-//tolua_begin
 
 // Unit describing a player's request: <PlayerID,TimeStamp>
-typedef std::pair<UINT32,UINT32> PLAYER_REQUESTS;
+using PLAYER_REQUESTS = std::pair<UINT32,UINT32>;
 // This would be a queue if they weren't bugged under rh6
-typedef std::vector<UINT32> OVERRUNS;
-typedef std::map<UINT32,EWSReport*> EWSREPORTS;
-typedef std::vector<PLAYER_REQUESTS> HISTORY;
-typedef std::map<Brigade*,UINT32> ACTIVE_BRIGADES;
+using OVERRUNS = std::vector<UINT32>;
+using EWSREPORTS = std::map<UINT32,EWSReport*>;
+using HISTORY = std::vector<PLAYER_REQUESTS>;
+using ACTIVE_BRIGADES = std::map<Brigade*,UINT32>;
+
+//tolua_begin
 
 // External data structures
 extern const UINT32 attackFlags[MAX_SIDES];
@@ -108,6 +106,8 @@ struct CSAFE_CPStruct
 
 	bool 				m_contention;
 	bool 				m_enemyLinked;
+	bool 				m_frontline;
+	bool 				m_frontlineLinked;
 	bool				isUnderAttack;
 	bool				m_friendlyLinked;
 	bool				m_isSupplyCenter;
@@ -121,6 +121,16 @@ struct CSAFE_CPStruct
 	UINT64				m_lastUpdateNo;
 	TeulTimeMS			m_routeingRun;
 //tolua_begin
+};
+
+enum TOWN_STATUS
+{
+	INACTIVE = 0,
+	RESERVE,
+	BACK_LINE,
+	FRONT_LINE,
+	// Add new statuses here
+	MAX_TOWN_STATUS
 };
 
 class CPStruct : public CSAFE_CPStruct
@@ -139,6 +149,8 @@ public:
 		, m_units()
 		, m_value(0)
 		, m_brigades()
+		, m_townstatus(INACTIVE)
+		, m_lastCaptureTime(0)
 	{}
 
 	~CPStruct()
@@ -155,21 +167,21 @@ public:
 	UINT16 getPlayers(WWII_SIDE forSide=WWII_NO_SIDE, WEAPON_CATEGORY forWeap=_NO_CATEGORY) const
 											{ return m_players[forSide][forWeap]; }
 
-	CPStruct* clearAlerts(void)				{ _changeFlags(flags&~_alertFlags()); return this;}
+	CPStruct* clearAlerts()				{ _changeFlags(flags&~_alertFlags()); return this;}
 	CPStruct* clearFlag(UINT32 flag) { _changeFlags(flags&~flag); return this; }
 
 	CPStruct* clearFallback()				{ m_fallback = WWII_NO_SIDE; m_fallbackTime = 0; return clearFlag(CP_STAT_FALLBACK); }
 	CPStruct* clearHolding()				{ return clearFlag(CP_STAT_OWN_HAAC); }
 	CPStruct* clearObjective(WWII_SIDE forSide);
 	CPStruct* clearOverrun()				{ return clearFlag(CP_STAT_OVERRUN); }
-	CPStruct* clearOverrunHistory()			{ if ( m_overruns != nullptr ) { delete m_overruns; m_overruns = nullptr; } return this; }
+	CPStruct* clearOverrunHistory()			{ delete m_overruns; m_overruns = nullptr; return this; }
 
 	CPStruct* endContention();
 
 	bool isAttackObjective(WWII_SIDE forSide) const { return ( (flags & attackFlags[forSide]) != 0 ); }
-	bool isBridge(void) const { return (fullObjID.objType == CP_BRIDGE); }
+	bool isBridge() const { return (fullObjID.objType == CP_BRIDGE); }
 	bool isCaptureObjective(WWII_SIDE forSide) const { return ( isCity() && isAttackObjective(forSide) ); }
-	bool isCity(void) const { return (fullObjID.objType != CP_BRIDGE); }
+	bool isCity() const { return (fullObjID.objType != CP_BRIDGE); }
 	bool isDefendObjective(WWII_SIDE forSide) const { return (flags & defendFlags[forSide]) != 0; }
 	bool isFallingBack()					const { return (flags & CP_STAT_FALLBACK) != 0; }
 	bool isFallingBack(WWII_SIDE forSide)	const { return ( isFallingBack() && m_fallback == forSide ); }
@@ -185,7 +197,7 @@ public:
 	CPStruct* setAttackObjective(bool modifyObjectiveList=false, HCUnit* unit=nullptr);
 	CPStruct* setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList=false);
 	CPStruct* setFlag(UINT32 flag)	{ _changeFlags(flags|flag); return this; }
-	CPStruct* checkForUnderAttack(void);
+	CPStruct* checkForUnderAttack();
 
 	bool isSurrendering() const { return ( flags & CP_STAT_SURRENDER_CANDIDATE ) != 0; }
 	CPStruct* setSurrender(bool state) { if ( state ) _changeFlags(flags|CP_STAT_SURRENDER_CANDIDATE); else  _changeFlags(flags&(~CP_STAT_SURRENDER_CANDIDATE)); return this; }
@@ -216,8 +228,13 @@ public:
 	WWII_SIDE attacker() const { return m_attacker; }
 	HCUnit* attackingUnit() const { return m_attackingUnit; }
 
+	bool canChangeOwnership(WWII_COUNTRY toCountry, bool force);
+	bool changeOwnershipNoCapture(WWII_COUNTRY toCountry, bool force, bool quietly);
 	bool changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly);
+	void changeOwnershipFromScript(WWII_COUNTRY toCountry, bool force, bool quietly);
 
+	void checkTownStatus(CPStruct *, bool, int);
+	
 	void checkHCUnits();
 
 	bool enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility);
@@ -247,10 +264,14 @@ public:
 
 	bool isContested() const { return m_contention; }
 	bool isEnemyLinked() const { return m_enemyLinked; }
+	bool isFrontlineLinked() const { return m_frontlineLinked; }
+	bool isFrontline() const { return m_frontline; }
 	bool isFriendlyLinked() const { return m_friendlyLinked; }
 
+    bool islinkedToAnAO();
+
 	LinkStruct* link(UINT32 i) const;
-	LinkStruct* linkTo(const FULL_OBJ_ID& rhs) const;
+	LinkStruct* linkTo(const FULL_OBJ_ID rhs) const;
 	LinkStruct* linkTo(const CPStruct* rhs) const;
 
 	UINT32 minimumObjectiveLifetime(UINT32 currentTime) const;
@@ -280,6 +301,17 @@ public:
 
 	void setRouteing(bool isConnected);
 
+	// Purges the supply and unsubscribes the Toe Template header of all Garrisons in this cp.
+	void removeAllGarrisonsSupply();
+
+	// Changes the country and the toe Template header for all Garrisons in this cp.
+	void changeAllGarrisonCountries(WWII_COUNTRY countryID, bool manualChange);
+
+	StratHCUnit* getGarrisonHCUnit(BRANCH_ENUM branchID, BRANCH_ENUM movementType);
+
+	void disableAllGarrisons();
+	void enableAllGarrisons();
+
 	void setTableStates(bool isNewObjective = false);
 
 	// Is a particular side allowed to spawn here?
@@ -290,12 +322,13 @@ public:
 	// Check and update the friendly link status
 	void updateFriendlyLinkStatus();
 
-public:
-	typedef std::set<LinkStruct*> LINKS;
+//tolua_end
+	using LINKS = std::set<LinkStruct*>;
 
 public:
 	LINKS				m_links;
 
+//tolua_begin
 	// Cached responses for .own messages for various sides;
 	std::string 		ownMessage[MAX_SIDES];
 
@@ -314,8 +347,13 @@ public:
 	// How much our current brigade occupants make us worth
 	UINT32				m_value;
 
-//tolua_end
+	TOWN_STATUS				m_townstatus;
+
+	//tolua_end
 	ACTIVE_BRIGADES		m_brigades;
+
+	void setLastCaptureTime(UINT32 time);
+	UINT32 getLastCaptureTime() { return m_lastCaptureTime; }
 
 private:
 	//// Helper functions
@@ -328,6 +366,8 @@ private:
 
 	// Internal part of clearObjective
 	void _removeObjective(WWII_SIDE forSide);
+
+	UINT32	m_lastCaptureTime;
 
 public:
 //tolua_begin

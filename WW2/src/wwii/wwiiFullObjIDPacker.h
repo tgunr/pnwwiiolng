@@ -11,7 +11,7 @@ namespace Teul
 	struct Packer<FULL_OBJ_ID>
 	{
 		FULL_OBJ_ID m_value;
-		void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+		void packer(PackMode mode, ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
 		void pack(ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) const
 		{
 			UINT64 key = m_value.Key();

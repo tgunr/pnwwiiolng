@@ -13,8 +13,8 @@
 #include "chat/chatWho.h"
 #include "teul/teulTime.h"
 
-typedef std::map<ChatHandle, Chat::Who> SquadMembers;
-typedef std::vector<Recruiter> RecruiterList;
+using SquadMembers = std::map<ChatHandle, Chat::Who>;
+using RecruiterList = std::vector<Recruiter>;
 
 #define SQUAD_INVITATION_TIMEOUT 120
 

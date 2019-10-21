@@ -17,7 +17,7 @@ struct IRC
 	virtual bool ignoring(const char* channelName) const = 0;
 	virtual const std::string& nick() const = 0;
 
-	static const char _SERVER_PREFIX = '^';
+	enum : char { _SERVER_PREFIX = '^' };
 };
 
 #include "host/hostCommand.h"
@@ -54,8 +54,8 @@ extern bool wwiiIRCActivate(bool includeSigHup);
 extern void wwiiIRCTerminate(const char* reason);
 
 extern void wwiiIRCChannelMessage(const char* channel, const char* message);
-extern void wwiiIRCMessage(const char* channel, const char* fmt, ...) FORMAT_FUN(2,3);
+extern void wwiiIRCMessage(const char* channel, const char* fmt, ...) FORMAT_FN(2,3);
 extern void wwiiIRCChannelNotice(const char* channel, const char* message);
 
-typedef void(*irc_dotcmd_t)(Host::CommandMsg &);
+using irc_dotcmd_t = void(*)(Host::CommandMsg &);
 extern void wwiiIRCRegisterCommand(const char* command, irc_dotcmd_t function);

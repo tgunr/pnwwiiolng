@@ -7,13 +7,11 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-void chatInitDB(void);
-void chatLoadMotds(void);
+void chatInitDB();
+void chatLoadMotds();
 void chatdbRecordEvent(const SCHAR* category, const SCHAR* callsign, const SCHAR* event, const SCHAR* parameter, const SCHAR* data);
 
 class Property;
-Property* chatFindProperty(const struct FULL_OBJ_ID& id);
+Property* chatFindProperty(const struct FULL_OBJ_ID id);
 
-bool chatGetWWIIConfig(void);
-
-UINT32 chatGetPermissionNames(const PermissionMask& mask, char* into, UINT32 fromIndex);
+UINT32 chatGetPermissionNames(const PermissionMask& mask, std::string &into, UINT32 fromIndex);

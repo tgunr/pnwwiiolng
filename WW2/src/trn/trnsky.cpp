@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -79,14 +79,14 @@ static float rainfogclip = 1.0f;
 
 static piVECTOR		_StarField[NUM_STARS];
 
-static LOGICAL _UpdateSunLight(LIGHT* light, const TERRAINSKY* s);
-static LOGICAL _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s);
-static UINT32 _InitSun(void);
-static UINT32 _InitMoon(void);
-static UINT32 _UpdateFogSphere(void);
+static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s);
+static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s);
+static UINT32 _InitSun();
+static UINT32 _InitMoon();
+static void _UpdateFogSphere();
 static UINT32 _ColorObject(OBJECT * Object,UINT32 Color);
 static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color);
-static UINT32 _DrawStarsDeprecated(void);
+static UINT32 _DrawStarsDeprecated();
 
 static bool _moonfirsttime = true;
 static bool _sunfirsttime = true;
@@ -719,7 +719,7 @@ static inline float Interpolate(float fStart, float fEnd, float fPercent)
 	return fStart + (fEnd - fStart) * fPercent;
 }
 
-void computeFlareParameters(void)
+void computeFlareParameters()
 {
     // project the sun to the window
     Vec4f pos;
@@ -744,8 +744,8 @@ void computeFlareParameters(void)
     pos.z() /= pos.w();
     pos.w() = 1.0f;
 
-    float halfw = (float)WantedWidth * 0.5f;
-    float halfh = (float)WantedHeight * 0.5f;
+    float halfw = (float)ddpGetWidth() * 0.5f;
+    float halfh = (float)ddpGetHeight() * 0.5f;
 
    // halfw *= (FieldOfView / 90.0f);
    // halfh *= (FieldOfView / 90.0f);
@@ -778,8 +778,8 @@ void computeFlareParameters(void)
     }
 
     // set flare brightness
-    x /= (float)WantedWidth;
-    y /= (float)WantedHeight;
+    x /= (float)ddpGetWidth();
+    y /= (float)ddpGetHeight();
 
     float distance = math3dFastSqrt((FLOAT32)(((0.5f - x) * (0.5f - x)) + ((0.5f - y) * (0.5f - y))));
 	g_beforebright = Interpolate(0.0f, g_halfMaxBright, 1.0f - (distance * g_distanceScale));
@@ -804,7 +804,7 @@ FLOAT32 trnskyGetAfterBright()
 }
 #endif
 
-static LOGICAL FogUpdate(void)
+static void _FogUpdate()
 {
 	int j, num;
 
@@ -819,11 +819,9 @@ static LOGICAL FogUpdate(void)
 	}
 
 	num = sky->numverts;
-
-	return(TRUE);
 }
 
-LOGICAL trnskyUpdate(void)
+LOGICAL trnskyUpdate()
 {
 SINT32		paints;
 piVECTOR	pos, rot;
@@ -1188,7 +1186,7 @@ void trnskyDraw()
     }
 }
 
-LOGICAL trnskyDrawDeprecated(void)
+LOGICAL trnskyDrawDeprecated()
 {
     if(gCustomTerrain)
     {
@@ -1527,7 +1525,7 @@ LOGICAL trnskyDrawDeprecated(void)
 }
 
 #if USE_STATESET
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1604,7 +1602,7 @@ static UINT32 _DrawStarsDeprecated(void)
 	return 0;
 }
 #else
-static UINT32 _DrawStarsDeprecated(void)
+static UINT32 _DrawStarsDeprecated()
 {
 	static piLVERTEX	Vertex[NUM_STARS];
 	UINT32		i, num;
@@ -1697,7 +1695,7 @@ static UINT32 _DrawStarsDeprecated(void)
 
 extern void LensFlareKill();
 
-void trnskyKill(void)
+void trnskyKill()
 {
     LensFlareKill();
 
@@ -1739,7 +1737,7 @@ void trnskyKill(void)
     oglFreeMipTextures(skyboxtextures[SKY_TOP]);
 }
 
-static UINT32 _InitSun(void)
+static UINT32 _InitSun()
 {
 LIGHT Light;
 
@@ -1785,12 +1783,12 @@ LIGHT Light;
 	return 0;
 }
 
-LIGHT* trnskyGetSunSource(void)
+LIGHT* trnskyGetSunSource()
 {
-	return(_SunLight);
+	return _SunLight;
 }
 
-static UINT32 _InitMoon(void)
+static UINT32 _InitMoon()
 {
     TERRAINSKY* s = trndataGetSkyData(_setting);
 
@@ -1803,17 +1801,17 @@ static UINT32 _InitMoon(void)
 	strcpy(Light.name, "moon");
 	Light.flags = LITE_ON;
 	Light.light.dltType = piLIGHT_DIRECTIONAL;
-    Light.light.dcvColor.r = s->_moon.r * colorONEOVER255;
-	Light.light.dcvColor.g = s->_moon.g * colorONEOVER255;
-	Light.light.dcvColor.b = s->_moon.b * colorONEOVER255;
+    Light.light.dcvColor.r = s->_moon.r;
+	Light.light.dcvColor.g = s->_moon.g;
+	Light.light.dcvColor.b = s->_moon.b;
 	Light.light.dcvColor.a = 0.0f;
-	Light.light.dcvSpecular.r = s->_moon.r * colorONEOVER255;
-	Light.light.dcvSpecular.g = s->_moon.g * colorONEOVER255;
-	Light.light.dcvSpecular.b = s->_moon.b * colorONEOVER255;
+	Light.light.dcvSpecular.r = s->_moon.r;
+	Light.light.dcvSpecular.g = s->_moon.g;
+	Light.light.dcvSpecular.b = s->_moon.b;
 	Light.light.dcvSpecular.a = 0.0f;
-	Light.light.dcvAmbient.r = s->_moon.r * colorONEOVER255;
-	Light.light.dcvAmbient.g = s->_moon.g * colorONEOVER255;
-	Light.light.dcvAmbient.b = s->_moon.b * colorONEOVER255;
+	Light.light.dcvAmbient.r = s->_moon.r;
+	Light.light.dcvAmbient.g = s->_moon.g;
+	Light.light.dcvAmbient.b = s->_moon.b;
 	Light.light.dcvAmbient.a = 0.0f;
 	Light.light.dvPosition.x = 0;
 	Light.light.dvPosition.y = 0;
@@ -1836,7 +1834,7 @@ static UINT32 _InitMoon(void)
 	return 0;
 }
 
-LIGHT* trnskyGetMoonSource(void)
+LIGHT* trnskyGetMoonSource()
 {
 	return(_MoonLight);
 }
@@ -1845,9 +1843,9 @@ static void _resetsun(LIGHT* light)
 {
     TERRAINSKY* s = trndataGetSkyData(_setting);
 
-    light->light.dcvAmbient.r = s->_sunnight.r;
-    light->light.dcvAmbient.g = s->_sunnight.g;
-    light->light.dcvAmbient.b = s->_sunnight.b;
+    light->light.dcvAmbient.r = s->_skyclearambient.r;
+    light->light.dcvAmbient.g = s->_skyclearambient.g;
+    light->light.dcvAmbient.b = s->_skyclearambient.b;
 
     light->light.dcvSpecular.r = s->_sunnoon.r;
     light->light.dcvSpecular.g = s->_sunnoon.g;
@@ -1908,21 +1906,19 @@ static void InterpolateIfNecessary(TERRAINSKY& c)
     }
 }
 
-static LOGICAL _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
+static void _UpdateSunLight(LIGHT* light, const TERRAINSKY* s)
 {
-UINT32 TimeOfDay;
-FLOAT32 Angle;
-piVECTOR Vec, Dir;
-FLOAT32 TempNum;
-FLOAT32 Red,Green,Blue,Alpha;
-UINT32 Color;
-FLOAT64VECTOR WorldOriginOffset;
-FLOAT32 PlayerSunDotProduct;
-
-#define FADE_TIME   30000
+	UINT32 TimeOfDay;
+	FLOAT32 Angle;
+	piVECTOR Vec, Dir;
+	FLOAT32 TempNum;
+	FLOAT32 Red,Green,Blue,Alpha = 0.0f;
+	UINT32 Color;
+	FLOAT64VECTOR worldOriginOffset;
+	FLOAT32 PlayerSunDotProduct;
 
 	trnTODGetTimeOfDay(&TimeOfDay);
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
 	sunelevation = (FLOAT32)(fmod(2*PI*TimeOfDay/86400,2*PI));
 
@@ -1936,314 +1932,138 @@ FLOAT32 PlayerSunDotProduct;
 
 	PlayerSunDotProduct = mathVectDotProduct(&Dir,&playdir);
 
-	// now determine light
 	Vec.x = 0;
 	Vec.y = 0;
 	Vec.z = 1.0;
 
 	TempNum = mathVectDotProduct(&Vec,&Dir);
 
-#if(0)
-	// The Foliage material ambient color must be synchronized to the sun's angle in the sky.
-	// This causes the tree line objects to display properly. The 2X multiplier was used
-	// because the noon lighting of the objects was insufficient (this is related to the
-	// ambient color equation used by DirectX (and OpenGL, I guess?).
-	piGetMaterials(&lpmat);
-	lpmat = &lpmat[FoliageMatId];
-	Temp = -TempNum;
-	if (Temp < 0.0f)
-	{
-		Temp = 0.0f;
-	}
-
-    lpmat->material.ambient.r = 2.0f * (Temp + s->_skynightambient.r * colorONEOVER255);
-
-    if (lpmat->material.ambient.r > 2.0f)
-	{
-		lpmat->material.ambient.r = 2.0f;
-	}
-
-    lpmat->material.ambient.g = 2.0f * (Temp + s->_skynightambient.g * colorONEOVER255);
-
-    if (lpmat->material.ambient.g > 2.0f)
-	{
-		lpmat->material.ambient.g = 2.0f;
-	}
-
-    lpmat->material.ambient.b = 2.0f * (Temp + s->_skynightambient.b * colorONEOVER255);
-
-	if (lpmat->material.ambient.b > 2.0f)
-	{
-		lpmat->material.ambient.b = 2.0f;
-	}
-#endif
-
 	Angle = -(FLOAT32)mlRAD_TO_DEG(asin(TempNum));
 	_SunAngle = Angle;
 
-	// diffuse for daylight
-	if(Angle < -5.0)
+	if (_sunfirsttime)
 	{
-        Blue = s->_sunnight.b;
-        Green = s->_sunnight.g;
-        Red = s->_sunnight.r;
+		obdliteSetDynaState(light, FALSE);
+		_sunfirsttime = false;
+		_resetsun(light);
 	}
-	else if (Angle >= -5.0 && Angle < 0.0)
-	{
-		TempNum = (FLOAT32)((Angle+5.0) / 5.0);
 
-        Blue = (FLOAT32)(TempNum * s->_sunset.b + (1.0 - TempNum) * s->_sunnight.b);
-        Green = (FLOAT32)(TempNum * s->_sunset.g + (1.0 - TempNum) * s->_sunnight.g);
-        Red = (FLOAT32)(TempNum * s->_sunset.r + (1.0 - TempNum) * s->_sunnight.r);
+	// Night time, the sun is disabled, the moon lights the world.
+	if(Angle < -10.0)
+	{
+		obdliteSetDynaState(light, FALSE);
+
+		// Hide the sun
+		sundisk->child->flag2 &= ~OBJECT_HIDDEN;
 	}
+
+// Sunrise and sunset
+	// As the sun rises it's light gets faded in
+	// and as it falls it's light gets faded out.
+	else if (Angle >= -10.0 && Angle < 0.0)
+	{
+		obdliteSetDynaState(light, TRUE);
+
+		FLOAT32 t = (FLOAT32)((Angle) / -10.0);
+
+		t = 1.0f - std::max(std::min(t, 1.0f), 0.8f);
+
+		Red = t * s->_skyclearambient.r;
+		Green = t * s->_skyclearambient.g;
+		Blue = t * s->_skyclearambient.b;
+		//light->light.dcvAmbient.set(Red, Green, Blue, 1.0);
+
+		light->light.dcvSpecular.r = t * s->_sunset.r;
+		light->light.dcvSpecular.g = t * s->_sunset.g;
+		light->light.dcvSpecular.b = t * s->_sunset.b;
+
+		light->light.dcvColor.r = t * s->_sunset.r;
+		light->light.dcvColor.g = t * s->_sunset.g;
+		light->light.dcvColor.b = t * s->_sunset.b;
+		light->light.dcvColor.a = t;
+
+		// The Falloff value controls how light intensity decreases
+		// between the outer edge of the inner cone and the inner edge
+		// of the outer cone. This is not used, so using it for interpolating
+		// between sun on/off states. See obShader.
+		light->light.dvFalloff = t;
+		// Make the sun visible
+		sundisk->child->flag2 |= OBJECT_HIDDEN;
+	}
+	// Sunrise and sunset
+	// Fades the colour of the sun from daylight to a nice orange sunset
+	// and vice versa in the morning.
+	else if (Angle >= 0.0 && Angle < 15.0)
+	{
+		obdliteSetDynaState(light, TRUE);
+
+		FLOAT32 t = (FLOAT32)((Angle) / 15.0);
+
+		t = std::max(std::min(t, 1.0f), 0.8f);
+
+		Red = t * s->_skyclearambient.r;
+		Green = t * s->_skyclearambient.g;
+		Blue = t * s->_skyclearambient.b;
+		light->light.dcvAmbient.set(Red, Green, Blue, 1.0);
+
+		light->light.dcvSpecular.r = (FLOAT32)(t * s->_sunnoon.r + (1.0 - t) * s->_sunset.r);
+		light->light.dcvSpecular.g = (FLOAT32)(t * s->_sunnoon.g + (1.0 - t) * s->_sunset.g);
+		light->light.dcvSpecular.b = (FLOAT32)(t * s->_sunnoon.b + (1.0 - t) * s->_sunset.b);
+
+		light->light.dcvColor.r = (FLOAT32)(t * s->_sunnoon.r + (1.0 - t) * s->_sunset.r);
+		light->light.dcvColor.g = (FLOAT32)(t * s->_sunnoon.g + (1.0 - t) * s->_sunset.g);
+		light->light.dcvColor.b = (FLOAT32)(t * s->_sunnoon.b + (1.0 - t) * s->_sunset.b);
+		light->light.dcvColor.a = 1.0f;
+
+		// The Falloff value controls how light intensity decreases
+		// between the outer edge of the inner cone and the inner edge
+		// of the outer cone. This is not used, so using it for interpolating
+		// between sun on/off states. See obShader.
+		light->light.dvFalloff = t;
+		// Show the sun
+		sundisk->child->flag2 |= OBJECT_HIDDEN;
+	}
+	// Daytime.
 	else
 	{
-		if (Angle <= 15.0)
-		{
-			TempNum = (FLOAT32)((Angle) / 15.0);
-            Blue = (FLOAT32)(TempNum * s->_sunnoon.b + (1.0 - TempNum) * s->_sunset.b);
-		}
-		else
-		{
-            Blue = s->_sunnoon.b;
-		}
+		obdliteSetDynaState(light, TRUE);
 
-		if (Angle <= 10.0)
-		{
-			TempNum = (FLOAT32)((Angle) / 10.0);
-            Green = (FLOAT32)(TempNum * s->_sunnoon.g + (1.0 - TempNum) * s->_sunset.g);
-		}
-		else
-		{
-			Green = s->_sunnoon.g;
-		}
+		Red = s->_skyclearambient.r;
+		Green = s->_skyclearambient.g;
+		Blue = s->_skyclearambient.b;
+		light->light.dcvAmbient.set(Red, Green, Blue, 1.0);
 
-		if (Angle <= 5.0)
-		{
-			TempNum = (FLOAT32)((Angle) / 5.0);
-            Red = (FLOAT32)(TempNum * s->_sunnoon.r + (1.0 - TempNum) * s->_sunset.r);
-		}
-		else
-		{
-            Red = s->_sunnoon.r;
-		}
+		light->light.dcvSpecular.r = s->_sunnoon.r;
+		light->light.dcvSpecular.g = s->_sunnoon.g;
+		light->light.dcvSpecular.b = s->_sunnoon.b;
+
+		light->light.dcvColor.r = s->_sunnoon.r;
+		light->light.dcvColor.g = s->_sunnoon.g;
+		light->light.dcvColor.b = s->_sunnoon.b;
+		light->light.dcvColor.a = 1.0f;
+		light->light.dvFalloff = 1.0f;
+
+		sundisk->child->flag2 |= OBJECT_HIDDEN;
 	}
-
-    light->light.dcvColor.r = Red;
-    light->light.dcvColor.g = Green;
-    light->light.dcvColor.b = Blue;
-    light->light.dcvColor.a = 1.0f;
-
+	// Apply the above changes to the light.
     obdliteSetDynaLite(light);
 
-    static int sunfade = 0;
-    static int starttime = 0;
-    static FLOAT32 r, g, b;
-
-	// diffuse for sun disk
-	if (Angle < -5.0)
-	{
-        if(!sunfade && light->flags & LITE_ON && !_sunfirsttime)
-        {
-            //rnmainListText("SUN FADE DOWN BEGIN");
-            sunfade = 1;
-            starttime = frametime;
-
-            r = Red;
-            g = Green;
-            b = Blue;
-        }
-
-        if(_sunfirsttime)
-        {
-            obdliteSetDynaState(light, FALSE);
-            _sunfirsttime = false;
-            sunfade = 0;
-            _resetsun(light);
-        }
-
-        if(sunfade == 1)
-        {
-            SINT32 diff = frametime - starttime;
-            FLOAT32 t = 1.0f - (FLOAT32)diff / (FLOAT32)FADE_TIME;
-
-            t = t < 0.0f ? 0.0f : t;
-
-            light->light.dcvAmbient.r = t * s->_sunnight.r;
-            light->light.dcvAmbient.g = t * s->_sunnight.g;
-            light->light.dcvAmbient.b = t * s->_sunnight.b;
-
-            light->light.dcvSpecular.r = t * s->_sunnoon.r;
-            light->light.dcvSpecular.g = t * s->_sunnoon.g;
-            light->light.dcvSpecular.b = t * s->_sunnoon.b;
-
-            light->light.dcvColor.r = t * r;
-            light->light.dcvColor.g = t * g;
-            light->light.dcvColor.b = t * b;
-            light->light.dcvColor.a = 1.0f;
-
-            // The Falloff value controls how light intensity decreases
-            // between the outer edge of the inner cone and the inner edge
-            // of the outer cone. This is not used, so using it for interpolating
-            // between sun on/off states. See obShader.
-            light->light.dvFalloff = t;
-
-            if(diff > FADE_TIME + 100)
-            {
-                //rnmainListText("SUN FADE DISABLED");
-                sunfade = 0;
-                obdliteSetDynaState(light, FALSE);
-            }
-        }
-
-        obdliteSetDynaLite(light);
-
-        sundisk->child->flag2 |= OBJECT_HIDDEN;
-
-		Blue = s->_sunnight.b;
-		Green = s->_sunnight.g;
-		Red = s->_sunnight.r;
-
-        Alpha = 0;
-	}
-	else
-	{
-		sundisk->child->flag2 &= ~OBJECT_HIDDEN;
-
-		if (Angle >= -5.0 && Angle < 0.0)
-		{
-			TempNum = (FLOAT32)((Angle+5.0) / 5.0);
-			Alpha = TempNum * 255.0f;
-
-            Blue = (FLOAT32)(TempNum * s->_sunset.b + (1.0 - TempNum) * s->_sunnight.b);
-			Green = (FLOAT32)(TempNum * s->_sunset.g + (1.0 - TempNum) * s->_sunnight.g);
-			Red = (FLOAT32)(TempNum * s->_sunset.r + (1.0 - TempNum) * s->_sunnight.r);
-		}
-		else
-		{
-			Alpha = 255.0f;
-			if (Angle <= 15.0)
-			{
-				TempNum = (FLOAT32)((Angle) / 15.0);
-                Blue = (FLOAT32)(TempNum * s->_sunitselfnoon.b + (1.0 - TempNum) * s->_sunset.b);
-			}
-			else
-			{
-                Blue = s->_sunitselfnoon.b;
-			}
-
-			if (Angle <= 10.0)
-			{
-				TempNum = (FLOAT32)((Angle) / 10.0);
-                Green = (FLOAT32)(TempNum * s->_sunitselfnoon.g + (1.0 - TempNum) * s->_sunset.g);
-			}
-			else
-			{
-                Green = s->_sunitselfnoon.g;
-			}
-
-			if (Angle <= 5.0)
-			{
-				TempNum = (FLOAT32)((Angle) / 5.0);
-                Red = (FLOAT32)(TempNum * s->_sunitselfnoon.r + (1.0 - TempNum) * s->_sunset.r);
-			}
-			else
-			{
-                Red = s->_sunitselfnoon.r;
-			}
-        }
-
-        if(!sunfade && !(light->flags & LITE_ON) && !_sunfirsttime)
-        {
-            //rnmainListText("SUN FADE UP BEGIN");
-            sunfade = 1;
-            starttime = frametime;
-
-            r = Red;
-            g = Green;
-            b = Blue;
-        }
-
-        if(_sunfirsttime)
-        {
-            _sunfirsttime = false;
-            sunfade = 0;
-            _resetsun(light);
-        }
-
-     	obdliteSetDynaState(light, TRUE);
-
-        if(sunfade == 1)
-        {
-            SINT32 diff = frametime - starttime;
-            FLOAT32 t = (FLOAT32)diff / (FLOAT32)FADE_TIME;
-
-            t = t > 1.0f ? 1.0f : t;
-
-            light->light.dcvAmbient.r = t * s->_sunnight.r;
-            light->light.dcvAmbient.g = t * s->_sunnight.g;
-            light->light.dcvAmbient.b = t * s->_sunnight.b;
-
-            light->light.dcvSpecular.r = t * s->_sunnoon.r;
-            light->light.dcvSpecular.g = t * s->_sunnoon.g;
-            light->light.dcvSpecular.b = t * s->_sunnoon.b;
-
-            light->light.dcvColor.r = t * r;
-            light->light.dcvColor.g = t * g;
-            light->light.dcvColor.b = t * b;
-            light->light.dcvColor.a = 1.0f;
-
-            // The Falloff value controls how light intensity decreases
-            // between the outer edge of the inner cone and the inner edge
-            // of the outer cone. This is not used, so using it for interpolating
-            // between sun on/off states. See obShader.
-            light->light.dvFalloff = t;
-
-            if(diff > FADE_TIME + 100)
-            {
-                //rnmainListText("SUN FADE DISABLED");
-                sunfade = 0;
-            }
-		}
-
-        obdliteSetDynaLite(light);
-	}
-
+ // Use the colours calculated above to change the sundisk colour.
 	Color = piRGBA_MAKE((UINT32)(Red*255.0), (UINT32)(Green*255.0), (UINT32)(Blue*255.0), (UINT32)Alpha);
 	_ColorObject(sundisk, Color);
 
-	// ambient light
-	if (Angle < -5.0)
-	{
-        Red = s->_skynightambient.r;
-		Green = s->_skynightambient.g;
-		Blue = s->_skynightambient.b;
-	}
-	else
-	if (Angle >= -5.0 && Angle <= 15.0)
-	{
-		TempNum = (FLOAT32)((Angle + 5.0) / 20.0);
 
-        Red = (FLOAT32)(s->_skyclearambient.r * TempNum + s->_skynightambient.r * (1.0 - TempNum));
-		Green = (FLOAT32)(s->_skyclearambient.g  * TempNum + s->_skynightambient.g * (1.0 - TempNum));
-		Blue = (FLOAT32)(s->_skyclearambient.b  * TempNum + s->_skynightambient.b * (1.0 - TempNum));
-	}
-	else
-	{
-        Red = s->_skyclearambient.r;
-        Green = s->_skyclearambient.g;
-        Blue = s->_skyclearambient.b;
-	}
 
-    light->light.dcvAmbient.set(Red * colorONEOVER255, Green * colorONEOVER255, Blue * colorONEOVER255, 1.0);
+// horizon color
 
-	// horizon color
+	// After the sun has set
 	if (Angle < -10.0)
 	{
         Red = s->_skynightambient.r;
         Green = s->_skynightambient.g;
         Blue = s->_skynightambient.b;
 	}
+	// Sunset and sunrise
 	else if(Angle >= -10.0 && Angle <= 15.0)
 	{
 		TempNum = (FLOAT32)((Angle + 10.0) / 25.0);
@@ -2252,6 +2072,7 @@ FLOAT32 PlayerSunDotProduct;
 		Green = (FLOAT32)(s->_horizon.g * TempNum + s->_skynightambient.g * (1.0 - TempNum));
 		Blue = (FLOAT32)(s->_horizon.b * TempNum + s->_skynightambient.b * (1.0 - TempNum));
 	}
+	// Daytime.
 	else
 	{
         Red = s->_horizon.r;
@@ -2259,55 +2080,34 @@ FLOAT32 PlayerSunDotProduct;
         Blue = s->_horizon.b;
 	}
 
-	// now factor in altitude
-	if (playpos.z - WorldOriginOffset.z < 20000)
-	{
-		Red = (FLOAT32)(Red*(0.9 + 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-		Green = (FLOAT32)(Green*(0.9 + 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-		Blue = (FLOAT32)(Blue*(1.1 - 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-	}
-	else
-	{
-		Red = (FLOAT32)(Red*(0.9 + 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-		Green = (FLOAT32)(Green*(0.9 + 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-		Blue = (FLOAT32)(Blue*(1.1 - 0.1 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000)));
-
-		TempNum = (FLOAT32)(0.1 + 0.7 * (1.0 - (playpos.z - WorldOriginOffset.z - 10000) / 10000));
-		Blue = (FLOAT32)TempNum * Blue;
-	}
-
-	// now add in sun angle and view angle to sun into color scheme
-	TempNum = (FLOAT32)cos(mlDEG_TO_RAD(Angle));
-	TempNum *= PlayerSunDotProduct;
-	TempNum *= (FLOAT32)0.15;
-	if (TempNum > 0.0)
-	{
-		Red = (FLOAT32)((Red + light->light.dcvColor.r * 255.0 * TempNum) / (1.0 + TempNum));
-		Green = (FLOAT32)((Green + light->light.dcvColor.g * 255.0 * TempNum) / (1.0 + TempNum));
-		Blue = (FLOAT32)((Blue + light->light.dcvColor.b * 255.0 * TempNum) / (1.0 + TempNum));
-	}
-
-	_FogColor = FogColor = piRGBA_MAKE((UINT32)Red, (UINT32)Green, (UINT32)Blue, 255);
+	_FogColor = FogColor = piRGBA_MAKE((UINT32)(Red*255.0), (UINT32)(Green*255.0), (UINT32)(Blue*255.0), 255);
 
 	_ColorObject(horiz, FogColor);
 	_ColorObject(horiztop, FogColor);
 
-	// sky color
+
+
+
+// sky color
+
+	// After the sun has set. 
 	if (Angle < -10.0)
 	{
         Red = s->_skycolornight.r;
         Green = s->_skycolornight.g;
         Blue = s->_skycolornight.b;
 	}
+	// sunset and sunrise.
 	else
 	if (Angle >= -10.0 && Angle <= 15.0)
 	{
 		TempNum = (FLOAT32)((Angle + 10.0) / 25.0);
 
-        Red = (FLOAT32)(s->_skycolor.r * TempNum + s->_skycolornight.r * (1.0 - TempNum));
-        Green = (FLOAT32)(s->_skycolor.g * TempNum + s->_skycolornight.g * (1.0 - TempNum));
-        Blue = (FLOAT32)(s->_skycolor.b * TempNum + s->_skycolornight.b * (1.0 - TempNum));
+        Red = (FLOAT32)((s->_skycolor.r * TempNum) + (s->_skycolornight.r * (1.0 - TempNum)));
+        Green = (FLOAT32)((s->_skycolor.g * TempNum) + (s->_skycolornight.g * (1.0 - TempNum)));
+        Blue = (FLOAT32)((s->_skycolor.b * TempNum) + (s->_skycolornight.b * (1.0 - TempNum)));
 	}
+	// Daytime.
 	else
 	{
         Red = s->_skycolor.r;
@@ -2315,66 +2115,35 @@ FLOAT32 PlayerSunDotProduct;
         Blue = s->_skycolor.b;
 	}
 
-	// now factor in altitude
-	if (playpos.z - WorldOriginOffset.z < 10000)
-	{
-		TempNum = (FLOAT32)(0.5 + 0.5 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000));
-		Red = (FLOAT32)TempNum*Red;
-		Green = (FLOAT32)TempNum*Green;
-	}
-	else
-	{
-		TempNum = (FLOAT32)(0.5 + 0.5 * (1.0 - (playpos.z - WorldOriginOffset.z) / 20000));
-		Red = (FLOAT32)TempNum*Red;
-		Green = (FLOAT32)TempNum*Green;
-
-		TempNum = (FLOAT32)(0.5 + 0.5 * (1.0 - (playpos.z - WorldOriginOffset.z - 10000) / 10000));
-		Blue = (FLOAT32)TempNum * Blue;
-	}
-
-	TempNum = (FLOAT32)cos(mlDEG_TO_RAD(Angle));
-	TempNum *= PlayerSunDotProduct;
-	TempNum *= (FLOAT32)0.15;
-	if (TempNum > 0.0)
-	{
-		Red = (FLOAT32)((Red + light->light.dcvColor.r * 255.0 * TempNum) / (1.0 + TempNum));
-		Green = (FLOAT32)((Green + light->light.dcvColor.g * 255.0 * TempNum) / (1.0 + TempNum));
-		Blue = (FLOAT32)((Blue + light->light.dcvColor.b * 255.0 * TempNum) / (1.0 + TempNum));
-	}
-
-	Color = piRGBA_MAKE((UINT32)Red, (UINT32)Green, (UINT32)Blue, 255);
+	Color = piRGBA_MAKE((UINT32)(Red*255.0), (UINT32)(Green*255.0), (UINT32)(Blue*255.0), 255);
 
 	_ColorObject(sky,Color);
 
-	if (!FogUpdate())
-	{
-		return(FALSE);
-	}
-
-	return TRUE;
+	_FogUpdate();
 }
 
 static void _resetmoon(LIGHT* light)
 {
     TERRAINSKY* s = trndataGetSkyData(_setting);
 
-    light->light.dcvAmbient.r = s->_moon.r * colorONEOVER255;
-    light->light.dcvAmbient.g = s->_moon.g * colorONEOVER255;
-    light->light.dcvAmbient.b = s->_moon.b * colorONEOVER255;
+    light->light.dcvAmbient.r = s->_moon.r;
+    light->light.dcvAmbient.g = s->_moon.g;
+    light->light.dcvAmbient.b = s->_moon.b;
 
-    light->light.dcvSpecular.r = s->_moon.r * colorONEOVER255;
-    light->light.dcvSpecular.g = s->_moon.g * colorONEOVER255;
-    light->light.dcvSpecular.b = s->_moon.b * colorONEOVER255;
+    light->light.dcvSpecular.r = s->_moon.r;
+    light->light.dcvSpecular.g = s->_moon.g;
+    light->light.dcvSpecular.b = s->_moon.b;
 
     light->light.dvFalloff = 1.0f;
 }
 
-static LOGICAL _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
+static void _UpdateMoonLight(LIGHT* light, const TERRAINSKY* s)
 {
-UINT32 TimeOfDay;
-FLOAT32 Angle;
-piVECTOR Vec, Dir;
-FLOAT32 TempNum;
+	UINT32 TimeOfDay;
+	FLOAT32 Angle;
+	piVECTOR Vec, Dir;
+	FLOAT32 TempNum;
+	//FLOAT32 Red, Green, Blue, Alpha;
 
 	trnTODGetTimeOfDay(&TimeOfDay);
 
@@ -2396,117 +2165,78 @@ FLOAT32 TempNum;
 	TempNum = mathVectDotProduct(&Vec,&Dir);
 	Angle = -(FLOAT32)mlRAD_TO_DEG(asin(TempNum));
 
-#define FADE_TIME   30000
-
-    static SINT32 moonfade = 0;
-    static SINT32 starttime = 0;
-
-	if (Angle > 5.0)
+	if (_moonfirsttime)
 	{
-        if(!moonfade && light->flags & LITE_ON && !_moonfirsttime)
-        {
-            //rnmainListText("MOON FADE DOWN BEGIN");
-            moonfade = 1;
-            starttime = frametime;
-        }
-
-        if(_moonfirsttime)
-        {
-            obdliteSetDynaState(light, FALSE);
-            _moonfirsttime = false;
-            moonfade = 0;
-            _resetmoon(light);
-        }
-
-        if(moonfade == 1)
-        {
-            SINT32 diff = frametime - starttime;
-            FLOAT32 t = 1.0f - (FLOAT32)diff / (FLOAT32)FADE_TIME;
-
-            t = t < 0.0f ? 0.0f : t;
-
-            light->light.dcvAmbient.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvAmbient.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvAmbient.b = t * s->_moon.b * colorONEOVER255;
-
-            light->light.dcvSpecular.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvSpecular.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvSpecular.b = t * s->_moon.b * colorONEOVER255;
-
-            light->light.dcvColor.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvColor.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvColor.b = t * s->_moon.b * colorONEOVER255;
-            light->light.dcvColor.a = 1.0f;
-
-            // The Falloff value controls how light intensity decreases
-            // between the outer edge of the inner cone and the inner edge
-            // of the outer cone. This is not used, so using it for interpolating
-            // between moon on/off states. See obShader.
-            light->light.dvFalloff = t;
-
-            if(diff > FADE_TIME + 100)
-            {
-               // rnmainListText("MOON FADE DISABLED");
-                moonfade = 0;
-                obdliteSetDynaState(light, FALSE);
-            }
-        }
+		obdliteSetDynaState(light, FALSE);
+		_moonfirsttime = false;
+		_resetmoon(light);
 	}
+
+
+	// Daytime, the moon is disabled, the sun lights the world.
+	if (Angle > 10.0)
+	{
+		obdliteSetDynaState(light, FALSE);
+
+		// Hide the moon
+		moondisk->child->flag2 |= OBJECT_HIDDEN;
+		
+	}
+	// As the moon rises it's light gets faded in
+	// and as it falls it's light gets faded out.
+	else if (Angle <= 10.0 && Angle > -15.0)
+	{
+		obdliteSetDynaState(light, TRUE);
+
+		FLOAT32 t = (FLOAT32)((Angle - 10.0) / -20.0);
+
+		t = std::max(std::min(t, 1.0f), 0.8f);
+
+		light->light.dcvAmbient.r = t * s->_skynightambient.r;
+		light->light.dcvAmbient.g = t * s->_skynightambient.g;
+		light->light.dcvAmbient.b = t * s->_skynightambient.b;
+
+		light->light.dcvSpecular.r = t * s->_moon.r;
+		light->light.dcvSpecular.g = t * s->_moon.g;
+		light->light.dcvSpecular.b = t * s->_moon.b;
+
+		light->light.dcvColor.r = t * s->_skynightambient.r;
+		light->light.dcvColor.g = t * s->_skynightambient.g;
+		light->light.dcvColor.b = t * s->_skynightambient.b;
+		light->light.dcvColor.a = 1.0f;
+
+		// The Falloff value controls how light intensity decreases
+		// between the outer edge of the inner cone and the inner edge
+		// of the outer cone. This is not used, so using it for interpolating
+		// between sun on/off states. See obShader.
+		light->light.dvFalloff = t;
+		// Show the moon
+		moondisk->child->flag2 &= ~OBJECT_HIDDEN;
+	}
+	// Night time.
 	else
 	{
-        if(!moonfade && !(light->flags & LITE_ON) && !_moonfirsttime)
-        {
-           // rnmainListText("MOON FADE UP BEGIN");
-            moonfade = 1;
-            starttime = frametime;
-        }
+		obdliteSetDynaState(light, TRUE);
 
-        if(_moonfirsttime)
-        {
-    		obdliteSetDynaState(light, TRUE);
-            _moonfirsttime = false;
-            _resetmoon(light);
-        }
+		light->light.dcvAmbient.r = s->_skynightambient.r;
+		light->light.dcvAmbient.g = s->_skynightambient.g;
+		light->light.dcvAmbient.b = s->_skynightambient.b;
 
-        if(moonfade == 1)
-        {
-     		obdliteSetDynaState(light, TRUE);
+		light->light.dcvSpecular.r = s->_moon.r;
+		light->light.dcvSpecular.g = s->_moon.g;
+		light->light.dcvSpecular.b = s->_moon.b;
 
-            SINT32 diff = frametime - starttime;
-            FLOAT32 t = (FLOAT32)diff / (FLOAT32)FADE_TIME;
+		light->light.dcvColor.r = s->_skynightambient.r;
+		light->light.dcvColor.g = s->_skynightambient.g;
+		light->light.dcvColor.b = s->_skynightambient.b;
+		light->light.dcvColor.a = 1.0f;
+		light->light.dvFalloff = 1.0f;
 
-            t = t > 1.0f ? 1.0f : t;
-
-            light->light.dcvAmbient.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvAmbient.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvAmbient.b = t * s->_moon.b * colorONEOVER255;
-
-            light->light.dcvSpecular.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvSpecular.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvSpecular.b = t * s->_moon.b * colorONEOVER255;
-
-            light->light.dcvColor.r = t * s->_moon.r * colorONEOVER255;
-            light->light.dcvColor.g = t * s->_moon.g * colorONEOVER255;
-            light->light.dcvColor.b = t * s->_moon.b * colorONEOVER255;
-            light->light.dcvColor.a = 1.0f;
-
-            // The Falloff value controls how light intensity decreases
-            // between the outer edge of the inner cone and the inner edge
-            // of the outer cone. This is not used, so using it for interpolating
-            // between moon on/off states. See obShader.
-            light->light.dvFalloff = t;
-
-            if(diff > FADE_TIME + 100)
-            {
-             //   rnmainListText("MOON FADE DISABLED");
-                moonfade = 0;
-            }
-        }
+		moondisk->child->flag2 &= ~OBJECT_HIDDEN;
 	}
-
-    obdliteSetDynaLite(light);
-
-	return TRUE;
+	
+	// Apply the above changes to the light.
+	obdliteSetDynaLite(light);
 }
 
 static UINT32 _ColorObject(OBJECT * Object,UINT32 Color)
@@ -2663,16 +2393,16 @@ SINT32 trnskyGetFogOption()
     return _fogoption;
 }
 
-UINT32 _UpdateFogSphere(void)
+void _UpdateFogSphere()
 {
-FLOAT32 Alt, AltStep, InvFactor;
-UINT32 Poly;
-piVECTOR Pos;
-FLOAT32 FogStart,FogEnd;
-FLOAT32 ScaleFactor;
-FLOAT32 ZBufferNearVal;
-FLOAT32 FogScaleFactor;
-UINT32 TempNum;
+	FLOAT32 Alt, AltStep, InvFactor;
+	UINT32 Poly;
+	piVECTOR Pos;
+	FLOAT32 FogStart,FogEnd;
+	FLOAT32 ScaleFactor;
+	FLOAT32 ZBufferNearVal;
+	FLOAT32 FogScaleFactor;
+	UINT32 TempNum;
 
 	Alt = -playpos.z;
 
@@ -2693,11 +2423,11 @@ UINT32 TempNum;
         if(v)
         {
             static WEAPON_SPEC spec = NULL_WEAP_SPEC;
-            static LOGICAL firsttime = 1;
+            static bool firsttime = 1;
 
             if(firsttime)
             {
-                firsttime = 0;
+                firsttime = false;
                 spec = weapFindClass("sea");
             }
 
@@ -2823,12 +2553,7 @@ UINT32 TempNum;
 
 
 	// get the lower part of the sky hemisphere to fade into fog color
-	if (!FogUpdate())
-	{
-		return(FALSE);
-	}
-
-	return 0;
+	_FogUpdate();
 }
 
 void trnskyGetFogDensity(FLOAT32& start, FLOAT32& end)

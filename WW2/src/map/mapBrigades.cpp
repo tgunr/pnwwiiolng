@@ -9,8 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Supporting Programmer: Patrick "thunder" Macgruder
 
-#include "versionNo.h"
-
 #include <stdexcept>
 #include <algorithm>
 
@@ -35,11 +33,11 @@ UINT64 lastBrigadeMovement = 0LL;			// How many times brigades have been moved
 //////////////////////////////////////////////////////////////////////
 // Constructor for a BrigadeDetail object
 
-Brigade::Brigade(UINT32 withBrigadeID, UINT32 withParentID
+Brigade::Brigade(UINT32 withBrigadeID, HCUNIT_TYPE withTypeID, UINT32 withParentID
 				, WWII_COUNTRY withCountryID, BRANCH_ENUM withBranchID, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-				, const ChatHandle& withHandle, const char* withName, const char* nick, UINT8 withRank
-				, const FULL_OBJ_ID& homeCP, const ChatHandle& withOwner, RANK_NO withOwnerRank)
-		: BrigadeDetail(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
+				, const ChatHandle withHandle, const char* withName, const char* nick, UINT8 withRank
+				, const FULL_OBJ_ID homeCP, const ChatHandle withOwner, RANK_NO withOwnerRank)
+		: BrigadeDetail(withBrigadeID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 						, withHandle, withName, nick, withRank, homeCP, withOwner, withOwnerRank)
 		, m_missionPartitionIt(m_missionList.end())
 		, m_ownerID(0)
@@ -155,7 +153,7 @@ Brigade::addPlayer(Player* const player)
 
 	// Ok - this is where they should be added then
 	m_currentMembers.insert(it, std::make_pair(player->playerID(), player));
-	m_players = m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 
 	// Are they an officer?
 	if ( player->useRank().commissioned() )
@@ -188,7 +186,7 @@ Brigade::removePlayer(Player* const player)
 	m_currentMembers.erase(player->playerID());
 	m_currentOfficers.erase(player);
 
-	m_players = (m_currentMembers.empty()) ? 0 : m_currentMembers.size();
+	m_players = (UINT16)m_currentMembers.size();
 	updateOfficers();
 }
 
@@ -262,7 +260,7 @@ void
 Brigade::updateDestinations()
 {
 	// This function is a little complex because we need to try and avoid
-	// spending too much time dicking with these lists.
+	// spending too much time messing with these lists.
 	//
 	// So what we do is partition the mission list into a convenient
 	// active objective missions vs inactive/non-objective/non-city list.
@@ -289,7 +287,7 @@ Brigade::updateDestinations()
 		dbugLog(_FLI, "brig:%d missions: ", brigadeID());
 		for ( it = m_missionList.begin(); it != m_missionList.end(); ++it )
 		{
-			dbugLog(_FLIB, "%c%d:%s[%d] "
+			dbugLog(_FLI, "%c%d:%s[%d] "
 							, ((it == m_missionPartitionIt) ? '*' : '+')
 							, (*it)->missionID(), (*it)->targetCP()->name, _isObjectiveMission(*it));
 		}
@@ -365,25 +363,22 @@ Brigade::updateDestinations()
 //////////////////////////////////////////////////////////////////////
 // Update the officer count and lists
 
-static bool _rankCompare(const wwiiPlayer* lhs, const wwiiPlayer* rhs)
-{
-	return rhs->effectiveRank() < lhs->effectiveRank();
-}
-
 void
 Brigade::updateOfficers()
 {
-	m_officers = (m_currentOfficers.empty()) ? 0 : m_currentOfficers.size();
-	if ( officers() == 0 )
+	m_officers = (UINT16)m_currentOfficers.size();
+	if ( m_officers == 0 )
 		return;
 
 	wwiiPlayer* topOfficers[_MAX_OFFICERS];
 
-	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), &topOfficers[0], &topOfficers[_MAX_OFFICERS], _rankCompare);
+	partial_sort_copy(m_currentOfficers.begin(), m_currentOfficers.end(), std::begin(topOfficers), std::end(topOfficers), [](auto* lhs, auto* rhs) {
+		return rhs->effectiveRank() < lhs->effectiveRank();
+	});
 
-	for ( UINT32 i = 0; i < _MAX_OFFICERS; ++i )
+	for ( size_t i = 0; i < _MAX_OFFICERS; ++i )
 	{
-		if ( i < officers() )
+		if ( i < m_officers )
 		{
 			m_officerHandles[i] = topOfficers[i]->chatHandle();
 			m_officerRanks[i] = topOfficers[i]->effectiveRank();
@@ -403,13 +398,28 @@ Brigade*
 mapFindBrigade(UINT32 brigadeID)
 {
 	HCUnit* unit = HCUnit::Lookup(brigadeID);
-	return ( unit != nullptr && unit->type() == HCU_BRIGADE ) ? (Brigade*)unit : nullptr;
+	return ( unit != nullptr && (unit->type() == HCU_BRIGADE || unit->type() == HCU_GARRISON) ) ? (Brigade*)unit : nullptr;
+}
+
+void mapClearBrigadeMissions(UINT32 brigadeID)
+{
+	Brigade* brigade = (Brigade*)HCUnit::Lookup(brigadeID);
+	if (brigade->missions() > 0)
+	{
+		while (brigade->m_missionList.size() > 0)
+		{
+			Mission *mission = *brigade->m_missionList.begin();
+			delete mission;
+		}
+
+		mapNotifyPlayersInGarrison(brigadeID, brigade, brigade->country(), brigade->branch(), brigade->country());
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
 // Update the status of all brigades with missions at a particular CP
 
-typedef std::set<Brigade*> BRIGADE_SET;
+using BRIGADE_SET = std::set<Brigade*>;
 
 void
 mapUpdateBrigadesWithMissionsAt(const CPStruct* cp)

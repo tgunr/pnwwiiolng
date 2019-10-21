@@ -18,7 +18,7 @@ extern PLAYERS sidePlayers[MAX_SIDES];
 
 extern UINT32 _sideCount[];
 
-void chatInitPlayerLists(void);
+void chatInitPlayerLists();
 
 //This is the logic that is run whenever a logout is received on a teulIndex
 void chatLogoutPlayer(SINT32 teulIndex);

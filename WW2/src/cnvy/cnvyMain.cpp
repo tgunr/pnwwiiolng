@@ -28,7 +28,6 @@
 #include "strt/strtSupply.h"
 #include "strt/strtSpawn.h"
 #include "chat/chatStratSupportMessages.h"
-#include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"
 #include "strt/strtDB.h"
 #include "strt/strtHostDB.h"
@@ -59,7 +58,7 @@ static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
 static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
-typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
+using StratUpdateList = IntrusiveList<STRAT_UPDATE>;
 static StratUpdateList s_stratUpdateList;
 static STRAT_UPDATE* _convoyUpdate;
 
@@ -69,34 +68,20 @@ static STRAT_UPDATE* _convoyUpdate;
 static void _insertStratUpdate(STRAT_UPDATE* stratUpdate) {
 	ABORT_IF ( stratUpdate == nullptr );
 
-	if ( s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime ) {
-		if ( s_stratUpdateList.front() == stratUpdate ) {
-			dbugLog(_FLM, "Attempted to re-add strat update [%d : %d] @ %d",
-			        stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
-			return;
-		}
-
-		s_stratUpdateList.push_front(stratUpdate);
-		return;
-	}
-
 	for ( auto it = s_stratUpdateList.rbegin() ; it != s_stratUpdateList.rend() ; ++it ) {
 		if ( it->updateTime > stratUpdate->updateTime )
 			continue;
 
-		if ( it->m_next == stratUpdate ) {
+		if ( it->m_next == stratUpdate )
 			dbugLog(_FLM, "Attempted to re-add strat update [%d : %d] @ %d",
 			        stratUpdate->type, stratUpdate->value, stratUpdate->updateTime);
-			return;
-		}
-		
-		stratUpdate->link(it->m_next);
+		else
+			stratUpdate->link(it->m_next);
 
 		return;
 	}
 
-	// if we get here, the list must be out of order.
-	LogAbort("s_stratUpdateList is out of order");
+	s_stratUpdateList.push_front(stratUpdate);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -453,11 +438,11 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			_insertStratUpdate(update);
 			update = nullptr;
 		};
-		auto finish_update = [&update] (void) {
+		auto finish_update = [&update] () {
 			_releaseStratUpdate(update);
 			update = nullptr;
 		};
-		auto update_handled = [&update] (void) -> bool { return update == nullptr; };
+		auto update_handled = [&update] () -> bool { return update == nullptr; };
 
 		switch (update->type)
 		{
@@ -590,14 +575,13 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 		case STRAT_REFORM_BRIGADE:
 			// Redeploy a brigade to its division
 			dbugLog(_FLI, "hcu:%u reforming brigade", (UINT32)update->value);
-			// HACK: If successful, this will call StratHCUnit::deploy(), which will in
-			// turn "cancel" the event that triggered deploy(), freeing it. Since we're
-			// using preallocated memory, the result isn't a nice immediate crash but
-			// shenanigans down the road from having the same pointer get allocated twice.
-			if ( ! strtReformBrigade((UINT32)update->value, update) )
-				finish_update();
-			else
-				update = nullptr;
+			strtReformBrigade((UINT32)update->value, update);
+			// HACK: If successful, the above will call StratHCUnit::deploy(), which will in
+			// turn "cancel" the event that triggered deploy(), freeing it. If failed, the
+			// event will remain pointed to by the brigade, which will free it later.
+			// Either way, we're leaving this particular event's lifetime up to the brigade
+			// that owns it.
+			update = nullptr; // To mark as handled without (re-)deleting the event.
 		break;
 
 		default:

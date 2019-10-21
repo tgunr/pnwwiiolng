@@ -8,16 +8,14 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct WEAPON_SPEC;
-
-//tolua_begin
 
 extern void strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country, UINT32 branch);
-extern void strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m);
+extern void strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m);
 
 // Save all modified TOEWeaponEntries. Must be called once before
 // TOEWeaponEntries will begin saving - this prevents the initial
 // loading sequence from saving everything.
-extern void strtSaveTOESupplies();
+extern void strtSaveTOESupplies();  //tolua_export
 
-//tolua_end
+extern void strtClearTOESaveList(StratHCUnit& unit);
+

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "versionNo.h"						// For version dependent code
-
 #include "strt/strtFacilityStruct.h"		// Facility
 #include "strt/strtHostDB.h"				// strtSaveObject
 #include "strt/strtObjectStruct.h"			// ObjectStruct definition
@@ -162,7 +160,7 @@ ObjectStruct::setRepairRPs(UINT32 newRepairRPs)
 void
 ObjectStruct::setTableTimer(UCHAR inVisLevel, bool allowRebuild, bool shortRebuild)
 {
-	betaLog(_FLI, "setTableTimer(%s:%d -> %d) %s, %s"
+	dbugLog(_FLI, "setTableTimer(%s:%d -> %d) %s, %s"
 			, name , visLevel()
 			, inVisLevel
 			, ((allowRebuild)?"RB":"NORB")

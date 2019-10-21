@@ -22,9 +22,9 @@
 
 	};
 
-	typedef UINT32 oglMATERIALHANDLE;
-	typedef UINT32 oglTEXTUREHANDLE, *oglLPTEXTUREHANDLE;
-	typedef UINT32 oglCOLOR, *oglLPCOLOR;
+	using oglMATERIALHANDLE = UINT32;
+	using oglTEXTUREHANDLE = UINT32;
+	using oglCOLOR = UINT32;
 
 	enum
 	{
@@ -292,7 +292,7 @@
 
 	};
 
-	// these new guys need to be taken care of...
+	// these new states need to be taken care of...
 
 	enum oglRENDERSTATEFOGTYPE
 	{

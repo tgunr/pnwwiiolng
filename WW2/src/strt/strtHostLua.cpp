@@ -17,12 +17,10 @@
 #include "include/luaGlue.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiIRC.h"
-#include "wwii/wwiiConfigVars.h"
+#include "include/configVars.h"
 
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
-
-extern ConfigPath cv_luaRCFile, cv_luaStratlibFile;
 
 // Lua/Tolua API headers
 #ifdef __cplusplus
@@ -92,7 +90,7 @@ _getDouble(const char* function, int argc=0)
 		return 0;
 	}
 	double result = (double)lua_tonumber(L, -1);
-	betaLog(_FLI, "%s returned %g", function, result);
+	dbugLog(_FLI, "%s returned %g", function, result);
 	lua_pop(L, 1);
 	return result;
 }
@@ -173,7 +171,7 @@ bool stratCountsAsEngagement(const CPStruct& target) {
 }
 
 UINT32
-stratResupplyTime(const WEAPON_SPEC& weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer)
+stratResupplyTime(const WEAPON_SPEC weapon, StratHCUnit* unit, FacilityStruct* facility, UINT32 resupplyTimer)
 {
 	static const char* function = "resupplyTimeFn";
 
@@ -304,7 +302,7 @@ stratProcessLuaEventQueue()
 {
 //	static std::string code = "if LuaEvent then LuaEvent.ProcessQueue() end";
 //	Lua::RunObject("LuaEventQueue", code);
-	static std::string code = Lua::CompileCode("if LuaEvent then LuaEvent.ProcessQueue() end", "EventQueue");
+	static std::string code = Lua::CompileCode("if LuaEvent then\n\tLuaEvent.ProcessQueue()\nend\n", "EventQueue");
 	Lua::RunObject("EventQueue", code);
 }
 

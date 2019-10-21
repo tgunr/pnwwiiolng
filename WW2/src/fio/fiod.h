@@ -1,10 +1,21 @@
 #pragma once
 // The defines for the Archive portion of fiod
 
+#include "wwii/wwiiUTF.h"
+
 namespace IO { class MappedFile; }
 
-extern const char* fiodGetPrepath(void);
-extern void fiodSetPrepath(char* newpath);
+// TODO: Can be made internal
+extern const fullpath_t* fiodGetPrepath();
+extern bool fiodGetPrepath(char returnPrePath[PN_MAX_PATH + 1]);  //  MJH
+extern bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath);  //  MJH
+extern void fiodSetUserpath(bool userpath);
+
+struct UsingUserdir {
+	UsingUserdir(bool userdir = true) { fiodSetUserpath(userdir); }
+	~UsingUserdir() { fiodSetUserpath(false); }
+	operator bool(void) const { return false; }
+};
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);
 extern IO::MappedFile* fiodGetMappedFile(int fd);
@@ -21,37 +32,55 @@ extern int fiodEOF(int hfile);
 extern LOGICAL fiodAccess(const char* filename, bool userdir = false);
 extern LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir = false);
 extern size_t fiodFileSize(const char* name, bool userdir = false);
+extern bool fiodFileExists(const char* name, bool userdir = false);
 
 extern void fiodmkdir(const char* path);
 
-#if !defined(LIMITED_FIO)
-	extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
-	extern void fiocfgMkDir(const char* path, bool userdir = false);
+extern size_t fiodGetString(int hfile, char* string, size_t length);
 
-	#if platOS == OS_WIN32
-		#define fiocfgOpen fiodOpen
-		#define fiocfgOpenWrite fiodOpenWrite
-		#define fiocfgAccess fiodAccess
-		#define fiocfgModified fiodModified
-		#define fiocfgFileSize fiodFileSize
-	#else
-    size_t fiocfgRead(int fd, void* dptr, size_t length);
-		size_t fiocfgOpen(const char* filename, bool userdir = false);
-		size_t fiocfgOpenWrite(const char* filename, bool userdir = false);
-		LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
-		LOGICAL fiocfgModified(SINT32* modified, const char* filename, bool userdir = false);
-		SINT32 fiocfgFileSize(const char* name, bool userdir = false);
-	#endif
-#else // LIMITED_FIO
-	extern size_t fiodGetString(int hfile, char* string, size_t length);
+#if platBuild == BUILD_CLIENT
 
-	template<typename _Type>
-	static int fiodGet(int fd, _Type& into)
-	{
-		return fiodRead(fd, &into, sizeof(int));
-	}
+extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
+extern UINT32 fiodGetDirFileList_WC(wwiiolpath_string dirToSearch, std::vector<wwiiolpath_string> &fileList);
+
+extern void fiocfgMkDir(const char* path, bool userdir = false);
+
+#if platOS == OS_WIN32
+    #define fiocfgOpen fiodOpen
+    #define fiocfgOpenWrite fiodOpenWrite
+    LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
+    #define fiocfgModified fiodModified
+    #define fiocfgFileSize fiodFileSize
+#else
+size_t fiocfgRead(int fd, void* dptr, size_t length);
+    size_t fiocfgOpen(const char* filename, bool userdir = false);
+    size_t fiocfgOpenWrite(const char* filename, bool userdir = false);
+    LOGICAL fiocfgAccess(const char* filename, bool userdir = false);
+    LOGICAL fiocfgModified(SINT32* modified, const char* filename, bool userdir = false);
+    SINT32 fiocfgFileSize(const char* name, bool userdir = false);
+#endif
+
+#else // platBuild == BUILD_CLIENT
+
+template<typename _Type>
+static int fiodGet(int fd, _Type& into)
+{
+    return fiodRead(fd, &into, sizeof(int));
+}
+
 #endif
 
 #if RECORD_FILES
     extern void dumpFileRefs();
 #endif
+
+
+//==============
+
+UINT32 GetFullPath_unsafe(fullpath_t *path, const char* rawname);
+
+template <size_t N>
+UINT32 GetFullPath(fullpath_t(&path)[N], const char* name) {
+	static_assert ( N == PN_MAX_PATH , "All fio paths must be properly sized" );
+	return GetFullPath_unsafe(path, name);
+}

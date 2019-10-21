@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 ////////////////////////////////////////////////
 // Module: fxMgr.cpp
 // Description: Top level module for FX.
@@ -168,7 +168,7 @@ void fxMgrFreeAll()
     if(bSoundEnable)
     {
         fxSndKill();
-        fxAmbStop(TRUE);
+        fxAmbStop(true);
     }
 
     fxMiscResetAll();
@@ -273,20 +273,19 @@ void fxMgrUpdateSound()
 {
     if(!bSoundEnable) return;
 
-    UINT32 position = 0;
-    persGetPersonaPosition(&position);
+    UINT32 position = persGetPersonaPosition();
 
     // We are dead.
     if(persGetCrewIsDead(position))
     {
         fxSndStopSoundsForThisPosition(position);
-        fxAmbStop(TRUE);
+        fxAmbStop(true);
     }
     else
     {
         // Well, it turns out we could be dead, but not really! &*#&@*#!
         fxSndResetSoundsForThisPosition(position);
-        fxAmbStop(FALSE);
+        fxAmbStop(false);
     }
 
     fxSndUpdate();
@@ -336,7 +335,7 @@ SINT32 _SortCompare(const void* o1, const void* o2)
 // Function: fxMgrKill
 // Description: Top level kill for FX.
 /////////////////////////////////////////////////
-LOGICAL fxMgrKill()
+void fxMgrKill()
 {
    // fxkill();
 
@@ -365,8 +364,6 @@ LOGICAL fxMgrKill()
     }
 
     Write_Log(LOG_OLD, LOG_INFO, "[fxMgrKill]");
-
-    return TRUE;
 }
 
 /////////////////////////////////////////////////

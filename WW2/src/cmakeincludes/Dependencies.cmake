@@ -1,63 +1,88 @@
 # Server project dependencies.
+MARK_AS_ADVANCED(
+    LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR
+    GIT_EXECUTABLE
+    LIBIRCCLIENT_FOUND
+)
 
-MARK_AS_ADVANCED(CNL LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR)
+# We need PkgConfig for finding some things on Linux
+IF ( LINUX )
+	FIND_PACKAGE( PkgConfig REQUIRED )
+ENDIF()
 
-FIND_LIBRARY(CNL NAMES ncurses)
-IF ( UNIX AND NOT CNL )
- MESSAGE(SEND_ERROR "ncurses library not found")
-ENDIF ()
+# Make sure Git is available. While we don't use it further in the CMakeLists,
+# build_info needs it (unless PN_NO_BUILD_INFO is set).
+FIND_PROGRAM( GIT_EXECUTABLE NAMES git )
+IF ( NOT GIT_EXECUTABLE AND NOT PN_NO_BUILD_INFO )
+    MESSAGE( FATAL_ERROR "A working git executable is required" )
+ENDIF()
 
-# Include our macros etc
-find_package(MySQL REQUIRED)
+# Eventually we'll go find Lua, but for now pull in our embedded (outdated) one
+ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/lua51 lua51 )
+SET_TARGET_PROPERTIES( lua51 PROPERTIES FOLDER "Libs" )
 
-# Find SubVersion
-if ( 0 )
- find_package(Subversion REQUIRED)
- IF ( NOT Subversion_FOUND )
-	 message(SEND_ERROR "Unable to find subversion executables")
- ENDIF ( NOT Subversion_FOUND )
- # Ask Subversion for info on this working copy.
- Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-else ( )
-# include ( cmakeincludes/FindMercurial.cmake )
-# if ( NOT MERCURIAL_FOUND )
-#  message(SEND_ERROR "Unable to find mercurial executables")
-# endif ( )
-# MERCURIAL_HG_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-endif ( )
+# Ditto for tolua++ since we haven't gotten rid of it yet
+ADD_SUBDIRECTORY( ${LIBRARIES_DIR}/tolua++ ${CMAKE_CURRENT_BINARY_DIR}/tolua++ )
+SET_TARGET_PROPERTIES( libtolua++ PROPERTIES FOLDER "Libs" )
+SET_TARGET_PROPERTIES( tolua++ PROPERTIES FOLDER "Tools" )
 
-# Find Lua 5.1
-ADD_SUBDIRECTORY(${LIBRARIES_DIR}/lua51 ${CMAKE_CURRENT_BINARY_DIR}/lua51)
-INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR})
-SET_TARGET_PROPERTIES(lua51 PROPERTIES FOLDER "Libs")
+# On Windows, pull in our embedded libevent; elsewhere, search the system for it
+IF ( WIN32 )
+	ADD_SUBDIRECTORY( "${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent" )
+	SET( LIBEVENT_INCLUDE_DIRS "${LIBRARIES_DIR}/libevent/include" )
+	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
+	INCLUDE_DIRECTORIES( BEFORE SYSTEM ${LIBEVENT_INCLUDE_DIRS}/../WIN32-CODE )
+	SET_TARGET_PROPERTIES( event PROPERTIES FOLDER "Libs" )
+	SET(LIBEVENT_LIBRARIES event)
+ELSE()
+    FIND_PACKAGE( LibEvent REQUIRED )
+	INCLUDE_DIRECTORIES( SYSTEM ${LIBEVENT_INCLUDE_DIRS} )
+ENDIF()
 
-# Build/use tolua++
-ADD_SUBDIRECTORY(${LIBRARIES_DIR}/tolua++ ${CMAKE_CURRENT_BINARY_DIR}/tolua++)
-SET_TARGET_PROPERTIES(libtolua++ PROPERTIES FOLDER "Libs")
-SET_TARGET_PROPERTIES(tolua++ PROPERTIES FOLDER "Tools")
+IF ( LINUX )
+	# Need libcrypto
+	FIND_PACKAGE( OpenSSL REQUIRED )
+	LINK_LIBRARIES( OpenSSL::Crypto )
 
-IF ( UNIX )
-	find_program(CTAGS ctags)
-	add_custom_target(ctags
-		COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*
-		)
-	MARK_AS_ADVANCED(CTAGS)
-ENDIF ( )
+	# Need a modern libbsd
+	PKG_CHECK_MODULES( LibBsd REQUIRED IMPORTED_TARGET libbsd>=0.9.1 )
+	LINK_LIBRARIES( PkgConfig::LibBsd )
+ENDIF()
 
-IF ( WIN OR WIN32 OR WIN64 )
-	ADD_SUBDIRECTORY("${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent")
-	SET(LIBEVENT_INCLUDE_DIR "${LIBRARIES_DIR}/libevent/include")
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR})
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE)
-	SET_TARGET_PROPERTIES(event PROPERTIES FOLDER "Libs")
-ELSE ( )
-	FIND_LIBRARY(LIBEVENT_FOUND
-			NAMES	event-2.0-5 event-2.0 event2 event
-				libevent-2.0-5 libevent-2.0 libevent2 libevent
-			)
-	FIND_PATH(LIBEVENT_INCLUDE_DIR event2/event.h
-			HINTS /usr/include /usr/local/include)
-	IF (NOT LIBEVENT_FOUND OR NOT LIBEVENT_INCLUDE_DIR)
-		MESSAGE(FATAL_ERROR "libevent not found")
-	ENDIF ( )
-ENDIF ( )
+# Need Python for build_info.py
+FIND_PACKAGE( PythonInterp 2.7 REQUIRED )
+
+# Need libircclient
+INCLUDE_DIRECTORIES( libircclient/include )
+
+IF ( WIN32 )
+    # All the extra rigamarole is necessary because Windows insists on doing
+    # the absurd shenanigans it does with C runtimes.
+	FIND_LIBRARY( LIBXML2_DEBUG_LIBRARY
+		NAMES libxml2_a PATHS "${PROJECT_DIR}/WW2/lib/win/Debug/3rdParty"
+		NO_DEFAULT_PATH )
+	FIND_LIBRARY( LIBXML2_RELEASE_LIBRARY
+		NAMES libxml2_a PATHS "${PROJECT_DIR}/WW2/lib/win/Release/3rdParty"
+		NO_DEFAULT_PATH )
+	ADD_LIBRARY( LibXml2::LibXml2 STATIC IMPORTED )
+	SET_PROPERTY( TARGET LibXml2::LibXml2 PROPERTY INTERFACE_COMPILE_DEFINITIONS LIBXML_STATIC )
+	SET_PROPERTY( TARGET LibXml2::LibXml2 PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${LIBRARIES_DIR}/libxml2/include" )
+	SET_PROPERTY( TARGET LibXml2::LibXml2 APPEND PROPERTY IMPORTED_LOCATION_DEBUG "${LIBXML2_DEBUG_LIBRARY}" )
+	SET_PROPERTY( TARGET LibXml2::LibXml2 APPEND PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO "${LIBXML2_RELEASE_LIBRARY}" )
+
+	FIND_LIBRARY ( MYSQL_DEBUG_LIBRARY
+	    NAMES mysqlclient_debug PATHS "${LIBRARIES_DIR}/mysql/win${BUILD_BITNESS}/lib"
+	    NO_DEFAULT_PATH )
+	FIND_LIBRARY ( MYSQL_RELEASE_LIBRARY
+	    NAMES mysqlclient_release PATHS "${LIBRARIES_DIR}/mysql/win${BUILD_BITNESS}/lib"
+	    NO_DEFAULT_PATH )
+	ADD_LIBRARY( MySQL::MySQL STATIC IMPORTED )
+	SET_PROPERTY( TARGET MySQL::MySQL PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${LIBRARIES_DIR}/mysql/win${BUILD_BITNESS}/include" )
+	SET_PROPERTY( TARGET MySQL::MySQL APPEND PROPERTY IMPORTED_LOCATION_DEBUG "${MYSQL_DEBUG_LIBRARY}" )
+	SET_PROPERTY( TARGET MySQL::MySQL APPEND PROPERTY IMPORTED_LOCATION_RELWITHDEBINFO "${MYSQL_RELEASE_LIBRARY}" )
+ELSE()
+	FIND_PACKAGE( LibXml2 REQUIRED )
+    FIND_PACKAGE( MySQL REQUIRED )
+ENDIF()
+
+INCLUDE_DIRECTORIES( ${LIBRARIES_DIR}/json/src )

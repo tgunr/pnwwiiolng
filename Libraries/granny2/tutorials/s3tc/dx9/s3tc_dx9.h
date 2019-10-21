@@ -1,11 +1,11 @@
 #if !defined(S3TC_DX9_H)
 // ========================================================================
-// $File: //jeffr/granny/tutorial/s3tc/dx9/s3tc_dx9.h $
-// $DateTime: 2006/11/29 15:58:12 $
-// $Change: 13818 $
-// $Revision: #1 $
+// $File$
+// $DateTime$
+// $Change$
+// $Revision$
 //
-// (C) Copyright 1999-2008 by RAD Game Tools, All Rights Reserved.
+// $Notice: $
 // ========================================================================
 #include "granny.h"
 #include <d3d9.h>

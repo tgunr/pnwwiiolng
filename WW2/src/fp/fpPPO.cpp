@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include "fp/fpFPSinternal.h"
 #include "fp/fpPPO.h"
@@ -32,14 +32,23 @@
 #include "cfg/cfgPrefs.h"
 #include "wwii/wwiiPermissions.h"
 #include "client/GameClient.h"
+#include "wwii/wwiiPPOLoader.h"
+#include "wwii/wwiiServerTrackedObject.h"
+#include "client/GameClient.h"
+#include "weap/weapSpec.h"
 
 // WWIIOL specific.
 #include "strt/strtCPFlags.h"
-#include "omg/omgChat.hxx"
+#include "chat/omgChat.h"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 
-typedef std::map<UINT32,SINT32> PPO_SINK_MAP;
+using PPO_SINK_MAP = std::map<UINT32,SINT32>;
+
+extern PPOSpecLoader specLoader;
+
+std::vector<PPOSpec *> activePPOList;
+UINT16 activePPOIndex = 0;
 
 static int _badMat			= -1;
 static int _goodMat			= -1;
@@ -49,7 +58,6 @@ static std::wstring _fail	= L"";
 
 static PlayerPlacedObject* _placedObject = nullptr;
 
-static PPO_SPEC_MAP _ppoSpecMap;
 static PPO_SINK_MAP _ppoSinkMap;
 
 static ref_ptr<oglMaterial> ppomaterial;
@@ -58,6 +66,8 @@ static bool _ppoDrawCallback(OBJECT* o);
 static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side);
 static bool _checkFacilityRange(FLOAT32 distance, StratDB::StratObject* so, SINT32 side, bool friendly);
 static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radius);
+
+SINT32 globalMSCoolDownEnd = 0;
 
 struct AddDrawCallback
 {
@@ -127,9 +137,9 @@ PlayerPlacedObject::PlayerPlacedObject(PPOSpec* s) :
 	obj = obmgrCreateModelInstance(modelName, transform, true);
 	if(!obj) return;
 
-    struct AddDrawCallback addcallback;
-    addcallback.o = obj;
-    addcallback.Apply();
+	struct AddDrawCallback addcallback;
+	addcallback.o = obj;
+	addcallback.Apply();
 
 	// update our object's bounding box
 	trnopRecalcBoundsAndNormals(obj); // COMMENT: possible crash in ldmdlCalcNormals2() in here, #500+ in 1.33.4
@@ -236,7 +246,7 @@ void PlayerPlacedObject::UpdateColliders()
 	position.y() += forward.y;
 	position.z() += forward.z;
 
-	Vec3d& adjust = spec->rayAdjust;
+	Vec3d adjust(spec->rayAdjust);
 
 	if(spec->rotation)
 	{
@@ -257,18 +267,6 @@ void PlayerPlacedObject::UpdateColliders()
 		geom = geoms.at(i);
 
 		// set the ray pos
-
-		/*
-		switch(i)
-		{
-			case 0: rayPos.set(0,0,0);												break; // center
-			case 1: rayPos.set(bl.x + adjust.x(),bl.y + adjust.y(), 0);	break; // front left
-			case 2: rayPos.set(tr.x - adjust.x(),bl.y + adjust.y(), 0);	break; // front right
-			case 3: rayPos.set(bl.x + adjust.x(),tr.y - adjust.y(), 0);	break; // back left
-			case 4: rayPos.set(tr.x - adjust.x(),tr.y - adjust.y(), 0);		break; // back right
-		}
-		*/
-
 		switch(i)
 		{
 			case 0: rayPos.set(0,0,0);							break; // center
@@ -342,7 +340,7 @@ static bool _foundMaterial(std::vector<std::string>& texnames, const char* texna
 
 	for(unsigned int i = 0; i < texnames.size(); i++)
 	{
-		if(!stricmp(texnames[i].c_str(), texname))
+		if(!strcasecmp(texnames[i].c_str(), texname))
 			return true;
 	}
 
@@ -389,7 +387,17 @@ void PlayerPlacedObject::SetInvalid(const char* key, bool force)
 
 SINT32 PlayerPlacedObject::CoolDown()
 {
-	return spec->coolDownEnd;
+#ifdef BETA_RELEASE
+	if ( SuperTroop )
+		return 0;
+#endif
+
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+
+	return *coolDownEnd;
 }
 
 bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool checksOnly)
@@ -538,11 +546,11 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 					{
                         /*
                          TBD - this doesn't actually do anything.  Probably something unfinished?
-                         
+
 						OBJECT* ohit = colliderData<OBJECT>(hits[0].g2);
 						trnCDTerrainObject* thit = colliderSpaceData<trnCDTerrainObject>(hits[0].g2);
                          */
-                        
+
 						std::vector<std::string> desc = colliderGetDescription(diff);
 
 						SetInvalid("ppos.badavoidance");
@@ -787,78 +795,44 @@ void PlayerPlacedObject::SetValidityCallback(PPOCallback vc)
 	validityCallback = vc;
 }
 
-/*
-bool PlayerPlacedObject::GetTransform(piMATRIX& t)
-{
-	vehVehicle* player = playerGetVehicle();
-	if(!player) return false;
-
-	FLOAT64VECTOR pos		= player->ModelData->VehiclePos;
-	piMATRIX& att					= player->ModelData->VehicleAttMat;
-	FLOAT64VECTOR ppoPos	= {0, 0, 0};
-	piVECTOR ppoAtt				= {0, 0, 0};
-
-	piVECTOR forward				= {0,-7.0f,0};
-
-	// now orient the vector to our facing
-	math3dMultiplyRotation(&forward, &forward, &att);
-
-	pos.x += forward.x;
-	pos.y += forward.y;
-	pos.z += forward.z;
-
-	if(trnopDynamicBase(pos, att, 2.0f, 1.0f, ppoPos, ppoAtt))
-	{
-		t = IdentityMatrix;
-		mathEul_ToMatrix(&t, EulOrdXYZr, &ppoAtt);
-
-		t._41 = (FLOAT32)(ppoPos.x - WorldOriginOffset.x);
-		t._42 = (FLOAT32)(ppoPos.y - WorldOriginOffset.y);
-		t._43 = (FLOAT32)-(ppoPos.z - WorldOriginOffset.z);
-
-		return true;
-	}
-
-	return false;
-}
-*/
-
 static bool _ppoDrawCallback(OBJECT* o)
 {
 
 	if(fpFPSIsSwimming())
 		return true;
 
-    if(ogl::UseDeprecatedPath() && ppomaterial.valid())
-    {
-        oglSetRenderState(oglRENDERSTATE_LIGHTING, FALSE);
+	if(ogl::UseDeprecatedPath() && ppomaterial.valid())
+	{
+		oglSetRenderState(oglRENDERSTATE_LIGHTING, FALSE);
 
-        ppomaterial->AddTexture(0, o->texid);
-        ppomaterial->Apply();
+		ppomaterial->AddTexture(0, o->texid);
+       		ppomaterial->Apply();
 
-        int id = ppomaterial->GetMaterial();
-        const piMATERIAL& mat = oglGetMaterial(id);
+		int id = ppomaterial->GetMaterial();
+		const piMATERIAL& mat = oglGetMaterial(id);
 
-        oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(mat.diffuse.r, mat.diffuse.g, mat.diffuse.b, mat.diffuse.a));
+		oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(mat.diffuse.r, mat.diffuse.g, mat.diffuse.b, mat.diffuse.a));
 
-        oglSetWorldMatrix(&o->mat);
-        obdrawDrawMesh(o);
+		oglSetWorldMatrix(&o->mat);
+		obdrawDrawMesh(o);
 
-        oglSetRenderState(oglRENDERSTATE_LIGHTING, piLIGHTING_DEFAULT);
-        oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(1, 1, 1, 1));
-    }
-    else
-    {
-        // TODO
-    }
+		oglSetRenderState(oglRENDERSTATE_LIGHTING, piLIGHTING_DEFAULT);
+		oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(1, 1, 1, 1));
+	}
+	else
+	{
+		// TODO
+	}
 
-    return true;
+	return true;
 }
 
 bool PlayerPlacedObject::Update()
 {
 	piVECTOR pos	= {0, 0, 0};
 	piVECTOR att	= {0, 0, 0};
+
+	SINT32 coolDownEnd = CoolDown();
 
 	if(!lastUpdate)
 		lastUpdate = frametime;
@@ -869,7 +843,7 @@ bool PlayerPlacedObject::Update()
 		CalculatePlacement(pos, att, true);
 
 		if(Modified())
-            ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
+			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
 		if(frametime < buildAt) // we're building
 		{
@@ -897,10 +871,10 @@ bool PlayerPlacedObject::Update()
 
 		UpdateColliders();
 
-		if(CalculatePlacement(pos, att))
+		if(CalculatePlacement(pos, att) && obj != nullptr)
 			ogrpMoveAndRotateObjectGroup(obj, &pos, &att);
 
-		if(frametime <= spec->coolDownEnd)
+		if(frametime <= coolDownEnd)
 		{
 			_fail = uiLocString("ppos.coolingdown");
 			valid = false;
@@ -913,12 +887,12 @@ bool PlayerPlacedObject::Update()
 		}
 
 		if(Modified())
-            ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
+			ppomaterial->SetMaterial((valid) ? _goodMat: _badMat);
 
-		if(frametime <= spec->coolDownEnd) // we're cooling off
+		if(frametime <= coolDownEnd) // we're cooling off
 		{
 			// we did our cool down start
-			SINT32 coolDownStart = spec->coolDownEnd - spec->coolDown;
+			SINT32 coolDownStart = coolDownEnd - spec->coolDown;
 			SINT32 coolDownProgress = frametime - coolDownStart;
 
 			if(coolDownProgress < 0)
@@ -935,7 +909,8 @@ bool PlayerPlacedObject::Update()
 
 			// Used to offset progress by however much progress we already have
 
-			float progress = float(coolDownProgress) / float(spec->coolDown);
+            
+            float progress = (spec->coolDown)?(float(coolDownProgress) / float(spec->coolDown)):0.0f;
 
 			char script[128+1];
 			snprintf(script, 128, "game.oncooldown(%f)", progress);
@@ -967,7 +942,12 @@ bool PlayerPlacedObject::Build()
 {
 	if(valid && buildAt == 0)
 	{
-		buildAt = frametime + spec->buildTime;
+#ifdef BETA_RELEASE
+		if ( SuperTroop )
+			buildAt = frametime;
+		else
+#endif
+			buildAt = frametime + spec->buildTime;
 		buildUI = uiLoadView("buildppo");
 
 		if(buildUI)
@@ -1005,7 +985,12 @@ bool PlayerPlacedObject::Execute()
 {
 	Interrupt();
 
-	// might need to do a max object count here
+    SINT32 *coolDownEnd = &globalMSCoolDownEnd;
+
+    if (spec && spec->stotype != ServerTrackedObject::_UMS)
+        coolDownEnd = &spec->coolDownEnd;
+
+    // might need to do a max object count here
 	// if too many objects, make invalid
 
 	// if we have an execute callback and it returns false, then
@@ -1018,28 +1003,48 @@ bool PlayerPlacedObject::Execute()
 	    WorldPosition_m position(finalPos.x(), finalPos.y(), finalPos.z());
 		AttitudeVector attitude(finalAtt.x, finalAtt.y, finalAtt.z);
 
+        vehVehicle* player = persGetPersonaVehiclePtr();
 		if(Online)
 		{
-			// create a ppo sto
-			PlayerPlacedSTO sto(0, spec->id, position, attitude);
 
-			// send the request to the host
-			sto.request(PlayerClient()->ChatConnection());
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                // create a ppo sto
+                PlayerPlacedSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
+
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+            }
+            else
+            {
+                // create a ppo sto
+                MobileSpawnSTO sto(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+
+                // send the request to the host
+                sto.request(PlayerClient()->ChatConnection());
+
+            }
 		}
 		else
 		{
-			PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, spec->id, position, attitude);
-			ServerTrackedObject::addToIndex(sto);
-			trnCDUpdateCollideLists(true);
-			//sto->Sink();
+
+            if (spec->stotype != ServerTrackedObject::_UMS)
+            {
+                PlayerPlacedSTO* sto = new PlayerPlacedSTO(0, static_cast<UINT16>(spec->id), position, attitude, static_cast<UINT16>(spec->stotype), (UINT32)player->Country);
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
+            else
+            {
+                MobileSpawnSTO* sto = new MobileSpawnSTO(0, static_cast<UINT16>(spec->id), position, attitude, (UINT32)player->Country);
+                ServerTrackedObject::addToIndex(sto);
+                trnCDUpdateCollideLists(true);
+                //sto->Sink();
+            }
 		}
 
-		// fru's are shared and get their cool down from the host
-		if(!Online || spec->id != FRU_INDEX)
-		{
-			// we should apply non-shared cool downs here
-			spec->coolDownEnd = frametime + spec->coolDown;
-		}
+        *coolDownEnd = frametime + spec->coolDown;
 
 		// handle troop specific stuff
 		fpFPSCancelPPO();
@@ -1075,8 +1080,42 @@ bool PlayerPlacedObject::Modified()
 	return false;
 }
 
+void fpPPOInitiateBuildAction(UINT32 & state, UINT32 & control, SINT32 & stance)
+{
+    PlayerPlacedObject* ppo = fpPPOGet();
+
+    if(ppo)
+    {
+        Write_Log (LOG_FPS, LOG_INFO, "Building ppo!");
+
+        if(ppo->Build())
+        {
+            state &= static_cast<UINT32>(~STATE_HOLD_FIRE);
+            control &= static_cast<UINT32>(~FPS_FIRE);
+
+            stance = fpFPSGetPlayerPose();
+
+            if(stance != POSE_CROUCH)
+            {
+                control |= static_cast<UINT32>(FPS_CROUCH);
+                control &= static_cast<UINT32>(~FPS_PRONE);
+            }
+
+            if(stance == POSE_TRANSITION)
+                stance = POSE_CROUCH;
+        }
+    }
+
+    //fpsTrooper.firedWeapon = 1;
+
+}
+
 void fpPPOSet(PlayerPlacedObject* to)
 {
+    // do nothing if already set
+    if (to != nullptr && to == _placedObject)
+        return;
+
 	if(_placedObject)
 		delete _placedObject;
 
@@ -1086,6 +1125,60 @@ void fpPPOSet(PlayerPlacedObject* to)
 PlayerPlacedObject* fpPPOGet()
 {
 	return _placedObject;
+}
+
+/*
+  The user has elected to switch to the next PPO type.
+  Usually due to pressing the mapped "cycle ammo" key <BKSP> default.
+ */
+void fpPPOSwitchPPO(bool adjust) {
+	if ( activePPOList.size() ) {
+		PPOCallback up = nullptr, ex = nullptr, val = nullptr;
+		if ( _placedObject ) {
+			up = _placedObject->updateCallback;
+			ex = _placedObject->executeCallback;
+			val = _placedObject->validityCallback;
+			fpPPOKill(false);
+		}
+
+		if ( adjust )
+			++activePPOIndex;
+
+		if ( activePPOIndex >= activePPOList.size() )
+			activePPOIndex = 0;
+
+		fpPPOSet(fpPPOCreate(activePPOList[activePPOIndex]->id, up, ex, val));
+	}
+}
+
+/*
+ Called when you wish to reset the list of possible PPOs that the current vehicle can build.
+ Should be called when the BUILD weapon is first selected.
+ */
+void fpPPOReset()
+{
+	static WEAPON_SPEC troop = NULL_WEAP_SPEC;
+	static bool firsttime = true;
+
+	if(firsttime)
+	{
+		firsttime = false;
+		troop = weapCreateSpec("GV_troop.1");
+	}
+
+	activePPOIndex = 0;
+
+	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
+    vehType* vtype = VehicleData->VehicleMasterPtr->VehicleType;
+
+	// only allow FRUs for infrantry when mission leader
+	bool allowFrus = vtype->WeaponSpec.wClass != troop.wClass || (Online && PlayerClient()->IsMissionLeader());
+
+    // make sure this class/type has ppo types available to it
+    if (specLoader.getAllowedPPOs(vtype->WeaponSpec.wClass, vtype->WeaponSpec.wType, activePPOList, !allowFrus))
+	{
+		fpPPOSwitchPPO(false);
+	}
 }
 
 bool fpPPOUpdate()
@@ -1120,18 +1213,24 @@ bool fpPPOUpdate()
 	return false;
 }
 
-void fpPPOKill()
+void fpPPOKill(bool release)
 {
-	fpPPOCancel();
+    if (release)
+    {
+        activePPOIndex = 0;
+        activePPOList.clear();
+    }
+	fpPPOCancel(release);
 	fpPPOSet(nullptr);
 }
 
-void fpPPOCancel()
+void fpPPOCancel(bool release)
 {
 	if(_placedObject)
 	{
 		_placedObject->Interrupt();
-		fpFPSCancelPPO();
+        if (release)
+            fpFPSCancelPPO();
 	}
 }
 
@@ -1197,42 +1296,7 @@ void fpPPOCreateMaterial()
 	}
 }
 
-static void _loadSpecMap()
-{
-	_ppoSpecMap.clear();
-
-	// create a spec loader
-	PPOSpecLoader loader(PPO_SPEC, &_ppoSpecMap);
-
-	// load up the ppo specs
-	loader.Load();
-
-	if(Online)
-	{
-		ARENA_VARS::iterator itr = g_arenaDescription.find("fru_cooldown");
-
-		if(itr != g_arenaDescription.end())
-		{
-			PPO_SPEC_MAP::iterator it = _ppoSpecMap.begin();
-
-			for(; it != _ppoSpecMap.end(); ++it)
-			{
-				if(it->first == FRU_INDEX)
-					it->second.coolDown = (SINT32)atol(itr->second.c_str());
-			}
-		}
-
-		PPO_SPEC_MAP::iterator pit = _ppoSpecMap.begin();
-
-		for(; pit != _ppoSpecMap.end(); ++pit)
-		{
-			if(pit->first == FRU_INDEX)
-				pit->second.coolDown = 420000;
-		}
-	}
-}
-
-PlayerPlacedObject* fpPPOCreate(int type,  bool save)
+PlayerPlacedObject* fpPPOCreate(int type,  PPOCallback updateCB, PPOCallback executeCB, PPOCallback validityCB, bool save)
 {
 	static int _lastType = -1;
 
@@ -1247,28 +1311,22 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 
 	_fail = L"";
 
-	PPOSpec* spec = fpPPOGetSpec(type);
+	PPOSpec* spec = specLoader.ppoGetSpec(type);
 	if(!spec) return nullptr;
 
-	if(!fpPPOReady(type))
-		return nullptr;
-
 	// make sure our materials are created
-    fpPPOCreateMaterial();
+	fpPPOCreateMaterial();
 
-	if(Online && spec->id == FRU_INDEX)
+	if(Online && spec->stotype == ServerTrackedObject::_UMS)
 	{
 		const Chat::MissionStatus* ms = PlayerClient()->MissionStatus();
 
 		if(ms)
 		{
 			SINT32 remaining	= SINT32(ms->fru().cooldownRemaining());
-			spec->coolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
+			globalMSCoolDownEnd	= (remaining > 0) ? frametime + remaining : 0;
 		}
 	}
-
-	//if(false && !Online)
-	//	coolDown = fpPPOSetCooldown(0);
 
 	PlayerPlacedObject* ppo = new PlayerPlacedObject(spec);
 
@@ -1279,40 +1337,14 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 		ppo = nullptr;
 	}
 
+    ppo->SetUpdateCallback(updateCB);
+    ppo->SetExecuteCallback(executeCB);
+    ppo->SetValidityCallback(validityCB);
+
 	if(save)
 		fpPPOSet(ppo);
 
 	return ppo;
-}
-
-bool fpPPOReady(int type)
-{
-	PPOSpec* spec = fpPPOGetSpec(type);
-	if(!spec) return false;
-
-	// grab the spec and make sure we can create one
-	// check _lastPlacement against the spec
-	PPO_SPEC_MAP::iterator it = _ppoSpecMap.find(type);
-
-	if(it != _ppoSpecMap.end())
-	{
-		//if(it->second.
-	}
-
-	return true;
-}
-
-PPOSpec* fpPPOGetSpec(int type)
-{
-	if(_ppoSpecMap.empty())
-		_loadSpecMap();
-
-	PPO_SPEC_MAP::iterator found = _ppoSpecMap.find(type);
-
-	if(found != _ppoSpecMap.end())
-		return &found->second;
-
-	return nullptr;
 }
 
 void fpPPOAlert(const wchar_t* message)
@@ -1348,9 +1380,6 @@ PlayerPlacedSTO::~PlayerPlacedSTO()
 bool PlayerPlacedSTO::applyJoules(const SINT64& joules, class Player* player)
 {
 	return TerrainSTO::applyJoules(joules, player);
-
-	//Sink();
-	//return true;
 }
 
 bool PlayerPlacedSTO::load()
@@ -1365,12 +1394,22 @@ bool PlayerPlacedSTO::load()
 
 const char* PlayerPlacedSTO::model() const
 {
-	PPOSpec* spec = fpPPOGetSpec(m_subType);
+	PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
 
 	if(spec)
 		return spec->modelName.c_str();
 
 	return "";
+}
+
+const char* MobileSpawnSTO::model() const
+{
+    PPOSpec* spec = specLoader.ppoGetSpec(m_subType);
+
+    if(spec)
+        return spec->modelName.c_str();
+
+    return "";
 }
 
 void PlayerPlacedSTO::Sink()
@@ -1411,12 +1450,6 @@ void PlayerPlacedSTO::Sink()
 	}
 }
 
-static LOGICAL _sinkppo(struct OBJECT* o, void* userdata)
-{
-	o->mat._43 += (float)(*((FLOAT64*)userdata));
-	return TRUE;
-}
-
 void PlayerPlacedSTO::Update()
 {
 	FLOAT64 delta = (FLOAT64(frametime) - FLOAT64(_lastUpdate)) / 1000.0f;
@@ -1424,18 +1457,8 @@ void PlayerPlacedSTO::Update()
 
 	FLOAT64 move = SINK_RATE * delta;
 
-	obmainFindCallback(_to, _sinkppo, &move);
-
-	/*
-	FLOAT64ATT att;
-	att.Roll	= attitude().x();
-	att.Pitch	= attitude().y();
-	att.Yaw		= attitude().z();
-
-	_pos.z -= move;
-
-	mlMoveAndRotateObject(_to, &_pos, &att);
-	*/
+	auto sinkppo = [](OBJECT& o, void* userdata) { o.mat._43 += (float)(*((FLOAT64*)userdata)); };
+	obmainFindCallback(_to, sinkppo, &move);
 
 	_lastUpdate = frametime;
 }
@@ -1446,7 +1469,7 @@ void PlayerPlacedSTO::Update()
 static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 {
  	FULL_OBJ_ID foi = PlayerClient()->SelectedMission().m_target;
-    StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)foi);
+	StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)foi);
 
 	if(!so)
 		return true;
@@ -1493,8 +1516,8 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 				best = child;
 				bestDistance2 = diff.length2();
 			}
-        }
-    }
+		}
+	}
 
 	if(best && _checkFacilityRange(distance, best, side, friendly))
 		return true;
@@ -1531,7 +1554,7 @@ static bool _checkFacilityRange(FLOAT32 distance, StratDB::StratObject* so, SINT
 	Vec3d sPos = Vec3d((double)so->PosX(), (double)so->PosY(), pPos.z());
 	Vec3d diff = sPos - pPos;
 
-    FLOAT64 facDis2 = diff.length2();
+	FLOAT64 facDis2 = diff.length2();
 	FLOAT32 adist = fabs(distance);
 
 	if(distance >= 0)
@@ -1572,4 +1595,135 @@ static bool _fbCheck(vehVehicle* player, StratDB::StratObject* fac, FLOAT32 radi
 	}
 
 	return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+namespace {
+	// Two-point Lagrange interpolation
+	SINT64 InterpDamage(SINT64 lo_in, SINT64 lo_out, SINT64 hi_in, SINT64 hi_out, SINT64 val) {
+		double x0 = static_cast<double>(lo_in),  x1 = static_cast<double>(hi_in);
+		double y0 = static_cast<double>(lo_out), y1 = static_cast<double>(hi_out);
+		double x = static_cast<double>(val);
+
+		SINT64 out = static_cast<SINT64>(((x-x1)/(x0-x1))*y0+ ((x-x0)/(x1-x0))*y1);
+		return std::max((SINT64)0, std::min(out, hi_out));
+	}
+}
+
+// !!!HACK!!!
+// This entire setup is based on values gathered through testing and what's in
+// the ammo data files, so any changes could bring this whole thing crumbling
+// down. Even if it remains permanent, this setup needs to be overhauled.
+//
+// NOTE: The values in testing are at least partially wrong since some PPOs seem
+// to take damage from certain sources multiple times. Fun...
+//
+// TODO: Right now many of these are based on joules, when the actual projectile
+// weight, etc. are probably far better indicators of what should be in what
+// tier.
+SINT64 fpPPOScaleJoules(const weapAmmo& round, SINT64 joules) {
+	using Joules = SINT64;
+	const weapAmmoType& src = *round.AmmoType;
+
+	// Small-arms [0-1k]
+	const Joules smallarms_min = 0;
+	const Joules smallarms_max = 4000;
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC &&
+	     (joules < smallarms_max || strcmp((const char*)src.Name, "shrapnel") == 0) ) {
+		return InterpDamage(smallarms_min, 0, smallarms_max, 1000, joules);
+	}
+
+	// Anti-material fire (AT Rifle) [20-25k]
+	const Joules antimat_min = 10000;
+	const Joules antimat_max = 18000;
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC && joules < antimat_max ) {
+		return InterpDamage(antimat_min, 20000, antimat_max, 25000, joules);
+	}
+
+	if ( src.SubType == WEAPAMMO_SUBTYPE_GRENADE ) {
+		if ( src.ExplosiveEnergy < 500000 ) {
+			// Shrapnel [10k]
+			return joules > 5000 ? 10000 : 0;
+		} else {
+			// Concussion [15k]
+			// Should be far higher, but only the Axis have one, so...
+			return joules > 5000 ? 15000 : 0;
+		}
+	}
+
+	// Ignore system-created "shaped charge jet" effects.
+	if ( strcmp((const char*)src.Name, "shaped charge jet") == 0)
+		return 0;
+
+	// Rocket [90-110k]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_ROCKET ) {
+		const Joules rocket_min = 180000;
+		const Joules rocket_max = 610000;
+		return InterpDamage(rocket_min, 90000, rocket_max, 110000, joules);
+	}
+
+	// Mortar [600k]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_MORTAR ) {
+		return joules > 5000 ? 600000 : 0;
+	}
+
+	// AP/HE* [varies]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BALLISTIC ) {
+		if ( src.ExplosiveEnergy > 0.0f ) {
+			// HE* [750-1000k]
+			const Joules he_min = 250000;
+			const Joules he_max = 6500000;
+			if ( joules > 100000 ) // Boost HE effectiveness around the edge of its effect
+				joules = std::max(joules, he_min / 2);
+			return InterpDamage(he_min, 750000, he_max, 1000000, joules);
+		} else {
+			// Non-HE*
+			// x2 is to make up for HE's tendency to hit more than once
+			if ( src.AmmoWeight < 0.25 ) {
+				// Autocannon [300k x2]
+				const Joules ac_min = 42500;
+				const Joules ac_max = 44000;
+				return InterpDamage(ac_min, 280000, ac_max, 320000, joules) * 2;
+			} else {
+				// AP [750-1000k x2]
+				// Note the Panhard is a bit under half due to its tiny gun,
+				// but this is reflected through the math anyway.
+				const Joules ap_min = 200000;
+				const Joules ap_max = 3000000;
+				SINT64 damage = InterpDamage(ap_min, 750000, ap_max, 1000000, joules) * 2;
+				// HACK: Because asking to create something consistent is apparently too much,
+				// so just create a mess of special cases and exceptions as problems roll in.
+				damage = std::min(damage, (SINT64)1000000);
+				return damage;
+			}
+		}
+	}
+
+	// AAA [300-1000k]
+	// HACK: /4 due to excessive damage to FMS/ATG Emplacement
+	if ( src.SubType == WEAPAMMO_SUBTYPE_AIRBURST ) {
+		const Joules aaa_min = 36000;
+		const Joules aaa_max = 600000;
+		if ( joules > 5000 ) // Boost HE effectiveness around the edge of its effect
+			joules = std::max(joules, aaa_min / 2);
+		return InterpDamage(aaa_min, 300000 / 4, aaa_max, 1000000 / 4, joules);
+	}
+
+	// Satchel [25m]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_PLACED ) {
+		return joules > 3000000 ? 25000000 : 0;
+	}
+
+	// Bomb [10m-25m]
+	if ( src.SubType == WEAPAMMO_SUBTYPE_BOMB ) {
+		const Joules bomb_min = 50000000;
+		const Joules bomb_max = 190000000;
+		if ( joules > 100000 ) // Boost HE effectiveness around the edge of its effect
+			joules = std::max(joules, bomb_min / 2);
+		return InterpDamage(bomb_min, 10000000, bomb_max, 25000000, joules);
+	}
+
+	// If anything's left, just return the joules done.
+	return joules;
 }

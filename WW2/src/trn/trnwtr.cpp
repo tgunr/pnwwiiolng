@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 #include <string>
 
@@ -30,13 +30,13 @@
 
 static std::set<SINT32> _waterids;
 
-typedef struct tagWATERFBO
+struct WATERFBO
 {
     SINT32 id;
     SINT32 depth;
     SINT32 w;
     SINT32 h;
-} WATERFBO;
+};
 
 // Defines
 #define NUM_WATER_TEXTURES		8
@@ -106,7 +106,7 @@ void trnwtrSetRenderPass()
 {
 }
 
-void trnwtrKill(void)
+void trnwtrKill()
 {
 #ifdef USE_WATER_EFFECT
 
@@ -138,7 +138,7 @@ LOGICAL trnwtrIsWaterTexture(SINT32 texid)
 	return FALSE;
 }
 
-LOGICAL trnwtrUpdate(void)
+LOGICAL trnwtrUpdate()
 {
 #ifdef USE_WATER_EFFECT
 	SINT32		i;
@@ -315,7 +315,7 @@ static LOGICAL ApplyBumpmapTextureStage(OBJECT* lpobj, piMATRIX* mat, SINT32 tex
 	return(TRUE);
 }
 
-static LOGICAL ReleaseBumpmapTextureStage(void)
+static LOGICAL ReleaseBumpmapTextureStage()
 {
 #ifdef USE_WATER_EFFECT
 	if (bTexturesDisabled)
@@ -400,7 +400,7 @@ LOGICAL trnwtrPreDrawMultitexture(OBJECT* lpobj, piMATRIX* mtmat)
 	return(TRUE);
 }
 
-LOGICAL trnwtrPostDraw(void)
+LOGICAL trnwtrPostDraw()
 {
 #ifdef USE_WATER_EFFECT
 	ReleaseBumpmapTextureStage();

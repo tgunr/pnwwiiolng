@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //	 Copyright 2008 Playnet Inc, All rights reserved
 //	 Not to be distributed in API form except as part of a compiled library
 //	 under License or NDA
@@ -10,6 +10,7 @@
 #include "fio/fio.h"
 #include "ld/ldpix.h"
 #include "ld/ldbmp.h"
+#include "ld/ldtexture.h"
 
 static LOGICAL ispow2(int l)
 {
@@ -154,36 +155,19 @@ piBITMAPFILEHEADER  bfh;
 piBITMAPINFO*  bi;
 int   stream;
 
-#ifdef LOAD_TIMER
-SINT32		t1, t2, t3, t4, t5;
-
-	t1 = piReadTimeStamp32();
-#endif
-
 	stream = fioOpen(Filename);
 	if (stream == -1)
 	{
 		return(FALSE);
 	}
 
-#ifdef LOAD_TIMER
-	t2 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\t\tOpen: %10d", t2-t1);
-#endif
-
-	length = fioSeek(stream, 0, fioSEEK_END) - sizeof(piBITMAPFILEHEADER);
-	fioSeek(stream, 0, fioSEEK_SET);
+	length = fioSeek(stream, 0, SEEK_END) - sizeof(piBITMAPFILEHEADER);
+	fioSeek(stream, 0, SEEK_SET);
 	if (sizeof(piBITMAPFILEHEADER) != fioRead(stream, &bfh, sizeof(piBITMAPFILEHEADER)))
 	{
 		fioClose(stream);
 		return(FALSE);
 	}
-
-
-#ifdef LOAD_TIMER
-	t3 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\t\tS+R1: %10d", t3-t2);
-#endif
 
 	if (bfh.bfType != (UINT16)('B' | ('M' << 8)))
 	{
@@ -205,17 +189,7 @@ SINT32		t1, t2, t3, t4, t5;
 		return(FALSE);
 	}
 
-#ifdef LOAD_TIMER
-	t4 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\t\tRd2 : %10d", t4-t3);
-#endif
-
 	fioClose(stream);
-
-#ifdef LOAD_TIMER
-	t5 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\t\tClse: %10d", t5-t4);
-#endif
 
 	// set the biSizeImage ourselves
 	if(bi->bmiHeader.biSizeImage == 0)
@@ -243,25 +217,29 @@ SINT32		t1, t2, t3, t4, t5;
 
 int ldbmpLoadBMPFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 WantFlags)
 {
-int   texid;
-piBITMAPINFO*  bi;
+	int   texid;
+	piBITMAPINFO*  bi;
     TEXTURE* t = nullptr;
 
-#ifdef LOAD_TIMER
-SINT32	t1, t2, t3;
+	std::string str = Filename;
+	std::string::size_type pos = str.rfind('.');
+	std::string ext = ".";
+	if(pos != std::string::npos)
+	{
+		ext = ext + str.substr(pos+1);
+		str.erase(pos, str.length()-pos);
+	}
 
-	t1 = piReadTimeStamp32();
-#endif
+	// If suffix is defined (theme) and file exists, load that instead
+	std::string fileName = Filename;
 
-	if (!ldbmpLoadBMPFile(Filename, &bi))
+	if (fioFileExists(str, ldGetOptionalFileSuffix(), ext))
+		fileName = str + ldGetOptionalFileSuffix() + ext;
+	
+	if (!ldbmpLoadBMPFile(fileName.c_str(), &bi))
 	{
 		return(-1);
 	}
-
-#ifdef LOAD_TIMER
-	t2 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\tLoad: %10d", t2-t1);
-#endif
 
 	texid = ldbmpLoadDIBToSurface(bi, TransparentColor, WantFlags);
 
@@ -271,11 +249,6 @@ SINT32	t1, t2, t3;
     {
         t->type = TEXTURE_BMP;
     }
-
-#ifdef LOAD_TIMER
-	t3 = piReadTimeStamp32();
- 	Write_Debug ("\t\t\tLDBS: %10d", t3-t2);
-#endif
 
 	memFree(bi);
 

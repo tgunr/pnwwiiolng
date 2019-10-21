@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include "pi/pi.h"
@@ -22,7 +22,7 @@ static FLOAT32 _DaytimeTimeMultiplier; // time rate accelerator
 
 SINT32 trntodTimeOfDayHasChanged; // flag to state that the time of day has changed
 
-UINT32 trnTODInit(void)
+UINT32 trnTODInit()
 {
 	_TimeOfDay = 43200; // midday
 	_DaytimeTimeMultiplier = 1.0;
@@ -35,7 +35,7 @@ UINT32 trnTODInit(void)
 	return 0;
 }
 
-UINT32 trnTODUpdate(void)
+UINT32 trnTODUpdate()
 {
     UINT32 TempNum;
     static UINT32 _Lastframetime;
@@ -79,9 +79,21 @@ UINT32 trnTODUpdate(void)
 
 UINT32 trnTODGetTimeOfDay(UINT32 * TimeOfDay)
 {
+	// If we are spawned into a tutorial we do not want it to get dark
+	// so that noobs can easily see tutorial waypoints.
+	bool setTimeToMidday = false;
+
+	TutorialManager* tutManager = TutorialManager::GetInstance();
+	if (tutManager != nullptr)
+		setTimeToMidday = tutManager->getAreSpawnedIn();
+
 	if (TimeOfDay != nullptr)
 	{
-		*TimeOfDay = _TimeOfDay;
+		if (setTimeToMidday)
+			// We force the time of day to always be midday.
+			*TimeOfDay = 44000; // Just slightly past noon (43200)
+		else
+			*TimeOfDay = _TimeOfDay;
 	}
 
 	return 0;

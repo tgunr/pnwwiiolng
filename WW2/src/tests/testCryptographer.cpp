@@ -12,9 +12,9 @@ public: CryptographerTest() : TestUnit("Cryptographer") {}
 
 public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, const UINT64 startSeed)
 		{
-			UCHAR* buf1 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4));
-			UCHAR* buf2 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4));
-			UCHAR* buf3 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4));
+			std::unique_ptr<UCHAR[]> buf1(new UCHAR[bufSize + 4]);
+			std::unique_ptr<UCHAR[]> buf2(new UCHAR[bufSize + 4]);
+			std::unique_ptr<UCHAR[]> buf3(new UCHAR[bufSize + 4]);
 
 			ENDPOINT ep;
 			EndpointImpl impl;
@@ -37,14 +37,14 @@ public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, con
 			UINT16 len1 = bufSize, len2 = 0;
 
 			char versionStr[120];
-			strprintf(versionStr, "Encrypt: %04x: %" PRSizeT " bytes w/%llx", version, bufSize, startSeed);
+			strprintf(versionStr, "Encrypt: %04x: %" PRSizeT " bytes w/%" PRPermMaskT "", version, bufSize, startSeed);
 
 			BEGIN_SUB_STAGE( versionStr )
 
-				memcpy(buf2, buf1, len1);
-				ep.encrypt(buf2, len1);
+				memcpy(buf2.get(), buf1.get(), len1);
+				ep.encrypt(buf2.get(), len1);
 
-				const bool buf1_matches_buf2 = (memcmp(buf1, buf2, len1) == 0);
+				const bool buf1_matches_buf2 = (memcmp(buf1.get(), buf2.get(), len1) == 0);
 				if ( version > Teul::BaseVersion )
 				{
 					// Encryption should have changed the contents.
@@ -63,15 +63,15 @@ public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, con
 
 			END_SUB_STAGE( versionStr )
 
-			strprintf(versionStr, "Decrypt: %04x: %" PRSizeT " bytes w/%llu", version, bufSize, startSeed);
+			strprintf(versionStr, "Decrypt: %04x: %" PRSizeT " bytes w/%" PR64BitUT "", version, bufSize, startSeed);
 
 			BEGIN_SUB_STAGE( versionStr )
 
 				// Now decrypt the encrypted data into a third buffer.
 				len2 = len1;
 
-				memcpy(buf3, buf2, len2);
-				ep.decrypt(buf3, len2);
+				memcpy(buf3.get(), buf2.get(), len2);
+				ep.decrypt(buf3.get(), len2);
 
 				// Old versions should have subtracted the size byte again,
 				// new versions would never have changed it.
@@ -79,7 +79,7 @@ public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, con
 
 				CRITICAL( ExpectEqual( len1, len2 ) );
 
-				const bool buf1_matches_buf3 = (memcmp(buf1, buf3, len2) == 0);
+				const bool buf1_matches_buf3 = (memcmp(buf1.get(), buf3.get(), len2) == 0);
 				CRITICAL( ExpectTrue( buf1_matches_buf3 ) );
 
 				if ( version >= Teul::TeulV2 )

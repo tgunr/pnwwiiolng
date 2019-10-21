@@ -15,6 +15,16 @@
 #include "LoginData.h"
 #include "Playgate.h"
 
+#ifdef IGNORE_REGISTRY
+#include "wwii/wwiiUTF.h"
+
+// HACK: In versionWin.cpp
+extern bool GetFileVersion(TCHAR* const dest, const size_t destSize, const TCHAR* const filename);
+// HACK: launchAppWin.cpp
+extern SINT32 _FillInParamValues(const APP_LAUNCH *AppLaunch, const TCHAR* path, const TCHAR* Params, TCHAR* FilledInParams, size_t FIPSize);
+bool launchApplication(const TCHAR* exeFile, const TCHAR* parameters, std::wstring path);
+#endif
+
 #define		MAX_REG_KEY		256
 #define		MAX_URL			256
 
@@ -37,7 +47,9 @@ static TEUL_CALLBACK*  _GetGameList;
 static TEUL_CALLBACK*  _LoginXchg;
 
 static APP_LAUNCH _AppLaunch;
+#ifndef IGNORE_REGISTRY
 static char		_SavedRegistryKey[MAX_REG_KEY];
+#endif
 static UINT32     _NumberOfOldVersions;
 static char      _DownloadPage[MAX_URL];
 const char* userName;
@@ -81,8 +93,6 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.arenaID = loginData.m_arenaID;
 	ArenaRequest.sessionID = 0;
 	ArenaRequest.presenterVersion = g_playgateVersion;
-
-	// Username is stored as wide characters, convert to UTF8
 	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
 	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
 
@@ -97,7 +107,7 @@ LOGICAL launchArenaRequest()
 	return TRUE;
 }
 
-static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
+static SINT32 _ReceivePlayGateOk(ACTION_OBJECT *a)
 {
 	playgate.SetStatus(GetLoc(AUTH_OK));
 /*
@@ -111,11 +121,13 @@ static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
 SINT32 launchAppVerify(SINT32 Connection, APP_VERIFY *AppVerify)
 {
 APP_LAUNCH_REQ LaunchRequest;
+#ifndef IGNORE_REGISTRY
 SINT32         NumberOfInstances;
 UINT32         CurrentVer;
+#endif
 
 	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
-	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);
+	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password) - 1);
 
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;
@@ -125,6 +137,25 @@ UINT32         CurrentVer;
 	LaunchRequest.appVersion = 0;//AppVerify->appVersionMax;
 	LaunchRequest.oVersion = 2;
 
+#ifdef IGNORE_REGISTRY
+	// Access Window's version information for the executable.
+	TCHAR buffer[256+1];
+	if ( !GetFileVersion(buffer, sizeof(buffer), (WW2_exePath + g_exeName).c_str()) ) {
+		LaunchRequest.status = -1;
+		return 0;
+	}
+
+	char verStr[25 + 1];
+	WWII::ConvertChars(buffer, verStr, sizeof(verStr));
+	teulGetHost(verStr, &LaunchRequest.appVersion);
+
+	if ( commSend(_LaunchReq, &LaunchRequest) < 0 ) {
+		playgate.SetStatus(GetLoc(AUTH_LAUNCH_FAIL), AppError);
+		return 0;
+	}
+
+	return 1;
+#else
 	_NumberOfOldVersions = 0;
 
 	if (_SavedRegistryKey[0] != '\0')
@@ -163,6 +194,7 @@ UINT32         CurrentVer;
 	}
 
 	return 1;
+#endif
 }
 
 bool launchRequestGameList()
@@ -278,7 +310,16 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 
 	playgate.SetStatus(GetLoc(INFO_LAUNCH), AppProgress);
 
+#ifdef IGNORE_REGISTRY
+	std::wstring param_pattern = L"-serverip $QUAD -serverport $PORT -serverotp $OTP -side $SESSIONID";
+	TCHAR c_params[500]; // HACK
+	_FillInParamValues(&AppLaunch, WW2_exePath.c_str(), param_pattern.c_str(), c_params, sizeof(c_params) / sizeof(TCHAR));
+	std::wstring params(c_params + (L" " + g_exeParams));
+
+	launchApplication((WW2_exePath + L"/" + g_exeName).c_str(), params.c_str(), WW2_exePath.c_str());
+#else
 	launchAppWin(&AppLaunch, _SavedRegistryKey);
+#endif
 
 	_CleanUpLaunchData();
 
@@ -291,7 +332,7 @@ static SINT32 _ReceiveAppVerify(ACTION_OBJECT *Action)
 {
 	APP_VERIFY AppVerify;
 
-	//playgate.SetStatus("Recieved app verify");
+	//playgate.SetStatus("Received app verify");
 
 	Action->offset = authPackAPP_VERIFY(TEUL_UNPACK, Action->packed, Action->offset, &AppVerify, 0);
 
@@ -330,7 +371,7 @@ extern SINT32 launchInstallCallbacks(void)
 			throw 4;
 		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _ReceiveAppVerify) == nullptr)
 			throw 5;
-		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _RecievePlayGateOk) == nullptr )
+		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _ReceivePlayGateOk) == nullptr )
 			throw 6;
 		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList);
 		if ( nullptr == _GetGameList )
@@ -350,7 +391,9 @@ extern SINT32 launchInstallCallbacks(void)
 
 static void _CleanUpLaunchData(void)
 {
+#ifndef IGNORE_REGISTRY
 	_SavedRegistryKey[0] = '\0';
+#endif
 }
 
 static SINT32 _errorFunc(ACTION_OBJECT *Action)

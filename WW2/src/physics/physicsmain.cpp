@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <set>
 #include <map>
 
@@ -33,7 +33,7 @@ struct WorldForce
 	SINT32 expires;
 };
 
-typedef std::vector<WorldForce> WorldForces;
+using WorldForces = std::vector<WorldForce>;
 
 static dWorld* _odeWorld;
 static double _odeStepSize;
@@ -159,7 +159,7 @@ void physicsRemoveAllObjects(bool includeOwned)
     _objects.clear();
 }
 
-physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
+physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{
@@ -176,7 +176,7 @@ physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
 	return nullptr;
 }
 
-bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data)
+bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER filter, void* const data)
 {
 	if(filter)
 	{
@@ -643,18 +643,10 @@ void physicsCreateObjectCollider(OBJECT* Object, dSpaceID space, unsigned int ca
 	bool newOb = (lo != check);
 
 	lo = check;
-
-	if(newOb && lo && strstr(lo->name, "twn2rd15r36"))
-		bool stop = true;
 #endif
 
 	if(isSheared)
 	{
-#ifdef OBJECT_COLLIDER_DEBUG
-		if(newOb)
-			bool stop = true;
-#endif
-
 		//if(colliderIsType(cat, COLLIDER_MANMADE_MASK))
 		//	isSheared = false;
 	}
@@ -697,9 +689,6 @@ void physicsCreateObjectCollider(OBJECT* Object, dSpaceID space, unsigned int ca
 	Object->collider->create(Object, &Object->mat); // other slow path 2/3
 
 #ifdef OBJECT_COLLIDER_DEBUG
-	if(Object->collider->geoms() == 0)
-		bool stop = true;
-
 	unsigned int scat = dGeomGetCategoryBits((dGeomID)space);
 	unsigned int scol = dGeomGetCollideBits((dGeomID)space);
 
@@ -714,11 +703,7 @@ void physicsCreateObjectCollider(OBJECT* Object, dSpaceID space, unsigned int ca
 
 		std::vector<std::string> catFlags = colliderGetDescription(dGeomGetCategoryBits(id));
 		std::vector<std::string> colFlags = colliderGetDescription(dGeomGetCollideBits(id));
-
-		bool stop = true;
 	}
-
-	bool stop = true;
 #endif
 
 	/*

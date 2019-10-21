@@ -76,19 +76,25 @@ public:
 		, _BDE_DISABLED					// Brigade is disabled by TOE.
 	};
 
-	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID& fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
+	
+#ifdef MULTI_CLIENT
+	FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_NORMAL)
+#else
+    FacilityWeaponList(UINT32 playerID = 0, const FULL_OBJ_ID fullObjID = nullObjID, FacilityWeaponList::REASON_CODE status=FacilityWeaponList::_INVALID)
+#endif
 		: m_status(status)
 		, m_playerID(playerID), m_fullObjID(fullObjID)
 		, m_numWeapons(0)
 		, m_refreshSeconds(30)
-		{ }
+    { }
+
 	FacilityWeaponList(ACTION_OBJECT* const a) : m_status(FacilityWeaponList::_INVALID), m_numWeapons(0) { a->offset = packer(TEUL_UNPACK, a); }
 	~FacilityWeaponList() {}
 
 	bool isSpawnable() const { return (m_fullObjID.id > 0 && m_status > FacilityWeaponList::_INVALID && m_status <= FacilityWeaponList::_NORMAL); }
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	SINT32 packer(PackMode mode, ACTION_OBJECT* a);
 	bool populate(const StratHCUnit& unit, const FacilityStruct& facility, UINT32 playerID, const PermissionMask& permMask);		// Host function
 	SINT32 send(SINT32 teulIndex);
 

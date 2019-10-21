@@ -24,6 +24,8 @@
 
 #include "strt/strtServerTypes.h"
 #include "strt/strtPostListReply.h"
+#include "map/mapHostMessages.h"
+#include "mm/mmMain.h"
 
 #ifndef STRAT_CLIENT
 #include "strt/strtFacilityWeaponList.h"
@@ -38,7 +40,6 @@
 
 #define STICK_DEBUG
 
-static TEUL_CALLBACK* _XCHG_MM_POST_INFO;
 static TEUL_CALLBACK* _SEND_MM_POST_LIST;
 static TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
 static TEUL_CALLBACK* _XCHG_MM_FACILITY_CAPACITY;
@@ -63,14 +64,11 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 	MM_POST_ACCEPT postAccept;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postAccept, sizeof(MM_POST_ACCEPT));
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
-						, postAccept.customerID
-						, PRA_WEAPON_SERIAL(postAccept.weaponSerial)
-						, postAccept.portal
-						, postAccept.immediateSpawn);
-	}
+    dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
+                    , postAccept.customerID
+                    , PRA_WEAPON_SERIAL(postAccept.weaponSerial)
+                    , postAccept.portal
+                    , postAccept.immediateSpawn);
 	//if (postAccept.portal == 0)
 		//postAccept.portal = 1;
 
@@ -198,11 +196,6 @@ _recvMMSpawnGrantResponse(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32 _sendMMPostInfoRequest(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_REQUEST));
-}
-
 static SINT32 _sendMMJoinListRequest(ACTION_OBJECT* const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_REQUEST));
@@ -226,7 +219,7 @@ static SINT32 _recvMMJoinListResponse(ACTION_OBJECT* const a)
 
 static SINT32 _recvMMLeaveListResponse(ACTION_OBJECT* const a)
 {
-MM_POST_INFO_RESPONSE postInfoResponse;
+	MM_POST_INFO_RESPONSE postInfoResponse;
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoResponse, sizeof(MM_POST_INFO_RESPONSE));
 
@@ -238,25 +231,6 @@ MM_POST_INFO_RESPONSE postInfoResponse;
 static SINT32 _sendMMPostInfoUpdate(ACTION_OBJECT* const a)
 {
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_UPDATE));
-}
-
-static SINT32 _recvMMPostInfoResponse(ACTION_OBJECT* const a)
-{
-	MM_POST_INFO_RESPONSE postInfoResponse;
-
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoResponse, sizeof(MM_POST_INFO_RESPONSE));
-
-#ifdef DEBUG
-	dbugLog(_FLD,"postInfoResponse: %d %d %d"
-				,postInfoResponse.customerID
-				, postInfoResponse.postedWeapon.commander
-				, postInfoResponse.postedWeapon.crew);
-#endif
-
-#ifndef STRAT_CLIENT
-//	mmProcessPostInfoResponse(&postInfoResponse);
-#endif
-	return a->offset;
 }
 
 static SINT32 _sendMMPostCancel(ACTION_OBJECT* const a)
@@ -346,9 +320,9 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 //This function sends a request to post a weapon at a facility
 SINT32
 strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
-					, UINT32 missionID, UINT32 brigadeID, const PermissionMask& permMask
-					, const FULL_OBJ_ID& facility, WEAPON_SPEC weapon
-					, LOGICAL multicrew,LOGICAL immediateSpawn)
+					, UINT32 missionID, UINT32 brigadeID, const PermissionMask permMask
+					, const FULL_OBJ_ID facility, WEAPON_SPEC weapon
+					, bool multicrew, bool immediateSpawn)
 {
 	MM_POST_REQUEST postRequest;
 
@@ -373,7 +347,7 @@ strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
 
 //This function sends a request to list all the posted weapons at a facility
 SINT32
-strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID& facility)
+strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* callsign, UINT32 missionID, UINT32 brigadeID, const FULL_OBJ_ID facility)
 {
 	SINT32 retval;
 	MM_POST_LIST_REQUEST postListRequest;
@@ -417,7 +391,7 @@ SINT32 strtSendMMJoinRequest(SINT32 connection, UINT32 customerID, const WEAPON_
 	return 0;
 }
 
-SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, LOGICAL multicrew)
+SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool multicrew)
 {
 	SINT32 retval;
 	MM_POST_INFO_UPDATE infoUpdate;
@@ -443,6 +417,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	spawnGrantRequest.weaponSerial = weaponSerial;
 	spawnGrantRequest.playerID = player.playerID();
 	spawnGrantRequest.missionID = 0;
+	spawnGrantRequest.usedMobileSpawn = player.m_wantMobileSpawn;
 
 	if ( player.validMissionPacket() )
 	{
@@ -453,7 +428,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 						, player.missionID()
 						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
-						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
+						, weapPrintName(spawnGrantRequest.weaponSerial.spec)
 						, PRA_FULL_OBJ_ID(spawnGrantRequest.weaponSerial.source)
 						);
 
@@ -494,20 +469,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	return 0;
 }
 
-SINT32
-strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle& handle, LOGICAL join)
-{
-	MM_POST_INFO_REQUEST postInfoRequest;
-
-	postInfoRequest.customerID = crewID;
-	postInfoRequest.weaponSerial = weaponSerial;
-	postInfoRequest.handle = handle;
-	postInfoRequest.join = join;
-
-	return teulSend(connection, _XCHG_MM_POST_INFO, &postInfoRequest);
-}
-
-SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle& handle, LOGICAL join)
+SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL& weaponSerial, const ChatHandle handle, bool join)
 {
 	SINT32 retval;
 	MM_POST_INFO_REQUEST postInfoRequest;
@@ -543,7 +505,7 @@ strtSendMMPostCancel(SINT32 connection, const WEAPON_SERIAL& weaponSerial)
 }
 
 //This function sends a spawn cancel to the strat system
-SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID& facility, const WEAPON_SERIAL& weaponSerial)
+SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OBJ_ID facility, const WEAPON_SERIAL& weaponSerial)
 {
 	SINT32 retval;
 	MM_SPAWN_CANCEL spawnCancel;
@@ -561,7 +523,7 @@ SINT32 strtSendMMSpawnCancel(SINT32 connection, UINT32 customerID, const FULL_OB
 }
 
 //This function sends a capacity request to the strat system
-SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID, UINT32 customerID, const FULL_OBJ_ID& facility, CODE_RTB rtb)
+SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID, UINT32 customerID, const FULL_OBJ_ID facility, CODE_RTB rtb)
 {
 	MM_CAPACITY_REQUEST capacityRequest;
 	SINT32 retval;
@@ -572,15 +534,12 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 	capacityRequest.facility = facility;
 	capacityRequest.rtb = rtb;
 
-	if ( g_logDebug )
-	{
-		dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
-					, capacityRequest.tag, capacityRequest.missionID
-					, capacityRequest.customerID
-					, PRA_FULL_OBJ_ID(capacityRequest.facility)
-					, capacityRequest.rtb
-					);
-	}
+    dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
+                , capacityRequest.tag, capacityRequest.missionID
+                , capacityRequest.customerID
+                , PRA_FULL_OBJ_ID(capacityRequest.facility)
+                , capacityRequest.rtb
+                );
 
 	retval = teulSend(connection, _XCHG_MM_FACILITY_CAPACITY, &capacityRequest);
 
@@ -621,14 +580,27 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 	return 0;
 }
 
+// Send a Garrison country change request to Strat.
+static SINT32 _sendMMGarrisonCountryChangeRequest(ACTION_OBJECT* const a)
+{
+	GarrisonCountryChangeReq* request = (GarrisonCountryChangeReq*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
+}
+
+// Garrison country change response from Strat.
+static SINT32 _recvMMGarrisonCountryChangeResponse(ACTION_OBJECT* const a)
+{
+	dbugLog(_FLD, "GarrisonCountryChangeReq received on map host from strat.");
+	return mmhostToClientGarrisonCountryChange(a);
+}
+
 //////////////////////////////////////////////////////////////////////
 //Install all the map callbacks
 SINT32
-strtInstallMapCallbacks(void)
+strtInstallMapCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
-		REGISTER_SENDRECV(STRT_MM_POST_INFO_Y, _sendMMPostInfoRequest, _recvMMPostInfoResponse, _XCHG_MM_POST_INFO);
+	{
 		REGISTER_SENDRECV(STRT_MM_POST_LIST_Y, _sendMMPostListReq, PostListReply::Process, _SEND_MM_POST_LIST);
 		REGISTER_SENDRECV(STRT_MM_SPAWN_GRANT_Y, _sendMMSpawnGrantRequest, _recvMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_SENDRECV(STRT_MM_CAPACITY_Y, _sendMMFacilityCapacityRequest, _recvMMFacilityCapacityResponse, _XCHG_MM_FACILITY_CAPACITY);
@@ -651,7 +623,7 @@ strtInstallMapCallbacks(void)
 		REGISTER_RECEIVER(STRT_MM_DAMAGE_EVENT_Y, _recvMissionDamageEvent);
 
 		REGISTER_MSG(STRT_MM_SERIAL_REQUEST_Y, SERIAL_NUMBER_REQUEST);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }
 

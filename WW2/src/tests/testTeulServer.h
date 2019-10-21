@@ -97,7 +97,7 @@ struct ServerRole : public Role
 	static SINT32 recvUnencrypted(ACTION_OBJECT* const a)
 	{
 		if ( strcmp((const char*)a->packed, (const char*)"unencrypted") != 0 )
-			throw Teul::Error("Unencrypted data was bad", -1 );
+			throw Teul::Error("Unencrypted data was bad", -1);
 		Dprintf("Unencrypted data looked good, sending some back\n");
 
 		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
@@ -129,6 +129,7 @@ struct ServerRole : public Role
 	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
+		{
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
 
 			REGISTER_RECVSEND(Role::HelloRel_Y, recvHello, sendHello, s_cbRelHello);
@@ -144,7 +145,8 @@ struct ServerRole : public Role
 			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
 
 			REGISTER_RECEIVER(Role::Spam_Y, [](ACTION_OBJECT* a) { return a->offset; });
-		END_CALLBACK_REGISTRATION
+		}
+		END_CALLBACK_REGISTRATION(Role::Test_X)
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -172,9 +174,32 @@ struct ServerRole : public Role
 	//////////////////////////////////////////////////////////////
 	// Open the listen interface.
 
+    private:
+    UINT32 hostAddress;
+
+    private:
+    void GetHostAddress()
+    {
+        // Test hostname lookup.
+        UINT32 address = Teul::GetSingleIP(Config::serverName);
+        if ( address == 0U || address == ~0U )
+            throw Teul::Error("Teul::GetSingleIP failed", address);
+        hostAddress = address;
+    }
+
 	void OpenListener()
 	{
-		const SINT32 teulIndex = teulOpenListen(Config::TestPort, acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        SINT32 teulIndex = -1;
+        
+#if platBuild == BUILD_SERVER
+        if (Config::protocol == PROTOCOL_UDB) {
+            GetHostAddress();
+            teulIndex = teulOpenListenHost(hostAddress, Config::TestPort, nullptr, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        } else
+#endif
+        {
+		    teulIndex = teulOpenListen(Config::TestPort, acceptFn, Config::ConnectTimeoutMS, Config::protocol, errorFn);
+        }
 		if ( teulIndex < 0 )
 			throw Teul::Error("teulOpenListen failed", teulIndex);
 

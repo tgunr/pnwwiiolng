@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -31,7 +31,7 @@ FLARE   ret;
 	return(ret);
 }
 
-LOGICAL oblfInit(void)
+LOGICAL oblfInit()
 {
 LOGICAL  retval=TRUE;
 char  texname[256];
@@ -39,7 +39,7 @@ int   i;
 
 	for (i=0 ; i < NUMFLAREGFX ; i++)
 	{
-		sprintf(texname, "flare%d.bmp", i+1);
+		strprintf(texname, "flare%d.bmp", i+1);
 		flareid[i] = ldpixLoadImageFileToSurface(texname, colorBLACK, LDPIX_NONE);
 		if (!piIsTexture(flareid[i], 0))
 		{
@@ -195,7 +195,7 @@ UINT16		  indices[6] = { 0, 1, 3, 1, 2, 3 };
 	return(TRUE);
 }
 
-void oblfUpdate(void)
+void oblfUpdate()
 {
 	DYNALITE*  lplites;
 	LIGHT*     light;
@@ -215,7 +215,7 @@ void oblfUpdate(void)
 	}
 }
 
-void oblfKill(void)
+void oblfKill()
 {
 int   i;
 

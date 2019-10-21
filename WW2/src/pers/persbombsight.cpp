@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "pi/pi.h"
 #include "include/vars.h"
 
@@ -48,7 +48,7 @@
 
 #define TIME_INCREMENT 0.1
 
-typedef struct
+struct BombSightData
 {
 	OBJECT* PivotDOF;
 	OBJECT* AltPntDOF;
@@ -66,8 +66,7 @@ typedef struct
 	FLOAT32 altRate, speedRate;
 
 	LOGICAL useEnglish;
-
-} BombSightData;
+};
 
 static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, SINT32 type);
 static FLOAT32 _CalcBombAngle(FLOAT32 Alt,FLOAT32 InSpeed,weapAmmoType * AmmoType);
@@ -84,7 +83,7 @@ static SINT32 _AdjustAltDir;
 	persBombsightInit
 *************************************************************************************************/
 
-LOGICAL persBombsightInit(void)
+LOGICAL persBombsightInit()
 {
 	return TRUE;
 }
@@ -93,7 +92,7 @@ LOGICAL persBombsightInit(void)
 	persBombsightUpdate
 *************************************************************************************************/
 
-LOGICAL persBombsightUpdate(void)
+LOGICAL persBombsightUpdate()
 {
 	switch(_BombsightType)
 	{
@@ -110,17 +109,16 @@ LOGICAL persBombsightUpdate(void)
 	persBombsightKill
 *************************************************************************************************/
 
-LOGICAL persBombsightKill(void)
+void persBombsightKill()
 {
 	persClearBombsight();
-	return TRUE;
 }
 
 /************************************************************************************************
 	persClearBombsight
 *************************************************************************************************/
 
-LOGICAL persClearBombsight(void)
+LOGICAL persClearBombsight()
 {
 	if (_Data != nullptr)
 	{
@@ -230,7 +228,7 @@ FLOAT32 persBombsightAltitude()
 
 static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, SINT32 type)
 {
-	BombSightData* BSD = nullptr;
+	BombSightData* BSDat = nullptr;
 	weapAmmoType * AmmoType = nullptr;
 	mlComponent * Component = nullptr;
 	mlWeaponMount * Mount = nullptr;
@@ -244,7 +242,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 
 	if (_Data != nullptr)
 	{
-		piExitProgram(__FILE__,__LINE__,"Bombsight data being setup with non-null data pointer!");
+		piExitProgram(_FL,"Bombsight data being setup with non-null data pointer!");
 	}
 
 	mlComponentListBegin(VehicleData->ComponentList, &it);
@@ -318,40 +316,38 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 	}
 
 
-	BSD = (BombSightData*)memAlloc(sizeof(BombSightData));
-	_Data = BSD;
-	memset(_Data,0,sizeof(BombSightData));
+	_Data = BSDat = (BombSightData*)memAlloc(sizeof(BombSightData));
 
-	BSD->PivotDOF = PivotDOF;
-	BSD->AltPntDOF = AltPntDOF;
-	BSD->SpeedPntDOF = SpeedPntDOF;
-	BSD->ForeSightDOF = ForeSightDOF;
-	BSD->BackSightDOF = BackSightDOF;
-	BSD->ForeSightDOF->flag2 |= OBJECT_DOF_USECHILDMATRIX;
-	BSD->BackSightDOF->flag2 |= OBJECT_DOF_USECHILDMATRIX;
+	BSDat->PivotDOF = PivotDOF;
+	BSDat->AltPntDOF = AltPntDOF;
+	BSDat->SpeedPntDOF = SpeedPntDOF;
+	BSDat->ForeSightDOF = ForeSightDOF;
+	BSDat->BackSightDOF = BackSightDOF;
+	BSDat->ForeSightDOF->flag2 |= OBJECT_DOF_USECHILDMATRIX;
+	BSDat->BackSightDOF->flag2 |= OBJECT_DOF_USECHILDMATRIX;
 
-	BSD->AmmoType = AmmoType;
+	BSDat->AmmoType = AmmoType;
 
 	switch(type)
 	{
 		case BOMBSIGHT_TYPE_BRITISH_MK9A:
-			BSD->minAlt 	= _MK9A_MIN_ALT;
-			BSD->maxAlt 	= _MK9A_MAX_ALT;
-			BSD->minSpeed 	= _MK9A_MIN_SPEED;
-			BSD->maxSpeed 	= _MK9A_MAX_SPEED;
-			BSD->altRate 	= _MK9A_ALT_CHANGE_RATE;
-			BSD->speedRate 	= _MK9A_SPEED_CHANGE_RATE;
-			BSD->useEnglish	= TRUE;
+			BSDat->minAlt   	= _MK9A_MIN_ALT;
+			BSDat->maxAlt    	= _MK9A_MAX_ALT;
+			BSDat->minSpeed 	= _MK9A_MIN_SPEED;
+			BSDat->maxSpeed 	= _MK9A_MAX_SPEED;
+			BSDat->altRate 	    = _MK9A_ALT_CHANGE_RATE;
+			BSDat->speedRate 	= _MK9A_SPEED_CHANGE_RATE;
+			BSDat->useEnglish	= TRUE;
 		break;
 
 		case BOMBSIGHT_TYPE_GERMAN_LOTFEC7B:
-			BSD->minAlt		= _LOTFEC7B_MIN_ALT;
-			BSD->maxAlt		= _LOTFEC7B_MAX_ALT;
-			BSD->minSpeed	= _LOTFEC7B_MIN_SPEED;
-			BSD->maxSpeed	= _LOTFEC7B_MAX_SPEED;
-			BSD->altRate	= _LOTFEC7B_ALT_CHANGE_RATE;
-			BSD->speedRate	= _LOTFEC7B_SPEED_CHANGE_RATE;
-			BSD->useEnglish = FALSE;
+			BSDat->minAlt		= _LOTFEC7B_MIN_ALT;
+			BSDat->maxAlt		= _LOTFEC7B_MAX_ALT;
+			BSDat->minSpeed 	= _LOTFEC7B_MIN_SPEED;
+			BSDat->maxSpeed 	= _LOTFEC7B_MAX_SPEED;
+			BSDat->altRate  	= _LOTFEC7B_ALT_CHANGE_RATE;
+			BSDat->speedRate	= _LOTFEC7B_SPEED_CHANGE_RATE;
+			BSDat->useEnglish    = FALSE;
 		break;
 	}
 
@@ -482,7 +478,7 @@ static FLOAT32 _CalcBombAngle(FLOAT32 Alt,FLOAT32 InSpeed,weapAmmoType * AmmoTyp
 
 static LOGICAL _UpdateBombsight()
 {
-	BombSightData* BSD;
+	BombSightData* BSDat;
 	FLOAT32 DeltaTime;
 	FLOAT32 Adjust;
 	piVECTOR V1,V2;
@@ -496,62 +492,62 @@ static LOGICAL _UpdateBombsight()
 	{
 		return FALSE;
 	}
-	BSD = _Data;
+	BSDat = _Data;
 
 	DeltaTime = (frametime - _LastUpdateTime) / 1000.0f;
 	_LastUpdateTime = frametime;
 
 	// speed
-	Adjust = (_AdjustAltDir * DeltaTime * BSD->altRate);
-	BSD->CurrentAlt += Adjust;
+	Adjust = (_AdjustAltDir * DeltaTime * BSDat->altRate);
+	BSDat->CurrentAlt += Adjust;
 
 	// alt
-	Adjust = (_AdjustSpeedDir * DeltaTime * BSD->speedRate);
-	BSD->CurrentSpeed += Adjust;
+	Adjust = (_AdjustSpeedDir * DeltaTime * BSDat->speedRate);
+	BSDat->CurrentSpeed += Adjust;
 
 
-	if (BSD->CurrentAlt < BSD->minAlt)
+	if (BSDat->CurrentAlt < BSDat->minAlt)
 	{
-		BSD->CurrentAlt = BSD->minAlt;
+		BSDat->CurrentAlt = BSDat->minAlt;
 	}
-	if (BSD->CurrentAlt > BSD->maxAlt)
+	if (BSDat->CurrentAlt > BSDat->maxAlt)
 	{
-		BSD->CurrentAlt = BSD->maxAlt;
+		BSDat->CurrentAlt = BSDat->maxAlt;
 	}
-	if (BSD->CurrentSpeed < BSD->minSpeed)
+	if (BSDat->CurrentSpeed < BSDat->minSpeed)
 	{
-		BSD->CurrentSpeed = BSD->minSpeed;
+		BSDat->CurrentSpeed = BSDat->minSpeed;
 	}
-	if (BSD->CurrentSpeed > BSD->maxSpeed)
+	if (BSDat->CurrentSpeed > BSDat->maxSpeed)
 	{
-		BSD->CurrentSpeed = BSD->maxSpeed;
+		BSDat->CurrentSpeed = BSDat->maxSpeed;
 	}
 
-	if(BSD->useEnglish)
-		mlSetBombsightReadoutEnglish(BSD->CurrentAlt,BSD->CurrentSpeed);
+	if(BSDat->useEnglish)
+		mlSetBombsightReadoutEnglish(BSDat->CurrentAlt,BSDat->CurrentSpeed);
 	else
-		mlSetBombsightReadoutMKS(BSD->CurrentAlt,BSD->CurrentSpeed);
+		mlSetBombsightReadoutMKS(BSDat->CurrentAlt,BSDat->CurrentSpeed);
 
-	mlUpdateBombSightGauges(BSD->CurrentSpeed,BSD->CurrentAlt);
+	mlUpdateBombSightGauges(BSDat->CurrentSpeed,BSDat->CurrentAlt);
 
 	// tilt the view to line up the two points
-	V1.x = BSD->ForeSightDOF->dof->dofmatrix2._41;
-	V1.y = BSD->ForeSightDOF->dof->dofmatrix2._42;
-	V1.z = BSD->ForeSightDOF->dof->dofmatrix2._43;
+	V1.x = BSDat->ForeSightDOF->dof->dofmatrix2._41;
+	V1.y = BSDat->ForeSightDOF->dof->dofmatrix2._42;
+	V1.z = BSDat->ForeSightDOF->dof->dofmatrix2._43;
 
-	math3dVectorMultiply(&V1,&V1,&BSD->ForeSightDOF->matint);
+	math3dVectorMultiply(&V1,&V1,&BSDat->ForeSightDOF->matint);
 
-	V2.x = BSD->BackSightDOF->dof->dofmatrix2._41;
-	V2.y = BSD->BackSightDOF->dof->dofmatrix2._42;
-	V2.z = BSD->BackSightDOF->dof->dofmatrix2._43;
+	V2.x = BSDat->BackSightDOF->dof->dofmatrix2._41;
+	V2.y = BSDat->BackSightDOF->dof->dofmatrix2._42;
+	V2.z = BSDat->BackSightDOF->dof->dofmatrix2._43;
 
-	math3dVectorMultiply(&V2,&V2,&BSD->BackSightDOF->matint);
+	math3dVectorMultiply(&V2,&V2,&BSDat->BackSightDOF->matint);
 
 	mathSubVectors(&V1,&V1,&V2);
 
 	V2.x = V2.z = 0.0f;
 	V2.y = 1.0f;
-	Mat1 = BSD->BackSightDOF->matint;
+	Mat1 = BSDat->BackSightDOF->matint;
 	Mat1._41 = Mat1._42 = Mat1._43 = 0.0f;
 	math3dVectorMultiply(&V2,&V2,&Mat1);
 	math3dNormalize(&V1);
@@ -561,8 +557,8 @@ static LOGICAL _UpdateBombsight()
 
 	mathEul_ToMatrix(&Mat1,EulOrdXYZr,&Att);
 
-	BSD->BackSightDOF->dof->dofposmatrix = Mat1;
-	BSD->BackSightDOF->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
+	BSDat->BackSightDOF->dof->dofposmatrix = Mat1;
+	BSDat->BackSightDOF->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
 
 	// calculate the overall angle needed
 
@@ -579,7 +575,7 @@ static LOGICAL _UpdateBombsight()
 		}
 		else
 		{
-			Angle = -_CalcBombAngle(BSD->CurrentAlt,BSD->CurrentSpeed,(weapAmmoType*)VehicleData->BombSightAmmoType);
+			Angle = -_CalcBombAngle(BSDat->CurrentAlt,BSDat->CurrentSpeed,(weapAmmoType*)VehicleData->BombSightAmmoType);
 		}
 	}
 	Angle -= ViewAngle;
@@ -610,8 +606,8 @@ static LOGICAL _UpdateBombsight()
 
 	mathEul_ToMatrix(&Mat1,EulOrdXYZr,&Att);
 
-	BSD->PivotDOF->dof->dofposmatrix = Mat1;
-	BSD->PivotDOF->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
+	BSDat->PivotDOF->dof->dofposmatrix = Mat1;
+	BSDat->PivotDOF->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
 
 	return TRUE;
 }

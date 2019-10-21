@@ -20,7 +20,7 @@ extern void strtEnableDebugSupply();
 extern void strtDisableDebugSupply();
 
 // Get the current supply debug state
-extern LOGICAL strtGetDebugSupply();
+extern bool strtGetDebugSupply();
 
 extern UINT32 strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID);
 

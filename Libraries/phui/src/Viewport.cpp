@@ -67,7 +67,7 @@ void Viewport::DrawSelf()
 		/*
 		 HideToolTip nulls out the tooltipview, so this block only gets
 		 called for the life of the tooltip, which is at max
-		 TOOLTIP_LIFE + tooltipdelay miliseconds. For now TOOLTIP_LIFE
+		 TOOLTIP_LIFE + tooltipdelay milliseconds. For now TOOLTIP_LIFE
 		 is hardcoded, but eventually it will become a style option
 		 like tooltipdelay
 		 */

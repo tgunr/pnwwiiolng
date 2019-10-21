@@ -1,5 +1,5 @@
 // =======================================================================================
-// dx9_rendering.cpp: Demonstrates rendering an animated mesh in DX9
+// dx10_rendering.cpp: Demonstrates rendering an animated mesh in DX9
 //
 // Copyright 1999-2006 by RAD Game Tools, Inc., All Rights Reserved.
 // =======================================================================================
@@ -15,7 +15,7 @@ using namespace std;
 // database that you'll want to completely ignore when you build your
 // own app on top of Granny.  This simply keeps everything very
 // straightfoward.
-char const* const GlobalSceneFilename     = "..\\media\\pixo_dance.gr2";
+char const* const GlobalSceneFilename     = "media\\pixo_dance.gr2";
 
 // Must match the define in the shader.  Better to pass this as a
 // constant to the effect compile, actually.
@@ -54,7 +54,7 @@ ID3D10InputLayout* g_pRigidVertexLayout = 0;
 
 // ---------------------------------------------------------
 // Win32 objects
-const char* MainWindowTitle = "DirectX9 GrannySample";
+const char* MainWindowTitle = "DirectX10 GrannySample";
 HWND g_hwnd = 0;
 bool GlobalRunning = false;
 
@@ -187,8 +187,8 @@ bool CreateDemoTextures()
             GrannyTexture->ImageCount == 1)
         {
             D3D10_TEXTURE2D_DESC texDesc = {
-                GrannyTexture->Width,       // Width
-                GrannyTexture->Height,      // Height
+                (UINT)GrannyTexture->Width,       // Width
+                (UINT)GrannyTexture->Height,      // Height
                 1,                          // Miplevels
                 1,                          // Array size
                 DXGI_FORMAT_R8G8B8A8_UNORM, // Format
@@ -258,7 +258,7 @@ bool CreateDemoTextures()
    the model.  We make a distinction in this demo between meshes that are bound only to
    one bone (i.e, rigid meshes) and those bound to multiple bones (skinned meshes).  We
    select a simple vertex format for each case, and convert the Granny vertices to the D3D
-   format we specified (in dx9_rendering_helper.cpp) using $CopyMeshVertices.
+   format we specified (in dx10_rendering_helper.cpp) using $CopyMeshVertices.
 
    The index buffer is similarly initialized by copying the result of $GetMeshIndices.
    Note that to demonstrate how to use the 16-bit index buffer support in Granny, we check
@@ -551,7 +551,7 @@ bool InitCameraAndLights()
 
                 CameraFields CameraFields;
                 GrannyConvertSingleObject(CameraStoredType, CameraObject,
-                                          CameraFieldsType, &CameraFields);
+                                          CameraFieldsType, &CameraFields, 0);
 
                 // Ok, now we can setup the camera...
                 GrannyInitializeDefaultCamera(&GlobalScene.DemoCamera);

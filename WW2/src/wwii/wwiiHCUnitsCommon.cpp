@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Thu Nov  9 15:09:09 CST 2006
 //
 // Client/Host standard functions for HCUnits
@@ -21,21 +21,35 @@ HCUNIT_INDEX hcUnits;
 using HCUNIT_HANDLES = std::unordered_map<ChatHandle, HCUnit*>;
 static HCUNIT_HANDLES hcUnitsByHandle;
 
+// Ownership of HCUnits
+static std::map<UINT32, std::unique_ptr<HCUnit>> s_hcUnitPointers;
+
 // Pack a brigade ID
 
 SINT32
-wwiiPackBrigadeID(LOGICAL mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
+wwiiPackBrigadeID(PackMode mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode, data, offset, &brigadeID, 16);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Register a HCUnit
+
+void HCUnit::addToRegistry()
+{
+	s_hcUnitPointers[m_unitID].reset(this);
+	hcUnits.emplace(m_unitID, this);
+	dbugLog(_FLI, "registered %u->%s", m_unitID, m_callsign);
+	hcUnitsByHandle.emplace(m_handle, this);
 }
 
 //////////////////////////////////////////////////////////////////////
 
 HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 			, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, BRANCH_ENUM withMovementType, UCHAR withUnitClass
-			, const ChatHandle& withHandle
+			, const ChatHandle withHandle
 			, const char* withName, const char* nick, UINT8 Rank
-			, const FULL_OBJ_ID& home
+			, const FULL_OBJ_ID home
 			, const ChatHandle withOwner, RANK_NO withOwnerRank
 			)
 	: m_unitID(withUnit), m_type(withType), m_parentID(withParent)
@@ -57,9 +71,6 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	strsafecpy(m_shortName, nick);
 	chatGetCallsign(m_callsign, withHandle);
 	lookupParent();
-	hcUnits[m_unitID] = this;
-	dbugLog(_FLI, "registered %u->%s", m_unitID, m_callsign);
-	hcUnitsByHandle[withHandle] = this;
 
 	if ( home.id != 0 )
 		setHomeCPID(home);
@@ -79,7 +90,7 @@ HCUnit::HCUnit(UINT32 UnitID, HCUNIT_TYPE Type)
 	, m_training(false)
 {
 	m_callsign[0] = 'U';	// WTF? For consistency
-	m_callsign[1] = 'U';
+	m_callsign[1] = 0;
 	m_name[0] = 'U';
 	m_name[1] = 0;
 	m_shortName[0] = 'U';
@@ -157,7 +168,7 @@ HCUnit::canUseOrigin(int facilityType) const
 // HCUnit Packer
 
 SINT32
-HCUnit::packer(LOGICAL mode, ACTION_OBJECT* a)
+HCUnit::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID);
 	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_parentID);
@@ -254,19 +265,19 @@ HCUnitList::HCUnitList(ACTION_OBJECT* const a)
 // Packer for the list of HCUnits
 
 SINT32
-HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
+HCUnitList::packer(PackMode mode, ACTION_OBJECT* a)
 {
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listStart, 1);	//
 	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listEnd, 1);	// 8-bits
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_count, 6);		//
 
 	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i ) {
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 		a->offset = m_units[i]->packer(mode, a);
 #else
 		a->offset = m_units[i].packer(mode, a);
 #endif
-    }
+	}
 
 	return a->offset;
 }
@@ -286,10 +297,68 @@ HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 			continue;
 		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
 			continue;
-		if ( it->second->isBrigade() || it->second->isDivision() )
+		if ( it->second->isBrigade() || it->second->isDivision() || it->second->isGarrison() )
 			continue;
 		return it->second;
 	}
 
 	return nullptr;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Return the training unit for a particular country/branch
+
+HCUnit*
+HCUnit::GetTrainingUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
+{
+	//  Returns:  a pointer to the Selected Training HCUnit  OR  nullptr.
+	
+	HCUnit* retVal = nullptr;
+
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
+	{
+		if (it->second->isTrainingUnit() == true)
+		{
+			if (it->second->country() == forCountry && it->second->branch() == forBranch)
+			{
+				retVal = it->second;
+				break;
+			}
+		}
+	}
+
+	return retVal;
+}
+
+void HCUnit::GetGarrisonUnits(std::list<HCUnit *>& unitsList, FULL_OBJ_ID cpID)
+{
+	//dbugLog(_FLN, "Performing HCUnit::GetGarrisonUnits");
+	for (auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it)
+	{
+		if (it->second->isGarrison())
+		{
+			if (it->second->homeCPID() == cpID)
+			{
+				unitsList.push_back(it->second);
+			}
+		}
+	}
+}
+
+UINT32 HCUnit::GetArmyGarrison(FULL_OBJ_ID cpID)
+{
+	// Need to look up primary brigade for the target CP
+	UINT32 brigadeID = 0;
+	std::list<HCUnit *> garrisons;
+	HCUnit::GetGarrisonUnits(garrisons, cpID);
+	for (HCUnit *unit : garrisons)
+	{
+		if (!unit->isParatroopUnit() && (unit->branch() == BRANCH_LAND))
+		{
+			brigadeID = unit->m_unitID;
+			break;
+		}
+	}
+
+	return brigadeID;
 }

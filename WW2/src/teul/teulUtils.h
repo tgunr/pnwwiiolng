@@ -17,7 +17,7 @@ namespace Teul
 	int SetSignalHandler(int signum, void (*handler)(int));
 #endif
 
-#if platBuild == TEUL_SERVER
+#if platBuild == BUILD_SERVER
 	//! Determine if the specified IP address is one of my public addresses or loopback.
 	bool IsMyAddress(UINT32 addr_);
 #endif

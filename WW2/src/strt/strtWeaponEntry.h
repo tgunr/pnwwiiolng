@@ -48,7 +48,7 @@ public:
 	const ObjectStruct& portals(UINT32 index) const { return *m_portals[index]; }
 	const FacilityStruct* facility() const { return m_portals[0]->facility; }
 	FacilityStruct* facility() { return m_portals[0]->facility; }
-	const WEAPON_SPEC& spec() const { return m_weapon.spec(); }
+	WEAPON_SPEC spec() const { return m_weapon.spec(); }
 	const WEAPON& weapon() const { return m_weapon; }
 
 public:
@@ -56,7 +56,7 @@ public:
 
 //tolua_end
 public:
-	typedef std::vector<const ObjectStruct*> PORTALS;
+	using PORTALS = std::vector<const ObjectStruct*>;
 	const PORTALS& portals() const { return m_portals; }
 
 protected:

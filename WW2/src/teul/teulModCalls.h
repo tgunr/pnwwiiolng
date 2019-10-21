@@ -9,9 +9,8 @@
 
 extern TEUL_CALLBACK*		SYN_TOKEN;
 
-extern TEUL_CALLBACK*		FYN_TOKEN;
 extern TEUL_CALLBACK*		KLIVE_TOKEN;
 
 //! Initialize teul module callbacks.
-SINT32	teulInitModCallbacks(void);
+SINT32	teulInitModCallbacks();
 

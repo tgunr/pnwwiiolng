@@ -25,7 +25,7 @@ namespace Vehicle
 		_Type		m_y;
 		_Type		m_z;
 
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const struct Position& base) { return -EINVAL; }
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const struct Position& base) { return -EINVAL; }
 	};
 
 	/// @struct Vehicle::Position
@@ -46,21 +46,21 @@ namespace Vehicle
 //		SINT32 x_sc() const { return x_cm() / SUPERCELL_SIZE_M; }
 //		SINT32 y_sc() const { return y_cm() / SUPERCELL_SIZE_M; }
 
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Position& base);
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Position& base);
 	};
 
 	/// @struct Vehicle::Acceleration
 	/// @brief Shared client/host transport of vehicle acceleration vector.
 	struct Acceleration : public Vector<SINT16>
 	{
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Position& base);
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Position& base);
 	};
 
 	/// @struct Vehicle::Attitude
 	/// @brief Shared client/host transport of a vehicle's attitude.
 	struct Attitude : public Vector<SINT16>
 	{
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Position& base);
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Position& base);
 	};
 
 	/// @struct Vehicle::AttVel
@@ -68,14 +68,14 @@ namespace Vehicle
 	/// Name (AttVel) inherited from old structures.
 	struct AttVel : public Vector<SINT16>
 	{
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Position& base);
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Position& base);
 	};
 
 	/// @struct Vehicle::Velocity
 	/// @brief Shared client/host transport of a vehicle's velocity vector.
 	struct Velocity : public Vector<SINT16>
 	{
-		virtual SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Position& base);
+		virtual SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Position& base);
 	};
 
 	/// @struct Vehicle::FireData
@@ -97,7 +97,7 @@ namespace Vehicle
 		}
 		TeulTimeMS& clock(size_t turret) { return m_clock[turret].m_time; }
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a);
 	};
 
 	/// @struct Vehicle::TurretData
@@ -108,7 +108,7 @@ namespace Vehicle
 		turret_t		m_y[MAX_TURRETS];	///< Y value this frame.
 		UINT16			m_mask;			///< Flags indicating which turrets moved.
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a);
 	};
 
 	/// @struct Vehicle::RideData
@@ -126,7 +126,7 @@ namespace Vehicle
 		Position		m_relpos;			///< Relative position.
 		turret_t		m_yaw;
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, bool includeRelpos);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, bool includeRelpos);
 	};
 
 	/// @struct	Vehicle::Intro
@@ -146,7 +146,7 @@ namespace Vehicle
 		ChatHandle		m_handle;		///< Vehicle's name.
 		ChatHandle		m_squadHandle;	///< SquadHandle or 0 for none.
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a);
 	};
 
 	/// @struct Vehicle::Update
@@ -158,18 +158,18 @@ namespace Vehicle
 		UINT8				country() const { return intro().m_weaponSpec.wCountry; }
 		UINT8				side() const { return wwiiSide(country()); }
 		UINT32				oneTimeBits() const { return intro().m_oneTimeBits; }
-		const WEAPON_SPEC&	weaponSpec() const { return intro().m_weaponSpec; }
+		WEAPON_SPEC	        weaponSpec() const { return intro().m_weaponSpec; }
 		WEAPON_SPEC&		weaponSpec() { return intro().m_weaponSpec; }
 		UINT32				brigadeID() const { return intro().m_brigadeID; }
 		UCHAR				decal() const { return intro().m_decal; }
 		RANK_NO				rank() const { return intro().m_rank; }
 		UINT32				clientFlags1() const { return m_clientFlags1; }
 		UINT32				clientFlags2() const { return m_clientFlags2; }
-		const ChatHandle&	handle() const { return intro().m_handle; }
+		ChatHandle	        handle() const { return intro().m_handle; }
 		ChatHandle&			handle() { return intro().m_handle; }
 		UINT32				squadID() const { return intro().m_squadID; }
-		const ChatHandle&	squadHandle() const { return intro().m_squadHandle; }
-		ChatHandle			squadHandle() { return intro().m_squadHandle; }
+		ChatHandle	        squadHandle() const { return intro().m_squadHandle; }
+		ChatHandle&			squadHandle() { return intro().m_squadHandle; }
 
 		const FireData&		fireData() const { return m_fireData; }
 		FireData&			fireData() { return m_fireData; }
@@ -219,7 +219,7 @@ public:
 		/// NOT transmitted across the network.
 		TeulTimeMS		mloc_posTimestamp;	// loc = local.
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a, const Vehicle::Position& base);
+		SINT32 packer(PackMode mode, struct ACTION_OBJECT* a, const Vehicle::Position& base);
 	};
 }
 

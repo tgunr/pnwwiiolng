@@ -25,8 +25,8 @@ enum GR2_OBJECT_TYPE
 	GOT_NUM_TYPES
 };
 
-typedef std::vector<gr2Model*> ModelList;
-typedef std::vector<gr2AnimationBlend*> GrannyBlendList;
+using ModelList = std::vector<gr2Model*>;
+using GrannyBlendList = std::vector<gr2AnimationBlend*>;
 
 class gr2Object
 {
@@ -40,7 +40,7 @@ public:
 		bool owner;
 	};
 
-	typedef std::vector<gr2Attachment> Attachments;
+	using Attachments = std::vector<gr2Attachment>;
 
 	gr2Object();
 	gr2Object(const char* skeletonFile, bool skeletonIsLOD = true);

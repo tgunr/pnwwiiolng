@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Communication with the cell host.
 //
 // Copyright 1999 Playnet Inc, All rights reserved
@@ -52,9 +52,6 @@ SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAY
 	if ( teulIndex < 0 )
 		return -EINVAL;
 
-	// Make sure nagle is disabled so that this actually gets sent.
-	endpoint->setNagleEnabled(false);
-
 	PLAYER_EXIT pe = { destination, exitCode, facility };
 	return teulSend(teulIndex, _PLAYER_EXIT, &pe);
 }
@@ -91,7 +88,7 @@ static SINT32 _sendPlayerExit(ACTION_OBJECT* const a)
 {
 	PLAYER_EXIT* const pe = (PLAYER_EXIT*) a->localRawData;
 
-	dbugWrite(_FLAS,"sending player exit %d dest %d",pe->destination,pe->exitCode);
+	dbugWrite(_FLA,"sending player exit %d dest %d",pe->destination,pe->exitCode);
 
 	return commPackPlayerExit(TEUL_PACK, a->packed, a->offset, pe, 0);
 }
@@ -100,11 +97,11 @@ static SINT32 _recvPlayerExit(ACTION_OBJECT* const a)
 {
 	PLAYER_EXIT pe;
 	a->offset = commPackPlayerExit(TEUL_UNPACK, a->packed, a->offset, &pe, 0);
-	dbugWrite(_FLAS, "received player exit destination %d", pe.destination);
+	dbugWrite(_FLA, "received player exit destination %d", pe.destination);
 
 	clientForcedCellExit(a->teulIndex,pe.exitCode);
 
-#ifndef FRONT_END
+#if platBuild == BUILD_SERVER
 #pragma message "move to clientForcedCellExit?"
 	// OGS: Probably not, because that would cause a feedback loop.
 	commSendPlayerExit(a->teulIndex,  PDEST_MAP, pe.exitCode, pe.facility);
@@ -128,16 +125,15 @@ static SINT32 _recvVehicleAcknowledge( ACTION_OBJECT* const a )
 static RunningAverage<UINT32, 120> pingHistogram;
 SINT32 g_averagePing = 0;
 
-SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes)
+SINT32 commRecvWorldUpdateData(ACTION_OBJECT* a)
 {
-	WORLD_UPDATE wu;
-	memset(&wu, 0, sizeof(WORLD_UPDATE));
+	WORLD_UPDATE wu{};
 
 	// #1 unpack the header.
-	wu.header = *(WORLD_UPDATE::Header*)(data);
-	offset += Teul::BytesToBits(sizeof(wu.header));
+	wu.header = a->read<WORLD_UPDATE::Header>();
 
-	offset = updtPackWORLD_UPDATE(TEUL_UNPACK, data, offset, &wu, 0);
+	// HACK: Because heaven forbid we actually handle unpacking things in a consistent way...
+	a->offset = updtPackWORLD_UPDATE(TEUL_UNPACK, a->packed, a->offset, &wu, 0);
 
 	// Client side sanity check on the vehicle count.
 	if ( wu.header.numVehicles > MAX_VEH_PER_UPDATE )
@@ -161,27 +157,21 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		vehupdateProcessPositionUpdateMsg(&wu.vehUpdate[i]);
 	}
 
-	clientWorldUpdate(teulIndex, &wu);
+	clientWorldUpdate(a->teulIndex, &wu);
 
-	const size_t offInBytes = Teul::BitsToBytes(offset);
-	if ( offInBytes < (size_t)size_bytes )
-	{
-		TeulTimeMS& lastPing = *(UINT64*)(data + offInBytes);
-		teulSyncClock();
-		g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
-		pingHistogram.add(g_lastPing);
-		g_averagePing = pingHistogram.average();
-	}
-	else
-	{
-		g_lastPing = -1;
-		g_averagePing = 0;
-	}
+	//------
+	auto lastPing = a->read<TeulTimeMS>();
+	teulSyncClock();
+	g_lastPing = std::max((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
+	pingHistogram.add(g_lastPing);
+	g_averagePing = pingHistogram.average();
+	Write_Debug("Last ping: %d teulClock: %" PR64BitUT "", g_lastPing, teulClock64);
+
 #ifdef VEHICLES_GAME_INFO
 	vehSaveLastWorldUpdate(wu);
 #endif
 
-	return offset;
+	return a->offset;
 }
 
 static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
@@ -190,8 +180,8 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	if(Online)
 	{
 #endif
-	dbugWrite(_FLWS, "index: %d time: %llu", a->teulIndex, teulClock64);
-	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
+	dbugWrite(_FLW, "index: %d time: %" PR64BitUT "", a->teulIndex, teulClock64);
+	a->offset = commRecvWorldUpdateData(a);
 #ifdef MULTI_CLIENT
 	}
 #endif
@@ -205,7 +195,7 @@ static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 	vehProcessVehicleHit(hit);
 
 	// fill out the local vehicle data from this information.
-	dbugWrite(_FLAS,"Vehicle Hit: from %d sent %d numcomponentshit %d\n"
+	dbugWrite(_FLA,"Vehicle Hit: from %d sent %" PR64BitUT " numcomponentshit %zu\n"
 				, hit.m_shooter, hit.m_timestamp, hit.m_components.size());
 
 	return a->offset;
@@ -369,7 +359,7 @@ static SINT32 _recvGameTimeUpdate(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-SINT32 commInstallClientCallbacks(void)
+SINT32 commInstallClientCallbacks()
 {
 	SINT32 retval;
 
@@ -380,7 +370,7 @@ SINT32 commInstallClientCallbacks(void)
 		return retval;
 
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
-
+	{
 		REGISTER_RECEIVER(WORLD_UPDATE_Y, _recvWorldUpdate);
 		REGISTER_RECEIVER(GRANT_VEHICLE_JOIN_Y, _recvVehicleAcknowledge);
 		REGISTER_RECEIVER(HOST_HIT_Y, _recvHostVehicleHit);
@@ -405,7 +395,7 @@ SINT32 commInstallClientCallbacks(void)
 		REGISTER_RECEIVER(CAPTURE_STATE_Y, _recvCaptureState);
 		REGISTER_MSG_RECEIVER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING);
 		REGISTER_RECEIVER(STRAT_EVENTS_Y, _recvStratEvents);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Comm::CallbackX)
 }
 

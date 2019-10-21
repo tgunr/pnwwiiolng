@@ -25,7 +25,7 @@
 
 class SquadInvite;
 class PlayerStatusNode;
-typedef std::set<ChatHandle> HANDLES;
+using HANDLES = std::set<ChatHandle>;
 namespace Chat
 {
 	class PersonaUpdate;
@@ -48,7 +48,7 @@ public:
 	//// Try to keep the funtion list in alpha order
 	// Acknowledge channel tuned
 	// Channel is detuned if ack-send fails
-	bool ackTuneHandle(UCHAR index, const ChatHandle& handle);
+	bool ackTuneHandle(UCHAR index, const ChatHandle handle);
 
 	// Complete the process of connection
 	void activate(SINT32 newIndex, PlayerStatusNode* psn);
@@ -59,7 +59,7 @@ public:
 	WWII_SIDE activeCommandSide() const;
 
 	// Add them to the command list
-	void addToCommandList(void);
+	void addToCommandList();
 
 	// Announce the player to their squad channel
 	void announceToSquadChannel();
@@ -128,7 +128,7 @@ public:
 
 	bool ignoring(const Player* rhs) const { return ignoring(rhs->matchHandle()); }
 	bool ignoring(const Player& rhs) const { return ignoring(rhs.matchHandle()); }
-	bool ignoring(const ChatHandle& handle) const { return m_ignores.find(handle) != m_ignores.end(); }
+	bool ignoring(const ChatHandle handle) const { return m_ignores.find(handle) != m_ignores.end(); }
 
 	// Invalidate the group list forcibly
 	void invalidateGroups() { m_lastGroupRead = 0; }
@@ -188,19 +188,19 @@ public:
 	void removeFromAWS();
 
 	// Remove them from the command list
-	void removeFromCommandList(void);
+	void removeFromCommandList();
 
 	// Remove them from the chat grid
-	void removeFromGrid(void);
+	void removeFromGrid();
 
 	// Send a hostmessage to the player
 	SINT32 send(const Chat::HostMessage& message);
 
 	bool approveGCIMessage(UINT32 messageID, const Chat::GCIMessage& message, bool isGlobal);
 
-	void sendSquadCreateInvite(const ChatHandle& handle, const std::string& name, const ChatHandle& from, RANK_NO rank);
+	void sendSquadCreateInvite(const ChatHandle handle, const std::string& name, const ChatHandle from, RANK_NO rank);
 	void sendSquadInfo(class SquadList* list=nullptr);
-	bool sendSquadInvite(UINT32 squadID, const ChatHandle& from);
+	bool sendSquadInvite(UINT32 squadID, const ChatHandle from);
 
 	// Send a command to the strat host in the player's context
 	bool sendStratCommand(const char* string, const char* arguments, bool useMapTarget=true);
@@ -216,12 +216,14 @@ public:
 
 	void SetHqOff(bool to) { m_hqOff = to; }
 
+	void SetTrOff(bool to) { m_trOff = to; }
+
 	void SetLeadingBrigade(UINT32 toBrigadeID);
 
 	// Change the personas mission ID
 	void SetMission(UINT32 missionID);
 
-	void SetTimer(const char* name, const TeulTimeMS& time);
+	void SetTimer(const char* name, const TeulTimeMS time);
 
 	// Change the noEnemyChat flag
 	void SetNoEnemyChat(bool state) { m_noEnemyChat = state; }
@@ -232,13 +234,15 @@ public:
 
 	void SetSpawned(bool newValue);
 
-	void SetSquad(UINT32 squadID, RANK_NO rank, const ChatHandle& handle, UINT32 joined=0);
+	void SetSquad(UINT32 squadID, RANK_NO rank, const ChatHandle handle, UINT32 joined=0);
 	void SetSquadInvite(SquadInvite* invite);
 
 	// Set the current UI Target CP/Facility ID
-	void SetUITarget(const FULL_OBJ_ID& to) { m_uiTarget = to; }
+	void SetUITarget(const FULL_OBJ_ID to) { m_uiTarget = to; }
 
-	void SetWeapon(const WEAPON_SPEC& weapon);
+	void SetWeapon(const WEAPON_SPEC weapon);
+
+	void GetWeaponStr(std::string &str) const;
 
 	void squelchSquadAnnounce() { m_announcedToSquad = true; }
 
@@ -258,14 +262,14 @@ public:
 	void tunePlaceHolder(UCHAR index, CHANNEL_TYPE);
 
 	// Tune a specific radio to the best match for a channel type/handle
-	bool tuneRadio(UCHAR index, CHANNEL_TYPE, const ChatHandle& handle);
+	bool tuneRadio(UCHAR index, CHANNEL_TYPE, const ChatHandle handle);
 
 	// Tune a specific radio to a specified channel
 	bool tuneRadioToChannel(UCHAR index, class Chat::Channel* channel, CHANNEL_TYPE type);
 
 	// Tune a specific radio to a channel-handle
 	// (determines if a named, numbered or player channel is required)
-	bool tuneRadioToHandle(UCHAR index, const ChatHandle& handle);
+	bool tuneRadioToHandle(UCHAR index, const ChatHandle handle);
 
 	// Tune a specific radio to a named channel
 	bool tuneRadioToNamedChannel(UCHAR index, const char* command);
@@ -288,7 +292,7 @@ public:
 	void updateGridPosition();
 
 	// Handle a new locality update
-	void updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z, bool cpChanged, const FULL_OBJ_ID& nearCP, UINT32 ride, const FULL_OBJ_ID& inFacility, UINT32 lastPing, bool onAWS, bool inCapBldg, const FULL_OBJ_ID& capFac, SINT32 progress);
+	void updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z, bool cpChanged, const FULL_OBJ_ID nearCP, UINT32 ride, const FULL_OBJ_ID inFacility, UINT32 lastPing, bool onAWS, bool inCapBldg, const FULL_OBJ_ID capFac, SINT32 progress);
 
 	void updatePermMask();
 
@@ -306,19 +310,20 @@ public:
 	bool visible(const Player* target) const { return target->isVisibleTo(this); }
 
 	// Describe the locality of a player
-	void whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const;
+	void whereabouts(std::string &into, const FLOAT64& x, const FLOAT64& y) const;
 
 	// CONST Accessors
 	bool active() const { return m_active; }
 	const Chat::ChannelSubscription& getChannelSub(UINT32 index) const { return m_channels[index]; }
 	bool gmHide() const { return m_gmHide; }
 	UINT32 goneAFK() const { return m_goneAFK; }
-	const ChatHandle& grabbing() const { return m_grabbing; }
+	ChatHandle grabbing() const { return m_grabbing; }
 	SINT32 gridX() const { return m_gridX; }
 	SINT32 gridY() const { return m_gridY; }
 	bool haveChannels() const { return m_haveChannels; }
 	bool hcOff() const { return m_hcOff; }
 	bool hqOff() const { return m_hqOff; }
+	bool trOff() const { return m_trOff; }
 	const HANDLES& ignores() const { return m_ignores; }
 	bool initialized() const { return m_initialized; }
 	const Property* insideFacility() const { return m_insideFacility; }
@@ -327,11 +332,11 @@ public:
 	bool isBuzzard() const { return m_isBuzzard; }
 	virtual bool isManager() const { return false; }
 	bool isSpawned() const { return m_isSpawned; }	///TODO:134: Move to wwiiPlayer, replace with permissions(IS_SPAWNED)
-	const TeulTimeMS& joinedMission() const { return m_joinedMission; }
+	TeulTimeMS joinedMission() const { return m_joinedMission; }
 	UINT32 joinedSquad() const { return (squadID() > 0) ? m_joinedSquad : 0; }
 	const Property* lastCP() const { return m_lastCP; }
 	UINT32 lastMessageID() const { return m_lastMessageID; }
-	const TeulTimeMS& lastSquadInfoMS() const { return m_lastSquadInfo_ms; }
+	TeulTimeMS lastSquadInfoMS() const { return m_lastSquadInfo_ms; }
 	const FLOAT64& lastX() const { return m_lastX; }
 	const FLOAT64& lastY() const { return m_lastY; }
 	const FLOAT64& lastZ() const { return m_lastZ; }
@@ -340,15 +345,15 @@ public:
 	bool checkTimerElapsed(const char*) const;			// Check if a timer is unset or has elapsed.
 	bool noEnemyChat() const { return m_noEnemyChat; }
 	bool noWho() const { return m_noWho; }
-	const FULL_OBJ_ID& objectiveCpID() const { return m_objectiveCpID; }
-	const FULL_OBJ_ID& originCpID() const { return m_originCpID; }
-//	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	FULL_OBJ_ID objectiveCpID() const { return m_objectiveCpID; }
+	FULL_OBJ_ID originCpID() const { return m_originCpID; }
+//	ChatHandle squadHandle() const { return m_squadHandle; }
 	SquadInvite* squadInvite() { return m_squadInvite; }
 	const SquadInvite* squadInvite() const { return m_squadInvite; }
 	bool rejectLead() const;
-	const ChatHandle& takenBy() const { return m_takenBy; }
-	const FULL_OBJ_ID& uiTarget() const { return m_uiTarget; }
-	const WEAPON_SPEC& weapon() const { return m_weapon; }
+	ChatHandle takenBy() const { return m_takenBy; }
+	FULL_OBJ_ID uiTarget() const { return m_uiTarget; }
+	WEAPON_SPEC weapon() const { return m_weapon; }
 
 	// Non-const accessors
 	Chat::ChannelSubscription& getChannelSub(UINT32 index) { return m_channels[index]; }
@@ -373,6 +378,7 @@ protected:
 	TeulTimeMS		m_lastSquadInfo_ms;	// When we last sent squad info
 public:
 	TeulTimeMS		m_lastAWSRequest;
+	SINT32			m_latestPing =0;
 
 protected:
 	// Last known location of the player
@@ -427,6 +433,16 @@ public:
 	Player*			m_crsSnoopBy;		// CRS watching me
 	Player*			m_crsSnoopOn;		// Someone I am snooping on
 
+	// Checks for memory tampering
+	// TODO: Move types elsewhere
+	typedef std::pair<std::string, std::string> FunctionName;
+	// TODO: Make an actual md5 type to avoid redefining this size everywhere.
+	static const size_t md5_size = 16;
+	struct FunctionMd5 { char md5[md5_size]; };
+
+	std::map<FunctionName, FunctionMd5> func_hashes;
+	std::set<FunctionName> tampered_funcs;
+
 	struct Tunes*	m_tunes;
 
 	class PropFacility*	m_capping;
@@ -440,6 +456,7 @@ protected:
 	bool			m_initialized	: 1;
 	bool			m_hqOff			: 1;
 	bool			m_hcOff			: 1;
+	bool			m_trOff         : 1;  // Not visible in the trainer list when true.
 	bool			m_gmHide		: 1;
 	bool			m_gmNote		: 1;
 	bool			m_active		: 1;
@@ -447,7 +464,7 @@ protected:
 	bool			m_feReady		: 1;
 	bool			m_rxAllHQ		: 1;
 	bool			m_grabbed		: 1;
-	bool			m_isSpawned		: 1;	// True when we know he's spawned
+	bool			m_isSpawned		: 1;	// True when we know they've spawned
 	bool			m_onCommandList	: 1;	// True when we are on the command list
 	bool			m_noWho			: 1;	// True when they turn "who" off.
 	bool			m_noEnemyChat	: 1;	// True disable enemy chat receipt
@@ -477,7 +494,7 @@ class PlayerInterface
 public:
 	static Player* Lookup(UINT32);
 	static Player* Lookup(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
-	static Player* Lookup(const ChatHandle&);
+	static Player* Lookup(const ChatHandle);
 	static Player* Lookup(const char* callsign) { return Lookup(chatGetLowercaseHandle(callsign)); }
 };
 

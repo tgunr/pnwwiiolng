@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 
 #include <math.h>
@@ -36,6 +36,7 @@
 #include "spt/Tree.h"
 #include "scen/ScenarioManager.h"
 #include "trn/trnScenario.h"
+#include "wwii/wwiiThemes.h"
 
 #ifdef BETA_RELEASE
 #include "ui/uiChat.h"
@@ -81,7 +82,7 @@ LOGICAL trnopCollideDownWithDTL(piVECTOR* retpos,
 LOGICAL		retval=FALSE;
 piVECTOR	oldpos, newpos;
 COLLISION	collision;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	oldpos = newpos = *pos;
 	oldpos.z -= 20000.0f * ScaleFactor;
@@ -100,11 +101,11 @@ FLOAT64VECTOR WorldOriginOffset;
 
 	if (retval)
 	{
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		retpos->x = (FLOAT32)(collision.colpos.x - WorldOriginOffset.x);
-		retpos->y = (FLOAT32)(collision.colpos.y - WorldOriginOffset.y);
-		retpos->z = (FLOAT32)(collision.colpos.z - WorldOriginOffset.z);
+		retpos->x = (FLOAT32)(collision.colpos.x - worldOriginOffset.x);
+		retpos->y = (FLOAT32)(collision.colpos.y - worldOriginOffset.y);
+		retpos->z = (FLOAT32)(collision.colpos.z - worldOriginOffset.z);
 
         if(poly)
         {
@@ -127,7 +128,7 @@ LOGICAL trnopCollideDown(piVECTOR* retpos, SINT32* poly, piVECTOR* pos)
 LOGICAL		retval=FALSE;
 piVECTOR	oldpos, newpos;
 COLLISION	collision;
-FLOAT64VECTOR WorldOriginOffset;
+FLOAT64VECTOR worldOriginOffset;
 
 	oldpos = newpos = *pos;
 	oldpos.z -= 20000.0f * ScaleFactor;
@@ -144,11 +145,11 @@ FLOAT64VECTOR WorldOriginOffset;
 	retval = trncdCheckTerrainDown(&collision);
 	if (retval)
 	{
-		trnGetWorldOriginOffset(&WorldOriginOffset);
+		trnGetWorldOriginOffset(&worldOriginOffset);
 
-		retpos->x = (FLOAT32)(collision.colpos.x - WorldOriginOffset.x);
-		retpos->y = (FLOAT32)(collision.colpos.y - WorldOriginOffset.y);
-		retpos->z = (FLOAT32)(collision.colpos.z - WorldOriginOffset.z);
+		retpos->x = (FLOAT32)(collision.colpos.x - worldOriginOffset.x);
+		retpos->y = (FLOAT32)(collision.colpos.y - worldOriginOffset.y);
+		retpos->z = (FLOAT32)(collision.colpos.z - worldOriginOffset.z);
 		*poly = collision.colpoly;
 	}
 	else
@@ -252,9 +253,7 @@ piMATRIX	mat;
 
 	if (!trnopCollideDown(&cpos, &poly, &pos))
 	{
-#ifdef TERRAIN_EDITOR
 		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
-#endif
 		return(FALSE);
 	}
 
@@ -332,10 +331,7 @@ piMATRIX	mat;
 
     if(!trnopCollideDownWithDTL(&cpos, &pos, &poly, _superCell))
 	{
-#ifdef TERRAIN_EDITOR
 		Write_Debug("OnGroundLODImplement: Could not find the ground for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -389,9 +385,7 @@ OBJECT*	lpatt;
 
 static LOGICAL OnGroundLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for on ground", lod);
-#endif
+	//Write_Debug("Processing LOD %d for on ground", lod);
 
 	if (lpobj->flags & OBJECT_LOD)
 	{
@@ -417,9 +411,7 @@ static LOGICAL PlaceOnGround(OBJECT* lpobj)
 {
 int			i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place on ground: %s", lpobj->name);
-#endif
 
 	for (i=1; i < 10; i++)
 	{
@@ -443,9 +435,7 @@ static LOGICAL PlaceRelativeToGround(OBJECT* lpobj)
 {
 int		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place relative to ground: %s", lpobj->name);
-#endif
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightPlaceLOD))
@@ -465,9 +455,7 @@ int		i;
 */
 static LOGICAL PlaceAbsolute(OBJECT* lpobj)
 {
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place absolute: %s", lpobj->name);
-#endif
 	return TRUE;
 }
 
@@ -516,9 +504,7 @@ piMATRIX	mat;
 OBJECT*	lpbase;
 
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for height conformance", lod);
-#endif
+	//Write_Debug("Processing LOD %d for height conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
         if(lpobj->child->flag2 & OBJECT_IS_ROTATED)
@@ -543,10 +529,7 @@ OBJECT*	lpbase;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("HeightPlaceLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -604,9 +587,7 @@ OBJECT*	lpbase;
 			}
 			else
 			{
-#ifdef TERRAIN_EDITOR
 				Write_Debug("HeightPlaceLOD: Could not find the ground for 'base' for object '%s'", lpobj->name);
-#endif
 			}
 		}
 	}
@@ -627,9 +608,7 @@ piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for height conformance", lod);
-#endif
+	//Write_Debug("Processing LOD %d for height conformance", lod);
 
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
@@ -655,10 +634,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("HeightConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -771,9 +747,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-#ifdef TERRAIN_EDITOR
 					Write_Debug("HeightConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
-#endif
 				}
 			}
 		}
@@ -796,9 +770,7 @@ static LOGICAL PlaceHeightConform(OBJECT* lpobj)
 {
 int			i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place height conform: %s", lpobj->name);
-#endif
 
 	for (i=1; i < 10; i++)
 	{
@@ -848,7 +820,7 @@ SINT32		i, poly;
 		// ok place objects o1-o7
 		for (i=1; i < 8; i++)
 		{
-			sprintf(s, "o%d", i);
+			strprintf(s, "o%d", i);
 			ogrpFindSubObjectByName(&TempObjPtr, lpobj, s);
 			if (TempObjPtr != nullptr)
 			{
@@ -877,14 +849,6 @@ SINT32		i, poly;
 	else
 	{
 		Write_Debug("Could not find the ground in OctetReplace (%s)", lpobj->name);
-#ifdef TERRAIN_EDITOR
-		{
-		SINT8	txt[256];
-
-			sprintf(txt, "No ground, OctetReplace");
-			rnmainListText(txt);
-		}
-#endif
 	}
 
 	return (TRUE);
@@ -1014,10 +978,7 @@ piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
 
-
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for bottom conformance", lod);
-#endif
+	//Write_Debug("Processing LOD %d for bottom conformance", lod);
 	if (!obmainFindComment(&lpbase, lpobj->child, "base"))
 	{
 		math3dVectorMultiply(&pos, &lpobj->child->pos, &lpobj->child->mat);
@@ -1033,10 +994,7 @@ OBJECT*	lpbase, *lpnext;
 		mat._43 = dz;
 		ApplyMatrixToObjectTree(lpobj->child, &mat);
 
-#ifdef TERRAIN_EDITOR
 		Write_Debug("BottomConformLOD: Could not find 'base' subobject for object '%s'", lpobj->name);
-#endif
-
 		return(FALSE);
 	}
 
@@ -1080,9 +1038,7 @@ OBJECT*	lpbase, *lpnext;
 		lpnext = lpnext->attached;
 	}
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Elevating subobject by %f meters", dz / ScaleFactor);
-#endif
 
 	mat = IdentityMatrix;
 	mat._41 = 0.0f;
@@ -1112,9 +1068,7 @@ OBJECT*	lpbase, *lpnext;
 				}
 				else
 				{
-#ifdef TERRAIN_EDITOR
 					Write_Debug("BottomConformLOD: Could not find the ground for 'base' for subobject '%s'", lpnext->name);
-#endif
 				}
 			}
 		}
@@ -1138,10 +1092,7 @@ static LOGICAL PlaceBottomConform(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place bottom conform: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, BottomConformLOD))
@@ -1308,14 +1259,6 @@ FLOAT32 TempNum;
 	else
 	{
 		Write_Debug("Could not find the ground in ConformRadialLODIterate (%s)", lpobj->name);
-#ifdef TERRAIN_EDITOR
-		{
-		SINT8	txt[256];
-
-			sprintf(txt, "No ground, ConformRadialLODIterate");
-			rnmainListText(txt);
-		}
-#endif
 	}
 
 	return (TRUE);
@@ -1467,10 +1410,7 @@ OBJECT*	lpatt;
 
 static LOGICAL DownLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for down", lod);
-#endif
-
+	//Write_Debug("Processing LOD %d for down", lod);
 	DownLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1486,10 +1426,7 @@ static LOGICAL PlaceDown(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Place down: %s", lpobj->name);
-#endif
-
+	//Write_Debug("Place down: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
@@ -1508,10 +1445,7 @@ static LOGICAL PlaceConformRadial(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Place conform radial: %s", lpobj->name);
-#endif
-
+	//Write_Debug("Place conform radial: %s", lpobj->name);
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
@@ -1589,10 +1523,7 @@ OBJECT*	lpatt;
 
 static LOGICAL RotateLOD(OBJECT* lpobj, UINT32 lod)
 {
-#ifdef TERRAIN_EDITOR
-	Write_Debug("Processing LOD %d for rotate", lod);
-#endif
-
+	//Write_Debug("Processing LOD %d for rotate", lod);
 	RotateLODInterate(lpobj->child);
 
 	return(TRUE);
@@ -1608,10 +1539,7 @@ static LOGICAL PlaceRotate(OBJECT* lpobj)
 {
 SINT32		i;
 
-#ifdef TERRAIN_EDITOR
 	Write_Debug("Place and rotate: %s", lpobj->name);
-#endif
-
 	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, RotateLOD))
@@ -1652,7 +1580,7 @@ OBJECT*	lpatt;
 }
 
 
-void trnopLoadTrees(LOGICAL bLoad)
+void trnopLoadTrees(bool bLoad)
 {
 #if defined(BETA_RELEASE)
     g_bLoadTrees = bLoad;
@@ -1761,10 +1689,11 @@ struct ParseTrees
                     // Comment section has tree types as 1 based.
                     SINT16 base = types[i] - 1;
 
-#if CHRISTMAS
-                    if(base == 2)
-                        o->mat._43 -= 0.5f;
-#endif
+					if (WWII::Theme::theme() == WWII::THEME::THEME_HOLIDAY_SEASON)
+					{
+                    	if(base == 2)
+                        	o->mat._43 -= 0.5f;
+					}
 
                     if(base >= 0)
                     {
@@ -1806,10 +1735,6 @@ SINT32 trnopHandleSpeedTree(OBJECT* group)
         return -1;
     }
 
-    COLLISION collision;
-
-    memset(&collision, 0, sizeof(COLLISION));
-
     if(trndtl[_superCell].m_trees == nullptr)
     {
         return 0;
@@ -1837,7 +1762,7 @@ SINT8*			ptr;
 SINT32			place;
 piMATRIX		mat;
 OBJECT*		lpsub;
-FLOAT64VECTOR	WorldOriginOffset;
+FLOAT64VECTOR	worldOriginOffset;
 UINT32			i;
 UINT32			toplevel;
 LOGICAL			DoGroupNormals;
@@ -1850,7 +1775,7 @@ OBJECT*			TempObj;
 
 	mat = IdentityMatrix;
 
-	trnGetWorldOriginOffset(&WorldOriginOffset);
+	trnGetWorldOriginOffset(&worldOriginOffset);
 
     if(lpobj->flag2 & OBJECT_IS_ROTATED)
     {
@@ -1859,16 +1784,14 @@ OBJECT*			TempObj;
     }
 
 	piVECTOR	translation;
-	translation.x = (FLOAT32)((FLOAT64)pos->x - WorldOriginOffset.x);
-	translation.y = (FLOAT32)((FLOAT64)pos->y - WorldOriginOffset.y);
-	translation.z = (FLOAT32)((FLOAT64)pos->z - WorldOriginOffset.z);
+	translation.x = (FLOAT32)((FLOAT64)pos->x - worldOriginOffset.x);
+	translation.y = (FLOAT32)((FLOAT64)pos->y - worldOriginOffset.y);
+	translation.z = (FLOAT32)((FLOAT64)pos->z - worldOriginOffset.z);
 
 	obplyrRotateAndTranslateObjectTree(lpobj, mat, translation);
 
 
-#ifdef TERRAIN_EDITOR
-	Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
-#endif
+	//Write_Debug("trnopOrientSubobjects for '%s'", lpobj->name);
 
 	// lpobj should point to a Topmost object
 	lpsub = nullptr;
@@ -1918,10 +1841,7 @@ OBJECT*			TempObj;
 			place = atoi(ptr);
 		}
 
-#ifdef TERRAIN_EDITOR
-		Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
-#endif
-
+		//Write_Debug(" subobject '%s', place = %d", lpsub->name, place);
 		switch (place)
 		{
 			case OBJVAL_ON_GROUND:

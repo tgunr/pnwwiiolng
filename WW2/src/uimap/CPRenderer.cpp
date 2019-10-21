@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include "gl/glew.h"
 #include "gl/glplat.h"
 
@@ -165,7 +165,7 @@ CPRenderer::CPRenderer()
 	showcps = showcivilian = showarmy = showairforce = shownavy = showdepots = showbridges = true;
 	shownames = showcpnames = showfacnames = false;
 	showicons = showflags = showclutter = true;
-	showsmallcps = showlargecps = showews = showfront = showrear = showairfields = showports = true;
+	showsmallcps = showlargecps = showews = showfrontline = showbackline = showreserve = showrear = showairfields = showports = true;
 	showobjectives = showbrigades = showdeployments = showorders = showmydivision = true;
 
 	playerposx = playerposy = 0;
@@ -237,8 +237,12 @@ void CPRenderer::FilterStrat(const char* name, const unsigned char* value)
 		showlargecps = phui::UIXMLbool(value);
 	else if(strcmp("showews", name) == 0)
 		showews = phui::UIXMLbool(value);
-	else if(strcmp("showfront", name) == 0)
-		showfront = phui::UIXMLbool(value);
+	else if(strcmp("showfrontline", name) == 0)
+		showfrontline = phui::UIXMLbool(value);
+	else if (strcmp("showbackline", name) == 0)
+		showbackline = phui::UIXMLbool(value);
+	else if (strcmp("showreserve", name) == 0)
+		showreserve = phui::UIXMLbool(value);
 	else if(strcmp("showrear", name) == 0)
 		showrear = phui::UIXMLbool(value);
 	else if(strcmp("showairfields", name) == 0)
@@ -343,7 +347,10 @@ void FacilityMapObject::DrawSelf(SuperCellMapView* mv)
 //	unsigned int cpflags	= _cp.StratFlags();
 	phui::BoxVerts box;
 
-	if(mv->Scale() > 8) iconscale = mv->Width()/8.0f;
+	if (mv->Scale() > 8) {
+		iconscale = mv->Width() / 8.0f;
+		iconsize = _renderer->iconsize / iconscale;
+	}
 
 	float r,g,b,a;
 	mv->GetBackgroundColor(&r, &g, &b, &a);
@@ -455,12 +462,26 @@ void CPMapObject::DrawCPMarker(SuperCellMapView* mv)
 // this code is ugly and needs cleaning up - ramp
 void CPMapObject::DrawCP(SuperCellMapView* mv)
 {
-	phui::GraphicsContext* ctx = mv->GetGraphicsContext();
+	// Set the needed variables to find out if the town has only a Garrison unit
+	_mycountry	= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
+	_myside		= wwiiSide(_mycountry);
+	bool garrisonOnly = false;
+	
+	// If no best unit was found, we know that it's only a Garrison in this town.
+	if (_cp.FindBestUnit(_myside, _mycountry, 0, true) == 0)
+		garrisonOnly = true;
+
+//	Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Entering renderer for town %s", _cp.Name());
+	phui::GraphicsContext *ctx = mv->GetGraphicsContext();
 
 	glPushMatrix();
 	ctx->DisableTexture();
 
 	unsigned int cpflags	= _cp.StratFlags(true);
+
+	// If the town has a Garrison unit and also has an inactive status, show it as inactive.
+	if(garrisonOnly && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+		_bestunit = 0;
 
 	int font			= mv->GetFont();
 	float fontheight	= ctx->FontHeight(font);
@@ -503,9 +524,13 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	phui::box_verts_with_pos(box, bgx - 5, bgy, bgw + 34, bgh);
 
 	if(_contended)
+	{
 		ctx->SetColor(.5f,.5f,0.0f,.7f);
+	}
 	else
+	{
 		ctx->SetColor(.3f,.3f,.3f,(_bestunit) ? 1.0f: .6f);
+	}
 
 	ctx->DrawQuad(box.verts);
 
@@ -533,7 +558,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 	for(int i = 0; i < (int)_statusicons.size(); ++i)
 	{
-		MapIcon& icon = _statusicons[i];
+//		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status icon for town %s", _cp.Name());
+		MapIcon &icon = _statusicons[i];
 		ctx->SetTexture(icon.id);
 		phui::box_verts_with_pos(box, offsetx, offsety, iconsize, iconsize);
 		phui::draw_gl_quad(box.verts, icon.uv);
@@ -543,7 +569,8 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 	// draw the brigade icon
 	if(_bestuniticon > -1 && !TUT_MGR->IsActive())
 	{
-		bigiconsize	= (64.0f/iconscale)/1.5f;
+//		Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing brigade icon for town %s", _cp.Name());
+		bigiconsize = (64.0f / iconscale) / 1.5f;
 
 		float ugx = -iconbuffer*2.5f;
 		float ugy = 0;
@@ -578,11 +605,15 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 
 		ctx->SetColor(1,1,1,1);
 
-		ctx->SetTexture(_bestuniticon);
-		phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
-		phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
+		// Only towns that don't have Garrison units can show the Unit Flag designation
+		if(!garrisonOnly || (garrisonOnly && _bestuniticon == _renderer->animFlagIcons[WWII_NO_COUNTRY])){
+			ctx->SetTexture(_bestuniticon);
+			phui::box_verts_with_pos(box, ugx, ugy, ugw, ugh);
+			phui::draw_gl_quad(box.verts, frames[_lastflagframe]);
+		}
 
-		if(_altuniticon)
+		// Only draw the AltUnitIcon if the town is frontline, backline or reserve so we don't show the hidden garrison
+		if(_altuniticon && (cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
 		{
 			float auiOffset = 1.0f/iconscale;
 			glTranslatef(-auiOffset*2, auiOffset*33, 0.0f);
@@ -602,8 +633,12 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		ctx->SetColor(_namecolor[0],_namecolor[1],_namecolor[2],1.0f);
 		ctx->DisableTexture();
 
+		if(iconbuffer > 0.01)
+			iconbuffer = 0.01;
+
 		ugx = -iconbuffer * 4.0f;
-		ugy = bigiconsize - iconbuffer * 2.0f;
+		// Towns with Garrion units don't have a flag, let's adjust the Dots down a bit
+		ugy = bigiconsize - iconbuffer * (garrisonOnly ? 11.0f : 2.0f);
 
 		translatedx += ugx;
 		translatedy += ugy;
@@ -611,9 +646,20 @@ void CPMapObject::DrawCP(SuperCellMapView* mv)
 		glTranslatef(ugx, ugy, 0.0f);
 
 		unsigned int count = _cp.GetUnitCount();
+		
+		// If the town is not fronline, backline, reserve or a frontline airfield don't show a Dot for the hidden Garrison that is there
+		if((!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED | CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) 
+			|| ((cpflags & CP_STAT_FRONTLINE) && (cpflags & CP_STAT_HAS_AIRBASE)))
+		{
+			count--;
+		}
+
 		unsigned int limit = std::min(5U, count);
+
 		for(unsigned int s = 0; s < limit; ++s)
 		{
+//			Write_Log(LOG_COMM, LOG_INFO, "CPRenderer: Drawing status circle for town %s", _cp.Name());
+
 			ctx->DrawCircle(iconbuffer, true);
 			ugy -= iconbuffer;
 			glTranslatef(0.0f, -iconbuffer*3.0f, 0.0f);
@@ -670,8 +716,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 	// init cache variables
 	_mycountry		= _renderer->client ? _renderer->client->PersonaSelected().m_countryID: 0;
-	_myside			= _mycountry ? (_mycountry == 4) ? 2: 1: 0;
-	_cpside			= (_cp.Country() == 4) ? 2: 1;
+	_myside			= wwiiSide(_mycountry);
+	_cpside			= wwiiSide(_cp.Country());
 	_namecolor		= (_cpside == 1) ? _renderer->alliedcolor: _renderer->axiscolor;
 	_cutoff			= 0;
 	_objective		= 0;
@@ -706,8 +752,16 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 		// contention
 		_contended = cpflags & CP_STAT_CONTENTION;
 
-		// best brigade
-		_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0);
+		// Find the best unit that isn't a Garrison.
+		_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0, true);
+		bool garrisonOnly = false;
+		// If no best unit was found we know that it's only a Garrison in this town.
+		// we still need to get a best unit so we can find it's country.
+		if (_bestunit == 0)
+		{
+			garrisonOnly = true;
+			_bestunit = _cp.FindBestUnit(_myside, _mycountry, 0, false);
+		}
 
 		// other unit here?
 		_altuniticon = 0;
@@ -727,14 +781,32 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					case WWII_USA:
 					case WWII_FRANCE:
 					{
-						_bestuniticon = _renderer->animFlagIcons[unit->country()];
-
-						if(alliedUnit)
-							_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
+						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
+						// Take into account the player's map preference settings aswell
+						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
+							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
+							(_renderer->showbrigades && !garrisonOnly))
+						{
+							_bestuniticon = _renderer->animFlagIcons[unit->country()];
+							
+							if(alliedUnit && alliedUnit->isBrigade())
+								_altuniticon = _renderer->animFlagIcons[alliedUnit->country()];
+						}
 					}
 					break;
 					case WWII_GERMANY:
-						_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
+					{
+						// We only want to show the Garrison/Brigade Flags and Dots whenever towns are Frontline/Rearline or have AF/Naval
+						// Take into account the player's map preference settings aswell
+						if((_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) || 
+							(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) || 
+							(_renderer->showreserve && cpflags & (CP_STAT_HAS_AIRBASE | CP_STAT_HAS_NAVYBASE)) ||
+							(_renderer->showbrigades && !garrisonOnly))
+						{
+							_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
+						}
+					}
 					break;
                     default:
                         // No other valid countries right now
@@ -845,10 +917,14 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 
 		if((cpflags & CP_STAT_SURRENDER_CANDIDATE) && _renderer->animFlagIcons[WWII_NO_COUNTRY] >= 0)
 		{
-			if(_bestuniticon >= 0)
+			if(_bestuniticon >= 0 && !garrisonOnly)
+			{
 				_altuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 			else
+			{
 				_bestuniticon = _renderer->animFlagIcons[WWII_NO_COUNTRY];
+			}
 		}
 	}
 	else
@@ -879,8 +955,10 @@ void CPMapBridgeObject::DrawSelf(SuperCellMapView* mv)
 	float iconsize = _renderer->iconsize / iconscale;
 	phui::BoxVerts box;
 
-	if(mv->Scale() > 8)
-		iconscale = mv->Width()/8.0f;
+	if (mv->Scale() > 8) {
+		iconscale = mv->Width() / 8.0f;
+		iconsize = _renderer->iconsize / iconscale;
+	}
 
 	float iconx = (float)_cp.PosX()/SDM_SUPERCELL_SIZE - iconsize/2.0f;
 	float icony = (float)_cp.PosY()/SDM_SUPERCELL_SIZE - iconsize/2.0f;
@@ -966,16 +1044,18 @@ bool CPMapObject::ObjectVisible() const
 {
 	unsigned int cpflags = _cp.StratFlags(true);
 	return _mouseover || _selected || _childselected || _renderer->showcps ||
-		   (_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
-		   (_renderer->showfront && cpflags & CP_STAT_ENEMY_LINKED) ||
-		   (_renderer->showrear && !(cpflags & CP_STAT_ENEMY_LINKED)) ||
-		   (_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
-		   (_renderer->showbrigades && _bestunit) ||
-		   (_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
-		   (_renderer->showports && cpflags & CP_STAT_HAS_NAVYBASE) ||
-		   (_renderer->showdeployments && cpflags & (CP_STAT_HAS_RARE_NAVY | CP_STAT_HAS_RARE_AIR | CP_STAT_HAS_RARE_INF)) ||
-		   (_renderer->showorders && cpflags & (CP_STAT_OWN_HAAC | CP_STAT_FALLBACK | CP_STAT_OVERRUN)) ||
-		   (_renderer->showmydivision && _mybase);
+		(_renderer->showews && cpflags & (CP_STAT_CONTENTION | CP_EWS_FLAG_MASK)) ||
+		(_renderer->showfrontline && cpflags & CP_STAT_FRONTLINE) ||
+		(_renderer->showbackline && cpflags & CP_STAT_FRONTLINE_LINKED) ||
+		(_renderer->showreserve && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))) ||
+		(_renderer->showrear && !(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED))) ||
+		(_renderer->showobjectives && cpflags & CP_OBJECTIVES) ||
+		(_renderer->showbrigades && _bestunit) ||
+		(_renderer->showairfields && cpflags & CP_STAT_HAS_AIRBASE) ||
+		(_renderer->showports && cpflags & CP_STAT_HAS_NAVYBASE) ||
+		(_renderer->showdeployments && cpflags & (CP_STAT_HAS_RARE_NAVY | CP_STAT_HAS_RARE_AIR | CP_STAT_HAS_RARE_INF)) ||
+		(_renderer->showorders && cpflags & (CP_STAT_OWN_HAAC | CP_STAT_FALLBACK | CP_STAT_OVERRUN)) ||
+		(_renderer->showmydivision && _mybase);
 }
 
 bool CPMapBridgeObject::ObjectVisible() const
@@ -1073,7 +1153,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 			std::wstring tip;
 
 			int objective		= 0;
-			int cpflags			= _cp.StratFlags(true);
+			unsigned int cpflags	= _cp.StratFlags(true);
 			int side			= _renderer->client ? (_renderer->client->PersonaSelected().m_countryID == 4) ? 2:1 : 0;
 			UINT32 myBrigadeID	= _renderer->client ? _renderer->client->BrigadeSelected().m_detail.brigadeID() : 0;
 
@@ -1155,6 +1235,8 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 
 			const StratDB::StratObject::UnitList& units = _cp.GetUnits();
 
+			bool display = false;
+
 			if(units.size() > 0 && !TUT_ACTIVE)
 			{
 				tip += L"\n";
@@ -1165,6 +1247,7 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				BrigadeControlList* oic	= nullptr;
 				unsigned int current	= 0;
 				bool foundMine			= false;
+				bool townIsEmpty        = true;
 
 				for(int i = 0; i < (int)units.size(); ++i)
 				{
@@ -1173,66 +1256,144 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 					if(unit && !unit->isTrainingUnit())
 					{
 						HCUnit* division = (unit->isBrigade()) ? unit->parent(): unit;
-
-						if(division && division->unitID() != current)
+						display = false;
+						
+						if (unit->isGarrison() &&
+							(cpflags & CP_STAT_FRONTLINE) &&
+							(unit->branch() == BRANCH_AIR))
+							continue;
+						
+						// Check whether this is a reserve town with no units in it or not.
+						if (unit->isBrigade() || unit->isDivision() ||
+							(unit->isGarrison() && (cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED |
+								CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE))))
 						{
-							current = division->unitID();
-							tip += uiUTF8toUTF16(division->m_name);
-							switch(division->country())
+							display = true;
+							townIsEmpty = false;
+						}
+
+						// If the town is not empty then we display the units that are in it on mouse over.
+						if (display)
+						{
+							// Garrisons don't have a Division so let's just show the Garrion
+							if (division && division->unitID() != current && !division->isGarrison())
 							{
+								current = division->unitID();
+								tip += uiUTF8toUTF16(division->m_name);
+								switch (division->country())
+								{
 								case WWII_ENGLAND:
 									tip += L" - UK";
-								break;
+									break;
 								case WWII_USA:
 									tip += L" - US";
-								break;
+									break;
 								case WWII_FRANCE:
 									tip += L" - FR";
-								break;
+									break;
 								case WWII_GERMANY:
 									tip += L" - DE";
-								break;
-                                default:
-                                    // Currently unrecognized country
-                                    break;
+									break;
+								default:
+									// Currently unrecognized country
+									break;
+								}
+								tip += L"\n";
 							}
+
+							if (unit->unitID() == myBrigadeID)
+							{
+								foundMine = true;
+								tip += L"*";
+							}
+
+							if (unit->isBrigade() || unit->isGarrison())
+							{
+								tip += L"     ";
+								tip += uiUTF8toUTF16(unit->m_name);
+								
+								// If a Unit is a different country than the Town owner and it's a Garrison, 
+								// show the country abbreviation after the unit name.
+								if(unit->country() != _cp.Country() && unit->isGarrison())
+								{
+									switch (unit->country())
+									{
+									case WWII_ENGLAND:
+										tip += L" - UK";
+										break;
+									case WWII_USA:
+										tip += L" - US";
+										break;
+									case WWII_FRANCE:
+										tip += L" - FR";
+										break;
+									case WWII_GERMANY:
+										tip += L" - DE";
+										break;
+									default:
+										// Currently unrecognized country
+										break;
+									}
+								}
+							}
+							else if (unit->isDivision())
+							{
+								tip += L"     ";
+								tip += _renderer->tooltip("widgets.map.tooltip.divhq");
+							}
+
+							oic = _renderer->client ? _renderer->client->LookupBrigadeOIC(unit->unitID()) : 0;
+							if (oic && oic->m_officer)
+							{
+								tip += L" - OIC: ";
+								tip += chatGetWideCallsign(oic->m_officer);
+							}
+
 							tip += L"\n";
 						}
-
-						if(unit->unitID() == myBrigadeID)
-						{
-							foundMine = true;
-							tip += L"*";
-						}
-
-						if(unit->isBrigade())
-						{
-							tip += L"     ";
-							tip += uiUTF8toUTF16(unit->m_name);
-						}
-						else
-						{
-							tip += L"     ";
-							tip += _renderer->tooltip("widgets.map.tooltip.divhq");
-						}
-
-						oic = _renderer->client ? _renderer->client->LookupBrigadeOIC(unit->unitID()) : 0;
-						if(oic && oic->m_officer)
-						{
-							tip += L" - OIC: ";
-							tip += chatGetWideCallsign(oic->m_officer);
-						}
-
-						tip += L"\n";
 					}
 				}
+				// If there are no units in this town.
+				if (townIsEmpty)
+				{
+					tip += _renderer->tooltip("widgets.map.tooltip.emptytown");
+					tip += L"\n";
+				}
 
-				if(foundMine)
+				if(foundMine && display)
 				{
 					tip += L"\n";
 					tip += _renderer->tooltip("widgets.map.tooltip.yours");
 					tip += L"\n";
 				}
+			}
+
+			if (cpflags & CP_STAT_FRONTLINE)
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.frontline");
+				tip += L"\n";
+			}
+			else
+			if (cpflags & CP_STAT_FRONTLINE_LINKED)
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.backline");
+				tip += L"\n";
+			}
+			else
+			if (!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && !(cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.inactive");
+				tip += L"\n";
+			}
+			else
+			if (!(cpflags & (CP_STAT_FRONTLINE | CP_STAT_FRONTLINE_LINKED)) && (cpflags & (CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE)))
+			{
+				tip += L"\n";
+				tip += _renderer->tooltip("widgets.map.tooltip.reserve");
+				tip += L"\n";
 			}
 
 			mv->SetToolTip(tip.c_str());
@@ -1260,8 +1421,8 @@ void CPRenderer::MessageReceived(phui::Message* msg, phui::MessageHandler* reply
 			msg->FindLong(CPUPDATE_SX, &sx,i);
 			msg->FindLong(CPUPDATE_SY, &sy,i);
 
-			fullid.cell.ox = (SINT16)(sx << 4);
-			fullid.cell.oy = (SINT16)(sy << 4);
+			fullid.cell.ox = static_cast<SINT16>(static_cast<UINT16>(sx) << 4);
+			fullid.cell.oy = static_cast<SINT16>(static_cast<UINT16>(sy) << 4);
 			fullid.id = (UINT16)id;
 
 			stratobj = StratDB::FindStratObject(fullid);

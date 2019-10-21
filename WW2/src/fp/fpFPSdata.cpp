@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //
 // Date: Tue Jul 12 15:10:07 CDT 2005
 //
@@ -21,8 +21,6 @@
 
 #include "xml/XMLLoader2.h"
 
-#include "sys/sysWinISO.h"
-
 #define	FPS_DIR		"FPS\\"
 
 #define FPS_DATA_DIR		"vehicles\\ground\\groundman\\"
@@ -36,7 +34,7 @@
 
 //#define CACHE_FPS_DATA
 
-typedef std::map<std::string, fpFPSTrooperLoadout> fpFPSLoadoutMap;
+using fpFPSLoadoutMap = std::map<std::string, fpFPSTrooperLoadout>;
 
 const SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
 const SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
@@ -71,7 +69,11 @@ const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
 	FPS_DIR "arms\\armsmesh-frenchinf",
-	FPS_DIR "arms\\armsmesh-britinf" // americans
+	FPS_DIR "arms\\armsmesh-britinf", // Americans
+	FPS_DIR "arms\\armsmesh-germinf", // Italians
+	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack
+	FPS_DIR "arms\\armsmesh-britinf", // American Para NoPack
+	FPS_DIR "arms\\armsmesh-britinf", // American Para Pack Self
 };
 
 const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
@@ -98,7 +100,11 @@ const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
 	FPS_DIR "legs\\french-legs",
-	FPS_DIR "legs\\brit-legs" // americans
+	FPS_DIR "legs\\brit-legs", // Americans
+	FPS_DIR "legs\\german-legs", // Italians
+	FPS_DIR "legs\\brit-legs", // American Para Pack
+	FPS_DIR "legs\\brit-legs", // American Para NoPack
+	FPS_DIR "legs\\brit-legs", // American Para Pack Self
 };
 
 const SCHAR* hud_icons[NUM_ICONS] =
@@ -120,6 +126,7 @@ const SCHAR* hud_icons[NUM_ICONS] =
 	"hudltmortar1.bmp"
 };
 
+// HUD Icons
 const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 {
 	"none",
@@ -132,8 +139,8 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"lebel",
 	"m1935",
 	"luger",
-	"mills",
-	"mills",
+	"uk_he_nade", // British HE Grenade
+	"fr_he_nade", // French HE Grenade
 	"stigr",
 	"enfmk2",
 	"binocs",
@@ -142,9 +149,9 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"bren",
 	"mg34",
 	"fm39",
-	"smoke",
-	"smoke",
-	"smoke",
+	"stigr_smk",	// German Smoke Grenade
+	"uk_smoke_nade",	// British Smoke Grenade
+	"fr_smoke_nade",	// French Smoke Grenade
 	"ammocan",
 	"mas36",
 	"mas40",
@@ -174,12 +181,14 @@ const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"bazooka",
 	"pzschreck",
 	"m1903a3",
-	"smoke",
+	"smoke",	// American Smoke Grenade
 	"piat",
 	"Sten",
 	"GreaseGun",
 	"mp34",
 	"fg42g",
+	"carcano",
+	"beretta38",
 };
 
 const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
@@ -221,7 +230,11 @@ const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"ukml",
 	"deml",
 	"frml",
-	"usarmy"
+	"usarmy",
+	"itarmy",
+	"uspara",
+	"usparanopack",
+	"usparaself"
 };
 
 const SCHAR* weapNameStrings[NUM_WEAPONS] =
@@ -284,6 +297,8 @@ const SCHAR* weapNameStrings[NUM_WEAPONS] =
 	(SCHAR *)"m3a1",
 	(SCHAR *)"mp34",
 	(SCHAR *)"fg42g",
+	(SCHAR *)"carcano",
+	(SCHAR *)"beretta38",
 };
 
 class fpFPSVisLoadoutsLoader : public XMLLoader2<fpFPSVisLoadoutsLoader>
@@ -310,6 +325,7 @@ static void _fpFPSReadVisualLoadouts();
 
 static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 {
+    bool hasWarned = false;
 	std::string weapFileName(FPS_WEAP_DATA_DIR);
 	weapFileName += filename;
 
@@ -335,121 +351,121 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 		if (varName == nullptr || varData == nullptr) continue;
 
-		if (stricmp(buf, "weaponType") == 0)
+		if (strcasecmp(buf, "weaponType") == 0)
 			_fpFPSDataHandleWeaponTypeString (weapon, varData);
-		else if (stricmp(buf, "muzzleRise") == 0)
+		else if (strcasecmp(buf, "muzzleRise") == 0)
 			fpsWeapons[weapon].muzzleRise = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "muzzleReturn") == 0)
+		else if (strcasecmp(buf, "muzzleReturn") == 0)
 			fpsWeapons[weapon].muzzleReturn = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "muzzleClimbRate") == 0)
+		else if (strcasecmp(buf, "muzzleClimbRate") == 0)
 			fpsWeapons[weapon].muzzleClimbRate = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "fireDelay") == 0)
+		else if (strcasecmp(buf, "fireDelay") == 0)
 			fpsWeapons[weapon].fireDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "minimumDispersion") == 0)
+		else if (strcasecmp(buf, "minimumDispersion") == 0)
 			fpsWeapons[weapon].minimumDispersion = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "unaimedDispersionMod") == 0)
+		else if (strcasecmp(buf, "unaimedDispersionMod") == 0)
 			fpsWeapons[weapon].unaimedDispersionMod = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "controlability") == 0)
+		else if (strcasecmp(buf, "controlability") == 0)
 			fpsWeapons[weapon].controlability = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimFOV") == 0)
+		else if (strcasecmp(buf, "aimFOV") == 0)
 			fpsWeapons[weapon].aimFOV = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "bulletJitter") == 0)
+		else if (strcasecmp(buf, "bulletJitter") == 0)
 			fpsWeapons[weapon].bulletJitter = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "horizJitterMult") == 0)
+		else if (strcasecmp(buf, "horizJitterMult") == 0)
 			fpsWeapons[weapon].horizJitterMult = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "speedMultiplier") == 0)
+		else if (strcasecmp(buf, "speedMultiplier") == 0)
 			fpsWeapons[weapon].speedMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimVerticalCorrection") == 0)
+		else if (strcasecmp(buf, "aimVerticalCorrection") == 0)
 			fpsWeapons[weapon].aimVerticalCorrection = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "aimHorizontalCorrection") == 0)
+		else if (strcasecmp(buf, "aimHorizontalCorrection") == 0)
 			fpsWeapons[weapon].aimHorizontalCorrection = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convergenceDistance") == 0)
+		else if (strcasecmp(buf, "convergenceDistance") == 0)
 			fpsWeapons[weapon].convergenceDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "ejectDelay") == 0)
+		else if (strcasecmp(buf, "ejectDelay") == 0)
 			fpsWeapons[weapon].ejectDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "shellScale") == 0)
+		else if (strcasecmp(buf, "shellScale") == 0)
 			fpsWeapons[weapon].shellScale = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointDisplacement") == 0)
+		else if (strcasecmp(buf, "firepointDisplacement") == 0)
 			fpsWeapons[weapon].firepointDisplacement = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "firepointZDistance") == 0 || stricmp(buf, "fpYOffset") == 0)
+		else if (strcasecmp(buf, "firepointZDistance") == 0 || strcasecmp(buf, "fpYOffset") == 0)
 			fpsWeapons[weapon].firepointZDistance = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointHorizOffset") == 0 || stricmp(buf, "fpxOffset") == 0)
+		else if (strcasecmp(buf, "firepointHorizOffset") == 0 || strcasecmp(buf, "fpxOffset") == 0)
 			fpsWeapons[weapon].firepointHorizOffset = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "firepointVertOffset") == 0 || stricmp(buf, "fpZOffset") == 0)
+		else if (strcasecmp(buf, "firepointVertOffset") == 0 || strcasecmp(buf, "fpZOffset") == 0)
 			fpsWeapons[weapon].firepointVertOffset = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "grenadeVisDelay") == 0)
+		else if (strcasecmp(buf, "grenadeVisDelay") == 0)
 			fpsWeapons[weapon].grenadeVisDelay= (FLOAT32)atof(varData);
 
-		else if (stricmp(buf, "weaponBreathMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponBreathMultiplier") == 0)
 			fpsWeapons[weapon].weaponBreathMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponHeartMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponHeartMultiplier") == 0)
 			fpsWeapons[weapon].weaponHeartMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponMoveMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponMoveMultiplier") == 0)
 			fpsWeapons[weapon].weaponMoveMultiplier = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weaponPoseMultiplier") == 0)
+		else if (strcasecmp(buf, "weaponPoseMultiplier") == 0)
 			fpsWeapons[weapon].weaponPoseMultiplier = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "auxAltRGCupConnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGCupConnectTime") == 0)
 			fpsWeapons[weapon].auxAltConnectTime[FPS_AUX_RGCUP] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "auxAltRGCupDisconnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGCupDisconnectTime") == 0)
 			fpsWeapons[weapon].auxAltDisconnectTime[FPS_AUX_RGCUP] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "auxAltRGGrenadeConnectTime") == 0)
+		else if (strcasecmp(buf, "auxAltRGGrenadeConnectTime") == 0)
 			fpsWeapons[weapon].auxAltConnectTime[FPS_AUX_RGGRENADE] = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "weapDeployUpAngleStand") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleStand") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleStand") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleStand") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployUpAngleCrouch") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleCrouch") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleCrouch") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleCrouch") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployUpAngleProne") == 0)
+		else if (strcasecmp(buf, "weapDeployUpAngleProne") == 0)
 			fpsWeapons[weapon].weapDeployUpAngle[FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployDownAngleProne") == 0)
+		else if (strcasecmp(buf, "weapDeployDownAngleProne") == 0)
 			fpsWeapons[weapon].weapDeployDownAngle[FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployKneelDeployUpAngle") == 0)
+		else if (strcasecmp(buf, "weapDeployKneelDeployUpAngle") == 0)
 			fpsWeapons[weapon].weapDeployKneelDeployUpAngle = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "weapDeployKneelDeployDownAngle") == 0)
+		else if (strcasecmp(buf, "weapDeployKneelDeployDownAngle") == 0)
 			fpsWeapons[weapon].weapDeployKneelDeployDownAngle = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "staticDeploy") == 0)
+		else if (strcasecmp(buf, "staticDeploy") == 0)
 			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "grenadeDelayTime") == 0)
+		else if (strcasecmp(buf, "grenadeDelayTime") == 0)
 			fpsWeapons[weapon].grenadeDelayTime = (SINT32)atol(varData);
-		else if (stricmp(buf, "holdfire") == 0)
+		else if (strcasecmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
-		else if (stricmp(buf, "sniperGunSight") == 0)
+		else if (strcasecmp(buf, "sniperGunSight") == 0)
 			fpsWeapons[weapon].sniperGunSight = (SCHAR*) strpool (varData);
-        else if (stricmp(buf, "sniperScopeDelay") == 0)
+        else if (strcasecmp(buf, "sniperScopeDelay") == 0)
 			fpsWeapons[weapon].sniperScopeDelay = atof (varData);
-		else if (stricmp(buf, "sniperScopeEndDelay") == 0)
+		else if (strcasecmp(buf, "sniperScopeEndDelay") == 0)
 			fpsWeapons[weapon].sniperScopeEndDelay = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "hudIconType") == 0)
+		else if (strcasecmp(buf, "hudIconType") == 0)
 			fpsWeapons[weapon].hudIconType = (fpFPSIconType) atol (varData);
-		else if (stricmp(buf, "ejectImmediate") == 0)
+		else if (strcasecmp(buf, "ejectImmediate") == 0)
 			fpsWeapons[weapon].ejectImmediate = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "clipBullets") == 0)
+		else if (strcasecmp(buf, "clipBullets") == 0)
 			fpsWeapons[weapon].clipBullets = atol(varData);
-		else if (stricmp(buf, "reloadSound") == 0)
+		else if (strcasecmp(buf, "reloadSound") == 0)
 			fpsWeapons[weapon].reloadSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "reload2Sound") == 0)
+		else if (strcasecmp(buf, "reload2Sound") == 0)
 			fpsWeapons[weapon].reload2Sound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "reload3Sound") == 0)
+		else if (strcasecmp(buf, "reload3Sound") == 0)
 			fpsWeapons[weapon].reload3Sound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "recycleSound") == 0)
+		else if (strcasecmp(buf, "recycleSound") == 0)
 			fpsWeapons[weapon].recycleSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "rgReloadSound") == 0)
+		else if (strcasecmp(buf, "rgReloadSound") == 0)
 			fpsWeapons[weapon].rgReloadSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "deploySound") == 0)
+		else if (strcasecmp(buf, "deploySound") == 0)
 			fpsWeapons[weapon].deploySound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "undeploySound") == 0)
+		else if (strcasecmp(buf, "undeploySound") == 0)
 			fpsWeapons[weapon].undeploySound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "hiddenMeshes") == 0)
+		else if (strcasecmp(buf, "hiddenMeshes") == 0)
 			fpsWeapons[weapon].hiddenMeshes = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "weaponModel") == 0)
+		else if (strcasecmp(buf, "weaponModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -457,11 +473,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].weaponModel = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "weaponConnectTo") == 0)
+		else if (strcasecmp(buf, "weaponConnectTo") == 0)
 			fpsWeapons[weapon].weaponConnectTo = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "weaponConnect") == 0)
+		else if (strcasecmp(buf, "weaponConnect") == 0)
 			fpsWeapons[weapon].weaponConnect = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "clipModel") == 0)
+		else if (strcasecmp(buf, "clipModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -469,11 +485,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].clipModel = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "clipConnectTo") == 0)
+		else if (strcasecmp(buf, "clipConnectTo") == 0)
 			fpsWeapons[weapon].clipConnectTo = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "clipConnect") == 0)
+		else if (strcasecmp(buf, "clipConnect") == 0)
 			fpsWeapons[weapon].clipConnect = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupModel") == 0)
+		else if (strcasecmp(buf, "auxRGCupModel") == 0)
 		{
 			static char tString[255];
 			strcpy (tString, FPS_DIR);
@@ -481,13 +497,13 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].auxModel[FPS_AUX_RGCUP] = (SCHAR*) strpool (tString);
 		}
-		else if (stricmp(buf, "auxRGCupConnect") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnect") == 0)
 			fpsWeapons[weapon].auxConnect[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupConnectTo") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnectTo") == 0)
 			fpsWeapons[weapon].auxConnectTo[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGCupConnectToAlt") == 0)
+		else if (strcasecmp(buf, "auxRGCupConnectToAlt") == 0)
 			fpsWeapons[weapon].auxConnectToAlt[FPS_AUX_RGCUP] = (SCHAR*) strpool (varData);
-		/*else if (stricmp(buf, "auxRGGrenadeModel") == 0)
+		/*else if (strcasecmp(buf, "auxRGGrenadeModel") == 0)
 		{
 			char tString[255];
 			memset (tString, 0, sizeof (tString));
@@ -496,74 +512,62 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 			fpsWeapons[weapon].auxModel[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (tString);
 		}*/ //DEG
-		else if (stricmp(buf, "auxRGGrenadeConnect") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnect") == 0)
 			fpsWeapons[weapon].auxConnect[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGGrenadeConnectTo") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnectTo") == 0)
 			fpsWeapons[weapon].auxConnectTo[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "auxRGGrenadeConnectToAlt") == 0)
+		else if (strcasecmp(buf, "auxRGGrenadeConnectToAlt") == 0)
 			fpsWeapons[weapon].auxConnectToAlt[FPS_AUX_RGGRENADE] = (SCHAR*) strpool (varData);
 
-		else if (stricmp(buf, "rgFiringRules") == 0)
+		else if (strcasecmp(buf, "rgFiringRules") == 0)
 			fpsWeapons[weapon].rgFiringRules = (SINT32) atol (varData);
-		else if (stricmp(buf, "rgFiringAngle") == 0)
+		else if (strcasecmp(buf, "rgFiringAngle") == 0)
 			fpsWeapons[weapon].rgFiringAngle = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "leanFireOK") == 0)
+		else if (strcasecmp(buf, "leanFireOK") == 0)
 			fpsWeapons[weapon].leanFireOK = strtoul(varData, nullptr, 10);
 
-		else if (stricmp(buf, "onlyFireDeployed") == 0)
+		else if (strcasecmp(buf, "onlyFireDeployed") == 0)
 			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "suppressAim") == 0)
+		else if (strcasecmp(buf, "suppressAim") == 0)
 			fpsWeapons[weapon].suppressAim = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "deployPivotBone") == 0)
+		else if (strcasecmp(buf, "deployPivotBone") == 0)
 			fpsWeapons[weapon].deployPivotBone = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "perBulletATP") == 0)
+		else if (strcasecmp(buf, "perBulletATP") == 0)
 			fpsWeapons[weapon].perBulletATP = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "riseStopsReload") == 0)
+		else if (strcasecmp(buf, "riseStopsReload") == 0)
 			fpsWeapons[weapon].riseStopsReload = strtoul(varData, nullptr, 10);
-		else if (stricmp(buf, "delayAfterFire") == 0)
+		else if (strcasecmp(buf, "delayAfterFire") == 0)
 			fpsWeapons[weapon].delayAfterFire = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "sightAdjustSound") == 0)
+		else if (strcasecmp(buf, "sightAdjustSound") == 0)
 			fpsWeapons[weapon].sightAdjustSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "sightAdjustTime") == 0)
+		else if (strcasecmp(buf, "sightAdjustTime") == 0)
 			fpsWeapons[weapon].sightAdjustTime = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "numConvDists") == 0)
+		else if (strcasecmp(buf, "numConvDists") == 0)
 			fpsWeapons[weapon].numSightDists = (SINT32) atol (varData);
-		else if (stricmp(buf, "startConvDists") == 0)
+		else if (strcasecmp(buf, "startConvDists") == 0)
 			fpsWeapons[weapon].startSightDists = (SINT32) atol (varData);
-		else if (stricmp(buf, "incConvDists") == 0)
+		else if (strcasecmp(buf, "incConvDists") == 0)
 			fpsWeapons[weapon].incSightDists = (SINT32) atol (varData);
 
-		/*
-		else if (stricmp(buf, "convDist1") == 0)
-			fpsWeapons[weapon].sightDists[0] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist2") == 0)
-			fpsWeapons[weapon].sightDists[1] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist3") == 0)
-			fpsWeapons[weapon].sightDists[2] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist4") == 0)
-			fpsWeapons[weapon].sightDists[3] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist5") == 0)
-			fpsWeapons[weapon].sightDists[4] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist6") == 0)
-			fpsWeapons[weapon].sightDists[5] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist7") == 0)
-			fpsWeapons[weapon].sightDists[6] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist8") == 0)
-			fpsWeapons[weapon].sightDists[7] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist9") == 0)
-			fpsWeapons[weapon].sightDists[8] = (FLOAT32) atof (varData);
-		else if (stricmp(buf, "convDist10") == 0)
-			fpsWeapons[weapon].sightDists[9] = (FLOAT32) atof (varData);
-		*/
+		else if (strcasecmp(buf, "convDist1") == 0 || strcasecmp(buf, "convDist2") == 0 ||
+                 strcasecmp(buf, "convDist3") == 0 || strcasecmp(buf, "convDist4") == 0 ||
+                 strcasecmp(buf, "convDist5") == 0 || strcasecmp(buf, "convDist6") == 0 ||
+                 strcasecmp(buf, "convDist7") == 0 || strcasecmp(buf, "convDist8") == 0 ||
+                 strcasecmp(buf, "convDist9") == 0 || strcasecmp(buf, "convDist10") == 0) {
+            if (!hasWarned) {
+                Write_Log(LOG_FPS, LOG_WARN, "Data file %s is still using old convDistN, consider updating with startConvDists/incConvDists", filename);
+                hasWarned = true;
+            }
+        }
 
-		else if (stricmp(buf, "dryFireSound") == 0)
+		else if (strcasecmp(buf, "dryFireSound") == 0)
 			fpsWeapons[weapon].dryFireSound = (SCHAR*) strpool (varData);
-		else if (stricmp(buf, "dryFireSoundLength") == 0)
+		else if (strcasecmp(buf, "dryFireSoundLength") == 0)
 			fpsWeapons[weapon].dryFireSoundLength = (FLOAT32) atof (varData);
 
-		else if (stricmp(buf, "placedObject") == 0)
+		else if (strcasecmp(buf, "placedObject") == 0)
 			fpsWeapons[weapon].placedObject = (LOGICAL) atoi (varData);
 
 		else
@@ -582,7 +586,7 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	for (type=FPS_WEAPONTYPE_SMG; type < FPS_WEAPONTYPE_NUM_TYPES; type++)
 	{
-		if (stricmp (typestring, fpFPSWeaponTypeStrings[type]) == 0)
+		if (strcasecmp (typestring, fpFPSWeaponTypeStrings[type]) == 0)
 			break;
 	}
 
@@ -594,8 +598,8 @@ static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* types
 
 	fpsWeapons[weapon].weaponType = (fpFPSWeaponType)type;
 
-	static char			defaultTypeFileName[255];
-	sprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
+	static char defaultTypeFileName[255];
+	strprintf(defaultTypeFileName, "default_%s.txt", fpFPSWeaponTypeStrings[type]);
 
 	_fpFPSDataReadWeaponFile (weapon, defaultTypeFileName);
 }
@@ -620,9 +624,9 @@ void fpFPSDataReadFPSFile()
 
 
 	/*
-     
+
      TBD - is this test code??
-     
+
     UINT64 val1 = fpStringHash("piatFile");
 	UINT64 val1 = fpStringHash("m1garandFile");
 	UINT64 val2 = fpStringHash("colt1911File");
@@ -644,7 +648,7 @@ void fpFPSDataReadFPSFile()
 			continue;
 
 		// for easy lookup of new variable hashes
-		//if(stricmp(varName, "concussionMod") == 0)
+		//if(strcasecmp(varName, "concussionMod") == 0)
 		//	int i = 0;
 
 		UINT64 hash = fpStringHash(buf);
@@ -977,6 +981,9 @@ void fpFPSDataReadFPSFile()
 		case bridgeRepairJoules_hash:
 			fpsTrooper.bridgeRepairJoules = (FLOAT64) atof (varData);
 		break;
+		case fbDamageJoules_hash:
+			fpsTrooper.fbDamageJoules = (FLOAT64) atof (varData);
+		break;
 		case redScreenFadeTime_hash:
 			fpsTrooper.redScreenFadeTime = (FLOAT32) atof (varData);
 		break;
@@ -1196,7 +1203,13 @@ void fpFPSDataReadFPSFile()
 		case fg42gFile_hash:
 			_fpFPSDataReadWeaponFile (FG42G, varData);
 		break;
-		
+		case carcanoFile_hash:
+			_fpFPSDataReadWeaponFile (CARCANO, varData);
+		break;
+		case beretta38File_hash:
+			_fpFPSDataReadWeaponFile(BERETTA38, varData);
+		break;
+
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
 		break;
@@ -1256,7 +1269,7 @@ void fpFPSDataReadFPSFile()
 		break;
 
 		default:
-			Write_Debug("Unknown hash: '%s' : %llu", buf, hash);
+			Write_Debug("Unknown hash: '%s' : %" PR64BitUT "", buf, hash);
 		}
 	}
 
@@ -2508,6 +2521,45 @@ void fpFPSDataInit ()
 	arms_anim_files[FG42G][DEPLOYED_FIRE]   = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_fireDeployed";
 	arms_anim_files[FG42G][DEPLOYED_RELOAD] = FPS_DIR "fg42g\\Arms Animations\\arms_FG42_reload";
 
+	weap_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\weapon\\weap_Carcano_reload";
+	weap_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
+	weap_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\weapon\\weap_Carcano_fire";
+	weap_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\weapon\\weap_Carcano_aimFire";
+	weap_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\weapon\\weap_Carcano_recycle";
+	arms_anim_files[CARCANO][RELOAD]      = FPS_DIR "carcano\\arms\\arms_Carcano_reload";
+	arms_anim_files[CARCANO][STAND_FIRE]  = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
+	arms_anim_files[CARCANO][CROUCH_FIRE] = FPS_DIR "carcano\\arms\\arms_Carcano_fire";
+	arms_anim_files[CARCANO][AIM_FIRE]    = FPS_DIR "carcano\\arms\\arms_Carcano_aimFire";
+	arms_anim_files[CARCANO][RECYCLE]     = FPS_DIR "carcano\\arms\\arms_Carcano_recycle";
+	arms_anim_files[CARCANO][LOWER]       = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
+	arms_anim_files[CARCANO][IDLE]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][KNEEL]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][AIM]         = FPS_DIR "carcano\\arms\\arms_Carcano_aim";
+	arms_anim_files[CARCANO][TROT]        = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][CREEP]       = FPS_DIR "carcano\\arms\\arms_Carcano_neutral";
+	arms_anim_files[CARCANO][CRAWL]       = FPS_DIR "carcano\\arms\\arms_Carcano_crawl";
+	arms_anim_files[CARCANO][SPRINT]      = FPS_DIR "carcano\\arms\\arms_Carcano_run";
+	arms_anim_files[CARCANO][SIT]         = FPS_DIR "carcano\\arms\\arms_Carcano_lowered";
+
+	weap_anim_files[BERETTA38][RELOAD]      = FPS_DIR "beretta38\\weapon\\weap_beretta38_reload";
+	weap_anim_files[BERETTA38][STAND_FIRE]  = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
+	weap_anim_files[BERETTA38][CROUCH_FIRE] = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
+	weap_anim_files[BERETTA38][AIM_FIRE]    = FPS_DIR "beretta38\\weapon\\weap_beretta38_fire";
+	arms_anim_files[BERETTA38][RELOAD]      = FPS_DIR "beretta38\\arms\\arms_beretta38_reload";
+	arms_anim_files[BERETTA38][STAND_FIRE]  = FPS_DIR "beretta38\\arms\\arms_beretta38_fire";
+	arms_anim_files[BERETTA38][CROUCH_FIRE] = FPS_DIR "beretta38\\arms\\arms_beretta38_fire";
+	arms_anim_files[BERETTA38][AIM_FIRE]    = FPS_DIR "beretta38\\arms\\arms_beretta38_aimFire";
+	arms_anim_files[BERETTA38][LOWER]       = FPS_DIR "beretta38\\arms\\arms_beretta38_lowered";
+	arms_anim_files[BERETTA38][IDLE]        = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
+	arms_anim_files[BERETTA38][KNEEL]       = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
+	arms_anim_files[BERETTA38][AIM]         = FPS_DIR "beretta38\\arms\\arms_beretta38_aim";
+	arms_anim_files[BERETTA38][AIM_SMG]     = FPS_DIR "beretta38\\arms\\arms_beretta38_aim";
+	arms_anim_files[BERETTA38][TROT]        = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
+	arms_anim_files[BERETTA38][CREEP]       = FPS_DIR "beretta38\\arms\\arms_beretta38_neutral";
+	arms_anim_files[BERETTA38][CRAWL]       = FPS_DIR "beretta38\\arms\\arms_beretta38_crawl";
+	arms_anim_files[BERETTA38][SPRINT]      = FPS_DIR "beretta38\\arms\\arms_beretta38_sprint";
+	arms_anim_files[BERETTA38][SIT]         = FPS_DIR "beretta38\\arms\\arms_beretta38_lowered";
+
 	// BRIDGE_REPAIR animation files
 	arms_anim_files[BRIDGE_REPAIR][STAND_FIRE] = FPS_DIR "satchel\\animations\\fire\\satchel-fire(1)";
 
@@ -2588,11 +2640,13 @@ void fpFPSDataInit ()
 	default_arms_tex_names[BRITISH_PARA_PACK] = "british_torso";
 	default_arms_tex_names[FRENCH_PARA_PACK] = "french_torso";
 	default_arms_tex_names[GERMAN_PARA_PACK] = "german_torso";
+	default_arms_tex_names[AMERICAN_PARA_PACK] = "american_torso";
 
 	memset (replacement_arms_tex_names, 0, sizeof (replacement_arms_tex_names));
 	replacement_arms_tex_names[BRITISH_PARA_PACK] = "brit_torso_para";
 	replacement_arms_tex_names[FRENCH_PARA_PACK] = "french_torso_para";
 	replacement_arms_tex_names[GERMAN_PARA_PACK] = "germ_torso_para";
+	replacement_arms_tex_names[AMERICAN_PARA_PACK] = "american_torso_para";
 
 	// init weapon sight tables
 	for(int i = 0; i < NUM_WEAPONS; i++)
@@ -2706,7 +2760,7 @@ int fpFPSVisLoadoutsLoader::_getArmsID(const char* name)
 {
 	for(int i = 0; i < NUM_INFANTRY_TYPES; i++)
 	{
-		if(!stricmp(name, armTypeStrings[i]))
+		if(!strcasecmp(name, armTypeStrings[i]))
 			return i;
 	}
 
@@ -2717,7 +2771,7 @@ int fpFPSVisLoadoutsLoader::_getWeaponID(const char* name)
 {
 	for(int i = 0; i < NUM_WEAPONS; i++)
 	{
-		if(!stricmp(name, weapNameStrings[i]))
+		if(!strcasecmp(name, weapNameStrings[i]))
 			return i;
 	}
 

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 #include <string.h>
 
 #include "phui/Util.h"
@@ -48,15 +48,16 @@ JSFunctionSpec jsWaypointObject::jsfunctions[] =
 };
 JSPropertySpec jsWaypointObject::jsproperties[] =
 {
-	{"objecttype",		jsWaypointObject::OBJECTTYPE_PROP,	JSPROP_PERMANENT | JSPROP_READONLY},
-	{"local",				jsWaypointObject::LOCAL_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
+	{"objecttype",		jsWaypointObject::OBJECTTYPE_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
+	{"local",			jsWaypointObject::LOCAL_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{"shared",			jsWaypointObject::SHARED_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"name",				jsWaypointObject::NAME_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
+	{"name",			jsWaypointObject::NAME_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{"notes",			jsWaypointObject::NOTES_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"position",			jsWaypointObject::POSITION_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
+	{"position",		jsWaypointObject::POSITION_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
 	{"active",			jsWaypointObject::ACTIVE_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
-	{"type",				jsWaypointObject::TYPE_PROP,					JSPROP_PERMANENT | JSPROP_READONLY},
-	{"displayname",	jsWaypointObject::DISPLAYNAME_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
+	{"type",			jsWaypointObject::TYPE_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
+	{"displayname",		jsWaypointObject::DISPLAYNAME_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
+	{"creator",			jsWaypointObject::CREATOR_PROP,			JSPROP_PERMANENT | JSPROP_READONLY},
 	{0}
 };
 
@@ -425,7 +426,7 @@ JS_FUNCTION_DEF(jsMapView, enablelayer)
 	if(!dom) return JS_FALSE;
 
 	const char* name = nullptr;
-	long val = 0;
+	int32 val = 0;
 	if(argc > 0)
 		name = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 	if(argc > 1)
@@ -649,7 +650,7 @@ JS_FUNCTION_DEF(jsMapView, deletereports)
 				case WPT_DEFEND:
 				case WPT_WAYPOINT:
 				case WPT_PATROL:
-				case WPT_MORTAR:
+				case WPT_BOMB:
 					PlayerClient()->RemoveWaypoint(wp.handle());
 				break;
                 default:
@@ -850,21 +851,17 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 	JS_ValueToNumber(ctx, argv[1], &jx);
 	JS_ValueToNumber(ctx, argv[2], &jy);
 
-	const wchar_t* wname		= L"";
-	const wchar_t* wnotes		= L"";
 	const char* name			= "";
 	const char* notes			= "";
 
 	if(argc >= 4)
 	{
-		wname = (const wchar_t*)JS_GetStringChars(JS_ValueToString(ctx, argv[3]));
-		name = UTF8(wname);
+        name = JS_GetStringBytes(JS_ValueToString(ctx, argv[3]));
 	}
 
 	if(argc >= 5)
 	{
-		wnotes = (const wchar_t*)JS_GetStringChars(JS_ValueToString(ctx, argv[4]));
-		notes = UTF8(wnotes);
+        notes = JS_GetStringBytes(JS_ValueToString(ctx, argv[4]));
 	}
 
 	char prefix = 'R';
@@ -909,6 +906,11 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 		wptype = WPT_ENEMY;
 		subtype = WTP_ENEMY_DANGER;
 	}
+    else if(!strcmp(type, "ppo"))
+    {
+        wptype = WPT_ENEMY;
+        subtype = WTP_ENEMY_PPO;
+    }
 	else if(!strcmp(type, "unknown"))
 	{
 		wptype = WPT_ENEMY;
@@ -928,6 +930,10 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 	{
 		wptype = WPT_ENEMY;
 		subtype = WTP_ENEMY_MORTAR;
+	}
+	else if ( !strcmp(type, "bombard") )
+	{
+		wptype = WPT_BOMB;
 		prefix = 'M';
 	}
 
@@ -942,7 +948,7 @@ JS_FUNCTION_DEF(jsMapView, addwaypoint)
 
 	if(name && *name)
 	{
-		handle = chatGetHandle(wname);
+		handle = chatGetHandle(name);
 	}
 	else if(prefix)
 	{
@@ -1171,6 +1177,9 @@ JSBool jsWaypointObject::GetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 		case DISPLAYNAME_PROP:
 			*val = phui::js::NewString(_mapobj->_name.c_str());
+		break;
+		case CREATOR_PROP:
+			*val = phui::js::NewString(chatGetWideCallsign(_mapobj->_waypoint.playerHandle()));
 		break;
 	}
 

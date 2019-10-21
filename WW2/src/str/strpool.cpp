@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 
 #include <string>
 #include "str/strpool.h"
@@ -11,7 +11,7 @@
 
 static char EMPTY_STR[] = "";
 
-typedef std::unordered_set<std::string> StringSet;
+using StringSet = std::unordered_set<std::string>;
 
 static StringSet strings;
 #ifdef STRPOOL_DEBUG
@@ -41,6 +41,6 @@ const char* strpool(const char* s)
 void strpoolKill()
 {
 #ifdef STRPOOL_DEBUG
-	WriteToConsole("strpool: %" PRSizeT " strings, %" PRSizeT " calls, %" PRSizeT " matches\n", strings.size(), callcount, foundcount);
+	dbugLog(_FLD, "strpool: %" PRSizeT " strings, %" PRSizeT " calls, %" PRSizeT " matches\n", strings.size(), callcount, foundcount);
 #endif
 }

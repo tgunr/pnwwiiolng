@@ -1,10 +1,11 @@
 //
 
-#include <syscfg.h>
+#include "syscfg.h"
 #include <math.h>
 #include <iostream>
 #include <fstream>
 #include <string>
+
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "fio/fio.h"
@@ -23,6 +24,7 @@
 #include "ob/oblf.h"
 #include "ob/obwld.h"
 #include "ob/obcs.h"
+#include "trn/trnautogun.h"
 #include "trn/trnmain.h"
 #include "trn/trnsky.h"
 #include "trn/trnwtr.h"
@@ -30,9 +32,7 @@
 #include "trn/trnvars.h"
 #include "trn/trntod.h"
 #include "draw/draw2d.h"
-#include "cfg/cfgLoad.h"
 #include "sn/sndsSoundControl.h"
-#include "dbug/dbugExtErrors.h"
 #include "pers/pershud.h"
 #include "ml/mlCompon.h"
 #include "locl/loclLang.h"
@@ -52,16 +52,10 @@
 #include "ui/uiDotCommands.h"
 #include "map/mapArenaDescription.h"
 
-#if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-#include "syspee.h"
-#endif
-
 #include "shader/glsl.h"
 
 #if platOS == OS_WIN32
 #include <direct.h>
-#elif platOS == OS_MACOS
-#include <Carbon/Carbon.h>
 #endif
 #include "math/math3d.h"
 #include "comm/commClientMessages.h"
@@ -79,12 +73,12 @@
 #include "ml/mltypes.h"
 #include "weap/weapammo.h"
 #include "locl/loclMain.h"
-#include "versionNo.h"
 #include "sysmain.h"
+#include "sys/sysSteam.h"
 #include "sdm/sdm.h"
 #include "sdm/StratDB.h"
 #include "js/jsClient.h"
-#include "sysLaunchUrl.h"
+#include "sys/sysLaunchUrl.h"
 #include "physics/physicsMain.h"
 #include "ui/uiMain.h"
 #include "cfg/cfgPrefs.h"
@@ -112,10 +106,10 @@
 #define FRAMEFACTOR_MINFPS	15
 #define FRAMEFACTOR_MINVAL	0.1f
 
-static void PrintDateTime(void);
+static void PrintDateTime();
 
-static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie);
-static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp);
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT32* cookie);
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT32* otp);
 
 static FLOAT32 _ViewScaleFactor;
 static FLOAT32 _ZBufferNearVal;
@@ -130,7 +124,7 @@ extern SINT32 DefaultMaterialId;
 
 static piVECTOR			lastpos, lastrot;
 
-LOGICAL rnmainSetDefaultRenderStates(void)
+LOGICAL rnmainSetDefaultRenderStates()
 {
 #if USE_STATESET
     States::InitDefaultAttributes();
@@ -232,7 +226,7 @@ LOGICAL		retval=FALSE;
 	return(TRUE);
 }
 
-static LOGICAL SetupVariables(void)
+static LOGICAL SetupVariables()
 {
 	FogStart = piFloatLikeLong(piLongLikeFloat(FogStart) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
 	FogEnd   = piFloatLikeLong(piLongLikeFloat(FogEnd) * ScaleFactor * (FLOAT32)_WORLD_VIEW_SCALE_FACTOR);
@@ -241,12 +235,6 @@ static LOGICAL SetupVariables(void)
 	{
 		return(FALSE);
 	}
-
-    // Temp for now until added to configuration
-#if platOS != OS_MACOS
-	OS_MKDIR(PREPATH);
-	fiodSetPrepath(PREPATH);
-#endif
 
 	rnlogoInit();
 
@@ -276,153 +264,162 @@ static int _GetStratData(int scx, int scy, sdm_strat_data* sdmdata)
 //////////////////////////////////////////////////////////////////////
 // Find out whether this is going to be an online session or not.
 
-static UINT32 GameHost, GameOTP;
-static UINT16 GamePort;
+namespace {
+	UINT32 GameHost = 0, GameOTP = 0;
+	UINT16 GamePort = 0;
+}
 
-Covert<bool> ProtectedOnlineFlag = false;
-
-bool rnmainGetOnlineSetting()
-{
-	UINT16 CommType;
-
+void rncheckPlaygateParams(void) {
 	// temp hack until command line params set for going online
-	if (BypassString[0] != '\0')
-	{
-		if (BypassString[0] == 'R')
+	if ( BypassString[0] != '\0' ) {
+		if ( BypassString[0] == 'R' )
 			BypassID = strtoul(&BypassString[1], nullptr, 10);
 		else
 			BypassID = strtoul(&BypassString[0], nullptr, 10);
-	}
-	else
+	} else
 		BypassID = 0;
 
-	if (BypassID != 0 )
-	{
-		Online = 1;
-
-		if (teulGetHost(GameServerIP, &GameHost) == 0)
-		{
+	if ( BypassID != 0 ) {
+		if ( teulGetHost(GameServerIP, &GameHost) == 0 ) {
 			Write_Debug("Unable to translate host address");
-			return false;
+			return;
 		}
 
 		GamePort = WWII::Net::Ports::MapHost;
-		CommType = PROTOCOL_TCP;
 		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
-#if FRES || defined(BETA_RELEASE)
-		if(GameOTP == 0)
-		{
+#if defined(BETA_RELEASE)
+		if ( GameOTP == 0 ) {
 			GameOTP = AUTH_BYPASS_OTP;
 			snprintf(GameServerOTP, sizeof(GameServerOTP)-1, "%u", GameOTP);
 		}
 #endif
-	}
-	else
-	{
+	} else {
 #if defined(AUTH_BYPASS)
-		Online = 1;
-
-		#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
-		if (teulGetHost((UCHAR*) AUTH_BYPASS, &GameHost) == 0)
-		{
+#pragma message("AUTH_BYPASS using Host " AUTH_BYPASS)
+		if ( teulGetHost((UCHAR*)AUTH_BYPASS, &GameHost) == 0 ) {
 			Write_Debug("Unable to translate host address");
 			return false;
 		}
 
 		GamePort = WWII::Net::Ports::MapHost;
-		CommType = TCP;
 		GameOTP = AUTH_BYPASS_OTP;
 #else
-		if (TicketFile[0] != 0)
-		{
-			Online = 1;
-
-			if (!_ParseTicketFile(&GameHost, &GamePort, &CommType, &GameOTP))
-			{
-				Online = 0;
-				return false;
-			}
-		}
-		else if (GameServerIP[0] != 0)
-		{
-			Online = 1;
-
-			if (!_ParseCommandArgs(&GameHost, &GamePort, &CommType, &GameOTP))
-			{
-				Online = 0;
-				return false;
-			}
-		}
+		if ( TicketFile[0] != 0 )
+			_ParseTicketFile(&GameHost, &GamePort, &GameOTP);
+		else if ( GameServerIP[0] != 0 )
+			_ParseCommandArgs(&GameHost, &GamePort, &GameOTP);
 #endif
 	}
-
-  ProtectedOnlineFlag = Online;
-
-	return true;
 }
 
-static bool _connectClientToGameNetwork()
-{
-	try
-	{
-		UINT32 appversion = 0;
 
-		rnlogoUpdateStatus("loading.network");
+bool rnhasServerInfo(void) {
+	return GameOTP != 0;
+}
 
-		teulGetHost(STRVER, &appversion);
+//////////////////////////////////////////////////////////////////////
+// HACK: Logic wasn't written with us going online/offline after loading.
+namespace {
+	void PostInit(void) {
+		static bool initialized = false;
+		if ( initialized )
+			return;
 
-		if ( teulMaskNetworkAddress(0) == 0 )
-			teulSetNetworkMask(GameHost);
+		cfgPrefsPostInit();
+		trnPostinitAutogunSystem();
+		fxWeatherPostinit();
 
-		if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
-			throw ClientNetError(-1, "connect.fail");
-
-		if ( PlayerClient()->ChatConnection() < 0 )
-			throw ClientNetError(-1, "connect.chat.fail");
+		initialized = true;
 	}
-	catch (ClientNetError& e)
-	{
-		const char* key = e.What();
-		const std::wstring& message = uiLocString(key);
+}
 
-		rnlogoUpdateStatus(key);
+//////////////////////////////////////////////////////////////////////
 
-#if platOS == OS_WIN32
-		// character 0 will be a '?' if the uiLocString lookup failed
-		// this can happen if a non ui loc string was passed to the
-		// ClientNetError constructor
-		MessageBox(nullptr, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
+Covert<bool> ProtectedOnlineFlag = false;
 
-		// launch the browser with a local html page
-		// describing what to do next
-		// once the mac implementation of this
-		// function is done, it can be moved
-		// outside of the this #if block
-		syslaunchurl("neterror.html", 1);
-#else
-		fprintf(stderr, "NETWORK ERROR: %s", UTF8(message.c_str()));
-#endif
+void rnsetServerInfo(UINT32 serverip, UINT32 serverport, UINT32 otp) {
+	GameHost = serverip;
+	GamePort = serverport;
+	GameOTP = otp;
+}
 
-		piExitProgram(__FILE__, __LINE__, UTF8(message.c_str()));
-		return false;
-	}
+void rnconnectToServer(void) {
+	UINT32 appversion = 0;
+
+	if ( gClientV[0] != 0 )
+		teulGetHost(gClientV, &appversion);
+	else
+		teulGetHost(PN_product_version_string, &appversion);
+
+	if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
+		throw ClientNetError("connect.fail");
+
+	if ( PlayerClient()->ChatConnection() < 0 )
+		throw ClientNetError("connect.chat.fail");
+
+	// TODO: Send antihack info at this point?
 
 	// Wipe these variables out.
-	GameHost = rand();
-	GameOTP = rand();
-	GamePort = (UINT16)rand();
+	GameHost = static_cast<UINT32>(random());
+	GameOTP = static_cast<UINT32>(random());
+	GamePort = static_cast<UINT16>(random());
 
-	return true;
+	// TODO: Clear this flag if we lose connection so players can continue in offline mode.
+	Online = true;
+	ProtectedOnlineFlag = Online;
+
+	cfgPrefsSendSharedPrefs();
+
+	PostInit();
 }
 
-// Init everything for rendering
-LOGICAL rnmainInit(void)
+void rnstartOfflineMode(void) {
+	PostInit();
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void rnloadRootWindow(void) {
+	if ( Online ) {
+		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
+		if ( found != g_arenaDescription.end() ) {
+			SINT32 playMode = atoi(found->second.c_str());
+
+			if ( playMode == 2 )
+				uiLoadView("scenarios/lobby");
+			else if ( playMode == 1 )
+				uiLoadView("persona");
+			else
+				uiLoadView("online");
+		} else {
+			uiLoadView("persona");
+		}
+	} else {
+		if ( IsSteamCopy() )
+			uiLoadView("SteamOnlineModeSelect");
+		else
+			// TODO: Reenable once we've figured out in-game patching
+			//uiLoadView("OnlineModeSelect");
+			uiLoadView("offline");
+	}
+}
+
+// Init everything for rendering (HACK: and everything else...)
+LOGICAL rnmainInit()
 {
-#ifdef EVENT_LOG_TIMES
-	srand(0);
-#else
-	srand(timeGetTime());
+#if platOS == OS_WIN32
+    // OS X and Linux auto-seed the PRNG. Windows, being a backwards OS in need
+    // of assistance, doesn't. Therefore, we borrow Windows' equivalent of
+    // arc4random() to seed the useless LCRG until we can replace all uses of
+    // rand() in the code outright.
+    //
+    // Oh, and by the way, seeding rand() with the current time is the worst
+    // idea ever conceived even if you're NOT looking for cryptographically
+    // secure values. Just don't do that. Please.
+    unsigned int value;
+    rand_s(&value);
+    srand(value);
 #endif
 
 	rnlogoSplash();
@@ -434,15 +431,7 @@ LOGICAL rnmainInit(void)
 
     uiSoundInit();
 	uiInit();
-	//cfgPrefsLoad(); // now called from sysmain > WinMain
 	dimainInit();
-
-#if platOS == OS_WIN32
-	// We have to do this here again because a dll loaded with dimainInit() resets the FPU exception mask
-	// and we do want to get FPU exceptions for all the other things done here
-	// OGS: Not on the Mac, you don't :)
-	SetupFPU(true);
-#endif
 
 	// Setup variables
 	if (!SetupVariables())
@@ -468,17 +457,16 @@ LOGICAL rnmainInit(void)
 		return(FALSE);
 	}
 
-    if(Online)
-    {
-		// Time to connect the game to the servers.
-		if(_connectClientToGameNetwork() == false)
-			return FALSE;
+	GameClientInitTeul();
 
-		// send prefs that are shared between the host and client
-		// these are originated from the client
-		// includes vis player limit
-		cfgPrefsSendSharedPrefs();
-    }
+	if ( rnhasServerInfo() ) {
+		try {
+			rnconnectToServer();
+		} catch ( std::exception& e ) {
+			dbugLog(_FLA, "Failed to connect to server: '%s'", e.what());
+			return FALSE;
+		}
+	}
 
 	// lets check to make sure we have the minimum spec to run the game
 	if(!piinfoIsSupportedSystem())
@@ -504,15 +492,6 @@ LOGICAL rnmainInit(void)
 		rnmainResetPlayer();
 	}
 
-#ifdef USE_GAME_ADVERTISING
-	rnlogoUpdateStatus("loading.extresource");
-	if(!adInit())
-    {
-        // Not an error
-        Write_Log(LOG_OLD, LOG_INFO, "[rnmainInit] adInit FAILED");
-    }
-#endif
-
 	rnlogoUpdateStatus("loading.sounds.init");
 	if (!sndsInit())
 	{
@@ -521,6 +500,14 @@ LOGICAL rnmainInit(void)
         bSoundEnable = FALSE;
 	}
 
+#if platOS == OS_MACOS
+        //  Macs initialise graphics in WWIIOnline a lot quicker than Windows,
+        //  so to allow the spalshscreen to be seen rather than blink in and out
+        //  on the Mac Client.
+        //  1000000us = 1 second.
+        usleep(2000000);
+#endif
+    
 	rnlogoUpdateStatus("loading.objects");
 	if (!obmainInit())
 	{
@@ -561,64 +548,25 @@ LOGICAL rnmainInit(void)
 		return FALSE;
 	}
 
-	/* tutorial testing by ramp
-	if(Online)
-	{
-		try
-		{
-			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
-			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-
-			strat = StratDB::FindStratObject("Lier");
-			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-
-			strat = StratDB::FindStratObject("Schilde");
-			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
-		}
-		catch(std::runtime_error)
-		{
-			// do nothing
-		}
-	}
-	*/
-
 	// Should be the last function called in Init!
 	piReleaseTextureHandles();
 
 	_ViewScaleFactor = _WORLD_VIEW_SCALE_FACTOR;
 
 	uiPostInit();
-
-	if(!Online)
-	{
-		uiLoadView("offline");
-	}
-	else
-	{
-		// a bit of conditional logic to determine online entry page
-		// default to campaign mode only
-		SINT32 playMode = 1;
-
-		ARENA_VARS::iterator found = g_arenaDescription.find("play_mode");
-
-		if(found != g_arenaDescription.end())
-			playMode = atoi(found->second.c_str());
-
-		if(playMode == 2)
-			uiLoadView("scenarios/lobby");
-		else if(playMode == 1)
-			uiLoadView("persona");
-		else
-			uiLoadView("online");
-	}
-
+	rnloadRootWindow();
 	uiChatShow();
-
-	// make sure devices get detected
-	// testing for now
-	dimainKill();
-	dimainInit();
-	imapLoadPresets();
+	
+	// This "tear down and re-init" sequence breaks the Steam overlay by
+    // disrupting its sense of the D3D device capture state. Technically, that's
+    // probably a bug in the overlay, but I can't back up our usage of DI in any
+    // universe, so we'll call it our fix anyhow.
+    
+    //make sure devices get detected
+	//testing for now
+	//dimainKill();
+	//dimainInit();
+	//imapLoadPresets();
 	// end testing
 
 #ifdef MULTI_CLIENT
@@ -718,7 +666,7 @@ LOGICAL rnmainGetDefaultFogAttributes(UINT32 * OutFogColor, FLOAT32 * OutFogStar
 	return TRUE;
 }
 
-LOGICAL rnmainFOVChange(void)
+LOGICAL rnmainFOVChange()
 {
 	if (FieldOfView < 15.0f)
 	{
@@ -774,7 +722,7 @@ LOGICAL rnmainFOVChange(void)
 }
 
 // Kill the render engine
-LOGICAL rnmainKill(void)
+void rnmainKill()
 {
 #ifdef MULTI_CLIENT
 	multiClientKill(true);
@@ -785,10 +733,6 @@ LOGICAL rnmainKill(void)
 		Online = 0;
 		ww2::Client::Kill();
 	}
-
-#ifdef USE_GAME_ADVERTISING
-    adKill();
-#endif
 
 	sptExitApp();
 
@@ -814,8 +758,6 @@ LOGICAL rnmainKill(void)
     glslKill();
 
     Write_Log(LOG_OLD, LOG_INFO, "[rnmainKill]");
-
-	return(TRUE);
 }
 
 void rnmainSetPlayerInfo(piVECTOR* lppos, piVECTOR* lprot)
@@ -997,7 +939,7 @@ void rnmainSetViewMatrix2(piMATRIX* view)
     piSetCockpitViewMatrix(&mat);
 }
 
-static void RotateTranslatePlayer(void)
+static void RotateTranslatePlayer()
 {
 piMATRIX    mat,mat1,mat2,mat4;
 piMATRIX	DistortionMat;
@@ -1081,7 +1023,7 @@ piVECTOR	Att;
 	piSetCockpitViewMatrix(&mat);
 }
 
-void rnmainResetPlayer(void)
+void rnmainResetPlayer()
 {
 piMATRIX    mat;
 
@@ -1119,7 +1061,7 @@ void rnmainMovePlayer(piVECTOR* lppos)
 	lastpos.z = lppos->z * ScaleFactor;
 }
 
-void rnUpdateView(void)
+void rnUpdateView()
 {
 	if (ft50msticks != 0)
 	{
@@ -1173,32 +1115,15 @@ LOGICAL rnmainMoveView(FLOAT64 PosX, FLOAT64 PosY)
 	return(TRUE);
 }
 
-static void PrintDateTime(void)
+static void PrintDateTime()
 {
-#if platOS == OS_WIN32
-SYSTEMTIME	SystemTime;
+    char buf[256] = {0};
+    struct tm t;
+    time_t p = time(nullptr);
 
-	GetLocalTime(&SystemTime);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				SystemTime.wMonth,
-				SystemTime.wDay,
-				SystemTime.wYear,
-				SystemTime.wHour,
-				SystemTime.wMinute,
-				SystemTime.wSecond);
-#elif platOS == OS_MACOS
-DateTimeRec	time;
-	GetTime(&time);
-	Write_Debug("Date and time: %d/%d/%d %d:%02d:%02d",
-				time.month,
-				time.day,
-				time.year,
-				time.hour,
-				time.minute,
-				time.second);
-#else
-	Write_Debug("Normally, you'd see date and time printed here. Take care of this, programmer...");
-#endif
+    localtime_r(&p, &t);
+    strftime(buf, 255, "Date and time: %F %T %z", &t);
+    Write_Debug("%s\n", buf);
 }
 
 
@@ -1290,95 +1215,78 @@ inline std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
     return s;
 }
 
-static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie)
-{
-    LOGICAL	retval=TRUE;
-    std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
-    
-    try {
-        std::ifstream  ticketFileStream (TicketFile);
-        std::getline(ticketFileStream, apID); // ignore
-        std::getline(ticketFileStream, data); // ignore
-        std::getline(ticketFileStream, serverIP);
-        std::string temp =serverIP.substr(serverIP.find(" ")+1);
-        std::string ipAddress = rtrim(temp);
-        if (!ipAddress.empty())
-        {
-            *host = strtoul(ipAddress.c_str(), nullptr, 10);
-        }
-        std::getline(ticketFileStream, serverport);
-        std::string ipPort = serverport.substr(serverport.find(" ")+1);
-        if (!ipPort.empty())
-        {
-            *port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
-        }
-        std::getline(ticketFileStream, serverprotocol);
-        std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
-        if (!ipProt.empty())
-        {
-            *protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
-        }
-        std::getline(ticketFileStream, otp); // cookie
-        std::string otpText = otp.substr(otp.find(" ")+1);
-        if (!otpText.empty())
-        {
-            *cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
-        }
-        
-        std::getline(ticketFileStream, bypass);
-        if (!bypass.empty())
-        {
-            if (teulGetHost(ipAddress.c_str(), host) == 0)
-            {
-                Write_Debug("Unable to translate host address");
-                return (FALSE);
-            }
-            
-            std::string userId = bypass.substr(bypass.find(" ")+1);
-            if (!userId.empty())
-            {
-                strncpy(BypassString,userId.c_str(),32);
-            
-                if (BypassString[0] != '\0')
-                {
-                    if (BypassString[0] == 'R')
-                        BypassID = strtoul(&BypassString[1], nullptr, 10);
-                    else
-                        BypassID = strtoul(&BypassString[0], nullptr, 10);
-                }
-                else
-                    BypassID = 0;
-            }
+static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT32* cookie) {
+	LOGICAL	retval = TRUE;
+	std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
 
-        }
-    } catch (std::ifstream::failure e) {
-        Write_Debug( e.what());
-        retval = FALSE;
-        Online = 0;
-    }
+	try {
+		std::ifstream  ticketFileStream(TicketFile);
+		std::getline(ticketFileStream, apID); // ignore
+		std::getline(ticketFileStream, data); // ignore
+		std::getline(ticketFileStream, serverIP);
+		std::string temp = serverIP.substr(serverIP.find(" ")+1);
+		std::string ipAddress = rtrim(temp);
+		if ( !ipAddress.empty() ) {
+			*host = strtoul(ipAddress.c_str(), nullptr, 10);
+		}
+		std::getline(ticketFileStream, serverport);
+		std::string ipPort = serverport.substr(serverport.find(" ")+1);
+		if ( !ipPort.empty() ) {
+			*port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
+		}
+		std::getline(ticketFileStream, serverprotocol); // ignore
+		std::getline(ticketFileStream, otp); // cookie
+		std::string otpText = otp.substr(otp.find(" ")+1);
+		if ( !otpText.empty() ) {
+			*cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
+		}
+
+		std::getline(ticketFileStream, bypass);
+		if ( !bypass.empty() ) {
+			if ( teulGetHost(ipAddress.c_str(), host) == 0 ) {
+				Write_Debug("Unable to translate host address");
+				return (FALSE);
+			}
+
+			std::string userId = bypass.substr(bypass.find(" ")+1);
+			if ( !userId.empty() ) {
+				strncpy(BypassString, userId.c_str(), 32);
+
+				if ( BypassString[0] != '\0' ) {
+					if ( BypassString[0] == 'R' )
+						BypassID = strtoul(&BypassString[1], nullptr, 10);
+					else
+						BypassID = strtoul(&BypassString[0], nullptr, 10);
+				} else
+					BypassID = 0;
+			}
+
+		}
+	} catch ( std::ifstream::failure e ) {
+		Write_Debug(e.what());
+		retval = FALSE;
+		Online = 0;
+	}
 
 
 	return(retval);
 }
 
-static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp)
-{
+static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT32* otp) {
 
-	if (GameServerIP[0] == 0)
+	if ( GameServerIP[0] == 0 )
 		return FALSE;
-	if (GameServerPort[0] == 0)
+	if ( GameServerPort[0] == 0 )
 		return FALSE;
-	if (GameServerOTP[0] == 0)
+	if ( GameServerOTP[0] == 0 )
 		return FALSE;
 
-	if (teulGetHost(GameServerIP, host) == 0)
-	{
+	if ( teulGetHost(GameServerIP, host) == 0 ) {
 		Write_Debug("Unable to translate host address");
 		return (FALSE);
 	}
 
 	*port = (UINT16)strtoul(GameServerPort, nullptr, 10);
-	*protocol = PROTOCOL_TCP;
 
 	*otp = strtoul(GameServerOTP, nullptr, 10);
 

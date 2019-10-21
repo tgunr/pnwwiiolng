@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Created: Fri Nov  3 13:53:33 2000
 //
 // This file contains the setup and message API that the front-end will use
@@ -32,12 +32,12 @@ static SINT32 _sendEnemySpotted(ACTION_OBJECT* const a)
 }
 
 //Installs all the client callbacks
-extern SINT32
-strtInstallClientCallbacks(void)
+SINT32
+strtInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-
+	{
 		REGISTER_SENDER(STRT_ENEMY_SPOTTED_Y, _sendEnemySpotted, _ENEMY_SPOTTED);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Strat::CallbackX)
 }

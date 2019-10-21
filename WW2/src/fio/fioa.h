@@ -1,6 +1,13 @@
 #pragma once
 
+enum
+{
+	FIOA_FD_START = (1 << 17),
+};
+
 extern int fioaAddArchive(const char* archive);
+extern int fioaAddArchive(wwiiolpath_string archive);
+
 extern void fioaKill();
 
 extern int  fioaOpen(const char* filename);
@@ -14,6 +21,6 @@ extern size_t fioaSeek(int fd, size_t offset, int from);
 extern int fioaEOF(int fd);
 
 extern size_t fioaFileSize(const char* name);
-extern int fioaAccess(const char* filename);
+extern bool fioaFileExists(const char* filename);
 
 extern size_t fioaMap(int fd, const void*& data);

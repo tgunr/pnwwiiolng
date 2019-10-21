@@ -2,6 +2,8 @@
 // Playgate.cpp : Defines the class behaviors for the application.
 //
 
+#include "syscfg.h" // Path is project specific.
+
 #include "Playgate.h"
 #include "PlaygateDlg.h"
 #include "SingleInstanceApp.h"		// For CLimitSingleInstance
@@ -18,7 +20,6 @@
 #include "pnRegion.h"
 #include "launchApp.h"
 #include "wwii/wwiiUTF.h"
-#include "../WW2/proj/versionNo.h"
 #include "../WW2/src/auth/authAppIDs.h"
 
 #ifdef _DEBUG
@@ -37,11 +38,13 @@ HANDLE		hApplicationMutex;
 HANDLE		hLogonAttemptMutex;
 bool		g_tryLogonAttempt = false;
 
-std::wstring g_dataPath, g_exePath;
+std::wstring g_exeName = L"\\ww2.exe", g_exeParams;
 
 UINT32 g_gameAppID;
+#ifndef IGNORE_REGISTRY
 char g_registryKey[256]; // Where the registry values are located.
 wchar_t g_registryKeyW[256];
+#endif
 UINT32 g_playgateVersion;
 SINT32 g_arenaID, g_sessionID;
 
@@ -57,16 +60,6 @@ UINT32 webURL;
 
 CPlaygateApp playgate;
 
-enum PlaygateState
-{
-	PgStarting = 0
-,	PgTOS
-,	PgRegionSelection
-,	PgAuthentication
-,	PgServerSelect
-,	PgFinished
-};
-
 static PlaygateState pgState;
 
 //////////////////////////////////////////////////////////////////////
@@ -81,7 +74,6 @@ static CLimitSingleInstance g_SingleInstanceObj(TEXT("Global\\{0DC91C4C-AE4F-43d
 BEGIN_MESSAGE_MAP(CPlaygateApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
-
 
 // CPlaygateApp construction
 
@@ -259,11 +251,46 @@ namespace {
 	class CommandLineParser : public CCommandLineInfo {
 	public:
 		virtual void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) {
-			// HACK: Assume only argument is auth server.
-			ASSERT ( bLast == true ) ;
-			// HACK: Just modify the existing global to changes to the overall
-			// program minimal for the time being.
-			sprintf_s(g_authHostName, 256, "%s", CT2A(lpszParam)) ;
+			// HACK: Not being particularly robust since only devs & GMs will ever use this.
+
+			std::wstring param(lpszParam);
+
+			std::wstring var(param.begin(), param.begin()+param.find_first_of('='));
+			std::wstring val(param.begin()+param.find_first_of('=')+1, param.end());
+
+			if (var == L"authserver")
+				WWII::ConvertChars(val.c_str(), g_authHostName, sizeof(g_authHostName));
+			else if (var == L"path")
+			{
+				wwiiolpath_string exePath = L"";
+
+				exePath = val;
+				if (exePath.length() == 0)
+				{
+					WW2_exePath = val;
+				}
+			}
+			else if ( var == L"data" )
+			{
+				wwiiolpath_string exePlayarcPath = L"";
+
+				exePlayarcPath = val;
+				if (exePlayarcPath.length() == 0)
+				{
+					WW2_exePlayarcPath = val;
+				}
+			}
+			else if ( var == L"game" )
+				g_exeName = val;
+			else if ( var == L"params" )
+				g_exeParams = val;
+			else {
+				std::wstring msg(L"Invalid parameter \'");
+				msg += lpszParam;
+				msg += L"\' passed into Playgate.";
+				MessageBox(nullptr, msg.c_str(), L"Invalid Parameters", MB_ICONEXCLAMATION | MB_OK);
+				exit(0);
+			}
 		}
 	} ;
 }
@@ -276,10 +303,12 @@ BOOL CPlaygateApp::InitInstance()
 	// OGS: First things first, determine what kind of client we are.
 	// If the version number ends in .255 we are appID 1, otherwise we're beta.
 	g_gameAppID = Auth::Apps::LIVE_APP_ID;
+#ifndef IGNORE_REGISTRY
 	if (strstr(STRVER, ".255") == nullptr)
 		g_gameAppID = Auth::Apps::BETA_APP_ID;
 	_snprintf(g_registryKey, 255, "Software\\Playnet\\apps\\appid%u\\instance1", g_gameAppID);
 	WWII::ConvertChars(g_registryKey, g_registryKeyW, sizeof(g_registryKeyW));
+#endif
 
 	LocInit();
 	
@@ -325,23 +354,16 @@ BOOL CPlaygateApp::InitInstance()
 	teulGetHost(PLAY_GATE_VERSION, &g_playgateVersion);
 
 	// Move ourselves to the playgate home
-	if ( registryGetPaths(g_exePath, g_dataPath) == false )
+	if ( registryGetPaths(WW2_exePath, WW2_exeDataPath, WW2_userDocumentsPath) == false )
 	{
 		dbugLog(_FLA, "Unable to retrieve paths from registry.");
 		MessageBox(nullptr, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
-	_tchdir(g_dataPath.c_str());
-
-	commInit();
-
-	registryGetPaths(g_exePath, g_dataPath);
-	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, g_exePath.c_str(), g_dataPath.c_str());
-
-	if ( _tchdir(g_exePath.c_str()) != 0 )
+	if (_tchdir(WW2_exePath.c_str()) != 0)
 	{
-		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, WW2_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
@@ -349,6 +371,10 @@ BOOL CPlaygateApp::InitInstance()
 	loginData.Read();
 	// Make sure it's not just or something.
 	loginData.Validate();
+
+	commInit();
+
+	dbugLog(_FLM, "Playgate launching information:\n\nPlaygate version %s.\nCommand Line: %s\nExePath: %ls\nDataPath: %ls\n\n", PG_COPYRIGHT, GetCommandLineA(), WW2_exePath.c_str(), WW2_exePlayarcPath.c_str());
 
 	pgState = PgTOS;
 
@@ -381,10 +407,10 @@ BOOL CPlaygateApp::InitInstance()
 	}
 
 	// Verify access to the data directory.
-	if ( _tchdir(g_dataPath.c_str()) != 0 )
+	if ( _tchdir(WW2_exeDataPath.c_str()) != 0 )
 	{
-		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
-		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		dbugLog(_FLA, "Unable to access datapath [%ls]", WW2_exeDataPath.c_str());
+		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, WW2_exeDataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		return FALSE;
 	}
 
@@ -396,15 +422,17 @@ BOOL CPlaygateApp::InitInstance()
 
 	DWORD threadId;
 	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
-	if ( _Login() )
+
+	if (_Login())
 	{
 		loginData.MarkForWrite();
 
 		pgState = PgServerSelect;
 
-		if ( _ServerSelect() )
+		if (_ServerSelect())
 			loginData.MarkForWrite();
 	}
+
 
 	pgState = PgFinished;
 
@@ -424,6 +452,12 @@ BOOL CPlaygateApp::InitInstance()
 }
 
 void
+CPlaygateApp::SetState(PlaygateState state)
+{
+	pgState = state;
+}
+
+void
 CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 {
 	if ( !hMainWnd ) return;
@@ -432,8 +466,11 @@ CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 	WaitForSingleObject(hStatusMutex, INFINITE);
 	if ( hMainWnd )
 	{
-		hMainWnd->m_hint.SetWindowText(message);
-		hMainWnd->m_hint.SetTextColor((int)status);
+		if (hMainWnd->m_hint.IsWindowVisible())
+		{
+			hMainWnd->m_hint.SetWindowText(message);
+			hMainWnd->m_hint.SetTextColor((int)status);
+		}
 	}
 	ReleaseMutex(hStatusMutex);
 	Sleep(250);
@@ -551,7 +588,7 @@ void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 
 HBITMAP pgLoadImage(const std::wstring& filename)
 {
-	std::wstring fullName(g_exePath.begin(), g_exePath.end());
+	std::wstring fullName(WW2_exePath.begin(), WW2_exePath.end());
 	fullName += L"\\data\\playgate\\";
 	fullName += filename;
 	return (HBITMAP)::LoadImage(hMainInstance, fullName.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);

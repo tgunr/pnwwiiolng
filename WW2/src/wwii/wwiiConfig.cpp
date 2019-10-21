@@ -12,6 +12,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiConfigMap.h"
 #include <limits.h>
+#include "wwii/wwiiPPOLoader.h"
 
 //Country names that match up with the country codes
 const char* _countryName[MAX_COUNTRIES] =
@@ -76,6 +77,7 @@ WWII_CONFIG host_config;
 
 WWII_CONFIG_MAP configMap[] =
 {
+	// name,						type,		data,									max,	defaultValue,	description
 	{ nullptr,	TYPE_UNUSED, nullptr, 0, nullptr, nullptr }
 ,	{ "arena.banCheats",			TYPE_BOOL,	&host_config.arena.banCheats,			0,		"n",	"Ban DamnCheaters detects" }
 ,	{ "arena.checksums",			TYPE_BOOL,	&host_config.arena.checksums,			0,		"n",	"Detect and eject players with modified clients" }
@@ -96,7 +98,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "arena.speedHackRatio",		TYPE_FLOAT,	&host_config.arena.speedHackRatio,		0,		"1.0001",	"Minimum drift ratio to be a speed-hack" }
 ,	{ "arena.mobileSpawnWaypoint",	TYPE_STRING,host_config.arena.mobileSpawnWaypoint, MAX_HANDLE_SIZE, "MSPAWN", "Mobile Spawn Waypoint (gamename)" }
 ,	{ "arena.despawnTime",			TYPE_SINT,	&host_config.arena.despawnTime_s,		3600,	"10",	"Despawn Timer (seconds)" }
-
+,	{ "arena.allowDirectSpawn",		TYPE_BOOL,	&host_config.arena.allowDirectSpawn,	0,		"n",	"Enable direct spawning used by Multi-Client" }
+,	{ "arena.theme",				TYPE_SINT,	&host_config.arena.theme, 				0,		"0",	"Themes: 0=None, 1=Christmas, 2=Veterens, 3=Halloween" }
 ,	{ "balance.above",				TYPE_SINT,	&host_config.balance.above,				0,		"0",	"Minimum players top side must have to get side balanced"  }
 ,	{ "balance.delaysMax",			TYPE_SINT, 	&host_config.balance.delaysMax, 		0,		"0",	"Maximum side-balancing delay (seconds)" }
 ,	{ "balance.delaysPctg",			TYPE_SINT,	&host_config.balance.delaysPctg,		0,		"0",	"Side must have this %age more players to start spawn delays" }
@@ -128,7 +131,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "kills.notifyKiller",			TYPE_BOOL,	&host_config.kills.notifyKiller,		0,		"n",	"Enable kill credit notifices" }
 ,	{ "kills.reportRats",			TYPE_BOOL,	&host_config.kills.reportRats,			0,		"n",	"Enable Kill-A-Rat notices" }
 ,	{ "kills.reportDamage",			TYPE_BOOL,	&host_config.kills.reportDamage,		0,		"n",		"Enable host reporting of joules damage being sent to your client" }
-,	{ "kills.assistWindow_s",		TYPE_BOOL,	&host_config.kills.assistWindow_s,		0,		"90",	"Time damage is remembered for assist credit (seconds)" }
+,	{ "kills.assistWindow_s",		TYPE_BOOL,	&host_config.kills.assistWindow_s,		0,		"y",	"Time damage is remembered for assist credit (seconds)" }
 
 //,	{ "mission.expireM",			TYPE_SINT,	&host_config.mission.expire_m,			15840,	"0",	"No-longer used (minutes)" }
 ,	{ "mission.launchCycleS",		TYPE_SINT,	&host_config.mission.launchCycle_s,		3600,	"0",	"Time between launch button recycles (seconds,	0=disabled)" }
@@ -148,6 +151,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "objective.warningPeriodM",		TYPE_SINT,	&host_config.objective.warningPeriod_m,1440,"10",	"Duration of AO budet warnings (minutes)" }
 ,	{ "oic.attackVoteTimeS",		TYPE_SINT,	&host_config.oic.attackVoteTime_s,		3600,	"60",	"Duration of attack requests (seconds)" }
 ,	{ "oic.moveVoteTimeS",			TYPE_SINT,	&host_config.oic.moveVoteTime_s,		3600,	"60",	"Duration of move request proposals (seconds)" }
+,	{ "oic.countryChangeVoteTimeS",	TYPE_SINT,	&host_config.oic.changeCountryVoteTime_s,		3600,	"60",	"Duration of change country request proposals (seconds)" }
 ,	{ "oic.nominationVoteTimeS",	TYPE_SINT,	&host_config.oic.nominationVoteTime_s,	3600,	"60",	"Duration of nomination proposals (seconds)" }
 ,	{ "oic.offerTimeS",				TYPE_SINT,	&host_config.oic.offerTime_s,			3600,	"90",	"Duration of OIC offers (seconds)" }
 ,	{ "oic.removalVoteTimeS",		TYPE_SINT,	&host_config.oic.removalVoteTime_s,		3600,	"60",	"Duration of OIC removal proposals (seconds)" }
@@ -155,12 +159,20 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "oic.withdrawVoteTimeS",		TYPE_SINT,	&host_config.oic.withdrawVoteTime_s,	3600,	"90",	"Duration of attack withdrawl proposals (seconds)" }
 
 ,	{ "score.capperKillBonus",		TYPE_SINT,	&host_config.score.capperKillBonus,		0,		"1",	"Bonus points for killing a player who is inside a capture building" }
-,	{ "score.capture",				TYPE_SINT,	&host_config.score.capture,				0,		"5",	"Points awarded for capture" }
+,	{ "score.capture",				TYPE_SINT,	&host_config.score.capture,				0,		"30",	"Points awarded for capture" }
 ,	{ "score.guardingKillBonus",	TYPE_SINT,	&host_config.score.guardingKillBonus,	0,		"2",	"Bonus points for scoring a kill FROM inside a capture building" }
 ,	{ "score.guardPointPer_s",		TYPE_SINT,	&host_config.score.guardPointPer_m,		0,		"2",	"Time required to score one guard point (minutes)" }
 ,	{ "score.stratDmgInterval_s",	TYPE_SINT,	&host_config.score.stratDmgInterval_s,	0,		"30",	"Minimum time between same strat object awarding points" }
 ,	{ "score.maxGlobalSharedRank",	TYPE_SINT,	&host_config.score.maxGlobalSharedRank,	0,		"5",	"Rank at which rank-sharing cross-sides stops (ranks below this are shared cross-side by branch)" }
 ,	{ "score.maxSideSharedRank",	TYPE_SINT,	&host_config.score.maxSideSharedRank,	0,		"12",	"Rank at which rank-sharing same-side stops (ranks below this are shared by branch among personas on the same side)" }
+,	{ "score.destroyAI",				TYPE_SINT,	&host_config.score.destroyAI,				0,		"10",	"Points awarded for destroying an AI" }
+,	{ "score.infResupplier",				TYPE_SINT,	&host_config.score.infResupplier,				0,		"20",	"Points awarded for resupplying another infantry player" }
+,	{ "score.resupply",				TYPE_SINT,	&host_config.score.resupply,				0,		"30",	"Points awarded for resupplying equipment while on a resupply mission" }
+,	{ "score.destroyFMS",				TYPE_SINT,	&host_config.score.destroyFMS,				0,		"20",	"Points awarded for destroying an FMS" }
+,	{ "score.repairBridge",				TYPE_SINT,	&host_config.score.repairBridge,				0,		"20",	"Points awarded for repairing a bridge" }
+,	{ "score.damageBridge",				TYPE_SINT,	&host_config.score.damageBridge,				0,		"20",	"Points awarded for damaging a bridge" }
+,	{ "score.damageFactory",				TYPE_SINT,	&host_config.score.damageFactory,				0,		"30",	"Points awarded for damaging a factory" }
+,	{ "score.damageFB",				TYPE_SINT,	&host_config.score.damageFB,				0,		"20",	"Points awarded for damaging an FB" }
 
 ,	{ "squad.electionDuration",		TYPE_SINT,	&host_config.squad.electionDuration,	0,		"1",	"Duration of undecided CO elections (days)" }
 ,	{ "squad.electionInterval",		TYPE_SINT,	&host_config.squad.electionInterval,	0,		"7",	"Minimum time between elections for a squad (days)" }
@@ -169,10 +181,44 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "squad.recruiterListMin",		TYPE_BYTE,	&host_config.squad.recruiterListMin,	64,		"8",	"Minimum best matches to list before showing less-suitable matches" }
 ,	{ "squad.defaultSquad",			TYPE_STRING,&host_config.squad.defaultSquad,MAX_HANDLE_SIZE,"",	"If set: players will be auto-joined to this squad if they have not yet been in a squad" }
 
-,	{ "sto.damageCapacity",			TYPE_INT,	&host_config.sto.damageCapacity,		0,		"15000","Cumulative joules damage to destroy an STO UMS" }
-,	{ "sto.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold,		0,		"1000",	"Minimum joules for damage to be applied to an STO UMS" }
-,	{ "sto.fruDeathCooldownS",		TYPE_INT,	&host_config.sto.fruDeathCooldown_s,	0,		"120",	"Seconds after one FRU is destroyed before another can be placed" }
-,	{ "sto.fruPlaceCooldownS",		TYPE_INT,	&host_config.sto.fruPlaceCooldown_s,	0,		"60",	"Seconds after placing one FRU before another can be placed" }
+// NOTE: would have preferred a map here but since its packed and sent over the network that wouldn't work (plus we'd have to change the way this struct is initialized.
+//       THIS INDEX ORDER MUST MATCH THE ppo.xml ORDER!!  So add new PPOs to the end of the list
+,	{ "sto.ifp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[0],		0,		"0",	"Cumulative joules damage to destroy an Infantry Fighting Position" }
+,	{ "sto.ifp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[0],		0,		"0",	"Minimum joules for damage to be applied to an Infantry Fighting Position" }
+,	{ "sto.ifp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[0],		0,		"120",	"Seconds after an Infantry Fighting Position is destroyed before anything else can be placed" }
+,	{ "sto.ifp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[0],		0,		"60",	"Seconds after placing an Infantry Fighting Position before another PPO can be placed" }
+
+,	{ "sto.ge.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[1],		0,		"250000000","Cumulative joules damage to destroy a gun emplacement" }
+,	{ "sto.ge.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[1],		0,		"1000",	"Minimum joules for damage to be applied to a gun emplacement" }
+,	{ "sto.ge.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[1],		0,		"120",	"Seconds after a gun emplacement is destroyed before anything else can be placed" }
+,	{ "sto.ge.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[1],		0,		"60",	"Seconds after placing a gun emplacement before another PPO can be placed" }
+
+,	{ "sto.fmsp.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[2],		0,		"100000000","Cumulative joules damage to destroy a fortified mobile spawn" }
+,	{ "sto.fmsp.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[2],		0,		"10000000",	"Minimum joules for damage to be applied to a fortified mobile spawn" }
+,	{ "sto.fmsp.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[2],		0,		"120",	"Seconds after fortified MS is destroyed before anything else can be placed" }
+,	{ "sto.fmsp.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[2],		0,		"60",	"Seconds after placing fortified MS before another PPO can be placed" }
+
+,	{ "sto.afru.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[3],		0,		"15000","Cumulative joules damage to destroy an ammo-only FRU" }
+,	{ "sto.afru.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[3],		0,		"1000",	"Minimum joules for damage to be applied to a city-only FRU" }
+,	{ "sto.afru.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[3],		0,		"120",	"Seconds after an ammo-only FRU is destroyed before anything else can be placed" }
+,	{ "sto.afru.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[3],		0,		"60",	"Seconds after placing an ammo-only FRU before another PPO can be placed" }
+
+,	{ "sto.cfru.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[4],		0,		"15000","Cumulative joules damage to destroy a city mobile spawn" }
+,	{ "sto.cfru.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[4],		0,		"1000",	"Minimum joules for damage to be applied to a city mobile spawn" }
+,	{ "sto.cfru.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[4],		0,		"120",	"Seconds after city MS is destroyed before anything else can be placed" }
+,	{ "sto.cfru.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[4],		0,		"60",	"Seconds after placing city MS before another PPO can be placed" }
+
+,	{ "sto.sbag.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[5],		0,		"10000","Cumulative joules damage to destroy a sand bag" }
+,	{ "sto.sbag.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[5],		0,		"5000",	"Minimum joules for damage to be applied to a sand bag" }
+,	{ "sto.sbag.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[5],		0,		"120",	"Seconds after sand bag is destroyed before anything else can be placed" }
+,	{ "sto.sbag.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[5],		0,		"60",	"Seconds after placing sand bag before another PPO can be placed" }
+
+,	{ "sto.ttrap.damageCapacity",		TYPE_INT,	&host_config.sto.damageCapacity[6],		0,		"15000","Cumulative joules damage to destroy a tank trap" }
+,	{ "sto.ttrap.damageThreshold",		TYPE_INT,	&host_config.sto.damageThreshold[6],		0,		"5000",	"Minimum joules for damage to be applied to a tank trap" }
+,	{ "sto.ttrap.deathCooldownS",		TYPE_INT,	&host_config.sto.deathCooldown_s[6],		0,		"120",	"Seconds after a tank trap is destroyed before anything else can be placed" }
+,	{ "sto.ttrap.placeCooldownS",		TYPE_INT,	&host_config.sto.placeCooldown_s[6],		0,		"60",	"Seconds after placing a tank trap before another PPO can be placed" }
+
+
 ,	{ "sto.hulkLifetime",			TYPE_SINT,	&host_config.sto.hulkLifetime_m,		0,		"30",	"Maximum lifetime of an STO Hulk (minutes)" }
 ,	{ "sto.hulkDamageCapacity",		TYPE_INT,	&host_config.sto.hulkDamageCapacity,	0,		"0",	"Cumulative joules damage to destroy an STO Hulk" }
 ,	{ "sto.hulkDamageThreshold",	TYPE_INT,	&host_config.sto.hulkDamageThreshold,	0,		"0",	"Minimum joules for damage to be applied to an STO Hulk" }
@@ -197,11 +243,21 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "supply.trickleStartM",		TYPE_SINT,	&host_config.supply.trickleStart_m,		0,		"15",	"Time delay for first trickle (minutes)" }
 ,	{ "supply.trickleTimeM",		TYPE_INT,	&host_config.supply.trickleTime_m,		0,		"180",	"Time from start to completion of trickle (minutes)" }
 
+,   { "supply.garrisonTrickleTimeM",TYPE_INT,	&host_config.supply.garrisonTrickleTime_m,		0,		"180",	"Time from start to completion of trickle for a Garrison (minutes)" }
+,   { "supply.garrisonInactiveTimeM",TYPE_INT,	&host_config.supply.garrisonInactiveTime_m,		0,		"180",	"Time it takes before a Garrison becomes active (minutes)" }
+,   { "supply.mGarrisonTrickleTimeM",TYPE_INT,	&host_config.supply.mGarrisonTrickleTime_m,		0,		"30",	"Time from start to completion of trickle for a Garrison (minutes) after the country was manually changed" }
+,   { "supply.mGarrisonInactiveTimeM",TYPE_INT,	&host_config.supply.mGarrisonInactiveTime_m,		0,		"15",	"Time it takes before a Garrison becomes active (minutes) after the country was manually changed" }
+,   { "supply.noPenaltySwitchPeriodM",TYPE_INT,	&host_config.supply.noPenaltySwitchPeriod_m,		0,		"5",	"Time (minutes) that HC has to switch garrison ownership without a trickle penalty" }
+
 ,	{ "throttle.enabled",			TYPE_BOOL,	&host_config.throttle.enabled,			0,		"y",	"Enable depot throttling" }
 ,	{ "throttle.percentage",		TYPE_BYTE,	&host_config.throttle.percentage,		100,	"5",	"Percentage equipment to expose at throttles" }
 ,	{ "throttle.timeM",				TYPE_BYTE,	&host_config.throttle.timeM,			0,		"10",	"Time after which throttles are released (minutes)" }
 
 ,	{ "update.avoidRepeats",		TYPE_BOOL,	&host_config.update.avoidRepeats,		0,		"n",	"Enable re-sending old update data for a vehicle" }
+
+,	{ "update.maxAccumDelay",		TYPE_SINT,	&host_config.update.accumDelayLimit_ms,		0,		"1500",	"Maximum Accumulated Delay allowed before considering player kick" }
+,	{ "update.timeAtLimit",			TYPE_SINT,	&host_config.update.timeAtLimitBeforeKick_s,		0,		"4",	"Seconds of delay must hold at max before player is kicked" }
+
 ,	{ "update.countingEnabled",		TYPE_BOOL,	&host_config.update.countingEnabled,	0,		"n",	"Enable speed hacker monitoring" }
 ,	{ "update.defaultUM",			TYPE_BYTE,	&host_config.update.defaultUM,			0,		"0",	"Default Update Mode (0-4)" }
 ,	{ "update.errorThrottling",		TYPE_BOOL,	&host_config.update.errorThrottling,	0,		"n",	"Enable throttling of updates on congestion" }
@@ -216,12 +272,17 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "update.visLimitThrottling",		TYPE_BYTE,	&host_config.update.visLimitThrottling,	255,"0",	"Number of missed updates before limiting player's vis limit" }
 ,	{ "update.awsGracePeriodS",		TYPE_SINT,	&host_config.update.awsGracePeriod_s,	60000,	"90",	"Number of seconds from triggering AWS to appearing on it" }
 ,	{ "update.awsHighThreshold",	TYPE_BYTE,	&host_config.update.awsHighThreshold,	255,	"8",	"Number of planes to trip a 'high' EWS presence" }
+,	{ "update.awsEnemyDistance_km",	TYPE_SINT,	&host_config.update.awsEnemyDistance_km,		500,	"10",	"How many km from the front lines to trip AWS" }
+,	{ "update.awsFriendlyDistance_km",	TYPE_SINT,	&host_config.update.awsFriendlyDistance_km,	500,	"10",	"How many km off map to trip AWS" }
 
 ,	{ "weather.lockToFog",			TYPE_SINT,	&host_config.weather.lockToFog,			99,	"0",	"Lock to a particular fog pattern number (0=unlocked)" }
 ,	{ "weather.lockToPattern",		TYPE_SINT,	&host_config.weather.lockToPattern,		99,	"0",	"Lock to a particular weather pattern number (0=unlocked)" }
 ,	{ "weather.numFogs",			TYPE_SINT,	&host_config.weather.numFogs,		 99,	"16",	"Number of fog patterns [per weather pattern]" }
 ,	{ "weather.numPatterns",		TYPE_SINT,	&host_config.weather.numPatterns,		99,	"3",	"Number of weather patterns" }
 ,	{ "weather.chanceOf",			TYPE_SINT,	&host_config.weather.chanceOf,		100,	"10",	"Per-day chance it will be a rainy day (0=never,	100=always)" }
+
+,	{ "netcode3Enabled",			TYPE_BOOL,	&host_config.netcode3Enabled,		0,		"n",	"Enable transmission of time-critical client-host data over UDP." }
+
 
 // -- End of list
 ,	{ nullptr, MAX_WWII_CONFIG_TYPES, nullptr, 0, nullptr, nullptr }
@@ -246,7 +307,7 @@ wwiiConfigSetINT(UINT32* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -271,7 +332,7 @@ wwiiConfigSetSINT(UINT16* data, const char* const source, UINT64 max)
 	UINT32 value;
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -301,7 +362,7 @@ wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -323,13 +384,13 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
 	if ( max == 0 )
 	{
-		dbugLog(_FLAS, "supplied 0 as string maxlength");
+		dbugLog(_FLA, "supplied 0 as string maxlength");
 		return false;
 	}
 
@@ -338,7 +399,7 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 	if ( *source == 0 )
 		return false;
 
-	strncpy(data, source, static_cast<size_t>(max));
+	strsafecpy(data, source, static_cast<size_t>(max));
 
 	return true;
 }
@@ -348,7 +409,7 @@ wwiiConfigSetBOOL(UCHAR* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 
@@ -367,7 +428,7 @@ wwiiConfigSetBYTE(UCHAR* data, const char* const source, UINT64 max)
 {
 	if ( data == nullptr || source == nullptr )
 	{
-		dbugLog(_FLAS, "called with NULL data or source");
+		dbugLog(_FLA, "called with NULL data or source");
 		return false;
 	}
 

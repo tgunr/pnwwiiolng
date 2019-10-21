@@ -239,17 +239,9 @@ end
 
 gluehelp['allStratHCUnits'] = "() Iterates through all Strat HC Units (brigades + divisions)"
 function allStratHCUnits ()
-  local it = hcUnits:beginIterator()
-  local last = hcUnits:endIterator()
+  local it = HcUnitIterator:new()
   return function ()
-    local hcUnit, unit
-    repeat
-      if it == nil or it == last then return nil end
-      hcUnit = getHCiHCUnit(it)
-      unit = getHCiStratHCUnit(it)
-      it = getHCiNext(it)
-    until hcUnit:isBrigade() == true or hcUnit:isDivision() == true
-    return unit
+	return it:getNext()
   end
 end
 
@@ -329,6 +321,11 @@ end
 gluehelp['getPopulation'] = "() Returns the total server population"
 function getPopulation ()
   return chatGetPopulation(ALLIED) + chatGetPopulation(AXIS)
+end
+
+gluehelp['getLowerPopulation'] = "() Returns the lower of the two sides' population"
+function getLowerPopulation()
+  return math.min(chatGetPopulation(ALLIED), chatGetPopulation(AXIS))
 end
 
 ----------------------------------------------------------------------
@@ -520,7 +517,7 @@ function setCP(targetCP, country, announce, force)
  local ctry = getCountry(country)
  if type(ctry) ~= 'number' then return error("Unrecognized country "..country) end
  if force or cp.country ~= ctry then
-  cp:changeOwnership(ctry, true, not(announce))
+  cp:changeOwnershipFromScript(ctry, true, not(announce))
  end
  strtSaveCP(cp)
  return cp
@@ -560,10 +557,10 @@ function blowFirebase(targetFB)
 end
 
 ----------------------------------------------------------------------
--- Blow a firebase
+-- Open a firebase
 
 gluehelp['openFirebase'] = "(fb) Closes the opposing firebase"
-function blowFirebase(targetFB)
+function openFirebase(targetFB)
  local fb = getFacility(targetFB)
  if fb == nil then return error("Invalid FB " .. targetFB) end
  if fb.type ~= FACILITY_FIREBASE then
@@ -952,7 +949,7 @@ end
 -- Unfortunately, you have to look up all the player details yourself
 -- for now.
 
-function captureAndLog(theFac, thePlayer, customerID, theMissionID, theHCUnit)
+function captureAndLog(theFac, thePlayer, customerID, country, theMissionID, theHCUnit)
  local fac = getFacility(theFac)
  if fac == nil then return error("Unknown facility: " .. theFac) ; end
  local handle = getHandle(thePlayer)
@@ -960,7 +957,7 @@ function captureAndLog(theFac, thePlayer, customerID, theMissionID, theHCUnit)
  local unit = getHCUnit('104atr')
  if unit == nil then return error("Unknown HC Unit: " .. theHCUnit) ; end
  local seconds = 60
- strtCaptureAndLog(fac, handle, customerID, theMissionID, unit, seconds)
+ strtCaptureAndLog(fac, handle, customerID, country, theMissionID, unit, seconds)
  print("Captured " .. fac.name)
 end
 

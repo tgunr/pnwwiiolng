@@ -1,12 +1,7 @@
 #pragma once
 
-#if platOS == OS_MACOS
-	#pragma options align=packed
-#elif platOS == OS_WIN32 || platOS == OS_LINUX
-	#pragma pack(push, 1)
-#else
-	#error No packing specified
-#endif
+#pragma pack(push)
+#pragma pack(1)
 
 	// Defines
 	#define PLAYNET_COMPANY			('P' + ('N' << 8))		// short for Playnet
@@ -236,8 +231,4 @@
 
 	};
 
-#if platOS == OS_MACOS
-	#pragma options align=reset
-#elif platOS == OS_WIN32 || platOS == OS_LINUX
-	#pragma pack(pop)
-#endif
+#pragma pack(pop)

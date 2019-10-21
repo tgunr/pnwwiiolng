@@ -18,8 +18,8 @@ struct PIDeviceInfo
 	std::string id; // unique id of the device
 };
 
-typedef std::vector<PIDeviceInfo> DeviceList;
-typedef std::vector<std::string> InfoList;
+using DeviceList = std::vector<PIDeviceInfo>;
+using InfoList = std::vector<std::string>;
 
 extern bool piinfoGetVideoCards(DeviceList* list);
 extern bool piinfoGetSoundCards(DeviceList* list);

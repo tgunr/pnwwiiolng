@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /* -*-c++-*- OpenSceneGraph - Copyright (C) 1998-2006 Robert Osfield
  *
  * This library is open source and may be redistributed and/or modified under
@@ -26,7 +26,7 @@ DeleteHandler::~DeleteHandler()
 
 void DeleteHandler::flush()
 {
-    typedef std::list<const Referenced*> DeletionList;
+	using DeletionList = std::list<const Referenced*>;
     DeletionList deletionList;
 
     {
@@ -63,7 +63,7 @@ void DeleteHandler::flushAll()
     int temp_numFramesToRetainObjects = _numFramesToRetainObjects;
     _numFramesToRetainObjects = 0;
 
-    typedef std::list<const Referenced*> DeletionList;
+	using DeletionList = std::list<const Referenced*>;
     DeletionList deletionList;
 
     {

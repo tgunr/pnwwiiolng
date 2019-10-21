@@ -245,7 +245,7 @@ class Image : public Referenced
         static int computeNumberOfMipmapLevels(int s,int t = 1, int r = 1);
 
         /** Precomputed mipmaps stuff. */
-        typedef std::vector< unsigned int > MipmapDataType;
+        using MipmapDataType = std::vector<unsigned int>;
 
         inline bool isMipmap() const {return !_mipmapData.empty();};
 

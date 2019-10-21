@@ -89,7 +89,7 @@ extern LOGICAL fxMgrCreateMaterial();
 extern LOGICAL fxMgrDetach(struct OBJECT* lpObj);
 extern LOGICAL fxMgrDraw(LOGICAL bBeforeAlpha);
 extern LOGICAL fxMgrInit();
-extern LOGICAL fxMgrKill();
+extern void fxMgrKill();
 extern LOGICAL fxMgrUpdate();
 
 ///////////////////

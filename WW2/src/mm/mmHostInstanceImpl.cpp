@@ -27,7 +27,7 @@ MMHostInstanceImpl::PreDestructionHandler()
 	if ( inst().descriptor().id() == 0 )
 		return;
 
-	betaLog(_FLD, "in:%u.%u.%llu.%llu host instance destructor"
+	dbugLog(_FLD, "in:%u.%u.%" PR64BitUT ".%" PR64BitUT " host instance destructor"
 				, inst().descriptor().category(), inst().descriptor().type(), inst().descriptor().handle(), inst().descriptor().id());
 
 	// Tell the mission system to delete all missions associated with

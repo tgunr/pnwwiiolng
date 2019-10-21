@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 /*
  *  SpatialDB.cpp
  *  WW2OL
@@ -23,11 +23,6 @@ class CSpeedWind;
 #include "draw3d.h"
 #include "trnvars.h"
 #include "persmain.h"
-
-#if platOS == OS_MACOS
-#undef NDEBUG
-#include <assert.h>
-#endif
 
 bool SDB_DrawDebugFlag=TRUE; // dont release this!
 

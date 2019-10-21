@@ -142,8 +142,8 @@
 
 /********* defines **********/
 #define XML_GET_USERDATA(type,name) (type)(*(xmlDataMap*)userData)["name"]
-#define XML_CMP_STRINGS(s1,s2) !stricmp((const char*)(s1), (const char*)(s2))
-#define XML_IS_NODETYPE(type) !stricmp((const char*)node->name, "type")
+#define XML_CMP_STRINGS(s1,s2) !strcasecmp((const char*)(s1), (const char*)(s2))
+#define XML_IS_NODETYPE(type) !strcasecmp((const char*)node->name, "type")
 #define XML_TAG_HANDLER(handler) bool handler(XMLLoader* loader, xmlNode* node, bool first, void* userData)
 #define XML_PROCESS_CHILDREN(data) \
 for(xmlNodePtr child = node->children; child; child = child->next) \
@@ -164,9 +164,9 @@ class XMLLoader;
  * the children are processed and false afterwards
  * this lets you "get ready" for child data
  */
-typedef bool (*xmlTagHandler)(XMLLoader*, xmlNode*, bool, void*);
-typedef std::map<std::string, xmlTagHandler> xmlTagHandlerMap;
-typedef std::map<std::string, void*> xmlDataMap;
+using xmlTagHandler = bool(*)(XMLLoader*, xmlNode*, bool, void*);
+using xmlTagHandlerMap = std::map<std::string, xmlTagHandler>;
+using xmlDataMap = std::map<std::string, void*>;
 
 class XMLLoader
 {

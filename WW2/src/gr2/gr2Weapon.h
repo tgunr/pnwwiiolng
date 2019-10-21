@@ -18,7 +18,7 @@ class gr2Vehicle;
 struct weapWeapon;
 struct gr2ModuleSpec;
 
-typedef gr2Weapon* (*GR2_WEAPON_CREATOR)(gr2ModuleSpec*);
+using GR2_WEAPON_CREATOR = gr2Weapon*(*)(gr2ModuleSpec*);
 
 enum GR2_WEAPON_CONTROL_FLAG
 {
@@ -44,7 +44,7 @@ class gr2Weapon : public gr2GameObject
 {
 public:
 
-	typedef std::map<std::string, GR2_WEAPON_CREATOR> CreatorMap;
+	using CreatorMap = std::map<std::string, GR2_WEAPON_CREATOR>;
 
 	gr2Weapon(gr2ModuleSpec* spec = NULL);
 	gr2Weapon(const char* skeletonFile, bool skeletonIsLOD = true);

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 //////////////////////////////////////////////////////////////////////
 //  CLensFlare Class
 //
@@ -429,7 +429,7 @@ void CLensFlare::DrawBeforeFlare()
     oglSetOrthoProjectionMatrix(right, left, top, bottom, znear, zfar);
     oglSetWorldMatrix(&world);
 
-    float AspectRatio = (float)WantedWidth / (float)WantedHeight;
+    float AspectRatio = (float)ddpGetWidth() / (float)ddpGetHeight();
     float Height = SunSize * AspectRatio;
 
     glareMaterial->Apply();
@@ -479,24 +479,24 @@ void CLensFlare::DrawAfterFlare(float brightness)
 
             drawquad(0,
                      0,
-                     WantedWidth,
-                     WantedHeight,
+                     ddpGetWidth(),
+                     ddpGetHeight(),
                      piRGBA(1.0f, 1.0f, 1.0f, brightness));
 #else
             // screen brightness
 	        oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(afColor[0], afColor[1], afColor[2], brightness * 0.5f));
             glBegin(GL_TRIANGLE_STRIP);
                 glVertex2i(0, 0);
-                glVertex2i(0, WantedHeight);
-                glVertex2i(WantedWidth, 0);
-                glVertex2i(WantedWidth, WantedHeight);
+                glVertex2i(0, ddpGetHeight());
+                glVertex2i(ddpGetWidth(), 0);
+                glVertex2i(ddpGetWidth(), ddpGetHeight());
             glEnd();
 #endif
         }
         else
         {
             afterflareMaterial->Apply();
-            drawquad(0, 0, WantedWidth, WantedHeight, piRGBA(afColor[0], afColor[1], afColor[2], brightness * 0.5f));
+            drawquad(0, 0, ddpGetWidth(), ddpGetHeight(), piRGBA(afColor[0], afColor[1], afColor[2], brightness * 0.5f));
         }
     }
 }
@@ -527,7 +527,7 @@ void CLensFlare::DrawFlare()
 
     if(m_bEnabled && m_bFlareVisible && AfterBright > 0.0f)
     {
-        oglSetOrthoProjectionMatrix(WantedWidth, 0.0f, WantedHeight, 0.0f, -1.0f, 1.0f);
+        oglSetOrthoProjectionMatrix(ddpGetWidth(), 0.0f, ddpGetHeight(), 0.0f, -1.0f, 1.0f);
         oglSetViewMatrix(&IdentityMatrix);
 
         DrawAfterFlare(AfterBright);
@@ -612,7 +612,7 @@ void CLensFlare::DrawFlare()
             float oldback = BackClip;
             float oldfront = FrontClip;
 
-            oglSetOrthoProjectionMatrix(WantedWidth, 0.0f, WantedHeight, 0.0f, -1.0f, 1.0f);
+            oglSetOrthoProjectionMatrix(ddpGetWidth(), 0.0f, ddpGetHeight(), 0.0f, -1.0f, 1.0f);
             oglSetViewMatrix(&IdentityMatrix);
 
             // Ticket: 5172
@@ -672,9 +672,9 @@ void CLensFlare::DrawFlare()
             oglSetViewMatrix(&IdentityMatrix);
 
             float left = 0.0f;
-            float right = WantedWidth;
+            float right = ddpGetWidth();
             float bottom = 0.0f;
-            float top = WantedHeight;
+            float top = ddpGetHeight();
             float znear = -1.0f;
             float zfar = 1.0f;
 
@@ -713,7 +713,7 @@ void CLensFlare::DrawFlare()
     if(sunfbo.valid() && g_postRenderFilter)
     {
         sunfbo->UnApply();
-        oglSetViewport(0, 0, WantedWidth, WantedHeight);
+        oglSetViewport(0, 0, ddpGetWidth(), ddpGetHeight());
     }
 }
 #endif
@@ -779,7 +779,7 @@ void CLensFlare::Initialize(std::string strPath)
 
     flarestateset->SetRenderState(bf);
 
-    canUseTexture2D = oglCanUseTexture2D(WantedWidth, WantedHeight);
+    canUseTexture2D = oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight());
 
     sunfbo = new FrameBufferObject;
 
@@ -788,14 +788,14 @@ void CLensFlare::Initialize(std::string strPath)
         suntex = new Texture2D;
         Texture2D* t = dynamic_cast<Texture2D*>(suntex.get());
         sunfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(t));
-        t->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        t->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
     }
     else if(GLEW_ARB_texture_rectangle)
     {
         suntex = new TextureRectangle;
         TextureRectangle* t = dynamic_cast<TextureRectangle*>(suntex.get());
         sunfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(t));
-        t->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        t->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
     }
 
     flarestateset->SetRenderState(sunfbo.get());
@@ -858,7 +858,7 @@ void CLensFlare::Initialize(std::string strPath)
         return;
     }
 
-    canUseTexture2D = oglCanUseTexture2D(WantedWidth, WantedHeight);
+    canUseTexture2D = oglCanUseTexture2D(ddpGetWidth(), ddpGetHeight());
 
     sunfbo = new FrameBufferObject;
 
@@ -867,14 +867,14 @@ void CLensFlare::Initialize(std::string strPath)
         suntex = new Texture2D;
         Texture2D* t = dynamic_cast<Texture2D*>(suntex.get());
         sunfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(t));
-        t->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        t->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
     }
     else if(GLEW_ARB_texture_rectangle)
     {
         suntex = new TextureRectangle;
         TextureRectangle* t = dynamic_cast<TextureRectangle*>(suntex.get());
         sunfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(t));
-        t->setTextureSize(WantedWidth / 4, WantedHeight / 4);
+        t->setTextureSize(ddpGetWidth() / 4, ddpGetHeight() / 4);
     }
     else
     {
@@ -913,8 +913,8 @@ void CLensFlare::SetFlareLocation(GLdouble x, GLdouble y)
         FlareWinPos[0] = float(x);
         FlareWinPos[1] = float(y);
 
-        FlarePos[0] = float(x) / (float)WantedWidth;
-        FlarePos[1] = float(y) / (float)WantedHeight;
+        FlarePos[0] = float(x) / (float)ddpGetWidth();
+        FlarePos[1] = float(y) / (float)ddpGetHeight();
     }
 }
 

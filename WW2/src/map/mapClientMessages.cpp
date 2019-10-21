@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include "syscfg.h" // Path is project specific.
 // Date: Thu Jan 25 11:04:13 2001
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -59,7 +59,7 @@ _check64(const char* filename)
 	char* memory = (char*)alloca(READ_BUF_SIZE);
 	if ( memory == nullptr )
 	{
-		dbugWrite("No memory");
+		dbugWrite(_FLF, "No memory");
 		return 0;
 	}
 
@@ -67,7 +67,7 @@ _check64(const char* filename)
 	fd = _open(filename, _O_RDONLY | _O_BINARY, 0);
 	if ( fd == -1 )
 	{
-		dbugWrite("File missing");
+		dbugWrite(_FLW, "File missing");
 		return 0;
 	}
 
@@ -76,7 +76,7 @@ _check64(const char* filename)
 		bytes = _read(fd, memory, READ_BUF_SIZE);
 		if ( bytes < 0 )
 		{
-			dbugWrite("Read failure");
+			dbugWrite(_FLI, "Read failure");
 			checksum = 0;
 			break;
 		}
@@ -199,6 +199,7 @@ HCUnitList::receive(SINT32 teulIndex)
 
 		// Constructed this way, the HCUnit will self-register itself into hcUnits.
 		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank());
+		hcUnit->addToRegistry();
 
 		// The client assigns decals to brigades, so we need to look the unit up and pass it to the decal
 		// code /once/ per HC Unit
@@ -360,10 +361,7 @@ _recvBuildingVisLevels(ACTION_OBJECT* const a)
 		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr;
 		const size_t size = xfer.size_bytes();
 		if ( size == 0 )
-		{
-			ptr = endPtr;
 			break;
-		}
 
 		ptr += size;
 
@@ -484,16 +482,17 @@ Tutorial::GroupProgress::send(SINT32 chatIndex)
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32 mapInstallClientCallbacks(void)
+SINT32
+mapInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
-
+	{
 		REGISTER_SENDER(Map::EXIT_WWIIOL_Y, _sendExitWWIIOL, MAP_SEND_EXIT_WWIIOL);
 
 		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList);
 		REGISTER_RECEIVER(Map::ARENA_DESCRIPTION_Y, _recvArenaDescription);
 
-		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest,_recvPersonaListResponse, _XCHG_PERSONA_LIST);
+		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest, _recvPersonaListResponse, _XCHG_PERSONA_LIST);
 		REGISTER_SENDRECV(Map::XCHG_PERSONA_SELECT_Y, _sendPersonaSelectRequest, _recvPersonaSelectResponse, _XCHG_PERSONA_SELECT);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST);
 		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);
@@ -501,6 +500,7 @@ SINT32 mapInstallClientCallbacks(void)
 
 		REGISTER_MSG_RECEIVER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
 		REGISTER_MSG_RECEIVER(Map::SWING_METER_Y, SWING_METER_MSG);
+		REGISTER_MSG_RECEIVER(Map::HC_UNIT_COUNTRY_CHANGE_Y, HC_UNIT_COUNTRY_CHANGES);
 
 		// Incoming description of an opinion poll
 		REGISTER_MSG_RECEIVER(Map::OPINION_POLL_Y, OPINION_POLL_MSG);
@@ -512,6 +512,6 @@ SINT32 mapInstallClientCallbacks(void)
 
 		// The big packet of strat data we get when we spawn.
 		REGISTER_RECEIVER(Map::BUILDING_VISLEVELS_Y, _recvBuildingVisLevels);
-
-	END_CALLBACK_REGISTRATION
+	}
+	END_CALLBACK_REGISTRATION(Map::CallbackX)
 }

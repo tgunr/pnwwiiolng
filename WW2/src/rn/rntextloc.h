@@ -58,7 +58,7 @@ extern LOGICAL rntextLoc3DString(UCHAR* pStr,
                           LOCCHAR* lpVert,
                           SINT32 iNumVert);
 extern LOGICAL rntextLocInit();
-extern LOGICAL rntextLocKill();
+extern void rntextLocKill();
 extern LOGICAL rntextLocValidChar(UCHAR c);
 
 ///////////////////////////
