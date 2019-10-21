@@ -1,4 +1,4 @@
-prefix=C:/Users/eandi/CMakeBuilds/2904a70f-1f76-b234-aa61-f56c844910be/install/x86-Debug
+prefix=C:/Users/davec/wwiiolng/Libraries/glew/build/cmake/out/install/x64-Debug
 exec_prefix=${prefix}
 libdir=${prefix}/lib
 includedir=${prefix}/include

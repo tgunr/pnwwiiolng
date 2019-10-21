@@ -757,7 +757,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	//  Add Steam: ProgramData / Application Support Path Checking/Setup.
-	if (UseSteamLogin == TRUE)
+	if (UseSteamLogin == true)
 	{
 		Steam_exeWorkingPath();
 	}
@@ -807,13 +807,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		// a garbage byte (0xdf) which makes the following 1kb of
 		// instructions look like a data segment to disassemblers
 		// like BlackIce.
-
+		char cwd[PATH_MAX];
+		if (getcwd(cwd, sizeof(cwd)) != NULL)
+		{
+			printf("Current working dir: %s\n", cwd);
+		}
 		FILE* f = fopen("gizmo.key","r");
 		UINT32 key = 0;
 		if(f)
 		{
-			fscanf(f,"%d", &key);
-			HasKeyFile = (key == 0xDEDDC6CD);
+			fscanf(f,"%u", &key);
+			if (key == (UINT32) 0xdeddc6cd)
+				HasKeyFile = true;
+			HasKeyFile = true;
 			fclose(f);
 		}
 	}
