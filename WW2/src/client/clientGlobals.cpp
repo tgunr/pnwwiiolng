@@ -260,11 +260,9 @@ LOGICAL			gCellClientActive;
 LOGICAL          gWaterShadersEnabled;
 
 LOGICAL			disableButtonInput, disableAxisInput;
-#if defined(DEBUG) || defined(ALPHA_RELEASE)
-LOGICAL			OpenConsole = TRUE;
-#else
-LOGICAL			OpenConsole = FALSE;
-#endif
+
+LOGICAL			OpenConsole = FALSE;        // Disable useless console logging, can't crontol scrolling ect
+
 LOGICAL			SquadInvites;
 UINT32			OverrideSpawner;
 UINT32			gRegion; // used for china localizations and other functionality differences
@@ -287,6 +285,22 @@ SINT8            gAuthServerPort[64];
 char             gAuthRelayURL[128]; // Auth relay URL override
 SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 SINT8            gClientV[32]; // Version to submit
+
+FLOAT32 gRate = 1.0;   // Rate multiplier
+FLOAT32 gXRate = 1.0;  // Rate multiplier
+FLOAT32 gYRate = 1.0;  // Rate multiplier
+FLOAT32 gZRate = 1.0;  // Rate multiplier
+FLOAT32 gValue = 1.0;  // Global debug value
+FLOAT32 gDValue = 1.0; // Global debug value
+FLOAT32 gEValue = 1.0; // Global debug value
+FLOAT32 gHValue = 1.0; // Global debug value
+FLOAT32 gXValue = 1.0; // Global debug value
+FLOAT32 gYValue = 1.0; // Global debug value
+FLOAT32 gZValue = 1.0; // Global debug value
+LOGICAL gToggle = true;
+LOGICAL gToggle1 = true;
+LOGICAL gToggle2 = true;
+LOGICAL gToggle3 = true;
 
 #ifdef DEBUG_WW2
 LOGICAL          DebugBuildingMDLFilesOnly = false;

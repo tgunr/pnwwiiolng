@@ -21,7 +21,6 @@
 #include "uimap/uiMap.h"
 #include "fp/fpFPS.h"
 #include "ui/uiChat.h"
-#include "ui/uiKeymap.h"
 #include "tut/TutorialManager.h"
 #include "ui/uiDotCommands.h"
 #include "scen/ScenarioManager.h"
@@ -181,6 +180,11 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"fpceammo",						IMAP_HOLD_FP_CE_AMMO,						fpFPSControlInput,				VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"fpcejump",						IMAP_HOLD_FP_CE_JUMP,						fpFPSControlInput,				VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 
+    {"toggleheadlook",                   IMAP_TOGGLE_HEAD_LOOK,                      nullptr,                        VEH_CNTRL_ISHOLDDOWN,    VEH_CONTROL_UNAFFECTED, VCEID},
+    {"headlookx",                        IMAP_HEAD_LOOK_X,                           nullptr,                        VEH_CNTRL_ISAXIS,        VEH_CONTROL_UNAFFECTED, VCEID},
+    {"headlooky",                        IMAP_HEAD_LOOK_Y,                           nullptr,                        VEH_CNTRL_ISAXIS,        VEH_CONTROL_UNAFFECTED, VCEID},
+    {"headlookz",                        IMAP_HEAD_LOOK_Z,                           nullptr,                        VEH_CNTRL_ISAXIS,        VEH_CONTROL_UNAFFECTED, VCEID},
+    
 	{"togglemouselook",					IMAP_TOGGLE_MOUSE_LOOK,						nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"mouselookx",						IMAP_MOUSE_LOOK_X,							nullptr,						VEH_CNTRL_ISAXIS,		VEH_CONTROL_UNAFFECTED, VCEID},
 	{"mouselooky",						IMAP_MOUSE_LOOK_Y,							nullptr,						VEH_CNTRL_ISAXIS,		VEH_CONTROL_UNAFFECTED, VCEID},
@@ -263,6 +267,20 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"ezprevpos",						IMAP_EZ_PREVPOS,							nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"ezengine",						IMAP_EZ_ENGINE,								nullptr,						VEH_CNTRL_ISHOLDDOWN,	VEH_CONTROL_UNAFFECTED, VCEID},
 
+    // Experiments
+    {"gvalueinc",                       IMAP_HOLD_GVALUE_INC,                      gValueInc,                   VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gvaluedec",                       IMAP_HOLD_GVALUE_DEC,                      gValueDec,                   VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gxvalueinc",                      IMAP_HOLD_GXVALUE_INC,                     gXValueInc,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gxvaluedec",                      IMAP_HOLD_GXVALUE_DEC,                     gXValueDec,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gyvalueinc",                      IMAP_HOLD_GYVALUE_INC,                     gYValueInc,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gyvaluedec",                      IMAP_HOLD_GYVALUE_DEC,                     gYValueDec,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gzvalueinc",                      IMAP_HOLD_GZVALUE_INC,                     gZValueInc,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gzvaluedec",                      IMAP_HOLD_GZVALUE_DEC,                     gZValueDec,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle",                         IMAP_TOGGLE,                               gValueToggle,                VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle1",                        IMAP_TOGGLE1,                              gValueToggle1,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle2",                        IMAP_TOGGLE2,                              gValueToggle2,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle3",                        IMAP_TOGGLE3,                              gValueToggle3,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+
 	{"",								0,											nullptr,						0,						0, VCEID} // "null-terminated",
 
 };
@@ -305,6 +323,11 @@ UINT32 vehCntrlInstallControlCallbacks()
 		imapInstallControlCallback(IMAP_MOUSE_LOOK_Y, mlMouseLook);
 		imapInstallControlCallback(IMAP_MOUSE_LOOK_Z, mlMouseLook);
 
+        imapInstallControlCallback(IMAP_TOGGLE_HEAD_LOOK,         mlToggleHeadLook);
+        imapInstallControlCallback(IMAP_HEAD_TRANSLATE_X, mlHeadLook);
+        imapInstallControlCallback(IMAP_HEAD_TRANSLATE_Y, mlHeadLook);
+        imapInstallControlCallback(IMAP_HEAD_TRANSLATE_Z, mlHeadLook);
+        
 		imapInstallControlCallback(IMAP_LOOK_FORWARD,	 		mlSetHeadViewCallback);
 		imapInstallControlCallback(IMAP_LOOK_BACK,	 			mlSetHeadViewCallback);
 		imapInstallControlCallback(IMAP_LOOK_UP,  				mlSetHeadViewCallback);
@@ -347,7 +370,7 @@ UINT32 vehCntrlInstallControlCallbacks()
 	imapInstallControlCallback(IMAP_MOM_RESET_HUD,			persHUDResetHUD);
 	imapInstallControlCallback(IMAP_MOM_TOGGLE_CHATHEIGHT,	uiChatToggleHeight);
 	imapInstallControlCallback(IMAP_MOM_SHOW_IN_GAME_MAP, 	uiMapToggleIngameMap);
-	imapInstallControlCallback(IMAP_MOM_SHOW_IN_GAME_KEYMAPPER, 	uiMapToggleIngameKeymapper);
+//	imapInstallControlCallback(IMAP_MOM_SHOW_IN_GAME_KEYMAPPER, 	uiMapToggleIngameKeymapper);
 	imapInstallControlCallback(IMAP_SHOW_STATS, 			persHUDToggleReadout);
 
 	if(TUT_ACTIVE && !SCEN_MGR->IsActive())
@@ -665,7 +688,8 @@ vehCntrlCommandListElement* _LookupElement(UINT32 Id)
 
 	for(i = 0; vehCntrlCommandList[i].CommandId != IMAP_NO_FUNCTION; i++)
 	{
-		if(vehCntrlCommandList[i].CommandId == Id) return &vehCntrlCommandList[i];
+		if(vehCntrlCommandList[i].CommandId == Id)
+            return &vehCntrlCommandList[i];
 	}
 	return nullptr;
 }

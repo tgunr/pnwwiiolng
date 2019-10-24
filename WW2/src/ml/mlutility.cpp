@@ -219,9 +219,9 @@ piVECTOR Att1;
 
 UINT32 mlUtilityGetModelPositionFromObjectMatrix(FLOAT64VECTOR * Pos,piMATRIX * Mat)
 {
-	Pos->x = Mat->_41 / ScaleFactor;
-	Pos->y = Mat->_42 / ScaleFactor;
-	Pos->z = -Mat->_43 / ScaleFactor;
+	Pos->x = Mat->_41;
+	Pos->y = Mat->_42;
+	Pos->z = -Mat->_43;
 
 	return 0;
 }

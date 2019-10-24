@@ -36,7 +36,8 @@ enum
 {
 	LOG_FATAL,
 	LOG_WARN,
-	LOG_INFO
+	LOG_INFO,
+	LOG_DEBUG
 };
 
 #ifdef EVENT_LOG

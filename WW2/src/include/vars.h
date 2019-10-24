@@ -308,6 +308,24 @@ extern SINT8            gAuthServerPort[64];
 extern char             gAuthRelayURL[128]; // Auth relay URL override
 extern SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 extern SINT8            gClientV[32]; // Version to submit
+extern SINT8            gLogMask[_MAX_PATH];	// Gobal logmask value to specify subsystem to match.
+extern SINT32           gLogLevel;		// Global log level
+extern LOGICAL 			gLogDuplicates;	// Controls duplicate log messages
+extern FLOAT32          gRate; // Rate multiplier
+extern FLOAT32          gXRate; // Rate multiplier
+extern FLOAT32          gYRate; // Rate multiplier
+extern FLOAT32          gZRate; // Rate multiplier
+extern FLOAT32          gValue; // Global debug value
+extern FLOAT32          gDValue; // Global debug value
+extern FLOAT32          gEValue; // Global debug value
+extern FLOAT32          gHValue; // Global debug value
+extern FLOAT32          gXValue; // Global debug value
+extern FLOAT32          gYValue; // Global debug value
+extern FLOAT32          gZValue; // Global debug value
+extern LOGICAL          gToggle; // Global debug value
+extern LOGICAL          gToggle1; // Global debug value
+extern LOGICAL          gToggle2; // Global debug value
+extern LOGICAL          gToggle3; // Global debug value
 
 #ifdef DEBUG_WW2
 extern LOGICAL          DebugBuildingMDLFilesOnly;

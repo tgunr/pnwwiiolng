@@ -453,6 +453,22 @@ UINT32 mlGetHeadPos(FLOAT64VECTOR* Displacement, FLOAT64ATT* AttChange,
 	return 0;
 }
 
+UINT32 mlToggleHeadLook(SINT32 keyState, UINT32 functionNum, UINT32 unused)
+{
+    if(keyState) {
+        _mouseLook = !_mouseLook;
+        mlCenterMouseLook();
+        TUT_MGR->DoEvent(TUT_EVENT_INPUT, &functionNum, &keyState);
+    }
+    return 0;
+}
+
+UINT32 mlHeadLook(SINT32 param, UINT32 functionNum, UINT32 data){
+
+	Write_Debug("mlHeadLook Unimplemented");
+	return -1;
+}
+
 /************************************************************************************************
 	mlToggleMouseLookadPos
 *************************************************************************************************/

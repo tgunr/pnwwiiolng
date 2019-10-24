@@ -65,6 +65,7 @@ enum
 	WW2_FUNC_ALL = WW2_FUNC_GENERAL | WW2_FUNC_VIEW | WW2_FUNC_EZ | WW2_FUNC_ALL_PERSONA_TYPES
 };
 
+// See: http://confluence.corneredrats.com:8090/display/DEV/Adding+Experimental+Buttons
 static const functionEntry functionTable[] =
 {
 	{IMAP_TMP_EXIT_VEHICLE,	 					"exitvehicle",					239,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_INGAME, -1},
@@ -144,9 +145,10 @@ static const functionEntry functionTable[] =
 	{IMAP_LOOK_BACK_RIGHT_DOWN,					"lookviewtwentythree",			226,			0,	WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
 	{IMAP_LOOK_BACK_LEFT_DOWN,					"lookviewtwentyfour",			227,			0,	WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
 
-//	{IMAP_HEAD_TRANSLATE_X,						"headtransx",					923,			1,	WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
-//	{IMAP_HEAD_TRANSLATE_Y,						"headtransy",					924,			1,	WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
-//	{IMAP_HEAD_TRANSLATE_Z,						"headtransz",					925,			1,	WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HEAD_TRANSLATE_X,                     "headtransx",                    923,           1,    WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HEAD_TRANSLATE_Y,                     "headtransy",                    924,           1,    WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HEAD_TRANSLATE_Z,                     "headtransz",                    925,           1,    WW2_FUNC_VIEW|WW2_FUNC_PERSON, WW2_FUNC_DELTA_AXIS, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_TOGGLE_HEAD_LOOK,                     "toggleheadlook",                926,           0,    WW2_FUNC_VIEW|WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_VIEW, -1},
 
 	{IMAP_HOLD_FP_FIRE,							"fpfire",						288,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
 	{IMAP_HOLD_FP_GUNSIGHT,						"fpgunsight",					276,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_WEAPON, -1},
@@ -274,7 +276,21 @@ static const functionEntry functionTable[] =
 	{IMAP_EZ_PREVPOS,						"ezprevpos",							4008,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 	{IMAP_EZ_ENGINE,						"ezengine",								4009,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
 
-	{IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
+    // Experiments
+    {IMAP_HOLD_GVALUE_INC,                         "gvalueinc",                     65536,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GVALUE_DEC,                         "gvaluedec",                     65537,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GXVALUE_INC,                        "gxvalueinc",                    65538,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GXVALUE_DEC,                        "gxvaluedec",                    65539,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GYVALUE_INC,                        "gyvalueinc",                    65540,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GYVALUE_DEC,                        "gyvaluedec",                    65541,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GZVALUE_INC,                        "gzvalueinc",                    65542,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_HOLD_GZVALUE_DEC,                        "gzvaluedec",                    65543,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_TOGGLE,                                  "gtoggle",                       65544,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_TOGGLE1,                                 "gtoggle1",                      65545,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_TOGGLE2,                                 "gtoggle2",                      65546,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+    {IMAP_TOGGLE3,                                 "gtoggle3",                      65547,            0,    WW2_FUNC_VIEW, 0, WW2_FUNC_HEADER_VIEW, -1},
+
+    {IMAP_NO_FUNCTION,"",0,0,0,(unsigned int)-1}, // end
 };
 
 static void (*localized_string) (const char*, int, char*, int) = nullptr;

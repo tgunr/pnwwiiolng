@@ -26,6 +26,7 @@
 #include "gr2/gr2layer.h"
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"
+#include "imaplib/imap.h"
 #include "include/vars.h"
 #include "js/jsContent.h"
 #include "js/jsGame.h"
@@ -2185,6 +2186,19 @@ static SINT32 dot_imapkey(const char* line)
 	return DC_HANDLED;
 }
 
+static SINT32 dot_imapdump(const char* line) {
+    imapDump();
+    uiChatPrintLine("Look in log for results");
+    return DC_HANDLED;
+}
+
+static SINT32 dot_imapinit(const char *line) {
+    uiChatPrintLine("Not ready!");
+    ww2imapKill();
+    ww2imapInit();
+    return DC_HANDLED;
+}
+
 /************************************************************************************************
 	discohostCmd
 *************************************************************************************************/
@@ -3414,6 +3428,19 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
+static int dot_gv(const char * line) {
+    FLOAT32 gv;
+    int argc = sscanf(line, "%*s %f", &gv);
+    rnmainListLocText(IDE_LANG_UI, 854);
+
+    if(argc > 0)
+        gValue = gv;
+    else
+        uiChatPrintLine("gValue: %d", gValue);
+    
+    return DC_HANDLED;
+}
+
 #ifdef SPATIAL_DB
 extern bool SDB_DrawDebugFlag;
 
@@ -3428,7 +3455,7 @@ static int dot_drawsdb(const char* line)
 
     return DC_HANDLED;
 }
-#endif
+#endif // SPATIAL_DB
 
 #ifdef GENICONS
 
@@ -3494,7 +3521,8 @@ static int dot_gentiles(const char* line)
   return DC_HANDLED;
 }
 
-#endif
+#endif // GENICONS
+
 static int dot_getcell(const char* line)
 {
     int sx, sy, r, c;
@@ -4256,7 +4284,7 @@ static SINT32 dot_heightmap(const char* in)
 
     return DC_HANDLED;
 }
-#endif
+#endif // platOS != OS_MACOS
 
 #include "trn/trnScenario.h"
 static int dot_enablemouseclicktodamagebuildings(const char* line)
@@ -5599,7 +5627,151 @@ static SINT32 dot_speed(const char*)
 
 #endif // BETA_RELEASE
 
+UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
 
+    gValue = gValue + gRate;
+    uiChatPrintLine("gValue= %.3f", gValue);
+
+    return 0;
+}
+
+UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gValue = gValue - gRate;
+    if (gValue <= 1)
+        gValue = 1;
+    uiChatPrintLine("gValue= %.3f", gValue);
+
+    return 0;
+}
+
+UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gXValue = gXValue + gXRate;
+    uiChatPrintLine("gXValue= %.3f", gXValue);
+
+    return 0;
+}
+
+UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gXValue = gXValue - gXRate;
+    uiChatPrintLine("gXValue= %.3f", gXValue);
+
+    return 0;
+}
+
+UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gYValue = gYValue + gYRate;
+    uiChatPrintLine("gYValue= %.3f", gYValue);
+
+    return 0;
+}
+
+UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gYValue = gYValue - gYRate;
+    uiChatPrintLine("gYValue= %.3f", gYValue);
+
+    return 0;
+}
+
+UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gZValue = gZValue + (gZRate / 100);
+    uiChatPrintLine("gZValue= %.3f", gZValue);
+
+    return 0;
+}
+
+UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gZValue = gZValue - (gZRate / 100);
+    uiChatPrintLine("gZValue= %.3f", gZValue);
+
+    return 0;
+}
+
+UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle = !gToggle;
+    sptDrawOn(0, gToggle);
+
+    return 0;
+}
+
+UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle1 = !gToggle1;
+    uiChatPrintLine("gToggle1");
+
+    return 0;
+}
+
+UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle2 = !gToggle2;
+    uiChatPrintLine("gToggle2");
+
+    return 0;
+}
+
+UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+
+    gToggle3 = !gToggle3;
+    uiChatPrintLine("gToggle3");
+
+    return 0;
+}
 
 #ifdef GM_RELEASE
 
@@ -5715,13 +5887,76 @@ InfLODModCmd
 static SINT32 dot_inflodmod(const char* line)
 {
 	if (sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
-		uiChatPrintLine("Setting infantry LOD mod to %.2f%% and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
+		uiChatPrintLine("Setting infantry LOD mod to %.2f and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
 	else
 		uiChatPrintLine("You must set a percent (0 to 1) in the 1st parameter and an optional mod in the 2nd one.");
 
 	return DC_HANDLED;
 }
-#endif
+
+static int dot_sf(const char* line)
+{
+    FLOAT32 x = 0.0;
+    if (sscanf(line, "%*s %f", &x) > 0) {
+        ScaleFactor = x;
+    } else
+        uiChatPrintLine("Scalefactor: %.2f", ScaleFactor);
+    return DC_HANDLED;
+}
+
+static int dot_gav(const char* line)
+{
+    FLOAT32 x = 0.0, y = 0.0, z = 0.0;
+    if (sscanf(line, "%*s %f %f %f", &x, &y, &z) > 0) {
+               gXValue = x;
+               gYValue = y;
+               gZValue = z;
+    } else
+        uiChatPrintLine("gX: %.3f gY: %.3f gZ: %.3f", gXValue, gYValue, gZValue);
+    return DC_HANDLED;
+}
+
+static int dot_grv(const char* line)
+{
+    FLOAT32 d = 0.0, e = 0.0, h = 0.0;
+    if (sscanf(line, "%*s %f %f %f", &d, &e, &h) > 0) {
+               gDValue = d;
+               gEValue = e;
+               gHValue = h;
+    } else
+        uiChatPrintLine("gD: %.3f gE: %.3f gH: %.3f", gDValue, gEValue, gHValue);
+    return DC_HANDLED;
+}
+
+static int dot_rate(const char* line)
+{
+    FLOAT32 x = 0.0;
+    if (sscanf(line, "%*s %f", &gRate) > 0) {
+        gRate = x;
+        uiChatPrintLine("gRate= %.3f", gRate);
+    } else
+        uiChatPrintLine("gRate= %.3f", gRate);
+    
+    return DC_HANDLED;
+    
+}
+
+static int dot_rates(const char* line)
+{
+    FLOAT32 x = 0.0, y = 0.0, z = 0.0;
+    if (sscanf(line, "%*s %f %f %f", &x, &y, &z) > 0) {
+        gXRate = x;
+        gYRate = y;
+        gZRate = z;
+    } else
+        uiChatPrintLine("gXRate =: %.3f gYRate =: %.3f gZRate =: %.3f", gXRate, gYRate, gZRate);
+    
+    return DC_HANDLED;
+    
+}
+
+
+#endif // defined(BETA_RELEASE)
 
 /************************************************************************************************
 	else
@@ -6484,6 +6719,9 @@ static int dot_fire(const char* line)
     mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData) return DC_ERROR;
 
+    Write_Log(LOG_WEAP, LOG_DEBUG, "Vx: %f Vy: %f Vz: %f Ap: %f Ar: %f Ay: %f",
+			VehicleData->VehiclePos.x, VehicleData->VehiclePos.y, VehicleData->VehiclePos.z,
+            VehicleData->VehicleAtt.Pitch, VehicleData->VehicleAtt.Roll, VehicleData->VehicleAtt.Yaw);
 	static char LastAmmoName[64];
 	static FLOAT32 lastX, lastY, lastZ, lasttraverse, lastelevate;
 	char AmmoName[64] = "";
@@ -6701,6 +6939,43 @@ static int dot_supertroop(const char* line)
 static int dot_aion(const char* line)
 {
     trnautogunToggleAI();
+    return DC_HANDLED;
+}
+
+static SINT32 dot_view(const char* line)
+{
+    phui::View* canvas = 0;
+    const char *command = "view ";
+    char *view;
+    size_t commandLen = sizeof(command);
+    int rc = strncmp(command, line, commandLen);
+    if (rc == 0) {
+        view = (char *)line + commandLen + 1;
+        canvas = uiViewport()->FindView(view);
+    }
+    
+    if(canvas)
+    {
+        canvas->Close();
+    }
+    else
+    {
+        canvas = uiLoadView(view);
+        
+        if(canvas)
+        {
+            char parent[32] = "";
+            sscanf(line, "%*s %31s", parent);
+            
+            std::string script = "setParent('";
+            script += parent;
+            script += "');";
+            
+            phui::DOM::ElementDOM* viewdom = dynamic_cast<phui::DOM::ElementDOM*>(canvas->UserData(DOM_VIEW_USERDATA));
+            if(viewdom) viewdom->RunScript(script.c_str());
+        }
+    }
+    
     return DC_HANDLED;
 }
 

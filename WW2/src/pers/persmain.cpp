@@ -1400,6 +1400,9 @@ OBJECT * TempObj;
 			if (_Persona.PersonaEyeDOF != nullptr)
 			{
 				math3dMatrixMultiply(Mat,&(_Persona.PersonaEyeDOF->dof->dofmatrix2),Mat);
+                Mat->_41 *= gXValue;
+                Mat->_42 *= gYValue;
+                Mat->_43 *= gZValue;
 			}
 		}
 
@@ -2065,12 +2068,12 @@ Displacement.x = Displacement.y = Displacement.z = 0.0;
 		HeadAtt.Pitch = HeadAtt.Roll = HeadAtt.Yaw = 0.0f;
 		EyeAtt.Pitch = EyeAtt.Roll = EyeAtt.Yaw = 0.0f;
 	}
-	HeadAtt.Pitch = (_Persona.LastHeadAtt.Pitch * 0.05 + HeadAtt.Pitch * DeltaTime) /
-					(0.05+DeltaTime);
-	HeadAtt.Roll = (_Persona.LastHeadAtt.Roll * 0.05 + HeadAtt.Roll * DeltaTime) /
-					(0.05+DeltaTime);
-	HeadAtt.Yaw = (_Persona.LastHeadAtt.Yaw * 0.05 + HeadAtt.Yaw * DeltaTime) /
-					(0.05+DeltaTime);
+//    HeadAtt.Pitch = (_Persona.LastHeadAtt.Pitch * 0.05 + HeadAtt.Pitch * DeltaTime) /
+//                    (0.05+DeltaTime);
+//    HeadAtt.Roll = (_Persona.LastHeadAtt.Roll * 0.05 + HeadAtt.Roll * DeltaTime) /
+//                    (0.05+DeltaTime);
+//    HeadAtt.Yaw = (_Persona.LastHeadAtt.Yaw * 0.05 + HeadAtt.Yaw * DeltaTime) /
+//                    (0.05+DeltaTime);
 	_Persona.LastHeadAtt = HeadAtt;
 	Att1.x = -(float)HeadAtt.Pitch;
 	Att1.y = -(float)HeadAtt.Roll;
