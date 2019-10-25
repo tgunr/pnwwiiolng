@@ -1,7 +1,9 @@
 apID: 12
 data: Login Accepted
-serverIP: 66.28.224.143
+serverIP: 204.237.246.193
 port: 27015
 protocol: 2
 OTP: 2342426
-bypass: 245825
+bypass: 3141
+#bypass: 3204 KFS1
+#bypass: 245825
