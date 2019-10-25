@@ -106,7 +106,7 @@ extern UINT32 Get_Log_Mask();
 
 #else // EVENT_LOG
 #define Write_Where
-#define WriteLog(system, level, fmt, ...)
+#define Write_Log
 #define Enable_Log
 #define Set_Log_Level
 #define Set_Log_Mask

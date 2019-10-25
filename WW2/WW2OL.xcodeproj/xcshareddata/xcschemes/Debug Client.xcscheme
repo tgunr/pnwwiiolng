@@ -63,12 +63,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-ticket $(SRCROOT)/../tgunr.tkt"
+            argument = "-data 1"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-bypass 3240"
-            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-window 1"
@@ -88,27 +84,15 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-logg false"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-clientv 1.36.2.0"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-data 1"
+            argument = "-clientv 1.36.1.2"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-noinf"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-console"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

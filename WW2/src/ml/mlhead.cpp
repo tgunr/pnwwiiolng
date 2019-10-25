@@ -463,7 +463,9 @@ UINT32 mlToggleHeadLook(SINT32 keyState, UINT32 functionNum, UINT32 unused)
     return 0;
 }
 
-UINT32 mlHeadLook(SINT32 param, UINT32 functionNum, UINT32 data) { return 0; }
+UINT32 mlHeadLook(SINT32 param, UINT32 functionNum, UINT32 data) {
+    
+}
 
 /************************************************************************************************
 	mlToggleMouseLookadPos

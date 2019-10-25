@@ -297,7 +297,7 @@ SINT32           gLogLevel = LOG_DEBUG;
 #else
 SINT32           gLogLevel = LOG_RECOVER;
 #endif
-FLOAT32         gRate   = 0.5; // Rate multiplier
+FLOAT32         gRate   = 1.0; // Rate multiplier
 FLOAT32         gXRate  = 0.01; // Rate multiplier
 FLOAT32         gYRate  = 0.01; // Rate multiplier
 FLOAT32         gZRate  = 0.01; // Rate multiplier

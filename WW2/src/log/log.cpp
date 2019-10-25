@@ -211,7 +211,7 @@ UINT32 Get_Log_Mask()
 static void logdup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
     int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
-    char buf[sizeof(wheresize) + 1]; // note +1 for terminating null byte
+    char buf[wheresize + 1]; // note +1 for terminating null byte
     snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
     vprintf(buf, marker);
     printf("\n");
@@ -235,7 +235,7 @@ static void logdup(const char *file, int line, const char *function, UINT32 syst
 static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
 {
     int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
-    char buf[sizeof(wheresize) + 5]; // + 4 just in case str is empty and we hit case 1, + 1 for terminating null byte
+    char buf[wheresize + 5]; // + 4 just in case str is empty and we hit case 1, + 1 for terminating null byte
     if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
         switch (prevLog.count) {
             case 0: // first time for this log message file and line number
@@ -275,7 +275,7 @@ static void logwstr(const char *file, int line, const char *function, UINT32 sys
 
 logwhere:
     int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
-    char buf[sizeof(wheresize) + 1]; // note +1 for terminating null byte
+    char buf[wheresize + 1]; // note +1 for terminating null byte
     snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
     printf("%s\n", buf);
 }

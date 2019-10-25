@@ -26,7 +26,7 @@
 #include "include/configVars.h"
 
 #if platOS == OS_WIN32
-//#pragma comment(lib, "event.lib")
+#pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "IPHLPAPI.lib")
 #endif
