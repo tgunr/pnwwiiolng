@@ -274,7 +274,7 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
     {"gyvaluedec",                      IMAP_HOLD_GYVALUE_DEC,                     gYValueDec,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gzvalueinc",                      IMAP_HOLD_GZVALUE_INC,                     gZValueInc,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gzvaluedec",                      IMAP_HOLD_GZVALUE_DEC,                     gZValueDec,                  VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
-    {"gtoggle",                         IMAP_TOGGLE,                               gValueToggle,                VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
+    {"gtoggle",                         IMAP_TOGGLE,                               gValueToggle,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gtoggle1",                        IMAP_TOGGLE1,                              gValueToggle1,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gtoggle2",                        IMAP_TOGGLE2,                              gValueToggle2,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},
     {"gtoggle3",                        IMAP_TOGGLE3,                              gValueToggle3,               VEH_CNTRL_ISNOTAXIS,   VEH_CONTROL_UNAFFECTED, VCEID},

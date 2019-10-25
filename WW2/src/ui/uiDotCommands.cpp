@@ -3440,6 +3440,149 @@ static int dot_genscenariomap(const char* line)
     return DC_HANDLED;
 }
 
+UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gValue = gValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gValue = gValue - .25f;
+    if (gValue <= 1)
+        gValue = 1;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gXValue = gXValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    
+    return 0;
+}
+
+UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gXValue = gXValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gXValue);
+    
+    return 0;
+}
+
+UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gYValue = gYValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    
+    return 0;
+}
+
+UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gYValue = gYValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gYValue);
+    
+    return 0;
+}
+
+UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gZValue = gZValue + .25f;
+    uiChatPrintLine("Set to: %.2f%%", gZValue);
+    
+    return 0;
+}
+
+UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gZValue = gZValue - .25f;
+    uiChatPrintLine("Set to: %.2f%%", gValue);
+    
+    return 0;
+}
+
+UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle = !gToggle;
+    sptDrawOn(0, gToggle);
+    
+    return 0;
+}
+
+UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle1 = !gToggle1;
+    
+    return 0;
+}
+
+UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle2 = !gToggle2;
+    
+    return 0;
+}
+
+UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
+{
+    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
+    if (!pObjectData)
+        return 0;
+    
+    gToggle3 = !gToggle3;
+    
+    return 0;
+}
+
 static int dot_gv(const char * line) {
     FLOAT32 gv;
     int argc = sscanf(line, "%*s %f", &gv);
@@ -3467,7 +3610,7 @@ static int dot_drawsdb(const char* line)
 
     return DC_HANDLED;
 }
-#endif // SPATIAL_DB
+#endif
 
 #ifdef GENICONS
 
@@ -3533,8 +3676,7 @@ static int dot_gentiles(const char* line)
   return DC_HANDLED;
 }
 
-#endif // GENICONS
-
+#endif
 static int dot_getcell(const char* line)
 {
     int sx, sy, r, c;
@@ -4296,7 +4438,7 @@ static SINT32 dot_heightmap(const char* in)
 
     return DC_HANDLED;
 }
-#endif // platOS != OS_MACOS
+#endif
 
 #include "trn/trnScenario.h"
 static int dot_enablemouseclicktodamagebuildings(const char* line)
@@ -5647,151 +5789,7 @@ static SINT32 dot_speed(const char*)
 
 #endif // BETA_RELEASE
 
-UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
 
-    gValue = gValue + gRate;
-    uiChatPrintLine("gValue= %.3f", gValue);
-
-    return 0;
-}
-
-UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gValue = gValue - gRate;
-    if (gValue <= 1)
-        gValue = 1;
-    uiChatPrintLine("gValue= %.3f", gValue);
-
-    return 0;
-}
-
-UINT32 gXValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gXValue = gXValue + gXRate;
-    uiChatPrintLine("gXValue= %.3f", gXValue);
-
-    return 0;
-}
-
-UINT32 gXValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gXValue = gXValue - gXRate;
-    uiChatPrintLine("gXValue= %.3f", gXValue);
-
-    return 0;
-}
-
-UINT32 gYValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gYValue = gYValue + gYRate;
-    uiChatPrintLine("gYValue= %.3f", gYValue);
-
-    return 0;
-}
-
-UINT32 gYValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gYValue = gYValue - gYRate;
-    uiChatPrintLine("gYValue= %.3f", gYValue);
-
-    return 0;
-}
-
-UINT32 gZValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gZValue = gZValue + (gZRate / 100);
-    uiChatPrintLine("gZValue= %.3f", gZValue);
-
-    return 0;
-}
-
-UINT32 gZValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gZValue = gZValue - (gZRate / 100);
-    uiChatPrintLine("gZValue= %.3f", gZValue);
-
-    return 0;
-}
-
-UINT32 gValueToggle(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gToggle = !gToggle;
-    sptDrawOn(0, gToggle);
-
-    return 0;
-}
-
-UINT32 gValueToggle1(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gToggle1 = !gToggle1;
-    uiChatPrintLine("gToggle1");
-
-    return 0;
-}
-
-UINT32 gValueToggle2(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gToggle2 = !gToggle2;
-    uiChatPrintLine("gToggle2");
-
-    return 0;
-}
-
-UINT32 gValueToggle3(SINT32 Param,UINT32 Id,UINT32 Detach)
-{
-    OBJECT*    pObjectData = persGetPersonaVehicleObjectDataPtr();
-    if (!pObjectData)
-        return 0;
-
-    gToggle3 = !gToggle3;
-    uiChatPrintLine("gToggle3");
-
-    return 0;
-}
 
 #ifdef GM_RELEASE
 
@@ -5907,7 +5905,7 @@ InfLODModCmd
 static SINT32 dot_inflodmod(const char* line)
 {
 	if (sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
-		uiChatPrintLine("Setting infantry LOD mod to %.2f and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
+		uiChatPrintLine("Setting infantry LOD mod to %.2f%% and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
 	else
 		uiChatPrintLine("You must set a percent (0 to 1) in the 1st parameter and an optional mod in the 2nd one.");
 
@@ -5932,7 +5930,7 @@ static int dot_gav(const char* line)
                gYValue = y;
                gZValue = z;
     } else
-        uiChatPrintLine("gX: %.3f gY: %.3f gZ: %.3f", gXValue, gYValue, gZValue);
+        uiChatPrintLine("gX: %.2f gY: %.2f gZ: %.2f", gXValue, gYValue, gZValue);
     return DC_HANDLED;
 }
 
@@ -5944,39 +5942,22 @@ static int dot_grv(const char* line)
                gEValue = e;
                gHValue = h;
     } else
-        uiChatPrintLine("gD: %.3f gE: %.3f gH: %.3f", gDValue, gEValue, gHValue);
+        uiChatPrintLine("gD: %.2f gE: %.2f gH: %.2f", gDValue, gEValue, gHValue);
     return DC_HANDLED;
 }
 
 static int dot_rate(const char* line)
 {
-    FLOAT32 x = 0.0;
-    if (sscanf(line, "%*s %f", &gRate) > 0) {
-        gRate = x;
-        uiChatPrintLine("gRate= %.3f", gRate);
-    } else
-        uiChatPrintLine("gRate= %.3f", gRate);
-    
+    if (sscanf(line, "%*s %f", &gRate) > 0)
+        uiChatPrintLine("Setting turrate to %.2f%%", gRate);
+    else
+        uiChatPrintLine("Set to: %.2f%%", gRate);
+
     return DC_HANDLED;
     
 }
 
-static int dot_rates(const char* line)
-{
-    FLOAT32 x = 0.0, y = 0.0, z = 0.0;
-    if (sscanf(line, "%*s %f %f %f", &x, &y, &z) > 0) {
-        gXRate = x;
-        gYRate = y;
-        gZRate = z;
-    } else
-        uiChatPrintLine("gXRate =: %.3f gYRate =: %.3f gZRate =: %.3f", gXRate, gYRate, gZRate);
-    
-    return DC_HANDLED;
-    
-}
-
-
-#endif // defined(BETA_RELEASE)
+#endif
 
 /************************************************************************************************
 	else
@@ -8326,12 +8307,6 @@ void uiDotCommandsInit()
 #if RELEASE_CLIENT == 0
 	//ADD_DOT_COMMAND(font, false);
 	ADD_DOT_COMMAND(canvas, false);
-    ADD_DOT_COMMAND(rate, true);
-    ADD_DOT_COMMAND(rates, true);
-    ADD_DOT_COMMAND(gv, true);
-    ADD_DOT_COMMAND(gav, true);
-    ADD_DOT_COMMAND(grv, true);
-    ADD_DOT_COMMAND(sf, true);
 #endif
 #endif
 
@@ -8345,6 +8320,11 @@ void uiDotCommandsInit()
     uiDotCommandAdd("bug", dot_clientinfo_command, false);
     uiDotCommandAdd("report", dot_clientinfo_command, false);
 
+    ADD_DOT_COMMAND(rate, true);
+    ADD_DOT_COMMAND(gv, true);
+    ADD_DOT_COMMAND(gav, true);
+    ADD_DOT_COMMAND(grv, true);
+    ADD_DOT_COMMAND(sf, true);
 
 	uiDotCommandsInitLoc();
 }
