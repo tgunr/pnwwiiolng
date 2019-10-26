@@ -173,9 +173,6 @@ LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when loaded
 
 LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-fullpath_t DataPath[_MAX_PATH];
-fullpath_t UserDataPath[_MAX_PATH];
-
 FLOAT32			FieldOfView;		// FOV in degrees
 FLOAT32			HorizontalFieldOfView;
 
@@ -228,6 +225,7 @@ UINT32			gIconEnemyColor;			// Icon color for enemy players
 UINT32			gIconSquadColor;			// Icon color for squad mates
 UINT32			gIconMissionColor;          // Icon color for mission mates
 UINT32			gIconMissionLeaderColor;    // Icon color for mission leader
+UINT32			gIconNoobColor;             // Icon color for new players
 
 UINT32			gLanguage;					// Language used for localization
 

@@ -7,6 +7,8 @@ namespace IO { class MappedFile; }
 
 // TODO: Can be made internal
 extern const fullpath_t* fiodGetPrepath();
+extern bool fiodGetPrepath(char returnPrePath[PN_MAX_PATH + 1]);  //  MJH
+extern bool fiodGetPrepath_WC(wwiiolpath_string &returnPrePath);  //  MJH
 extern void fiodSetUserpath(bool userpath);
 
 struct UsingUserdir {
@@ -39,6 +41,8 @@ extern size_t fiodGetString(int hfile, char* string, size_t length);
 #if platBuild == BUILD_CLIENT
 
 extern void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFiles);
+extern UINT32 fiodGetDirFileList_WC(wwiiolpath_string dirToSearch, std::vector<wwiiolpath_string> &fileList);
+
 extern void fiocfgMkDir(const char* path, bool userdir = false);
 
 #if platOS == OS_WIN32

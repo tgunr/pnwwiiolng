@@ -1796,12 +1796,25 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	bool rescue = false;
 	bool rescuable = false;
 	bool vehicleDelivered = false;
+
+	// If ToM is greater than rescueTomThresold_m on KIA without enemy inflicted damage, then weapon must go through Full RDP return
+	UINT32 timeOnMission = teulTime() - m_posted;
+	UINT32 tomThresold = 60 * host_config.supply.rescueTomThresold_m;
+	bool hasExceededTomThresold = timeOnMission > tomThresold;
+
 	if (m_playerExitCode == PEXIT_OVER_FRIENDLY_TERRITORY && isDead() == false)
+	{
 		rescuable = true;
+	}
 	else if (m_playerExitCode == PEXIT_OVER_ENEMY_TERRITORY && isDead() == false && hasBeenHit == false)
+	{
 		rescuable = true;
-	else if (isDead() && !hasBeenHit)
+	}
+	else if (isDead() && !hasBeenHit && !hasExceededTomThresold)
+	{
 		rescuable = true;
+	}
+
 	switch (m_status)
 	{
 		case _RESERVED:
@@ -1825,13 +1838,14 @@ POSTED_WEAPON::returnWeapon(bool allowOverstock, bool hasBeenHit)
 	if (returnable && rtbed == false)
 		returnable = false;
 
-	TELL_TESTER(m_commander, "processing #%u return => %s [%s, %s, %s, %s]"
+	TELL_TESTER(m_commander, "processing #%u return => %s [%s, %s, %s, %s, %s]"
 					, m_weaponSerial.serial
 					, (m_facility) ? m_facility->name : "<nowhere>"
 					, (allowOverstock ? "overstockable" : "norm")
 					, (rtbed ? "rtbing" : "non-rtb")
 					, (rescue ? "rescue" : "non-resc")
 					, (returnable ? "returnable" : "non-returnable")
+					, (hasExceededTomThresold ? "outside ToM thresold for rescue" : "within ToM thresold for rescue")
 				);
 
 	if (returnable == false)

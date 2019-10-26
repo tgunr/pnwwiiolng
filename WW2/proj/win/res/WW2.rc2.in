@@ -29,16 +29,16 @@ BEGIN
     BEGIN
         BLOCK "040904b0"
         BEGIN
-            VALUE "Comments", "Massively Multiplayer Online Game\0"
-            VALUE "CompanyName", "Playnet, Inc.\0"
-            VALUE "FileDescription", "WW2\0"
+            VALUE "Comments", "The Virtual Battlefield Does Exist . . . !\0"
+            VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC.\0"
+            VALUE "FileDescription", "World War II Online - Game Client\0"
             VALUE "FileVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"
             VALUE "InternalName", "WW2\0"
-            VALUE "LegalCopyright", "Copyright © 1999-${DATEYEAR}\0"
+            VALUE "LegalCopyright", "© 1999-${DATEYEAR} Playnet, Inc & CRS LLC. All Rights Reserved.\0"
             VALUE "LegalTrademarks", "\0"
             VALUE "OriginalFilename", "WW2.exe\0"
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "Playnet, Inc. WW2\0"
+            VALUE "ProductName", "WW2: World War II Online - Client\0"
             VALUE "ProductVersion", "${PRODUCT_VERSION_VALUE_MAJOR}.${PRODUCT_VERSION_VALUE_MINOR}.${PRODUCT_VERSION_VALUE_PATCH}.${PRODUCT_VERSION_VALUE_BUILD}\0"
             VALUE "SpecialBuild", "\0"
         END

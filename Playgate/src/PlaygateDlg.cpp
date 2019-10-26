@@ -1,6 +1,8 @@
 // PlaygateDlg.cpp : implementation file
 //
 
+#include "syscfg.h" // Path is project specific.
+
 #include "Playgate.h"
 #include "PlaygateDlg.h"
 #include "LoginData.h"

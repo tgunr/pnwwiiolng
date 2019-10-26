@@ -398,7 +398,7 @@ OBJECT*	lpobj;
 		if (!(lpobj->flags & OBJECT_NOTOBJECT))
 		{
 			obplyrOffsetObject(lpobj, loc);
-			//WriteDebug("Offset: %s", lpobj->name);
+			//Write_Debug("Offset: %s", lpobj->name);
 		}
 
 		OffsetTree(lpobj->sibling, loc);
@@ -604,7 +604,7 @@ static bool AddShadow(int numargs, FUNCARGS* args)
 	OBJECT* lpobj = obmainFindChildFromObject(lpgrp, "shadow");
 	if (lpobj == nullptr)
 	{
-		WriteDebug("Shadow object not found in model");
+		Write_Debug("Shadow object not found in model");
 		return(FALSE);
 	}
 
@@ -829,7 +829,7 @@ UINT32	T1, T2;
 
     if(!obcInit())
     {
-        WriteLog(LOG_FX, LOG_WARN, "obcInit** FAILED**");
+        Write_Log(LOG_OLD, LOG_INFO, "[obwldInit] obcInit** FAILED**");
         return FALSE;
     }
 
@@ -849,12 +849,13 @@ logTimerEndExtMacro(parseWor);
 
 #ifdef DEBUG_WW2
 	if (DebugBuildingMDLFilesOnly) {
+		Write_Debug("Done building MDL files.Bailing out."); 
 		fprintf(stderr, "Done building MDL files. Bailing out.");
 		exit(0);
 	}
 #endif
 	T2 = timeGetTime();
-	WriteLog(LOG_UI, LOG_INFO, "*****************Total time loading blitzwor.csv file: %u milliseconds", T2-T1);
+	Write_Debug ("\n\n*****************  Total time loading blitzwor.csv file: %u milliseconds\n\n", T2-T1);
 
 	// Granny2 system (needs materials loaded)
 #if defined(BETA_RELEASE)
@@ -887,7 +888,7 @@ void obwldKill()
 
 	gr2AnimKill();
 
-    WriteLog(LOG_OLD, LOG_INFO, "[obwldKill]");
+    Write_Log(LOG_OLD, LOG_INFO, "[obwldKill]");
 }
 
 LOGICAL obwldUpdate()

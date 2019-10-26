@@ -140,10 +140,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		}
 
 #if platOS == OS_WIN32
-		// Ask Windows for a default temporary path.
-		GetTempPathA(outputSize, output);
-		strncat(output, "WW2OL\\", outputSize);
-		OS_MKDIR(output);
+		wwiiolpath_string workingPath = WW2_exeWorkingPath;
+		workingPath += L"\\";
+
+		unsigned int tmp = Wstring2Char(workingPath, output, outputSize);
+		workingPath = L"";
 #else
 		strcpy(output, "/tmp/");
 #endif
@@ -358,7 +359,7 @@ void dbugInit(LogMode logMode, const char* const filename)
 
     if ( file >= 0 ) {
         dbugLog(_FLM, "%s", _OPEN_MSG);
-        dbugLog(_FLM, "Version: %s (%s%s, %s)", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, PN_build_platform_string);
+        dbugLog(_FLM, "Version: %s (%s%s, %s)\n", PN_product_version_string, PN_code_git_commitish_string, PN_data_git_commitish_string, PN_build_platform_string);
     }
 }
 

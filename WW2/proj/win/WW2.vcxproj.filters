@@ -1662,6 +1662,9 @@
     <ClInclude Include="..\..\src\imaplib\imapTypes.h">
       <Filter>imaplib</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\fio\fiostructure.h">
+      <Filter>fio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -2722,6 +2725,9 @@
     </ClCompile>
     <ClCompile Include="..\..\src\imaplib\imapKeymap.cpp">
       <Filter>imaplib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fiostructure.cpp">
+      <Filter>fio</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -39,7 +39,7 @@ enum{ ICON_MODE_NORMAL, ICON_MODE_VEHICLE_TYPE, ICON_MODE_NONE, ICON_MODE_MAX };
 
 #define MaxHandleVisDist	1500.0f		// maximum distance to see handle
 #define MaxIdVisDist		1500.0f 	// maximum distance to see vehicle id
-#define MaxRangeCircleDist	6000.0f		// maximum range on range circle
+#define MaxRangeCircleDist	4000.0f		// maximum range on range circle
 
 #define IconFadeStartDist 	100.0f 		// icon starts to fade at this distance
 #define IconFadeEndDist 	4000.0f 	// icon fully faded at this distance
@@ -177,7 +177,7 @@ UINT32 vehIconColor(vehVehicle* Vehicle)
 			IconColor = gIconFriendlyColor;
 
 		if(Vehicle->Rank == 1)
-			IconColor = colorGREENALPHA;
+			IconColor = gIconNoobColor;
 	}
 
 	return IconColor  | colorALPHA;

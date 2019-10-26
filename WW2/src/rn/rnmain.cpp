@@ -500,6 +500,14 @@ LOGICAL rnmainInit()
         bSoundEnable = FALSE;
 	}
 
+#if platOS == OS_MACOS
+        //  Macs initialise graphics in WWIIOnline a lot quicker than Windows,
+        //  so to allow the spalshscreen to be seen rather than blink in and out
+        //  on the Mac Client.
+        //  1000000us = 1 second.
+        usleep(2000000);
+#endif
+    
 	rnlogoUpdateStatus("loading.objects");
 	if (!obmainInit())
 	{
@@ -1115,7 +1123,7 @@ static void PrintDateTime()
 
     localtime_r(&p, &t);
     strftime(buf, 255, "Date and time: %F %T %z", &t);
-    Write_Debug("%s", buf);
+    Write_Debug("%s\n", buf);
 }
 
 

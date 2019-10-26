@@ -119,8 +119,12 @@ IF NOT EXIST ..\..\build\Debug\controller.exe (
 )
 
 echo.
-echo Moving the Server Binaries
-move ..\..\build\Debug\* Server\ >nul
+rem echo Moving the Server Binaries
+rem move ..\..\build\Debug\* Server\ >nul
+
+rem bootstrap.py also checks that location. If they are NOT there it FAILS.
+echo Copying the Server Binaries
+copy ..\..\build\Debug\* Server\ >nul
 echo === Complete ===
 
 echo.

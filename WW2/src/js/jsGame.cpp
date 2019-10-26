@@ -2960,6 +2960,13 @@ JSBool jsSettings::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(colorBuffer);
 		}
 		break;
+		case cfgNOOB_COLOR: // gIconNoobColor
+		{
+			char colorBuffer[8];
+			snprintf(colorBuffer, 8, "#%02x%02x%02x", piRGBA_GETRED(gIconNoobColor), piRGBA_GETGREEN(gIconNoobColor), piRGBA_GETBLUE(gIconNoobColor));
+			*val = phui::js::NewString(colorBuffer);
+		}
+		break;
 		case cfgAWS_LOW:
 		case cfgAWS_HIGH:
 		case cfgPPO_OK:
@@ -3188,6 +3195,18 @@ JSBool jsSettings::SetProperty(JSContext* ctx, int propid, jsval* val)
 			}
 		}
 		break;
+		case cfgNOOB_COLOR: // gIconNoobColor
+		{
+			const char* buffer = JS_GetStringBytes(JS_ValueToString(ctx, *val));
+			UINT32 r, g, b;
+
+			if(sscanf(buffer,"#%02x%02x%02x", &r, &g, &b) == 3)
+			{
+				gIconNoobColor = piRGB_MAKE(r, g, b);
+				cfgPrefsSetGlobal(cfgNOOB_COLOR, &gIconNoobColor, false);
+			}
+		}
+		break;
 		case cfgAWS_LOW:
 		case cfgAWS_HIGH:
 		case cfgPPO_OK:
@@ -3283,6 +3302,7 @@ JSPropertySpec jsSettings::jsproperties[] =
 	{"squadcolor",		jsSettings::SQUADCOLOR_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"missioncolor",	jsSettings::MISSIONCOLOR_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
 	{"leadercolor",		jsSettings::LEADERCOLOR_PROP,		JSPROP_READONLY | JSPROP_PERMANENT},
+	{"noobcolor",		jsSettings::NOOBCOLOR_PROP,         JSPROP_READONLY | JSPROP_PERMANENT},
 	{0}
 };
 */

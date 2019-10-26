@@ -162,6 +162,10 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.aimScalar",			&aimMouse,					    cfgPARAM_FLOAT,		1,		0,  8,      true },
     {"app.gVaue",               &gValue,                        cfgPARAM_FLOAT,     1,      1,  100,    true },
     {"app.gRate",               &gRate,                         cfgPARAM_FLOAT,     1,      1,  20,     true }
+	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
+	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
+	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true },
+	{"app.noobcolor",			&gIconNoobColor,			cfgPARAM_UINT,		1,		0,	0, true	}
 	// add more vars here
 };
 
@@ -983,11 +987,12 @@ void cfgPrefsSetDefaults()
 	g_bSoundConvertOnLoad = FALSE;
 	g_bCaptuerAllDisplays = TRUE;
 
-	gIconFriendlyColor		= colorBLUE;	// DEFAULT_FRIENDLY_COLOR
-	gIconEnemyColor			= colorRED;		// DEFAULT_ENEMY_COLOR
-	gIconSquadColor			= colorWHITE;		// DEFAULT_SQUAD_COLOR
-	gIconMissionColor		= colorCYAN;
-	gIconMissionLeaderColor = colorMAGENTA;
+	gIconFriendlyColor      = colorBLUE;    // DEFAULT_FRIENDLY_COLOR
+	gIconEnemyColor         = colorRED;     // DEFAULT_ENEMY_COLOR
+	gIconSquadColor         = colorWHITE;   // DEFAULT_SQUAD_COLOR
+	gIconMissionColor       = colorCYAN;    // DEFAULT_MISSION_COLOR
+	gIconMissionLeaderColor = colorMAGENTA; // DEFAULT_MISSION_LEADER_COLOR
+	gIconNoobColor          = colorGREEN;   // DEFAULT_NOOB_COLOR
 
 	DamageLevel			= 0;
 	FrameFactor			= 1.0f;

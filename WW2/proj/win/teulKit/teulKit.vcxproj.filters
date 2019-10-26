@@ -193,6 +193,9 @@
     <ClInclude Include="..\..\..\src\teul\raknetConn.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\fio\fiostructure.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\build_info.py" />

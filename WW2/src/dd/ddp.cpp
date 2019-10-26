@@ -1650,40 +1650,61 @@ void ddpSaveImgAsBitmap(unsigned char* img, int w, int h, wchar_t* filename)
     capSave(img, w, h, filename);
 }
 
+int checkFile(wwiiolpath_string targetFile) {
+	int Result = -10;
+
+#if platOS == OS_WIN32
+	//  The function returns -1 if the named file does not exist or does not have the given mode. Mode 0 = Test Exists Only.
+	Result = _waccess(targetFile.c_str(), 0);
+
+#else
+	char targetFileChar[MAX_PATH] = "";
+	Wstring2Char(targetFile, targetFileChar, MAX_PATH);
+
+	//  The function returns -1 if the named file does not exist or does not have the given mode. Mode 0 = Test Exists Only.
+	Result = _access(targetFileChar, 0);
+#endif
+
+	return Result;
+}
+
 static void glScreenCapture(void) {
 	// TODO: Switch file stuff to fio
 	// TODO: Switch to writeBMPImage()
-#if platOS == OS_WIN32 // HACK
+	// TODO: Add UI and Save/Restore elements to allow the user to change the Screen Shots destination Folder.
+
 	#define topathstr std::to_wstring
-	#define checkfile _waccess
+	//  wwiiolpath_string base_fileName = WW2_userDocumentsPath + OS_PATHSEP_WC + L"ScreenShots" + OS_PATHSEP_WC;
+	wwiiolpath_string base_fileName = WW2_userScreenShotsPath + OS_PATHSEP_WC;
+	wwiiolpath_string fileTimeStamp = SQL_DateTimeStamp(true);
+	wwiiolpath_string fileName = L"";
+	int shotCount = 0;
 
-	std::basic_string<fullpath_t> base_filename(UserDataPath);
-#else
-	#define topathstr std::to_string
-	#define checkfile _access
+	if (checkFile(base_fileName) == -1)  //  Does not exist.
+	{
+		base_fileName = WW2_userDocumentsPath + OS_PATHSEP_WC;
+	}
 
-	std::basic_string<fullpath_t> base_filename;
-#endif
+	base_fileName += L"SShot_";
+	fileName = base_fileName + fileTimeStamp + L".bmp";
 
-	base_filename += PATHLit("SShot");
+	//  Chech to ensure the filename is unique.
+	if ( checkFile(fileName) == 0 )  //  Exists.
+	{
+		shotCount = 1;
+		do {
+			fileName = base_fileName + fileTimeStamp + L"_" + topathstr(shotCount++) + L".bmp";
 
-	std::basic_string<fullpath_t> filename;
-	int shotCount = 1;
-	do {
-		if ( shotCount > 1000 )
-			return;
-		filename = base_filename + topathstr(shotCount++) + PATHLit(".bmp");
-	} while ( checkfile(filename.c_str(), 0) == 0 );
-
+		} while (checkFile(fileName) == 0);
+	}
+	
+	#undef topathstr
+	
 	UCHAR* bitmap = (UCHAR*)memAlloc(ddpGetWidth() * ddpGetHeight()* 3);
 	if ( bitmap == nullptr )
 		return;
 	glReadPixels(0, 0, ddpGetWidth(), ddpGetHeight(), GL_RGB, GL_UNSIGNED_BYTE, bitmap);
-	// Cap save will release the bitmap memory.
-	capSave(bitmap, ddpGetWidth(), ddpGetHeight(), filename.c_str());
-
-	#undef topathstr
-	#undef checkfile
+	capSave(bitmap, ddpGetWidth(), ddpGetHeight(), fileName.c_str());
 }
 
 LOGICAL ddcapStart()

@@ -35,7 +35,7 @@
 #include "teul/teulTime.h"
 #include "weap/weapSpawnXML.h"
 #include "wwii/wwiiConfig.h"
-#include "fio/fiod.h"                                           // for fiodGetPrepath()
+//  #include "fio/fiod.h"        // for fiodGetPrepath()  --  27-June-2019. No longer required  Seems to only cause build errors in the hosts. MJH.
 
 static SpawnLoader spawnLoader;
 

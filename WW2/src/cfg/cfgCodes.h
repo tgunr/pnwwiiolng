@@ -92,6 +92,7 @@ enum _cfgPARAMS
     cfgAIM_ADJUST,
     cfgGValue,
     cfgTurRate,
+	cfgNOOB_COLOR,
 	// add more vars here
 	cfgNUM_TOTAL_PARAMS
 };
@@ -266,7 +267,8 @@ enum _INTEGER_DEFAULTS
 	cfgDEFAULT_FSSA_SAMPLES,
 	cfgDEFAULT_UPDATE_RATE,
 	cfgDEFAULT_NETWORK_ROUTE,
-	cfgNUM_DEFAULT_INTEGERS
+	cfgNUM_DEFAULT_INTEGERS,
+	cfgDEFAULT_NOOB_COLOR
 };
 
 enum _FLOAT_DEFAULTS

@@ -47,6 +47,26 @@ int fioaAddArchive(const char* archive)
 	return paOpen(fioa.pf, archive, "rb");
 }
 
+int fioaAddArchive(wwiiolpath_string archive)
+{
+	if (PN_UNLIKELY(fioaMutex == nullptr))
+		fioaMutex = systhreadMutexCreate();
+
+	if (PN_UNLIKELY(fioa.pf == nullptr))
+	{
+		fioa.pf = paAlloc();
+		if (PN_UNLIKELY(fioa.pf == nullptr))
+			return -1;
+	}
+
+	char buffer[MAX_PATH + 1] = "";
+	unsigned int ret = Wstring2Char(archive, buffer, sizeof(buffer));
+
+	ret = paOpen(fioa.pf, buffer, "rb");
+
+	return ret;
+}
+
 /************************************************************************************************
 	fioaKill
 *************************************************************************************************/

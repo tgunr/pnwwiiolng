@@ -14,77 +14,46 @@
 #ifdef EVENT_LOG
 
 static std::mutex logLock;
-static SINT32 gLogLevelOnly = LOG_NONE;
-static UINT32 glogMaskOnly = LOG_NONE;
-LOGICAL gLogDuplicates = FALSE;
-
 #ifdef DEBUG_WW2
-static UINT32 logMask = LOG_WEAPON;
-static SINT32 logLevel = LOG_DEBUG;
+static UINT32 logMask = LOG_ALL;
+static SINT32 logLevel = LOG_INFO;
 #else
-static UINT32 logMask = LOG_NONE;
-static SINT32 logLevel = LOG_NONE;
+static UINT32 logMask = LOG_ERROR;
+static SINT32 logLevel = LOG_FATAL;
 #endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
-static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker);
-static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr);
 
-struct {
-    const char* prevFile = "";
-    int prevLine = 0;
-    uint count = 0;
-} prevLog ;
-
-//int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
-// dbugWrite: Same as dbugLog but has its own logging level. Don't know why this exists.
-//SINT32 _dbugWrite(const char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
-
-//#define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
-//#define dbugWrite(m, fmt, ...) _dbugWrite(m, fmt, ## __VA_ARGS__)
+static const char* LOG_SYSTEM_NAMES[32] =
+{
+	"old",
+	"terrain",
+	"weap",
+	"fps",
+	"render",
+	"sound",
+	"ui",
+	"vehicle",
+	"physics",
+	"comm",
+	"fx",
+	"timer",
+    "texture",
+	"console",
+    "ERROR",
+	// NULLS the rest out
+};
 
 /************************************************************************************************
-	Write_Where
+	Write_Log
 *************************************************************************************************/
-void Write_Where(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, ...) {
-    const char* pstr;
-    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
-        switch (prevLog.count) {
-            case 0:
-                pstr = str;
-                prevLog.count += 1;
-                va_list marker;
-                va_start(marker, str);
-                logw(file, line, function, system, level, str, marker);
-                va_end(marker);
-                break;
-            case 1:
-                pstr = "REPEATED";
-                prevLog.count += 1;
-                logwstr(file, line, function, system, level, pstr);
-                break;
-            default:
-                prevLog.count += 1;
-                return;
-        }
-    } else {
-        prevLog.count = 1;
-        va_list marker;
-        va_start(marker, str);
-        logw(file, line, function, system, level, str, marker);
-        va_end(marker);
-    }
-    prevLog.prevFile = file;
-    prevLog.prevLine = line;
-}
 
-// Write log message according to system and level
 void Write_Log(UINT32 system, SINT32 level, const char* str, ...)
 {
 	va_list marker;
 
 	va_start(marker, str);
-	logv(system, level, str, marker);
+	logv(system,level,str, marker);
 	va_end(marker);
 }
 
@@ -112,35 +81,8 @@ void Set_Log_Level(SINT32 level)
 	std::lock_guard<std::mutex> guard(logLock);
 
 	logLevel = level;
-    dbugSetLogLevel(level);
 }
 
-/************************************************************************************************
-	Set_Log_Mask
- *************************************************************************************************/
-
-void Set_Log_Mask(const char* system)
-{
-    int i;
-    
-    if(!strcmp("all", system)) {
-        logMask = LOG_ALL;
-        return;
-    }
-    else if(!strcmp("none", system)) {
-        logMask = LOG_NONE;
-        return;
-    }
-    
-    for(i = 0; i < 31; i++)
-    {
-        if(LOG_SYSTEM_NAMES[i] == nullptr)
-            break;
-        
-        if(!strcmp(LOG_SYSTEM_NAMES[i], system))
-            logMask = (1 << i);
-    }
-}
 
 /************************************************************************************************
 	Write_Debug
@@ -208,122 +150,6 @@ UINT32 Get_Log_Mask()
 	return logMask;
 }
 
-static void logdup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
-    char buf[wheresize + 1]; // note +1 for terminating null byte
-    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
-    vprintf(buf, marker);
-    printf("\n");
-}
-
-
-//static void logww(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
-//{
-//    if(gLogLevelOnly && glogMaskOnly) {
-//        if (gLogLevelOnly == level && (system & glogMaskOnly))
-//            logwI(file, line, function, system, level, str, marker);
-//    } else {
-//        if (logLevel < level || !(system & logMask))
-//            return;
-//        else
-//            logwI(file, line, function, system, level, str, marker);
-//    }
-//}
-
-// Do not log if the message is same as previous message as defined by file and line number
-static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
-    char buf[wheresize + 5]; // + 4 just in case str is empty and we hit case 1, + 1 for terminating null byte
-    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
-        switch (prevLog.count) {
-            case 0: // first time for this log message file and line number
-                snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
-                prevLog.count += 1;
-                goto printLog;
-            case 1: // second time for this log message, truncate to indicate repeated log
-                snprintf(buf, sizeof buf, "%s:%d: %s: ...", file, line, function);
-                prevLog.count += 1;
-                goto printLog;
-            default: // third and subsequent times, just return, no log message printed
-                prevLog.count += 1;
-                return;
-        }
-    } else { // log message has changed, reset count for next message test
-        snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
-        prevLog.count = 0;
-    }
-printLog:
-    vprintf(buf, marker);
-    printf("\n");
-    prevLog.prevFile = file;
-    prevLog.prevLine = line;
-}
-
-static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
-{
-    if(gLogLevelOnly && glogMaskOnly) {
-        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
-            goto logwhere;
-    } else {
-        if (logLevel < level || !(system & logMask))
-            return;
-        else
-            goto logwhere;
-    }
-
-logwhere:
-    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
-    char buf[wheresize + 1]; // note +1 for terminating null byte
-    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
-    printf("%s\n", buf);
-}
-
-// Log where the log message originated
-static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-    if(gLogLevelOnly && glogMaskOnly) { // are we logging only a certain level and mask?
-        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
-            goto logwhere;
-    } else {
-        if (logLevel < level || !(system & logMask))
-            return;
-        else
-            goto logwhere;
-    }
-logwhere:
-    if(gLogDuplicates)
-        logdup(file, line, function, system, level, str, marker);
-    else
-        lognodup(file, line, function, system, level, str, marker);
-}
-
-#if platOS == OS_MACOS
-
-/************************************************************************************************
-	logv
-*************************************************************************************************/
-
-static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
-{
-	if(logLevel < level || !(system & logMask)) return;
-
-	vprintf(str, marker);
-	printf("\n");
-}
-
-LOGICAL Open_Debug(const char* filename)
-{
-	return TRUE;
-}
-
-void Close_Debug()
-{
-}
-
-#elif platOS == OS_WIN32
-
 #include "include/vars.h"
 
 static FILE *ofp = nullptr;
@@ -332,26 +158,35 @@ static FILE *ofp = nullptr;
 	Open_Debug
 *************************************************************************************************/
 
+static LOGICAL Open_Debug_Unlocked(const char* filename)
+{
+    if (filename == nullptr) {
+        return false;
+    }
+
+    if (ofp != nullptr) {
+        return true;
+    }
+    ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
+    if (ofp == nullptr) {
+        return false;
+    }
+    return true;
+}
+
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == nullptr) {
-		return false;
-	}
-
-	{
-		std::lock_guard<std::mutex> guard(logLock);
-
-		if (ofp != nullptr) {
-			return true;
-		}
-		ofp = fioUserFile((std::string(filename) + ".log").c_str(), "w");
-		if (ofp == nullptr) {
-			return false;
-		}
-	}
-
-	WriteDebug("\r\nDebug Message System Open.\r\n");
-	return true;
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+        if (filename == nullptr) {
+            return false;
+        }
+        if (!Open_Debug_Unlocked(filename)) {
+            return false;
+        }
+    }
+    Write_Debug("Debug Message System Open - %s.\n", filename);
+    return true;
 }
 
 /************************************************************************************************
@@ -371,39 +206,80 @@ void Close_Debug()
 /************************************************************************************************
 	logv
 *************************************************************************************************/
+static void _log_outv(const char * const format, va_list args)
+{
+#ifdef DEBUG_WW2
+    vfprintf(stderr, format, args);
+    fflush(stderr);
+#endif
+
+    if (ofp != nullptr) {
+        vfprintf(ofp, format, args);
+        fflush(ofp);
+    }
+}
+
+static void _log_outf(const char * const format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    _log_outv(format, args);
+    va_end(args);
+}
+
+// Borrowed from dbug.cpp
+// TODO FIXME: Make this a global utiltiy
+static void _getCurrentTime(struct tm &tm, uint32_t &millis)
+{
+	auto now = std::chrono::system_clock::now();
+	time_t nowTime = std::chrono::system_clock::to_time_t(now);
+	auto nowRounded = std::chrono::system_clock::from_time_t(nowTime);
+
+	// If the time value was rounded upward instead of truncated or rounded down,
+	// adjust for the rounding.
+	if (nowRounded > now) {
+		--nowTime;
+		nowRounded -= std::chrono::seconds(1);
+	}
+
+	localtime_r(&nowTime, &tm);
+	millis = std::chrono::duration_cast<std::chrono::duration<uint32_t, std::milli>>(now - nowRounded).count();
+}
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	std::lock_guard<std::mutex> guard(logLock);
+    if (system != LOG_ERROR) { // "error" system is never ignored
+        std::lock_guard<std::mutex> guard(logLock);
 
-	if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
-		return;
-	}
+        if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
+            return;
+        }
+    }
 
-	// There's no OutputDebugFormat(), so we fake vasprintf()
-	size_t len = static_cast<size_t>(_vscprintf(str, marker));
-	if (len >= INT_MAX) { return; }
-	std::unique_ptr<char[]> buf = std::make_unique<char[]>(len + 1);
-	vsnprintf_s(buf.get(), len + 1, _TRUNCATE, str, marker);
+	UINT32 milis;
+	struct tm myTm;
+	_getCurrentTime(myTm, milis);
+	char myTime[49];
+	char myYear[10];
 
-#ifdef DEBUG_WW2
-	// Output to debugger always
-	OutputDebugStringA(buf.get());
-	OutputDebugStringA("\r\n");
+	strftime(myTime, sizeof(myTime) - 1, "%a %b %d %X", &myTm);
+    strftime(myYear, sizeof(myYear) - 1, "%Y", &myTm);
 
-	// Output to stderr always
-	fprintf_s(stderr, "%s\n", buf.get());
-	fflush(stderr);
-#endif
+    char *cbuf = nullptr;
+    vasprintf(&cbuf, str, marker);
+    std::unique_ptr<char[], std::function<void(void*)>> buf(cbuf, free);
 
-	// Output to file, if any
-	if (ofp != nullptr) {
-		fprintf_s(ofp, "%s\n", buf.get());
-		fflush(ofp);
-	}
+    {
+        std::lock_guard<std::mutex> guard(logLock);
+
+        // For errors, we don't care whether it's a debug/beta/alpha client or
+        // whether logs weren't requested; we need to log these always.
+        if (system == LOG_ERROR && ofp == nullptr) {
+            Open_Debug_Unlocked(SYS_TITLE); // TODO: The name should not be hardcoded in this specific location
+        }
+        _log_outf("[%s.%03u %s] %s\n", myTime, milis, myYear, buf.get());
+    }
 }
-
-#endif // OS_WIN32
 
 #ifdef USE_LOG_TIMER
 /************************************************************************************************
@@ -414,22 +290,18 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 
 #define MAX_TIMERS 1024
 
-#if platOS == OS_WIN32
-extern FLOAT32 GetCPUSpeed();
-#endif
-
 struct logTimer
 {
 	char funcname[128];
 	int callcount; // to handle recursion
-	SINT32 starttime;
-	SINT32 tottime[10]; // last 10 totaltimes
+	UINT64 starttime;
+	UINT64 tottime[10]; // last 10 totaltimes
 };
 
 struct logTimerStat
 {
 	const char* funcname;
-	SINT32 tottime;
+	UINT64 tottime;
 };
 
 static logTimer logTimers[MAX_TIMERS];
@@ -458,7 +330,7 @@ void logTimerReset()
 
 		timer->callcount = 0;
 		timer->starttime = 0;
-		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT32));
+		memmove(&timer->tottime[1], &timer->tottime[0], 9 * sizeof(SINT64));
 		timer->tottime[0] = 0;
 	}
 }
@@ -500,7 +372,7 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	if(timer)
 	{
 		if(timer->callcount == 0)
-			timer->starttime = piReadTimeStamp32();
+			timer->starttime = piReadTimeStamp64();
 
 		timer->callcount++;
 	}else
@@ -513,9 +385,9 @@ void logTimerBegin(const char* parent, const char* child, int* timerid)
 	logTimerEnd
 *************************************************************************************************/
 
-int logTimerEnd(int timerid)
+UINT64 logTimerEnd(int timerid)
 {
-	int dt = 0;
+	UINT64 dt = 0;
 
 	if(timerid > -1 && timerid < MAX_TIMERS)
 	{
@@ -525,7 +397,7 @@ int logTimerEnd(int timerid)
 
 		if(timer->callcount == 0)
 		{
-			dt =  piReadTimeStamp32() - timer->starttime;
+			dt =  piReadTimeStamp64() - timer->starttime;
 			timer->tottime[0] += dt;
 		}
 	}
@@ -551,8 +423,8 @@ static int logTimerStatCompar(const void* v1, const void* v2)
 
 void logTimerPrint(int maintimerid, int frameidx)
 {
-	int i, numTimers;
-	SINT32 totaltime = 0;
+	size_t i, numTimers;
+	UINT64 totaltime = 0;
 	logTimer* timer;
 	logTimerStat* sortTime;
 
@@ -591,8 +463,8 @@ void logTimerPrint(int maintimerid, int frameidx)
 
 		if(sortTime->tottime > 0)
 		{
-			WriteLog(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
-						(sortTime->tottime / (FLOAT32)totaltime) * 100.0f);
+			Write_Log(LOG_TIMER, LOG_INFO, "%s: %.2f ms %.2f%%", sortTime->funcname, logTimerToMs(sortTime->tottime),
+						(sortTime->tottime / (FLOAT64)totaltime) * 100.0f);
 
 		}
 	}
@@ -602,17 +474,9 @@ void logTimerPrint(int maintimerid, int frameidx)
 	logTimerToMs
 *************************************************************************************************/
 
-float logTimerToMs(int dt)
+float logTimerToMs(UINT64 dt)
 {
-#if platOS == OS_WIN32
-	static FLOAT32 cpuSpeed = -1;
-	if(cpuSpeed < 0)
-		cpuSpeed = GetCPUSpeed() * 1000000.0f;
-
-	return dt / cpuSpeed * 1000.f;
-#elif platOS == OS_MACOS
 	return dt / 1000.0f;
-#endif
 }
 #endif //#ifdef USE_LOG_TIMER
 #endif // EVENT_LOG

@@ -62,6 +62,8 @@ Chat::ClientMessage::packer(PackMode mode, ACTION_OBJECT* a)
 
 	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_uiTarget, 0);
 
+	a->offset = teulPackSINT32(mode, a->packed, a->offset, &g_latestPing, 0);
+
 	return a->offset;
 }
 

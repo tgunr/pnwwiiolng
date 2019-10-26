@@ -10,19 +10,26 @@
 #include "phui/GraphicsContext.h"
 #include "phui/Util.h"
 
+#include "chat/chatClientMessages.h"
+#include "fio/fio.h"
+#include "fp/fpFPS.h"
 #include "gl/glplat.h"
 #include "imaplib/imapTypes.h"
-#include "ui/uiMain.h"
-#include "ui/uiKeymap.h"
 #include "imap/ww2func.h"
 #include "imap/ww2imap.h"
 #include "imap/iac.h"
 #include "js/jsGame.h"
 #include "js/jsKeymap.h"
+#include "pers/persmain.h"
+#include "tut/TutorialManager.h"
+#include "ui/uiMain.h"
+#include "ui/uiKeymap.h"
 
 /************************************************************************************************
 	uiKeymap
 *************************************************************************************************/
+
+bool _ingamekeymapperon	= false;
 
 class ImapPeriodical : public phui::Periodical
 {
@@ -617,4 +624,69 @@ bool JoystickCalibView::MouseDrag (float dragx, float dragy, int button, bool st
 	ww2KeymapSetJoysickCalibration(iac, deadband, fullband, x, y);
 
 	return true;
+}
+
+/************************************************************************************************
+	uiMapToggleIngameKeymapper
+*************************************************************************************************/
+
+UINT32 uiMapToggleIngameKeymapper(SINT32 keyState,  UINT32 functionNum, UINT32 data)
+{
+	if(!keyState)
+		return 0;
+
+	_ingamekeymapperon = !_ingamekeymapperon;
+
+	if(persIsCrewDead())
+		_ingamekeymapperon = false;
+
+	phui::View* _ingamekeymapper = uiViewport()->FindView("ingamekeymapper");
+
+	if(_ingamekeymapperon)
+	{
+		if(!_ingamekeymapper)
+			_ingamekeymapper = uiLoadView("ingamekeymapper", true, false);
+
+		fpFPSMapState(TRUE);
+		uiSetCursor(1);
+
+		_ingamekeymapper->Show();
+	}
+	else
+	{
+		fpFPSMapState(FALSE);
+
+		if(_ingamekeymapper)
+			uiMapHideIngameKeymapper();
+	}
+
+	uiGC();
+
+	return 0;
+}
+
+/************************************************************************************************
+	uiMapHideIngameKeymapper
+*************************************************************************************************/
+
+void uiMapHideIngameKeymapper(bool close)
+{
+	phui::View* _ingamekeymapper	= uiViewport()->FindView("ingamekeymapper");
+
+	if(_ingamekeymapper)
+	{
+		_ingamekeymapper->Hide();
+
+		uiSetCursor(0);
+
+		if(close || fioQuery() == ISDIRECTORY)
+		{
+			_ingamekeymapper->Close();
+			_ingamekeymapper = nullptr;
+		}
+	}
+
+	uiGC();
+
+	_ingamekeymapperon = false;
 }

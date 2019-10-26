@@ -4,7 +4,7 @@
 #pragma once
 #include "afxwin.h"
 
-#include "../src/dx/dx3dinfo.h"
+#include "dx3dinfo.h"
 
 // CsettingsDlg dialog
 class CsettingsDlg : public CDialog
@@ -40,12 +40,17 @@ protected:
     void _initGlew();
     void _setVideoCard();
     void _setResolution();
-    void _kill();
+/*  HDPI CheckBox - Disabled; MJH 2019-03-07
+	void _getHiDPI();
+	void _setHiDPI();
+*/
+	void _kill();
     void _adjustOK();
     void _adjustCancel();
     void _setNetwork();
     void _setSoundCard();
     void _saveDialogValues();
+	int getWindowsVersion();
 
 public:
     afx_msg void OnCbnSelchangeComboLanguages();
@@ -57,6 +62,7 @@ public:
     //afx_msg void OnBnClickedCheckRunSse2();
     afx_msg void OnCbnSelchangeComboNetwork();
     afx_msg void OnCbnSelchangeComboSoundCard();
+//	afx_msg void OnBnClickedCheckHiDPI();  HDPI CheckBox - Disabled; MJH 2019-03-07
 
 private:
     CComboBox _language;
@@ -64,12 +70,20 @@ private:
     CComboBox _resolution;
     CComboBox _network;
     CComboBox _soundcard;
+//	CButton _hidpi;  HDPI CheckBox - Disabled; MJH 2019-03-07
 
     //CButton _runsse2;
 
     CBitmap _background;
 
-    std::vector<std::wstring> displays;
+	struct videoDisplay {
+		DWORD indexNumber;
+		std::wstring deviceName;
+		std::wstring deviceString;
+		std::wstring displayName;
+	};
+
+	std::vector <videoDisplay> displayList;
 
     CFont font;
 };

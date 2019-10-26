@@ -47,6 +47,7 @@ _findVehicleByPlayerID(const playerid_t playerID)
 		return nullptr;
 
 	const Player* player = (Player*)(psn->localInfo);
+
 	if ( player == nullptr )
 		return nullptr;
 

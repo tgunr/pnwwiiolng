@@ -24,25 +24,23 @@ static SINT32 fio_switch;
 
 void fioInit()
 {
+    LOGICAL resultValue = FALSE;
+    
+    resultValue = fioStructureInit();
+    
+    // Default to current directory
 #if platOS == OS_WIN32
-	// Default to current directory
-	std::wstring path = L".";
+    
+    //  \User -> My Documents -> WWIIOnline
+    //  resultValue = fioStructureInit();
+    resultValue = SetCurrentDirectoryW(WW2_userDocumentsPath.c_str());
 
-	// TODO: Switch to FOLDERID_RoamingAppData
-	wchar_t *docsPath = nullptr;
-	if ( SUCCEEDED(SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_SIMPLE_IDLIST | KF_FLAG_CREATE, nullptr, &docsPath)) ) {
-		path = docsPath;
-		path += L"\\Battleground Europe\\"; // TODO: Switch to WWIIOL
-		CoTaskMemFree(docsPath);
-	}
-
-	strsafecpy(UserDataPath, path.c_str());
-
-	// Ensure our subdirectory exists
-	CreateDirectory(UserDataPath, nullptr);
 #elif platOS == OS_MACOS
-	// TODO: Need a Mac guy to verify this will work nicely
-	strsafecpy(UserDataPath, macDocumentsPath());
+    
+    //  /Users -> "currentuser" -> Documents -> WWIIOnline
+    //  resultValue = fioStructureInit();
+    //  resultValue = fioSetCurrentWorkingPath(WW2_userDocumentsPath);
+
 #endif
 }
 
@@ -65,7 +63,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	// Assess the file size, assume fioFileSize will
 	// report any errors locating the file etc.
-	SINT32 fileSize = fioFileSize(filename);
+	UINT32 fileSize = fioFileSize(filename);
 	if ( PN_UNLIKELY(fileSize < 0) )
 	{
 		return false;
@@ -127,18 +125,23 @@ int fioOpen(const char* const filename)
 
 	switch(fio_switch)
     {
-		case ISUSERDIRECTORY:
-			WITH ( UsingUserdir() )
-				fd = fiodOpen(fn);
-		break;
-        case ISDIRECTORY:
-       	default:
-			fd = fiodOpen(fn);
-       	break;
+        //  ISARCHIVE = 1: virtual directory (playarc = WW2_exePlayarcPath).
         case ISARCHIVE:
-			fd = fioaOpen(fn);
-       	break;
-    }
+            fd = fioaOpen(fn);
+       		break;
+
+		//  ISUSERDIRECTORY = 2: local "user" directory (WW2_userDocumentsPath = My Documents -> WWIIOnline).
+		case ISUSERDIRECTORY:
+			WITH(UsingUserdir())
+				fd = fiodOpen(fn);
+			break;
+
+		//  ISDIRECTORY = 0: local directory (WantDataDir - Want to run out of a Data directory. Set by commandline).
+		case ISDIRECTORY:
+		default:
+			fd = fiodOpen(fn);
+			break;
+	}
 
     return fd;
 }
@@ -150,12 +153,22 @@ int fioOpen(const char* const filename)
 FILE* fioUserFile(const char* filename, const char* mode)
 {
 	fullpath_t path[PN_MAX_PATH];
-	WITH ( UsingUserdir() )
-		GetFullPath(path, filename);
+
+	wchar_t tmpFilename[PN_MAX_PATH];
+	wwiiolpath_string tmpPath = WW2_exeWorkingPath;
+
+	mbstowcs(tmpFilename, filename, PN_MAX_PATH);
 	
 #if platOS == OS_WIN32 && defined(_UNICODE)
-	return _wfopen(path, UTF16(mode));
+    tmpPath += L"\\";
+    tmpPath += tmpFilename;
+
+    return _wfopen(tmpPath.c_str(), UTF16(mode));
 #else
+    tmpPath += L"/";
+    tmpPath += tmpFilename;
+
+    Wstring2Char(tmpPath, path, PN_MAX_PATH);
 	return fopen(path, mode);
 #endif
 }
@@ -687,7 +700,7 @@ namespace Fio
 
 	//////////////////////////////////////////////////////////////////////
 	// Return the name of the standard log file.
-   const char* LogFileName() { return "WW2_Log.txt"; }
+	const char* LogFileName() { return "WW2_Log.txt"; }
 
 	//////////////////////////////////////////////////////////////////////
 	// Return a FILE* to the unified log file
@@ -699,13 +712,25 @@ namespace Fio
 	void DeleteLogFile()
 	{
 		fullpath_t path[PN_MAX_PATH];
-		WITH ( UsingUserdir() )
-			GetFullPath(path, Fio::LogFileName());
-#if platOS == OS_WIN32
-		_wunlink(path);
+
+		wchar_t tmpFilename[PN_MAX_PATH];
+		wwiiolpath_string tmpPath = WW2_exeWorkingPath;
+
+		mbstowcs(tmpFilename, Fio::LogFileName(), PN_MAX_PATH);
+
+#if platOS == OS_WIN32 && defined(_UNICODE)
+		tmpPath += L"\\";
+		tmpPath += tmpFilename;
+
+		_wunlink(tmpPath.c_str());
 #else
+		tmpPath += L"/";
+		tmpPath += tmpFilename;
+        Wstring2Char(tmpPath, path, PN_MAX_PATH);
+
 		unlink(path);
 #endif
 	}
+
 
 };	// end namespace Fio

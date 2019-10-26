@@ -6,6 +6,7 @@ static_assert( platBuild != BUILD_SERVER, "Can't include vars.h in a server buil
 
 #include "pi/pi.h"
 #include "include/defs.h"
+#include "fio/fiostructure.h"
 
 // These are configuration variables that are filled
 // from the .CFG file. Corresponding information
@@ -175,8 +176,27 @@ extern LOGICAL			g_bSoundConvertOnLoad;// convert audio data to best format when
 
 extern LOGICAL			g_bCaptuerAllDisplays;// capture all displays or just the game display (Mac OS X only currently)
 
-extern fullpath_t DataPath[_MAX_PATH];
-extern fullpath_t UserDataPath[_MAX_PATH];
+//  MJH =====
+extern LOGICAL				WantedCopyOldSetup;			//  DEF = TRUE -- Look for and copy the old BGE setup files (IF FOUND) to the New WWIIOnline folder.
+extern wwiiolpath_string	WantedDataPath;				//  DEF = L"" -- SET by the command line - ENABLED by WantDataDir = True < OR > is a Nul String L"".
+extern wwiiolpath_string	WWIIOnlineDirName;			//  DEF = L"WWIIOnline" -- The ROOT folder for the game install - .\WWIIOnline
+
+extern wwiiolpath_string	WW2_exePath;				//	Windows - EXE ROOT folder:  \Program * Files -> CRS -> WWIIOnline == *.exe, WWIIOnline.ico, readme.*, unins*.* (uninstaller), *.tkt, *.script, bin(dir), DATA(dir), docs(dir), playarc(dir).
+														//	macOS - EXE ROOT folder:  /Applications -> World War II Online.app == Contents -> _CodeSignature(dir), Frameworks(dir), MacOS(dir -> exefile), Resources(dir) info.plist, PkgInfo.
+extern wwiiolpath_string	WW2_exeDataPath;			//	EXE Support Data folder:  \Program * Files -> CRS  -> WWIIOnline -> DATA == DirectXRedist(dir), loc(dir), playgate(dir), RuntimeLibraries(dir). 
+extern wwiiolpath_string	WW2_exeDocsPath;			//	Windows - EXE Docs Folder:  \Program * Files -> CRS  -> WWIIOnline -> docs == eula.txt, license.*, regions.txt, tos.txt.
+														//	macOS - EXE Docs Folder:  /Applications -> World War II Online.app -> Contents -> Resources -> docs == eula.txt, license.*, regions.txt, tos.txt.
+extern wwiiolpath_string	WW2_exePlayarcPath;			//	Windoes - EXE playarc folder:  \Program * Files -> CRS  -> WWIIOnline -> playarc == playarc??.ww2  --OR--  == "-data" command line switch.
+														//	macOS - EXE playarc folder:  /Applications -> World War II Online.app -> Contents -> Resources == playarc.ww2.
+extern wwiiolpath_string	WW2_exeWorkingPath;			//	Windows - EXE Working folder:  \ProgramData -> WWIIOnline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+														//	macOS - EXE Working folder:  /Users -> "currentuser" -> Library -> Application Support -> com.corneredrats.wwiionline == ftplog.txt, downloaded patches, WWIIOL.log, *.log.
+extern wwiiolpath_string	WW2_userDocumentsPath;		//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+														//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline == wwiiol.xml, cfml(dir).
+extern wwiiolpath_string	WW2_userScreenShotsPath;	//	Windows - USER Config ROOT folder:  \User -> My Documents -> WWIIOnline -> screenshots == SShot*.bmp.
+														//	macOS - USER Config ROOT folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> screenshots == SShot*.bmp.
+extern wwiiolpath_string	WW2_userWorkingPath;		//	Windows - USER Working folder:  \User -> My Documents -> WWIIOnline -> bin == lg.dat.
+														//	macOS - USER Working folder:  /Users -> "currentuser" -> Documents -> WWIIOnline -> bin == lg.dat.
+//  =========
 
 extern FLOAT32			FieldOfView;		// FOV in degrees
 extern FLOAT32			HorizontalFieldOfView;
@@ -230,6 +250,7 @@ extern UINT32			gIconEnemyColor;			// Icon color for enemy players
 extern UINT32			gIconSquadColor;			// Icon color for squad mates
 extern UINT32			gIconMissionColor;          // Icon color for mission mates
 extern UINT32			gIconMissionLeaderColor;    // Icon color for mission leader
+extern UINT32			gIconNoobColor;             // Icon color for new players
 
 extern UINT32			gLanguage;					// Language used for localization
 
@@ -252,7 +273,8 @@ extern LOGICAL			NoBlitzWorPreload;			// don't preload blitz.wor
 extern LOGICAL			NoInfPreload;				// don't preload infantry
 extern LOGICAL          g_bBuildMDLS;               // Build MDLS for archives.
 extern LOGICAL          g_buildTerrain;             // Build SDMs for archives.
-extern LOGICAL          g_logDebug;                 // Enable/Disable global logging
+extern LOGICAL          WantRequiredTraining;		// Want The Basic Tutorials to be Required - MJH (DEV-1999: Remove basic graduation tutorial restriction.)
+
 extern LOGICAL          g_log_comm;					// turn on logging for LOG_COMM
 extern LOGICAL          g_log_fps;					// turn on logging for LOG_FPS
 extern LOGICAL          g_log_weap;					// turn on logging for LOG_WEAPON

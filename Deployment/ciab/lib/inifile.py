@@ -87,10 +87,11 @@ _ini_spec = [
         Comment('Other paths'),
         Field('log_path', pathname('%(playnet_path)s', 'tmp')),
         Field('wwiiol_path', pathname('%(playnet_path)s', 'wwiiol')),
+        Field('scripts_path', pathname('%(playnet_path)s', 'scripts')),
         Field('data_path', pathname('%(wwiiol_path)s', 'data')),
         Field('uweb_path', pathname('%(wwiiol_path)s', 'uweb', 'debug')),
         Field('lua_path', pathname('%(wwiiol_path)s', 'lua')),
-        Field('ww2_path', '\"C:\Program Files (x86)\CRS\Battleground Europe\WW2.exe\"'),
+        Field('ww2_path', '\"C:\Program Files (x86)\CRS\WWIIOnline\WW2.exe\"'),
 ]
 
 

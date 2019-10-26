@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -64,34 +62,34 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_WWII_ICON           ICON                    "res\\wwii1.ico"
+IDI_WWII_ICON           ICON                    "..\\..\\Installer\\ww2assets\\oswin\\WWIIOnline.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Dialog
 //
 
-IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 232, 231
+IDD_SETTINGS_DIALOG DIALOGEX 0, 0, 285, 206
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_APPWINDOW
 CAPTION "settings"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    COMBOBOX        IDC_COMBO_LANGUAGES,13,20,65,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_NETWORK,90,20,135,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_VIDEO_CARD,25,70,182,62,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    COMBOBOX        IDC_COMBO_RESOLUTION,25,100,84,62,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Video Card",IDC_STATIC_VIDEO_CARD,27,60,74,8
-    GROUPBOX        "Video",IDC_STATIC_VIDEO,15,45,210,79
-    LTEXT           "Resolution",IDC_STATIC_RESOLUTION,28,90,85,8
-    GROUPBOX        "Sound",IDC_STATIC_SOUND,15,126,210,56
-    LTEXT           "Sound Card",IDC_STATIC_SOUND_CARD,27,141,102,8
-    COMBOBOX        IDC_COMBO_SOUND_CARD,26,152,180,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-//    CONTROL         "Run SSE2 Executable",IDC_CHECK_RUN_SSE2,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,14,190,184,10
-    DEFPUSHBUTTON   "Save",IDOK,12,205,50,16
-    PUSHBUTTON      "Cancel",IDCANCEL,172,205,50,16
-    LTEXT           "Language",IDC_STATIC_LANGUAGE,18,9,53,8
-    LTEXT           "Connection",IDC_STATIC_NETWORK,93,10,78,8
+    LTEXT           "Language",IDC_STATIC_LANGUAGE,19,10,83,10
+    COMBOBOX        IDC_COMBO_LANGUAGES,19,22,83,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Connection",IDC_STATIC_NETWORK,114,10,150,10
+    COMBOBOX        IDC_COMBO_NETWORK,114,22,150,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Video Card",IDC_STATIC_VIDEO_CARD,19,53,245,10
+    COMBOBOX        IDC_COMBO_VIDEO_CARD,19,65,245,62,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Resolution",IDC_STATIC_RESOLUTION,19,84,245,10
+    COMBOBOX        IDC_COMBO_RESOLUTION,19,96,245,62,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Sound Card",IDC_STATIC_SOUND_CARD,17,137,247,10
+    COMBOBOX        IDC_COMBO_SOUND_CARD,17,149,247,49,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "Save",IDOK,18,180,60,16
+    PUSHBUTTON      "Cancel",IDCANCEL,204,180,62,16
+    GROUPBOX        "Video",IDC_STATIC_VIDEO,12,42,264,79
+    GROUPBOX        "Sound",IDC_STATIC_SOUND,12,126,264,46
 END
 
 
@@ -101,8 +99,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,3
- PRODUCTVERSION 1,0,0,3
+ FILEVERSION 1,1,0,0
+ PRODUCTVERSION 1,1,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -117,14 +115,15 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "Playnet, Inc."
-            VALUE "FileDescription", "WWIIOL Settings Application"
-            VALUE "FileVersion", "1.0.0.3"
-            VALUE "InternalName", "settings.exe"
-            VALUE "LegalCopyright", "Copyright (c) 2008 Playnet, Inc. All rights reserved."
-            VALUE "OriginalFilename", "settings.exe"
-            VALUE "ProductName", "Settings Application"
-            VALUE "ProductVersion", "1.0.0.3"
+            VALUE "Comments", "The Virtual Battlefield Does Exist . . . !"
+            VALUE "CompanyName", "Playnet, Inc. / Cornered Rat Software, LLC."
+            VALUE "FileDescription", "World War II Online - Settings"
+            VALUE "FileVersion", "1.1.0.0"
+            VALUE "InternalName", "Settings"
+            VALUE "LegalCopyright", "Copyright © 1999-2019 Playnet, Inc & CRS LLC. All Rights Reserved."
+            VALUE "OriginalFilename", "Settings.exe"
+            VALUE "ProductName", "Settings: World War II Online - Application"
+            VALUE "ProductVersion", "1.1.0.0"
         END
     END
     BLOCK "VarFileInfo"
@@ -140,19 +139,30 @@ END
 //
 
 #ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+GUIDELINES DESIGNINFO
 BEGIN
     IDD_SETTINGS_DIALOG, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 225
+        RIGHTMARGIN, 278
         TOPMARGIN, 7
-        BOTTOMMARGIN, 224
+        BOTTOMMARGIN, 199
     END
 END
 #endif    // APSTUDIO_INVOKED
 
-#endif    // English (U.S.) resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SETTINGS_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

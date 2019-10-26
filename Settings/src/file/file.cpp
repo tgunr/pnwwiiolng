@@ -1,6 +1,9 @@
 /*--------------------------------------------------------------------------------
 file.cpp
 ---------------------------------------------------------------------------------*/
+
+#include "syscfg.h" // Path is project specific.
+
 #include "file.h"
 #include "registry.h"
 #include "language.h"
@@ -19,8 +22,6 @@ file.cpp
 
 #define WW2OL_APP 1
 #define WW2OL_BETA_APP 12
-
-TCHAR UserDataPath[256];
 
 std::string fileUrlDecode(const char* src)
 {
@@ -62,16 +63,44 @@ void fileInit()
 #if GREEN_INSTALL == 1
 	lstrcat(UserDataPath, _T("."));
 #else
-    SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, UserDataPath);
+	wchar_t wBuffer[MAX_PATH + 1];
 
-	const TCHAR* base = registryInstallValue(_T("Version"));
+	wwiiolpath_string regBasePath = L"";
+	wwiiolpath_string userDocumentsPath = L"";
+
+	LOGICAL retValue = FALSE;
 	
-	if(base) {
-		lstrcat(UserDataPath, _T("\\"));
-		lstrcat(UserDataPath, base);
-	} else {
-		lstrcat(UserDataPath, _T("\\"));
-		lstrcat(UserDataPath, _T("Battleground Europe"));
+	wBuffer[0] = 0;
+	SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, wBuffer);
+	regBasePath = registryInstallValue(_T("Version"));
+
+	if (regBasePath == L"" || regBasePath == L"Battleground Europe")
+		regBasePath = WWIIOnlineDirName;
+
+	//  Registry Path.
+	userDocumentsPath += wBuffer;
+	userDocumentsPath += L"\\" + regBasePath;
+
+	//  Initialise Standard Paths.
+	retValue = fioStructureInit();
+
+	if (userDocumentsPath != L"")
+	{
+		//  Use the Registry Path FIRST.
+		WW2_userDocumentsPath = userDocumentsPath;
+	}
+	else if (WW2_userDocumentsPath != L"")
+	{
+		//  Use the Initialised Path SECOND.  All is Good.
+		//  ST_userDocumentsPath = ST_userDocumentsPath;
+	}
+	else
+	{
+		//  This should not happen - NOT Good.
+		std::wstring tmp = WWIIOnlineDirName + L" - Settings.";
+
+		MessageBox(nullptr, L"Please check your Client Install.\n\nShutting down.", tmp.c_str(), MB_ICONSTOP | MB_OK);
+		exit(0);
 	}
 #endif // GREEN_INSTALL
 }

@@ -462,15 +462,27 @@ void ddpCapture()
 // from any message; therefore checking "screenshotsDir" counts as checking
 // both at once. (Additionally, messages to nil are very very fast, so no speed
 // penalty is taken.)
+
+static NSString* WStringToNSString ( const std::wstring& Str )
+{
+    //  Convert std::wstring (wwiiolpath_string) to NSString.
+    NSString* pString = [ [ NSString alloc ]
+                         initWithBytes : (char*)Str.data()
+                         length : Str.size() * sizeof(wchar_t)
+                         encoding : CFStringConvertEncodingToNSStringEncoding ( kCFStringEncodingUTF32LE ) ];
+    return pString;
+}
+
 static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
 {
     static dispatch_once_t predicate = 0;
+    static NSString * tmpPath = nil;
     static NSURL *screenshotsDirectory = nil;
     static NSDateFormatter *dateFormatter = nil;
 
     // Only need to do all this setup and configuration once.
     dispatch_once(&predicate, ^ {
-        // Find ~/Pictures
+/*        // Find ~/Pictures
         NSURL *picturesDir = [[NSFileManager defaultManager]
             URLForDirectory:NSPicturesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
         // Add our custom subdirectory to the URLs - TODO: Add a setting for users to configure this
@@ -491,7 +503,11 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
             }
         }
         screenshotsDirectory = screenshotsDir;
-
+*/
+        
+        tmpPath = WStringToNSString(WW2_userScreenShotsPath);
+        screenshotsDirectory = [NSURL fileURLWithPath:tmpPath];
+        
         // Create a date formatter that includes full date and time info,
         // doesn't return "today" etc., and uses the user's formatting settings.
         dateFormatter = [[NSDateFormatter alloc] init];
@@ -502,6 +518,7 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
 
     // The filename will be "<providedName> - <datetime>.png" ("WW2OL" is the default if no name is provided)
     NSString *screenshotName = [NSString stringWithFormat:@"%@ - %@", providedName ?: @"WW2OL", [dateFormatter stringFromDate:[NSDate date]]];
+    //  NSString *screenshotName = [NSString stringWithFormat:@"%@ - %@", providedName ?: @"SShot", [dateFormatter stringFromDate:[NSDate date]]];
 
     // Because NSDateFormatter's locale template may generate invalid characters
     // for filenames, we sanitize the string. Unfortunately, Cocoa does not

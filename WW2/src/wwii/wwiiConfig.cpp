@@ -77,6 +77,7 @@ WWII_CONFIG host_config;
 
 WWII_CONFIG_MAP configMap[] =
 {
+	// name,						type,		data,									max,	defaultValue,	description
 	{ nullptr,	TYPE_UNUSED, nullptr, 0, nullptr, nullptr }
 ,	{ "arena.banCheats",			TYPE_BOOL,	&host_config.arena.banCheats,			0,		"n",	"Ban DamnCheaters detects" }
 ,	{ "arena.checksums",			TYPE_BOOL,	&host_config.arena.checksums,			0,		"n",	"Detect and eject players with modified clients" }
@@ -234,6 +235,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "supply.nomanDepots",			TYPE_BOOL,	&host_config.supply.nomanDepots,		0,		"y",	"Enable spawning at brigade-linked depots in DO towns" }
 ,	{ "supply.populationAdjust",		TYPE_SINT,	&host_config.supply.populationAdjust,100,	"60",	"Divisor in population-based rate adjustment" }
 ,	{ "supply.reserveTimeoutM",		TYPE_SINT,	&host_config.supply.reserveTimeout_m,	0,		"10",	"Time vehicle reservations last (minutes)" }
+,	{ "supply.rescueTomThresoldM",	TYPE_INT,	&host_config.supply.rescueTomThresold_m, 0,	"3",	"Time on mission that ends KIA without enemy inflicted damage and can still be rescued (minutes)" }
 ,	{ "supply.rescueTimeM",			TYPE_SINT,	&host_config.supply.rescueTime_m,		0,		"15",	"Time 'rescue'd vehicles take to to return to supply (minutes)" }
 ,	{ "supply.resupplyTimeM",		TYPE_INT,	&host_config.supply.resupplyTime_m,		0,		"270",	"Baseline time for resupply of spawned vehicles (minutes)" }
 ,	{ "supply.surrenderInf",		TYPE_BYTE,	&host_config.supply.surrenderInf,		100,	"10",	"Percentage infantry must pass below before allowing 'offmap' surrender from a pocket" }
@@ -271,6 +273,8 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "update.visLimitThrottling",		TYPE_BYTE,	&host_config.update.visLimitThrottling,	255,"0",	"Number of missed updates before limiting player's vis limit" }
 ,	{ "update.awsGracePeriodS",		TYPE_SINT,	&host_config.update.awsGracePeriod_s,	60000,	"90",	"Number of seconds from triggering AWS to appearing on it" }
 ,	{ "update.awsHighThreshold",	TYPE_BYTE,	&host_config.update.awsHighThreshold,	255,	"8",	"Number of planes to trip a 'high' EWS presence" }
+,	{ "update.awsEnemyDistance_km",	TYPE_SINT,	&host_config.update.awsEnemyDistance_km,		500,	"10",	"How many km from the front lines to trip AWS" }
+,	{ "update.awsFriendlyDistance_km",	TYPE_SINT,	&host_config.update.awsFriendlyDistance_km,	500,	"10",	"How many km off map to trip AWS" }
 
 ,	{ "weather.lockToFog",			TYPE_SINT,	&host_config.weather.lockToFog,			99,	"0",	"Lock to a particular fog pattern number (0=unlocked)" }
 ,	{ "weather.lockToPattern",		TYPE_SINT,	&host_config.weather.lockToPattern,		99,	"0",	"Lock to a particular weather pattern number (0=unlocked)" }

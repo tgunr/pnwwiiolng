@@ -21,6 +21,7 @@
 #include "uimap/uiMap.h"
 #include "fp/fpFPS.h"
 #include "ui/uiChat.h"
+#include "ui/uiKeymap.h"
 #include "tut/TutorialManager.h"
 #include "ui/uiDotCommands.h"
 #include "scen/ScenarioManager.h"
@@ -233,6 +234,7 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"guichatwindow",					IMAP_MOM_SHOW_GUI_CHAT_WINDOW,				nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"showradiobuffer",					IMAP_MOM_SHOW_RADIO_BUFFER,					nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"showingamemap",					IMAP_MOM_SHOW_IN_GAME_MAP,					nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
+	{"showingamekeymapper",				IMAP_MOM_SHOW_IN_GAME_KEYMAPPER,			nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"changehudmode",					IMAP_MOM_TOGGLE_HUD,						nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"resethud",						IMAP_MOM_RESET_HUD,							nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
 	{"changechatheight",				IMAP_MOM_TOGGLE_CHATHEIGHT,					nullptr,						VEH_CNTRL_IS_SPECIAL,	VEH_CONTROL_UNAFFECTED, VCEID},
@@ -368,6 +370,7 @@ UINT32 vehCntrlInstallControlCallbacks()
 	imapInstallControlCallback(IMAP_MOM_RESET_HUD,			persHUDResetHUD);
 	imapInstallControlCallback(IMAP_MOM_TOGGLE_CHATHEIGHT,	uiChatToggleHeight);
 	imapInstallControlCallback(IMAP_MOM_SHOW_IN_GAME_MAP, 	uiMapToggleIngameMap);
+	imapInstallControlCallback(IMAP_MOM_SHOW_IN_GAME_KEYMAPPER, 	uiMapToggleIngameKeymapper);
 	imapInstallControlCallback(IMAP_SHOW_STATS, 			persHUDToggleReadout);
 
 	if(TUT_ACTIVE && !SCEN_MGR->IsActive())

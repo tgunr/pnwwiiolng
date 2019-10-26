@@ -1,0 +1,22 @@
+<!ENTITY settings.button.cancel "Отменить">
+<!ENTITY settings.button.save "Спасти">
+<!ENTITY settings.language.chinese "китайский язык">
+<!ENTITY settings.language.english "английский">
+<!ENTITY settings.language.french "Французский">
+<!ENTITY settings.language.german "Немецкий">
+<!ENTITY settings.language.italian "итальянский">
+<!ENTITY settings.language.russian "Русский язык">
+<!ENTITY settings.language.spanish "испанский">
+<!ENTITY settings.net.usebest "Используйте лучшее (рекомендуется)">
+<!ENTITY settings.net.useprimary "Первичное Использование">
+<!ENTITY settings.net.usesecondary "Использовать вторичный">
+<!ENTITY settings.sound.primary "Основной звуковой драйвер">
+<!ENTITY settings.text.connection "соединение">
+<!ENTITY settings.text.language "язык">
+<!ENTITY settings.text.resolution "разрешение">
+<!ENTITY settings.text.sound "звук">
+<!ENTITY settings.text.soundcard "Звуковая плата">
+<!ENTITY settings.text.title "WWII Параметры настройки Онлайн">
+<!ENTITY settings.text.video "видео">
+<!ENTITY settings.text.videocard "Видеокарта">
+<!ENTITY settings.video.primary "Основной драйвер дисплея">

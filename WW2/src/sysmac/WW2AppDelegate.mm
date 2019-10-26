@@ -182,8 +182,11 @@ static void saveJoystickCalibration()
 @end
 
 // Per Apple's recommendedations for error domains
-NSString * const PGErrorDomain = @"com.playnet.wwiiol.PGErrorDomain";
-NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
+//  NSString * const PGErrorDomain = @"com.playnet.wwiiol.PGErrorDomain";
+//  NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
+
+NSString * const PGErrorDomain = @"com.corneredrats.wwiionline.PGErrorDomain";
+NSString * const PGteulErrorDomain = @"com.corneredrats.wwiionline.PGteulErrorDomain";
 
 @interface NSError (WW2Additions)
 + (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError;
@@ -338,7 +341,7 @@ static NSString *placeholderHTML = @""
 @"<body>"
 @"<div class=\"hi\">"
 @"<a href=\"https://www.wwiionline.com/\">"
-@"<img style=\"height: 90px;\" src=\"placeholder-title.png\"/>"
+@"<img style=\"height: 140px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
 @"</body>"
@@ -515,7 +518,12 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-    g_logDebug = true;
+    //  /Applications -> World War II Online.app -> Contents -> Resources
+    chAppDir();
+
+    //  Setup the data paths
+    fioInit();
+
     if (!mngoptParse()) {
         [NSApp terminate:self];
         return;
@@ -529,13 +537,9 @@ extern NSString *WebActionOriginalURLKey;
     xmlSetGenericErrorFunc(0,xmlerrorstub);
     xmlSetStructuredErrorFunc(0,xmlstructurederrorstub);
     
-    chAppDir();
-    
     // Set up anti-hack stuff - not needed on macOS but do it for good measure anyway
     NetFrameSync::InitializeHashes();
-    
-    // Setup the user data path
-    fioInit();
+
     Fio::DeleteLogFile();
 
 #ifdef DEBUG_WW2
@@ -553,15 +557,32 @@ extern NSString *WebActionOriginalURLKey;
     LogEnabled = FALSE;
     UserLogEnabled = FALSE;
 #endif
-
+    
+    //  ISDIRECTORY
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
     
     if(!WantDataDir) {
         extern void sysmainAddArchives();
         sysmainAddArchives();
     }
-    
+
+    //  Copy (If Found) the BGE setup files to the New WWIIOnline folder.
+    //  This may interrupt the Client Build process.
+    if (WantedCopyOldSetup == TRUE)
+    {
+#ifdef DEBUG_WW2
+        if (DebugBuildingMDLFilesOnly == false)
+        {
+            CopyOldSetupFiles_MAC();
+        }
+#else
+        CopyOldSetupFiles_MAC();
+#endif
+    }
+
     cfgPrefsLoad();
+    
+    Write_Debug("Command Line:\n'%s'\n", GetCommandLineA());
     
     // For complex reasons, we need to call mngoptParse() again here. See the
     // Windows sysmain.cpp file for details.
@@ -616,6 +637,10 @@ extern NSString *WebActionOriginalURLKey;
     authPort = std::stoul(gAuthServerPort);
     
     if (UseSteamLogin) {
+		
+		//  Add Steam: ProgramData / Application Support Path Checking/Setup.
+		//  Steam_exeWorkingPath();
+	
         state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
@@ -624,7 +649,7 @@ extern NSString *WebActionOriginalURLKey;
     
     [launcherWindow setIsVisible:true];
     
-#ifdef DEBUG_WW2e
+#ifdef DEBUG_WW2
     dbugInit(LogMode::TO_FILE, nullptr);
 #else
     dbugInit(LogMode::OFF, nullptr);
@@ -867,10 +892,10 @@ extern NSString *WebActionOriginalURLKey;
 {
     @autoreleasepool {
         
-        [self setUserName:@"pgunr"];
-        [userNameField setStringValue:@"pgunr"];
-        [self setUserPassword:@"bat1d93k"];
-        [passwordField setStringValue:@"bat1d93k"];
+        [self setUserName:@""];
+        [userNameField setStringValue:@""];
+        [self setUserPassword:@""];
+        [passwordField setStringValue:@""];
         rememberUserPassword = NO;
         [rememberPasswordCheckbox setState:NSOffState];
         
@@ -1273,7 +1298,7 @@ static const char patchHandleKey = 0, patchSizeKey = 0, patchWrittenKey = 0;
     NSURL *patchURL = [NSURL URLWithString:rawPatchURL];
     NSURLRequest *request = [NSURLRequest requestWithURL:patchURL cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:60.0];
     NSURLConnection *uconnection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    NSURL *patchDir = [NSURL fileURLWithPath:@(macDocumentsPath())];
+    NSURL *patchDir = [NSURL fileURLWithPath:@(macWorkingPathAPP())];
     NSURL *patchFileURL = [patchDir URLByAppendingPathComponent:patchURL.lastPathComponent];
     NSError *error = nil;
     NSFileHandle *patchFile = nil;
