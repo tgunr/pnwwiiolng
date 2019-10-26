@@ -67,12 +67,16 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "-authserver auth.playnet.com"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "-log 1"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-data 1 -datadir $(SRCROOT)/../opt/ww2mods/data/"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-data 1 -datadir /Volumes/Disk1/DataMac/Gitrepos/ww2mods/data/"
@@ -80,6 +84,18 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-data 1 -datadir $(SRCROOT)/../../ww2mods/data/"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-window 1"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-height 1200"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-width 1600"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
