@@ -3279,7 +3279,7 @@ void sptDrawOn(int type, bool draw)
     switch(type)
     {
     case 0:
-        uiChatPrintLine("TREE drawing %s", draw ? "ON" : "OFF");
+//        uiChatPrintLine("TREE drawing %s", draw ? "ON" : "OFF");
         drawtrees = draw;
         break;
     case 1:

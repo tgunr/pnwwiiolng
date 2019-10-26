@@ -3447,7 +3447,7 @@ UINT32 gValueInc(SINT32 Param,UINT32 Id,UINT32 Detach)
         return 0;
     
     gValue = gValue + gRate;
-    uiChatPrintLine("gValue= %.3f", gValue);
+//    uiChatPrintLine("gValue= %.3f", gValue);
     
     return 0;
 }
@@ -3461,7 +3461,7 @@ UINT32 gValueDec(SINT32 Param,UINT32 Id,UINT32 Detach)
     gValue = gValue - gRate;
     if (gValue <= 1)
         gValue = 1;
-    uiChatPrintLine("gValue= %.3f", gValue);
+//    uiChatPrintLine("gValue= %.3f", gValue);
     
     return 0;
 }
