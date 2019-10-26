@@ -5791,6 +5791,10 @@ static SINT32 dot_speed(const char*)
 	return DC_HANDLED;
 }
 
+#endif // BETA_RELEASE
+
+
+
 #ifdef GM_RELEASE
 
 /************************************************************************************************

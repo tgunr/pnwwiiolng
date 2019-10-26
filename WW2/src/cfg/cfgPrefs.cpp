@@ -158,14 +158,11 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.pponok",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.macsound",			nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.inflodmod",			&gTrooperMOD,				    cfgPARAM_FLOAT,		1,		0,	4, true	},
-	{"app.conv",				&Convergence,				    cfgPARAM_UINT,		1,		0,  800,    true },
-	{"app.aimScalar",			&aimMouse,					    cfgPARAM_FLOAT,		1,		0,  8,      true },
-    {"app.gVaue",               &gValue,                        cfgPARAM_FLOAT,     1,      1,  100,    true },
-    {"app.gRate",               &gRate,                         cfgPARAM_FLOAT,     1,      1,  20,     true }
-	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
-	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
-	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true },
-	{"app.noobcolor",			&gIconNoobColor,			cfgPARAM_UINT,		1,		0,	0, true	}
+	{"app.conv",				&Convergence,				    cfgPARAM_UINT,		1,		0,  800, true },
+	{"app.aimScalar",			&aimMouse,					    cfgPARAM_FLOAT,		1,		0,  8,   true },
+    {"app.gVaue",               &gValue,                        cfgPARAM_FLOAT,     1,      1,  100, true },
+    {"app.gRate",               &gRate,                         cfgPARAM_FLOAT,     1,      1,  20,  true },
+	{"app.noobcolor",			&gIconNoobColor,			    cfgPARAM_UINT,		1,		0,	0,   true }
 	// add more vars here
 };
 

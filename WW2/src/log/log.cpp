@@ -1,5 +1,6 @@
 #include "syscfg.h" // Path is project specific.
 #include "log/log.h"
+#include "include/vars.h"
 
 #include <string.h>
 
@@ -14,6 +15,10 @@
 #ifdef EVENT_LOG
 
 static std::mutex logLock;
+static SINT32 gLogLevelOnly = LOG_NONE;
+static UINT32 glogMaskOnly = LOG_NONE;
+LOGICAL gLogDuplicates = FALSE;
+
 #ifdef DEBUG_WW2
 static UINT32 logMask = LOG_ALL;
 static SINT32 logLevel = LOG_INFO;
@@ -23,30 +28,49 @@ static SINT32 logLevel = LOG_FATAL;
 #endif
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker);
-
-static const char* LOG_SYSTEM_NAMES[32] =
-{
-	"old",
-	"terrain",
-	"weap",
-	"fps",
-	"render",
-	"sound",
-	"ui",
-	"vehicle",
-	"physics",
-	"comm",
-	"fx",
-	"timer",
-    "texture",
-	"console",
-    "ERROR",
-	// NULLS the rest out
-};
+static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker);
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr);
 
 /************************************************************************************************
 	Write_Log
 *************************************************************************************************/
+struct {
+    const char* prevFile = "";
+    int prevLine = 0;
+    uint count = 0;
+} prevLog ;
+
+void Write_Where(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, ...) {
+    const char* pstr;
+    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
+        switch (prevLog.count) {
+            case 0:
+                pstr = str;
+                prevLog.count += 1;
+                va_list marker;
+                va_start(marker, str);
+                logw(file, line, function, system, level, str, marker);
+                va_end(marker);
+                break;
+            case 1:
+                pstr = "REPEATED";
+                prevLog.count += 1;
+                logwstr(file, line, function, system, level, pstr);
+                break;
+            default:
+                prevLog.count += 1;
+                return;
+        }
+    } else {
+        prevLog.count = 1;
+        va_list marker;
+        va_start(marker, str);
+        logw(file, line, function, system, level, str, marker);
+        va_end(marker);
+    }
+    prevLog.prevFile = file;
+    prevLog.prevLine = line;
+}
 
 void Write_Log(UINT32 system, SINT32 level, const char* str, ...)
 {
@@ -150,7 +174,63 @@ UINT32 Get_Log_Mask()
 	return logMask;
 }
 
-#include "include/vars.h"
+static void logdup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
+    char buf[sizeof(wheresize) + 1]; // note +1 for terminating null byte
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
+    vprintf(buf, marker);
+    printf("\n");
+}
+
+// Do not log if the message is same as previous message as defined by file and line number
+static void lognodup(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, str);
+    char buf[sizeof(wheresize) + 5]; // + 4 just in case str is empty and we hit case 1, + 1 for terminating null byte
+    if ( (prevLog.prevFile == file) && (prevLog.prevLine == line) ) {
+        switch (prevLog.count) {
+            case 0: // first time for this log message file and line number
+                snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
+                prevLog.count += 1;
+                goto printLog;
+            case 1: // second time for this log message, truncate to indicate repeated log
+                snprintf(buf, sizeof buf, "%s:%d: %s: ...", file, line, function);
+                prevLog.count += 1;
+                goto printLog;
+            default: // third and subsequent times, just return, no log message printed
+                prevLog.count += 1;
+                return;
+        }
+    } else { // log message has changed, reset count for next message test
+        snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, str);
+        prevLog.count = 0;
+    }
+printLog:
+    vprintf(buf, marker);
+    printf("\n");
+    prevLog.prevFile = file;
+    prevLog.prevLine = line;
+}
+
+static void logwstr(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* pstr)
+{
+    if(gLogLevelOnly && glogMaskOnly) {
+        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+            goto logwhere;
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            goto logwhere;
+    }
+    
+logwhere:
+    int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
+    char buf[wheresize + 1]; // note +1 for terminating null byte
+    snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
+    printf("%s\n", buf);
+}
 
 static FILE *ofp = nullptr;
 
@@ -248,7 +328,7 @@ static void _getCurrentTime(struct tm &tm, uint32_t &millis)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-    if (system != LOG_ERROR) { // "error" system is never ignored
+    if (system != LOG_WARN) { // "error" system is never ignored
         std::lock_guard<std::mutex> guard(logLock);
 
         if (logLevel < level || (system & logMask) == 0 || str == nullptr) {
@@ -274,11 +354,30 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 
         // For errors, we don't care whether it's a debug/beta/alpha client or
         // whether logs weren't requested; we need to log these always.
-        if (system == LOG_ERROR && ofp == nullptr) {
+        if (system == LOG_WARN && ofp == nullptr) {
             Open_Debug_Unlocked(SYS_TITLE); // TODO: The name should not be hardcoded in this specific location
         }
         _log_outf("[%s.%03u %s] %s\n", myTime, milis, myYear, buf.get());
     }
+}
+
+// Log where the log message originated
+static void logw(const char *file, int line, const char *function, UINT32 system, SINT32 level, const char* str, va_list marker)
+{
+    if(gLogLevelOnly && glogMaskOnly) { // are we logging only a certain level and mask?
+        if ((gLogLevelOnly == level) && (system & glogMaskOnly))
+            goto logwhere;
+    } else {
+        if (logLevel < level || !(system & logMask))
+            return;
+        else
+            goto logwhere;
+    }
+logwhere:
+    if(gLogDuplicates)
+        logdup(file, line, function, system, level, str, marker);
+    else
+        lognodup(file, line, function, system, level, str, marker);
 }
 
 #ifdef USE_LOG_TIMER
