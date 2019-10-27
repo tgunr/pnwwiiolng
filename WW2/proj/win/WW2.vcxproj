@@ -243,7 +243,7 @@
       <AdditionalDependencies>crypt32.lib;wininet.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;x3daudio.lib;steam_api.lib;libiconv.lib;granny2_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\davec\wwiiolng\build\libevent\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
