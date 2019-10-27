@@ -521,7 +521,7 @@ int			numcomps, *comps;
 					break;
 				}
 
-				Write_Debug(" Format %d: %s (0x%08x)", i, ptr, comps[i]);
+				//Write_Debug(" Format %d: %s (0x%08x)", i, ptr, comps[i]);
 			}
 			
 			if (i<MAX_COMPRESSED_TEXTURE)
@@ -532,13 +532,13 @@ int			numcomps, *comps;
 			{
 				info->compTextures.num = MAX_COMPRESSED_TEXTURE;
 			}
-			Write_Debug("Compressed Textures: %d", info->compTextures.num);
+			//Write_Debug("Compressed Textures: %d", info->compTextures.num);
 
 			free(comps);
 		}
 	}
-	else
-		Write_Debug("Compressed textures not supported");
+	//else
+	//	Write_Debug("Compressed textures not supported");
 
 #ifdef NOT_USED
 
@@ -580,7 +580,7 @@ PIXELFORMATDESCRIPTOR	pfd;
 		myhdc = GetDC(hwnd);
 		if (myhdc == nullptr)
 		{
-			Write_Debug("Failed to GetDC");
+			//Write_Debug("Failed to GetDC");
 			return(FALSE);
 		}
 	}
@@ -598,7 +598,7 @@ PIXELFORMATDESCRIPTOR	pfd;
 	if (myhrc == nullptr)
 	{
 		DisplayLastError();
-		Write_Debug("Could not create the rendering context");
+		//Write_Debug("Could not create the rendering context");
 		ReleaseDC(hwnd, myhdc);
 		myhdc = nullptr;
 		return(FALSE);
@@ -607,7 +607,7 @@ PIXELFORMATDESCRIPTOR	pfd;
 	// Make the rendering context current
 	if (!wglMakeCurrent(myhdc, myhrc))
 	{
-		Write_Debug("Could not make the rendering context current");
+		//Write_Debug("Could not make the rendering context current");
 		ReleaseDC(hwnd, myhdc);
 		myhdc = nullptr;
 		return(FALSE);
@@ -633,19 +633,19 @@ void oglEnd(void)
 }
 
 //#pragma managed(push, off)
-void	Write_Debug(char *str, ...)
-{
-char		buf[2048];
-va_list		marker;
-
-	if (str == nullptr)
-		return;
-
-	va_start(marker, str);
-	vsprintf_s(buf, str, marker);
-	va_end(marker);
-
-	dbugLog(_FLI,"%s",buf);
-
-}
+//void	Write_Debug(char *str, ...)
+//{
+//char		buf[2048];
+//va_list		marker;
+//
+//	if (str == nullptr)
+//		return;
+//
+//	va_start(marker, str);
+//	vsprintf_s(buf, str, marker);
+//	va_end(marker);
+//
+//	dbugLog(_FLI,"%s",buf);
+//
+//}
 //#pragma managed(pop)
