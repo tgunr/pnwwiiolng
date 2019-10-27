@@ -113,8 +113,9 @@ extern UINT32 Get_Log_Mask();
 #define Set_Log_Mask
 
 #define Open_Debug(...)
-#define	Write_Debug(...)
-#define	Close_Debug()
+#define Write_Debug(...)
+#define WriteDebug(...)
+#define Close_Debug()
 
 #define Log_System_Mask(x) 0
 #define Log_System_Name(x) nullptr
