@@ -16,4 +16,5 @@
 	#define     Open_Debug
 	#define     Close_Debug()
 	#define     Write_Debug
+	#define		WriteLog
 #endif
