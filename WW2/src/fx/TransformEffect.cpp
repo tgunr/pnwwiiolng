@@ -1848,6 +1848,11 @@ void TransformEffect::update()
 
         updatetransform();
 
+        if (_effectname.find("smoke") != std::string::npos) {
+            if (!gToggle)
+                _dead = true;
+        }
+        
         if(!_emitters.empty())
         {
             std::vector<Emitter*>::iterator itr = _emitters.begin();
