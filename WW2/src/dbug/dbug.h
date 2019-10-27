@@ -112,7 +112,7 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, UINT32 err
 #else
     #define DEBUG_ERR(fmt, ...) WriteLog(LOG_ALL, LOG_WARN, fmt, ## __VA_ARGS__)
     #define DEBUG_FATAL(fmt, ...) WriteLog(LOG_ALL, LOG_FATAL, fmt, ## __VA_ARGS__)
-    #define DEBUG_HERE Write_Where(__FILE__, __LINE__, __FUNCTION__, LOG_ALL, LOG_DEBUG, "Entered", ## __VA_ARGS__)
+    //#define DEBUG_HERE Write_Where(__FILE__, __LINE__, __FUNCTION__, LOG_ALL, LOG_DEBUG, "Entered", ## __VA_ARGS__)
 #endif
 
 extern const char* sane_basename(const char* const filepath) noexcept;

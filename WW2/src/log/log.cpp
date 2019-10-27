@@ -227,9 +227,10 @@ static void logwstr(const char *file, int line, const char *function, UINT32 sys
     
 logwhere:
     int wheresize = snprintf(NULL, 0, "%s:%d: %s: %s", file, line, function, pstr);
-    char buf[wheresize + 1]; // note +1 for terminating null byte
+	char *buf = (char *)malloc(wheresize + 1); // note +1 for terminating null byte
     snprintf(buf, sizeof buf, "%s:%d: %s: %s", file, line, function, pstr);
     printf("%s\n", buf);
+	free(buf);
 }
 
 static FILE *ofp = nullptr;

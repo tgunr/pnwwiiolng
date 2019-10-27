@@ -6968,7 +6968,7 @@ static SINT32 dot_view(const char* line)
 {
     phui::View* canvas = 0;
     const char *command = "view ";
-    char *view;
+	char *view = 0;
     size_t commandLen = sizeof(command);
     int rc = strncmp(command, line, commandLen);
     if (rc == 0) {
